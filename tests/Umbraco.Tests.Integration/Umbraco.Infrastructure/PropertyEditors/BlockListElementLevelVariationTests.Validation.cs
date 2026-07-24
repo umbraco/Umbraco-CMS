@@ -43,8 +43,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -143,8 +143,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -212,8 +212,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -267,8 +267,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -327,8 +327,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -455,8 +455,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -538,8 +538,8 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null },
-                    new VariantModel { Name = "Name da-DK", Culture = "da-DK", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" },
+                    new VariantModel { Name = "Name da-DK", Culture = "da-DK" }
                 ],
                 Properties =
                 [
@@ -590,7 +590,7 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" }
                 ],
                 Properties =
                 [
@@ -645,7 +645,7 @@ internal partial class BlockListElementLevelVariationTests
                 ContentTypeKey = contentType.Key,
                 Variants =
                 [
-                    new VariantModel { Name = "Name en-US", Culture = "en-US", Segment = null }
+                    new VariantModel { Name = "Name en-US", Culture = "en-US" }
                 ],
                 Properties =
                 [

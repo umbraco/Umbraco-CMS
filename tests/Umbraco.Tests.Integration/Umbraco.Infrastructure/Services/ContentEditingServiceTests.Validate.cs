@@ -132,11 +132,8 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Culture = "en-US", Segment = "seg-1", Name = "Updated English segment 1 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-1", Name = "Updated Danish segment 1 Name" },
-                new VariantModel { Culture = "en-US", Segment = "seg-2", Name = "Updated English segment 2 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-2", Name = "Updated Danish segment 2 Name" }
-
+                new VariantModel { Culture = "en-US", Name = "Updated English segment 1 Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish segment 1 Name" }
             ],
         };
 
@@ -164,10 +161,8 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Culture = "en-US", Segment = "seg-1", Name = "Updated English segment 1 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-1", Name = "Updated Danish segment 1 Name" },
-                new VariantModel { Culture = "en-US", Segment = "seg-2", Name = "Updated English segment 2 Name" },
-                new VariantModel { Culture = "da-DK", Segment = "seg-2", Name = "Updated Danish segment 2 Name" }
+                new VariantModel { Culture = "en-US", Name = "Updated English segment 1 Name" },
+                new VariantModel { Culture = "da-DK", Name = "Updated Danish segment 1 Name" }
             ],
         };
 

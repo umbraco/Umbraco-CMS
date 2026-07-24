@@ -91,8 +91,7 @@ internal static class BlockExposeFallbackHelper
         string? segment)
         => expose.Any(v =>
             v.ContentKey == elementKey &&
-            v.Culture.InvariantEquals(culture) &&
-            v.Segment == segment);
+            v.Culture.InvariantEquals(culture));
 
     /// <summary>
     /// Walks the language fallback chain and returns the culture that the block is exposed for,

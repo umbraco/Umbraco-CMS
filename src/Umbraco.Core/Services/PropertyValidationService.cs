@@ -193,8 +193,7 @@ public class PropertyValidationService : IPropertyValidationService
                 {
                     Culture = null,
                     Segment = null,
-                    CulturesBeingValidated = [impact.Culture!],
-                    SegmentsBeingValidated = []
+                    CulturesBeingValidated = [impact.Culture!]
                 });
             }
 
@@ -218,8 +217,7 @@ public class PropertyValidationService : IPropertyValidationService
         {
             Culture = validationContext.Culture?.NullOrWhiteSpaceAsNull(),
             Segment = validationContext.Segment?.NullOrWhiteSpaceAsNull(),
-            CulturesBeingValidated = validationContext.CulturesBeingValidated,
-            SegmentsBeingValidated = validationContext.SegmentsBeingValidated
+            CulturesBeingValidated = validationContext.CulturesBeingValidated
         };
 
         var culture = validationContext.Culture;
