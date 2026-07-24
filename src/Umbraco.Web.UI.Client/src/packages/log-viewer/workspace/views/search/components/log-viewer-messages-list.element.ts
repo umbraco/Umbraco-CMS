@@ -6,6 +6,7 @@ import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/b
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 import { skip } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 
 @customElement('umb-log-viewer-messages-list')
 export class UmbLogViewerMessagesListElement extends UmbLitElement {
@@ -203,6 +204,12 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 			#pagination {
 				display: block;
 				margin: var(--uui-size-space-5) 0;
+			}
+
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
+				#header {
+					display: none;
+				}
 			}
 		`,
 	];
