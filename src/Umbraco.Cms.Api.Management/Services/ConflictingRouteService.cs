@@ -4,6 +4,7 @@ using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services;
 
@@ -32,7 +33,7 @@ public class ConflictingRouteService : IConflictingRouteService
                 var conflicting = potentialConflicting
                     .Select(x => x.GetCustomAttribute<PluginControllerAttribute>())
                     .GroupBy(x => x?.AreaName)
-                    .Any(x => x?.Count() > 1);
+                    .Any(x => x?.HasAtLeastTwo() is true);
 
                 if (conflicting)
                 {

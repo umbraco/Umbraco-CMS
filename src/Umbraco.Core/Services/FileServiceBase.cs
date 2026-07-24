@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -63,7 +64,7 @@ public abstract class FileServiceBase<TRepository, TEntity> : RepositoryService,
     /// <returns><c>true</c> if the file name is valid; otherwise, <c>false</c>.</returns>
     protected virtual bool HasValidFileName(string fileName)
     {
-        if (fileName.ContainsAny(Path.GetInvalidFileNameChars()))
+        if (fileName.ContainsAny(CharArrays.InvalidFileNameChars))
         {
             return false;
         }

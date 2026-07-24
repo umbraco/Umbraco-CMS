@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
@@ -140,7 +141,7 @@ public abstract class Builder
         // for the last one, don't throw in InMemory mode, see comment
 
         // ensure we have no duplicates type names
-        foreach (IGrouping<string, TypeModel> xx in TypeModels.GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
+        foreach (IGrouping<string, TypeModel> xx in TypeModels.GroupBy(x => x.ClrName).Where(x => x.HasAtLeastTwo()))
         {
             throw new InvalidOperationException($"Type name \"{xx.Key}\" is used"
                                                 + $" for types with alias {string.Join(", ", xx.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Names have to be unique."
@@ -151,7 +152,7 @@ public abstract class Builder
         foreach (TypeModel typeModel in TypeModels)
         {
             foreach (IGrouping<string, PropertyModel> xx in typeModel.Properties.GroupBy(x => x.ClrName)
-                         .Where(x => x.Count() > 1))
+                         .Where(x => x.HasAtLeastTwo()))
             {
                 throw new InvalidOperationException(
                     $"Property name \"{xx.Key}\" in type {typeModel.ItemType}:\"{typeModel.Alias}\""

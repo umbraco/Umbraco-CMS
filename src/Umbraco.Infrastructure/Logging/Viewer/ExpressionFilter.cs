@@ -31,7 +31,7 @@ internal sealed class ExpressionFilter : ILogFilter
         }
 
         // If the expression is one word and doesn't contain a serilog operator then we can perform a like search
-        if (!filterExpression.Contains(" ") && !filterExpression.ContainsAny(ExpressionOperators.Select(c => c)))
+        if (!filterExpression.Contains(' ') && !filterExpression.ContainsAny(ExpressionOperators.Select(c => c)))
         {
             filter = PerformMessageLikeFilter(filterExpression, customSerilogFunctions);
         }
