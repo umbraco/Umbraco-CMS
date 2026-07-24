@@ -88,7 +88,6 @@ test('can see validation error clear when minimum number of links is met', async
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.needMoreItems);
   // Add second link
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
   await umbracoUi.content.enterLink(secondLink);

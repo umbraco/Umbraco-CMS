@@ -36,7 +36,7 @@ export class MediaUiHelper extends UiBaseLocators {
     this.mediaListView = this.page.locator('umb-media-table-collection-view');
     this.mediaGridView = this.page.locator('umb-media-grid-collection-view');
     this.mediaListHeader = this.mediaListView.locator('uui-table-head-cell span');
-    this.mediaCardItemsValues = this.mediaCardItems.locator('span');
+    this.mediaCardItemsValues = this.mediaCardItems.locator('#name');
     this.mediaListNameValues = this.mediaListView.locator('umb-media-table-column-name span');
     this.bulkTrashBtn = page.locator('umb-entity-bulk-action uui-button').filter({hasText: 'Trash'});
     this.bulkMoveToBtn = page.locator('umb-entity-bulk-action uui-button').filter({hasText: 'Move to'});
@@ -105,12 +105,12 @@ export class MediaUiHelper extends UiBaseLocators {
   }
 
   async clickEmptyRecycleBinButton() {
-    // Force click is needed
     await this.hoverAndClick(this.recycleBinMenuItem, this.emptyRecycleBinBtn, {force: true});
+    await expect(this.confirmEmptyRecycleBinBtn).toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   async clickConfirmEmptyRecycleBinButton() {
-    await this.click(this.confirmEmptyRecycleBinBtn);
+    await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.long});
   }
 
   async clickCreateModalButton() {
@@ -131,21 +131,21 @@ export class MediaUiHelper extends UiBaseLocators {
   }
 
   async doesMediaGridValuesMatch(expectedValues: string[]) {
-    return expectedValues.forEach((text, index) => {
-      expect(this.mediaCardItemsValues.nth(index)).toHaveText(text);
-    });
+    for (const [index, text] of expectedValues.entries()) {
+      await expect(this.mediaCardItemsValues.nth(index)).toHaveText(text);
+    }
   }
 
   async doesMediaListHeaderValuesMatch(expectedValues: string[]) {
-    return expectedValues.forEach((text, index) => {
-      expect(this.mediaListHeader.nth(index)).toHaveText(text);
-    });
+    for (const [index, text] of expectedValues.entries()) {
+      await expect(this.mediaListHeader.nth(index)).toHaveText(text);
+    }
   }
 
   async doesMediaListNameValuesMatch(expectedValues: string[]) {
-    return expectedValues.forEach((text, index) => {
-      expect(this.mediaListNameValues.nth(index)).toHaveText(text);
-    });
+    for (const [index, text] of expectedValues.entries()) {
+      await expect(this.mediaListNameValues.nth(index)).toHaveText(text);
+    }
   }
 
   async isMediaGridViewVisible(isVisible: boolean = true) {
