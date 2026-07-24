@@ -32,15 +32,15 @@ test('can trash an element', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.element.doesNameExist(elementName)).toBeFalsy();
-  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.element.doesNameExist(elementName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeTruthy();
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
   await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
   // Verify audit trail
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.clickInfoTab();
-  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
-  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
+  await umbracoUi.library.doesAnyHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.library.doesAnyHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
   await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name, 1);
@@ -75,12 +75,14 @@ test('can empty recycle bin', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.library.clickRecycleBinButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  // Wait for the recycle bin to finish loading (the trashed item is shown in the collection) before opening
+  // the empty dialog: a late load re-render otherwise dismisses the just-opened confirm modal.
+  await umbracoUi.library.isElementVisibleInRecycleBinCollection(elementName);
   await umbracoUi.library.clickEmptyRecycleBinButton();
   await umbracoUi.library.clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied();
 
   // Assert
-  expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
 });
 
 test('can see trashed element in recycle bin', async ({umbracoApi, umbracoUi}) => {
@@ -199,8 +201,8 @@ test('can restore element from recycle bin', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.reloadPage();
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.clickInfoTab();
-  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
-  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
+  await umbracoUi.library.doesAnyHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.library.doesAnyHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });

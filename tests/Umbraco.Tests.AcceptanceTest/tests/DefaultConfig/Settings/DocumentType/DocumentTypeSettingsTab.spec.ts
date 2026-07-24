@@ -86,11 +86,11 @@ test('cannot see History Cleanup section in Settings tab for an Element Type wit
   // Act
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
   await umbracoUi.documentType.clickDocumentTypeSettingsTab();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the UI to update after toggling Element Type
 
   // Assert
-  await umbracoUi.documentType.isPreventCleanupButtonVisible(false);
+  // Anchor on the not-applicable message so the tab has loaded before asserting the section is absent.
   await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('History clean up');
+  await umbracoUi.documentType.isPreventCleanupButtonVisible(false);
 });
 
 test('can see History Cleanup section in Settings tab after toggling off Element Type', async ({umbracoApi, umbracoUi}) => {

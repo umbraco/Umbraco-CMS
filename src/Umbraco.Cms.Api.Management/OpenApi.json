@@ -44193,6 +44193,7 @@
       },
       "DocumentUrlInfoModel": {
         "required": [
+          "isExternal",
           "message",
           "provider",
           "culture",
@@ -44208,6 +44209,9 @@
           },
           "provider": {
             "type": "string"
+          },
+          "isExternal": {
+            "type": "boolean"
           },
           "culture": {
             "type": [
@@ -54247,6 +54251,11 @@
           },
           "statusCode": {
             "type": "string"
+          },
+          "httpStatusCode": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           },
           "isSuccessStatusCode": {
             "type": "boolean"

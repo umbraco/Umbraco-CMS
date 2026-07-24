@@ -1,6 +1,7 @@
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Html;
 
@@ -9,7 +10,7 @@ namespace Umbraco.Cms.Web.Common.Mvc;
 /// <summary>
 ///     Provides utility methods for UmbracoHelper for working with strings and HTML in views.
 /// </summary>
-public sealed class HtmlStringUtilities
+public sealed partial class HtmlStringUtilities
 {
     /// <summary>
     ///     HTML encodes the text and replaces text line breaks with HTML line breaks.
@@ -28,6 +29,18 @@ public sealed class HtmlStringUtilities
         return new HtmlString(value);
     }
 
+    [GeneratedRegex(@"\s{2,}")]
+    private static partial Regex MultiSpaceRegex();
+
+    [GeneratedRegex(@"\s([\.,;:!?)\]}])")]
+    private static partial Regex PunctuationRegex();
+
+    /// <summary>
+    ///    Strips HTML tags from the given HTML string, optionally filtering by specific tags.
+    /// </summary>
+    /// <param name="html">The HTML string to process.</param>
+    /// <param name="tags">The tags to filter by. If null or empty, all tags will be stripped.</param>
+    /// <returns>The processed HTML string with specified tags removed.</returns>
     public HtmlString StripHtmlTags(string html, params string[]? tags)
     {
         var doc = new HtmlDocument();
@@ -38,6 +51,7 @@ public sealed class HtmlStringUtilities
 
         if (nodes is not null)
         {
+            bool filterAllTags = tags == null || !tags.Any();
             foreach (HtmlNode node in nodes)
             {
                 // is element
@@ -46,10 +60,8 @@ public sealed class HtmlStringUtilities
                     continue;
                 }
 
-                bool filterAllTags = tags == null || !tags.Any();
                 if (filterAllTags ||
-                    (tags?.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                     false))
+                    (tags?.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false))
                 {
                     targets.Add(node);
                 }
@@ -59,7 +71,7 @@ public sealed class HtmlStringUtilities
             targets.Reverse();
             foreach (HtmlNode target in CollectionsMarshal.AsSpan(targets))
             {
-                HtmlNode content = doc.CreateTextNode(target.InnerHtml);
+                HtmlNode content = doc.CreateTextNode(target.InnerHtml + " ");
                 target.ParentNode.ReplaceChild(content, target);
             }
         }
@@ -68,9 +80,17 @@ public sealed class HtmlStringUtilities
             return new HtmlString(html);
         }
 
-        return new HtmlString(doc.DocumentNode.InnerHtml.Replace("  ", " "));
+        var text = MultiSpaceRegex().Replace(doc.DocumentNode.InnerHtml, " ").Trim();
+        text = PunctuationRegex().Replace(text, "$1");
+        return new HtmlString(text);
     }
 
+    /// <summary>
+    ///     Joins the string representations of the specified objects using the specified separator, ignoring null or whitespace values.
+    /// </summary>
+    /// <param name="separator">The string to use as a separator.</param>
+    /// <param name="args">The objects to join.</param>
+    /// <returns>A string that consists of the elements in <paramref name="args"/> delimited by the <paramref name="separator"/> string.</returns>
     public string Join(string separator, params object[] args)
     {
         IEnumerable<string?> results = args
@@ -79,6 +99,11 @@ public sealed class HtmlStringUtilities
         return string.Join(separator, results);
     }
 
+    /// <summary>
+    ///     Concatenates the string representations of the specified objects, ignoring null or whitespace values.
+    /// </summary>
+    /// <param name="args">The objects to concatenate.</param>
+    /// <returns>A string that consists of the concatenated elements in <paramref name="args"/>.</returns>
     public string Concatenate(params object[] args)
     {
         var sb = new StringBuilder();
@@ -92,6 +117,11 @@ public sealed class HtmlStringUtilities
         return sb.ToString();
     }
 
+    /// <summary>
+    ///     Returns the first non-null and non-whitespace string representation of the specified objects.
+    /// </summary>
+    /// <param name="args">The objects to evaluate.</param>
+    /// <returns>The first non-null and non-whitespace string representation, or an empty string if none found.</returns>
     public string Coalesce(params object?[] args)
     {
         var arg = args
@@ -101,6 +131,14 @@ public sealed class HtmlStringUtilities
         return arg ?? string.Empty;
     }
 
+    /// <summary>
+    ///    Truncates the given HTML string to the specified length, optionally adding an ellipsis and treating tags as content.
+    /// </summary>
+    /// <param name="html">The HTML string to truncate.</param>
+    /// <param name="length">The maximum length of the truncated string.</param>
+    /// <param name="addElipsis">Whether to add an ellipsis ("&hellip;") at the end of the truncated string.</param>
+    /// <param name="treatTagsAsContent">Whether to treat HTML tags as content when calculating the length.</param>
+    /// <returns>The truncated HTML string as an <see cref="IHtmlContent"/>.</returns>
     public IHtmlContent Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
     {
         const string hellip = "&hellip;";
@@ -300,11 +338,11 @@ public sealed class HtmlStringUtilities
     }
 
     /// <summary>
-    ///     Returns the length of the words from a HTML block
+    ///     Returns the length of the words from a HTML block.
     /// </summary>
-    /// <param name="html">HTML text</param>
-    /// <param name="words">Amount of words you would like to measure</param>
-    /// <returns></returns>
+    /// <param name="html">The HTML string to measure.</param>
+    /// <param name="words">The number of words to measure.</param>
+    /// <returns>The length of the specified number of words in the HTML string.</returns>
     public int WordsToLength(string html, int words)
     {
         var doc = new HtmlDocument();

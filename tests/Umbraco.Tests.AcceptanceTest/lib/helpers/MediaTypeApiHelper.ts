@@ -13,7 +13,7 @@ export class MediaTypeApiHelper {
     const rootMediaTypes = await this.getAllAtRoot();
     const jsonMediaTypes = await rootMediaTypes.json();
 
-    for (const mediaType of jsonMediaTypes.items) {
+    for (const mediaType of this.api.itemsOf(jsonMediaTypes)) {
       if (mediaType.name === name) {
         if (mediaType.isFolder) {
           return await this.recurseDeleteChildren(mediaType);
@@ -46,7 +46,10 @@ export class MediaTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -73,7 +76,7 @@ export class MediaTypeApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/media-type/children?parentId=${id}&skip=0&take=10000&foldersOnly=false`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async create(mediaType) {
@@ -81,7 +84,7 @@ export class MediaTypeApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/media-type', mediaType);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
 
@@ -97,7 +100,7 @@ export class MediaTypeApiHelper {
     const rootMediaTypes = await this.getAllAtRoot();
     const jsonMediaTypes = await rootMediaTypes.json();
 
-    for (const mediaType of jsonMediaTypes.items) {
+    for (const mediaType of this.api.itemsOf(jsonMediaTypes)) {
       if (mediaType.name === name) {
         if (mediaType.isFolder) {
           return this.getFolder(mediaType.id);
@@ -142,7 +145,7 @@ export class MediaTypeApiHelper {
       "parent": parentId ? {"id": parentId} : null
     }
     const response =  await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/media-type/folder', folder);
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async renameFolder(folderId: string, folderName: string) {
@@ -156,6 +159,17 @@ export class MediaTypeApiHelper {
     const mediaType = new MediaTypeBuilder()
       .withName(mediaTypeName)
       .withAlias(AliasHelper.toAlias(mediaTypeName))
+      .build();
+    return await this.create(mediaType);
+  }
+
+  async createDefaultMediaTypeInFolder(mediaTypeName: string, folderId: string) {
+    await this.ensureNameNotExists(mediaTypeName);
+
+    const mediaType = new MediaTypeBuilder()
+      .withName(mediaTypeName)
+      .withAlias(AliasHelper.toAlias(mediaTypeName))
+      .withFolderId(folderId)
       .build();
     return await this.create(mediaType);
   }

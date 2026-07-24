@@ -89,7 +89,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             return null;
         }
 
-        if (Guid.TryParse(path.AsSpan(PreviewContentRequestPathPrefix.Length).TrimEnd("/"), out Guid contentId) is false)
+        if (Guid.TryParse(path.AsSpan(PreviewContentRequestPathPrefix.Length).TrimEnd('/'), out Guid contentId) is false)
         {
             return null;
         }

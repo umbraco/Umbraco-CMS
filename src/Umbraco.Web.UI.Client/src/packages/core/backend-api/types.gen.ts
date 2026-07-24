@@ -927,6 +927,7 @@ export type DocumentTypeTreeItemResponseModel = {
 export type DocumentUrlInfoModel = {
     message: null | string;
     provider: string;
+    isExternal: boolean;
     culture: null | string;
     url: null | string;
 };
@@ -3541,6 +3542,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
+    httpStatusCode?: number;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;

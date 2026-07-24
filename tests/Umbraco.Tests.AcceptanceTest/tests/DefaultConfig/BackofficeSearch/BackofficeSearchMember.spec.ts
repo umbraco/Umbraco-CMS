@@ -16,13 +16,14 @@ test.afterEach(async ({umbracoApi}) => {
 test('can find a member by name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const defaultMemberType = await umbracoApi.memberType.getByName('Member');
-  await umbracoApi.member.createDefaultMember(
+  const memberId = await umbracoApi.member.createDefaultMember(
     memberName,
     defaultMemberType.id,
     memberEmail,
     memberUsername,
     memberPassword,
   );
+  await umbracoApi.member.waitUntilIndexed(memberName, memberId);
 
   // Act
   await umbracoUi.backofficeSearch.clickSearchHeaderButton();
