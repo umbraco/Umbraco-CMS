@@ -13,6 +13,7 @@ import {
 	distinctUntilChanged,
 	auditTime,
 } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
@@ -568,7 +569,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extensions registry to get auth providers from.
 	 * @returns {Observable<ManifestAuthProvider[]>} An observable that emits the registered auth providers.
 	 */
-	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
+	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry): Observable<ManifestAuthProvider[]> {
 		return this.#isInitialized.pipe(
 			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
 		);
