@@ -211,6 +211,24 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
+	 * Initiates login for the single available provider on a cold boot (no session yet), navigating
+	 * full-page instead of opening a popup — there is no in-progress work to preserve, and skipping the
+	 * modal + popup gives a direct login (matching the pre-cookie-auth behaviour). Local login goes to
+	 * the server login app; an external provider goes straight to its challenge endpoint.
+	 * @param {ManifestAuthProvider} manifest The single registered provider to initiate.
+	 */
+	autoInitiateLogin(manifest: ManifestAuthProvider): void {
+		if (manifest.forProviderName.toLowerCase() === 'umbraco') {
+			window.location.href = `${this.#serverUrl}/umbraco/login`;
+			return;
+		}
+
+		const challengeUrl = new URL(`${this.#serverUrl}/umbraco/management/api/v1/security/back-office/external-login`);
+		challengeUrl.searchParams.set('provider', manifest.forProviderName);
+		window.location.href = challengeUrl.href;
+	}
+
+	/**
 	 * Checks if the user is authorized. If Authorization is bypassed, the user is always authorized.
 	 * @returns True if the user is authorized, otherwise false.
 	 */
