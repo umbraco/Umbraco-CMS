@@ -42,8 +42,9 @@ export class UmbAppAuthCallbackElement extends UmbLitElement {
 		window.close();
 
 		// window.close() is a silent no-op when the browser refuses it (e.g. this route loaded in an
-		// ordinary tab rather than the script-opened popup — the full-page autoInitiateLogin external
-		// flow). Fall back to the server-carried returnUrl (re-validated local) so a deep link isn't
+		// ordinary tab rather than the script-opened popup — the full-page external login flow
+		// (makeAuthorizationRequest with redirect: true)). Fall back to the server-carried returnUrl
+		// (re-validated local) so a deep link isn't
 		// dropped, otherwise the backoffice root — never leave a bare loader up indefinitely.
 		setTimeout(() => {
 			if (!window.closed) {

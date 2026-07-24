@@ -57,7 +57,8 @@ export class UmbAppAuthController extends UmbControllerBase {
 		try {
 			const providers = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));
 			if (providers.length === 1) {
-				this.#authContext.autoInitiateLogin(providers[0]);
+				// redirect: true → full-page navigate (cold boot, nothing to preserve), no modal flash.
+				this.#authContext.makeAuthorizationRequest(providers[0].forProviderName, true);
 				return false;
 			}
 		} catch {
