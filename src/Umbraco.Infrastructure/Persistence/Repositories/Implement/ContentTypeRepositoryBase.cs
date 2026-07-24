@@ -930,6 +930,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         ILookup<bool, IContentTypeComposition> impactedByIsElement = impactedList.ToLookup(x => x.IsElement);
         var impactedDocumentIds = impactedByIsElement[false].Select(x => x.Id).ToList();
         var impactedElementIds = impactedByIsElement[true].Select(x => x.Id).ToList();
+        var impactedIds = impactedList.Select(x => x.Id).ToList();
 
         // Group by the "To" variation so we can bulk update in the correct batches
         foreach (IGrouping<(ContentVariation FromVariation, ContentVariation ToVariation),
@@ -945,16 +946,16 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             if (!fromCultureEnabled && toCultureEnabled)
             {
                 // Culture has been enabled
-                CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedList.Select(x => x.Id).ToList());
-                CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedList.Select(x => x.Id).ToList());
+                CopyPropertyData(null, defaultLanguageId, propertyTypeIds, impactedIds);
+                CopyTagData(null, defaultLanguageId, propertyTypeIds, impactedIds);
                 RenormalizeDocumentEditedFlags(propertyTypeIds, impactedDocumentIds);
                 RenormalizeElementEditedFlags(propertyTypeIds, impactedElementIds);
             }
             else if (fromCultureEnabled && !toCultureEnabled)
             {
                 // Culture has been disabled
-                CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedList.Select(x => x.Id).ToList());
-                CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedList.Select(x => x.Id).ToList());
+                CopyPropertyData(defaultLanguageId, null, propertyTypeIds, impactedIds);
+                CopyTagData(defaultLanguageId, null, propertyTypeIds, impactedIds);
                 RenormalizeDocumentEditedFlags(propertyTypeIds, impactedDocumentIds);
                 RenormalizeElementEditedFlags(propertyTypeIds, impactedElementIds);
             }
