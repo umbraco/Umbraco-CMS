@@ -18151,6 +18151,7 @@ export type GetFilterUserData = {
         orderDirection?: DirectionModel;
         userGroupIds?: Array<string>;
         userStates?: Array<UserStateModel>;
+        userKinds?: Array<UserKindModel>;
         filter?: string;
     };
     url: '/umbraco/management/api/v1/filter/user';

@@ -281,6 +281,43 @@ internal sealed partial class UserServiceCrudTests
         Assert.IsTrue(users.Any());
         Assert.IsFalse(users.Any(x => x.Groups.FirstOrDefault(y => y.Key == editorGroup.Key) is not null));
     }
+
+    [Test]
+    public async Task Can_Filter_By_User_Kind()
+    {
+        var userService = CreateUserService();
+        var editorGroup = await UserGroupService.GetAsync(Constants.Security.EditorGroupKey);
+
+        var apiUserCreateModel = new UserCreateModel
+        {
+            UserName = "apiuser@email.com",
+            Email = "apiuser@email.com",
+            Name = "Api User",
+            Kind = UserKind.Api,
+            UserGroupKeys = new HashSet<Guid> { editorGroup!.Key },
+        };
+
+        var createApiUserAttempt = await userService.CreateAsync(Constants.Security.SuperUserKey, apiUserCreateModel, true);
+        Assert.IsTrue(createApiUserAttempt.Success);
+
+        // The seeded admin user is a Default kind user, so filtering by Api should exclude it.
+        var apiFilter = new UserFilter { IncludeUserKinds = new HashSet<UserKind> { UserKind.Api } };
+        var apiFilterAttempt = await userService.FilterAsync(Constants.Security.SuperUserKey, apiFilter, 0, 1000);
+
+        Assert.IsTrue(apiFilterAttempt.Success);
+        var apiUsers = apiFilterAttempt.Result.Items.ToList();
+        Assert.AreEqual(1, apiUsers.Count);
+        Assert.AreEqual(createApiUserAttempt.Result.CreatedUser!.Key, apiUsers.Single().Key);
+
+        // Filtering by Default should return the seeded admin user but not the API user.
+        var defaultFilter = new UserFilter { IncludeUserKinds = new HashSet<UserKind> { UserKind.Default } };
+        var defaultFilterAttempt = await userService.FilterAsync(Constants.Security.SuperUserKey, defaultFilter, 0, 1000);
+
+        Assert.IsTrue(defaultFilterAttempt.Success);
+        var defaultUsers = defaultFilterAttempt.Result.Items.ToList();
+        Assert.IsFalse(defaultUsers.Any(x => x.Key == createApiUserAttempt.Result.CreatedUser!.Key));
+        Assert.IsTrue(defaultUsers.Any(x => x.Key == Constants.Security.SuperUserKey));
+    }
 }
 
 

@@ -2173,6 +2173,7 @@ export default {
 		stateApproved: 'Đã phê duyệt',
 		stateInvited: 'Đã mời',
 		stateInactive: 'Không hoạt động',
+		type: 'Loại',
 		sortNameAscending: 'Tên (A-Z)',
 		sortNameDescending: 'Tên (Z-A)',
 		sortCreateDateDescending: 'Mới nhất',

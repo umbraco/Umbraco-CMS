@@ -1049,6 +1049,7 @@ export default {
 		username: 'ユーザー名',
 		userPermissions: 'ユーザーの権限',
 		usergroups: 'ユーザーのグループ',
+		type: '型',
 		usertype: 'ユーザーの種類',
 		userTypes: 'ユーザーの種類',
 		writer: '投稿者',

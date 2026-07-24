@@ -1793,6 +1793,7 @@ export default {
 		stateApproved: 'Odobren',
 		stateInvited: 'Pozvan',
 		stateInactive: 'Neaktivan',
+		type: 'Tip',
 		sortNameAscending: 'Ime (A-Z)',
 		sortNameDescending: 'Ime (Z-A)',
 		sortCreateDateAscending: 'Najstarije',
