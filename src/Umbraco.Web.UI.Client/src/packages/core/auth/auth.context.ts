@@ -312,6 +312,7 @@ export class UmbAuthContext extends UmbContextBase {
 				return false;
 			}
 
+			const data = await response.json();
 			const issuedAt = Math.floor(Date.now() / 1000);
 			const expiresIn = data.timeoutUtc
 				? Math.max(0, Math.floor(new Date(data.timeoutUtc).getTime() / 1000) - issuedAt)
