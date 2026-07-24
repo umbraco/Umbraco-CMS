@@ -15,7 +15,7 @@ import {
 } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
-import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
+import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbAuthSession {
 	/** When the access token expires (issuedAt + expiresIn). Used to decide when to refresh. */
@@ -56,6 +56,11 @@ export class UmbAuthContext extends UmbContextBase {
 	#keepAliveEndpoint;
 	#externalLoginEndpoint;
 	#postLogoutRedirectUri;
+
+	// Warn-once guards for the deprecated token accessors — they can be called per request, and
+	// UmbDeprecation.warn() does not de-duplicate, so an unguarded warning would flood the console.
+	#warnedLatestTokenDeprecation = false;
+	#warnedTokenConfigDeprecation = false;
 
 	/**
 	 * Observable that emits true when the auth context is initialized.
@@ -368,6 +373,15 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns {Promise<string>} The latest token from the Management API
 	 */
 	async getLatestToken(): Promise<string> {
+		if (!this.#warnedLatestTokenDeprecation) {
+			this.#warnedLatestTokenDeprecation = true;
+			new UmbDeprecation({
+				deprecated: 'UmbAuthContext.getLatestToken()',
+				removeInVersion: '21.0.0',
+				solution:
+					'Back-office auth is cookie-based and carries no client token. Use configureClient()/getOpenApiConfiguration(), or set credentials: "include" on fetch calls.',
+			}).warn();
+		}
 		return '[redacted]';
 	}
 
@@ -458,6 +472,20 @@ export class UmbAuthContext extends UmbContextBase {
 		return {
 			base: this.#serverUrl,
 			credentials: 'include',
+			// Deprecated (removal v21): cookie auth carries no client token — the auth cookie rides along
+			// via credentials: 'include'. Kept as a shim so existing `await config.token()` callers don't
+			// throw; returns the redacted placeholder and warns once.
+			token: async () => {
+				if (!this.#warnedTokenConfigDeprecation) {
+					this.#warnedTokenConfigDeprecation = true;
+					new UmbDeprecation({
+						deprecated: 'UmbOpenApiConfiguration.token',
+						removeInVersion: '21.0.0',
+						solution: 'The auth cookie is sent automatically with credentials: "include"; remove the token() call.',
+					}).warn();
+				}
+				return '[redacted]';
+			},
 		};
 	}
 
