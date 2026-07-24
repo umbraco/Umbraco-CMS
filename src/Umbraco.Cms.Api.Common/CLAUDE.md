@@ -158,26 +158,9 @@ options
 
 **Endpoints**: Backoffice `/umbraco/management/api/v1/security/*`, Member `/umbraco/member/api/v1/security/*`
 
-### Secure Cookie-Based Token Storage (v17+)
+### Back-Office Authentication (v19+)
 
-**Implementation** (DependencyInjection/HideBackOfficeTokensHandler.cs):
-
-Back-office tokens are hidden from client-side JavaScript via HTTP-only cookies:
-
-```csharp
-private const string AccessTokenCookieKey = "__Host-umbAccessToken";
-private const string RefreshTokenCookieKey = "__Host-umbRefreshToken";
-
-// Tokens are encrypted via Data Protection and stored in cookies
-SetCookie(httpContext, AccessTokenCookieKey, context.Response.AccessToken);
-context.Response.AccessToken = "[redacted]";  // Client sees redacted value
-```
-
-**Key Security Features** (lines 143-165): `HttpOnly`, `IsEssential`, `Path="/"`, `Secure` (HTTPS), `__Host-` prefix
-
-**Configuration**: `BackOfficeTokenCookieSettings.Enabled` (default: true in v17+)
-
-**Implications**: Client-side cannot access tokens; encrypted with Data Protection; load balancing needs shared key ring; API requests need `credentials: include`
+Back-office sessions are a single httpOnly cookie (no client-side tokens); the old `HideBackOfficeTokensHandler` token-hiding layer was removed. OpenIddict remains for API users only. See the client `docs/security.md` for the full model.
 
 ---
 
@@ -321,7 +304,6 @@ dotnet list src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj package --v
 | `UmbracoOperationIdTransformer` | Generate operation IDs | OpenApi/UmbracoOperationIdTransformer.cs |
 | `UmbracoJsonTypeInfoResolver` | Polymorphic JSON serialization | Serialization/UmbracoJsonTypeInfoResolver.cs |
 | `UmbracoBuilderAuthExtensions` | Configure OpenIddict | DependencyInjection/UmbracoBuilderAuthExtensions.cs |
-| `HideBackOfficeTokensHandler` | Secure cookie-based token storage | DependencyInjection/HideBackOfficeTokensHandler.cs |
 | `PagedViewModel<T>` | Generic pagination model | ViewModels/Pagination/PagedViewModel.cs |
 
 ### Important Files

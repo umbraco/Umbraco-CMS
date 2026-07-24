@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -80,6 +81,14 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             _globalSettings.UseHttps ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
         options.Cookie.Path = "/";
 
+        // SameSite=None (requires HTTPS) lets the cookie ride cross-site requests when the back office
+        // is served from a different origin than the server (dev server). Invalid values
+        // leave the framework default untouched.
+        if (Enum.TryParse(_securitySettings.AuthCookieSameSite, ignoreCase: true, out Microsoft.AspNetCore.Http.SameSiteMode sameSiteMode))
+        {
+            options.Cookie.SameSite = sameSiteMode;
+        }
+
         // NOTE: matches route in BackOfficeLoginController
         const string backOfficeLoginPath = "/umbraco/login";
         options.LoginPath = backOfficeLoginPath;
@@ -128,6 +137,17 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 backOfficeIdentity?.EnsureCulture();
 
                 EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
+
+                // An explicit keep-alive request renews the ticket for an actively-working user,
+                // regardless of KeepUserLoggedIn. This is what lets the session-timeout warning offer
+                // a working "Stay logged in" action even when the session has a fixed expiry.
+                // Scoped strictly to this one endpoint so we never set ShouldRenew unconditionally
+                // (see the note below the SecurityStampValidator call — that would break the
+                // validation-interval behaviour and AllowConcurrentLogins enforcement).
+                if (ctx.Request.Path.StartsWithSegments(Paths.BackOfficeApi.KeepAliveEndpoint, StringComparison.OrdinalIgnoreCase))
+                {
+                    ctx.ShouldRenew = true;
+                }
 
                 // add or update a claim to track when the cookie expires, we use this to track time remaining
                 backOfficeIdentity?.AddOrUpdateClaim(new Claim(
@@ -230,7 +250,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             // See this for more: https://github.com/dotnet/aspnetcore/issues/63093#issuecomment-3201530217
             OnRedirectToLogin = context =>
             {
-                if (IsXhr(context.Request))
+                if (IsXhr(context.Request) || IsManagementApiRequest(context.Request))
                 {
                     context.Response.Headers.Location = context.RedirectUri;
                     context.Response.StatusCode = 401;
@@ -244,7 +264,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             },
             OnRedirectToAccessDenied = context =>
             {
-                if (IsXhr(context.Request))
+                if (IsXhr(context.Request) || IsManagementApiRequest(context.Request))
                 {
                     context.Response.Headers.Location = context.RedirectUri;
                     context.Response.StatusCode = 403;
@@ -262,6 +282,14 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
     private bool IsXhr(HttpRequest request) =>
         string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
         string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
+
+    // Management API requests are always JSON, so an unauthenticated one must get a 401/403 — never a
+    // 302 to the HTML login page, which a fetch/JSON client can't follow meaningfully (it lands on
+    // login HTML and blows up downstream). The dual-scheme back-office policies now include this
+    // cookie scheme, so its challenge fires for API requests too; force the status-code branch for
+    // anything under the Management API path, regardless of the X-Requested-With header.
+    private static bool IsManagementApiRequest(HttpRequest request) =>
+        request.Path.StartsWithSegments("/umbraco" + Constants.Web.ManagementApiPath.TrimEnd('/'), StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     ///     Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn" /> is set to true

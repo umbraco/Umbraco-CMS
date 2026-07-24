@@ -42604,6 +42604,13 @@
           "keepUserLoggedIn": {
             "type": "boolean"
           },
+          "timeoutUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
           "passwordConfiguration": {
             "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
           },
@@ -54253,9 +54260,11 @@
             "type": "string"
           },
           "httpStatusCode": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "isSuccessStatusCode": {
             "type": "boolean"

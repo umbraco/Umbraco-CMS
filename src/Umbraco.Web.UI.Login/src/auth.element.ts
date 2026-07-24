@@ -201,6 +201,14 @@ export default class UmbAuthElement extends UmbLitElement {
 		return this.#authContext.returnPath;
 	}
 
+	@property({ attribute: 'back-office-host' })
+	set backOfficeHost(value: string) {
+		this.#authContext.backOfficeHost = value;
+	}
+	get backOfficeHost() {
+		return this.#authContext.backOfficeHost;
+	}
+
 	/**
 	 * Override the default flow.
 	 */

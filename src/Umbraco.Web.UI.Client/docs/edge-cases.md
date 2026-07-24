@@ -1,8 +1,8 @@
 # Edge Cases
+
 [← Umbraco Backoffice](../CLAUDE.md) | [← Monorepo Root](../../CLAUDE.md)
 
 ---
-
 
 ### Null/Undefined Handling
 
@@ -22,6 +22,7 @@ if (!this._content) {
 ```
 
 **TypeScript Strict Null Checks** (enabled):
+
 - Variables are non-nullable by default
 - Use `Type | undefined` or `Type | null` explicitly
 - TypeScript forces null checks
@@ -64,13 +65,13 @@ const items = Array.isArray(data) ? data : [data];
 
 ```typescript
 // Guard against undefined
-const ids = this._items?.map(item => item.id) ?? [];
+const ids = this._items?.map((item) => item.id) ?? [];
 
 // Or check first
 if (!this._items) {
 	return [];
 }
-return this._items.map(item => item.id);
+return this._items.map((item) => item.id);
 ```
 
 **Sparse Arrays** (rare in this codebase):
@@ -118,6 +119,7 @@ if (cleanName.length === 0) {
 ```
 
 **String Encoding**:
+
 - Use UTF-8 everywhere
 - Be aware of Unicode characters (emojis, etc.)
 - Use `textContent` not `innerHTML` for plain text
@@ -275,12 +277,12 @@ try {
 }
 
 // Or use .catch()
-asyncOperation().catch(error => {
+asyncOperation().catch((error) => {
 	console.error('Failed:', error);
 });
 
 // For fire-and-forget, explicitly catch
-void asyncOperation().catch(error => console.error(error));
+void asyncOperation().catch((error) => console.error(error));
 ```
 
 **Promise.all Fails Fast**:
@@ -326,12 +328,7 @@ const [data1, data2] = await Promise.all([fetchData1(), fetchData2()]);
 ```typescript
 // Implement timeout for operations
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-	return Promise.race([
-		promise,
-		new Promise<T>((_, reject) =>
-			setTimeout(() => reject(new Error('Timeout')), ms)
-		),
-	]);
+	return Promise.race([promise, new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))]);
 }
 
 // Usage
@@ -445,11 +442,14 @@ const local = utc.setZone('local');
 
 ```typescript
 // Compare DateTime objects
-if (date1 < date2) { }
-if (date1.equals(date2)) { }
+if (date1 < date2) {
+}
+if (date1.equals(date2)) {
+}
 
 // Or compare timestamps
-if (date1.toMillis() < date2.toMillis()) { }
+if (date1.toMillis() < date2.toMillis()) {
+}
 ```
 
 **Date Parsing Can Fail**:
@@ -583,74 +583,6 @@ async loadById(id: string, options?: LoadOptions): Promise<UmbContentModel> {
 
 ---
 
-### Auth & Cross-tab Coordination
-
-**`window.opener` is set for ANY window opened with `window.open()`**
-
-Not just OAuth popups. The preview window, for example, also has `window.opener` set. Do not use `window.opener` alone as a signal that you are in the OAuth code exchange flow — check the pathname too:
-
-```typescript
-// ❌ Too broad — breaks preview window, any other window.open() target
-if (window.opener) return;
-
-// ✅ Specific to the OAuth code exchange popup
-const pathname = pathWithoutBasePath({ start: true, end: false });
-if (window.opener && pathname === '/oauth_complete') return;
-```
-
-This mistake caused issue #22083 (preview window stuck loading) — the `window.opener` guard in `#setAuthStatus()` prevented `setInitialState()` from running in the preview window, so `isAuthorized` never became `true`.
-
-**BroadcastChannel does NOT deliver messages to the sender's own tab**
-
-Only other tabs/windows receive the message. Do not call methods that broadcast inside a BroadcastChannel handler — this causes N² message storms:
-
-```typescript
-// ❌ This tab sent 'sessionUpdate', now it receives it back and broadcasts again
-this.#channel.onmessage = (evt) => {
-	if (evt.data.type === 'sessionUpdate') {
-		this.#updateSession(...); // #updateSession also calls postMessage — storm!
-	}
-};
-
-// ✅ Use the local-only setter inside handlers, not the broadcasting wrapper
-this.#channel.onmessage = (evt) => {
-	if (evt.data.type === 'sessionUpdate') {
-		this.#setSessionLocally(...); // no broadcast
-	}
-};
-```
-
-**`sessionRequest` must guard against sharing expired sessions**
-
-When a new tab asks for the current session via BroadcastChannel `sessionRequest`, only respond if the session is still valid. Sharing an expired session causes the recipient to believe it is already authorized and skip the auth flow:
-
-```typescript
-// ✅ Guard with isSessionValid() before responding
-case 'sessionRequest': {
-	if (this.isSessionValid()) {
-		this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
-	}
-	break;
-}
-```
-
-**Web Lock `umb:token-refresh` deduplicates concurrent `/token` calls across tabs**
-
-Only one tab at a time should call `/token`. If your code needs to wait for an ongoing refresh in another tab before sending a request (to avoid using a token that is about to be revoked), query the lock state first and then conditionally wait:
-
-```typescript
-// Check if another tab is currently refreshing
-const state = await navigator.locks.query();
-if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
-	// Wait for it to finish (no-op inside the lock)
-	await navigator.locks.request('umb:token-refresh', async () => {});
-}
-// Now safe to proceed — cookie reflects the latest token
-```
-
-Note: there is a TOCTOU gap between `query()` and `request()`. If the lock releases between the two calls, `request()` acquires and releases immediately — this is harmless.
-
-
 ### Routing (`umb-router-slot` + dynamic routes)
 
 When a view owns an `umb-router-slot` and computes its routes from observable data (e.g. workspace/design editors), three behaviours of the slot must be respected. Getting any one of them wrong leaves the view stuck on a path it cannot recover from.
@@ -664,11 +596,7 @@ If `umb-router-slot` mounts with `routes = undefined` (or an early/empty array),
 return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 
 // ✅ Slot only mounts once real routes are in hand
-return html`
-	${this._routes
-		? html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`
-		: nothing}
-`;
+return html` ${this._routes ? html`<umb-router-slot .routes=${this._routes}></umb-router-slot>` : nothing} `;
 ```
 
 `umb-workspace-editor` (`packages/core/workspace/components/workspace-editor/workspace-editor.element.ts`) uses this guard; views that build their own router-slot must do the same.
@@ -707,4 +635,13 @@ routes.push({ ...defaultRoute, path: '' });
 
 Do **not** add `pathMatch: 'full'` to the duplicated empty-path route. The modal sub-router appends modal paths (e.g. `/add-property/-1/container-root`) to the current active local path. With `path: ''` matching prefix-wise (regex `/^/`), the main route stays matched and the modal-router can resolve the appended segment. With `pathMatch: 'full'`, the empty-path route only matches an exactly-empty URL — modal URLs fall through to the catch-all, the route component unmounts, the modal registration is torn down, and the modal never opens.
 
+---
 
+### Auth & Cross-tab
+
+Auth state is coordinated across tabs on the `umb:auth` BroadcastChannel (`authorized` / `sessionCleared` / `signedOut`, in `auth.context.ts`):
+
+- **A BroadcastChannel does not deliver to the sender's own tab** — the sending tab must also apply the state locally, not just post it.
+- **Don't re-broadcast from a message handler** — the sender already reached every tab; echoing loops forever.
+- **Don't probe the session per request** — the boot probe (`user/current/configuration`) runs once at boot and after `keepAlive()`; the cookie is sent automatically. (The old form of this bug was calling the now-removed `validateToken()` per request, which revoked the reference token → ID2019 errors.)
+- **`window.opener` is set for any `window.open()` target**, not just auth popups — scope opener guards to the pathname too (`hasOwnOpener()`).
