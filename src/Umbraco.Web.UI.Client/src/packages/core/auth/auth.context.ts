@@ -159,11 +159,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Initiates login for the given provider.
 	 *
 	 * The built-in "Umbraco" provider is local username/password login (the server login app); any
-	 * other provider is challenged via the cookie external-login endpoint. With `redirect` the flow
-	 * navigates full-page (cold-boot single-provider login — nothing to preserve); otherwise it opens
-	 * a popup so the current view keeps any unsaved work and adopts the session via the auth-callback
-	 * lander's `authorized` broadcast. No PKCE/OIDC state is involved — the httpOnly cookie the server
-	 * sets is the sole credential.
+	 * other provider is challenged via the cookie external-login endpoint.
 	 * @param {string} identityProvider The provider to log in with. Default 'Umbraco' (local login).
 	 * @param {boolean} redirect Navigate full-page instead of opening a popup.
 	 * @param {string} _usernameHint Ignored (cookie auth has no username hint).
@@ -175,8 +171,7 @@ export class UmbAuthContext extends UmbContextBase {
 		_usernameHint?: string,
 		manifest?: ManifestAuthProvider,
 	): Promise<void> {
-		// Preserve where the user was so login returns them there. Skip a bare backoffice root — the
-		// server defaults there. The server re-validates it with Url.IsLocalUrl (a relative path).
+		// Preserve where the user was so login returns them there.
 		const returnPath = window.location.pathname + window.location.search;
 		const deepLink = returnPath === this.#backofficePath ? undefined : returnPath;
 
@@ -232,7 +227,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Checks if the user is authorized. If Authorization is bypassed, the user is always authorized.
 	 * @returns {boolean} True if the user is authorized, otherwise false.
 	 */
-	getIsAuthorized() {
+	getIsAuthorized(): boolean {
 		if (this.#isBypassed) {
 			this.#isAuthorized.setValue(true);
 			return true;
@@ -245,8 +240,8 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Sets the initial state of the auth flow.
-	 * First asks existing tabs for their session via BroadcastChannel.
-	 * If no peer responds, falls back to a server refresh.
+	 * This must be called before any other auth methods are called.
+	 * It establishes if the user is authorized or not, and sets the session state accordingly.
 	 */
 	async setInitialState(): Promise<void> {
 		if (this.#isBypassed) {
@@ -263,24 +258,12 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Extends the current back-office session and returns whether it succeeded.
-	 *
 	 * This is the canonical, reusable way to keep a session alive: it pings the server keep-alive
-	 * endpoint (which re-issues the auth cookie with a fresh expiry, regardless of the
-	 * `KeepUserLoggedIn` setting), then re-reads the new expiry and refreshes the local session — so
-	 * `session$` emits, the timeout is rescheduled, and any open timeout modal is dismissed.
-	 *
-	 * Call it from anywhere holding the auth context: the session-timeout "Stay logged in" action, a
-	 * future activity-based auto-renewer, or an extension that needs to hold a session open during
-	 * long-running work. Safe to call repeatedly; it returns `false` (rather than throwing) when the
-	 * renewal fails, so callers can decide whether to fall back to sign-out / re-login.
+	 * endpoint.
 	 * @returns {boolean} True if the session was renewed, otherwise false.
 	 */
 	async keepAlive(): Promise<boolean> {
 		try {
-			// The keep-alive endpoint is on BackOfficeController, which is [ApiExplorerSettings(IgnoreApi
-			// = true)] — it never appears in OpenApi.json, so there is no generated client method and a
-			// direct fetch is the intended approach, not a stopgap. redirect: 'manual' stops an
-			// unauthenticated 302 from being followed and mistaken for success.
 			const response = await fetch(this.#keepAliveEndpoint, {
 				method: 'POST',
 				credentials: 'include',
@@ -301,21 +284,13 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Probes current-user/configuration and applies the resulting session locally (and broadcasts to
 	 * peer tabs). Returns true when authorized, false otherwise.
-	 *
-	 * redirect: 'manual' is important. When unauthenticated, the back-office cookie middleware's
-	 * OnRedirectToLogin issues a 302 to /umbraco/login for non-XHR requests; following it would return
-	 * the login HTML as a 200 that we'd mistake for a valid session. Manual mode turns any such
-	 * redirect into an opaque, non-ok response (status 0) so it reads as unauthorized — navigation to
-	 * the login screen is driven solely by the app auth controller, never by this probe.
 	 * @returns {Promise<boolean>} True if the session was established, otherwise false.
 	 */
 	async #establishSessionFromServer(): Promise<boolean> {
 		try {
 			// Probe the current-user configuration with a direct fetch, NOT the generated (intercepted)
 			// client. A 401 here is the expected "no session" answer to the boot probe; routing it
-			// through the API interceptor would queue this request for re-authentication (so the promise
-			// never resolves and boot hangs) and raise a spurious timeout signal. We handle the response
-			// manually and set the session state accordingly.
+			// through the API interceptor would queue this request for re-authentication.
 			const response = await fetch(`${this.#serverUrl}/umbraco/management/api/v1/user/current/configuration`, {
 				method: 'GET',
 				credentials: 'include',
@@ -336,10 +311,7 @@ export class UmbAuthContext extends UmbContextBase {
 				: 60 * 60;
 			this.#setSessionLocally(expiresIn, issuedAt);
 
-			// Tell other tabs a session is (re)established. A tab that was showing the timeout
-			// modal (its own session near expiry) adopts this fresh expiry via the 'authorized'
-			// handler and dismisses the modal, instead of waiting for its own countdown to lapse.
-			// The handler applies the session locally without re-broadcasting, so no message storm.
+			// Tell other tabs a session is (re)established, so they can update their local state too.
 			this.#channel.postMessage({ type: 'authorized', expiresIn, issuedAt });
 			return true;
 		} catch {
