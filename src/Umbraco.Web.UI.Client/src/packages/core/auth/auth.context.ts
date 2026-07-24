@@ -470,9 +470,7 @@ export class UmbAuthContext extends UmbContextBase {
 		return {
 			base: this.#serverUrl,
 			credentials: 'include',
-			// Deprecated (removal v21): cookie auth carries no client token — the auth cookie rides along
-			// via credentials: 'include'. Kept as a shim so existing `await config.token()` callers don't
-			// throw; returns the redacted placeholder.
+			// Deprecated (removal v21): cookie auth carries no client token, so this callback is a no-op.
 			token: async () => {
 				new UmbDeprecation({
 					deprecated: 'UmbOpenApiConfiguration.token',
