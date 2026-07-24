@@ -38,6 +38,16 @@ export class UmbAppAuthController extends UmbControllerBase {
 			return true;
 		}
 
+		// Stay put on the logout landing — without this the single-provider auto-init below would
+		// immediately bounce the just-logged-out user back to login. Match the trailing "logout"
+		// segment on the raw path rather than the client's computed logout URL: in a split-origin dev
+		// setup the server's logout redirect can miss the client's /logout route and fall through to
+		// this guard, where a base-relative comparison isn't reliable.
+		const lastPathSegment = window.location.pathname.split('/').filter(Boolean).pop();
+		if (lastPathSegment === 'logout') {
+			return false;
+		}
+
 		// Not authorized. Decide before opening the modal so a single provider doesn't flash it: this
 		// guard runs at router init, after public extensions have registered, so the provider list is
 		// available. Exactly one provider → initiate it directly (full-page); otherwise open the modal
