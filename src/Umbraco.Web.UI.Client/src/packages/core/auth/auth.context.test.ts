@@ -12,12 +12,10 @@ describe('UmbAuthContext', () => {
 
 	beforeEach(() => {
 		hostElement = new UmbTestAuthContextHostElement();
-		// Create context with test parameters
 		context = new UmbAuthContext(hostElement, 'http://localhost', '/umbraco', false);
 	});
 
 	afterEach(() => {
-		// Clean up context
 		context.destroy();
 	});
 
@@ -126,7 +124,6 @@ describe('UmbAuthContext', () => {
 
 	describe('clearTokenStorage', () => {
 		it('clears the session and broadcasts', () => {
-			// Should not throw when called with no session
 			expect(() => context.clearTokenStorage()).to.not.throw();
 			expect(context.getIsAuthorized()).to.be.false;
 		});
@@ -165,10 +162,8 @@ describe('UmbAuthContext', () => {
 		});
 	});
 
-	// The production code calls the bare global `fetch`, which resolves to `window.fetch` in the
-	// browser test runner — so stubbing `window.fetch` intercepts the calls. The unauthenticated
-	// probe is simulated with a 401 (an opaque redirect with status 0 cannot be constructed in JS);
-	// both are non-ok responses and take the same code path.
+	// Production calls the bare global `fetch`, so stubbing `window.fetch` intercepts it. The probe's
+	// unauthenticated case is simulated with a 401 — an opaque redirect (status 0) can't be built in JS.
 	describe('Server communication', () => {
 		let originalFetch: typeof window.fetch;
 		let fetchCalls: Array<{ input: RequestInfo | URL; init?: RequestInit }>;
