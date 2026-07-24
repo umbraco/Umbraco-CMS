@@ -160,21 +160,13 @@ export class UmbAuthViewElement extends UmbLitElement {
 		return provider.forProviderName.toLowerCase() !== 'umbraco';
 	};
 
-	#onSubmit = async (providerOrManifest: string | ManifestAuthProvider) => {
+	#onSubmit = async (manifest: ManifestAuthProvider) => {
 		try {
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 			if (!authContext) {
 				throw new Error('Auth context not available');
 			}
-
-			const manifest = typeof providerOrManifest === 'string' ? undefined : providerOrManifest;
-			const providerName =
-				typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
-
-			// Open the login flow in a popup (redirect: false) so the user keeps any unsaved work in the
-			// main window. makeAuthorizationRequest routes the built-in "Umbraco" provider to local
-			// login and any other provider to the external challenge.
-			authContext.makeAuthorizationRequest(providerName, false, undefined, manifest);
+			authContext.makeAuthorizationRequest(manifest.forProviderName, false, undefined, manifest);
 		} catch (error) {
 			console.error('[AuthView] Error submitting auth request', error);
 			this._error = error instanceof Error ? error.message : 'Unknown error (see console)';
