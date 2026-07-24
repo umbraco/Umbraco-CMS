@@ -18,6 +18,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly IPreviewService _previewService;
     private readonly IPublishedContentCache _publishedContentCache;
+    private readonly IDocumentCacheService _documentCacheService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishedContentStatusFilteringService"/> class.
@@ -26,16 +27,19 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     /// <param name="publishStatusQueryService">The service for querying document publish status.</param>
     /// <param name="previewService">The service for determining if the current request is in preview mode.</param>
     /// <param name="publishedContentCache">The published content cache for retrieving content items.</param>
+    /// <param name="documentCacheService">The document cache service used to materialise candidate keys in batches.</param>
     public PublishedContentStatusFilteringService(
         IVariationContextAccessor variationContextAccessor,
         IPublishStatusQueryService publishStatusQueryService,
         IPreviewService previewService,
-        IPublishedContentCache publishedContentCache)
+        IPublishedContentCache publishedContentCache,
+        IDocumentCacheService documentCacheService)
     {
         _variationContextAccessor = variationContextAccessor;
         _publishStatusQueryService = publishStatusQueryService;
         _previewService = previewService;
         _publishedContentCache = publishedContentCache;
+        _documentCacheService = documentCacheService;
     }
 
     /// <inheritdoc />
@@ -50,16 +54,26 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         }
 
         var preview = _previewService.IsInPreview();
-        candidateKeys = preview
+
+        // Kept lazy so the publish-status filter is only evaluated for keys actually drawn — preserving
+        // the short-circuit for .FirstOrDefault() / .Take(n).
+        IEnumerable<Guid> keys = preview
             ? candidateKeysAsArray
             : candidateKeysAsArray.Where(key =>
                 _publishStatusQueryService.IsDocumentPublished(key, culture)
                 && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
 
-        // Returned lazily so consumers like .FirstOrDefault() / .Take(n) can short-circuit
-        // without materialising the full result. Callers that need to enumerate the result
-        // more than once should buffer it themselves (.ToList() / .ToArray()).
-        return WhereIsInvariantOrHasCultureOrRequestedAllCultures(candidateKeys, culture, preview);
+        // Materialise in growing chunks: an all-L0-hit chunk stays fully synchronous (no async, no
+        // batch), while a cold set collapses its database access into batched reads. Returned lazily
+        // so short-circuiting consumers still exit early; callers that enumerate more than once should
+        // buffer the result themselves (.ToList() / .ToArray()).
+        return ChunkedPublishedContentEnumerator.Enumerate(
+            keys,
+            (Guid key, out IPublishedContent? content) => _documentCacheService.TryGetCached(key, preview, out content),
+            misses => _documentCacheService.GetByKeysAsync(misses, preview).GetAwaiter().GetResult(),
+            content => culture == Constants.System.InvariantCulture
+                       || content.ContentType.VariesByCulture() is false
+                       || content.Cultures.ContainsKey(culture));
     }
 
     /// <inheritdoc />
@@ -68,19 +82,4 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         var preview = _previewService.IsInPreview();
         return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull();
     }
-
-    /// <summary>
-    /// Filters content items to include only those that are invariant, have the requested culture, or when all cultures are requested.
-    /// </summary>
-    /// <param name="keys">The content keys to filter.</param>
-    /// <param name="culture">The requested culture.</param>
-    /// <param name="preview">Whether the request is in preview mode.</param>
-    /// <returns>A collection of <see cref="IPublishedContent"/> items that match the culture criteria.</returns>
-    private IEnumerable<IPublishedContent> WhereIsInvariantOrHasCultureOrRequestedAllCultures(IEnumerable<Guid> keys, string culture, bool preview)
-        => keys
-            .Select(key => _publishedContentCache.GetById(preview, key))
-            .WhereNotNull()
-            .Where(content => culture == Constants.System.InvariantCulture
-                              || content.ContentType.VariesByCulture() is false
-                              || content.Cultures.ContainsKey(culture));
 }

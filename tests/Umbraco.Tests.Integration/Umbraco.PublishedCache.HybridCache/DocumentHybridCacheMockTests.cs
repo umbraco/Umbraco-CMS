@@ -241,6 +241,45 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetByKeysAsync_BatchesDatabaseRead_AndNeverCallsSinglePerItem()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        // A set of cold keys (only Textpage resolves against the mocked batch).
+        var keys = new[] { Textpage.Key, Guid.NewGuid(), Guid.NewGuid() };
+
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(keys, false);
+
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(Textpage.Key, result[0].Key);
+
+        // The single batched query is used; the per-item single query is never called.
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_PopulatesMemoryCache_SoSubsequentReadsDoNotHitDatabase()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        _ = await _documentCacheService.GetByKeysAsync([Textpage.Key], false);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
+
+        // Now served from the in-memory (L0) cache — the sync fast path hits.
+        Assert.IsTrue(_documentCacheService.TryGetCached(Textpage.Key, false, out IPublishedContent? cached));
+        Assert.IsNotNull(cached);
+
+        // And a further retrieval makes no additional database call.
+        var again = await _mockedCache.GetByIdAsync(Textpage.Key, false);
+        Assert.IsNotNull(again);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false), Times.Once);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
     public async Task RefreshMemoryCache_Fetches_Draft_And_Published()
     {
         // Arrange
