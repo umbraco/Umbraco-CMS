@@ -1482,6 +1482,16 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async updateApprovedColorItemLabel(dataTypeName: string, color: string, label: string) {
+    const dataTypeData = await this.getByName(dataTypeName);
+    const itemsValue = dataTypeData.values.find(item => item.alias === 'items');
+    const colorItem = itemsValue?.value?.find(item => item.value === color);
+    if (colorItem) {
+      colorItem.label = label;
+    }
+    return await this.update(dataTypeData.id, dataTypeData);
+  }
+
   async getTiptapExtensionsCount(tipTapName: string) {
     const tipTapData = await this.getByName(tipTapName);
     const extensionsValue = tipTapData.values.find(value => value.alias === 'extensions');
