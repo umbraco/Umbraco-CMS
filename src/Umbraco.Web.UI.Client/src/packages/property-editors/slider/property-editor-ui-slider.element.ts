@@ -8,6 +8,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
 /**
@@ -111,8 +112,9 @@ export class UmbPropertyEditorUISliderElement
 		const initVal2 = Number(config.getValueByAlias('initVal2'));
 		this._initVal2 = isNaN(initVal2) ? this._initVal1 + this._step : initVal2;
 
-		this._min = this.#parseNumber(config.getValueByAlias('minVal')) || 0;
-		this._max = this.#parseNumber(config.getValueByAlias('maxVal')) || 100;
+		const range = config.getValueByAlias<UmbNumberRangeValueType>('validationRange');
+		this._min = range?.min ?? 0;
+		this._max = range?.max || 100;
 		this._minimumRange = Math.max(this.#parseNumber(config.getValueByAlias('minimumRange')) || 0, 0);
 
 		if (this._min === this._max) {

@@ -9,18 +9,11 @@ export const manifest: ManifestPropertyEditorSchema = {
 		settings: {
 			properties: [
 				{
-					alias: 'minVal',
-					label: 'Minimum value',
-					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
-					config: [{ alias: 'step', value: '0.00001' }],
-				},
-				{
-					alias: 'maxVal',
-					label: 'Maximum value',
-					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
-					config: [{ alias: 'step', value: '0.00001' }],
+					alias: 'validationRange',
+					label: 'Value range',
+					description: 'Set the minimum and maximum value of the slider.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
+					config: [{ alias: 'step', value: 0.00001 }],
 				},
 				{
 					alias: 'minimumRange',
@@ -32,8 +25,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 			],
 			defaultData: [
-				{ alias: 'minVal', value: 0.0 },
-				{ alias: 'maxVal', value: 100.0 },
+				{ alias: 'validationRange', value: { min: 0.0, max: 100.0 } },
 				{ alias: 'minimumRange', value: 0.0 },
 			],
 		},

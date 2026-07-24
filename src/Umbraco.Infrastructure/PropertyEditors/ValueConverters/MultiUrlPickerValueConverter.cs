@@ -129,7 +129,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
         using (!_proflog.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _proflog.DebugDuration<MultiUrlPickerValueConverter>(
                    $"ConvertPropertyToLinks ({propertyType.DataType.Id})"))
         {
-            var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.MaxNumber;
+            var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.ValidationLimit.Max ?? 0;
 
             if (string.IsNullOrWhiteSpace(inter?.ToString()))
             {
@@ -276,7 +276,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
     }
 
     private static bool IsSingleUrlPicker(IPublishedPropertyType propertyType)
-        => propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.MaxNumber == 1;
+        => propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>()!.ValidationLimit.Max == 1;
 
     private IEnumerable<MultiUrlPickerValueEditor.LinkDto>? ParseLinkDtos(string inter)
         => inter.DetectIsJson() ? _jsonSerializer.Deserialize<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter) : null;

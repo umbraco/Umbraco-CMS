@@ -424,22 +424,30 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
             string? valueType,
             PropertyValidationContext validationContext)
         {
-           if (multiUrlPickerConfiguration is null || (linksDtos is null && multiUrlPickerConfiguration.MinNumber == 0))
+           if (multiUrlPickerConfiguration is null)
            {
                return [];
            }
 
-           if (linksDtos is null || linksDtos.Length < multiUrlPickerConfiguration.MinNumber)
+           var minNumber = multiUrlPickerConfiguration.ValidationLimit.Min ?? 0;
+           var maxNumber = multiUrlPickerConfiguration.ValidationLimit.Max ?? 0;
+
+           if (linksDtos is null && minNumber == 0)
+           {
+               return [];
+           }
+
+           if (linksDtos is null || linksDtos.Length < minNumber)
            {
                return [new ValidationResult(
                    _localizedTextService.Localize(
                        "validation",
                        "entriesShort",
-                       [multiUrlPickerConfiguration.MinNumber.ToString(), (multiUrlPickerConfiguration.MinNumber - (linksDtos?.Length ?? 0)).ToString()]),
+                       [minNumber.ToString(), (minNumber - (linksDtos?.Length ?? 0)).ToString()]),
                    ["value"])];
            }
 
-           if (linksDtos.Length > multiUrlPickerConfiguration.MaxNumber && multiUrlPickerConfiguration.MaxNumber > 0)
+           if (linksDtos.Length > maxNumber && maxNumber > 0)
            {
                return
                [
@@ -448,8 +456,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
                            "validation",
                            "entriesExceed",
                            [
-                               multiUrlPickerConfiguration.MaxNumber.ToString(),
-                               (linksDtos.Length - multiUrlPickerConfiguration.MaxNumber).ToString()
+                               maxNumber.ToString(),
+                               (linksDtos.Length - maxNumber).ToString()
                            ]),
                        ["value"])
                ];

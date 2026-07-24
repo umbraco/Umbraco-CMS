@@ -232,7 +232,7 @@ public class MultiNodeTreePickerTests
 
     private static object? FromEditor(object? value, int max = 0, IJsonSerializer? jsonSerializer = null)
         => CreateValueEditor(jsonSerializer)
-            .FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { Max = max }), null);
+            .FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { ValidationLimit = new NumberRange { Max = max } }), null);
 
     private static object? ToEditor(object? value, IJsonSerializer? jsonSerializer = null)
     {
