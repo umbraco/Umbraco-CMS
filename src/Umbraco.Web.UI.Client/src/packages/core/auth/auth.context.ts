@@ -177,6 +177,33 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
+	 * Initiates local (username/password) login by opening a popup pointed at the server-rendered
+	 * login app. On success the login app sets the auth cookie and redirects to the `ReturnUrl` we
+	 * pass — the client's auth-callback lander — which broadcasts `authorized` and closes the popup,
+	 * so the main window keeps any unsaved work (same rationale as {@link startExternalLogin}).
+	 *
+	 * Local login cannot reuse the external-login challenge endpoint: that issues a `ChallengeResult`
+	 * for a named authentication scheme, and local login has no such scheme.
+	 * @param {ManifestAuthProvider} manifest The manifest for the built-in provider, used for the popup target/features.
+	 */
+	startLocalLogin(manifest?: ManifestAuthProvider): void {
+		const loginUrl = new URL(`${this.#serverUrl}/umbraco/login`);
+
+		// The login app redirects to a same-origin `ReturnUrl` on success; point it at our
+		// auth-callback lander. `document.baseURI` reflects the base path the client is served under
+		// (equal to the server's CallbackPathName in a valid setup), so this resolves to the same
+		// lander URL the server builds for external login.
+		loginUrl.searchParams.set('ReturnUrl', new URL('auth-callback', document.baseURI).href);
+
+		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
+		const popupFeatures =
+			manifest?.meta?.behavior?.popupFeatures ??
+			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
+
+		window.open(loginUrl.href, popupTarget, popupFeatures);
+	}
+
+	/**
 	 * Checks if the user is authorized. If Authorization is bypassed, the user is always authorized.
 	 * @returns True if the user is authorized, otherwise false.
 	 */
