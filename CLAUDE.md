@@ -402,22 +402,22 @@ The repository contains BOTH (actively supported):
 
 **Note**: The codebase is actively migrating to EF Core, but NPoco remains the primary persistence layer and is not deprecated. Both are fully supported.
 
-### Authentication: OpenIddict
+### Authentication: Cookie-Based Back-Office Auth + OpenIddict for API Users
 
-All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
-- Reference tokens (not JWT) for better security
-- **Secure cookie-based token storage** (v17+) - tokens stored in HTTP-only cookies with `__Host-` prefix
-- Tokens are redacted from client-side responses and passed via secure cookies only (`[redacted]` placeholder)
-- ASP.NET Core Data Protection for token encryption
-- Configured in `Umbraco.Cms.Api.Common`
-- API requests must include credentials (`credentials: include` for fetch)
+**Back-office session** (v19+) is **cookie-based**:
+- A single httpOnly authentication cookie (default name `UMB_UCONTEXT`, configurable via `Security:AuthCookieName`) is the sole credential — no client-side tokens, no PKCE/OAuth authorization-code flow
+- Login/logout/keep-alive endpoints live on `BackOfficeController` (`/umbraco/management/api/v1/security/back-office/*`); local login uses the server login app at `/umbraco/login`
+- API requests must include credentials (`credentials: 'include'` for fetch)
+- The deprecated `getLatestToken()`/`getOpenApiConfiguration().token()` accessors remain as `'[redacted]'` shims (removal v21)
 
-**Load Balancing Requirement**: All servers must share the same Data Protection key ring.
+**OpenIddict** (OAuth 2.0/OpenID Connect, configured in `Umbraco.Cms.Api.Common`) remains for API users (client credentials), Swagger, and Postman — NOT for the back-office session. It uses reference tokens (not JWT) protected with ASP.NET Core Data Protection.
+
+**Load Balancing Requirement**: All servers must share the same Data Protection key ring (protects both the auth cookie ticket and OpenIddict tokens).
 
 **Frontend auth pitfalls** — see `src/Umbraco.Web.UI.Client/docs/edge-cases.md` (Auth & Cross-tab section) and `docs/security.md`. Key points:
-- Never call `validateToken()` per API request — it revokes the previous reference token (ID2019 errors)
-- `window.opener` is set for ANY `window.open()` target, not only OAuth popups — scope guards to the pathname too
-- BroadcastChannel does not deliver messages to the sender's own tab
+- Never probe the session per API request — the boot probe (`user/current/configuration`) runs once at boot and after `keepAlive()`, and deliberately bypasses the intercepted client
+- `window.opener` is set for ANY `window.open()` target, not only auth popups — scope guards to the pathname too
+- BroadcastChannel does not deliver messages to the sender's own tab; handlers apply received state locally without re-broadcasting
 
 ### Content Caching Strategy
 
