@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -117,7 +118,7 @@ internal sealed class TemporaryFileService : ITemporaryFileService
     /// <param name="fileName">The file name to validate.</param>
     /// <returns><c>true</c> if the file name is valid; otherwise, <c>false</c>.</returns>
     private static bool IsValidFileName(string fileName) =>
-        !string.IsNullOrEmpty(fileName) && fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+        !string.IsNullOrEmpty(fileName) && fileName.IndexOfAny(CharArrays.InvalidFileNameChars) < 0;
 
     /// <inheritdoc />
     public async Task<Attempt<TemporaryFileModel?, TemporaryFileOperationStatus>> DeleteAsync(Guid key)

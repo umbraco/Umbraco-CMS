@@ -1,3 +1,5 @@
+using System.Buffers;
+
 namespace Umbraco.Cms.Core;
 
 public static partial class Constants
@@ -131,5 +133,10 @@ public static partial class Constants
         ///     Char array containing |
         /// </summary>
         public static readonly char[] VerticalTab = { '|' };
+
+        /// <summary>
+        /// Search values containing all the invalid file name characters for the current platform.
+        /// </summary>
+        public static readonly SearchValues<char> InvalidFileNameChars = SearchValues.Create(Path.GetInvalidFileNameChars());
     }
 }

@@ -469,4 +469,23 @@ public static class EnumerableExtensions
         Direction sortOrder) => sortOrder == Direction.Ascending
         ? source.OrderBy(keySelector)
         : source.OrderByDescending(keySelector);
+
+    /// <summary>
+    /// Checks if there are at least two elements in the enumerable.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the enumerable.</typeparam>
+    /// <param name="source">The source enumerable.</param>
+    /// <returns>True if there are at least two elements; otherwise, false.</returns>
+    public static bool HasAtLeastTwo<T>(this IEnumerable<T> source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        if (source.TryGetNonEnumeratedCount(out int count))
+        {
+            return count > 1;
+        }
+
+        using IEnumerator<T> enumerator = source.GetEnumerator();
+        return enumerator.MoveNext() && enumerator.MoveNext();
+    }
 }
