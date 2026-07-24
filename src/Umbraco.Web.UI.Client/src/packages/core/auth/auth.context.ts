@@ -18,9 +18,12 @@ import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-c
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbAuthSession {
-	/** When the access token expires (issuedAt + expiresIn). Used to decide when to refresh. */
+	/**
+	 * @deprecated Cookie auth has a single, server-owned expiry, so this is now identical to
+	 * {@link expiresAt}. Use `expiresAt`. Scheduled for removal in Umbraco 21.
+	 */
 	accessTokenExpiresAt: number;
-	/** When the full session expires (issuedAt + expiresIn * MULTIPLIER). Used for timeout UI. */
+	/** When the session (auth cookie) expires. Used for the timeout UI. */
 	expiresAt: number;
 }
 
@@ -158,11 +161,11 @@ export class UmbAuthContext extends UmbContextBase {
 	/* eslint-disable @typescript-eslint/no-unused-vars */
 	/**
 	 * Initiates the login flow.
-	 * @param identityProvider The provider to use for login. Default is 'Umbraco'.
-	 * @param redirect If true, the user will be redirected to the login page.
-	 * @param usernameHint The username hint to use for login.
+	 * @param identityProvider The provider to log in with. Default is 'Umbraco' (the built-in local login).
+	 * @param redirect Ignored.
+	 * @param usernameHint Ignored.
 	 * @param manifest The manifest for the registered provider.
-	 * @deprecated No-op — cookie auth has no client-side authorization flow. Use {@link startLocalLogin} or {@link startExternalLogin} instead. Scheduled for removal in Umbraco 21.
+	 * @deprecated Delegates to {@link startLocalLogin} (the built-in "Umbraco" provider) or {@link startExternalLogin}; call those directly. Note cookie auth opens a login popup rather than the old full-page authorization redirect. Scheduled for removal in Umbraco 21.
 	 */
 	async makeAuthorizationRequest(
 		identityProvider = 'Umbraco',
@@ -173,8 +176,13 @@ export class UmbAuthContext extends UmbContextBase {
 		new UmbDeprecation({
 			deprecated: 'UmbAuthContext.makeAuthorizationRequest()',
 			removeInVersion: '21.0.0',
-			solution: 'Use startLocalLogin() or startExternalLogin() instead.',
+			solution: 'Use startLocalLogin() or startExternalLogin() directly.',
 		}).warn();
+		if (identityProvider.toLowerCase() === 'umbraco') {
+			this.startLocalLogin(manifest);
+		} else {
+			this.startExternalLogin(identityProvider, manifest);
+		}
 	}
 	/* eslint-enable @typescript-eslint/no-unused-vars */
 
@@ -706,7 +714,7 @@ export class UmbAuthContext extends UmbContextBase {
 	#setSessionLocally(expiresIn: number, issuedAt: number) {
 		// Cookie auth: the session has a single, server-owned expiry (the auth cookie's), so both
 		// timestamps are the same — the historical access-vs-refresh token split (and its ×4
-		// multiplier) no longer applies. TODO (V19 cleanup): collapse UmbAuthSession to one expiresAt.
+		// multiplier) no longer applies. TODO (V21): drop the deprecated accessTokenExpiresAt.
 		const expiresAt = issuedAt + expiresIn;
 		this.#session.setValue({ accessTokenExpiresAt: expiresAt, expiresAt });
 		this.#isAuthorized.setValue(true);
