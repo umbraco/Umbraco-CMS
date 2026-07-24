@@ -16,7 +16,6 @@ import {
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment } from '@umbraco-cms/backoffice/utils';
-import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbAuthSession {
 	/** When the access token expires (issuedAt + expiresIn). Used to decide when to refresh. */
