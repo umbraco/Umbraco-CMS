@@ -378,12 +378,9 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#isAuthorized.setValue(false);
 		this.#channel.postMessage({ type: 'signedOut' });
 
-		// Redirect to the server sign-out endpoint, which clears the auth cookie.
-		const postLogoutRedirectUri = new URL(this.#postLogoutRedirectUri, window.location.origin);
-		const endSessionEndpoint = `${this.#serverUrl}/umbraco/management/api/v1/security/back-office/signout`;
-		const postLogoutLocation = new URL(endSessionEndpoint);
-		postLogoutLocation.searchParams.set('post_logout_redirect_uri', postLogoutRedirectUri.href);
-		location.href = postLogoutLocation.href;
+		// Navigate to the server sign-out endpoint: it clears the auth cookie and then redirects to the
+		// client logout landing (derived server-side from BackOfficeHost), which resets the SPA state.
+		location.href = `${this.#serverUrl}/umbraco/management/api/v1/security/back-office/signout`;
 	}
 
 	/**
