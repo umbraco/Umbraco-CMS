@@ -1101,6 +1101,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			? await overwriteCreate(saveData, variantIds, parent)
 			: await this.#defaultCreatePersistence(saveData, parent.unique);
 
+		// The server may have assigned a different unique than the one this workspace scaffolded with
+		// (e.g. a Saving notification handler assigning its own key), so re-sync before anything reads it.
+		if (persisted?.unique) {
+			this.setUnique(persisted.unique);
+		}
+
 		// Set persisted AND current before flipping isNew: the flip triggers the new->edit redirect,
 		// whose navigation guard compares the two states with an order-sensitive comparison.
 		await this.#applyPersistedData(persisted, variantIds);
