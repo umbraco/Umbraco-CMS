@@ -12,6 +12,7 @@ public class DecimalConfigurationEditor : ConfigurationEditor<DecimalConfigurati
     /// <summary>
     /// Initializes a new instance of the <see cref="DecimalConfigurationEditor"/> class.
     /// </summary>
+    /// <param name="ioHelper">The IO helper.</param>
     public DecimalConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
     {

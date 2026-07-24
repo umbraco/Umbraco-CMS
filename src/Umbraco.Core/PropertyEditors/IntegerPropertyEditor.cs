@@ -30,6 +30,7 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="IntegerPropertyEditor"/> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 21.")]
     public IntegerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : this(dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IIOHelper>())
@@ -39,6 +40,8 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="IntegerPropertyEditor"/> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+    /// <param name="ioHelper">The IO helper.</param>
     public IntegerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
@@ -227,14 +230,15 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
                     yield break;
                 }
 
-                TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? min, out _);
+                // Default min to 0 if not configured (step validation is relative to min).
+                TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? configuredMin, out _);
+                var min = configuredMin.HasValue ? (int)configuredMin.Value : 0;
 
-                if (min.HasValue &&
-                    TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out int step) &&
-                    ValidationHelper.IsValueValidForStep(parsedIntegerValue, (int)min.Value, step) is false)
+                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out int step) &&
+                    ValidationHelper.IsValueValidForStep(parsedIntegerValue, min, step) is false)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "invalidStep", [parsedIntegerValue.ToString(), step.ToString(), ((int)min.Value).ToString()]),
+                        LocalizedTextService.Localize("validation", "invalidStep", [parsedIntegerValue.ToString(), step.ToString(), min.ToString()]),
                         ["value"]);
                 }
             }

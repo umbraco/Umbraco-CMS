@@ -39,6 +39,6 @@ describe('UmbPropertyEditorUINumberRangeElement', () => {
 	it('is undefined when both bounds are unset', () => {
 		element.minValue = undefined;
 		element.maxValue = undefined;
-		expect(element.value).to.equal(undefined);
+		expect(element.value).to.be.undefined;
 	});
 });

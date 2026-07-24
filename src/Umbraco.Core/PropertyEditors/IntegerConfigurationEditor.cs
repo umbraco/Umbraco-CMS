@@ -12,6 +12,7 @@ public class IntegerConfigurationEditor : ConfigurationEditor<IntegerConfigurati
     /// <summary>
     /// Initializes a new instance of the <see cref="IntegerConfigurationEditor"/> class.
     /// </summary>
+    /// <param name="ioHelper">The IO helper.</param>
     public IntegerConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
     {

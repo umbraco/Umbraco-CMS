@@ -146,4 +146,30 @@ public class MigrateMinMaxToRangeTests
 
         Assert.That(MigrateBlockGridAreaMinMaxToRange.MigrateAreas(configuration), Is.False);
     }
+
+    [Test]
+    public void Block_Grid_Migration_Skips_Blocks_Without_Areas_And_Migrates_The_Rest()
+    {
+        var configuration = new JsonObject
+        {
+            ["blocks"] = new JsonArray(
+                new JsonObject { ["contentElementTypeKey"] = "no-areas-block" },
+                new JsonObject
+                {
+                    ["areas"] = new JsonArray(
+                        new JsonObject { ["minAllowed"] = 2, ["maxAllowed"] = 4 }),
+                }),
+        };
+
+        var changed = MigrateBlockGridAreaMinMaxToRange.MigrateAreas(configuration);
+
+        var migratedArea = (JsonObject)((JsonArray)((JsonObject)configuration["blocks"]![1]!)["areas"]!)[0]!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(changed, Is.True);
+            Assert.That(Min(migratedArea, "validationLimit"), Is.EqualTo(2));
+            Assert.That(Max(migratedArea, "validationLimit"), Is.EqualTo(4));
+        });
+    }
 }

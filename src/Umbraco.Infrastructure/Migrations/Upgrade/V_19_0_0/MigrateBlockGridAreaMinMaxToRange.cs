@@ -32,6 +32,8 @@ internal sealed class MigrateBlockGridAreaMinMaxToRange : MigrateMinMaxToRangeMi
     ///     Walks the <c>blocks[].areas[]</c> structure, converting each area's <c>minAllowed</c>/<c>maxAllowed</c>
     ///     into a single <c>validationLimit</c> range.
     /// </summary>
+    /// <param name="configuration">The Block Grid configuration to migrate in place.</param>
+    /// <returns><c>true</c> when at least one area was changed.</returns>
     internal static bool MigrateAreas(JsonObject configuration)
     {
         var blocksKey = FindKey(configuration, "blocks");
@@ -43,49 +45,58 @@ internal sealed class MigrateBlockGridAreaMinMaxToRange : MigrateMinMaxToRangeMi
         var changed = false;
         foreach (JsonNode? blockNode in blocks)
         {
-            if (blockNode is not JsonObject block)
+            if (blockNode is JsonObject block)
             {
-                continue;
-            }
-
-            var areasKey = FindKey(block, "areas");
-            if (areasKey is null || block[areasKey] is not JsonArray areas)
-            {
-                continue;
-            }
-
-            foreach (JsonNode? areaNode in areas)
-            {
-                if (areaNode is not JsonObject area)
-                {
-                    continue;
-                }
-
-                var minName = FindKey(area, "minAllowed");
-                var maxName = FindKey(area, "maxAllowed");
-                if (minName is null && maxName is null)
-                {
-                    continue;
-                }
-
-                decimal? min = minName is not null ? ToBound(area[minName], zeroIsUnbounded: false) : null;
-                decimal? max = maxName is not null ? ToBound(area[maxName], zeroIsUnbounded: false) : null;
-
-                if (minName is not null)
-                {
-                    area.Remove(minName);
-                }
-
-                if (maxName is not null)
-                {
-                    area.Remove(maxName);
-                }
-
-                SetRange(area, "validationLimit", min, max);
-                changed = true;
+                changed |= MigrateBlockAreas(block);
             }
         }
 
         return changed;
+    }
+
+    private static bool MigrateBlockAreas(JsonObject block)
+    {
+        var areasKey = FindKey(block, "areas");
+        if (areasKey is null || block[areasKey] is not JsonArray areas)
+        {
+            return false;
+        }
+
+        var changed = false;
+        foreach (JsonNode? areaNode in areas)
+        {
+            if (areaNode is JsonObject area)
+            {
+                changed |= MigrateArea(area);
+            }
+        }
+
+        return changed;
+    }
+
+    private static bool MigrateArea(JsonObject area)
+    {
+        var minName = FindKey(area, "minAllowed");
+        var maxName = FindKey(area, "maxAllowed");
+        if (minName is null && maxName is null)
+        {
+            return false;
+        }
+
+        decimal? min = minName is not null ? ToBound(area[minName], zeroIsUnbounded: false) : null;
+        decimal? max = maxName is not null ? ToBound(area[maxName], zeroIsUnbounded: false) : null;
+
+        if (minName is not null)
+        {
+            area.Remove(minName);
+        }
+
+        if (maxName is not null)
+        {
+            area.Remove(maxName);
+        }
+
+        SetRange(area, "validationLimit", min, max);
+        return true;
     }
 }

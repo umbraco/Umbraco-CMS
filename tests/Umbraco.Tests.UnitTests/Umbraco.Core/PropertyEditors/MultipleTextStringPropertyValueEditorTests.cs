@@ -379,8 +379,7 @@ public class MultipleTextStringPropertyValueEditorTests
         {
             ConfigurationObject = new MultipleTextStringConfiguration
             {
-                Min = 2,
-                Max = 4,
+                ValidationLimit = new NumberRange { Min = 2, Max = 4 },
             },
         };
     }

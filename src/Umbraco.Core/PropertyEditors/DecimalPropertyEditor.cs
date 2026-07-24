@@ -30,6 +30,8 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
     /// <summary>
     ///     Initializes a new instance of the <see cref="DecimalPropertyEditor" /> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+    /// <param name="ioHelper">The IO helper.</param>
     public DecimalPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
@@ -42,6 +44,7 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
     /// <summary>
     ///     Initializes a new instance of the <see cref="DecimalPropertyEditor" /> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 21.")]
     public DecimalPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory)
@@ -65,14 +68,7 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
         // typed configuration object (from the data type's ConfigurationObject) or as the raw dictionary.
         if (configuration is DecimalConfiguration or IDictionary<string, object>)
         {
-            object? rangeValue = configuration switch
-            {
-                DecimalConfiguration decimalConfiguration => decimalConfiguration.ValidationRange,
-                IDictionary<string, object> configDict when configDict.TryGetValue("validationRange", out var range) => range,
-                _ => null,
-            };
-
-            if (RangeConfigurationHelper.TryGetBounds(rangeValue, out decimal? min, out decimal? max))
+            if (RangeConfigurationHelper.TryGetBounds(GetRangeValue(configuration), out decimal? min, out decimal? max))
             {
                 if (min.HasValue)
                 {
@@ -85,19 +81,28 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
                 }
             }
 
-            var step = configuration switch
-            {
-                DecimalConfiguration decimalConfiguration when decimalConfiguration.Step.HasValue => (double)decimalConfiguration.Step.Value,
-                IDictionary<string, object> configDict when configDict.TryGetValue("step", out var stepValue) && stepValue is double stepDouble => stepDouble,
-                _ => (double?)null,
-            };
-
             // Default: allow up to 6 decimal places, matching DB DECIMAL(38,6).
-            schema["multipleOf"] = step is double configuredStep && configuredStep > 0 ? configuredStep : 0.000001;
+            schema["multipleOf"] = GetStep(configuration) is double configuredStep && configuredStep > 0 ? configuredStep : 0.000001;
         }
 
         return schema;
     }
+
+    private static object? GetRangeValue(object? configuration)
+        => configuration switch
+        {
+            DecimalConfiguration decimalConfiguration => decimalConfiguration.ValidationRange,
+            IDictionary<string, object> configDict when configDict.TryGetValue("validationRange", out var range) => range,
+            _ => null,
+        };
+
+    private static double? GetStep(object? configuration)
+        => configuration switch
+        {
+            DecimalConfiguration decimalConfiguration when decimalConfiguration.Step.HasValue => (double)decimalConfiguration.Step.Value,
+            IDictionary<string, object> configDict when configDict.TryGetValue("step", out var stepValue) && stepValue is double stepDouble => stepDouble,
+            _ => (double?)null,
+        };
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()

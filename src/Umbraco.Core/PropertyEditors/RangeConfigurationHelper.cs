@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -39,8 +40,8 @@ public static class RangeConfigurationHelper
                 max = decimalRange.Max;
                 return true;
             case JsonObject jsonObject:
-                min = ToDecimal(jsonObject["min"]);
-                max = ToDecimal(jsonObject["max"]);
+                min = jsonObject["min"].ToDecimal();
+                max = jsonObject["max"].ToDecimal();
                 return true;
             case JsonElement jsonElement when jsonElement.ValueKind == JsonValueKind.Object:
                 min = GetDecimal(jsonElement, "min");
@@ -60,23 +61,6 @@ public static class RangeConfigurationHelper
             ? value
             : null;
 
-    private static decimal? ToDecimal(JsonNode? node)
-    {
-        if (node is null)
-        {
-            return null;
-        }
-
-        try
-        {
-            return node.GetValue<decimal>();
-        }
-        catch
-        {
-            return decimal.TryParse(node.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
-        }
-    }
-
     private static decimal? ToDecimal(object? value)
         => value switch
         {
@@ -86,7 +70,7 @@ public static class RangeConfigurationHelper
             long l => l,
             double db => (decimal)db,
             float f => (decimal)f,
-            JsonNode node => ToDecimal(node),
+            JsonNode node => node.ToDecimal(),
             string s when decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed) => parsed,
             _ => null,
         };

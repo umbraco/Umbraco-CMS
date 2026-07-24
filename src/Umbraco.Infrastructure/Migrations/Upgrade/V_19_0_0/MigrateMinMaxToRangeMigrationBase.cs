@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
@@ -35,6 +34,7 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
     /// <summary>
     ///     Migrates a single data type's configuration in place.
     /// </summary>
+    /// <param name="configuration">The data type configuration to migrate in place.</param>
     /// <returns><c>true</c> when the configuration was changed and should be persisted.</returns>
     protected abstract bool TryMigrateConfiguration(JsonObject configuration);
 
@@ -88,10 +88,14 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
             if (TryMigrateConfiguration(configuration) is false)
             {
                 unchanged++;
-                Logger.LogDebug(
-                    "No range configuration to migrate for data type {DataTypeId} of editor {EditorAlias}.",
-                    dataTypeDto.NodeId,
-                    EditorAlias);
+                if (Logger.IsEnabled(LogLevel.Debug))
+                {
+                    Logger.LogDebug(
+                        "No range configuration to migrate for data type {DataTypeId} of editor {EditorAlias}.",
+                        dataTypeDto.NodeId,
+                        EditorAlias);
+                }
+
                 continue;
             }
 
@@ -160,6 +164,10 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
     /// <summary>
     ///     Sets a range object with the supplied bounds, omitting it entirely when both bounds are absent.
     /// </summary>
+    /// <param name="configuration">The configuration object to mutate.</param>
+    /// <param name="rangeKey">The range key to set.</param>
+    /// <param name="min">The minimum bound, or <c>null</c> when unbounded.</param>
+    /// <param name="max">The maximum bound, or <c>null</c> when unbounded.</param>
     internal static void SetRange(JsonObject configuration, string rangeKey, decimal? min, decimal? max)
     {
         var existingKey = FindKey(configuration, rangeKey);
@@ -190,32 +198,18 @@ internal abstract class MigrateMinMaxToRangeMigrationBase : AsyncMigrationBase
     /// <summary>
     ///     Parses a JSON node into a numeric bound, treating zero as unbounded when requested.
     /// </summary>
+    /// <param name="node">The JSON node to read the bound from.</param>
+    /// <param name="zeroIsUnbounded">Whether a stored value of zero represents "no bound".</param>
+    /// <returns>The numeric bound, or <c>null</c> when absent or (optionally) zero.</returns>
     internal static decimal? ToBound(JsonNode? node, bool zeroIsUnbounded)
     {
-        decimal? value = ToDecimal(node);
+        decimal? value = node.ToDecimal();
         if (value is null)
         {
             return null;
         }
 
         return zeroIsUnbounded && value.Value == 0m ? null : value;
-    }
-
-    private static decimal? ToDecimal(JsonNode? node)
-    {
-        if (node is null)
-        {
-            return null;
-        }
-
-        try
-        {
-            return node.GetValue<decimal>();
-        }
-        catch
-        {
-            return decimal.TryParse(node.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
-        }
     }
 
     /// <summary>
