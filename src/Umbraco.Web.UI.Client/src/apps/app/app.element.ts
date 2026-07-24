@@ -124,9 +124,8 @@ export class UmbAppElement extends UmbLitElement {
 			component: UmbAppAuthElement,
 		},
 		{
-			// Lander for the external-login popup flow — public (no auth guards): it loads with the
-			// auth cookie already set by the server callback, but must not depend on the authed-init
-			// gate. See app-auth-callback.element.ts for why no guard is needed here.
+			// Lander for the external-login popup flow (used by the timeout and external-login providers).
+			// It will close the popup and inform the opener window of the result (success or error) via postMessage.
 			path: 'auth-callback',
 			component: () => import('./app-auth-callback.element.js'),
 		},
