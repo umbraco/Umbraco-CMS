@@ -385,7 +385,11 @@ export class UmbPropertyEditorUIBlockListElement
 
 	#renderCreateButtonGroup() {
 		if (this._layouts.length > 0 && (this._limitMax === 1 || this.readonly)) return nothing;
-		return html`<uui-button-group>${this.#renderCreateButton()}${this.#renderPasteButton()}</uui-button-group>`;
+		return html`
+			<uui-button-group>
+				${this.#renderCreateButton()}${this.#renderLibraryButton()}${this.#renderPasteButton()}
+			</uui-button-group>
+		`;
 	}
 
 	#renderInlineCreateButton(index: number) {
@@ -439,9 +443,24 @@ export class UmbPropertyEditorUIBlockListElement
 		}
 	}
 
+	#renderLibraryButton() {
+		return html`
+			<uui-button
+				class="btnAction"
+				label="Reuse content from the Library"
+				look="placeholder"
+				href=${this._catalogueRouteBuilder?.({ view: 'library', index: -1 }) ?? ''}
+				?disabled=${this.readonly}
+				title=${this.localize.term('blockEditor_tabLibrary')}>
+				<uui-icon name="icon-link"></uui-icon>
+			</uui-button>
+		`;
+	}
+
 	#renderPasteButton() {
 		return html`
 			<uui-button
+				class="btnAction"
 				label=${this.localize.term('content_createFromClipboard')}
 				look="placeholder"
 				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}
@@ -465,8 +484,11 @@ export class UmbPropertyEditorUIBlockListElement
 
 			uui-button-group {
 				margin-top: 1px;
-				display: grid;
-				grid-template-columns: 1fr auto;
+				display: flex;
+
+				.btnAction {
+					flex: 0;
+				}
 			}
 		`,
 	];
