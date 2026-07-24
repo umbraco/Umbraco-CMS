@@ -581,6 +581,15 @@ export default {
 		sortHelp:
 			'다른 아이템을 마우스로 위,아래로 드래그 하여 이동하거나 열의 헤더를 클릭하여 아이템을 정렬할 수 있습니다',
 		sortPleaseWait: '잠시 기다리십시오. 아이템을 정렬 하는데 잠시 시간이 소요될 수 있습니다',
+		sortByFieldHeadline: '필드로 정렬',
+		sortByFieldSentence: '모든 하위 항목 정렬 기준:',
+		sortByFieldDirectionLabel: '방향',
+		sortByFieldAscending: '오름차순',
+		sortByFieldDescending: '내림차순',
+		sortByFieldNameOption: '이름',
+		sortByFieldCreateDateOption: '생성일',
+		sortByFieldUpdateDateOption: '마지막 편집',
+		sortIndividuallyHeadline: '개별 정렬',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: '3rd party add-in 때문에 발행이 취소되었습니다.',

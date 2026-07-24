@@ -583,6 +583,15 @@ export default {
 		sortHelp:
 			'יש לגרור את הפריטים מעלה או מטה כדי להגדיר את סדר התוכן. או לחץ על כותרת העמודה כדי למיין את כל פריטי התוכן',
 		sortPleaseWait: 'פריטי התוכן ממיונים ברגע זה, תהליך זה לוקח זמן מה.',
+		sortByFieldHeadline: 'מיון לפי שדה',
+		sortByFieldSentence: 'מיין את כל פריטי הצאצא לפי',
+		sortByFieldDirectionLabel: 'כיוון',
+		sortByFieldAscending: 'עולה',
+		sortByFieldDescending: 'יורד',
+		sortByFieldNameOption: 'שם',
+		sortByFieldCreateDateOption: 'נוצר',
+		sortByFieldUpdateDateOption: 'עריכה אחרונה',
+		sortIndividuallyHeadline: 'מיון פרטני',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'הפירסום בוטל על ידי תוסף צד שלישי',

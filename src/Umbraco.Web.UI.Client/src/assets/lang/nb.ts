@@ -877,6 +877,15 @@ export default {
 		sortHelp:
 			'Dra elementene opp eller ned for å arrangere dem. Du kan også klikke kolonneoverskriftene for å sortere alt på en gang.',
 		sortPleaseWait: 'Vennligst vent. Elementene blir sortert, dette kan ta litt tid.',
+		sortByFieldHeadline: 'Sorter etter felt',
+		sortByFieldSentence: 'Sorter alle underelementer etter',
+		sortByFieldDirectionLabel: 'Retning',
+		sortByFieldAscending: 'Stigende',
+		sortByFieldDescending: 'Synkende',
+		sortByFieldNameOption: 'Navn',
+		sortByFieldCreateDateOption: 'Opprettet',
+		sortByFieldUpdateDateOption: 'Sist endret',
+		sortIndividuallyHeadline: 'Sorter individuelt',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% av %1% dokumenter publisert.',
