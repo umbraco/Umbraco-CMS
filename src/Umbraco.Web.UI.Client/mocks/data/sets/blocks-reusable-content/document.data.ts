@@ -174,14 +174,36 @@ export const data: Array<UmbMockDocumentModel> = [
 						'Umbraco.BlockList': [
 							{
 								key: 'a08c8c6a-8da2-46d0-87b7-536985985b24',
-								contentUdi: 'umb://element/a08c8c6a8da246d087b7536985985b24',
-								settingsUdi: null,
 								contentKey: 'a08c8c6a-8da2-46d0-87b7-536985985b24',
 								settingsKey: null,
 							},
 							{
+								key: 'block-list-item-library-element-one-a',
+								contentKey: 'library-element-one-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+							{
 								key: 'block-list-item-library-element-two',
 								contentKey: 'library-element-two-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+							{
+								key: 'block-list-item-library-element-three',
+								contentKey: 'library-element-three-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+							{
+								key: 'block-list-item-library-element-four',
+								contentKey: 'library-element-four-id',
+								settingsKey: null,
+								isExternalContent: true,
+							},
+							{
+								key: 'block-list-item-library-element-one-b',
+								contentKey: 'library-element-one-id',
 								settingsKey: null,
 								isExternalContent: true,
 							},
