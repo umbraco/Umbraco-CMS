@@ -127,9 +127,11 @@ dotnet test tests/Umbraco.Tests.Integration/
 
 ## 5. OpenIddict Authentication
 
+**Scope** (v19+): OpenIddict serves **API users** (client credentials), Swagger, Postman, and member authentication — NOT the back-office session. The back-office UI authenticates with a plain httpOnly authentication cookie (default name `UMB_UCONTEXT`); login/logout/keep-alive endpoints live on `BackOfficeController` in `Umbraco.Cms.Api.Management`. The former `HideBackOfficeTokensHandler` (which swapped OpenIddict tokens into `__Host-` cookies and returned `[redacted]` to the client) has been **removed** along with the client-side PKCE flow.
+
 ### Key Configuration (DependencyInjection/UmbracoBuilderAuthExtensions.cs)
 
-**Reference Tokens over JWT** (line 76-80):
+**Reference Tokens over JWT** (line 83-87):
 ```csharp
 // Enable reference tokens
 // - see https://documentation.openiddict.com/configuration/token-storage.html
@@ -140,14 +142,14 @@ options
 
 **Why**: More secure (revocable), better for load balancing, uses ASP.NET Core Data Protection.
 
-**Token Lifetime** (line 88-91):
+**Token Lifetime** (line 96-98):
 ```csharp
 // Make the access token lifetime 25% of the refresh token lifetime
 options.SetAccessTokenLifetime(new TimeSpan(timeOut.Ticks / 4));
 options.SetRefreshTokenLifetime(timeOut);
 ```
 
-**PKCE Required** (line 59-63):
+**PKCE Required** (line 65-69):
 ```csharp
 // Enable authorization code flow with PKCE
 options
@@ -158,26 +160,16 @@ options
 
 **Endpoints**: Backoffice `/umbraco/management/api/v1/security/*`, Member `/umbraco/member/api/v1/security/*`
 
-### Secure Cookie-Based Token Storage (v17+)
+### Back-Office Cookie Authentication (v19+)
 
-**Implementation** (DependencyInjection/HideBackOfficeTokensHandler.cs):
+The back-office session is a single httpOnly authentication cookie, not an OpenIddict token:
 
-Back-office tokens are hidden from client-side JavaScript via HTTP-only cookies:
+- Cookie name defaults to `UMB_UCONTEXT` (`SecuritySettings.AuthCookieName`); the ticket is protected with ASP.NET Core Data Protection
+- All back-office API requests must send it via `credentials: 'include'`
+- Session renewal happens server-side via the `security/back-office/keep-alive` endpoint (the cookie middleware re-issues the ticket)
+- Sign-out (`security/back-office/signout`) clears the cookie and redirects to the client logout landing — there is no OpenIddict end-session for the back office
 
-```csharp
-private const string AccessTokenCookieKey = "__Host-umbAccessToken";
-private const string RefreshTokenCookieKey = "__Host-umbRefreshToken";
-
-// Tokens are encrypted via Data Protection and stored in cookies
-SetCookie(httpContext, AccessTokenCookieKey, context.Response.AccessToken);
-context.Response.AccessToken = "[redacted]";  // Client sees redacted value
-```
-
-**Key Security Features** (lines 143-165): `HttpOnly`, `IsEssential`, `Path="/"`, `Secure` (HTTPS), `__Host-` prefix
-
-**Configuration**: `BackOfficeTokenCookieSettings.Enabled` (default: true in v17+)
-
-**Implications**: Client-side cannot access tokens; encrypted with Data Protection; load balancing needs shared key ring; API requests need `credentials: include`
+**Implications**: The client never holds a credential; load balancing needs a shared Data Protection key ring (for both the cookie ticket and OpenIddict tokens).
 
 ---
 
@@ -321,7 +313,6 @@ dotnet list src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj package --v
 | `UmbracoOperationIdTransformer` | Generate operation IDs | OpenApi/UmbracoOperationIdTransformer.cs |
 | `UmbracoJsonTypeInfoResolver` | Polymorphic JSON serialization | Serialization/UmbracoJsonTypeInfoResolver.cs |
 | `UmbracoBuilderAuthExtensions` | Configure OpenIddict | DependencyInjection/UmbracoBuilderAuthExtensions.cs |
-| `HideBackOfficeTokensHandler` | Secure cookie-based token storage | DependencyInjection/HideBackOfficeTokensHandler.cs |
 | `PagedViewModel<T>` | Generic pagination model | ViewModels/Pagination/PagedViewModel.cs |
 
 ### Important Files
