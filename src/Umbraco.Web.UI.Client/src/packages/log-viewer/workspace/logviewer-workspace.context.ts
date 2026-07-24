@@ -179,10 +179,9 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		return this.#dateRange.getValue();
 	}
 
-	// The server buckets log entries into files by its own calendar date, so the selected calendar
-	// days are sent as absolute instants covering the full local day. This ensures entries logged
-	// late in the user's local day are still resolved when the server has rolled over to the next
-	// date (#14710).
+	// Query the server with absolute instants spanning the full local day (see
+	// getStartOfDayInLocalTime / getEndOfDayInLocalTime) so it resolves the correct day files
+	// regardless of the browser/server offset (#14710). #dateRange keeps the bare dates for display.
 	#getRequestDateRange(): UmbLogViewerDateRange {
 		const { startDate, endDate } = this.#dateRange.getValue();
 		return {

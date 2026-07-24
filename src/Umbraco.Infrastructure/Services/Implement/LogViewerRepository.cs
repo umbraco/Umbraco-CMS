@@ -38,10 +38,9 @@ public class LogViewerRepository : LogViewerRepositoryBase
     {
         var logs = new List<LogEvent>();
 
-        // The range bounds apply to every entry, so resolve them to absolute instants once here
-        // rather than per event. The period bounds are server-local wall-clock times (from
-        // DateTimeOffset.LocalDateTime); interpret them as local instants so the comparison against
-        // each entry's absolute timestamp is offset-correct regardless of the entry's own offset.
+        // StartTime/EndTime are server-local wall-clock DateTimes (they carry no offset). Re-attach
+        // the local offset so they become absolute instants comparable to each entry's timestamp,
+        // resolving them once here rather than per entry.
         var rangeStart = new DateTimeOffset(DateTime.SpecifyKind(logTimePeriod.StartTime, DateTimeKind.Local));
         var rangeEnd = new DateTimeOffset(DateTime.SpecifyKind(logTimePeriod.EndTime, DateTimeKind.Local));
 
