@@ -23,28 +23,28 @@ export class UmbBlockRteManagerContext<
 	public readonly pendingDeletions = this.#pendingDeletions.asObservable();
 
 	/**
-	 * Request a block to be deleted. This adds the contentKey to pending deletions,
+	 * Request a block to be deleted. This adds the layout key to pending deletions,
 	 * which will be processed by the Tiptap API to remove the HTML element first,
 	 * enabling undo support.
-	 * @param {string} contentKey - The content key of the block to delete.
+	 * @param {string} layoutKey - The layout key of the block to delete.
 	 */
-	public requestPendingDeletion(contentKey: string) {
-		this.#pendingDeletions.appendOne(contentKey);
+	public requestPendingDeletion(layoutKey: string) {
+		this.#pendingDeletions.appendOne(layoutKey);
 	}
 
 	/**
 	 * Clear a pending deletion after it has been processed.
-	 * @param {string} contentKey - The content key to clear from pending deletions.
+	 * @param {string} layoutKey - The layout key to clear from pending deletions.
 	 */
-	public clearPendingDeletion(contentKey: string) {
-		this.#pendingDeletions.removeOne(contentKey);
+	public clearPendingDeletion(layoutKey: string) {
+		this.#pendingDeletions.removeOne(layoutKey);
 	}
 
-	removeOneLayout(contentKey: string) {
-		this._layouts.removeOne(contentKey);
+	removeOneLayout(layoutKey: string) {
+		this._layouts.removeOne(layoutKey);
 	}
-	removeManyLayouts(contentKeys: Array<string>) {
-		this._layouts.remove(contentKeys);
+	removeManyLayouts(layoutKeys: Array<string>) {
+		this._layouts.remove(layoutKeys);
 	}
 
 	/**
