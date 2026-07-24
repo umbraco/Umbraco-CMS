@@ -213,6 +213,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         async Task<(ContentCacheNode? Node, bool AncestorCheckFailed)> GetContentCacheNodeFromRepo()
         {
             using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.ContentTree);
             ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
 
             // If we can resolve the content cache node, we still need to check if the ancestor path is published.
@@ -245,6 +246,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
         IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key], ContentCacheDataSerializerEntityType.Document);
         scope.Complete();
 
@@ -341,6 +343,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             }
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            scope.ReadLock(Constants.Locks.ContentTree);
 
             IEnumerable<ContentCacheNode> cacheNodes = await _databaseCacheRepository.GetContentSourcesAsync(uncachedKeys);
 

@@ -189,6 +189,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
         {
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
+			scope.ReadLock(Constants.Locks.MediaTree);
             ContentCacheNode? mediaCacheNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
             scope.Complete();
             return mediaCacheNode;
@@ -271,6 +272,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             }
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            scope.ReadLock(Constants.Locks.MediaTree);
 
             IEnumerable<ContentCacheNode> cacheNodes = await _databaseCacheRepository.GetMediaSourcesAsync(uncachedKeys);
 
@@ -300,6 +302,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.MediaTree);
 
         ContentCacheNode? publishedNode = await _databaseCacheRepository.GetMediaSourceAsync(key);
         if (publishedNode is not null)
@@ -373,6 +376,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     public IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.MediaTree);
         IEnumerable<ContentCacheNode> nodes = _databaseCacheRepository.GetContentByContentTypeKey([contentType.Key], ContentCacheDataSerializerEntityType.Media);
         scope.Complete();
 
