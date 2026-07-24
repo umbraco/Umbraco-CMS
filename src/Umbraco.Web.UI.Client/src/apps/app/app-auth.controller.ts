@@ -87,20 +87,21 @@ export class UmbAppAuthController extends UmbControllerBase {
 		// Avoid stacking a second modal instance while one is already open (e.g. a repeated timeout
 		// signal, or isAuthorized() re-checked for another guarded route).
 		if (this.#authModalOpen) return;
-
-		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-
+		// Set the flag before the await so two near-simultaneous triggers (e.g. a timeout signal and a
+		// route-guard re-check) can't both pass the guard and open a second modal. The try/finally
+		// resets it on every path, including a failed getContext.
 		this.#authModalOpen = true;
-		const modal = modalManager?.open(this, UMB_MODAL_APP_AUTH, {
-			modal: {
-				key: 'app-auth',
-			},
-			data: {
-				userLoginState,
-			},
-		});
 
 		try {
+			const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+			const modal = modalManager?.open(this, UMB_MODAL_APP_AUTH, {
+				modal: {
+					key: 'app-auth',
+				},
+				data: {
+					userLoginState,
+				},
+			});
 			await modal?.onSubmit();
 		} catch {
 			// Modal was force-closed — a subsequent timeout/guard check reopens it if still unauthorized.
