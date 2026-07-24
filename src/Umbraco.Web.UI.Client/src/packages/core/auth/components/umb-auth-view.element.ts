@@ -160,7 +160,7 @@ export class UmbAuthViewElement extends UmbLitElement {
 		return provider.forProviderName.toLowerCase() !== 'umbraco';
 	};
 
-	#onSubmit = async (providerOrManifest: string | ManifestAuthProvider, _loginHint?: string) => {
+	#onSubmit = async (providerOrManifest: string | ManifestAuthProvider) => {
 		try {
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 			if (!authContext) {

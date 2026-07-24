@@ -54,6 +54,7 @@ export class UmbAuthContext extends UmbContextBase {
 	#linkKeyEndpoint;
 	#unlinkEndpoint;
 	#keepAliveEndpoint;
+	#externalLoginEndpoint;
 	#postLogoutRedirectUri;
 
 	/**
@@ -104,6 +105,7 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#linkKeyEndpoint = `${serverUrl}/umbraco/management/api/v1/security/back-office/link-login-key`;
 		this.#unlinkEndpoint = `${serverUrl}/umbraco/management/api/v1/security/back-office/unlink-login`;
 		this.#keepAliveEndpoint = `${serverUrl}/umbraco/management/api/v1/security/back-office/keep-alive`;
+		this.#externalLoginEndpoint = `${serverUrl}/umbraco/management/api/v1/security/back-office/external-login`;
 
 		// Set up cross-tab coordination via BroadcastChannel
 		this.#channel = new BroadcastChannel('umb:auth');
@@ -163,8 +165,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @param {ManifestAuthProvider} manifest The manifest for the registered provider, used for the popup target/features.
 	 */
 	startExternalLogin(provider: string, manifest?: ManifestAuthProvider): void {
-		const challengeUrl = new URL(`${this.#serverUrl}/umbraco/management/api/v1/security/back-office/external-login`);
-		challengeUrl.searchParams.set('provider', provider);
+		const challengeUrl = this.#externalLoginChallengeUrl(provider);
 
 		// Preserve where the user was so context carries through the flow. Skip a bare backoffice
 		// root — the server already defaults there, so a returnUrl would just be noise.
@@ -173,12 +174,7 @@ export class UmbAuthContext extends UmbContextBase {
 			challengeUrl.searchParams.set('returnUrl', returnPath);
 		}
 
-		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
-		const popupFeatures =
-			manifest?.meta?.behavior?.popupFeatures ??
-			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
-
-		window.open(challengeUrl.href, popupTarget, popupFeatures);
+		this.#openLoginPopup(challengeUrl.href, manifest);
 	}
 
 	/**
@@ -201,12 +197,22 @@ export class UmbAuthContext extends UmbContextBase {
 		// host, not the backend's. `document.baseURI` gives the path under the client's base.
 		loginUrl.searchParams.set('ReturnUrl', new URL('auth-callback', document.baseURI).pathname);
 
+		this.#openLoginPopup(loginUrl.href, manifest);
+	}
+
+	#externalLoginChallengeUrl(provider: string): URL {
+		const challengeUrl = new URL(this.#externalLoginEndpoint);
+		challengeUrl.searchParams.set('provider', provider);
+		return challengeUrl;
+	}
+
+	#openLoginPopup(url: string, manifest?: ManifestAuthProvider): void {
 		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
 		const popupFeatures =
 			manifest?.meta?.behavior?.popupFeatures ??
 			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
 
-		window.open(loginUrl.href, popupTarget, popupFeatures);
+		window.open(url, popupTarget, popupFeatures);
 	}
 
 	/**
@@ -222,9 +228,7 @@ export class UmbAuthContext extends UmbContextBase {
 			return;
 		}
 
-		const challengeUrl = new URL(`${this.#serverUrl}/umbraco/management/api/v1/security/back-office/external-login`);
-		challengeUrl.searchParams.set('provider', manifest.forProviderName);
-		window.location.href = challengeUrl.href;
+		window.location.href = this.#externalLoginChallengeUrl(manifest.forProviderName).href;
 	}
 
 	/**

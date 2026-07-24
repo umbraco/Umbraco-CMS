@@ -4,6 +4,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#retrievedContext: Promise<unknown>;
@@ -77,8 +78,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 		// signal, or isAuthorized() re-checked for another guarded route).
 		if (this.#authModalOpen) return;
 
-		const contextToken = (await import('@umbraco-cms/backoffice/modal')).UMB_MODAL_MANAGER_CONTEXT;
-		const modalManager = await this.getContext(contextToken);
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
 		this.#authModalOpen = true;
 		const modal = modalManager?.open(this, UMB_MODAL_APP_AUTH, {

@@ -735,13 +735,12 @@ public class BackOfficeController : SecurityControllerBase
 
     private string ExternalLoginSuccessRedirectUrl(string? returnUrl)
     {
-        var origin = _securitySettings.Value.BackOfficeHost?.GetLeftPart(UriPartial.Authority) ?? string.Empty;
-        var url = origin + _securitySettings.Value.CallbackPathName.EnsureEndsWith('/') + "auth-callback";
+        var url = ClientRedirectUrl(_securitySettings.Value.CallbackPathName.EnsureEndsWith('/') + "auth-callback");
 
         // The value round-trips through the external provider's state, so re-validate it as untrusted input.
         if (string.IsNullOrWhiteSpace(returnUrl) is false && Url.IsLocalUrl(returnUrl))
         {
-            url = url.AppendQueryStringToUrl($"{ExternalLoginReturnUrlKey}={Uri.EscapeDataString(returnUrl!)}");
+            url = url.AppendQueryStringToUrl($"{ExternalLoginReturnUrlKey}={Uri.EscapeDataString(returnUrl)}");
         }
 
         return url;
