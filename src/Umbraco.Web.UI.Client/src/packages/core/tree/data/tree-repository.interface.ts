@@ -4,7 +4,6 @@ import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type {
 	UmbRepositoryResponse,
@@ -56,19 +55,4 @@ export interface UmbTreeRepository<
 	 * @memberof UmbTreeRepository
 	 */
 	requestTreeItemAncestors: (args: TreeAncestorsOfRequestArgsType) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
-
-	/**
-	 * Returns an observable of the root items of the tree.
-	 * @memberof UmbTreeRepository
-	 * @deprecated Use `requestTreeRootItems` instead. It will be removed in Umbraco 18.
-	 */
-	rootTreeItems?: () => Promise<Observable<TreeItemType[]>>;
-
-	/**
-	 * Returns an observable of the children of the given parent item.
-	 * @param {(string | null)} parentUnique
-	 * @memberof UmbTreeRepository
-	 * @deprecated Use `requestTreeItemsOf` instead. It will be removed in Umbraco 18.
-	 */
-	treeItemsOf?: (parentUnique: string | null) => Promise<Observable<TreeItemType[]>>;
 }

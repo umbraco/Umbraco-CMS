@@ -387,6 +387,33 @@ internal sealed partial class UserServiceTests
     }
 
     [Test]
+    public async Task GetDocumentPermissionsAsync_Returns_Empty_Permissions_For_Empty_Keys()
+    {
+        // Arrange
+        var userGroup = await CreateTestUserGroup();
+        var user = UserService.CreateUserWithIdentity("test1", "test1@test.com");
+        user.AddGroup(userGroup.ToReadOnlyGroup());
+        UserService.Save(user);
+
+        // Create content so the database is non-empty — we want to verify that an an empty key collection
+        // does not return ALL documents, producing a non-empty result instead of the expected empty one.
+        var contentType = ContentTypeBuilder.CreateSimpleContentType();
+        contentType.AllowedTemplates = null;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
+
+        // Act
+        var result = await UserService
+            .GetDocumentPermissionsAsync(user.Key, Array.Empty<Guid>());
+
+        // Assert
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(UserOperationStatus.Success, result.Status);
+        Assert.IsEmpty(result.Result);
+    }
+
+    [Test]
     public async Task AssignUserGroupPermission_Adds_To_Existing_Permissions()
     {
         // Arrange

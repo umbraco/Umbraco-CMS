@@ -38,9 +38,9 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     }
 
     [SetUp]
-    public void Setup() => CreateTestData();
+    public new async Task Setup() => await CreateTestData();
 
-    protected virtual void CreateTestData()
+    protected virtual async Task CreateTestData()
     {
         ContentType = new ContentTypeBuilder()
             .WithName("Page")
@@ -58,9 +58,12 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
                 .Done()
             .Build();
 
-        ContentTypeService.Save(ContentType);
+        var createResult = await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+
         ContentType.AllowedContentTypes = [new ContentTypeSort(ContentType.Key, 0, ContentType.Alias)];
-        ContentTypeService.Save(ContentType);
+        var updateResult = await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
 
         Root1 = new ContentBuilder()
             .WithContentType(ContentType)
@@ -107,6 +110,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             var item = actual.Result.Items.FirstOrDefault();
             Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
             Assert.AreEqual(Root2.Key, item?.NodeKey);
+            Assert.AreEqual(Root2.Name, item?.NodeName);
         });
     }
 
@@ -140,6 +144,9 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             Assert.IsFalse(itemKeys.Contains(Root1.Key)); // Should not return the parent itself (see: https://github.com/umbraco/Umbraco-CMS/pull/21162)
             Assert.AreEqual(1, itemKeys.Count);
             Assert.IsTrue(itemKeys.Contains(Child1.Key));
+
+            var childItem = actual.Result.Items.FirstOrDefault(x => x.NodeKey == Child1.Key);
+            Assert.AreEqual(Child1.Name, childItem?.NodeName);
         });
     }
 
@@ -183,6 +190,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             var item = actual.Items.FirstOrDefault();
             Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
             Assert.AreEqual(Root2.Key, item?.NodeKey);
+            Assert.AreEqual(Root2.Name, item?.NodeName);
         });
     }
 }

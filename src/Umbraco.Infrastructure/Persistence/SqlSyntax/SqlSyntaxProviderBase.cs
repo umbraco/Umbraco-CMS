@@ -227,9 +227,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// <summary>
     /// Determines the database type to use, potentially updating it based on the provided connection string.
     /// </summary>
-    /// <param name="current">The current <see cref="Umbraco.Cms.Infrastructure.Persistence.DatabaseType"/>.</param>
+    /// <param name="current">The current <see cref="DatabaseType"/>.</param>
     /// <param name="connectionString">An optional connection string that may influence the database type.</param>
-    /// <returns>The resulting <see cref="Umbraco.Cms.Infrastructure.Persistence.DatabaseType"/>.</returns>
+    /// <returns>The resulting <see cref="DatabaseType"/>.</returns>
     public virtual DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) => current;
 
     /// <summary>
@@ -301,7 +301,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// Returns the specified name quoted with double quotes for use in SQL statements.
     /// </summary>
     /// <param name="name">The name to quote. Can be <c>null</c>.</param>
-    /// <returns>The quoted name as a string, or <c>"null"</c> if <paramref name="name"/> is <c>null</c>.</returns
+    /// <returns>The quoted name as a string, or <c>"null"</c> if <paramref name="name"/> is <c>null</c>.</returns>
     public virtual string GetQuotedName(string? name) => $"\"{name}\"";
 
     /// <summary>
@@ -504,7 +504,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     /// <param name="sql">The base SQL query to which the left join and nested join will be applied.</param>
     /// <param name="nestedJoin">A function that defines the nested join logic to be included within the left join.</param>
     /// <param name="alias">An optional alias for the joined table.</param>
-    /// <returns>A <see cref="SqlJoinClause{ISqlContext}"/> representing the constructed left join with the nested join applied.</returns>
+    /// <returns>A <see cref="Sql{ISqlContext}.SqlJoinClause{ISqlContext}"/> representing the constructed left join with the nested join applied.</returns>
     public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
         Sql<ISqlContext> sql,
         Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
@@ -546,7 +546,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotSupportedException();
 
     /// <summary>
-    ///     This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
+    /// This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
     /// </summary>
     /// <param name="date">The date to format.</param>
     /// <param name="includeTime">Whether to include the time component.</param>
@@ -559,6 +559,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         // need CultureInfo.InvariantCulture because ":" here is the "time separator" and
         // may be converted to something else in different cultures (eg "." in DK).
         date.ToString(includeTime ? "yyyyMMdd HH:mm:ss" : "yyyyMMdd", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    public virtual string FormatGuid(Guid guid) => guid.ToString();
 
     /// <summary>
     /// Formats a SQL create table statement for the specified table definition.
@@ -641,12 +644,22 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual string Format(IEnumerable<ColumnDefinition> columns)
     {
         var sb = new StringBuilder();
+        bool first = true;
         foreach (ColumnDefinition column in columns)
         {
-            sb.Append(Format(column) + ",\n");
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                sb.Append(",\n");
+            }
+
+            sb.Append(Format(column));
         }
 
-        return sb.ToString().TrimEnd(",\n");
+        return sb.ToString();
     }
 
     /// <summary>

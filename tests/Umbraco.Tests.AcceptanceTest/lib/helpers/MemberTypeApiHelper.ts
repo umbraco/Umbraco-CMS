@@ -1,5 +1,6 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {AliasHelper} from "./AliasHelper";
+import {ConstantHelper} from "./ConstantHelper";
 import {MemberTypeBuilder} from "../builders";
 
 export class MemberTypeApiHelper {
@@ -13,31 +14,91 @@ export class MemberTypeApiHelper {
     const rootMemberTypes = await this.getAllAtRoot();
     const jsonMemberTypes = await rootMemberTypes.json();
 
-    for (const memberType of jsonMemberTypes.items) {
-      if (memberType.name === name) {
-        return await this.delete(memberType.id);
+    // Delete every match, comparing alias (case-insensitive) as well as name: a renamed type keeps its
+    // old alias, which a name-only match misses, causing a "Duplicate alias" 400 on the next create.
+    const alias = AliasHelper.toAlias(name).toLowerCase();
+    for (const memberType of this.api.itemsOf(jsonMemberTypes)) {
+      if (memberType.isFolder) {
+        if (memberType.name === name) {
+          await this.recurseDeleteChildren(memberType);
+        } else if (memberType.hasChildren) {
+          await this.recurseChildren(name, memberType.id, true);
+        }
+        continue;
+      }
+
+      let matches = memberType.name === name;
+      if (!matches) {
+        const full = await this.get(memberType.id);
+        matches = full.alias?.toLowerCase() === alias;
+      }
+      if (matches) {
+        await this.delete(memberType.id);
       }
     }
     return null;
+  }
+
+  private async recurseChildren(name: string, id: string, toDelete: boolean) {
+    const items = await this.getChildren(id);
+
+    for (const child of items) {
+      if (child.name === name) {
+        if (!toDelete) {
+          if (child.isFolder) {
+            return await this.getFolder(child.id);
+          }
+          return await this.get(child.id);
+        }
+        if (child.isFolder) {
+          return await this.recurseDeleteChildren(child);
+        }
+        return await this.delete(child.id);
+      } else if (child.hasChildren) {
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
+      }
+    }
+    return false;
+  }
+
+  private async recurseDeleteChildren(memberTypeFolder) {
+    if (!memberTypeFolder.hasChildren) {
+      return await this.deleteFolder(memberTypeFolder.id);
+    }
+    const items = await this.getChildren(memberTypeFolder.id);
+
+    for (const child of items) {
+      if (child.hasChildren) {
+        await this.recurseDeleteChildren(child);
+      } else if (child.isFolder) {
+        await this.deleteFolder(child.id);
+      } else {
+        await this.delete(child.id);
+      }
+    }
+    return await this.deleteFolder(memberTypeFolder.id);
   }
 
   async create(memberType) {
     if (memberType == null) {
       return;
     }
-    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/member-type', memberType);
-    return response.headers().location.split("v1/member-type/").pop();
+    const response = await this.api.post(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType, memberType);
+    return this.api.getIdFromLocation(response);
   }
 
   async update(id: string, updatedMemberType) {
     if (updatedMemberType == null) {
       return;
     }
-    return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id, updatedMemberType);
+    return await this.api.put(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id, updatedMemberType);
   }
 
   async get(id: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id);
+    const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id);
     return await response.json();
   }
 
@@ -45,28 +106,42 @@ export class MemberTypeApiHelper {
     if (id == null) {
       return;
     }
-    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id);
+    const response = await this.api.delete(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id);
     return response.status();
   }
 
   async getAllAtRoot() {
-    return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/member-type/root?skip=0&take=10000');
+    return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/member-type/root?skip=0&take=10000&foldersOnly=false');
+  }
+
+  async getChildren(id: string) {
+    const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/member-type/children?parentId=${id}&skip=0&take=10000&foldersOnly=false`);
+    const items = await response.json();
+    return this.api.itemsOf(items);
   }
 
   async getByName(name: string) {
     const rootMemberTypes = await this.getAllAtRoot();
     const jsonMemberTypes = await rootMemberTypes.json();
 
-    for (const memberType of jsonMemberTypes.items) {
+    for (const memberType of this.api.itemsOf(jsonMemberTypes)) {
       if (memberType.name === name) {
+        if (memberType.isFolder) {
+          return this.getFolder(memberType.id);
+        }
         return this.get(memberType.id);
+      } else if (memberType.isContainer || memberType.hasChildren) {
+        const result = await this.recurseChildren(name, memberType.id, false);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
   }
 
   async doesExist(id: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id);
+    const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id);
     return response.status() === 200;
   }
 
@@ -81,6 +156,19 @@ export class MemberTypeApiHelper {
       .withName(memberTypeName)
       .withAlias(AliasHelper.toAlias(memberTypeName))
       .withAllowedAsRoot(true)
+      .build();
+
+    return await this.create(memberType);
+  }
+
+  async createDefaultMemberTypeInFolder(memberTypeName: string, folderId: string) {
+    await this.ensureNameNotExists(memberTypeName);
+
+    const memberType = new MemberTypeBuilder()
+      .withName(memberTypeName)
+      .withAlias(AliasHelper.toAlias(memberTypeName))
+      .withAllowedAsRoot(true)
+      .withFolderId(folderId)
       .build();
 
     return await this.create(memberType);
@@ -150,5 +238,31 @@ export class MemberTypeApiHelper {
         .done()
       .build();
     return await this.create(memberType);
+  }
+
+  // Folder
+  async getFolder(id: string) {
+    const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + id);
+    return await response.json();
+  }
+
+  async deleteFolder(id: string) {
+    return await this.api.delete(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + id);
+  }
+
+  async createFolder(name: string, parentId?: string) {
+    const folder = {
+      "name": name,
+      "parent": parentId ? {"id": parentId} : null
+    }
+    const response = await this.api.post(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder, folder);
+    return this.api.getIdFromLocation(response);
+  }
+
+  async renameFolder(folderId: string, folderName: string) {
+    const folder = {
+      "name": folderName
+    }
+    return await this.api.put(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + folderId, folder);
   }
 }

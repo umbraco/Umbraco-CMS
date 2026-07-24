@@ -94,6 +94,7 @@ public static class UmbracoBuilderExtensions
                 }
             });
 
+        builder.Services.AddSingleton(new EFCoreScopeConfiguration<TestUmbracoDbContext>());
         builder.Services.AddUnique<IAmbientEFCoreScopeStack<TestUmbracoDbContext>, AmbientEFCoreScopeStack<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeAccessor<TestUmbracoDbContext>, EFCoreScopeAccessor<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeProvider<TestUmbracoDbContext>, EFCoreScopeProvider<TestUmbracoDbContext>>();
@@ -167,11 +168,13 @@ public static class UmbracoBuilderExtensions
         {
         }
 
+        [Obsolete("Use RebuildIndexAsync() instead. Scheduled for removal in Umbraco 19.")]
         public override void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
         {
             // noop
         }
 
+        [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in Umbraco 19.")]
         public override void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
         {
             // noop

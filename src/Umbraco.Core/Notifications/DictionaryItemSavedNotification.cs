@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
-///     A notification that is used to trigger the ILocalizationService when the Save (IDictionaryItem overload) method is called in the API and the data has been persisted.
+///     A notification that is used to trigger the IDictionaryItemService when a dictionary item is created or updated via the API, after data has been persisted.
 /// </summary>
 public class DictionaryItemSavedNotification : SavedNotification<IDictionaryItem>
 {

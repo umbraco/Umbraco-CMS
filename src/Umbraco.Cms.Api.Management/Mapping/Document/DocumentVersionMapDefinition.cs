@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -29,19 +27,6 @@ public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, Docum
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentVersionMapDefinition"/> class.
-    /// </summary>
-    /// <param name="propertyEditorCollection">The collection of property editors used for mapping document versions.</param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public DocumentVersionMapDefinition(
-        PropertyEditorCollection propertyEditorCollection)
-        : this(
-            propertyEditorCollection,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
-    /// <summary>
     /// Configures object-object mappings for converting document content entities to their version response models.
     /// </summary>
     /// <param name="mapper">The mapper instance used to define the mapping rules.</param>
@@ -50,6 +35,7 @@ public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, Docum
         mapper.Define<IContent, DocumentVersionResponseModel>((_, _) => new DocumentVersionResponseModel(), Map);
     }
 
+    // Umbraco.Code.MapAll -Flags
     private void Map(IContent source, DocumentVersionResponseModel target, MapperContext context)
     {
         target.Id = source.VersionId.ToGuid(); // this is a magic guid since versions do not have Guids in the DB
@@ -60,7 +46,7 @@ public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, Docum
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = DocumentVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);

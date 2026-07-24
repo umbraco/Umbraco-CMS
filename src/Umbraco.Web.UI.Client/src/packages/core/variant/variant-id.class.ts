@@ -7,6 +7,11 @@ export const UMB_INVARIANT_CULTURE = 'invariant';
  * The identifier is not specific for ContentType Variants, but is used for many type of identification of a culture and a segment. One case is any property of a ContentType can be resolved into a VariantId depending on their structural settings such as Vary by Culture and Vary by Segmentation.
  */
 export class UmbVariantId {
+	/**
+	 * A frozen instance of the UmbVariantId class representing the invariant variant, meaning it has no culture and no segment.
+	 */
+	public static readonly INVARIANT = Object.freeze(new UmbVariantId(null, null));
+
 	public static Create(variantData: UmbObjectWithVariantProperties): UmbVariantId {
 		return Object.freeze(new UmbVariantId(variantData.culture, variantData.segment));
 	}
@@ -16,7 +21,7 @@ export class UmbVariantId {
 	}
 
 	public static CreateInvariant(): UmbVariantId {
-		return Object.freeze(new UmbVariantId(null, null));
+		return UmbVariantId.INVARIANT;
 	}
 
 	public static FromString(str: string): UmbVariantId {

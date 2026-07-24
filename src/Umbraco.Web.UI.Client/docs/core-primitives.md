@@ -17,9 +17,9 @@ export class UmbMyElement extends UmbLitElement {
 }
 ```
 
-UmbLitElement extends Lit's `LitElement` with four core capabilities:
+UmbLitElement extends Lit's `LitElement` with core capabilities:
 
-### observe(source, callback?, controllerAlias?)
+### Observe a State
 
 Lifecycle-managed observable subscription. Automatically unsubscribes when the element disconnects from the DOM — no manual cleanup needed.
 
@@ -51,11 +51,18 @@ this.observe(
 ```
 
 **Alias behavior:**
-- If omitted and callback exists: auto-generated hash of the callback function
-- If `null`: no alias (controller cannot be replaced by alias)
-- If provided: explicit string/symbol for later reference
 
-### consumeContext(alias, callback)
+- If omitted and callback exists: auto-generated hash of the callback function — guards against accidental duplicate subscriptions when the same `observe(...)` line runs more than once
+- If `null`: no alias — use this when the call site is one-shot (e.g., set up once in a constructor and never invoked again). Intentional; not a missing-alias smell.
+- If provided: explicit string/symbol — re-running the same `observe(...)` line replaces the existing controller with the same alias, and you can remove it actively via `removeUmbControllerByAlias('_observeItems')`
+
+### Retrieve a Context
+
+**Default to `consumeContext`.** Use it whenever a controller or element needs the context at setup time — both for ongoing observation of values and for one-time reads on resolve. The callback runs as soon as the context is available and re-runs if the context is replaced; cleanup is tied to the controller lifecycle.
+
+**Use `getContext` only when the context is not needed until a user action runs.** Typical cases: an event handler, a property action's `execute()`, an entity action's `execute()`, a modal-open handler. Inside these, awaiting `getContext` keeps the call site flat and avoids registering a long-lived consumer for a one-off operation.
+
+#### consumeContext(alias, callback)
 
 Subscribe to a context provided by an ancestor element. The callback fires when the context becomes available (and re-fires if the context changes).
 
@@ -74,7 +81,7 @@ constructor() {
 }
 ```
 
-### getContext(alias, options?)
+#### getContext(alias, options?)
 
 Promise-based one-time context retrieval. Use for user-triggered actions where you don't need continuous observation.
 
@@ -85,18 +92,19 @@ async #handleClick() {
 }
 ```
 
-### provideContext(alias, instance)
+### Provide a Context
 
-Make a context instance available to all descendant elements.
+Make a context instance available to all descendant elements by extending UmbContextBase.
 
 ```typescript
-constructor() {
-	super();
-	this.provideContext(UMB_MY_CONTEXT, new UmbMyContext(this));
+class UmbMyContext extends UmbContextBase {
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_MY_CONTEXT);
+	}
 }
 ```
 
-### this.localize
+### Localization
 
 Built-in localization controller. Available on every UmbLitElement.
 
@@ -112,122 +120,25 @@ const label = this.localize.term('content_createBlueprintFrom');
 
 ## Observable State
 
-Reactive state containers built on RxJS `BehaviorSubject`. All state classes emit the current value immediately on subscription, then emit on every change.
+Reactive state containers built on RxJS `BehaviorSubject`. **All `Umb*State` classes only emit when the new value differs from the current value** — observers are not invoked on `setValue(x)` when the state already holds `x`. This means you do not need to write "is this a redundant re-emit?" guards inside observer callbacks.
 
-### State Types
-
-| Class | For | Change Detection |
-|-------|-----|-----------------|
-| `UmbStringState` | Strings | `!==` (reference) |
-| `UmbNumberState` | Numbers | `!==` (reference) |
-| `UmbBooleanState` | Booleans | `!==` (reference) |
-| `UmbObjectState` | Objects | JSON deep comparison + deep freeze |
-| `UmbArrayState` | Arrays | JSON deep comparison + deep freeze |
-| `UmbClassState` | Class instances | `.equal()` method on the class |
-| `UmbDeepState` | Any (base for Object/Array) | JSON deep comparison + deep freeze |
-
-### Basic Usage
+| Class | Holds | Comparison |
+|-------|-------|-----------|
+| `UmbStringState` / `UmbNumberState` / `UmbBooleanState` | Primitives | `===` |
+| `UmbObjectState` / `UmbArrayState` / `UmbDeepState` | Plain JSON data, deep-frozen | `JSON.stringify` deep compare |
+| `UmbClassState` | Class instance with `.equal()` | `oldValue.equal(newValue)` (when both non-null) |
+| `UmbBasicState` | Anything | `===` (reference) |
 
 ```typescript
 import { UmbStringState, UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
-// Create state (private)
-#name = new UmbStringState('');
-#items = new UmbArrayState<MyItem>([], (item) => item.unique);
-#data = new UmbObjectState<MyModel | undefined>(undefined);
-
-// Expose as observable (public, read-only)
+// Private state, public read-only observable
+#name = new UmbStringState<string>('');
 readonly name = this.#name.asObservable();
-readonly items = this.#items.asObservable();
-readonly data = this.#data.asObservable();
-
-// Read current value
-const currentName = this.#name.getValue();
-
-// Update value
 this.#name.setValue('new name');
 ```
 
-### UmbArrayState
-
-Requires a unique-key function for identity tracking. Provides rich array manipulation methods.
-
-```typescript
-#items = new UmbArrayState<MyItem>([], (item) => item.unique);
-
-// Append
-this.#items.appendOne(newItem);
-this.#items.append([item1, item2]);
-
-// Remove
-this.#items.removeOne('unique-id');
-this.#items.remove(['id1', 'id2']);
-
-// Update a single item (partial merge)
-this.#items.updateOne('unique-id', { name: 'Updated' });
-
-// Filter
-this.#items.filter((item) => item.active);
-
-// Sort
-this.#items.sortBy((a, b) => a.name.localeCompare(b.name));
-
-// Clear
-this.#items.clear();
-
-// Check existence
-this.#items.getHasOne('unique-id'); // boolean
-```
-
-### UmbObjectState
-
-```typescript
-#data = new UmbObjectState<MyModel>({ name: '', count: 0 });
-
-// Partial update (shallow merge)
-this.#data.update({ name: 'Updated' }); // count stays 0
-```
-
-### Derived Observables (asObservablePart)
-
-Create an observable that only emits when a specific derived value changes. Uses memoization to avoid unnecessary updates.
-
-```typescript
-// Only emits when the name changes, not when other properties change
-readonly name = this.#data.asObservablePart((data) => data?.name);
-
-// Count of items
-readonly itemCount = this.#items.asObservablePart((items) => items.length);
-
-// First item
-readonly firstItem = this.#items.asObservablePart((items) => items[0]);
-```
-
-### Deep Freeze
-
-`UmbDeepState`, `UmbObjectState`, and `UmbArrayState` deep-freeze their data. Attempting to mutate frozen data throws an error in development. This enforces immutable update patterns:
-
-```typescript
-// WRONG — throws TypeError in development
-const items = this.#items.getValue();
-items.push(newItem); // Frozen!
-
-// CORRECT — create new array
-this.#items.appendOne(newItem);
-// or
-this.#items.setValue([...this.#items.getValue(), newItem]);
-```
-
-### Mute/Unmute
-
-`UmbDeepState` (and its subclasses) support muting to batch multiple updates without emitting intermediate values:
-
-```typescript
-this.#data.mute();
-this.#data.update({ name: 'a' });
-this.#data.update({ count: 1 });
-this.#data.unmute(); // Single emission with both changes
-```
+For per-type comparison details, change-detection caveats (`UmbBasicState` holding objects, `UmbClassState` with `undefined`), `asObservablePart` memoization, mute/unmute, and the rationale for not writing emission guards in observers, see **[State System](./state-system.md)**.
 
 ---
 
@@ -343,6 +254,8 @@ this.observe(context.items, (items) => { ... }, '_observeItems');
 // Second call: destroys previous '_observeItems' observer, creates new one
 this.observe(context.items, (items) => { ... }, '_observeItems');
 ```
+
+
 
 ---
 

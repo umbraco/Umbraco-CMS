@@ -285,8 +285,6 @@ export default {
 		renewSession: 'Renovar agora para salvar seu trabalho',
 	},
 	login: {
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 	},
 	main: {
 		dashboard: 'Painel',
@@ -377,14 +375,8 @@ export default {
 		editscript: 'Editar arquivo de script',
 	},
 	sections: {
-		concierge: 'Porteiro',
-		courier: 'Mensageiro',
-		developer: 'Desenvolvedor',
-		installer: 'Assistente de Configuração Umbraco',
 		media: 'Mídia',
-		newsletters: 'Boletins Informativos',
 		settings: 'Configurações',
-		statistics: 'Estatísticas',
 		users: 'Usuários',
 	},
 	settings: {

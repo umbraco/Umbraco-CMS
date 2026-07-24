@@ -4,13 +4,10 @@ using System.Text;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
@@ -39,7 +36,6 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     /// <param name="contentTypeService">The service used to manage content types.</param>
     /// <param name="documentNavigationQueryService">The service used to query document navigation structures.</param>
     /// <param name="publishedContentStatusFilteringService">The service used to filter published content by status.</param>
-    [ActivatorUtilitiesConstructor]
     public ExecuteTemplateQueryController(
         IPublishedContentQuery publishedContentQuery,
         IPublishedValueFallback publishedValueFallback,

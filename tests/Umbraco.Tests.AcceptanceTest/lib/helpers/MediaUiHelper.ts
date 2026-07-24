@@ -105,12 +105,12 @@ export class MediaUiHelper extends UiBaseLocators {
   }
 
   async clickEmptyRecycleBinButton() {
-    // Force click is needed
     await this.hoverAndClick(this.recycleBinMenuItem, this.emptyRecycleBinBtn, {force: true});
+    await expect(this.confirmEmptyRecycleBinBtn).toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   async clickConfirmEmptyRecycleBinButton() {
-    await this.click(this.confirmEmptyRecycleBinBtn);
+    await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.long});
   }
 
   async clickCreateModalButton() {
@@ -129,23 +129,23 @@ export class MediaUiHelper extends UiBaseLocators {
       await this.clickMediaCaretButtonForName(name);
     }
   }
-  
+
   async doesMediaGridValuesMatch(expectedValues: string[]) {
-    return expectedValues.forEach((text, index) => {
-      expect(this.mediaCardItemsValues.nth(index)).toHaveText(text);
-    });
+    for (const [index, text] of expectedValues.entries()) {
+      await expect(this.mediaCardItemsValues.nth(index)).toHaveText(text);
+    }
   }
 
   async doesMediaListHeaderValuesMatch(expectedValues: string[]) {
-    return expectedValues.forEach((text, index) => {
-      expect(this.mediaListHeader.nth(index)).toHaveText(text);
-    });
+    for (const [index, text] of expectedValues.entries()) {
+      await expect(this.mediaListHeader.nth(index)).toHaveText(text);
+    }
   }
 
   async doesMediaListNameValuesMatch(expectedValues: string[]) {
-    return expectedValues.forEach((text, index) => {
-      expect(this.mediaListNameValues.nth(index)).toHaveText(text);
-    });
+    for (const [index, text] of expectedValues.entries()) {
+      await expect(this.mediaListNameValues.nth(index)).toHaveText(text);
+    }
   }
 
   async isMediaGridViewVisible(isVisible: boolean = true) {
@@ -224,7 +224,22 @@ export class MediaUiHelper extends UiBaseLocators {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.recycleBinMedia, this.clickConfirmEmptyRecycleBinButton(), ConstantHelper.statusCodes.ok);
   }
 
+  async clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved(mediaIds: string[]) {
+    // Wait for the move of each specific media id, so the assertion can't race an unrelated /move response.
+    await Promise.all([
+      ...mediaIds.map((id) =>
+        this.waitForResponse(
+          (resp) =>
+            resp.url().includes(`/media/${id}/move`) &&
+            resp.status() === ConstantHelper.statusCodes.ok,
+        ),
+      ),
+      this.clickChooseModalButton(),
+    ]);
+  }
+
+  /** @deprecated Prefer {@link clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved}, which waits per media id (deterministic); kept for backwards compatibility. */
   async clickChooseModalButtonAndWaitForMediaItemsToBeMoved(movedMediaItems: number) {
-    return await this.waitForMultipleResponsesAfterExecutingPromise('/move', this.clickChooseModalButton(), 200, movedMediaItems);
+    return await this.waitForMultipleResponsesAfterExecutingPromise('/move', this.clickChooseModalButton(), ConstantHelper.statusCodes.ok, movedMediaItems);
   }
 }

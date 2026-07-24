@@ -1,4 +1,4 @@
-import type { UmbExtensionManifestKind } from '../extension-registry/registry.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { manifests as actionManifests } from './action/manifests.js';
 import { manifests as pickerModalManifests } from './collection-item-picker-modal/manifests.js';
 import { manifests as conditionManifests } from './conditions/manifests.js';

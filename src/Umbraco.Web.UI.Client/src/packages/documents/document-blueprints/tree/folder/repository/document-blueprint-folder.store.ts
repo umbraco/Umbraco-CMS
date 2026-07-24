@@ -15,7 +15,7 @@ export class UmbDocumentBlueprintFolderStore extends UmbDetailStoreBase<UmbFolde
 	 * @memberof UmbDocumentBlueprintStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_BLUEPRINT_FOLDER_STORE_CONTEXT.toString());
+		super(host, UMB_DOCUMENT_BLUEPRINT_FOLDER_STORE_CONTEXT);
 	}
 }
 

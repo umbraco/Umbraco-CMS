@@ -1,5 +1,6 @@
 import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class ProfilingUiHelper extends UiBaseLocators {
   private readonly profilingTab: Locator;
@@ -19,6 +20,15 @@ export class ProfilingUiHelper extends UiBaseLocators {
 
   async clickActivateProfilerByDefaultToggle() {
     await this.click(this.activateProfilerByDefaultToggle);
+  }
+
+  async clickActivateProfilerByDefaultToggleAndWaitForUpdate() {
+    return await this.waitForResponseAfterExecutingPromise(
+      ConstantHelper.apiEndpoints.profilingStatus,
+      this.clickActivateProfilerByDefaultToggle(),
+      ConstantHelper.statusCodes.ok,
+      ConstantHelper.httpMethods.put,
+    );
   }
 
   async isActivateProfilerByDefaultToggleChecked(isChecked: boolean) {

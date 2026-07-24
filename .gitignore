@@ -52,7 +52,9 @@ tools/docfx/
 /build/csharp-docs/_site/
 
 # Local config
-.claude/settings.local.json
+.claude/*
+!.claude/skills/
+!.claude/settings.json
 .env.local
 
 # Build
@@ -70,7 +72,8 @@ tools/docfx/
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/assets
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/js
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/lib
-/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/views
+/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/views/*
+!/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/views/errors
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/login
 
 # Environment specific data
@@ -104,6 +107,7 @@ playwright-report
 trace.zip
 /tests/Umbraco.Tests.AcceptanceTest/results
 /tests/Umbraco.Tests.AcceptanceTest/dist
+/tests/Umbraco.Tests.AcceptanceTest/console-errors.json
 
 # Ignore auto-generated schema
 /src/Umbraco.Cms.Targets/tasks/
@@ -117,3 +121,10 @@ trace.zip
 /tests/Umbraco.Tests.Integration/appsettings-schema.*.json
 /tests/Umbraco.Tests.Integration/umbraco-package-schema.json
 /src/Umbraco.Cms/appsettings-schema.json
+.playwright-mcp/
+
+# SonarQube local analysis cache
+.sonarqube/
+
+# Playwright local cache
+.playwright-mcp/

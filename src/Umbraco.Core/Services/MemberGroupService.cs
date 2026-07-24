@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -31,55 +32,7 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
         _memberGroupRepository = memberGroupRepository;
 
     /// <inheritdoc />
-    public IEnumerable<IMemberGroup> GetAll() => GetAllAsync().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IEnumerable<IMemberGroup> GetByIds(IEnumerable<int> ids) => GetByIdsAsync(ids).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IMemberGroup? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _memberGroupRepository.Get(id);
-        }
-    }
-
-    /// <inheritdoc />
-    public IMemberGroup? GetById(Guid id) => GetAsync(id).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
     public IMemberGroup? GetByName(string? name) => name is null ? null : GetByNameAsync(name).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public void Save(IMemberGroup memberGroup)
-    {
-        if (string.IsNullOrWhiteSpace(memberGroup.Name))
-        {
-            throw new InvalidOperationException("The name of a MemberGroup can not be empty");
-        }
-
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var savingNotification = new MemberGroupSavingNotification(memberGroup, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _memberGroupRepository.Save(memberGroup);
-            scope.Complete();
-
-            scope.Notifications.Publish(
-                new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
-        }
-    }
-
-    /// <inheritdoc />
-    public void Delete(IMemberGroup memberGroup) => DeleteAsync(memberGroup.Key).GetAwaiter().GetResult();
 
     /// <inheritdoc/>
     public Task<IMemberGroup?> GetByNameAsync(string name)
@@ -93,6 +46,20 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return Task.FromResult(_memberGroupRepository.Get(key));
+    }
+
+    /// <inheritdoc/>
+    public Task<IEnumerable<IMemberGroup>> GetAsync(IEnumerable<Guid> keys)
+    {
+        List<Guid> keysAsList = [.. keys];
+        if (keysAsList.Count == 0)
+        {
+            return Task.FromResult<IEnumerable<IMemberGroup>>([]);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IQuery<IMemberGroup> query = Query<IMemberGroup>().Where(x => keysAsList.Contains(x.Key));
+        return Task.FromResult(_memberGroupRepository.Get(query));
     }
 
     /// <inheritdoc/>

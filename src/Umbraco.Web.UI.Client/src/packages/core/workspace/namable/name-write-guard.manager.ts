@@ -1,12 +1,15 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbGuardManagerBase, type UmbGuardRule } from '@umbraco-cms/backoffice/utils';
 
 export class UmbNameWriteGuardManager extends UmbGuardManagerBase {
 	public isPermittedForName(): Observable<boolean> {
-		return this._rules.asObservablePart((rules) => this.#resolvePermission(rules));
+		return mergeObservables([this.rules, this._fallback], ([rules, fallback]) => {
+			return this.#resolvePermission(rules) ?? fallback;
+		});
 	}
 
-	#resolvePermission(rules: Array<UmbGuardRule>): boolean {
+	#resolvePermission(rules: Array<UmbGuardRule>): boolean | undefined {
 		if (rules.some((rule) => rule.permitted === false)) {
 			return false;
 		}
@@ -15,6 +18,6 @@ export class UmbNameWriteGuardManager extends UmbGuardManagerBase {
 			return true;
 		}
 
-		return this._fallback;
+		return undefined;
 	}
 }

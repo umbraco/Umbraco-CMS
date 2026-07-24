@@ -55,6 +55,17 @@ test('can bulk publish multiple child content items from list view', async ({umb
   expect(firstChildData.variants[0].state).toBe(expectedState);
   const secondChildData = await umbracoApi.document.getByName(secondChildContentName);
   expect(secondChildData.variants[0].state).toBe(expectedState);
+  // Verify audit trail
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.clickContentCardWithName(firstChildContentName);
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSavedAndPublished);
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickContentCardWithName(secondChildContentName);
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSavedAndPublished);
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can bulk unpublish multiple child content items from list view', async ({umbracoApi, umbracoUi}) => {
@@ -124,7 +135,7 @@ test('can bulk move multiple child content items in list view', async ({umbracoA
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesListViewContainCount(0);
-  expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
+  await expect.poll(() => umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
   expect(await umbracoApi.document.getChildrenAmount(secondDocumentId)).toEqual(2);
 });
 
@@ -142,7 +153,7 @@ test('can bulk trash multiple child content items in list view', async ({umbraco
   // Assert
   await umbracoUi.content.isErrorNotificationVisible(false);
   await umbracoUi.content.doesListViewContainCount(0);
-  expect(await umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
+  await expect.poll(() => umbracoApi.document.getChildrenAmount(documentId)).toEqual(0);
   await umbracoUi.content.isItemVisibleInRecycleBin(firstChildContentName);
   await umbracoUi.content.isItemVisibleInRecycleBin(secondChildContentName);
 });

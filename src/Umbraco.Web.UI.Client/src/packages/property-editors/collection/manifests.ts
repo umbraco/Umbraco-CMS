@@ -13,7 +13,8 @@ const propertyEditorUiManifest: ManifestPropertyEditorUi = {
 		label: 'Collection',
 		propertyEditorSchemaAlias: 'Umbraco.ListView',
 		icon: 'icon-layers',
-		group: 'lists',
+		group: '#propertyEditorUIGroups_lists',
+		keywords: ['list', 'children', 'items', 'listview', 'table', 'overview'],
 		settings: {
 			properties: [
 				{

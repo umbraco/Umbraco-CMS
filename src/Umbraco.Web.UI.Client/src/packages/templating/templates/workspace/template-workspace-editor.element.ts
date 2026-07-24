@@ -36,7 +36,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	private _alias?: string = '';
 
 	@state()
-	private _masterTemplateName?: string | null = null;
+	private _layoutTemplateName?: string | null = null;
 
 	/**
 	 * Whether editing is restricted. True when in production mode OR when runtime mode is still unknown.
@@ -51,7 +51,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#templateWorkspaceContext?: typeof UMB_TEMPLATE_WORKSPACE_CONTEXT.TYPE;
 	#isNew = false;
 
-	#masterTemplateUnique: string | null = null;
+	#layoutTemplateUnique: string | null = null;
 
 	constructor() {
 		super();
@@ -81,9 +81,9 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				this._content = content;
 			});
 
-			this.observe(this.#templateWorkspaceContext?.masterTemplate, (masterTemplate) => {
-				this.#masterTemplateUnique = masterTemplate?.unique ?? null;
-				this._masterTemplateName = masterTemplate?.name ?? null;
+			this.observe(this.#templateWorkspaceContext?.layoutTemplate, (layoutTemplate) => {
+				this.#layoutTemplateUnique = layoutTemplate?.unique ?? null;
+				this._layoutTemplateName = layoutTemplate?.name ?? null;
 			});
 
 			this.observe(this.#templateWorkspaceContext?.isNew, (isNew) => {
@@ -122,11 +122,11 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			.catch(() => undefined);
 	}
 
-	#resetMasterTemplate() {
-		this.#templateWorkspaceContext?.setMasterTemplate(null, true);
+	#resetLayoutTemplate() {
+		this.#templateWorkspaceContext?.setLayoutTemplate(null, true);
 	}
 
-	#openMasterTemplatePicker() {
+	#openLayoutTemplatePicker() {
 		const modalContext = this.#modalContext?.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				pickableFilter: (item) => {
@@ -134,7 +134,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				},
 			},
 			value: {
-				selection: [this.#masterTemplateUnique],
+				selection: [this.#layoutTemplateUnique],
 			},
 		});
 
@@ -142,7 +142,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			?.onSubmit()
 			.then((value) => {
 				if (!value?.selection) return;
-				this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null, true);
+				this.#templateWorkspaceContext?.setLayoutTemplate(value.selection[0] ?? null, true);
 			})
 			.catch(() => undefined);
 	}
@@ -160,23 +160,23 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			.catch(() => undefined);
 	}
 
-	#renderMasterTemplatePicker() {
+	#renderLayoutTemplatePicker() {
 		return html`
 			<uui-button-group>
 				<uui-button
-					@click=${this.#openMasterTemplatePicker}
+					@click=${this.#openLayoutTemplatePicker}
 					look="secondary"
-					id="master-template-button"
+					id="layout-template-button"
 					?disabled=${this._isRestricted}
-					label="${this.localize.term('template_mastertemplate')}: ${this._masterTemplateName
-						? this._masterTemplateName
-						: this.localize.term('template_noMaster')}"></uui-button>
-				${this._masterTemplateName
+					label="${this.localize.term('template_layouttemplate')}: ${this._layoutTemplateName
+						? this._layoutTemplateName
+						: this.localize.term('template_noLayout')}"></uui-button>
+				${this._layoutTemplateName
 					? html`<uui-button
 							look="secondary"
 							label=${this.localize.term('actions_remove')}
 							?disabled=${this._isRestricted}
-							@click=${this.#resetMasterTemplate}
+							@click=${this.#resetLayoutTemplate}
 							compact>
 							<uui-icon name="icon-delete"></uui-icon>
 						</uui-button>`
@@ -206,7 +206,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				</umb-input-with-alias>
 
 				<uui-box>
-					<div slot="header" id="code-editor-menu-container">${this.#renderMasterTemplatePicker()}</div>
+					<div slot="header" id="code-editor-menu-container">${this.#renderLayoutTemplatePicker()}</div>
 					<div slot="header-actions">
 						<umb-templating-insert-menu @insert=${this.#insertSnippet} ?disabled=${this._isRestricted}>
 						</umb-templating-insert-menu>

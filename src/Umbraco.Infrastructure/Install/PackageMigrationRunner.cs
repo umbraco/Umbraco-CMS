@@ -62,18 +62,6 @@ public class PackageMigrationRunner
     }
 
     /// <summary>
-    /// Synchronously runs any pending migrations for the specified package.
-    /// </summary>
-    /// <param name="packageName">The name of the package for which to run pending migrations.</param>
-    /// <returns>An enumerable containing details of the executed migration plans, if any were run; otherwise, an empty enumerable.</returns>
-    /// <remarks>
-    /// This method is obsolete. Use <see cref="RunPackageMigrationsIfPendingAsync(string)"/> instead.
-    /// </remarks>
-    [Obsolete("Please use RunPackageMigrationsIfPendingAsync instead. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<ExecutedMigrationPlan> RunPackageMigrationsIfPending(string packageName)
-        => RunPackageMigrationsIfPendingAsync(packageName).GetAwaiter().GetResult();
-
-    /// <summary>
     ///     Runs all migration plans for a package name if any are pending.
     /// </summary>
     /// <param name="packageName"></param>
@@ -119,24 +107,15 @@ public class PackageMigrationRunner
     }
 
     /// <summary>
-    /// Runs the specified package migration plans synchronously.
+    ///     Runs all the specified package migration plans and publishes a <see cref="MigrationPlansExecutedNotification" />.
     /// </summary>
-    /// <param name="plansToRun">A collection of package migration plan names to run.</param>
-    /// <returns>An enumerable of executed migration plans.</returns>
     /// <remarks>
-    /// This method is obsolete. Use <see cref="RunPackageMigrationsIfPendingAsync"/> instead.
+    ///     All plans are run to completion even if one fails, so that one package's failure does not block another's.
+    ///     A failed plan is reported via <see cref="ExecutedMigrationPlan.Successful" /> on the returned result rather
+    ///     than by throwing; callers must inspect the results to detect a failure.
     /// </remarks>
-    [Obsolete("Please use RunPackageMigrationsIfPendingAsync instead. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<ExecutedMigrationPlan> RunPackagePlans(IEnumerable<string> plansToRun)
-        => RunPackagePlansAsync(plansToRun).GetAwaiter().GetResult();
-
-    /// <summary>
-    ///     Runs the all specified package migration plans and publishes a <see cref="MigrationPlansExecutedNotification" />
-    ///     if all are successful.
-    /// </summary>
     /// <param name="plansToRun"></param>
     /// <returns></returns>
-    /// <exception cref="Exception">If any plan fails it will throw an exception.</exception>
     public async Task<IEnumerable<ExecutedMigrationPlan>> RunPackagePlansAsync(IEnumerable<string> plansToRun)
     {
         List<ExecutedMigrationPlan> results = new();

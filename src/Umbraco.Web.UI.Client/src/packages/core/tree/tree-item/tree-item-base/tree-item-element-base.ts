@@ -34,28 +34,8 @@ export abstract class UmbTreeItemElementBase<
 	}
 	protected _item?: TreeItemModelType;
 
-	/**
-	 * @internal
-	 * Indicates whether the user has no access to this tree item.
-	 * This property is reflected as an attribute for styling purposes.
-	 *
-	 * **Usage Pattern (opt-in):**
-	 * Child classes that support access restrictions should observe their context's `noAccess` observable
-	 * and update this property. The base class provides the property, styling, and interaction prevention,
-	 * but does not subscribe to the observable to avoid forcing all tree item types to implement it.
-	 *
-	 * **Example (in child class api setter):**
-	 * ```typescript
-	 * this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
-	 * ```
-	 *
-	 * **Why not in the base interface?**
-	 * Adding `noAccess` to `UmbTreeItemContext` would be a breaking change, forcing all tree item
-	 * implementations (users, members, data types, etc.) to provide this property even when access
-	 * restrictions don't apply to them.
-	 */
 	@property({ type: Boolean, reflect: true, attribute: 'no-access' })
-	protected _noAccess = false;
+	protected _noAccess: boolean = false;
 
 	/**
 	 * @param item - The item from which to extract flags.
@@ -84,27 +64,42 @@ export abstract class UmbTreeItemElementBase<
 
 		if (this.#api) {
 			this.#api?.setIsMenu(this._isMenu);
-			this.observe(this.#api.childItems, (value) => (this._childItems = value));
-			this.observe(this.#api.hasChildren, (value) => (this._hasChildren = value));
-			this.observe(this.#api.isActive, (value) => (this._isActive = value));
-			this.observe(this.#api.isOpen, (value) => (this._isOpen = value));
-			this.observe(this.#api.isLoading, (value) => (this._isLoading = value));
-			this.observe(this.#api.isSelectableContext, (value) => (this._isSelectableContext = value));
-			this.observe(this.#api.isSelectable, (value) => (this._isSelectable = value));
-			this.observe(this.#api.isSelected, (value) => (this._isSelected = value));
-			this.observe(this.#api.path, (value) => (this._href = value));
-			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value));
-			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value));
-			this.observe(this.#api.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
-			this.observe(this.#api.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
+			this.observe(this.#api.childItems, (value) => (this._childItems = value), '_observeChildItems');
+			this.observe(this.#api.hasChildren, (value) => (this._hasChildren = value), '_observeHasChildren');
+			this.observe(this.#api.isActive, (value) => (this._isActive = value), '_observeIsActive');
+			this.observe(this.#api.isOpen, (value) => (this._isOpen = value), '_observeIsOpen');
+			this.observe(this.#api.isLoading, (value) => (this._isLoading = value), '_observeIsLoading');
+			this.observe(
+				this.#api.isSelectableContext,
+				(value) => (this._isSelectableContext = value),
+				'_observeIsSelectableContext',
+			);
+			this.observe(this.#api.isSelectable, (value) => (this._isSelectable = value), '_observeIsSelectable');
+			this.observe(this.#api.selectOnly, (value) => (this._selectOnly = value), '_observeSelectOnly');
+			this.observe(this.#api.isSelected, (value) => (this._isSelected = value), '_observeIsSelected');
+			this.observe(this.#api.noAccess, (value) => (this._noAccess = value), '_observeNoAccess');
+			this.observe(this.#api.path, (value) => (this._href = value), '_observePath');
+			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value), '_observeTotalPages');
+			this.observe(
+				this.#api.isLoadingPrevChildren,
+				(value) => (this._isLoadingPrevChildren = value ?? false),
+				'_observeIsLoadingPrevChildren',
+			);
+			this.observe(
+				this.#api.isLoadingNextChildren,
+				(value) => (this._isLoadingNextChildren = value ?? false),
+				'_observeIsLoadingNextChildren',
+			);
 
 			this.observe(
 				this.#api.targetPagination?.totalPrevItems,
 				(value) => (this._hasPreviousItems = value !== undefined ? value > 0 : false),
+				'_observeTotalPrevItems',
 			);
 			this.observe(
 				this.#api.targetPagination?.totalNextItems,
 				(value) => (this._hasNextItems = value !== undefined ? value > 0 : false),
+				'_observeTotalNextItems',
 			);
 
 			this.#initTreeItem();
@@ -137,6 +132,9 @@ export abstract class UmbTreeItemElementBase<
 	private _isSelectable = false;
 
 	@state()
+	private _selectOnly = false;
+
+	@state()
 	protected _isSelected = false;
 
 	@state()
@@ -153,9 +151,6 @@ export abstract class UmbTreeItemElementBase<
 
 	@state()
 	private _totalPages = 1;
-
-	@state()
-	private _currentPage = 1;
 
 	@state()
 	private _hasPreviousItems = false;
@@ -190,6 +185,12 @@ export abstract class UmbTreeItemElementBase<
 		this.#api?.deselect();
 	}
 
+	#handleDblClick(event: MouseEvent) {
+		if (!this._item?.hasChildren) return;
+		event.stopPropagation();
+		this.#api?.open();
+	}
+
 	private _onShowChildren(event: UUIMenuItemEvent) {
 		event.stopPropagation();
 		// Prevent default cause we will now control the show-children state ourself.
@@ -211,8 +212,7 @@ export abstract class UmbTreeItemElementBase<
 
 	#onLoadNext(event: any) {
 		event.stopPropagation();
-		const next = (this._currentPage = this._currentPage + 1);
-		this.#api?.pagination.setCurrentPageNumber(next);
+		this.#api?.loadNextItems?.();
 	}
 
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
@@ -228,7 +228,7 @@ export abstract class UmbTreeItemElementBase<
 				@selected=${this._handleSelectedItem}
 				@deselected=${this._handleDeselectedItem}
 				?active=${this._isActive}
-				?disabled=${(this._isSelectableContext && !this._isSelectable) || this._noAccess}
+				?disabled=${this._noAccess || (this._isSelectableContext && !this._isSelectable)}
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}
@@ -299,7 +299,7 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	renderLabel() {
-		return html`<slot name="label" slot="label"></slot>`;
+		return html`<span slot="label" @dblclick=${this.#handleDblClick}>${this._label}<slot name="label"></slot></span>`;
 	}
 
 	#renderActions() {

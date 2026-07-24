@@ -55,7 +55,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         if (result.Success)
         {
             IMediaType mediaType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForCreationAsync)} succeeded but did not yield any result");
-            await _mediaTypeService.SaveAsync(mediaType, userKey);
+            await _mediaTypeService.CreateAsync(mediaType, userKey);
         }
 
         return result;
@@ -73,7 +73,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         if (result.Success)
         {
             mediaType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForUpdateAsync)} succeeded but did not yield any result");
-            await _mediaTypeService.SaveAsync(mediaType, userKey);
+            await _mediaTypeService.UpdateAsync(mediaType, userKey);
         }
 
         return result;
@@ -111,7 +111,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     /// <inheritdoc />
     public async Task<PagedModel<MediaTypeFileExtensionMatchResult>> GetMediaTypesForFileExtensionWithMatchInfoAsync(string fileExtension, int skip, int take)
     {
-        fileExtension = fileExtension.TrimStart(Constants.CharArrays.Period).ToLowerInvariant();
+        fileExtension = fileExtension.TrimStart('.').ToLowerInvariant();
 
         IMediaType[] candidateMediaTypes = _mediaTypeService.GetAll().Where(mt => mt.CompositionPropertyTypes.Any(pt => pt.Alias == Constants.Conventions.Media.File)).ToArray();
         var results = new List<MediaTypeFileExtensionMatchResult>();

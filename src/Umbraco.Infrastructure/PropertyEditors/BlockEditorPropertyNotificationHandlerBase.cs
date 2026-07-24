@@ -64,7 +64,7 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
                     return match.Value;
                 }
 
-                var oldKey = Guid.Parse(match.Value);
+                var oldKey = Guid.Parse(match.ValueSpan);
                 if (oldToNewKeys.ContainsKey(oldKey) == false)
                 {
                     oldToNewKeys[oldKey] = createGuid(oldKey);

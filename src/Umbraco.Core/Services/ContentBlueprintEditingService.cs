@@ -47,12 +47,14 @@ internal sealed class ContentBlueprintEditingService
         IContentBlueprintContainerService containerService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService, contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        ILanguageService languageService,
+        IUserService userService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, validationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService)
         => _containerService = containerService;
 
     /// <inheritdoc />
-    public Task<IContent?> GetAsync(Guid key)
+    public override Task<IContent?> GetAsync(Guid key)
     {
         IContent? blueprint = ContentService.GetBlueprintById(key);
         return Task.FromResult(blueprint);
@@ -241,7 +243,7 @@ internal sealed class ContentBlueprintEditingService
     }
 
     /// <inheritdoc />
-    protected override IContent New(string? name, int parentId, IContentType contentType)
+    protected override IContent New(string name, int parentId, IContentType contentType)
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />
@@ -263,6 +265,7 @@ internal sealed class ContentBlueprintEditingService
     /// </summary>
     /// <param name="content">The content to move.</param>
     /// <param name="newParentId">The ID of the new parent.</param>
+    /// <param name="includeDescendants">Whether to move the descendants along with the content. Not supported for blueprints.</param>
     /// <param name="userId">The ID of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
@@ -270,7 +273,7 @@ internal sealed class ContentBlueprintEditingService
     /// Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
     /// but there are others that are not required to be implemented in the case of blueprints.
     /// </remarks>
-    protected override OperationResult? Move(IContent content, int newParentId, int userId) => throw new NotImplementedException();
+    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId) => throw new NotImplementedException();
 
     /// <summary>
     /// Copies the specified content to a new parent. Not supported for blueprints.
@@ -279,10 +282,15 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="newParentId">The ID of the new parent.</param>
     /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
-    /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId) => throw new NotImplementedException();
+    protected override Task<IContent?> CopyAsync(
+        IContent content,
+        int newParentId,
+        bool relateToOriginal,
+        bool includeDescendants,
+        Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Moves the specified content to the recycle bin. Not supported for blueprints.

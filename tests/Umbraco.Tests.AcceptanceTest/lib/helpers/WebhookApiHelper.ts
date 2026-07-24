@@ -34,7 +34,7 @@ export class WebhookApiHelper {
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/webhook', webhookData);
     // Returns the id of the created webhook
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -57,7 +57,7 @@ export class WebhookApiHelper {
     const allWebhooks = await this.getAll();
     const jsonWebhooks = await allWebhooks.json();
 
-    for (const webhook of jsonWebhooks.items) {
+    for (const webhook of this.api.itemsOf(jsonWebhooks)) {
       if (webhook.name === name) {
         return await this.get(webhook.id);
       }
@@ -69,7 +69,7 @@ export class WebhookApiHelper {
     const allWebhooks = await this.getAll();
     const jsonWebhooks = await allWebhooks.json();
 
-    for (const webhook of jsonWebhooks.items) {
+    for (const webhook of this.api.itemsOf(jsonWebhooks)) {
       if (webhook.name === name) {
         return await this.delete(webhook.id);
       }
@@ -84,11 +84,10 @@ export class WebhookApiHelper {
       }
     });
     const webhookData = await createWebhookResponse.json();
-    const webhookToken = webhookData.uuid;
-    return webhookToken;
+    return webhookData.uuid;
   }
 
-  async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = 15000, pollInterval: number = 1000) {
+  async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = ConstantHelper.timeout.veryLong, pollInterval: number = ConstantHelper.timeout.short, expectedContentFragment?: string) {
     const requestUrl = this.webhookSiteUrl + 'token/' + webhookSiteToken + '/requests';
     const start = Date.now();
 
@@ -99,11 +98,21 @@ export class WebhookApiHelper {
         }
       });
       const requestJson = await requestResponse.json();
-      if (requestJson.total > 0) {
-        return requestJson.data;
+      const requests = requestJson.data ?? [];
+      // Delivery to webhook.site is async and an unrelated request can arrive first, so when an
+      // expected content is given, keep polling until the matching webhook has actually been received.
+      if (expectedContentFragment === undefined) {
+        if (requests.length > 0) {
+          return requests;
+        }
+      } else {
+        const matches = requests.filter((request) => (request.content ?? '').includes(expectedContentFragment));
+        if (matches.length > 0) {
+          return matches;
+        }
       }
-      
-      // Polling again if there is no webhook received yet
+
+      // Polling again if the expected webhook has not been received yet
       await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
     return null;

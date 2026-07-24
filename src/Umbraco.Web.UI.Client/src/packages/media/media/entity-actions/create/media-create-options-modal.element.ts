@@ -7,6 +7,9 @@ import { html, nothing, customElement, state, repeat, css, when } from '@umbraco
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 @customElement('umb-media-create-options-modal')
 export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
@@ -21,6 +24,27 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _headline: string = this.localize.term('general_create');
+
+	@state()
+	private _loading = true;
+
+	@state()
+	private _hasSettingsAccess = false;
+
+	constructor() {
+		super();
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
+	}
 
 	override async firstUpdated() {
 		const mediaUnique = this.data?.parent.unique;
@@ -40,6 +64,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 			// TODO: implement pagination, or get 1000?
 			this._allowedMediaTypes = data.items;
 		}
+		this._loading = false;
 	}
 
 	async #retrieveHeadline(unique: string) {
@@ -64,11 +89,13 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<uui-dialog-layout headline=${this._headline ?? ''}>
-				${when(
-					this._allowedMediaTypes.length === 0,
-					() => this.#renderNotAllowed(),
-					() => this.#renderAllowedMediaTypes(),
-				)}
+				${this._loading
+					? html`<div id="loader"><uui-loader></uui-loader></div>`
+					: when(
+							this._allowedMediaTypes.length === 0,
+							() => this.#renderNotAllowed(),
+							() => this.#renderAllowedMediaTypes(),
+						)}
 				<uui-button
 					slot="actions"
 					id="cancel"
@@ -83,14 +110,20 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 			<umb-localize key="create_noMediaTypes">
 				There are no allowed Media Types available for creating media here. You must enable these in
 				<strong>Media Types</strong> within the <strong>Settings</strong> section, by editing the
-				<strong>Allowed child node types</strong> under <strong>Permissions</strong>. </umb-localize
-			><br />
-			<uui-button
-				id="edit-permissions"
-				look="secondary"
-				@click=${() => this._rejectModal()}
-				href=${`/section/settings/workspace/media-type/edit/${this.data?.mediaType?.unique}/view/structure`}
-				label=${this.localize.term('create_noMediaTypesEditPermissions')}></uui-button>
+				<strong>Allowed child node types</strong> under <strong>Structure</strong>.
+			</umb-localize>
+			${when(
+				this._hasSettingsAccess && this.data?.mediaType?.unique,
+				() => html`
+					<br />
+					<uui-button
+						id="edit-permissions"
+						look="secondary"
+						@click=${() => this._rejectModal()}
+						href=${`/section/settings/workspace/media-type/edit/${this.data?.mediaType?.unique}/view/structure`}
+						label=${this.localize.term('create_noMediaTypesEditPermissions')}></uui-button>
+				`,
+			)}
 		`;
 	}
 
@@ -116,6 +149,12 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 		css`
 			#edit-permissions {
 				margin-top: var(--uui-size-6);
+			}
+
+			#loader {
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		`,
 	];

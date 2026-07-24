@@ -6,11 +6,11 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-input-property-editor-data-source')
-export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
 			return element.id;
@@ -43,12 +43,12 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -66,7 +66,7 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
