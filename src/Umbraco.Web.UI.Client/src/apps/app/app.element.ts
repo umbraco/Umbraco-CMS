@@ -122,9 +122,6 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: 'logout',
 			component: UmbAppAuthElement,
-			setup: () => {
-				this.#authContext?.clearTokenStorage();
-			},
 		},
 		{
 			// Lander for the external-login popup flow — public (no auth guards): it loads with the
@@ -230,20 +227,20 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
-			// If the runtime level is "install" or ?status=false is set, we should clear any cached tokens
-			// else we should try and set the auth status
 			const searchParams = new URLSearchParams(window.location.search);
-			// /logout and /error render regardless of session state, so skip the session probe for
-			// them — it's an unnecessary network round-trip before those unauth routes can render.
 			const pathname = pathWithoutBasePath({ start: true, end: false });
-			const isUnauthenticatedRoute = pathname === '/logout' || pathname === '/error';
 
-			if (
+			// Skip the session probe when there's nothing to verify: install mode and an explicit
+			// ?status=false both mean "not authenticated", and /logout & /error render without a session —
+			// probing first would just be a wasted round-trip. Otherwise probe the server (the auth cookie)
+			// to establish the session.
+			const skipProbe =
 				(searchParams.has('status') && searchParams.get('status') === 'false') ||
-				this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL
-			) {
-				await this.#authContext.clearTokenStorage();
-			} else if (!isUnauthenticatedRoute) {
+				this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL ||
+				pathname === '/logout' ||
+				pathname === '/error';
+
+			if (!skipProbe) {
 				await this.#setAuthStatus();
 			}
 

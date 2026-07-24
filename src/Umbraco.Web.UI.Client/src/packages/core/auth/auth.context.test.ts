@@ -214,7 +214,6 @@ describe('UmbAuthContext', () => {
 				const session = getLatestSession();
 				expect(session).to.not.be.undefined;
 				expect(session!.expiresAt).to.be.greaterThan(Math.floor(Date.now() / 1000));
-				expect(context.isSessionValid()).to.be.true;
 			});
 
 			it('stays unauthorized and clears the session on a non-ok response', async () => {
@@ -225,7 +224,6 @@ describe('UmbAuthContext', () => {
 				expect(fetchCalls).to.have.lengthOf(1);
 				expect(context.getIsAuthorized()).to.be.false;
 				expect(getLatestSession()).to.be.undefined;
-				expect(context.isSessionValid()).to.be.false;
 			});
 		});
 

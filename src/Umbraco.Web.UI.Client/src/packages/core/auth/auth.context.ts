@@ -412,18 +412,30 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Checks if the current session is still valid.
+	 * @deprecated Cookie auth verifies the session with the server on boot and per request, so a local expiry check is redundant. Use {@link getIsAuthorized} or observe {@link session$}. Scheduled for removal in Umbraco 21.
 	 * @returns {boolean} True if the session has not expired.
 	 */
 	isSessionValid(): boolean {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.isSessionValid()',
+			removeInVersion: '21.0.0',
+			solution: 'Use getIsAuthorized() or observe session$ instead.',
+		}).warn();
 		const session = this.#session.getValue();
 		return !!session && session.expiresAt > Math.floor(Date.now() / 1000);
 	}
 
 	/**
-	 * Clears the in-memory session state.
+	 * Clears the in-memory session state and broadcasts to other tabs.
+	 * @deprecated Cookie auth stores no client-side token, and clearing local state without the server sign-out leaves the auth cookie intact (the next request re-authenticates). Use {@link signOut} to log out. Scheduled for removal in Umbraco 21.
 	 * @memberof UmbAuthContext
 	 */
 	clearTokenStorage() {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.clearTokenStorage()',
+			removeInVersion: '21.0.0',
+			solution: 'Use signOut() to log out.',
+		}).warn();
 		this.#session.setValue(undefined);
 		this.#isAuthorized.setValue(false);
 		this.#channel.postMessage({ type: 'sessionCleared' });
@@ -446,7 +458,8 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @memberof UmbAuthContext
 	 */
 	async signOut(): Promise<void> {
-		// Clear local state (don't call clearTokenStorage — signedOut covers other tabs)
+		// Clear local state directly — signedOut covers other tabs (and we must not emit the extra
+		// deprecated clearTokenStorage warning / sessionCleared broadcast here).
 		this.#session.setValue(undefined);
 		this.#isAuthorized.setValue(false);
 		this.#channel.postMessage({ type: 'signedOut' });
@@ -458,23 +471,16 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Get the server url to the Management API.
+	 * @deprecated Consume {@link UMB_SERVER_CONTEXT} and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 21.
 	 * @memberof UmbAuthContext
-	 * @example <caption>Using the server url</caption>
-	 * ```js
-	 * 	const serverUrl = authContext.getServerUrl();
-	 * 	OpenAPI.BASE = serverUrl;
-	 * ```
-	 * @example <caption></caption>
-	 * ```js
-	 * 	const config = authContext.getOpenApiConfiguration();
-	 * 	const result = await fetch(`${config.base}/umbraco/management/api/v1/my-resource`, {
-	 * 		credentials: config.credentials,
-	 * 		headers: { Authorization: `Bearer ${await config.token()}` },
-	 * 	});
-	 * ```
 	 * @returns {string} The server url to the Management API
 	 */
 	getServerUrl(): string {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.getServerUrl()',
+			removeInVersion: '21.0.0',
+			solution: 'Consume UMB_SERVER_CONTEXT and use its getServerUrl() instead.',
+		}).warn();
 		return this.#serverUrl;
 	}
 
