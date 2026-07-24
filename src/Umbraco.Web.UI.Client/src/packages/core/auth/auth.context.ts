@@ -57,10 +57,9 @@ export class UmbAuthContext extends UmbContextBase {
 	#externalLoginEndpoint;
 	#postLogoutRedirectUri;
 
-	// Warn-once guards for the deprecated token accessors — they can be called per request, and
+	// Warn-once guard for the deprecated members — they can be called per request, and
 	// UmbDeprecation.warn() does not de-duplicate, so an unguarded warning would flood the console.
-	#warnedLatestTokenDeprecation = false;
-	#warnedTokenConfigDeprecation = false;
+	#warnedDeprecations = new Set<string>();
 
 	/**
 	 * Observable that emits true when the auth context is initialized.
@@ -160,6 +159,34 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#channel.close();
 	}
 
+	#warnDeprecated(deprecated: string, solution: string): void {
+		if (this.#warnedDeprecations.has(deprecated)) return;
+		this.#warnedDeprecations.add(deprecated);
+		new UmbDeprecation({ deprecated, removeInVersion: '21.0.0', solution }).warn();
+	}
+
+	/* eslint-disable @typescript-eslint/no-unused-vars */
+	/**
+	 * Initiates the login flow.
+	 * @param identityProvider The provider to use for login. Default is 'Umbraco'.
+	 * @param redirect If true, the user will be redirected to the login page.
+	 * @param usernameHint The username hint to use for login.
+	 * @param manifest The manifest for the registered provider.
+	 * @deprecated No-op — cookie auth has no client-side authorization flow. Use {@link startLocalLogin} or {@link startExternalLogin} instead. Scheduled for removal in Umbraco 21.
+	 */
+	async makeAuthorizationRequest(
+		identityProvider = 'Umbraco',
+		redirect?: boolean,
+		usernameHint?: string,
+		manifest?: ManifestAuthProvider,
+	): Promise<void> {
+		this.#warnDeprecated(
+			'UmbAuthContext.makeAuthorizationRequest()',
+			'Use startLocalLogin() or startExternalLogin() instead.',
+		);
+	}
+	/* eslint-enable @typescript-eslint/no-unused-vars */
+
 	/**
 	 * Initiates external login for the given provider by opening a popup pointed at the server's
 	 * cookie-based external login challenge endpoint. The server redirects to the provider, then
@@ -180,6 +207,20 @@ export class UmbAuthContext extends UmbContextBase {
 		}
 
 		this.#openLoginPopup(challengeUrl.href, manifest);
+	}
+
+	/**
+	 * Completes the login flow.
+	 * This is called on the oauth_complete page to exchange the authorization code for tokens.
+	 * @returns The token response timing, or null if no authorization was pending.
+	 * @deprecated No-op — the server sets the auth cookie directly, there is no code exchange. Always returns null. Scheduled for removal in Umbraco 21.
+	 */
+	async completeAuthorizationRequest(): Promise<null> {
+		this.#warnDeprecated(
+			'UmbAuthContext.completeAuthorizationRequest()',
+			'There is no authorization code exchange with cookie auth; remove the call.',
+		);
+		return null;
 	}
 
 	/**
@@ -387,16 +428,36 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns {Promise<string>} The latest token from the Management API
 	 */
 	async getLatestToken(): Promise<string> {
-		if (!this.#warnedLatestTokenDeprecation) {
-			this.#warnedLatestTokenDeprecation = true;
-			new UmbDeprecation({
-				deprecated: 'UmbAuthContext.getLatestToken()',
-				removeInVersion: '21.0.0',
-				solution:
-					'Back-office auth is cookie-based and carries no client token. Use configureClient()/getOpenApiConfiguration(), or set credentials: "include" on fetch calls.',
-			}).warn();
-		}
+		this.#warnDeprecated(
+			'UmbAuthContext.getLatestToken()',
+			'Back-office auth is cookie-based and carries no client token. Use configureClient()/getOpenApiConfiguration(), or set credentials: "include" on fetch calls.',
+		);
 		return '[redacted]';
+	}
+
+	/**
+	 * Forces a token refresh against the server (calls `/token`) and returns true if successful.
+	 * Use this when you need to unconditionally refresh — e.g. session timeout keep-alive.
+	 * For per-request token handling, prefer {@link configureClient} which skips the network
+	 * call when the access token is still valid.
+	 * Uses Web Locks to deduplicate concurrent refresh requests across tabs.
+	 * @deprecated Cookie auth has no token to validate — returns {@link getIsAuthorized}. Use {@link keepAlive} to extend the session. Scheduled for removal in Umbraco 21.
+	 * @memberof UmbAuthContext
+	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false
+	 */
+	async validateToken(): Promise<boolean> {
+		this.#warnDeprecated('UmbAuthContext.validateToken()', 'Use getIsAuthorized() or keepAlive() instead.');
+		return this.getIsAuthorized();
+	}
+
+	/**
+	 * Attempts to refresh the token using Web Locks to prevent concurrent refresh requests.
+	 * @deprecated Cookie auth has no refresh token — returns {@link getIsAuthorized}. Use {@link keepAlive} to extend the session. Scheduled for removal in Umbraco 21.
+	 * @returns {Promise<boolean>} True if the refresh was successful, otherwise false.
+	 */
+	async makeRefreshTokenRequest(): Promise<boolean> {
+		this.#warnDeprecated('UmbAuthContext.makeRefreshTokenRequest()', 'Use getIsAuthorized() or keepAlive() instead.');
+		return this.getIsAuthorized();
 	}
 
 	/**
@@ -490,14 +551,10 @@ export class UmbAuthContext extends UmbContextBase {
 			// via credentials: 'include'. Kept as a shim so existing `await config.token()` callers don't
 			// throw; returns the redacted placeholder and warns once.
 			token: async () => {
-				if (!this.#warnedTokenConfigDeprecation) {
-					this.#warnedTokenConfigDeprecation = true;
-					new UmbDeprecation({
-						deprecated: 'UmbOpenApiConfiguration.token',
-						removeInVersion: '21.0.0',
-						solution: 'The auth cookie is sent automatically with credentials: "include"; remove the token() call.',
-					}).warn();
-				}
+				this.#warnDeprecated(
+					'UmbOpenApiConfiguration.token',
+					'The auth cookie is sent automatically with credentials: "include"; remove the token() call.',
+				);
 				return '[redacted]';
 			},
 		};
