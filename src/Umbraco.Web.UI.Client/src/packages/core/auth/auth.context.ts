@@ -111,7 +111,6 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#keepAliveEndpoint = `${serverUrl}/umbraco/management/api/v1/security/back-office/keep-alive`;
 		this.#externalLoginEndpoint = `${serverUrl}/umbraco/management/api/v1/security/back-office/external-login`;
 
-		// Set up cross-tab coordination via BroadcastChannel
 		this.#channel = new BroadcastChannel('umb:auth');
 		this.#channel.onmessage = (evt: MessageEvent) => {
 			switch (evt.data?.type) {
@@ -134,14 +133,12 @@ export class UmbAuthContext extends UmbContextBase {
 		};
 
 		if (!isTestEnvironment()) {
-			// Start the session timeout controller
 			new UmbAuthSessionTimeoutController(this);
 		}
 
 		// When an HTTP interceptor is active it registers an UmbAuthSignalerContext on the host.
 		// Consume it to keep authorization state in sync and to react to timeout requests.
 		this.consumeContext(UMB_AUTH_SIGNALER_CONTEXT, (signaler) => {
-			// Keep the signaler's authorization state in sync with ours
 			this.observe(this.isAuthorized, (isAuthorized) => signaler?.setAuthorized(isAuthorized ?? false));
 			// React to timeout requests from the interceptor. A 401 while we were never authorized
 			// (e.g. the cold-boot session probe) means "not logged in", not a session timeout — raising
@@ -458,14 +455,13 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @memberof UmbAuthContext
 	 */
 	async signOut(): Promise<void> {
-		// Clear local state directly — signedOut covers other tabs (and we must not emit the extra
-		// deprecated clearTokenStorage warning / sessionCleared broadcast here).
+		// Clear local state directly (not clearTokenStorage) to skip its deprecation warning; signedOut covers other tabs.
 		this.#session.setValue(undefined);
 		this.#isAuthorized.setValue(false);
 		this.#channel.postMessage({ type: 'signedOut' });
 
-		// Navigate to the server sign-out endpoint: it clears the auth cookie and then redirects to the
-		// client logout landing (derived server-side from BackOfficeHost), which resets the SPA state.
+		// The server sign-out endpoint clears the auth cookie, then redirects to the client logout landing
+		// (derived server-side from BackOfficeHost).
 		location.href = `${this.#serverUrl}/umbraco/management/api/v1/security/back-office/signout`;
 	}
 

@@ -4,16 +4,11 @@ import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
- * Lander for the external-login popup flow (`{BackOfficeHost}/auth-callback`, hardcoded server-side
- * in `BackOfficeController.ExternalLoginSuccessRedirectUrl`). The server callback has already set the
- * auth cookie and redirected the popup here.
- *
- * `UmbAppElement#setup` probes the server and broadcasts `authorized` on the `umb:auth`
- * BroadcastChannel for every route except `/logout` and `/error` — `auth-callback` is not in that
- * skip list, so the probe (and broadcast) already ran and resolved before the router even mounts this
- * element. This element only has to wait for `isAuthorized` to settle and then close the popup; it
- * does not trigger the probe itself. Same-origin BroadcastChannel already reached the opener, so no
- * `window.opener`/`postMessage` is used here.
+ * Lander for the external-login popup flow (`{BackOfficeHost}/auth-callback`, hardcoded server-side in
+ * `BackOfficeController.ExternalLoginSuccessRedirectUrl`). The server callback has already set the auth
+ * cookie and redirected here; the boot probe + `authorized` broadcast also already ran (`auth-callback`
+ * isn't in `UmbAppElement#setup`'s skip list). So this element only waits for `isAuthorized` to settle,
+ * then closes — no `window.opener`/`postMessage`, since the same-origin broadcast already reached the opener.
  */
 @customElement('umb-app-auth-callback')
 export class UmbAppAuthCallbackElement extends UmbLitElement {
@@ -41,11 +36,10 @@ export class UmbAppAuthCallbackElement extends UmbLitElement {
 	#close(): void {
 		window.close();
 
-		// window.close() is a silent no-op when the browser refuses it (e.g. this route loaded in an
-		// ordinary tab rather than the script-opened popup — the full-page external login flow
-		// (makeAuthorizationRequest with redirect: true)). Fall back to the server-carried returnUrl
-		// (re-validated local) so a deep link isn't
-		// dropped, otherwise the backoffice root — never leave a bare loader up indefinitely.
+		// window.close() is a silent no-op when the browser refuses it — e.g. this route loaded in an
+		// ordinary tab (the full-page redirect flow) rather than the script-opened popup. Fall back to
+		// the server-carried returnUrl (re-validated local), else the backoffice root — never leave a
+		// bare loader up indefinitely.
 		setTimeout(() => {
 			if (!window.closed) {
 				window.location.href = this.#fallbackUrl();
