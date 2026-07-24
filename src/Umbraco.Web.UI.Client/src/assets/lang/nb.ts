@@ -243,6 +243,7 @@ export default {
 		type: 'Type',
 		unpublish: 'Avpubliser',
 		unpublishDate: 'Dato for avpublisering',
+		scheduleForAllLanguages: 'Planlegg for alle valgte språk',
 		unpublished: 'Avpublisert',
 		updatedBy: 'Oppdatert av',
 		updateDate: 'Sist endret',

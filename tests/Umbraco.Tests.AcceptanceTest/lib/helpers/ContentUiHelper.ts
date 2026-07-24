@@ -164,6 +164,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly inlineCreateBtn: Locator;
   private readonly removeAt: Locator;
   private readonly selectAllCheckbox: Locator;
+  private readonly scheduleForAllLanguagesCheckbox: Locator;
   private readonly confirmToPublishBtn: Locator;
   private readonly tiptapStatusbarWordCount: Locator;
   private readonly tiptapStatusbarElementPath: Locator;
@@ -395,6 +396,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.publishAt = this.generalItem.filter({hasText: 'Publish at'}).locator('umb-localize-date');
     this.removeAt = this.generalItem.filter({hasText: 'Remove at'}).locator('umb-localize-date');
     this.selectAllCheckbox = this.documentScheduleModal.locator('[label="Select all"]');
+    this.scheduleForAllLanguagesCheckbox = this.documentScheduleModal.locator('[label="Schedule for all selected languages"]');
     this.confirmToPublishBtn = page.locator('umb-content-publish-modal').getByLabel('Publish');
     // Publish with descendants
     this.documentPublishWithDescendantsModal = page.locator('umb-document-publish-with-descendants-modal');
@@ -1804,6 +1806,15 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.selectAllCheckbox);
     // Confirm the toggle registered so rapid consecutive toggles don't lose a click.
     await expect(selectAllInput).toBeChecked({checked: !wasChecked});
+  }
+
+  async clickScheduleForAllLanguagesCheckbox() {
+    await this.click(this.scheduleForAllLanguagesCheckbox);
+  }
+
+  async doesPublishTimeHaveValue(time: string, index: number = 0) {
+    const publishAtInput = this.documentScheduleModal.locator('.publish-date').nth(index).locator('uui-form-layout-item').first().locator('#input');
+    await expect(publishAtInput).toHaveValue(time);
   }
 
   async doesSchedulePublishModalButtonContainDisabledTag(hasDisabledTag: boolean = false) {
