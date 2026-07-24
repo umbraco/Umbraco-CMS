@@ -33,8 +33,15 @@ test('can see correct information when published', async ({umbracoApi, umbracoUi
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  const contentData = await umbracoApi.document.getByName(contentName);
-  await umbracoUi.content.doesIdHaveText(contentData.id);
+  // id is known from creation - assert it directly rather than via an eventually-consistent name lookup,
+  // which can briefly return a partial record (undefined id) right after publish.
+  await umbracoUi.content.doesIdHaveText(contentId);
+  // The published-document read can return before the variant/createDate is populated; poll until it is.
+  let contentData;
+  await expect.poll(async () => {
+    contentData = await umbracoApi.document.get(contentId);
+    return contentData?.variants?.[0]?.createDate;
+  }, {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
   const expectedCreatedDate = new Date(contentData.variants[0].createDate).toLocaleString("en-US", {
     year: "numeric",
     month: "long",
