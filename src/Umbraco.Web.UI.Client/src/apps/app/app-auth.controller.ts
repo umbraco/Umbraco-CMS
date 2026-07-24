@@ -2,6 +2,8 @@ import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH } from '@umbraco-cms/backoffice/au
 import type { UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	#retrievedContext: Promise<unknown>;
@@ -33,6 +35,22 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 		if (this.#authContext.getIsAuthorized()) {
 			return true;
+		}
+
+		// Not authorized. Decide before opening the modal so a single provider doesn't flash it: this
+		// guard runs at router init, after public extensions have registered, so the provider list is
+		// available. Exactly one provider → initiate it directly (full-page); otherwise open the modal
+		// to pick. (Timeouts always open the modal — see the timeoutSignal observer.)
+		// TODO: counts frontend manifests only; the follow-up auth-providers endpoint will reconcile
+		// against the server's actually-configured providers (and local-login-disabled state).
+		try {
+			const providers = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));
+			if (providers.length === 1) {
+				this.#authContext.autoInitiateLogin(providers[0]);
+				return false;
+			}
+		} catch {
+			// Fall through to the modal if the provider list can't be resolved.
 		}
 
 		this.#openAuthModal('loggedOut');
