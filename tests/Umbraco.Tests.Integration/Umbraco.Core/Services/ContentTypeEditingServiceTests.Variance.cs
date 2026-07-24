@@ -406,7 +406,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         return contentType;
     }
 
-    private async Task<IElement> CreateElementInstanceWithValue(IContentType contentType, params (string? Culture, string Value)[] values)
+    private async Task<Element> CreateElementInstanceWithValue(IContentType contentType, params (string? Culture, string Value)[] values)
     {
         var elementBuilder = new ElementBuilder()
             .WithContentType(contentType)
@@ -421,7 +421,7 @@ internal sealed partial class ContentTypeEditingServiceTests
             }
         }
 
-        IElement element = elementBuilder.Build();
+        Element element = elementBuilder.Build();
         foreach (var (culture, value) in values)
         {
             element.SetValue(VarianceTestPropertyAlias, value, culture);
@@ -431,7 +431,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         return element;
     }
 
-    private async Task<IContent> CreateContentInstanceWithValue(IContentType contentType, params (string? Culture, string Value)[] values)
+    private async Task<Content> CreateContentInstanceWithValue(IContentType contentType, params (string? Culture, string Value)[] values)
     {
         var contentBuilder = new ContentBuilder()
             .WithContentType(contentType)
@@ -446,7 +446,7 @@ internal sealed partial class ContentTypeEditingServiceTests
             }
         }
 
-        IContent content = contentBuilder.Build();
+        Content content = contentBuilder.Build();
         foreach (var (culture, value) in values)
         {
             content.SetValue(VarianceTestPropertyAlias, value, culture);
