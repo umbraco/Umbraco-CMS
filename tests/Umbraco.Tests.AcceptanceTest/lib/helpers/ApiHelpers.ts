@@ -170,7 +170,8 @@ export class ApiHelpers {
     expect(response.ok(), `Expected a successful response but got ${response.status()} for ${response.url()}`).toBeTruthy();
     const location = response.headers()['location'];
     expect(location, `Expected Location header to be present for ${response.url()}`).toBeTruthy();
-    return location.split('/').pop()!;
+    // Trim any trailing slash so a "/document/{id}/" Location still yields the id, not an empty segment.
+    return location.replace(/\/+$/, '').split('/').pop()!;
   }
 
   // Examine indexes asynchronously after create; await this before a UI search so the item is findable.
