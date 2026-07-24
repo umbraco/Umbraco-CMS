@@ -6,6 +6,7 @@ import type {
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
+import { computeAncestorPublishedCultures } from '../utils.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
@@ -26,6 +27,8 @@ import {
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
@@ -132,7 +135,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		const { options, selected } = await this.#determineVariantOptions();
+		const [{ options, selected }, ancestorPublishedCultures] = await Promise.all([
+			this.#determineVariantOptions(),
+			this.#getAncestorPublishedCultures(unique),
+		]);
 
 		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 			data: {
@@ -146,6 +152,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 						unpublishTime: option.variant?.scheduledUnpublishDate,
 					},
 				})),
+				ancestorPublishedCultures,
 			},
 		}).catch(() => undefined);
 
@@ -471,6 +478,30 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		this.#eventContext?.dispatchEvent(event);
+	}
+
+	/**
+	 * Fetches the ancestor chain of the current document and delegates to
+	 * {@link computeAncestorPublishedCultures} to derive which cultures are
+	 * published across every ancestor.
+	 * @param unique The unique of the document being scheduled.
+	 */
+	async #getAncestorPublishedCultures(unique: string): Promise<Array<string | null> | undefined> {
+		const { data, error } = await tryExecute(
+			this,
+			DocumentService.getItemDocumentAncestors({ query: { id: [unique] } }),
+		);
+		if (error || !data) return undefined;
+
+		const ancestors = data.find((entry) => entry.id === unique)?.ancestors ?? [];
+		return computeAncestorPublishedCultures(
+			ancestors.map((ancestor) => ({
+				variants: ancestor.variants.map((variant) => ({
+					culture: variant.culture ?? null,
+					state: variant.state,
+				})),
+			})),
+		);
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
