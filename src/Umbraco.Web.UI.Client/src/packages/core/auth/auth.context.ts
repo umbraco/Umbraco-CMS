@@ -158,7 +158,6 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#channel.close();
 	}
 
-	/* eslint-disable @typescript-eslint/no-unused-vars */
 	/**
 	 * Initiates login for the given provider.
 	 *
@@ -168,15 +167,15 @@ export class UmbAuthContext extends UmbContextBase {
 	 * a popup so the current view keeps any unsaved work and adopts the session via the auth-callback
 	 * lander's `authorized` broadcast. No PKCE/OIDC state is involved — the httpOnly cookie the server
 	 * sets is the sole credential.
-	 * @param identityProvider The provider to log in with. Default 'Umbraco' (local login).
-	 * @param redirect Navigate full-page instead of opening a popup.
-	 * @param usernameHint Ignored (cookie auth has no username hint).
-	 * @param manifest The registered provider's manifest, used for the popup target/features.
+	 * @param {string} identityProvider The provider to log in with. Default 'Umbraco' (local login).
+	 * @param {boolean} redirect Navigate full-page instead of opening a popup.
+	 * @param {string} _usernameHint Ignored (cookie auth has no username hint).
+	 * @param {ManifestAuthProvider} manifest The registered provider's manifest, used for the popup target/features.
 	 */
 	async makeAuthorizationRequest(
 		identityProvider = 'Umbraco',
 		redirect?: boolean,
-		usernameHint?: string,
+		_usernameHint?: string,
 		manifest?: ManifestAuthProvider,
 	): Promise<void> {
 		// Preserve where the user was so login returns them there. Skip a bare backoffice root — the
@@ -196,7 +195,9 @@ export class UmbAuthContext extends UmbContextBase {
 		} else {
 			// External login always routes through the server callback to the auth-callback lander;
 			// carry the deep link so the lander's full-page fallback can return there.
-			target = this.#externalLoginChallengeUrl(identityProvider);
+			const challengeUrl = new URL(this.#externalLoginEndpoint);
+			challengeUrl.searchParams.set('provider', identityProvider);
+			target = challengeUrl;
 			if (deepLink) {
 				target.searchParams.set('returnUrl', deepLink);
 			}
@@ -207,9 +208,13 @@ export class UmbAuthContext extends UmbContextBase {
 			return;
 		}
 
-		this.#openLoginPopup(target.href, manifest);
+		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
+		const popupFeatures =
+			manifest?.meta?.behavior?.popupFeatures ??
+			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
+
+		window.open(target.href, popupTarget, popupFeatures);
 	}
-	/* eslint-enable @typescript-eslint/no-unused-vars */
 
 	/**
 	 * Completes the login flow.
@@ -226,24 +231,9 @@ export class UmbAuthContext extends UmbContextBase {
 		return null;
 	}
 
-	#externalLoginChallengeUrl(provider: string): URL {
-		const challengeUrl = new URL(this.#externalLoginEndpoint);
-		challengeUrl.searchParams.set('provider', provider);
-		return challengeUrl;
-	}
-
-	#openLoginPopup(url: string, manifest?: ManifestAuthProvider): void {
-		const popupTarget = manifest?.meta?.behavior?.popupTarget ?? 'umbracoAuthPopup';
-		const popupFeatures =
-			manifest?.meta?.behavior?.popupFeatures ??
-			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
-
-		window.open(url, popupTarget, popupFeatures);
-	}
-
 	/**
 	 * Checks if the user is authorized. If Authorization is bypassed, the user is always authorized.
-	 * @returns True if the user is authorized, otherwise false.
+	 * @returns {boolean} True if the user is authorized, otherwise false.
 	 */
 	getIsAuthorized() {
 		if (this.#isBypassed) {
@@ -260,7 +250,6 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Sets the initial state of the auth flow.
 	 * First asks existing tabs for their session via BroadcastChannel.
 	 * If no peer responds, falls back to a server refresh.
-	 * @returns {Promise<void>}
 	 */
 	async setInitialState(): Promise<void> {
 		if (this.#isBypassed) {
