@@ -634,3 +634,14 @@ routes.push({ ...defaultRoute, path: '' });
 `umb-workspace-editor` uses this pattern — see the `// Duplicate first workspace and use it for the empty path scenario.` block in `workspace-editor.element.ts`.
 
 Do **not** add `pathMatch: 'full'` to the duplicated empty-path route. The modal sub-router appends modal paths (e.g. `/add-property/-1/container-root`) to the current active local path. With `path: ''` matching prefix-wise (regex `/^/`), the main route stays matched and the modal-router can resolve the appended segment. With `pathMatch: 'full'`, the empty-path route only matches an exactly-empty URL — modal URLs fall through to the catch-all, the route component unmounts, the modal registration is torn down, and the modal never opens.
+
+---
+
+### Auth & Cross-tab
+
+Auth state is coordinated across tabs on the `umb:auth` BroadcastChannel (`authorized` / `sessionCleared` / `signedOut`, in `auth.context.ts`):
+
+- **A BroadcastChannel does not deliver to the sender's own tab** — the sending tab must also apply the state locally, not just post it.
+- **Don't re-broadcast from a message handler** — the sender already reached every tab; echoing loops forever.
+- **Don't probe the session per request** — the boot probe (`user/current/configuration`) runs once at boot and after `keepAlive()`; the cookie is sent automatically. (The old form of this bug was calling the now-removed `validateToken()` per request, which revoked the reference token → ID2019 errors.)
+- **`window.opener` is set for any `window.open()` target**, not just auth popups — scope opener guards to the pathname too (`hasOwnOpener()`).
