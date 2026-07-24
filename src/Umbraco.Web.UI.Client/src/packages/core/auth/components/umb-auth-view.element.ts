@@ -171,14 +171,10 @@ export class UmbAuthViewElement extends UmbLitElement {
 			const providerName =
 				typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
 
-			// The built-in "Umbraco" provider is local username/password login, which has no external
-			// auth scheme to challenge. Route it to the server login app (in a popup, like external
-			// providers) so the user keeps any unsaved work in the main window.
-			if (providerName.toLowerCase() === 'umbraco') {
-				authContext.startLocalLogin(manifest);
-			} else {
-				authContext.startExternalLogin(providerName, manifest);
-			}
+			// Open the login flow in a popup (redirect: false) so the user keeps any unsaved work in the
+			// main window. makeAuthorizationRequest routes the built-in "Umbraco" provider to local
+			// login and any other provider to the external challenge.
+			authContext.makeAuthorizationRequest(providerName, false, undefined, manifest);
 		} catch (error) {
 			console.error('[AuthView] Error submitting auth request', error);
 			this._error = error instanceof Error ? error.message : 'Unknown error (see console)';

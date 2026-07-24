@@ -280,8 +280,8 @@ describe('UmbAuthContext', () => {
 			window.open = originalOpen;
 		});
 
-		it('startExternalLogin opens a popup on the external-login challenge endpoint for the provider', () => {
-			context.startExternalLogin('Google');
+		it('makeAuthorizationRequest (external, popup) opens the external-login challenge for the provider', async () => {
+			await context.makeAuthorizationRequest('Google', false);
 
 			expect(openedWindows).to.have.lengthOf(1);
 			const url = new URL(openedWindows[0].url);
@@ -294,8 +294,8 @@ describe('UmbAuthContext', () => {
 			expect(openedWindows[0].target).to.equal('umbracoAuthPopup');
 		});
 
-		it('startLocalLogin opens a popup on the server login app with the auth-callback lander as ReturnUrl', () => {
-			context.startLocalLogin();
+		it('makeAuthorizationRequest (local, popup) opens the server login app with the auth-callback lander as ReturnUrl', async () => {
+			await context.makeAuthorizationRequest('Umbraco', false);
 
 			expect(openedWindows).to.have.lengthOf(1);
 			const url = new URL(openedWindows[0].url);

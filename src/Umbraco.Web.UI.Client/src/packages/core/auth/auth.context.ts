@@ -160,12 +160,18 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/* eslint-disable @typescript-eslint/no-unused-vars */
 	/**
-	 * Initiates the login flow.
-	 * @param identityProvider The provider to log in with. Default is 'Umbraco' (the built-in local login).
-	 * @param redirect Ignored.
-	 * @param usernameHint Ignored.
-	 * @param manifest The manifest for the registered provider.
-	 * @deprecated Delegates to {@link startLocalLogin} (the built-in "Umbraco" provider) or {@link startExternalLogin}; call those directly. Note cookie auth opens a login popup rather than the old full-page authorization redirect. Scheduled for removal in Umbraco 21.
+	 * Initiates login for the given provider.
+	 *
+	 * The built-in "Umbraco" provider is local username/password login (the server login app); any
+	 * other provider is challenged via the cookie external-login endpoint. With `redirect` the flow
+	 * navigates full-page (cold-boot single-provider login — nothing to preserve); otherwise it opens
+	 * a popup so the current view keeps any unsaved work and adopts the session via the auth-callback
+	 * lander's `authorized` broadcast. No PKCE/OIDC state is involved — the httpOnly cookie the server
+	 * sets is the sole credential.
+	 * @param identityProvider The provider to log in with. Default 'Umbraco' (local login).
+	 * @param redirect Navigate full-page instead of opening a popup.
+	 * @param usernameHint Ignored (cookie auth has no username hint).
+	 * @param manifest The registered provider's manifest, used for the popup target/features.
 	 */
 	async makeAuthorizationRequest(
 		identityProvider = 'Umbraco',
@@ -173,40 +179,37 @@ export class UmbAuthContext extends UmbContextBase {
 		usernameHint?: string,
 		manifest?: ManifestAuthProvider,
 	): Promise<void> {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.makeAuthorizationRequest()',
-			removeInVersion: '21.0.0',
-			solution: 'Use startLocalLogin() or startExternalLogin() directly.',
-		}).warn();
+		// Preserve where the user was so login returns them there. Skip a bare backoffice root — the
+		// server defaults there. The server re-validates it with Url.IsLocalUrl (a relative path).
+		const returnPath = window.location.pathname + window.location.search;
+		const deepLink = returnPath === this.#backofficePath ? undefined : returnPath;
+
+		let target: URL;
 		if (identityProvider.toLowerCase() === 'umbraco') {
-			this.startLocalLogin(manifest);
+			target = new URL(`${this.#serverUrl}/umbraco/login`);
+			// A popup must land on the auth-callback lander (it broadcasts `authorized` and closes the
+			// popup); a full-page redirect returns to the deep link instead.
+			const returnUrl = redirect ? deepLink : new URL('auth-callback', document.baseURI).pathname;
+			if (returnUrl) {
+				target.searchParams.set('ReturnUrl', returnUrl);
+			}
 		} else {
-			this.startExternalLogin(identityProvider, manifest);
+			// External login always routes through the server callback to the auth-callback lander;
+			// carry the deep link so the lander's full-page fallback can return there.
+			target = this.#externalLoginChallengeUrl(identityProvider);
+			if (deepLink) {
+				target.searchParams.set('returnUrl', deepLink);
+			}
 		}
+
+		if (redirect) {
+			window.location.href = target.href;
+			return;
+		}
+
+		this.#openLoginPopup(target.href, manifest);
 	}
 	/* eslint-enable @typescript-eslint/no-unused-vars */
-
-	/**
-	 * Initiates external login for the given provider by opening a popup pointed at the server's
-	 * cookie-based external login challenge endpoint. The server redirects to the provider, then
-	 * back through its callback (which sets the auth cookie), then to the client's auth-callback
-	 * lander, which broadcasts `authorized` and closes the popup. No PKCE/OIDC state is involved —
-	 * the httpOnly auth cookie set by the server is the sole credential.
-	 * @param {string} provider The provider to log in with.
-	 * @param {ManifestAuthProvider} manifest The manifest for the registered provider, used for the popup target/features.
-	 */
-	startExternalLogin(provider: string, manifest?: ManifestAuthProvider): void {
-		const challengeUrl = this.#externalLoginChallengeUrl(provider);
-
-		// Preserve where the user was so context carries through the flow. Skip a bare backoffice
-		// root — the server already defaults there, so a returnUrl would just be noise.
-		const returnPath = window.location.pathname + window.location.search;
-		if (returnPath !== this.#backofficePath) {
-			challengeUrl.searchParams.set('returnUrl', returnPath);
-		}
-
-		this.#openLoginPopup(challengeUrl.href, manifest);
-	}
 
 	/**
 	 * Completes the login flow.
@@ -223,29 +226,6 @@ export class UmbAuthContext extends UmbContextBase {
 		return null;
 	}
 
-	/**
-	 * Initiates local (username/password) login by opening a popup pointed at the server-rendered
-	 * login app. On success the login app sets the auth cookie and redirects to the `ReturnUrl` we
-	 * pass — the client's auth-callback lander — which broadcasts `authorized` and closes the popup,
-	 * so the main window keeps any unsaved work (same rationale as {@link startExternalLogin}).
-	 *
-	 * Local login cannot reuse the external-login challenge endpoint: that issues a `ChallengeResult`
-	 * for a named authentication scheme, and local login has no such scheme.
-	 * @param {ManifestAuthProvider} manifest The manifest for the built-in provider, used for the popup target/features.
-	 */
-	startLocalLogin(manifest?: ManifestAuthProvider): void {
-		const loginUrl = new URL(`${this.#serverUrl}/umbraco/login`);
-
-		// Return the popup to our auth-callback lander after login. Pass a LOCAL, RELATIVE path: the
-		// server login controller validates ReturnUrl with Url.IsLocalUrl (which rejects absolute /
-		// cross-origin URLs), and the login app then resolves it against its configured back-office-host
-		// — so in a split-origin setup (dev server / Umbraco Cloud) the popup still lands on the client
-		// host, not the backend's. `document.baseURI` gives the path under the client's base.
-		loginUrl.searchParams.set('ReturnUrl', new URL('auth-callback', document.baseURI).pathname);
-
-		this.#openLoginPopup(loginUrl.href, manifest);
-	}
-
 	#externalLoginChallengeUrl(provider: string): URL {
 		const challengeUrl = new URL(this.#externalLoginEndpoint);
 		challengeUrl.searchParams.set('provider', provider);
@@ -259,36 +239,6 @@ export class UmbAuthContext extends UmbContextBase {
 			'width=600,height=600,menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,toolbar=no';
 
 		window.open(url, popupTarget, popupFeatures);
-	}
-
-	/**
-	 * Initiates login for the single available provider on a cold boot (no session yet), navigating
-	 * full-page instead of opening a popup — there is no in-progress work to preserve, and skipping the
-	 * modal + popup gives a direct login (matching the pre-cookie-auth behaviour). Local login goes to
-	 * the server login app; an external provider goes straight to its challenge endpoint.
-	 * @param {ManifestAuthProvider} manifest The single registered provider to initiate.
-	 */
-	autoInitiateLogin(manifest: ManifestAuthProvider): void {
-		// Preserve the deep link so login returns the user to where they were. Skip a bare backoffice
-		// root — the server already defaults there, so a returnUrl would just be noise. The server
-		// re-validates it with Url.IsLocalUrl, so a relative path is required (which pathname+search is).
-		const returnPath = window.location.pathname + window.location.search;
-		const returnUrl = returnPath === this.#backofficePath ? undefined : returnPath;
-
-		if (manifest.forProviderName.toLowerCase() === 'umbraco') {
-			const loginUrl = new URL(`${this.#serverUrl}/umbraco/login`);
-			if (returnUrl) {
-				loginUrl.searchParams.set('ReturnUrl', returnUrl);
-			}
-			window.location.href = loginUrl.href;
-			return;
-		}
-
-		const challengeUrl = this.#externalLoginChallengeUrl(manifest.forProviderName);
-		if (returnUrl) {
-			challengeUrl.searchParams.set('returnUrl', returnUrl);
-		}
-		window.location.href = challengeUrl.href;
 	}
 
 	/**
@@ -458,16 +408,16 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Attempts to refresh the token using Web Locks to prevent concurrent refresh requests.
-	 * @deprecated Cookie auth has no refresh token — returns {@link getIsAuthorized}. Use {@link keepAlive} to extend the session. Scheduled for removal in Umbraco 21.
+	 * @deprecated Cookie auth has no refresh token — delegates to {@link keepAlive}, which extends the session by renewing the cookie. Scheduled for removal in Umbraco 21.
 	 * @returns {Promise<boolean>} True if the refresh was successful, otherwise false.
 	 */
 	async makeRefreshTokenRequest(): Promise<boolean> {
 		new UmbDeprecation({
 			deprecated: 'UmbAuthContext.makeRefreshTokenRequest()',
 			removeInVersion: '21.0.0',
-			solution: 'Use getIsAuthorized() or keepAlive() instead.',
+			solution: 'Use keepAlive() to extend the session.',
 		}).warn();
-		return this.getIsAuthorized();
+		return this.keepAlive();
 	}
 
 	/**
