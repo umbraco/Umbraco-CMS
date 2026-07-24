@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -347,7 +348,7 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var dataTypeDefinition =
-                new DataType(new IntegerPropertyEditor(DataValueEditorFactory), ConfigurationEditorJsonSerializer)
+                new DataType(new IntegerPropertyEditor(DataValueEditorFactory, GetRequiredService<IIOHelper>()), ConfigurationEditorJsonSerializer)
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",

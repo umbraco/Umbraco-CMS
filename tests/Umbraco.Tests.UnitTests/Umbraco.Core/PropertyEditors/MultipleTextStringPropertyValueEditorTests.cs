@@ -85,7 +85,7 @@ public class MultipleTextStringPropertyValueEditorTests
     public void Can_Parse_More_Items_Than_Allowed_From_Editor()
     {
         var valueEditor = CreateValueEditor();
-        var fromEditor = valueEditor.FromEditor(new ContentPropertyData(new[] { "One", "Two", "Three", "Four", "Five" }, new MultipleTextStringConfiguration { Max = 4 }), null) as string;
+        var fromEditor = valueEditor.FromEditor(new ContentPropertyData(new[] { "One", "Two", "Three", "Four", "Five" }, new MultipleTextStringConfiguration { ValidationLimit = new NumberRange { Max = 4 } }), null) as string;
         Assert.AreEqual("One\nTwo\nThree\nFour\nFive", fromEditor);
 
         var validationResults = valueEditor.Validate(fromEditor, false, null, PropertyValidationContext.Empty());
@@ -305,7 +305,7 @@ public class MultipleTextStringPropertyValueEditorTests
     public void MinMax_Validator_Does_Not_Count_Empty_Strings()
     {
         var editor = CreateValueEditor();
-        editor.ConfigurationObject = new MultipleTextStringConfiguration { Min = 2, Max = 4 };
+        editor.ConfigurationObject = new MultipleTextStringConfiguration { ValidationLimit = new NumberRange { Min = 2, Max = 4 } };
 
         // 2 non-empty + 2 empty = should count as 2, meeting min=2
         var value = new[] { "one", string.Empty, "two", string.Empty };
@@ -317,7 +317,7 @@ public class MultipleTextStringPropertyValueEditorTests
     public void MinMax_Validator_Does_Not_Count_Empty_Strings_Below_Min()
     {
         var editor = CreateValueEditor();
-        editor.ConfigurationObject = new MultipleTextStringConfiguration { Min = 2, Max = 4 };
+        editor.ConfigurationObject = new MultipleTextStringConfiguration { ValidationLimit = new NumberRange { Min = 2, Max = 4 } };
 
         // 1 non-empty + 2 empty = should count as 1, failing min=2
         var value = new[] { "one", string.Empty, string.Empty };
@@ -349,7 +349,7 @@ public class MultipleTextStringPropertyValueEditorTests
     }
 
     private static object? FromEditor(object? value, int max = 0)
-        => CreateValueEditor().FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { Max = max }), null);
+        => CreateValueEditor().FromEditor(new ContentPropertyData(value, new MultipleTextStringConfiguration { ValidationLimit = new NumberRange { Max = max } }), null);
 
     private static object? ToEditor(object? value)
     {

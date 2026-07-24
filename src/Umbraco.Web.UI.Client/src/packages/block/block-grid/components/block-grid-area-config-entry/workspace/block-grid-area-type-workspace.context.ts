@@ -106,8 +106,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 			alias: '',
 			columnSpan: 12,
 			rowSpan: 1,
-			minAllowed: 0,
-			maxAllowed: undefined,
+			validationLimit: { min: 0, max: undefined },
 			specifiedAllowance: [],
 		};
 

@@ -183,8 +183,7 @@ public class IntegerPropertyValueEditorTests
         {
             ConfigurationObject = new Dictionary<string, object>
             {
-                { "min", 10 },
-                { "max", 20 },
+                { "validationRange", new Dictionary<string, object> { { "min", 10 }, { "max", 20 } } },
                 { "step", step }
             }
         };

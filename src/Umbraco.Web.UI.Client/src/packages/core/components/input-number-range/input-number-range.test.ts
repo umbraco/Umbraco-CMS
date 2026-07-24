@@ -17,4 +17,28 @@ describe('UmbPropertyEditorUINumberRangeElement', () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});
 	}
+
+	it('treats a zero bound as a set value', () => {
+		element.minValue = 0;
+		element.maxValue = 5;
+		expect(element.value).to.equal('0,5');
+	});
+
+	it('supports negative bounds', () => {
+		element.minValue = -5;
+		element.maxValue = 5;
+		expect(element.value).to.equal('-5,5');
+	});
+
+	it('parses decimal values from the string value', () => {
+		element.value = '1.5,3.5';
+		expect(element.minValue).to.equal(1.5);
+		expect(element.maxValue).to.equal(3.5);
+	});
+
+	it('is undefined when both bounds are unset', () => {
+		element.minValue = undefined;
+		element.maxValue = undefined;
+		expect(element.value).to.equal(undefined);
+	});
 });

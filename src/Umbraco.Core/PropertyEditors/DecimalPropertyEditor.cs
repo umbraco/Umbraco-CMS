@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -23,13 +25,29 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueEditorIsReusable = true)]
 public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
 {
+    private readonly IIOHelper _ioHelper;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="DecimalPropertyEditor" /> class.
     /// </summary>
     public DecimalPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory) =>
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper ioHelper)
+        : base(dataValueEditorFactory)
+    {
+        _ioHelper = ioHelper;
         SupportsReadOnly = true;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DecimalPropertyEditor" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 21.")]
+    public DecimalPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory)
+        : this(dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IIOHelper>())
+    {
+    }
 
     /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(decimal?);
@@ -43,28 +61,39 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
             ["type"] = new JsonArray("number", "null"),
         };
 
-        // Add min/max/step constraints from configuration if available
-        if (configuration is IDictionary<string, object> configDict)
+        // Add min/max/step constraints from configuration if available. The configuration arrives either as the
+        // typed configuration object (from the data type's ConfigurationObject) or as the raw dictionary.
+        if (configuration is DecimalConfiguration or IDictionary<string, object>)
         {
-            if (configDict.TryGetValue("min", out var minValue) && minValue is double min)
+            object? rangeValue = configuration switch
             {
-                schema["minimum"] = min;
+                DecimalConfiguration decimalConfiguration => decimalConfiguration.ValidationRange,
+                IDictionary<string, object> configDict when configDict.TryGetValue("validationRange", out var range) => range,
+                _ => null,
+            };
+
+            if (RangeConfigurationHelper.TryGetBounds(rangeValue, out decimal? min, out decimal? max))
+            {
+                if (min.HasValue)
+                {
+                    schema["minimum"] = (double)min.Value;
+                }
+
+                if (max.HasValue)
+                {
+                    schema["maximum"] = (double)max.Value;
+                }
             }
 
-            if (configDict.TryGetValue("max", out var maxValue) && maxValue is double max)
+            var step = configuration switch
             {
-                schema["maximum"] = max;
-            }
+                DecimalConfiguration decimalConfiguration when decimalConfiguration.Step.HasValue => (double)decimalConfiguration.Step.Value,
+                IDictionary<string, object> configDict when configDict.TryGetValue("step", out var stepValue) && stepValue is double stepDouble => stepDouble,
+                _ => (double?)null,
+            };
 
-            if (configDict.TryGetValue("step", out var stepValue) && stepValue is double step && step > 0)
-            {
-                schema["multipleOf"] = step;
-            }
-            else
-            {
-                // Default: allow up to 6 decimal places, matching DB DECIMAL(38,6)
-                schema["multipleOf"] = 0.000001;
-            }
+            // Default: allow up to 6 decimal places, matching DB DECIMAL(38,6).
+            schema["multipleOf"] = step is double configuredStep && configuredStep > 0 ? configuredStep : 0.000001;
         }
 
         return schema;
@@ -75,7 +104,7 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
         => DataValueEditorFactory.Create<DecimalPropertyValueEditor>(Attribute!);
 
     /// <inheritdoc />
-    protected override IConfigurationEditor CreateConfigurationEditor() => new DecimalConfigurationEditor();
+    protected override IConfigurationEditor CreateConfigurationEditor() => new DecimalConfigurationEditor(_ioHelper);
 
     /// <summary>
     /// Defines the value editor for the decimal property editor.
@@ -122,14 +151,9 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
         internal abstract class DecimalPropertyConfigurationValidatorBase : SimplePropertyConfigurationValidatorBase<double>
         {
             /// <summary>
-            /// The configuration key for the minimum value.
+            /// The configuration key for the validation range.
             /// </summary>
-            protected const string ConfigurationKeyMinValue = "min";
-
-            /// <summary>
-            /// The configuration key for the maximum value.
-            /// </summary>
-            protected const string ConfigurationKeyMaxValue = "max";
+            protected const string ConfigurationKeyValidationRange = "validationRange";
 
             /// <summary>
             /// The configuration key for the step value.
@@ -203,17 +227,22 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
                     yield break;
                 }
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out double min) && parsedDecimalValue < min)
+                if (TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? min, out decimal? max) is false)
+                {
+                    yield break;
+                }
+
+                if (min.HasValue && parsedDecimalValue < (double)min.Value)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [parsedDecimalValue.ToString(), min.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [parsedDecimalValue.ToString(), min.Value.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMaxValue, out double max) && parsedDecimalValue > max)
+                if (max.HasValue && parsedDecimalValue > (double)max.Value)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [parsedDecimalValue.ToString(), max.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [parsedDecimalValue.ToString(), max.Value.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }
@@ -241,10 +270,8 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
                 }
 
                 // Default min to 0 if not configured (step validation is relative to min).
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out double min) is false)
-                {
-                    min = 0;
-                }
+                TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? configuredMin, out _);
+                var min = configuredMin.HasValue ? (double)configuredMin.Value : 0d;
 
                 // Default step to 0.000001 (6 decimal places) if not configured,
                 // matching the database DECIMAL(38,6) column precision.

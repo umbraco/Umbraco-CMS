@@ -93,14 +93,14 @@ public class MultiUrlPickerPropertyEditor : DataEditor, IValueSchemaProvider
         // Add minItems/maxItems from configuration if available
         if (configuration is MultiUrlPickerConfiguration pickerConfig)
         {
-            if (pickerConfig.MinNumber > 0)
+            if (pickerConfig.ValidationLimit.Min is int min && min > 0)
             {
-                schema["minItems"] = pickerConfig.MinNumber;
+                schema["minItems"] = min;
             }
 
-            if (pickerConfig.MaxNumber > 0)
+            if (pickerConfig.ValidationLimit.Max is int max && max > 0)
             {
-                schema["maxItems"] = pickerConfig.MaxNumber;
+                schema["maxItems"] = max;
             }
         }
 

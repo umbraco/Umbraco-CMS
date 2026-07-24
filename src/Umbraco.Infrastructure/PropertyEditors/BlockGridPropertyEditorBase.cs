@@ -226,7 +226,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
                         continue;
                     }
 
-                    if ((areaConfig.MinAllowed.HasValue && area.Items.Length < areaConfig.MinAllowed) || (areaConfig.MaxAllowed.HasValue && area.Items.Length > areaConfig.MaxAllowed))
+                    if ((areaConfig.ValidationLimit?.Min is int minAllowed && area.Items.Length < minAllowed) || (areaConfig.ValidationLimit?.Max is int maxAllowed && area.Items.Length > maxAllowed))
                     {
                         validationResults.Add(new ValidationResult(TextService.Localize("validation", "entriesAreasMismatch")));
                     }

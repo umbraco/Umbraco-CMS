@@ -109,6 +109,13 @@ public partial class UmbracoPlan : MigrationPlan
 
         // To 19.0.0
         To<V_19_0_0.AddExternalBlockElementRelationType>("{2D8F1B6E-4C3A-4E7D-9A1B-5F0C7E2D8A93}");
+        To<V_19_0_0.MigrateMultiUrlPickerMinMaxToRange>("{B1E4A7C2-3F5D-4A98-9C1E-0D2F6B7A81C4}");
+        To<V_19_0_0.MigrateMultiNodeTreePickerMinMaxToRange>("{C2F5B8D3-4A6E-4BA9-8D2F-1E3A7C8B92D5}");
+        To<V_19_0_0.MigrateMultipleTextStringMinMaxToRange>("{D3A6C9E4-5B7F-4CBA-9E30-2F4B8D9CA3E6}");
+        To<V_19_0_0.MigrateIntegerMinMaxToRange>("{E4B7DAF5-6C80-4DCB-8F41-3A5C9EADB4F7}");
+        To<V_19_0_0.MigrateDecimalMinMaxToRange>("{F5C8EB06-7D91-4EDC-9052-4B6DAFBEC508}");
+        To<V_19_0_0.MigrateSliderMinMaxToRange>("{06D9FC17-8EA2-4FED-A163-5C7EB0CFD619}");
+        To<V_19_0_0.MigrateBlockGridAreaMinMaxToRange>("{17EA0D28-9FB3-40FE-B274-6D8FC1D0E72A}");
     }
 
     /// <summary>

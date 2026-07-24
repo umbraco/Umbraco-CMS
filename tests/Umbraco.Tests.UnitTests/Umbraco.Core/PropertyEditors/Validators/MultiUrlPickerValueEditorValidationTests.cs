@@ -26,7 +26,7 @@ internal class MultiUrlPickerValueEditorValidationTests
     {
         var picker = CreateValueEditor();
 
-        picker.ConfigurationObject = new MultiUrlPickerConfiguration() { MinNumber = min };
+        picker.ConfigurationObject = new MultiUrlPickerConfiguration() { ValidationLimit = new NumberRange { Min = min } };
 
         var result = picker.Validate(value, false, null, PropertyValidationContext.Empty());
         ValidateResult(succeed, result);
@@ -41,7 +41,7 @@ internal class MultiUrlPickerValueEditorValidationTests
     {
         var picker = CreateValueEditor();
 
-        picker.ConfigurationObject = new MultiUrlPickerConfiguration() { MaxNumber = max };
+        picker.ConfigurationObject = new MultiUrlPickerConfiguration() { ValidationLimit = new NumberRange { Max = max } };
 
         var result = picker.Validate(value, false, null, PropertyValidationContext.Empty());
         ValidateResult(succeed, result);

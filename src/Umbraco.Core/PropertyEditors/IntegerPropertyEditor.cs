@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -23,12 +25,26 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueEditorIsReusable = true)]
 public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
 {
+    private readonly IIOHelper _ioHelper;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="IntegerPropertyEditor"/> class.
     /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 21.")]
     public IntegerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
+        : this(dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IIOHelper>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IntegerPropertyEditor"/> class.
+    /// </summary>
+    public IntegerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
-        => SupportsReadOnly = true;
+    {
+        _ioHelper = ioHelper;
+        SupportsReadOnly = true;
+    }
 
     /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(int?);
@@ -42,23 +58,38 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
             ["type"] = new JsonArray("integer", "null"),
         };
 
-        // Add min/max constraints from configuration if available
-        if (configuration is IDictionary<string, object> configDict)
+        // Add min/max constraints from configuration if available. The configuration arrives either as the typed
+        // configuration object (from the data type's ConfigurationObject) or as the raw dictionary.
+        object? rangeValue = configuration switch
         {
-            if (configDict.TryGetValue("min", out var minValue) && minValue is int min)
+            IntegerConfiguration integerConfiguration => integerConfiguration.ValidationRange,
+            IDictionary<string, object> configDict when configDict.TryGetValue("validationRange", out var range) => range,
+            _ => null,
+        };
+
+        if (RangeConfigurationHelper.TryGetBounds(rangeValue, out decimal? min, out decimal? max))
+        {
+            if (min.HasValue)
             {
-                schema["minimum"] = min;
+                schema["minimum"] = (int)min.Value;
             }
 
-            if (configDict.TryGetValue("max", out var maxValue) && maxValue is int max)
+            if (max.HasValue)
             {
-                schema["maximum"] = max;
+                schema["maximum"] = (int)max.Value;
             }
+        }
 
-            if (configDict.TryGetValue("step", out var stepValue) && stepValue is int step && step > 1)
-            {
-                schema["multipleOf"] = step;
-            }
+        var step = configuration switch
+        {
+            IntegerConfiguration integerConfiguration => integerConfiguration.Step,
+            IDictionary<string, object> configDict when configDict.TryGetValue("step", out var stepValue) && stepValue is int stepInt => stepInt,
+            _ => null,
+        };
+
+        if (step is int configuredStep && configuredStep > 1)
+        {
+            schema["multipleOf"] = configuredStep;
         }
 
         return schema;
@@ -69,7 +100,7 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
         => DataValueEditorFactory.Create<IntegerPropertyValueEditor>(Attribute!);
 
     /// <inheritdoc />
-    protected override IConfigurationEditor CreateConfigurationEditor() => new IntegerConfigurationEditor();
+    protected override IConfigurationEditor CreateConfigurationEditor() => new IntegerConfigurationEditor(_ioHelper);
 
     /// <summary>
     /// Defines the value editor for the integer property editor.
@@ -109,14 +140,9 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
         internal abstract class IntegerPropertyConfigurationValidatorBase : SimplePropertyConfigurationValidatorBase<int>
         {
             /// <summary>
-            /// The configuration key for the minimum value.
+            /// The configuration key for the validation range.
             /// </summary>
-            protected const string ConfigurationKeyMinValue = "min";
-
-            /// <summary>
-            /// The configuration key for the maximum value.
-            /// </summary>
-            protected const string ConfigurationKeyMaxValue = "max";
+            protected const string ConfigurationKeyValidationRange = "validationRange";
 
             /// <summary>
             /// The configuration key for the step value.
@@ -159,17 +185,22 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
                     yield break;
                 }
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out int min) && parsedIntegerValue < min)
+                if (TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? min, out decimal? max) is false)
+                {
+                    yield break;
+                }
+
+                if (min.HasValue && parsedIntegerValue < min.Value)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [parsedIntegerValue.ToString(), min.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [parsedIntegerValue.ToString(), ((int)min.Value).ToString()]),
                         ["value"]);
                 }
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMaxValue, out int max) && parsedIntegerValue > max)
+                if (max.HasValue && parsedIntegerValue > max.Value)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [parsedIntegerValue.ToString(), max.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [parsedIntegerValue.ToString(), ((int)max.Value).ToString()]),
                         ["value"]);
                 }
             }
@@ -196,12 +227,14 @@ public class IntegerPropertyEditor : DataEditor, IValueSchemaProvider
                     yield break;
                 }
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out int min) &&
+                TryGetConfiguredRange(dataTypeConfiguration, ConfigurationKeyValidationRange, out decimal? min, out _);
+
+                if (min.HasValue &&
                     TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out int step) &&
-                    ValidationHelper.IsValueValidForStep(parsedIntegerValue, min, step) is false)
+                    ValidationHelper.IsValueValidForStep(parsedIntegerValue, (int)min.Value, step) is false)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "invalidStep", [parsedIntegerValue.ToString(), step.ToString(), min.ToString()]),
+                        LocalizedTextService.Localize("validation", "invalidStep", [parsedIntegerValue.ToString(), step.ToString(), ((int)min.Value).ToString()]),
                         ["value"]);
                 }
             }

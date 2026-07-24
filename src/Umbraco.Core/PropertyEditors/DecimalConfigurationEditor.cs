@@ -1,30 +1,28 @@
-using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
-///     A custom pre-value editor class to deal with the legacy way that the pre-value data is stored.
+///     The configuration editor for the decimal property editor.
 /// </summary>
-public class DecimalConfigurationEditor : ConfigurationEditor
+public class DecimalConfigurationEditor : ConfigurationEditor<DecimalConfiguration>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="DecimalConfigurationEditor"/> class.
     /// </summary>
-    public DecimalConfigurationEditor()
+    public DecimalConfigurationEditor(IIOHelper ioHelper)
+        : base(ioHelper)
     {
-        Fields.Add(new ConfigurationField(new DecimalValidator())
-        {
-            Key = "min"
-        });
+    }
 
-        Fields.Add(new ConfigurationField(new DecimalValidator())
-        {
-            Key = "step",
-        });
-
-        Fields.Add(new ConfigurationField(new DecimalValidator())
-        {
-            Key = "max",
-        });
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DecimalConfigurationEditor"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 21.")]
+    public DecimalConfigurationEditor()
+        : this(StaticServiceProvider.Instance.GetRequiredService<IIOHelper>())
+    {
     }
 }

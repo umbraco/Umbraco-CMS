@@ -242,7 +242,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
     }
 
     private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>
-        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.MaxNumber == 1;
+        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.ValidationLimit.Max == 1;
 
     private static string GetEntityType(IPublishedPropertyType propertyType) =>
         propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.TreeSource?.ObjectType ?? Constants.UdiEntityType.Document;
