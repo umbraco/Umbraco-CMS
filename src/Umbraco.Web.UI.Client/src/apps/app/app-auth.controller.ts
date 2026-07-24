@@ -81,11 +81,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 		const modalManager = await this.getContext(contextToken);
 
 		this.#authModalOpen = true;
-		// TODO: Open this non-dismissible when there is no session. `UmbPersistentModalDialogElement`
-		// (packages/core/modal/component/persistent-modal-dialog.element.ts) exists for this, but
-		// wiring it in requires `modal: { type: 'custom', element: UmbPersistentModalDialogElement }`
-		// — a combination with no other usage in the codebase yet and unverifiable here (no browser).
-		// Leaving for task 4.4, which finishes the modal shell.
 		const modal = modalManager?.open(this, UMB_MODAL_APP_AUTH, {
 			modal: {
 				key: 'app-auth',
