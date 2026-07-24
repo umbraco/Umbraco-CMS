@@ -294,11 +294,16 @@ export class UmbAuthContext extends UmbContextBase {
 	 */
 	async #establishSessionFromServer(): Promise<boolean> {
 		try {
-			// This is a direct call to the backend API to check the current user configuration, so we have to avoid tryExecute() here, otherwise it will trigger a redirect to the login page if the user is not authenticated. Instead, we want to handle the response manually and set the session state accordingly.
-			// eslint-disable-next-line local-rules/no-direct-api-import
-			const { data, response } = await UserService.getUserCurrentConfiguration({
+			// Probe the current-user configuration with a direct fetch, NOT the generated (intercepted)
+			// client. A 401 here is the expected "no session" answer to the boot probe; routing it
+			// through the API interceptor would queue this request for re-authentication (so the promise
+			// never resolves and boot hangs) and raise a spurious timeout signal. We handle the response
+			// manually and set the session state accordingly.
+			const response = await fetch(`${this.#serverUrl}/umbraco/management/api/v1/user/current/configuration`, {
+				method: 'GET',
 				credentials: 'include',
 				redirect: 'manual',
+				headers: { Accept: 'application/json' },
 			});
 
 			if (!response.ok) {
