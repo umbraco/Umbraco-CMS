@@ -228,12 +228,26 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @param {ManifestAuthProvider} manifest The single registered provider to initiate.
 	 */
 	autoInitiateLogin(manifest: ManifestAuthProvider): void {
+		// Preserve the deep link so login returns the user to where they were. Skip a bare backoffice
+		// root — the server already defaults there, so a returnUrl would just be noise. The server
+		// re-validates it with Url.IsLocalUrl, so a relative path is required (which pathname+search is).
+		const returnPath = window.location.pathname + window.location.search;
+		const returnUrl = returnPath === this.#backofficePath ? undefined : returnPath;
+
 		if (manifest.forProviderName.toLowerCase() === 'umbraco') {
-			window.location.href = `${this.#serverUrl}/umbraco/login`;
+			const loginUrl = new URL(`${this.#serverUrl}/umbraco/login`);
+			if (returnUrl) {
+				loginUrl.searchParams.set('ReturnUrl', returnUrl);
+			}
+			window.location.href = loginUrl.href;
 			return;
 		}
 
-		window.location.href = this.#externalLoginChallengeUrl(manifest.forProviderName).href;
+		const challengeUrl = this.#externalLoginChallengeUrl(manifest.forProviderName);
+		if (returnUrl) {
+			challengeUrl.searchParams.set('returnUrl', returnUrl);
+		}
+		window.location.href = challengeUrl.href;
 	}
 
 	/**
