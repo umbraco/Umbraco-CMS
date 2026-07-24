@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class ElementContainerService : EntityTypeContainerService<IElement, IElementContainerRepository>, IElementContainerService
 {
     private readonly IElementContainerRepository _entityContainerRepository;
+    private readonly IEntityRepository _entityRepository;
     private readonly IEntityService _entityService;
     private readonly IElementRepository _elementRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
@@ -49,6 +50,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
     {
         _entityContainerRepository = entityContainerRepository;
+        _entityRepository = entityRepository;
         _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService;
         _elementRepository = elementRepository;
@@ -119,8 +121,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             scope,
             key,
             userKey,
-            mustBeTrashed: true,
-            requireEmpty: false);
+            ContainerDeleteMode.FromRecycleBin);
 
         scope.Complete();
         return deleteResult;
@@ -136,8 +137,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             scope,
             id,
             userKey,
-            mustBeTrashed: false,
-            requireEmpty: true);
+            ContainerDeleteMode.Direct);
 
         scope.Complete();
         return deleteResult;
@@ -372,8 +372,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         ICoreScope scope,
         Guid key,
         Guid userKey,
-        bool mustBeTrashed,
-        bool requireEmpty)
+        ContainerDeleteMode mode)
     {
         EntityContainer? container = _entityContainerRepository.Get(key);
         if (container is null)
@@ -381,14 +380,14 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotFound, null);
         }
 
-        if (mustBeTrashed && container.Trashed is false)
+        if (mode is ContainerDeleteMode.FromRecycleBin && container.Trashed is false)
         {
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotInTrash, container);
         }
 
         // 'container' here does not know about its children, so we need
-        // to get it again from the entity service, as a light entity
-        if (requireEmpty && _entityService.Get(container.Key)?.HasChildren is true)
+        // to get it again from the entity repository, as a light entity
+        if (mode is ContainerDeleteMode.Direct && _entityRepository.Get(container.Id)?.HasChildren is true)
         {
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.NotEmpty, container);
         }
@@ -402,7 +401,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
             return Attempt.FailWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.CancelledByNotification, container);
         }
 
-        List<IElement> deletedElements = requireEmpty
+        List<IElement> deletedElements = mode is ContainerDeleteMode.Direct
             ? []
             : DeleteDescendantsLocked(container.Key, UmbracoObjectTypes.ElementContainer, scope, eventMessages);
 
@@ -529,4 +528,15 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     protected override int[] ReadLockIds => new [] { Constants.Locks.ElementTree };
 
     protected override int[] WriteLockIds => ReadLockIds;
+
+    private enum ContainerDeleteMode
+    {
+        // Direct delete of a container that is not in the recycle bin; the container must be empty and its
+        // descendants are left untouched.
+        Direct,
+
+        // Delete of a container that has been moved to the recycle bin; the container and all of its
+        // descendants are removed.
+        FromRecycleBin,
+    }
 }

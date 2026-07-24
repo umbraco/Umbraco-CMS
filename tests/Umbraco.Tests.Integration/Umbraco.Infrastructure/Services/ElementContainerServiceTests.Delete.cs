@@ -62,6 +62,25 @@ public partial class ElementContainerServiceTests
     }
 
     [Test]
+    public async Task Cannot_Delete_Container_With_Child_Element()
+    {
+        var createResult = await ElementContainerService.CreateAsync(null, "Container", null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+        EntityContainer container = createResult.Result!;
+        IContentType elementType = await CreateElementType();
+        await CreateElement(elementType.Key, container.Key);
+
+        var result = await ElementContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.NotEmpty, result.Status);
+        });
+
+        Assert.IsNotNull(await ElementContainerService.GetAsync(container.Key));
+    }
+
+    [Test]
     public async Task Cannot_Delete_Non_Existing_Container()
     {
         var result = await ElementContainerService.DeleteAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
