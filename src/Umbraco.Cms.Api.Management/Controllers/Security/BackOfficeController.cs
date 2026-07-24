@@ -378,10 +378,9 @@ public class BackOfficeController : SecurityControllerBase
 
         // The auth cookie was already cleared by SignOutAsync above, and back-office auth is
         // cookie-only, so there is no OpenIddict end-session to run. Redirect straight to the client
-        // logout landing (BackOfficeHost + the effective logout path); a plain redirect also avoids
-        // OpenIddict's post_logout_redirect_uri validation, which rejected client hosts not registered
-        // on the OpenIddict client (ID2052).
-        return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.GetEffectiveLogoutPathName().TrimStart('/'));
+        // logout landing; a plain redirect also avoids OpenIddict's post_logout_redirect_uri validation,
+        // which rejected client hosts not registered on the OpenIddict client (ID2052).
+        return Redirect(ClientRedirectUrl(_securitySettings.Value.GetEffectiveLogoutPathName()));
     }
 
     /// <summary>
@@ -453,7 +452,7 @@ public class BackOfficeController : SecurityControllerBase
 
         if (claimsPrincipleAttempt.Success == false)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.GetEffectiveErrorPathName().TrimStart('/').AppendQueryStringToUrl(
+            return Redirect(ClientRedirectUrl(_securitySettings.Value.GetEffectiveErrorPathName()).AppendQueryStringToUrl(
                 $"{RedirectFlowParameter}=link-login",
                 $"{RedirectStatusParameter}=unauthorized"));
         }
@@ -461,7 +460,7 @@ public class BackOfficeController : SecurityControllerBase
         BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(claimsPrincipleAttempt.Result!);
         if (user == null)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.GetEffectiveErrorPathName().TrimStart('/').AppendQueryStringToUrl(
+            return Redirect(ClientRedirectUrl(_securitySettings.Value.GetEffectiveErrorPathName()).AppendQueryStringToUrl(
                 $"{RedirectFlowParameter}=link-login",
                 $"{RedirectStatusParameter}=user-not-found"));
         }
@@ -748,15 +747,21 @@ public class BackOfficeController : SecurityControllerBase
         return url;
     }
 
+    // Builds an absolute URL to a client (back-office) path. Uses the host authority, which drops any
+    // trailing slash on BackOfficeHost, so a configured "https://host/" + "/error" doesn't produce a
+    // double slash. Falls back to a host-relative path when BackOfficeHost isn't configured (same origin).
+    private string ClientRedirectUrl(string path)
+        => (_securitySettings.Value.BackOfficeHost?.GetLeftPart(UriPartial.Authority) ?? string.Empty)
+            + path.EnsureStartsWith('/');
+
     private RedirectResult ExternalLoginErrorRedirect(string status)
         => CallbackErrorRedirectWithStatus("external-login", status, Array.Empty<IdentityError>());
 
     private RedirectResult CallbackErrorRedirectWithStatus(string flowType, string status, IEnumerable<IdentityError> identityErrors)
     {
-        var redirectUrl = _securitySettings.Value.BackOfficeHost + "/" +
-                          _securitySettings.Value.GetEffectiveErrorPathName().TrimStart('/').AppendQueryStringToUrl(
-                              $"{RedirectFlowParameter}={flowType}",
-                              $"{RedirectStatusParameter}={status}");
+        var redirectUrl = ClientRedirectUrl(_securitySettings.Value.GetEffectiveErrorPathName()).AppendQueryStringToUrl(
+            $"{RedirectFlowParameter}={flowType}",
+            $"{RedirectStatusParameter}={status}");
         foreach (IdentityError identityError in identityErrors)
         {
             redirectUrl.AppendQueryStringToUrl($"{RedirectErrorCodeParameter}={identityError.Code}");
