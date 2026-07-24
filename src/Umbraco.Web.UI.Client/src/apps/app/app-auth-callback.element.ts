@@ -42,13 +42,24 @@ export class UmbAppAuthCallbackElement extends UmbLitElement {
 		window.close();
 
 		// window.close() is a silent no-op when the browser refuses it (e.g. this route loaded in an
-		// ordinary tab rather than the script-opened external-login popup). Fall back to landing on
-		// the backoffice root instead of leaving a bare loader up indefinitely.
+		// ordinary tab rather than the script-opened popup — the full-page autoInitiateLogin external
+		// flow). Fall back to the server-carried returnUrl (re-validated local) so a deep link isn't
+		// dropped, otherwise the backoffice root — never leave a bare loader up indefinitely.
 		setTimeout(() => {
 			if (!window.closed) {
-				window.location.href = this.#backofficePath;
+				window.location.href = this.#fallbackUrl();
 			}
 		}, 300);
+	}
+
+	#fallbackUrl(): string {
+		const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+		// Accept only a local, relative path (mirrors the server's Url.IsLocalUrl guard): a single
+		// leading slash, and neither a protocol-relative "//host" nor a "/\" backslash trick.
+		if (returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//') && !returnUrl.startsWith('/\\')) {
+			return returnUrl;
+		}
+		return this.#backofficePath;
 	}
 
 	override render() {
