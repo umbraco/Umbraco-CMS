@@ -230,9 +230,11 @@
 		"npm": ">=11"
 	},
 	"dependencies": {
-		"element-internals-polyfill": "^3.0.2"
+		"element-internals-polyfill": "^3.0.2",
+		"monaco-editor": "0.56.0"
 	},
 	"devDependencies": {
+		"@hey-api/openapi-ts": "0.97.0",
 		"@babel/core": "^7.29.7",
 		"@eslint/js": "^10.0.1",
 		"@open-wc/testing": "^4.0.0",
@@ -253,7 +255,7 @@
 		"cssnano": "^7.1.9",
 		"eslint": "^10.7.0",
 		"eslint-config-prettier": "^10.1.8",
-		"eslint-plugin-import": "^2.32.0",
+		"eslint-plugin-import": "^1.14.0",
 		"eslint-plugin-jsdoc": "^62.9.0",
 		"eslint-plugin-lit": "^2.3.1",
 		"eslint-plugin-local-rules": "^3.0.2",
@@ -275,7 +277,7 @@
 		"typedoc": "^0.28.20",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.65.0",
-		"typescript-json-schema": "^0.65.1",
+		"typescript-json-schema": "^0.68.0",
 		"vite": "^7.3.6",
 		"vite-plugin-static-copy": "^3.4.0",
 		"vite-tsconfig-paths": "^6.1.1",
@@ -298,6 +300,7 @@
 	},
 	"allowScripts": {
 		"msw@2.15.0": true,
-		"esbuild@0.27.7": true
+		"esbuild@0.27.7": true,
+		"es5-ext@0.10.64": true
 	}
 }
