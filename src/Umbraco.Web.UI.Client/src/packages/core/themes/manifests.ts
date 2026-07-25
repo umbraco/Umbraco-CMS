@@ -13,6 +13,7 @@ export const themes: Array<UmbExtensionManifest> = [
 		type: 'theme',
 		alias: UMB_THEME_LIGHT_ALIAS,
 		name: 'Light',
+		css: '/umbraco/backoffice/css/light.css',
 		weight: 300,
 	},
 	/*
