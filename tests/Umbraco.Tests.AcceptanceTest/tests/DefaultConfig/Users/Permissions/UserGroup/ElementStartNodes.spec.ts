@@ -62,7 +62,6 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
   // Assert
   await umbracoUi.library.isElementInTreeVisible(rootFolderName);
   await umbracoUi.library.goToElementWithName(rootFolderName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for workspace to load
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
   await umbracoUi.library.openElementCaretButtonForName(rootFolderName);
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementOneName);

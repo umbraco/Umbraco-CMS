@@ -9,6 +9,7 @@ export class UiBaseLocators extends BasePage {
   public readonly confirmBtn: Locator;
   public readonly chooseBtn: Locator;
   public readonly chooseModalBtn: Locator;
+  public readonly chooseModalLink: Locator;
   public readonly createBtn: Locator;
   public readonly addBtn: Locator;
   public readonly updateBtn: Locator;
@@ -202,6 +203,7 @@ export class UiBaseLocators extends BasePage {
   public readonly createNewDocumentBlueprintBtn: Locator;
 
   // User
+  public readonly currentUserHeaderApp: Locator;
   public readonly currentUserAvatarBtn: Locator;
   public readonly currentUserModal: Locator;
   public readonly newPasswordTxt: Locator;
@@ -258,11 +260,18 @@ export class UiBaseLocators extends BasePage {
     this.saveBtn = page.getByLabel("Save", { exact: true });
     this.submitBtn = page.getByLabel("Submit");
     this.confirmBtn = page.getByLabel("Confirm");
-    this.chooseBtn = page.getByLabel("Choose", { exact: true });
+    // The element/entity pickers render two "Choose" controls (a modal-opening link and a button)
+    // with the same accessible name; .first() keeps this unambiguous (a no-op for single-Choose pickers).
+    this.chooseBtn = page.getByLabel("Choose", { exact: true }).first();
+    // The tree-picker modal's primary confirm button is labelled by its action: "Choose" for entity
+    // pickers, "Move" for a move, "Copy" for a duplicate. Match any so one helper covers all three.
     this.chooseModalBtn = page
       .locator("uui-modal-sidebar")
       .locator('[look="primary"]')
-      .getByLabel("Choose");
+      .getByLabel(/^(Choose|Move|Copy)$/);
+    // The element/entity picker renders both a "Choose" link (opens the tree-picker modal) and a button;
+    // target the link specifically so the shared chooseModalBtn's strict-mode match isn't tripped.
+    this.chooseModalLink = page.getByRole("link", { name: "Choose", exact: true });
     this.createBtn = page.getByRole("button", { name: /^Create(…)?$/ });
     this.addBtn = page.getByRole("button", { name: "Add", exact: true });
     this.updateBtn = page.getByLabel("Update");
@@ -342,14 +351,13 @@ export class UiBaseLocators extends BasePage {
     this.sidebarSaveBtn = this.sidebarModal.getByLabel("Save", { exact: true });
     this.openedModal = page.locator("uui-modal-container[backdrop]");
     this.container = page.locator("#container");
-    this.containerChooseBtn = page.locator("#container").getByLabel("Choose");
+    // Like chooseModalBtn: the confirm button in a #container picker is labelled by its action -
+    // "Choose" for a destination picker, "Move"/"Copy" for a move/duplicate. Match any of them.
+    this.containerChooseBtn = page.locator("#container").getByLabel(/^(Choose|Move|Copy)$/);
     this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.containerSaveAndPublishBtn = page
       .locator("#container")
       .getByLabel("Save and Publish");
-    this.createModalBtn = page
-      .locator("uui-modal-sidebar")
-      .getByLabel("Create", { exact: true });
     this.createModalBtn = this.sidebarModal.getByLabel("Create", {
       exact: true,
     });
@@ -552,9 +560,8 @@ export class UiBaseLocators extends BasePage {
       .locator("umb-ref-item", { hasText: "Document Blueprint for" });
 
     // User
-    this.currentUserAvatarBtn = page
-      .getByTestId("header-app:Umb.HeaderApp.CurrentUser")
-      .locator("uui-avatar");
+    this.currentUserHeaderApp = page.getByTestId("header-app:Umb.HeaderApp.CurrentUser");
+    this.currentUserAvatarBtn = this.currentUserHeaderApp.locator("uui-avatar");
     this.currentUserModal = page.locator("umb-current-user-modal");
     this.currentPasswordTxt = page.locator('input[name="oldPassword"]');
     this.newPasswordTxt = page.locator('input[name="newPassword"]');
@@ -854,7 +861,6 @@ export class UiBaseLocators extends BasePage {
 
   async clickConfirmTrashButton() {
     await this.click(this.confirmTrashBtn);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
   }
 
   async clickDeleteAndConfirmButton() {
@@ -1183,8 +1189,14 @@ export class UiBaseLocators extends BasePage {
 
   // Alias & Icon Methods
   async enterAliasName(aliasName: string) {
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
-    await this.click(this.aliasLockBtn, { force: true });
+    // Retry unlocking until the field is editable (an early toggle click can be lost). The toggle only
+    // shows while locked, so the visibility guard avoids re-locking it.
+    await expect(async () => {
+      if (await this.aliasLockBtn.isVisible()) {
+        await this.click(this.aliasLockBtn, { force: true });
+      }
+      await expect(this.aliasNameTxt).toBeEditable({ timeout: ConstantHelper.timeout.short });
+    }).toPass({ timeout: ConstantHelper.timeout.medium });
     await this.enterText(this.aliasNameTxt, aliasName);
   }
 
@@ -1727,7 +1739,7 @@ export class UiBaseLocators extends BasePage {
   async uploadFile(filePath: string) {
     const [fileChooser] = await Promise.all([
       this.page.waitForEvent("filechooser"),
-      await this.clickToUploadButton(),
+      this.clickToUploadButton(),
     ]);
     await fileChooser.setFiles(filePath);
   }
@@ -1756,15 +1768,11 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    // Retry the open: the first click can land before the avatar is interactive, leaving the modal closed.
-    await expect(async () => {
-      if (!(await this.currentUserModal.isVisible())) {
-        await this.click(this.currentUserAvatarBtn);
-      }
-      await expect(this.currentUserModal).toBeVisible({
-        timeout: ConstantHelper.timeout.short,
-      });
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    // Wait for the backoffice to finish loading; clicking before the current-user extension bundle is ready
+    // no-ops, so the modal never opens.
+    await this.waitForPageLoad();
+    await this.click(this.currentUserAvatarBtn);
+    await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   // Collection Methods
@@ -2012,7 +2020,18 @@ export class UiBaseLocators extends BasePage {
     return await this.isVisible(this.page.getByText(message), isVisible);
   }
 
-  // Executes a promise (e.g. button click) and waits for a single API response.
+  /**
+   * Runs an action and resolves on the first response whose URL contains `url`
+   * and whose status matches.
+   *
+   * `url` is matched with `includes`, so endpoint constants are prefixes of each
+   * other (e.g. `.../document` also matches `.../document-type` and `.../document/{id}/publish`).
+   * When more than one such call is in flight, pass `method` and/or a more specific
+   * `url` fragment to disambiguate.
+   *
+   * @returns the trailing path segment of the response URL (the created/affected id),
+   *          or the `Location` header's last segment for 201 responses.
+   */
   async waitForResponseAfterExecutingPromise(
     url: string,
     promise: Promise<void>,
@@ -2032,9 +2051,24 @@ export class UiBaseLocators extends BasePage {
     return response.url().split("?")[0].split("/").pop();
   }
 
-  // Executes a promise (e.g. button click) and waits for multiple API responses.
-  // Use when an action triggers multiple API calls (e.g. moving multiple items).
-  // Returns an array of IDs extracted from the responses.
+  /**
+   * Waits until the workspace has re-routed from .../{entityType}/create/... to .../{entityType}/edit/{id}.
+   * A create isn't finished until this reload lands: a follow-up variant/segment switch started beforehand
+   * is discarded (the workspace reverts to the default culture), losing its edits so the awaited update
+   * response never fires.
+   */
+  async waitForWorkspaceEditRoute(entityType: 'document' | 'element') {
+    await expect(this.page).toHaveURL(new RegExp(`/workspace/${entityType}/edit/`), {timeout: ConstantHelper.timeout.long});
+  }
+
+  /**
+   * Runs an action that triggers several matching API calls (e.g. moving multiple
+   * items) and resolves once `expectedCount` responses matching `url` + `statusCode`
+   * have arrived. Uses the same loose `includes` URL matching as
+   * {@link waitForResponseAfterExecutingPromise}.
+   *
+   * @returns the ids extracted from each collected response, in arrival order.
+   */
   async waitForMultipleResponsesAfterExecutingPromise(
     url: string,
     promise: Promise<void>,
@@ -2043,21 +2077,27 @@ export class UiBaseLocators extends BasePage {
   ) {
     const responses: Response[] = [];
 
-    // Create a promise that resolves when we've collected enough responses
+    let resolveResponses!: () => void;
     const responsePromise = new Promise<void>((resolve) => {
-      this.page.on("response", (resp) => {
-        if (resp.url().includes(url) && resp.status() === statusCode) {
-          responses.push(resp);
-          // Resolve once we have all expected responses
-          if (responses.length >= expectedCount) {
-            resolve();
-          }
-        }
-      });
+      resolveResponses = resolve;
     });
+    // Named handler so it can be removed afterwards — otherwise every call leaks a
+    // listener that keeps mutating this (and prior calls') response arrays.
+    const onResponse = (resp) => {
+      if (resp.url().includes(url) && resp.status() === statusCode) {
+        responses.push(resp);
+        if (responses.length >= expectedCount) {
+          resolveResponses();
+        }
+      }
+    };
+    this.page.on("response", onResponse);
 
-    // Execute action and wait for responses simultaneously
-    await Promise.all([responsePromise, promise]);
+    try {
+      await Promise.all([responsePromise, promise]);
+    } finally {
+      this.page.off("response", onResponse);
+    }
 
     // Extract IDs from responses
     return responses.map((resp) => {
@@ -2068,8 +2108,13 @@ export class UiBaseLocators extends BasePage {
     });
   }
 
-  // Executes a promise and waits for multiple 201 Created responses matching URL endings.
-  // Returns array of IDs extracted from Location headers, in same order as urlEndings.
+  /**
+   * Runs an action and waits for one 201 Created response per entry in `urlEndings`.
+   * Unlike the sibling helpers this matches with `endsWith` (exact URL suffix), so
+   * prefix-overlapping endpoints do not collide.
+   *
+   * @returns the created ids from each `Location` header, in the order of `urlEndings`.
+   */
   async waitForCreatedResponsesAfterExecutingPromise(
     urlEndings: string[],
     promise: Promise<void>,

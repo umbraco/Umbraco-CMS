@@ -57,7 +57,7 @@ export class ScriptApiHelper {
   async getChildren(path: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/script/children?parentPath=${encodeURIComponent(path)}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getItems(paths: string[]) {
@@ -88,7 +88,7 @@ export class ScriptApiHelper {
     const rootScripts = await this.getAllAtRoot();
     const jsonScripts = await rootScripts.json();
 
-    for (const script of jsonScripts.items) {
+    for (const script of this.api.itemsOf(jsonScripts)) {
       if (script.name === name) {
         if (script.isFolder) {
           return this.getFolder(script.path);
@@ -153,7 +153,7 @@ export class ScriptApiHelper {
     const rootScripts = await this.getAllAtRoot();
     const jsonScripts = await rootScripts.json();
 
-    for (const script of jsonScripts.items) {
+    for (const script of this.api.itemsOf(jsonScripts)) {
       if (script.name === name) {
         if (script.isFolder) {
           return await this.recurseDeleteChildren(script);

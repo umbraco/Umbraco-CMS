@@ -25,7 +25,7 @@ export class DictionaryApiHelper {
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/dictionary', dictionary);
     // Returns the id of the created dictionary
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async update(id: string, dictionary: object) {
@@ -59,7 +59,7 @@ export class DictionaryApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/dictionary/children?parentId=' + id + '&skip=0&take=10000');
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   private async recurseDeleteChildren(id: string) {
@@ -102,7 +102,7 @@ export class DictionaryApiHelper {
     const rootDictionary = await this.getAllAtRoot();
     const jsonDictionary = await rootDictionary.json();
 
-    for (const dictionaryItem of jsonDictionary.items) {
+    for (const dictionaryItem of this.api.itemsOf(jsonDictionary)) {
       if (dictionaryItem.name === name) {
         return this.get(dictionaryItem.id);
       } else if (dictionaryItem.isContainer || dictionaryItem.hasChildren) {
@@ -123,7 +123,7 @@ export class DictionaryApiHelper {
     const rootDictionary = await this.getAllAtRoot();
     const jsonDictionary = await rootDictionary.json();
 
-    for (const dictionaryItem of jsonDictionary.items) {
+    for (const dictionaryItem of this.api.itemsOf(jsonDictionary)) {
       if (dictionaryItem.name === name) {
         if (dictionaryItem.isContainer || dictionaryItem.hasChildren) {
           await this.recurseDeleteChildren(dictionaryItem.id);
@@ -153,7 +153,7 @@ export class DictionaryApiHelper {
     await this.ensureNameNotExists(name);
     const allLanguages = await this.api.language.getAll();
     const jsonLanguages = await allLanguages.json();
-    const languageIsoCode = jsonLanguages.items[0].isoCode;
+    const languageIsoCode = this.api.itemsOf(jsonLanguages)[0].isoCode;
     const translations = [
       {
         "isoCode": languageIsoCode,

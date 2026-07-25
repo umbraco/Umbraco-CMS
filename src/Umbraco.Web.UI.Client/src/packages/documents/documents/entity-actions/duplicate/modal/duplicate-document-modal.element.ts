@@ -10,9 +10,7 @@ import type { UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbDocumentTreeItemModel } from '../../../types.js';
 
-const elementName = 'umb-document-duplicate-to-modal';
-
-@customElement(elementName)
+@customElement('umb-document-duplicate-to-modal')
 export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	UmbDuplicateDocumentModalData,
 	UmbDuplicateDocumentModalValue
@@ -170,6 +168,6 @@ export { UmbDocumentDuplicateToModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentDuplicateToModalElement;
+		'umb-document-duplicate-to-modal': UmbDocumentDuplicateToModalElement;
 	}
 }

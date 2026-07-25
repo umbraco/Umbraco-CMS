@@ -70,7 +70,8 @@ export class LogViewerUiHelper extends UiBaseLocators {
   }
 
   checkSavedSearch(searchName: string) {
-    return this.page.locator('#saved-searches').getByLabel(searchName, {exact: true});
+    // Exact match so a longer-named sibling can't satisfy the negative (.not.toBeVisible) assertion.
+    return this.page.locator('.saved-search-item').filter({has: this.page.getByText(searchName, {exact: true})});
   }
 
   async clickSortLogByTimestampButton() {
@@ -90,7 +91,10 @@ export class LogViewerUiHelper extends UiBaseLocators {
   }
 
   async clickSavedSearchByName(name: string) {
-    await this.click(this.page.locator('#saved-searches').getByLabel(name));
+    await this.clickSavedSearchesButton();
+    // Click the item's search button (the <li> also holds a delete button); clicking the button is what
+    // applies the saved query.
+    await this.click(this.page.locator('.saved-search-item').filter({hasText: name}).locator('.saved-search-item-button').first());
   }
 
   async doesSearchBoxHaveValue(searchValue: string) {
