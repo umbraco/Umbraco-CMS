@@ -326,7 +326,7 @@ export default {
 		notReadyToPublish: 'Wir sind für Veröffentlichungen bereit',
 		readyToPublish: 'Bereit zu Veröffentlichen?',
 		readyToSave: 'Bereit zu Sichern?',
-		resetFocalPoint: 'Fokus zurücksetzten.',
+		resetFocalPoint: 'Fokus zurücksetzten',
 		sendForApproval: 'Freigabe anfordern',
 		schedulePublishHelp: 'Wählen Sie Datum und Uhrzeit für die Veröffentlichung bzw. deren Rücknahme.',
 		createEmpty: 'Neues Element anlegen',
