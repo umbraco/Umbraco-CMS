@@ -5,14 +5,8 @@ import type { ManifestAuthProvider } from './auth-provider.extension.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbApiInterceptorController, UMB_AUTH_SIGNALER_CONTEXT } from '@umbraco-cms/backoffice/resources';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import {
-	ReplaySubject,
-	Subject,
-	switchMap,
-	distinctUntilChanged,
-	auditTime,
-} from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { ReplaySubject, Subject, distinctUntilChanged, auditTime, map } from '@umbraco-cms/backoffice/external/rxjs';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
@@ -29,7 +23,6 @@ export interface UmbAuthSession {
 }
 
 export class UmbAuthContext extends UmbContextBase {
-	#isAuthorized = new UmbBooleanState<boolean>(false);
 	// Timeout is different from `isAuthorized` because it can occur repeatedly
 	#isTimeout = new Subject<void>();
 	#isInitialized = new ReplaySubject<void>(1);
@@ -62,16 +55,27 @@ export class UmbAuthContext extends UmbContextBase {
 	#postLogoutRedirectUri;
 
 	/**
-	 * Observable that emits true when the auth context is initialized.
-	 * It will only emit once and then complete itself.
+	 * Observable that emits when the auth context is initialized.
+	 * @deprecated The auth context is initialized on creation and this emits immediately. Scheduled for removal in Umbraco 21.
+	 * @remark It will only emit once and then complete itself.
 	 */
-	readonly isInitialized = this.#isInitialized.asObservable();
+	get isInitialized(): Observable<void> {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.isInitialized',
+			removeInVersion: '21.0.0',
+			solution: 'The auth context is ready once constructed; remove the dependency on this signal.',
+		}).warn();
+		return this.#isInitialized.asObservable();
+	}
 
 	/**
 	 * Observable that emits true if the user is authorized, otherwise false.
 	 * It will only emit when the authorization state changes.
 	 */
-	readonly isAuthorized = this.#isAuthorized.asObservable().pipe(distinctUntilChanged());
+	readonly isAuthorized = this.#session.asObservable().pipe(
+		map((session) => this.#isBypassed || !!session),
+		distinctUntilChanged(),
+	);
 
 	/**
 	 * Observable that acts as a signal and emits when the user has timed out, i.e. the token has expired.
@@ -121,11 +125,9 @@ export class UmbAuthContext extends UmbContextBase {
 				}
 				case 'sessionCleared':
 					this.#session.setValue(undefined);
-					this.#isAuthorized.setValue(false);
 					break;
 				case 'signedOut':
 					this.#session.setValue(undefined);
-					this.#isAuthorized.setValue(false);
 					// Redirect to logout page — cookies already cleared by the tab that initiated sign-out
 					location.href = this.#postLogoutRedirectUri;
 					break;
@@ -135,6 +137,10 @@ export class UmbAuthContext extends UmbContextBase {
 		if (!isTestEnvironment()) {
 			new UmbAuthSessionTimeoutController(this);
 		}
+
+		// The auth context is ready once constructed — provider discovery no longer waits on a signal.
+		this.#isInitialized.next();
+		this.#isInitialized.complete();
 
 		// When an HTTP interceptor is active it registers an UmbAuthSignalerContext on the host.
 		// Consume it to keep authorization state in sync and to react to timeout requests.
@@ -228,14 +234,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns {boolean} True if the user is authorized, otherwise false.
 	 */
 	getIsAuthorized(): boolean {
-		if (this.#isBypassed) {
-			this.#isAuthorized.setValue(true);
-			return true;
-		} else {
-			const isAuthorized = !!this.#session.getValue();
-			this.#isAuthorized.setValue(isAuthorized);
-			return isAuthorized;
-		}
+		return this.#isBypassed || !!this.#session.getValue();
 	}
 
 	/**
@@ -300,7 +299,6 @@ export class UmbAuthContext extends UmbContextBase {
 
 			if (!response.ok) {
 				this.#session.setValue(undefined);
-				this.#isAuthorized.setValue(false);
 				return false;
 			}
 
@@ -316,7 +314,6 @@ export class UmbAuthContext extends UmbContextBase {
 			return true;
 		} catch {
 			this.#session.setValue(undefined);
-			this.#isAuthorized.setValue(false);
 			return false;
 		}
 	}
@@ -405,7 +402,6 @@ export class UmbAuthContext extends UmbContextBase {
 			solution: 'Use signOut() to log out.',
 		}).warn();
 		this.#session.setValue(undefined);
-		this.#isAuthorized.setValue(false);
 		this.#channel.postMessage({ type: 'sessionCleared' });
 	}
 
@@ -416,7 +412,6 @@ export class UmbAuthContext extends UmbContextBase {
 	 */
 	timeOut() {
 		this.#session.setValue(undefined);
-		this.#isAuthorized.setValue(false);
 		this.#isTimeout.next();
 	}
 
@@ -428,7 +423,6 @@ export class UmbAuthContext extends UmbContextBase {
 	async signOut(): Promise<void> {
 		// Clear local state directly (not clearTokenStorage) to skip its deprecation warning; signedOut covers other tabs.
 		this.#session.setValue(undefined);
-		this.#isAuthorized.setValue(false);
 		this.#channel.postMessage({ type: 'signedOut' });
 
 		// The server sign-out endpoint clears the auth cookie, then redirects to the client logout landing
@@ -527,23 +521,30 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
-	 * This is used to let the app context know that the core module is ready, which means that the core auth providers are available.
+	 * Sets the auth context as initialized.
+	 * @deprecated The auth context is ready once constructed and no longer gates provider discovery on this signal; it is now a no-op. Scheduled for removal in Umbraco 21.
 	 */
 	setInitialized() {
-		this.#isInitialized.next();
-		this.#isInitialized.complete();
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.setInitialized()',
+			removeInVersion: '21.0.0',
+			solution: 'Remove the call; the auth context is ready once constructed.',
+		}).warn();
 	}
 
 	/**
 	 * Gets all registered auth providers.
+	 * @deprecated Query the extension registry directly: `extensionsRegistry.byType('authProvider')`. Scheduled for removal in Umbraco 21.
 	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extensions registry to get auth providers from.
 	 * @returns {Observable<ManifestAuthProvider[]>} An observable that emits the registered auth providers.
 	 */
 	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry): Observable<ManifestAuthProvider[]> {
-		return this.#isInitialized.pipe(
-			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
-		);
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.getAuthProviders()',
+			removeInVersion: '21.0.0',
+			solution: "Query the extension registry directly with extensionsRegistry.byType('authProvider').",
+		}).warn();
+		return extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider');
 	}
 
 	/**
@@ -629,7 +630,6 @@ export class UmbAuthContext extends UmbContextBase {
 		// multiplier) no longer applies. TODO (V21): drop the deprecated accessTokenExpiresAt.
 		const expiresAt = issuedAt + expiresIn;
 		this.#session.setValue({ accessTokenExpiresAt: expiresAt, expiresAt });
-		this.#isAuthorized.setValue(true);
 	}
 
 	async #makeLinkTokenRequest(provider: string) {
