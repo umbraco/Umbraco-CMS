@@ -288,8 +288,10 @@ export class UserApiHelper {
   async loginToUser(userName: string, userEmail: string, userPassword: string) {
     const user = await this.getByName(userName);
     if (user.id !== null) {
-      await this.api.revokeTokens();
-      await this.api.updateTokenAndCookie(userEmail, userPassword);
+      // Sign the current session out first: the authentication cookie is the only credential, so
+      // signing in on top of a live session would otherwise leave two overlapping sign-ins.
+      await this.api.signOut();
+      await this.api.signIn(userEmail, userPassword);
     }
   }
 
