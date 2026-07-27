@@ -121,7 +121,7 @@ public class DomainService : RepositoryService, IDomainService
         }
 
         // make sure we're not attempting to assign duplicate domains
-        if (updateModel.Domains.GroupBy(domain => domain.DomainName).Any(group => group.HasAtLeastTwo()))
+        if (updateModel.Domains.GroupBy(domain => domain.DomainName).Any(group => group.HasAtLeast(2)))
         {
             return Attempt.FailWithStatus(DomainOperationStatus.DuplicateDomainName, new DomainUpdateResult());
         }

@@ -118,7 +118,7 @@ public sealed class UmbracoServices
     internal static IList<TypeModel> EnsureDistinctAliases(IList<TypeModel> typeModels)
     {
         IEnumerable<IGrouping<string, TypeModel>> groups = typeModels.GroupBy(x => x.Alias.ToLowerInvariant());
-        foreach (IGrouping<string, TypeModel> group in groups.Where(x => x.HasAtLeastTwo()))
+        foreach (IGrouping<string, TypeModel> group in groups.Where(x => x.HasAtLeast(2)))
         {
             throw new NotSupportedException($"Alias \"{group.Key}\" is used by types"
                                             + $" {string.Join(", ", group.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Aliases have to be unique."

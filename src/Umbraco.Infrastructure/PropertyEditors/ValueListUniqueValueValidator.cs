@@ -62,7 +62,7 @@ public class ValueListUniqueValueValidator : IValueValidator
         var duplicateValues = items
             .Select(item => item)
             .GroupBy(v => v)
-            .Where(group => group.HasAtLeastTwo())
+            .Where(group => group.HasAtLeast(2))
             .Select(group => group.First())
             .ToArray();
 

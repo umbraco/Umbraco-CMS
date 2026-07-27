@@ -166,16 +166,16 @@ public class EnumerableExtensionsTests
     }
 
     [Test]
-    public void List_Empty_Returns_False() => Assert.That(new List<int>().HasAtLeastTwo(), Is.False);
+    public void List_Empty_Returns_False() => Assert.That(new List<int>().HasAtLeast(2), Is.False);
 
     [Test]
-    public void List_Single_Returns_False() => Assert.That(new List<int> { 1 }.HasAtLeastTwo(), Is.False);
+    public void List_Single_Returns_False() => Assert.That(new List<int> { 1 }.HasAtLeast(2), Is.False);
 
     [Test]
-    public void List_Two_Returns_True() => Assert.That(new List<int> { 1, 2 }.HasAtLeastTwo(), Is.True);
+    public void List_Two_Returns_True() => Assert.That(new List<int> { 1, 2 }.HasAtLeast(2), Is.True);
 
     [Test]
-    public void List_Many_Returns_True() => Assert.That(Enumerable.Range(0, 1000).ToList().HasAtLeastTwo(), Is.True);
+    public void List_Many_Returns_True() => Assert.That(Enumerable.Range(0, 1000).ToList().HasAtLeast(5), Is.True);
 
     [Test]
     public void LazySequence_RespectsCount([Values(0, 1, 2, 5)] int size)
@@ -187,22 +187,23 @@ public class EnumerableExtensionsTests
                 yield return i;
             }
         }
-        Assert.That(Lazy(size).HasAtLeastTwo(), Is.EqualTo(size > 1));
+        Assert.That(Lazy(size).HasAtLeast(2), Is.EqualTo(size > 1));
     }
 
     [Test]
-    public void LazySequence_OnlyTouchesTwo()
+    public void LazySequence_OnlyTouchesWhatIsNeeded()
     {
         var failed = false;
         IEnumerable<string?> Source()
         {
             yield return null;
             yield return null;
+            yield return null;
             failed = true;
             yield return null;
         }
 
-        Assert.That(Source().HasAtLeastTwo(), Is.True);
+        Assert.That(Source().HasAtLeast(3), Is.True);
         Assert.That(failed, Is.False);
     }
 }

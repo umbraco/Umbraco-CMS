@@ -33,7 +33,7 @@ public class ConflictingRouteService : IConflictingRouteService
                 var conflicting = potentialConflicting
                     .Select(x => x.GetCustomAttribute<PluginControllerAttribute>())
                     .GroupBy(x => x?.AreaName)
-                    .Any(x => x?.HasAtLeastTwo() is true);
+                    .Any(x => x?.HasAtLeast(2) is true);
 
                 if (conflicting)
                 {
