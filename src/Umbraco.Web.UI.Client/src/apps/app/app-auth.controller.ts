@@ -55,7 +55,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 		// TODO: counts frontend manifests only; the follow-up auth-providers endpoint will reconcile
 		// against the server's actually-configured providers (and local-login-disabled state).
 		try {
-			const providers = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));
+			const providers = await firstValueFrom(umbExtensionsRegistry.byType('authProvider'));
 			if (providers.length === 1) {
 				// redirect: true → full-page navigate (cold boot, nothing to preserve), no modal flash.
 				this.#authContext.makeAuthorizationRequest(providers[0].forProviderName, true);
