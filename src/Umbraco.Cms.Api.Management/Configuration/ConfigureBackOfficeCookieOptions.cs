@@ -154,6 +154,10 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 }
 
                 // add or update a claim to track when the cookie expires, we use this to track time remaining
+                // NOTE: this runs before the ExpiresUtc reset below, so on a renewing request the claim
+                // still carries the pre-renewal expiry and only catches up on the next request. That is
+                // why the client re-reads the expiry from user/current/configuration after a keep-alive
+                // rather than trusting the claim on the keep-alive response itself.
                 backOfficeIdentity?.AddOrUpdateClaim(new Claim(
                     Constants.Security.TicketExpiresClaimType,
                     ctx.Properties.ExpiresUtc!.Value.ToString("o"),

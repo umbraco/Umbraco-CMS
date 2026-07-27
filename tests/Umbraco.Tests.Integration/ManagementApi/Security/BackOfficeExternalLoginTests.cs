@@ -39,11 +39,11 @@ public class BackOfficeExternalLoginTests : ManagementApiTest<BackOfficeControll
 
     private static void AssertAnonymousGet(string actionName, string expectedRouteTemplate)
     {
-        MethodInfo method = typeof(BackOfficeController).GetMethod(actionName)!;
+        MethodInfo? method = typeof(BackOfficeController).GetMethod(actionName);
         Assert.IsNotNull(method, $"Action {actionName} should exist");
 
         Assert.IsNotNull(
-            method.GetCustomAttribute<AllowAnonymousAttribute>(),
+            method!.GetCustomAttribute<AllowAnonymousAttribute>(),
             $"{actionName} must be [AllowAnonymous] (login happens before a session exists)");
 
         var httpGet = method.GetCustomAttribute<HttpGetAttribute>();
