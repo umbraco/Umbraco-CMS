@@ -52,7 +52,10 @@ export class UmbBlockGridEntryContext
 		return [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1];
 	}
 
-	readonly inlineEditingMode = this._blockType.asObservablePart((x) => x?.inlineEditing === true);
+	readonly inlineEditingMode = mergeObservables(
+		[this._blockType.asObservablePart((x) => x?.inlineEditing === true), this.isExternalContent],
+		([inlineEditing, isExternalContent]) => inlineEditing === true && !isExternalContent,
+	);
 
 	#relevantColumnSpanOptions = new UmbArrayState<number>([], (x) => x);
 	readonly relevantColumnSpanOptions = this.#relevantColumnSpanOptions.asObservable();
