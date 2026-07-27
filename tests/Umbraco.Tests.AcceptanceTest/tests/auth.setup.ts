@@ -1,14 +1,13 @@
 import {test as setup} from '@playwright/test';
 import {STORAGE_STATE} from '../playwright.config';
-import {ConstantHelper, UiHelpers} from "@umbraco/acceptance-test-helpers";
+import {ApiHelpers} from "@umbraco/acceptance-test-helpers";
 
+// The cookie is the only credential, so an API sign-in seeds storageState just as well as the login
+// UI would. The login screen is covered by DefaultConfig/Login/BackOfficeLogin.spec.ts.
 setup('authenticate', async ({page}) => {
-  const umbracoUi = new UiHelpers(page);
+  const umbracoApi = new ApiHelpers(page);
 
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.login.enterEmail(process.env.UMBRACO_USER_LOGIN);
-  await umbracoUi.login.enterPassword(process.env.UMBRACO_USER_PASSWORD);
-  await umbracoUi.login.clickLoginButtonAndWaitForBackOffice();
-  await umbracoUi.login.goToSection(ConstantHelper.sections.settings);
-  await umbracoUi.page.context().storageState({path: STORAGE_STATE});
+  await umbracoApi.loginToAdminUser();
+
+  await page.context().storageState({path: STORAGE_STATE});
 });
