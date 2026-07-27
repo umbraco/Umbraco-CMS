@@ -81,7 +81,7 @@ export class UmbAppAuthCallbackElement extends UmbLitElement {
 		return html`<div id="loader"><uui-loader></uui-loader></div>`;
 	}
 
-	static override styles = css`
+	static override readonly styles = css`
 		:host {
 			display: block;
 			height: 100vh;
