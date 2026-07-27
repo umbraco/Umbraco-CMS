@@ -63,6 +63,11 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         // so the granular aggregation test is unaffected.
         services.AddSingleton<IElementPermissionService>(sp =>
             new FallbackFilteringElementPermissionService(ActivatorUtilities.CreateInstance<ElementPermissionService>(sp)));
+
+        // Same decoration for the element container permission service, to prove the factory also routes
+        // fallback permissions through IElementContainerPermissionService.
+        services.AddSingleton<IElementContainerPermissionService>(sp =>
+            new FallbackFilteringElementContainerPermissionService(ActivatorUtilities.CreateInstance<ElementContainerPermissionService>(sp)));
     }
 
     [Test]
@@ -417,6 +422,52 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         // while other fallback verbs remain. This is what hides default-permission actions (e.g. Trash) in the UI.
         Assert.That(model.FallbackPermissions, Does.Not.Contain(FallbackFilteringElementPermissionService.StrippedVerb));
         Assert.That(model.FallbackPermissions, Contains.Item("Umb.Element.Read"));
+    }
+
+    [Test]
+    public async Task Can_Create_Current_User_Response_Model_Filtering_ElementContainer_Fallback_Permissions_Through_Service()
+    {
+        // A group whose default (fallback) permissions include the container verb that the decorator strips.
+        var group = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [],
+            [FallbackFilteringElementContainerPermissionService.StrippedVerb, "Umb.ElementContainer.Read"],
+            [],
+            Constants.System.Root);
+        var user = await CreateUser([group.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+
+        // The factory routed the fallback set through IElementContainerPermissionService, so the stripped verb is
+        // gone while other fallback verbs remain. This is what hides default-permission actions (e.g. Create) in the UI.
+        Assert.That(model.FallbackPermissions, Does.Not.Contain(FallbackFilteringElementContainerPermissionService.StrippedVerb));
+        Assert.That(model.FallbackPermissions, Contains.Item("Umb.ElementContainer.Read"));
+    }
+
+    private sealed class FallbackFilteringElementContainerPermissionService : IElementContainerPermissionService
+    {
+        public const string StrippedVerb = "Umb.ElementContainer.Create";
+
+        private readonly IElementContainerPermissionService _inner;
+
+        public FallbackFilteringElementContainerPermissionService(IElementContainerPermissionService inner) => _inner = inner;
+
+        public async Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
+        {
+            ISet<string> filtered = await _inner.FilterFallbackPermissionsAsync(user, fallbackPermissions);
+            filtered.Remove(StrippedVerb);
+            return filtered;
+        }
+
+        public Task<ElementAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> containerKeys, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeAccessAsync(user, containerKeys, permissionsToCheck);
+
+        public Task<ElementAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeRootAccessAsync(user, permissionsToCheck);
+
+        public Task<ElementAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeBinAccessAsync(user, permissionsToCheck);
     }
 
     private sealed class FallbackFilteringElementPermissionService : IElementPermissionService
