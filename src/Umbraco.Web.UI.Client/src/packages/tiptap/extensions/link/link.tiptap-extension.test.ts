@@ -33,6 +33,15 @@ describe('link.tiptap-extension', () => {
 		expect(editor.getHTML()).to.not.include('data-router-slot');
 	});
 
+	it('strips a pre-existing data-router-slot attribute from legacy stored content (regression)', () => {
+		editor.commands.setContent('<p><a href="https://example.com" data-router-slot="disabled">link</a></p>');
+
+		expect(editor.getHTML()).to.not.include('data-router-slot');
+
+		const anchor = host.querySelector('a');
+		expect(anchor?.dataset.routerSlot).to.equal('disabled');
+	});
+
 	it('preserves other attributes on both the live anchor and the serialized HTML', () => {
 		editor.commands.setContent('<p><a href="https://example.com" target="_blank">link</a></p>');
 
