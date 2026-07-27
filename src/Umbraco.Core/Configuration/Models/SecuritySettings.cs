@@ -312,14 +312,36 @@ public class SecuritySettings
     ///     <see cref="AuthorizeCallbackLogoutPathName"/> if set, otherwise derived from <see cref="CallbackPathName"/>.
     /// </summary>
     public string GetEffectiveLogoutPathName() =>
-        _authorizeCallbackLogoutPathName ?? CallbackPathName.EnsureEndsWith('/') + "logout";
+        EffectivePathName(_authorizeCallbackLogoutPathName, StaticAuthorizeCallbackLogoutPathName, "logout");
 
     /// <summary>
     ///     Gets the effective path to use for authorization callback error: the explicitly configured
     ///     <see cref="AuthorizeCallbackErrorPathName"/> if set, otherwise derived from <see cref="CallbackPathName"/>.
     /// </summary>
     public string GetEffectiveErrorPathName() =>
-        _authorizeCallbackErrorPathName ?? CallbackPathName.EnsureEndsWith('/') + "error";
+        EffectivePathName(_authorizeCallbackErrorPathName, StaticAuthorizeCallbackErrorPathName, "error");
+
+    /// <summary>
+    ///     Resolves an obsolete path setting: the explicitly configured value if there is one, otherwise
+    ///     derived from <see cref="CallbackPathName"/>. The legacy default counts as "not configured".
+    /// </summary>
+    /// <remarks>
+    ///     The configuration binder round-trips properties through get-then-set, so a getter that falls
+    ///     back to a static default writes that default into the backing field: once bound, a null check
+    ///     can never see the unset state, which would pin logout/error to /umbraco/* and silently ignore
+    ///     a custom <see cref="CallbackPathName"/>. Treating the legacy default as unset is safe —
+    ///     when <see cref="CallbackPathName"/> is itself the default, both branches agree.
+    /// </remarks>
+    /// <param name="configuredValue">The backing field for the obsolete setting.</param>
+    /// <param name="legacyDefault">The static default the obsolete property falls back to.</param>
+    /// <param name="suffix">The path segment to append when deriving.</param>
+    /// <returns>The path to use.</returns>
+    // TODO (V21): remove along with the obsolete properties; the effective paths then derive from
+    // CallbackPathName unconditionally.
+    private string EffectivePathName(string? configuredValue, string legacyDefault, string suffix) =>
+        string.IsNullOrEmpty(configuredValue) || configuredValue == legacyDefault
+            ? CallbackPathName.EnsureEndsWith('/') + suffix
+            : configuredValue;
 
     /// <summary>
     ///     Gets or sets the expiry time for password reset emails.

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 
@@ -145,6 +146,31 @@ public class SecuritySettingsTests
 
         Assert.That(settings.GetEffectiveLogoutPathName(), Is.EqualTo("/umbraco/logout"));
         Assert.That(settings.GetEffectiveErrorPathName(), Is.EqualTo("/umbraco/error"));
+    }
+
+    // Binding is the path that matters in production (AddUmbracoOptions does a plain Bind), and it
+    // behaves differently from setting the properties directly: the binder round-trips every property
+    // through get-then-set, so a getter that synthesises a default writes that default into the
+    // backing field and makes the "unset" state unobservable.
+    [Test]
+    public void Effective_Logout_And_Error_Derive_From_CallbackPathName_When_Bound_From_Configuration()
+    {
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Umbraco:CMS:Security:CallbackPathName"] = "/",
+            })
+            .Build();
+
+        var settings = new SecuritySettings();
+        configuration.GetSection("Umbraco:CMS:Security").Bind(settings);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(settings.CallbackPathName, Is.EqualTo("/"));
+            Assert.That(settings.GetEffectiveLogoutPathName(), Is.EqualTo("/logout"));
+            Assert.That(settings.GetEffectiveErrorPathName(), Is.EqualTo("/error"));
+        });
     }
 
     [Test]
