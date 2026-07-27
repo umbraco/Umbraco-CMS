@@ -125,17 +125,19 @@ public class SecuritySettingsTests
         Assert.That(settings.CallbackPathName, Is.EqualTo("/umbraco"));
     }
 
+    // The obsolete property used to hold the OAuth callback path (e.g. "/umbraco/oauth_complete").
+    // Honouring it would silently redefine where the back office is served, so it now only reads.
     [Test]
-    public void AuthorizeCallbackPathName_Reads_Through_To_CallbackPathName()
+    public void AuthorizeCallbackPathName_Reads_Through_But_Setting_It_Has_No_Effect()
     {
-        var settings = new SecuritySettings();
+        var settings = new SecuritySettings { CallbackPathName = "/other" };
 
 #pragma warning disable CS0618 // Type or member is obsolete
-        settings.AuthorizeCallbackPathName = "/custom";
-        Assert.That(settings.CallbackPathName, Is.EqualTo("/custom"));
-
-        settings.CallbackPathName = "/other";
         Assert.That(settings.AuthorizeCallbackPathName, Is.EqualTo("/other"));
+
+        settings.AuthorizeCallbackPathName = "/umbraco/oauth_complete";
+
+        Assert.That(settings.CallbackPathName, Is.EqualTo("/other"));
 #pragma warning restore CS0618
     }
 
@@ -173,15 +175,22 @@ public class SecuritySettingsTests
         });
     }
 
+    // Logout and error are client routes, so they have to stay in step with CallbackPathName. Pointing
+    // them elsewhere produced a path the client could not route, so the legacy setters are now inert.
     [Test]
-    public void Effective_Logout_Prefers_Explicit_Value_Over_Derived()
+    public void Setting_The_Obsolete_Logout_And_Error_Paths_Has_No_Effect()
     {
-        var settings = new SecuritySettings();
+        var settings = new SecuritySettings { CallbackPathName = "/" };
 
 #pragma warning disable CS0618 // Type or member is obsolete
         settings.AuthorizeCallbackLogoutPathName = "/backoffice/bye";
+        settings.AuthorizeCallbackErrorPathName = "/backoffice/oops";
 #pragma warning restore CS0618
 
-        Assert.That(settings.GetEffectiveLogoutPathName(), Is.EqualTo("/backoffice/bye"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(settings.GetEffectiveLogoutPathName(), Is.EqualTo("/logout"));
+            Assert.That(settings.GetEffectiveErrorPathName(), Is.EqualTo("/error"));
+        });
     }
 }

@@ -450,17 +450,17 @@ public class BackOfficeApplicationManagerTests
     }
 
     /// <summary>
-    /// Tests that an explicitly configured <see cref="SecuritySettings.AuthorizeCallbackLogoutPathName"/> still flows
-    /// through <see cref="SecuritySettings.GetEffectiveLogoutPathName"/> into PostLogoutRedirectUris, overriding the
-    /// value derived from CallbackPathName.
+    /// Tests that the obsolete <see cref="SecuritySettings.AuthorizeCallbackLogoutPathName"/> no longer overrides the
+    /// logout path: it is a client route, so it is always derived from CallbackPathName. Honouring an override could
+    /// produce a path the back office client cannot route.
     /// </summary>
     [Test]
-    public void BackofficeOpenIddictApplicationDescriptor_ExplicitLogoutPathNameOverride_IsHonoured()
+    public void BackofficeOpenIddictApplicationDescriptor_ObsoleteLogoutPathNameOverride_IsIgnored()
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         var securitySettingsWithExplicitLogout = Options.Create(new SecuritySettings
         {
-            CallbackPathName = "umbraco/oauth_complete",
+            CallbackPathName = "umbraco",
             AuthorizeCallbackLogoutPathName = "umbraco/custom-logout",
         });
 #pragma warning restore CS0618
@@ -476,8 +476,8 @@ public class BackOfficeApplicationManagerTests
 
         var postLogoutUriStrings = descriptor.PostLogoutRedirectUris.Select(u => u.ToString()).ToList();
 
-        Assert.That(postLogoutUriStrings, Does.Contain("https://server1.local/umbraco/custom-logout"));
-        Assert.That(postLogoutUriStrings, Does.Not.Contain("https://server1.local/umbraco/oauth_complete/logout"));
+        Assert.That(postLogoutUriStrings, Does.Contain("https://server1.local/umbraco/logout"));
+        Assert.That(postLogoutUriStrings, Does.Not.Contain("https://server1.local/umbraco/custom-logout"));
     }
 
     private BackOfficeApplicationManager CreateDefaultMockedBackofficeApplicationManager() =>

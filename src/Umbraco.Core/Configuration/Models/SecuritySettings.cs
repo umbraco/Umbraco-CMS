@@ -267,87 +267,70 @@ public class SecuritySettings
     public Uri? BackOfficeHost { get; set; }
 
     /// <summary>
-    ///     Gets or sets the path the back office is served at; the return URL is
-    ///     <c>BackOfficeHost + CallbackPathName</c>, and logout/error are derived from it.
+    ///     Gets or sets the path at which the back-office client is served. Used as the default
+    ///     post-login return target: appended to <see cref="BackOfficeHost" /> when that is set (e.g.
+    ///     "/" when the client runs at the root of a separate host such as a dev server), and used
+    ///     as-is on the current host otherwise. The logout and error paths are derived from it - see
+    ///     <see cref="GetEffectiveLogoutPathName" /> and <see cref="GetEffectiveErrorPathName" />.
+    ///     Defaults to the standard back-office path.
     /// </summary>
     [DefaultValue(StaticCallbackPathName)]
     public string CallbackPathName { get; set; } = StaticCallbackPathName;
 
     /// <summary>
-    ///     Gets or sets the path at which the back-office client is served. Used as the default
-    ///     post-login return target: appended to <see cref="BackOfficeHost" /> when that is set (e.g.
-    ///     "/" when the client runs at the root of a separate host such as a dev server), and used
-    ///     as-is on the current host otherwise. Defaults to the standard back-office path.
+    ///     Gets the path at which the back-office client is served.
     /// </summary>
-    [Obsolete("Use CallbackPathName; logout/error paths are derived from it. Scheduled for removal in Umbraco 21.")]
+    /// <remarks>
+    ///     Setting this has no effect. It used to be the OAuth callback path, a concept cookie
+    ///     authentication no longer has; honouring it would silently redefine where the back office is
+    ///     served. Reading it reflects <see cref="CallbackPathName" />.
+    /// </remarks>
+    [Obsolete("Setting this has no effect. Use CallbackPathName. Scheduled for removal in Umbraco 21.")]
     [DefaultValue(StaticCallbackPathName)]
     public string AuthorizeCallbackPathName
     {
         get => CallbackPathName;
-        set => CallbackPathName = value;
+        set
+        {
+            // Intentionally inert - see the remarks above.
+        }
     }
 
-    private string? _authorizeCallbackLogoutPathName;
-
-    private string? _authorizeCallbackErrorPathName;
-
     /// <summary>
-    ///     Gets or sets the path to use for authorization callback logout. Will be appended to the BackOfficeHost.
+    ///     Gets the path at which the back-office client's logout route is served.
     /// </summary>
-    [Obsolete("Use CallbackPathName; logout/error paths are derived from it. Scheduled for removal in Umbraco 21.")]
+    /// <remarks>
+    ///     Setting this has no effect - see <see cref="AuthorizeCallbackPathName" />. Logout is a client
+    ///     route, so it has to stay in step with <see cref="CallbackPathName" />; pointing it elsewhere
+    ///     produced a path the client could not route. Reading it returns the derived value.
+    /// </remarks>
+    [Obsolete("Setting this has no effect; the logout path is derived from CallbackPathName. Scheduled for removal in Umbraco 21.")]
     [DefaultValue(StaticAuthorizeCallbackLogoutPathName)]
     public string AuthorizeCallbackLogoutPathName
     {
-        get => _authorizeCallbackLogoutPathName ?? StaticAuthorizeCallbackLogoutPathName;
-        set => _authorizeCallbackLogoutPathName = value;
+        get => GetEffectiveLogoutPathName();
+        set
+        {
+            // Intentionally inert - see the remarks above.
+        }
     }
 
     /// <summary>
-    ///     Gets or sets the path to use for authorization callback error. Will be appended to the BackOfficeHost.
+    ///     Gets the path at which the back-office client's error route is served.
     /// </summary>
-    [Obsolete("Use CallbackPathName; logout/error paths are derived from it. Scheduled for removal in Umbraco 21.")]
+    /// <remarks>
+    ///     Setting this has no effect - see <see cref="AuthorizeCallbackLogoutPathName" />.
+    /// </remarks>
+    [Obsolete("Setting this has no effect; the error path is derived from CallbackPathName. Scheduled for removal in Umbraco 21.")]
     [DefaultValue(StaticAuthorizeCallbackErrorPathName)]
     public string AuthorizeCallbackErrorPathName
     {
-        get => _authorizeCallbackErrorPathName ?? StaticAuthorizeCallbackErrorPathName;
-        set => _authorizeCallbackErrorPathName = value;
+        get => GetEffectiveErrorPathName();
+        set
+        {
+            // Intentionally inert - see the remarks above.
+        }
     }
-
-    /// <summary>
-    ///     Gets the effective path to use for authorization callback logout: the explicitly configured
-    ///     <see cref="AuthorizeCallbackLogoutPathName"/> if set, otherwise derived from <see cref="CallbackPathName"/>.
-    /// </summary>
-    public string GetEffectiveLogoutPathName() =>
-        EffectivePathName(_authorizeCallbackLogoutPathName, StaticAuthorizeCallbackLogoutPathName, "logout");
-
-    /// <summary>
-    ///     Gets the effective path to use for authorization callback error: the explicitly configured
-    ///     <see cref="AuthorizeCallbackErrorPathName"/> if set, otherwise derived from <see cref="CallbackPathName"/>.
-    /// </summary>
-    public string GetEffectiveErrorPathName() =>
-        EffectivePathName(_authorizeCallbackErrorPathName, StaticAuthorizeCallbackErrorPathName, "error");
-
-    /// <summary>
-    ///     Resolves an obsolete path setting: the explicitly configured value if there is one, otherwise
-    ///     derived from <see cref="CallbackPathName"/>. The legacy default counts as "not configured".
-    /// </summary>
-    /// <remarks>
-    ///     The configuration binder round-trips properties through get-then-set, so a getter that falls
-    ///     back to a static default writes that default into the backing field: once bound, a null check
-    ///     can never see the unset state, which would pin logout/error to /umbraco/* and silently ignore
-    ///     a custom <see cref="CallbackPathName"/>. Treating the legacy default as unset is safe —
-    ///     when <see cref="CallbackPathName"/> is itself the default, both branches agree.
-    /// </remarks>
-    /// <param name="configuredValue">The backing field for the obsolete setting.</param>
-    /// <param name="legacyDefault">The static default the obsolete property falls back to.</param>
-    /// <param name="suffix">The path segment to append when deriving.</param>
-    /// <returns>The path to use.</returns>
-    // TODO (V21): remove along with the obsolete properties; the effective paths then derive from
-    // CallbackPathName unconditionally.
-    private string EffectivePathName(string? configuredValue, string legacyDefault, string suffix) =>
-        string.IsNullOrEmpty(configuredValue) || configuredValue == legacyDefault
-            ? CallbackPathName.EnsureEndsWith('/') + suffix
-            : configuredValue;
 
     /// <summary>
     ///     Gets or sets the expiry time for password reset emails.
@@ -378,4 +361,16 @@ public class SecuritySettings
     ///     for the <c>Umbraco:CMS:Security:MemberPassword</c> configuration section.
     /// </remarks>
     public MemberPasswordConfigurationSettings MemberPassword { get; set; } = new();
+
+    /// <summary>
+    ///     Gets the path to the back-office client's logout route, derived from <see cref="CallbackPathName" />.
+    /// </summary>
+    /// <returns>The logout path.</returns>
+    public string GetEffectiveLogoutPathName() => CallbackPathName.EnsureEndsWith('/') + "logout";
+
+    /// <summary>
+    ///     Gets the path to the back-office client's error route, derived from <see cref="CallbackPathName" />.
+    /// </summary>
+    /// <returns>The error path.</returns>
+    public string GetEffectiveErrorPathName() => CallbackPathName.EnsureEndsWith('/') + "error";
 }
