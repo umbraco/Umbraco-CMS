@@ -469,32 +469,4 @@ public static class EnumerableExtensions
         Direction sortOrder) => sortOrder == Direction.Ascending
         ? source.OrderBy(keySelector)
         : source.OrderByDescending(keySelector);
-
-    /// <summary>
-    /// Checks if there are at least the specified number of elements in the enumerable.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the enumerable.</typeparam>
-    /// <param name="source">The source enumerable.</param>
-    /// <param name="count">The minimum number of elements required.</param>
-    /// <returns>True if there are at least the specified number of elements; otherwise, false.</returns>
-    public static bool HasAtLeast<T>(this IEnumerable<T> source, int count)
-    {
-        ArgumentNullException.ThrowIfNull(source);
-
-        if (source.TryGetNonEnumeratedCount(out int actualCount))
-        {
-            return actualCount >= count;
-        }
-
-        using IEnumerator<T> enumerator = source.GetEnumerator();
-        for (int i = 0; i < count; i++)
-        {
-            if (!enumerator.MoveNext())
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 }
