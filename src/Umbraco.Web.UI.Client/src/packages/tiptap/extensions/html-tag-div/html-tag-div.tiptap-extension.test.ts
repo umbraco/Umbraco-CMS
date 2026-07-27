@@ -1,6 +1,6 @@
 import { BulletList, Document, Editor, ListItem, Paragraph, Text } from '../../externals.js';
 import { Div } from './html-tag-div.tiptap-extension.js';
-import { DivContainer } from './html-tag-container-div.tiptap-extension.js';
+import { DivContainer } from './html-tag-div-container.tiptap-extension.js';
 import { HtmlClassAttribute } from '../html-attr-class/html-attr-class.tiptap-extension.js';
 import { HtmlStyleAttribute } from '../html-attr-style/html-attr-style.tiptap-extension.js';
 import { expect } from '@open-wc/testing';
