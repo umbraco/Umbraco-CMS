@@ -10,18 +10,8 @@ import { ReplaySubject, Subject, distinctUntilChanged, auditTime, map } from '@u
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import { isReturnableRoute } from './returnable-route.function.js';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-
-/**
- * Client routes worth returning to after a login: the back office proper (`section/:sectionName` —
- * see `UMB_SECTION_PATH_PATTERN`) and the other routes behind the auth guard. Everything else is a
- * boot route (install, logout, error, auth-callback) that either renders without a session — so
- * returning there would just show the login screen again — or isn't a destination at all.
- *
- * Deliberately an allowlist: omitting a returnable route only costs a deep link (the user lands on
- * the back office root), while omitting a session-less one loops the login.
- */
-const RETURNABLE_ROUTES = ['section', 'upgrade', 'preview'];
 
 /**
  * Session lifetime assumed when the server reports no expiry, which happens with
@@ -196,7 +186,9 @@ export class UmbAuthContext extends UmbContextBase {
 		manifest?: ManifestAuthProvider,
 	): Promise<void> {
 		// Preserve where the user was, but only when it is somewhere worth returning to.
-		const deepLink = this.#isReturnableRoute() ? window.location.pathname + window.location.search : undefined;
+		const deepLink = isReturnableRoute(window.location.pathname, this.#backofficePath)
+			? window.location.pathname + window.location.search
+			: undefined;
 
 		let target: URL;
 		if (identityProvider.toLowerCase() === 'umbraco') {
@@ -569,21 +561,6 @@ export class UmbAuthContext extends UmbContextBase {
 			solution: "Query the extension registry directly with extensionsRegistry.byType('authProvider').",
 		}).warn();
 		return extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider');
-	}
-
-	/**
-	 * Whether the current location is somewhere a user should be returned to after logging in.
-	 * @returns {boolean} True for the back office's section routes and the other guarded routes.
-	 */
-	#isReturnableRoute(): boolean {
-		// Strip the back-office path so this holds whether the client is served at "/" or "/umbraco",
-		// then match on the top-level route segment.
-		const { pathname } = window.location;
-		const route = pathname.startsWith(this.#backofficePath)
-			? pathname.slice(this.#backofficePath.length)
-			: pathname;
-
-		return RETURNABLE_ROUTES.includes(route.split('/').filter(Boolean)[0]);
 	}
 
 	/**

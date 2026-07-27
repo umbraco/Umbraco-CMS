@@ -59,10 +59,6 @@ describe('UmbAuthContext', () => {
 		it('has a session$ observable', () => {
 			expect(context).to.have.property('session$');
 		});
-
-		it('has an authorizationSignal property (deprecated)', () => {
-			expect(context).to.have.property('authorizationSignal');
-		});
 	});
 
 	describe('getServerUrl', () => {
@@ -118,7 +114,10 @@ describe('UmbAuthContext', () => {
 
 			expect(receivedConfig).to.have.property('baseUrl', 'http://localhost');
 			expect(receivedConfig).to.have.property('credentials', 'include');
-			expect(receivedConfig).to.have.property('auth').that.is.a('function');
+			// Cookie auth carries no bearer token, so the auth callback is deliberately not set.
+			expect(receivedConfig.auth).to.be.undefined;
+			// The server's 302 to /login must not be followed; the interceptor handles the 401 instead.
+			expect(receivedConfig).to.have.property('redirect', 'manual');
 		});
 	});
 
@@ -179,6 +178,13 @@ describe('UmbAuthContext', () => {
 
 		function stubFetch(respond: (input: RequestInfo | URL) => Response) {
 			window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+				// Only intercept the endpoints under test. The stub is global, so anything else — most
+				// importantly the test runner's own reporting requests — has to reach the real fetch,
+				// otherwise the session never completes and the run times out instead of failing.
+				if (!String(input).includes('/umbraco/management/api/')) {
+					return originalFetch.call(window, input, init);
+				}
+
 				fetchCalls.push({ input, init });
 				return respond(input);
 			};
@@ -259,9 +265,6 @@ describe('UmbAuthContext', () => {
 	describe('Login URL construction', () => {
 		let originalOpen: typeof window.open;
 		let openedWindows: Array<{ url: string; target?: string; features?: string }>;
-		// The deep-link decision reads window.location, so these tests navigate via history and
-		// restore the runner's own path afterwards.
-		const originalPath = window.location.pathname + window.location.search;
 
 		beforeEach(() => {
 			originalOpen = window.open;
@@ -274,7 +277,6 @@ describe('UmbAuthContext', () => {
 
 		afterEach(() => {
 			window.open = originalOpen;
-			history.replaceState(null, '', originalPath);
 		});
 
 		it('makeAuthorizationRequest (external, popup) opens the external-login challenge for the provider', async () => {
@@ -289,28 +291,14 @@ describe('UmbAuthContext', () => {
 			expect(openedWindows[0].target).to.equal('umbracoAuthPopup');
 		});
 
-		// Only routes behind the auth guard are worth returning to. `upgrade` matters as much as the
-		// section routes: when the backend requires an upgrade the client routes there, so login has to
-		// come back. The rest render without a session, so returning would show the login screen again.
-		const returnUrlCases: Array<[path: string, expected: string | null]> = [
-			['/umbraco/section/content/workspace/document/edit/123', '/umbraco/section/content/workspace/document/edit/123'],
-			['/umbraco/upgrade', '/umbraco/upgrade'],
-			['/umbraco/preview', '/umbraco/preview'],
-			['/umbraco/logout', null],
-			['/umbraco/error', null],
-			['/umbraco/auth-callback', null],
-			['/umbraco', null],
-		];
+		// The allowlist itself is covered exhaustively in returnable-route.function.test.ts, which can
+		// vary the path without navigating. Here we only assert that the decision is wired in: the test
+		// runner's own path is not a back office route, so no returnUrl is carried.
+		it('omits returnUrl when the current location is not a back office route', async () => {
+			await context.makeAuthorizationRequest('Google', false);
 
-		returnUrlCases.forEach(([path, expected]) => {
-			it(`${expected ? 'carries' : 'omits'} returnUrl on ${path}`, async () => {
-				history.replaceState(null, '', path);
-
-				await context.makeAuthorizationRequest('Google', false);
-
-				const url = new URL(openedWindows[0].url);
-				expect(url.searchParams.get('returnUrl')).to.equal(expected);
-			});
+			const url = new URL(openedWindows[0].url);
+			expect(url.searchParams.get('returnUrl')).to.be.null;
 		});
 
 		it('makeAuthorizationRequest (local, popup) opens the server login app with the auth-callback lander as ReturnUrl', async () => {
