@@ -216,9 +216,8 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Completes the login flow.
-	 * This is called on the oauth_complete page to exchange the authorization code for tokens.
-	 * @returns The token response timing, or null if no authorization was pending.
 	 * @deprecated No-op — the server sets the auth cookie directly, there is no code exchange. Always returns null. Scheduled for removal in Umbraco 21.
+	 * @returns {Promise<null>} Always null.
 	 */
 	async completeAuthorizationRequest(): Promise<null> {
 		new UmbDeprecation({
@@ -262,17 +261,8 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns {boolean} True if the session was renewed, otherwise false.
 	 */
 	async keepAlive(): Promise<boolean> {
-		try {
-			const response = await fetch(this.#keepAliveEndpoint, {
-				method: 'POST',
-				credentials: 'include',
-				redirect: 'manual',
-				headers: { Accept: 'application/json' },
-			});
-			if (!response.ok) {
-				return false;
-			}
-		} catch {
+		const response = await this.#fetchWithCookie(this.#keepAliveEndpoint, 'POST');
+		if (!response?.ok) {
 			return false;
 		}
 
@@ -281,23 +271,40 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
+	 * Calls an auth endpoint with the session cookie, bypassing the generated (intercepted) client:
+	 * a 401 here is the expected "no session" answer, whereas the API interceptor would queue the
+	 * request for re-authentication and stall the caller. Resolves undefined if the request failed.
+	 * @param {string} url The endpoint to call.
+	 * @param {'GET' | 'POST'} method The HTTP method to use.
+	 * @returns {Promise<Response | undefined>} The response, or undefined if the request threw.
+	 */
+	async #fetchWithCookie(url: string, method: 'GET' | 'POST'): Promise<Response | undefined> {
+		try {
+			return await fetch(url, {
+				method,
+				credentials: 'include',
+				// Don't follow the server's redirect to /login; a non-ok response is the answer.
+				redirect: 'manual',
+				headers: { Accept: 'application/json' },
+			});
+		} catch {
+			return undefined;
+		}
+	}
+
+	/**
 	 * Probes current-user/configuration and applies the resulting session locally (and broadcasts to
 	 * peer tabs). Returns true when authorized, false otherwise.
 	 * @returns {Promise<boolean>} True if the session was established, otherwise false.
 	 */
 	async #establishSessionFromServer(): Promise<boolean> {
-		try {
-			// Probe the current-user configuration with a direct fetch, NOT the generated (intercepted)
-			// client. A 401 here is the expected "no session" answer to the boot probe; routing it
-			// through the API interceptor would queue this request for re-authentication.
-			const response = await fetch(`${this.#serverUrl}/umbraco/management/api/v1/user/current/configuration`, {
-				method: 'GET',
-				credentials: 'include',
-				redirect: 'manual',
-				headers: { Accept: 'application/json' },
-			});
+		const response = await this.#fetchWithCookie(
+			`${this.#serverUrl}/umbraco/management/api/v1/user/current/configuration`,
+			'GET',
+		);
 
-			if (!response.ok) {
+		try {
+			if (!response?.ok) {
 				this.#session.setValue(undefined);
 				return false;
 			}
