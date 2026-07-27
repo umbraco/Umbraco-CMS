@@ -288,9 +288,8 @@ export class UserApiHelper {
   async loginToUser(userName: string, userEmail: string, userPassword: string) {
     const user = await this.getByName(userName);
     if (user.id !== null) {
-      // Sign the current session out first: the authentication cookie is the only credential, so
-      // signing in on top of a live session would otherwise leave two overlapping sign-ins.
-      await this.api.signOut();
+      // No sign-out first: there is a single authentication cookie, so signing in replaces it. A
+      // failed switch still surfaces, because signIn asserts the response status.
       await this.api.signIn(userEmail, userPassword);
     }
   }

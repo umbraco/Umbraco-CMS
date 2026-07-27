@@ -275,7 +275,7 @@ export class ApiHelpers {
   }
 
   async loginToAdminUser() {
-    await this.signOut();
+    // Signing in replaces the single authentication cookie, so there is nothing to sign out of first.
     await this.signIn(umbracoConfig.user.login, umbracoConfig.user.password);
   }
 
