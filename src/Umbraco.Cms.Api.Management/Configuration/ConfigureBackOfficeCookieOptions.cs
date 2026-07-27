@@ -86,12 +86,9 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         options.Cookie.Path = "/";
 
         // SameSite=None (requires HTTPS) lets the cookie ride cross-site requests when the back office
-        // is served from a different origin than the server (dev server). Invalid values
-        // leave the framework default untouched.
-        if (Enum.TryParse(_securitySettings.AuthCookieSameSite, ignoreCase: true, out SameSiteMode sameSiteMode))
-        {
-            options.Cookie.SameSite = sameSiteMode;
-        }
+        // is served from a different origin than the server (dev server). CookieSameSiteMode mirrors
+        // SameSiteMode's numeric values, so the cast is safe.
+        options.Cookie.SameSite = (SameSiteMode)_securitySettings.AuthCookieSameSite;
 
         // NOTE: matches route in BackOfficeLoginController
         const string backOfficeLoginPath = "/umbraco/login";

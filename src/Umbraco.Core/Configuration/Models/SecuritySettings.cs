@@ -56,7 +56,7 @@ public class SecuritySettings
     /// <summary>
     ///     The default authentication cookie SameSite mode.
     /// </summary>
-    internal const string StaticAuthCookieSameSite = "Lax";
+    internal const CookieSameSiteMode StaticAuthCookieSameSite = CookieSameSiteMode.Lax;
 
     /// <summary>
     ///     The default value for using email as username.
@@ -152,18 +152,17 @@ public class SecuritySettings
     ///     Gets or sets the SameSite mode for the back-office authentication cookie.
     /// </summary>
     /// <remarks>
-    ///     Valid values are "Unspecified", "None", "Lax" and "Strict" (default "Lax"). Only set "None"
-    ///     (which also requires HTTPS) when the back office is served from a different origin than the
-    ///     server, such as a local front-end dev server or a containerised setup, so the cookie is sent
-    ///     on cross-site requests. A normal deployment serves both from the same origin and does not
-    ///     need it.
+    ///     Only set <see cref="CookieSameSiteMode.None" /> (which also requires HTTPS) when the back
+    ///     office is served from a different origin than the server, such as a local front-end dev
+    ///     server or a containerised setup, so the cookie is sent on cross-site requests. A normal
+    ///     deployment serves both from the same origin and does not need it.
     ///     <para>
     ///     Keep the default in production: "Lax" is what stops a cross-site request from carrying the
     ///     authentication cookie, and the Management API has no antiforgery tokens of its own.
     ///     </para>
     /// </remarks>
     [DefaultValue(StaticAuthCookieSameSite)]
-    public string AuthCookieSameSite { get; set; } = StaticAuthCookieSameSite;
+    public CookieSameSiteMode AuthCookieSameSite { get; set; } = StaticAuthCookieSameSite;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the user's email address is to be considered as their username.

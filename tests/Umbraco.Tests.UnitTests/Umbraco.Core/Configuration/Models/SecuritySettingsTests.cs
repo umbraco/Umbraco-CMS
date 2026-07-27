@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -192,5 +193,37 @@ public class SecuritySettingsTests
             Assert.That(settings.GetEffectiveLogoutPathName(), Is.EqualTo("/logout"));
             Assert.That(settings.GetEffectiveErrorPathName(), Is.EqualTo("/error"));
         });
+    }
+
+    // ConfigureBackOfficeCookieOptions casts straight from CookieSameSiteMode to SameSiteMode, so the
+    // two enums have to keep the same numeric values. Renumbering either one would silently hand the
+    // cookie a different SameSite policy than was configured.
+    [TestCase(CookieSameSiteMode.Unspecified, SameSiteMode.Unspecified)]
+    [TestCase(CookieSameSiteMode.None, SameSiteMode.None)]
+    [TestCase(CookieSameSiteMode.Lax, SameSiteMode.Lax)]
+    [TestCase(CookieSameSiteMode.Strict, SameSiteMode.Strict)]
+    public void CookieSameSiteMode_Matches_AspNetCore_SameSiteMode(CookieSameSiteMode ours, SameSiteMode theirs)
+        => Assert.That((int)ours, Is.EqualTo((int)theirs));
+
+    [Test]
+    public void CookieSameSiteMode_Covers_Every_AspNetCore_SameSiteMode()
+        => Assert.That(
+            Enum.GetValues<CookieSameSiteMode>().Select(x => (int)x),
+            Is.EquivalentTo(Enum.GetValues<SameSiteMode>().Select(x => (int)x)));
+
+    [Test]
+    public void AuthCookieSameSite_Binds_From_Configuration_By_Name()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Umbraco:CMS:Security:AuthCookieSameSite"] = "None",
+            })
+            .Build();
+
+        var settings = new SecuritySettings();
+        configuration.GetSection("Umbraco:CMS:Security").Bind(settings);
+
+        Assert.That(settings.AuthCookieSameSite, Is.EqualTo(CookieSameSiteMode.None));
     }
 }
