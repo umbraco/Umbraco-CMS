@@ -166,7 +166,12 @@ export class UmbAuthViewElement extends UmbLitElement {
 			if (!authContext) {
 				throw new Error('Auth context not available');
 			}
-			authContext.makeAuthorizationRequest(manifest.forProviderName, false, undefined, manifest);
+			// Only a timed-out session has unsaved work behind the modal, so that is the one flow that
+			// needs the popup. A cold-boot login has nothing to preserve and takes the full-page round
+			// trip instead — the same path local login already uses when it is the only provider, and it
+			// avoids depending on the popup's cross-tab broadcast reaching this window.
+			const redirect = this.userLoginState !== 'timedOut';
+			authContext.makeAuthorizationRequest(manifest.forProviderName, redirect, undefined, manifest);
 		} catch (error) {
 			console.error('[AuthView] Error submitting auth request', error);
 			this._error = error instanceof Error ? error.message : 'Unknown error (see console)';
