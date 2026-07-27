@@ -7,7 +7,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbAppAuthController extends UmbControllerBase {
-	#retrievedContext: Promise<unknown>;
+	readonly #retrievedContext: Promise<unknown>;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#authModalOpen = false;
 
@@ -27,6 +27,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	 * Checks if the user is authorized; if not, opens the auth modal over the (empty) shell.
 	 * Session verification is handled by setInitialState() (the current-user/configuration
 	 * cookie probe) before the router evaluates guards.
+	 * @returns {Promise<boolean>} True if the user is authorized, false if not (and the auth modal is opened).
 	 */
 	async isAuthorized(): Promise<boolean> {
 		await this.#retrievedContext.catch(() => undefined);
@@ -39,12 +40,8 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 
 		// Stay put on the logout landing — without this the single-provider auto-init below would
-		// immediately bounce the just-logged-out user back to login. Match the trailing "logout"
-		// segment on the raw path rather than the client's computed logout URL: in a split-origin dev
-		// setup the server's logout redirect can miss the client's /logout route and fall through to
-		// this guard, where a base-relative comparison isn't reliable.
-		const lastPathSegment = window.location.pathname.split('/').filter(Boolean).pop();
-		if (lastPathSegment === 'logout') {
+		// immediately bounce the just-logged-out user back to login.
+		if (this.#isOnLogoutPath()) {
 			return false;
 		}
 
@@ -70,9 +67,21 @@ export class UmbAppAuthController extends UmbControllerBase {
 	}
 
 	/**
+	 * Matches the trailing "logout" segment on the raw path rather than the client's computed logout
+	 * URL: in a split-origin dev setup the server's logout redirect can miss the client's /logout route
+	 * and fall through to the guard, where a base-relative comparison isn't reliable.
+	 * @returns {boolean} True if the current path ends with "logout" (ignoring query/fragment), false otherwise.
+	 */
+	#isOnLogoutPath(): boolean {
+		return window.location.pathname.split('/').filter(Boolean).pop() === 'logout';
+	}
+
+	/**
 	 * Cookie auth: authentication happens in the auth modal (login providers render inline over the
 	 * current view). A real navigation to the server /umbraco/login is only used by the modal's own
 	 * local-login action.
+	 * @param {UmbUserLoginState} userLoginState The state of the user login flow that triggered the modal.
+	 * @returns {Promise<void>} Resolves when the modal is closed (success or cancel).
 	 */
 	async #openAuthModal(userLoginState: UmbUserLoginState) {
 		if (!this.#authContext) {
@@ -80,8 +89,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 		// Stay put on the logout landing: it already renders the full login view inline (see
 		// app-auth.element.ts), so popping the modal there too would double up the login UI.
-		const logoutPath = new URL(this.#authContext.getPostLogoutRedirectUrl()).pathname;
-		if (window.location.pathname === logoutPath) {
+		if (this.#isOnLogoutPath()) {
 			return;
 		}
 
