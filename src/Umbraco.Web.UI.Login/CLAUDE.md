@@ -235,7 +235,7 @@ Form waits for localization availability before rendering. Retries 40 times with
 - `msw` - API mocking
 - `@hey-api/openapi-ts` - API client generation
 
-`@umbraco-cms/backoffice` is **not** an npm dependency — its types resolve from the sibling Client's source via generated tsconfig path aliases (see the type-resolution section above).
+`@umbraco-cms/backoffice` is **not** an npm dependency — its types resolve from the sibling Client's source via generated tsconfig path aliases.
 
 ### Known Technical Debt
 
