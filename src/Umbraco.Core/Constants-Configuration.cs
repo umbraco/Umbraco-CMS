@@ -305,10 +305,6 @@ public static partial class Constants
         /// </summary>
         public const string ConfigScheduledPublishing = ConfigPrefix + "ScheduledPublishing";
 
-        /// <summary>
-        ///     The configuration key for backoffice token cookie settings.
-        /// </summary>
-        public const string ConfigBackOfficeTokenCookie = ConfigSecurity + ":BackOfficeTokenCookie";
         public const string ConfigDictionary = ConfigPrefix + "Dictionary";
 
         /// <summary>
