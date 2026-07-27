@@ -18,6 +18,7 @@ export class MemberUiHelper extends UiBaseLocators {
   private readonly changePasswordBtn: Locator;
   private readonly membersMenu: Locator;
   private readonly infoTab: Locator;
+  private readonly membersCreateAction: Locator;
   private readonly membersCreateBtn: Locator;
   private readonly membersSidebar: Locator;
   private readonly membersSidebarBtn: Locator;
@@ -41,7 +42,8 @@ export class MemberUiHelper extends UiBaseLocators {
     this.changePasswordBtn = page.getByLabel('Change password', {exact: true});
     this.membersMenu = page.locator('umb-menu').getByLabel('Members', {exact: true});
     this.infoTab = page.locator('uui-tab').filter({hasText: 'Info'}).locator('svg');
-    this.membersCreateBtn = page.locator('umb-create-member-collection-action').getByLabel(/^Create/);
+    this.membersCreateAction = page.locator('umb-create-member-collection-action');
+    this.membersCreateBtn = this.membersCreateAction.getByLabel(/^Create/);
     this.membersSidebar = page.getByTestId('section-sidebar:Umb.SectionSidebarApp.Menu.MemberManagement');
     this.membersSidebarBtn = this.membersSidebar.locator('uui-menu-item').filter({hasText: 'Members'});
     this.memberTableCollectionRow = page.locator('umb-member-table-collection-view').locator('uui-table-row');
@@ -57,11 +59,29 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickMemberLinkByName(memberName: string) {
-    await this.click(this.page.getByRole('link', {name: memberName}));
+    await this.click(this.page.getByRole('link', {name: memberName, exact: true}));
   }
 
   async isMemberWithNameVisible(memberName: string, isVisible: boolean = true) {
-    await this.isVisible(this.memberTableCollectionRow.getByText(memberName, {exact: true}), isVisible);
+    const memberRow = this.memberTableCollectionRow.getByText(memberName, {exact: true});
+    if (!isVisible) {
+      await this.isVisible(memberRow, false);
+      return;
+    }
+    await expect(async () => {
+      if (!(await memberRow.isVisible())) {
+        await this.reopenMembersCollection();
+      }
+      await expect(memberRow).toBeVisible({timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.navigation});
+  }
+
+  // Leave and re-enter the Members collection so the table remounts and refetches, without a full page reload.
+  // skipReload guards against goToSection falling back to a page reload if we were already on the section.
+  private async reopenMembersCollection() {
+    await this.goToSection(ConstantHelper.sections.content, true, true);
+    await this.goToSection(ConstantHelper.sections.members, true, true);
+    await this.clickMembersSidebarButton();
   }
 
   async clickMembersSidebarButton() {
@@ -74,6 +94,8 @@ export class MemberUiHelper extends UiBaseLocators {
 
   async enterComments(comment: string) {
     await this.enterText(this.commentsTxt, comment);
+    // Blur to commit the value: the uui textarea commits on change/blur, not on fill, so a later save would miss it.
+    await this.commentsTxt.blur();
   }
 
   async enterUsername(username: string) {
@@ -121,7 +143,7 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickChangePasswordButton() {
-    await this.click(this.changePasswordBtn);
+    await this.click(this.changePasswordBtn, {timeout: ConstantHelper.timeout.long});
   }
 
   async clickRemoveMemberGroupByName(memberGroupName: string) {
@@ -145,8 +167,13 @@ export class MemberUiHelper extends UiBaseLocators {
     await this.click(this.infoTab);
   }
 
-  async clickCreateMembersButton() {
+  async clickCreateMembersButton(memberTypeName: string = 'Member') {
     await this.click(this.membersCreateBtn);
+    // More than one member type makes Create open a type picker instead of navigating; pick the type when it does.
+    const memberTypeOption = this.membersCreateAction.locator(`uui-menu-item[label="${memberTypeName}"]`);
+    if (await memberTypeOption.count() > 0) {
+      await this.click(memberTypeOption);
+    }
   }
 
   async clickSaveButtonAndWaitForMemberToBeCreated() {
@@ -154,7 +181,7 @@ export class MemberUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMemberToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.member, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.member, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMemberToBeDeleted() {

@@ -19,7 +19,7 @@ RESTful API for Umbraco backoffice operations. Manages content, media, users, an
 **REST API Library** - Plugged into Umbraco.Web.UI, provides the Management API surface for backoffice operations.
 
 ### Key Technologies
-- **Web Framework**: ASP.NET Core MVC with `Asp.Versioning.Mvc` (v1.0 currently)
+- **Web Framework**: ASP.NET Core MVC with `Asp.Versioning.Mvc` (v1.0 and v1.1)
 - **OpenAPI**: Swashbuckle.AspNetCore with custom schema/operation filters
 - **Authentication**: OpenIddict via `Umbraco.Cms.Api.Common` (reference tokens, not JWT)
 - **Authorization**: Policy-based with `IAuthorizationService`
