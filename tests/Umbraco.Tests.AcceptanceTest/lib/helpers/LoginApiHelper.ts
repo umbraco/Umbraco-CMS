@@ -36,10 +36,9 @@ export class LoginApiHelper {
       ignoreHTTPSErrors: true
     });
 
-    expect(
-      response.status(),
-      `Login for ${userEmail} failed with status ${response.status()}`,
-    ).toBe(ConstantHelper.statusCodes.ok);
+    // Playwright shows this as the step title in the report whether or not it passes, so it reads
+    // as a description rather than as a failure.
+    expect(response.status(), `Sign in ${userEmail}`).toBe(ConstantHelper.statusCodes.ok);
 
     return response;
   }
