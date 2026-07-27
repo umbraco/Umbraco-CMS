@@ -539,7 +539,7 @@ For integration tests that exercise caching or cache refreshers, see `tests/Umbr
 
 ## 10. Verification Discipline
 
-- **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see the caching note in section 9.)
+- **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
 - **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
 
 ---
