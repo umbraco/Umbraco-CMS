@@ -61,4 +61,15 @@ public interface IElementContainerPermissionService
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ElementAuthorizationStatus"/>.</returns>
     Task<ElementAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<string> permissionsToCheck);
+
+    /// <summary>
+    ///     Filters the fallback permissions for a user. Fallback permissions are the user group default permissions
+    ///     used by the UI when no granular per-container permissions are assigned.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to filter permissions for.</param>
+    /// <param name="fallbackPermissions">The fallback permissions aggregated from the user's groups.</param>
+    /// <returns>A task resolving into the filtered set of fallback permissions.</returns>
+    // TODO (V20): Remove the default implementation.
+    Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
+        => Task.FromResult(fallbackPermissions);
 }
