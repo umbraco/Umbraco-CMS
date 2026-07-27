@@ -72,7 +72,7 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 			if (isAuthorized === undefined) return;
 
 			if (isAuthorized) {
-				this.#initHubConnection('[redacted]');
+				this.#initHubConnection();
 			} else {
 				this.#isConnected.setValue(false);
 				this.#connection?.stop();
@@ -81,7 +81,7 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 		});
 	}
 
-	#initHubConnection(token: string) {
+	#initHubConnection() {
 		const serverURL = this.#serverContext?.getServerUrl();
 
 		if (!serverURL) {
@@ -93,9 +93,9 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 		const skipNegotiation = this.#serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
 
-		const hubOptions: IHttpConnectionOptions = {
-			accessTokenFactory: () => token,
-		};
+		// No accessTokenFactory: the auth cookie is the credential and SignalR sends it on both the
+		// negotiate request and the connection itself.
+		const hubOptions: IHttpConnectionOptions = {};
 
 		if (skipNegotiation) {
 			hubOptions.skipNegotiation = true;
