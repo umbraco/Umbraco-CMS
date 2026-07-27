@@ -16,7 +16,6 @@ public class ImagingSettings
     /// </summary>
     /// <remarks>
     /// Setting or updating this value will cause all existing generated URLs to become invalid and return a 400 Bad Request response code.
-    /// When set, the maximum resize settings are not used/validated anymore, because you can only request URLs with a valid HMAC token anyway.
     /// </remarks>
     public byte[] HMACSecretKey { get; set; } = Array.Empty<byte>();
 
