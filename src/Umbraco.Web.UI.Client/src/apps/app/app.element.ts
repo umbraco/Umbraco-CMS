@@ -124,8 +124,9 @@ export class UmbAppElement extends UmbLitElement {
 			component: UmbAppAuthElement,
 		},
 		{
-			// Lander for the external-login popup flow (used by the timeout and external-login providers).
-			// It will close the popup and inform the opener window of the result (success or error) via postMessage.
+			// Lander for the popup login flows, local and external: the auth cookie is already set by
+			// the time it loads, so it waits for the session to settle and closes the popup. The opener
+			// learns of the result from the `umb:auth` broadcast, not postMessage.
 			path: 'auth-callback',
 			component: () => import('./app-auth-callback.element.js'),
 		},
