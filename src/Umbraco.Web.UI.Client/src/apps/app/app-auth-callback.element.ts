@@ -2,6 +2,7 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { ensureLocalPath } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Lander for the external-login popup flow (`{BackOfficeHost}/auth-callback`, hardcoded server-side in
@@ -49,12 +50,10 @@ export class UmbAppAuthCallbackElement extends UmbLitElement {
 
 	#fallbackUrl(): string {
 		const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
-		// Accept only a local, relative path (mirrors the server's Url.IsLocalUrl guard): a single
-		// leading slash, and neither a protocol-relative "//host" nor a "/\" backslash trick.
-		if (returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//') && !returnUrl.startsWith('/\\')) {
-			return returnUrl;
-		}
-		return this.#backofficePath;
+		// Re-validate the server-carried returnUrl against this origin, mirroring the server's own
+		// Url.IsLocalUrl guard, so a tampered value can't redirect off-site.
+		const backofficeUrl = new URL(this.#backofficePath, window.location.origin);
+		return ensureLocalPath(returnUrl ?? backofficeUrl, backofficeUrl).href;
 	}
 
 	override render() {
