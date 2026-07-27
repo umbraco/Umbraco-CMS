@@ -14,14 +14,7 @@ const BLOCK_TAGS = new Set([
 	'p',
 	'ul',
 	'ol',
-	'li',
 	'table',
-	'thead',
-	'tbody',
-	'tfoot',
-	'tr',
-	'td',
-	'th',
 	'blockquote',
 	'h1',
 	'h2',
@@ -31,7 +24,6 @@ const BLOCK_TAGS = new Set([
 	'h6',
 	'hr',
 	'figure',
-	'figcaption',
 	'pre',
 	'section',
 	'article',
@@ -42,12 +34,18 @@ const BLOCK_TAGS = new Set([
 	'main',
 	'address',
 	'dl',
-	'dt',
-	'dd',
 	'form',
 	'fieldset',
 ]);
 
+/**
+ * Whether `element` has at least one direct child element that is block-level.
+ *
+ * Only checks direct children, so tags that can only ever appear nested inside another
+ * `BLOCK_TAGS` entry (e.g. `li` inside `ul`/`ol`, `tr`/`td`/`th`/`thead`/`tbody`/`tfoot` inside
+ * `table`, `dt`/`dd` inside `dl`, `figcaption` inside `figure`) are omitted from `BLOCK_TAGS`
+ * since their container is what would actually surface as the direct child.
+ */
 function hasBlockLevelChild(element: HTMLElement): boolean {
 	return Array.from(element.children).some((child) => BLOCK_TAGS.has(child.tagName.toLowerCase()));
 }
