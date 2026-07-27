@@ -23,6 +23,13 @@ import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils
  */
 const RETURNABLE_ROUTES = ['section', 'upgrade', 'preview'];
 
+/**
+ * Session lifetime assumed when the server reports no expiry, which happens with
+ * `keepUserLoggedIn`. It never drives the countdown — the timeout controller does not schedule a
+ * warning in that mode — it is only carried in the session broadcast to peer tabs.
+ */
+const ASSUMED_SESSION_LIFETIME_IN_SECONDS = 60 * 60;
+
 export interface UmbAuthSession {
 	/**
 	 * @deprecated Cookie auth has a single, server-owned expiry, so this is now identical to
@@ -323,7 +330,7 @@ export class UmbAuthContext extends UmbContextBase {
 			const issuedAt = Math.floor(Date.now() / 1000);
 			const expiresIn = data.timeoutUtc
 				? Math.max(0, Math.floor(new Date(data.timeoutUtc).getTime() / 1000) - issuedAt)
-				: 60 * 60;
+				: ASSUMED_SESSION_LIFETIME_IN_SECONDS;
 			this.#setSessionLocally(expiresIn, issuedAt);
 
 			// Tell other tabs a session is (re)established, so they can update their local state too.

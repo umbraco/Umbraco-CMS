@@ -171,7 +171,7 @@ export class UmbAuthViewElement extends UmbLitElement {
 			// trip instead — the same path local login already uses when it is the only provider, and it
 			// avoids depending on the popup's cross-tab broadcast reaching this window.
 			const redirect = this.userLoginState !== 'timedOut';
-			authContext.makeAuthorizationRequest(manifest.forProviderName, redirect, undefined, manifest);
+			await authContext.makeAuthorizationRequest(manifest.forProviderName, redirect, undefined, manifest);
 		} catch (error) {
 			console.error('[AuthView] Error submitting auth request', error);
 			this._error = error instanceof Error ? error.message : 'Unknown error (see console)';

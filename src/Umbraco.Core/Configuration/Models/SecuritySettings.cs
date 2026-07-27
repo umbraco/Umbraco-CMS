@@ -152,9 +152,15 @@ public class SecuritySettings
     ///     Gets or sets the SameSite mode for the back-office authentication cookie.
     /// </summary>
     /// <remarks>
-    ///     Valid values are "Unspecified", "None", "Lax" and "Strict" (default "Lax"). Set to "None"
+    ///     Valid values are "Unspecified", "None", "Lax" and "Strict" (default "Lax"). Only set "None"
     ///     (which also requires HTTPS) when the back office is served from a different origin than the
-    ///     server — e.g. a front-end dev server or Umbraco Cloud — so the cookie is sent on cross-site requests.
+    ///     server, such as a local front-end dev server or a containerised setup, so the cookie is sent
+    ///     on cross-site requests. A normal deployment serves both from the same origin and does not
+    ///     need it.
+    ///     <para>
+    ///     Keep the default in production: "Lax" is what stops a cross-site request from carrying the
+    ///     authentication cookie, and the Management API has no antiforgery tokens of its own.
+    ///     </para>
     /// </remarks>
     [DefaultValue(StaticAuthCookieSameSite)]
     public string AuthCookieSameSite { get; set; } = StaticAuthCookieSameSite;

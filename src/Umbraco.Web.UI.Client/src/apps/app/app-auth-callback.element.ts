@@ -30,7 +30,6 @@ export class UmbAppAuthCallbackElement extends UmbLitElement {
 			this.observe(
 				authContext?.isAuthorized,
 				(isAuthorized) => {
-					if (isAuthorized === undefined) return;
 					if (isAuthorized) {
 						this.#close();
 						return;
