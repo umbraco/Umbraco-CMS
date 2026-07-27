@@ -527,6 +527,8 @@ public class BackOfficeController : SecurityControllerBase
     [EndpointDescription("Initiates a cookie-based external login challenge for the back office.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status302Found)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public IActionResult ExternalLogin(string provider, string? returnUrl = null)
     {
         if (string.IsNullOrWhiteSpace(provider))
@@ -569,6 +571,7 @@ public class BackOfficeController : SecurityControllerBase
     [EndpointDescription("Handles the callback from an external login provider and signs the user into the back office.")]
     [AllowAnonymous]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status302Found)]
     public async Task<IActionResult> ExternalLoginCallback()
     {
         ExternalLoginInfo? loginInfo = await _backOfficeSignInManager.GetExternalLoginInfoAsync();
@@ -769,7 +772,8 @@ public class BackOfficeController : SecurityControllerBase
             $"{RedirectStatusParameter}={status}");
         foreach (IdentityError identityError in identityErrors)
         {
-            redirectUrl.AppendQueryStringToUrl($"{RedirectErrorCodeParameter}={identityError.Code}");
+            // AppendQueryStringToUrl is pure, so the result has to be reassigned or the codes are lost.
+            redirectUrl = redirectUrl.AppendQueryStringToUrl($"{RedirectErrorCodeParameter}={identityError.Code}");
         }
 
         return Redirect(redirectUrl);
