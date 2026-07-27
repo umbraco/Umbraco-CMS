@@ -3,10 +3,12 @@ import { umbMockManager } from '../../mock-manager.js';
 import { umbElementMockDb } from '../../db/element.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
+	CreateAndPublishElementRequestModel,
 	CreateElementRequestModel,
 	IReferenceResponseModel,
 	PagedIReferenceResponseModel,
 	PagedReferenceByIdModel,
+	UpdateAndPublishElementRequestModel,
 	UpdateElementRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -21,6 +23,21 @@ export const detailHandlers = [
 		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
 
 		const id = umbElementMockDb.detail.create(requestBody);
+
+		return HttpResponse.json(null, {
+			status: 201,
+			headers: {
+				Location: request.url + '/' + id,
+				'Umb-Generated-Resource': id,
+			},
+		});
+	}),
+
+	http.post(umbracoPath(`${UMB_SLUG}/create-and-publish`), async ({ request }) => {
+		const requestBody = (await request.json()) as CreateAndPublishElementRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
+
+		const id = umbElementMockDb.publishing.createAndPublish(requestBody);
 
 		return HttpResponse.json(null, {
 			status: 201,
@@ -79,6 +96,18 @@ export const detailHandlers = [
 		}
 		const response = umbElementMockDb.detail.read(id);
 		return HttpResponse.json(response);
+	}),
+
+	http.put(umbracoPath(`${UMB_SLUG}/:id/update-and-publish`), async ({ request, params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
+		if (id === 'forbidden') {
+			return new HttpResponse(null, { status: 403 });
+		}
+		const requestBody = (await request.json()) as UpdateAndPublishElementRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
+		umbElementMockDb.publishing.updateAndPublish(id, requestBody);
+		return new HttpResponse(null, { status: 200 });
 	}),
 
 	http.put(umbracoPath(`${UMB_SLUG}/:id`), async ({ request, params }) => {

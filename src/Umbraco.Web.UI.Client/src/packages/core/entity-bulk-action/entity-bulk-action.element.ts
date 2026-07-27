@@ -8,9 +8,7 @@ import type {
 	MetaEntityBulkActionDefaultKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const elementName = 'umb-entity-bulk-action';
-
-@customElement(elementName)
+@customElement('umb-entity-bulk-action')
 export class UmbEntityBulkActionDefaultElement<
 		MetaType extends MetaEntityBulkActionDefaultKind = MetaEntityBulkActionDefaultKind,
 		ApiType extends UmbEntityBulkAction<MetaType> = UmbEntityBulkAction<MetaType>,
@@ -44,6 +42,6 @@ export default UmbEntityBulkActionDefaultElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbEntityBulkActionDefaultElement;
+		'umb-entity-bulk-action': UmbEntityBulkActionDefaultElement;
 	}
 }

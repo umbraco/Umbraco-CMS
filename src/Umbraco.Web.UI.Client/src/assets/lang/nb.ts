@@ -12,6 +12,9 @@ import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localiza
 
 export default {
 	actions: {
+		copyInProgress: 'Kopierer - vennligst vent...',
+		deleteInProgress: 'Sletter - vennligst vent...',
+		moveInProgress: 'Flytter - vennligst vent...',
 		assigndomain: 'Angi domene',
 		auditTrail: 'Revisjoner',
 		browse: 'Bla gjennom',
@@ -829,6 +832,9 @@ export default {
 		paSimple: 'Enkelt: Beskytt ved hjelp av brukernavn og passord',
 		paSimpleHelp: 'Om du ønsker å bruke enkel autentisering via ett enkelt brukernavn og passord',
 	},
+	unpublish: {
+		inProgress: 'Avpubliserer - vennligst vent...',
+	},
 	publish: {
 		contentPublishedFailedAwaitingRelease: '%0% kunne ikke publiseres fordi den har planlagt utgivelsesdato.',
 		contentPublishedFailedInvalid: '%0% ble ikke publisert. Ett eller flere felter ble ikke godkjent av validering.',
@@ -906,6 +912,8 @@ export default {
 		sortPleaseWait: 'Vennligst vent. Elementene blir sortert, dette kan ta litt tid.',
 	},
 	speechBubbles: {
+		editMultiContentPublishedPartialText: '%0% av %1% dokumenter publisert.',
+		editMultiContentUnpublishedPartialText: '%0% av %1% dokumenter avpublisert.',
 		operationFailedHeader: 'En feil oppsto',
 		invalidUserPermissionsText: 'Utilstrekkelige brukertillatelser, kunne ikke fullføre operasjonen',
 		operationCancelledHeader: 'Avbrutt',

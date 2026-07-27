@@ -194,7 +194,6 @@ class UmbStoryBookElement extends UmbLitElement {
 
 customElements.define('umb-storybook', UmbStoryBookElement);
 
-
 const themeProvider = (story, context) => {
 	applyTheme(context.globals['theme'] ?? 'light');
 	return story();

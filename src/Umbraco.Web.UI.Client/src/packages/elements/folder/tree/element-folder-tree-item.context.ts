@@ -13,7 +13,6 @@ export class UmbElementFolderTreeItemContext extends UmbDefaultTreeItemContext<
 
 	// TODO: Move to API
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
-	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -22,6 +21,7 @@ export class UmbElementFolderTreeItemContext extends UmbDefaultTreeItemContext<
 			this.#isTrashedContext.setIsTrashed(isTrashed);
 		});
 	}
+
 }
 
 export { UmbElementFolderTreeItemContext as api };

@@ -140,7 +140,8 @@ internal sealed class SyntheticPublishedTreeFixture
             publishedModelFactory,
             previewMock.Object,
             publishStatusMock.Object,
-            NullLogger<DocumentCacheService>.Instance);
+            NullLogger<DocumentCacheService>.Instance,
+            new ConvertedPublishedContentCacheFactory(null, NullLogger<ConvertedPublishedContentCacheFactory>.Instance));
 
         // Seed every node directly so reads stay in-memory and never reach the repository stub.
         foreach (Guid key in _allKeys)

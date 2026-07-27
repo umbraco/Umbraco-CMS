@@ -174,6 +174,25 @@ umbConfirmModal(this, {
 });
 ```
 
+**Notification `htmlMessage` field**: notification `data.message` (`peek()`, `stay()`, `umbPeekError`) is always rendered as plain text. To render HTML in a toast, set `data.htmlMessage` instead — it takes precedence over `message`. A string value is sanitized with `sanitizeHTML` before rendering (scripts and event handlers are stripped); a `TemplateResult` renders as-is since Lit escapes its bindings. Sanitization does not prevent markup injection (links, images), so never interpolate user-controlled content into an `htmlMessage` string — use a `TemplateResult` (or `localize.htmlString()`) so the interpolated values are escaped:
+
+```typescript
+// ✅ Safe — static HTML string, sanitized at render
+notificationContext.peek('positive', {
+	data: { message: 'Import finished', htmlMessage: 'Import finished — <a href="/report">view the report</a>' },
+});
+
+// ✅ Safe — TemplateResult: Lit escapes item.name
+notificationContext.peek('positive', {
+	data: { message: `${item.name} published`, htmlMessage: html`<strong>${item.name}</strong> published` },
+});
+
+// ❌ Unsafe — user-controlled content in an HTML string survives sanitization as markup (e.g. links)
+notificationContext.peek('positive', {
+	data: { message: 'Published', htmlMessage: `<strong>${item.name}</strong> published` },
+});
+```
+
 **Attribute Binding**:
 
 ```typescript

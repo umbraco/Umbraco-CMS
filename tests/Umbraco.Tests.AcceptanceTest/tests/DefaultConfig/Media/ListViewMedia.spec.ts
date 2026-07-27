@@ -5,13 +5,15 @@ const dataTypeName = 'List View - Media';
 let dataTypeDefaultData = null;
 const firstMediaFileName = 'FirstMediaFile';
 const secondMediaFileName = 'SecondMediaFile';
+let firstMediaFileId = '';
+let secondMediaFileId = '';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
   await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
-  await umbracoApi.media.createDefaultMediaFile(firstMediaFileName);
-  await umbracoApi.media.createDefaultMediaFile(secondMediaFileName);
+  firstMediaFileId = await umbracoApi.media.createDefaultMediaFile(firstMediaFileName);
+  secondMediaFileId = await umbracoApi.media.createDefaultMediaFile(secondMediaFileName);
   await umbracoUi.goToBackOffice();
 });
 
@@ -39,21 +41,45 @@ test('can change the the default sort order for the list in the media section', 
   await umbracoUi.media.doesMediaListNameValuesMatch(expectedMediaValues);
 });
 
-test('can change the the order direction for the list in the media section', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const expectedMediaValues = await umbracoApi.media.getAllMediaNames('updateDate', 'Ascending');
+const orderDirections = [
+  {value: 'asc', name: 'ascending', queryDirection: 'Ascending'},
+  {value: 'desc', name: 'descending', queryDirection: 'Descending'}
+];
 
-  // Act
-  await umbracoApi.dataType.updateListViewMediaDataType('orderDirection', 'asc');
-  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+for (const orderDirection of orderDirections) {
+  test(`can order the grid view ${orderDirection.name} in the media section`, async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.dataType.updateListViewMediaDataTypeValues([
+      {alias: 'orderBy', value: 'name'},
+      {alias: 'orderDirection', value: orderDirection.value}
+    ]);
+    const expectedMediaValues = await umbracoApi.media.getAllMediaNames('name', orderDirection.queryDirection);
 
-  // Assert
-  await umbracoUi.media.isMediaGridViewVisible();
-  await umbracoUi.media.doesMediaGridValuesMatch(expectedMediaValues);
-  await umbracoUi.media.changeToListView();
-  await umbracoUi.media.isMediaListViewVisible();
-  await umbracoUi.media.doesMediaListNameValuesMatch(expectedMediaValues);
-});
+    // Act
+    await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+
+    // Assert
+    await umbracoUi.media.isMediaGridViewVisible();
+    await umbracoUi.media.doesMediaGridValuesMatch(expectedMediaValues);
+  });
+
+  test(`can order the list view ${orderDirection.name} in the media section`, async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.dataType.updateListViewMediaDataTypeValues([
+      {alias: 'orderBy', value: 'name'},
+      {alias: 'orderDirection', value: orderDirection.value}
+    ]);
+    const expectedMediaValues = await umbracoApi.media.getAllMediaNames('name', orderDirection.queryDirection);
+
+    // Act
+    await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+    await umbracoUi.media.changeToListView();
+
+    // Assert
+    await umbracoUi.media.isMediaListViewVisible();
+    await umbracoUi.media.doesMediaListNameValuesMatch(expectedMediaValues);
+  });
+}
 
 test('can add more columns to the list in the media section', async ({umbracoApi, umbracoUi}) => {
   // Arrange
@@ -105,10 +131,10 @@ test('can allow bulk trash in the media section', {tag: '@release'}, async ({umb
   await umbracoUi.media.clickConfirmTrashButtonAndWaitForMediaToBeTrashed();
 
   // Assert
-  expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
-  expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
-  expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
-  expect(await umbracoApi.media.doesMediaItemExistInRecycleBin(secondMediaFileName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.media.doesNameExist(firstMediaFileName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.media.doesNameExist(secondMediaFileName)).toBeFalsy();
+  await expect.poll(() => umbracoApi.media.doesMediaItemExistInRecycleBin(firstMediaFileName)).toBeTruthy();
+  await expect.poll(() => umbracoApi.media.doesMediaItemExistInRecycleBin(secondMediaFileName)).toBeTruthy();
   await umbracoUi.media.isItemVisibleInRecycleBin(firstMediaFileName);
   await umbracoUi.media.isItemVisibleInRecycleBin(secondMediaFileName, true, false);
 });
@@ -123,11 +149,10 @@ test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi})
   await umbracoUi.media.goToSection(ConstantHelper.sections.media);
   await umbracoUi.media.selectMediaWithName(firstMediaFileName);
   await umbracoUi.media.selectMediaWithName(secondMediaFileName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.media.clickBulkMoveToButton();
   await umbracoUi.media.openCaretButtonForName('Media', true);
   await umbracoUi.media.clickModalTextByName(mediaFolderName);
-  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaItemsToBeMoved(2);
+  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaWithIdsToBeMoved([firstMediaFileId, secondMediaFileId]);
 
   // Assert
   expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, firstMediaFileName)).toBeTruthy();

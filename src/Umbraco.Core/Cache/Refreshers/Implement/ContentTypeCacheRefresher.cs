@@ -176,45 +176,46 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         _publishedContentTypeFactory.NotifyDataTypeChanges();
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
         {
-            // Separate structural changes (RefreshMain) from non-structural changes (RefreshOther).
-            // Structural changes require a full memory cache rebuild, while non-structural changes
-            // only need the converted content cache cleared since ContentCacheNode only stores ContentTypeId.
-            var structuralDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.IsStructuralChange())
+            // Split changes into those that need the in-memory cache rebuilding (evicting the HybridCache
+            // entries by content type tag) and those that only need the converted content cache cleared.
+            // A structural change flagged RawDataUnaffected (a property removal) keeps its stored blob valid,
+            // so it belongs with the non-structural changes here — clearing the converted cache is enough.
+            var rebuildDocumentTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.RequiresRawDataRebuild())
                 .Select(x => x.Id)
                 .Distinct()
                 .ToArray();
 
-            var nonStructuralDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.IsNonStructuralChange())
+            var convertedOnlyDocumentTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.RequiresConvertedCacheClearOnly())
                 .Select(x => x.Id)
                 .Distinct()
                 .ToArray();
 
-            var structuralMediaTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.IsStructuralChange())
+            var rebuildMediaTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.RequiresRawDataRebuild())
                 .Select(x => x.Id)
                 .Distinct()
                 .ToArray();
 
-            var nonStructuralMediaTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.IsNonStructuralChange())
+            var convertedOnlyMediaTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.RequiresConvertedCacheClearOnly())
                 .Select(x => x.Id)
                 .Distinct()
                 .ToArray();
 
-            // Full memory cache rebuild only for structural changes
-            if (structuralDocumentTypeIds.Length > 0)
+            // Full memory cache rebuild only for changes that affect the stored data
+            if (rebuildDocumentTypeIds.Length > 0)
             {
-                _documentCacheService.RebuildMemoryCacheByContentTypeAsync(structuralDocumentTypeIds).GetAwaiter().GetResult();
+                _documentCacheService.RebuildMemoryCacheByContentTypeAsync(rebuildDocumentTypeIds).GetAwaiter().GetResult();
             }
 
-            if (structuralMediaTypeIds.Length > 0)
+            if (rebuildMediaTypeIds.Length > 0)
             {
-                _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(structuralMediaTypeIds).GetAwaiter().GetResult();
+                _mediaCacheService.RebuildMemoryCacheByContentTypeAsync(rebuildMediaTypeIds).GetAwaiter().GetResult();
             }
 
-            // Clear the converted content cache for non-structural changes (HybridCache entries remain valid).
+            // Clear the converted content cache for the remaining changes (HybridCache entries remain valid).
             // In auto models builder mode (InMemoryAuto), the factory reset above invalidates ALL compiled
             // model types, so we must clear all entries to prevent stale instances of other types
             // (e.g. Model.Parent<T>()) from being returned. In non-auto modes, only affected types need clearing.
@@ -222,26 +223,26 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
 
             if (isAutoFactory)
             {
-                if (structuralDocumentTypeIds.Length > 0 || nonStructuralDocumentTypeIds.Length > 0)
+                if (rebuildDocumentTypeIds.Length > 0 || convertedOnlyDocumentTypeIds.Length > 0)
                 {
                     _documentCacheService.ClearConvertedContentCache();
                 }
 
-                if (structuralMediaTypeIds.Length > 0 || nonStructuralMediaTypeIds.Length > 0)
+                if (rebuildMediaTypeIds.Length > 0 || convertedOnlyMediaTypeIds.Length > 0)
                 {
                     _mediaCacheService.ClearConvertedContentCache();
                 }
             }
             else
             {
-                if (nonStructuralDocumentTypeIds.Length > 0)
+                if (convertedOnlyDocumentTypeIds.Length > 0)
                 {
-                    _documentCacheService.ClearConvertedContentCache(nonStructuralDocumentTypeIds);
+                    _documentCacheService.ClearConvertedContentCache(convertedOnlyDocumentTypeIds);
                 }
 
-                if (nonStructuralMediaTypeIds.Length > 0)
+                if (convertedOnlyMediaTypeIds.Length > 0)
                 {
-                    _mediaCacheService.ClearConvertedContentCache(nonStructuralMediaTypeIds);
+                    _mediaCacheService.ClearConvertedContentCache(convertedOnlyMediaTypeIds);
                 }
             }
         });

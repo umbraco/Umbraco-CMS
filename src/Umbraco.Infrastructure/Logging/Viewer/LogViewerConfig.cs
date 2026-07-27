@@ -29,7 +29,7 @@ public class LogViewerConfig : ILogViewerConfig
     /// </summary>
     /// <returns>A read-only list of saved log searches.</returns>
     /// <remarks>
-    /// This method is obsolete. Use <see cref="ILogViewerService.GetSavedLogQueriesAsync"/> instead.
+    /// This method is obsolete. Use <see cref="Services.ILogViewerService.GetSavedLogQueriesAsync"/> instead.
     /// </remarks>
     [Obsolete("Use ILogViewerService.GetSavedLogQueriesAsync instead. Scheduled for removal in Umbraco 15.")]
     public IReadOnlyList<SavedLogSearch> GetSavedSearches()
@@ -47,7 +47,7 @@ public class LogViewerConfig : ILogViewerConfig
     /// <param name="query">The query string for the saved search.</param>
     /// <returns>A read-only list of all saved log searches.</returns>
     /// <remarks>
-    /// This method is obsolete. Use <see cref="ILogViewerService.AddSavedLogQueryAsync"/> instead. Scheduled for removal in Umbraco 15.
+    /// This method is obsolete. Use <see cref="Services.ILogViewerService.AddSavedLogQueryAsync"/> instead. Scheduled for removal in Umbraco 15.
     /// </remarks>
     [Obsolete("Use ILogViewerService.AddSavedLogQueryAsync instead. Scheduled for removal in Umbraco 15.")]
     public IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
@@ -65,7 +65,7 @@ public class LogViewerConfig : ILogViewerConfig
     /// <param name="name">The name of the saved search to delete.</param>
     /// <returns>A read-only list containing the remaining saved log searches after the specified search has been deleted.</returns>
     /// <remarks>
-    /// This method is obsolete. Use <see cref="ILogViewerService.DeleteSavedLogQueryAsync"/> instead. Scheduled for removal in Umbraco 15.
+    /// This method is obsolete. Use <see cref="Services.ILogViewerService.DeleteSavedLogQueryAsync"/> instead. Scheduled for removal in Umbraco 15.
     /// If no saved search with the specified name exists, the method returns the current list of saved searches unchanged.
     /// </remarks>
     [Obsolete("Use ILogViewerService.DeleteSavedLogQueryAsync instead. Scheduled for removal in Umbraco 15.")]

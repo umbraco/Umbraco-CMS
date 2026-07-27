@@ -4014,6 +4014,7 @@ rawData.push({
 	description: null,
 	icon: 'icon-documents color-green',
 	allowedAsRoot: false,
+	allowedInLibrary: false,
 	variesByCulture: false,
 	variesBySegment: false,
 	isElement: false,
@@ -4046,6 +4047,7 @@ rawData.push({
 		keepLatestVersionPerDayForDays: null,
 	},
 	flags: [],
+	noAccess: false,
 });
 
 // Allow the aggregate to be created as a child of Home.

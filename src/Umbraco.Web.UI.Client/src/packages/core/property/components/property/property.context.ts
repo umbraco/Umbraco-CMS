@@ -160,10 +160,18 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	private async _observeProperty(): Promise<void> {
 		const alias = this.#alias.getValue();
+		// Don't fall through to observing an `undefined` source: that blanks the value and tears down the live value
+		// subscription, so a transient absence of the dataset context or alias would wipe an already-filled value.
 		if (!this.#datasetContext || !alias) return;
 
+		const variantIdSource = await this.#datasetContext.propertyVariantId?.(alias);
+		const valueSource = await this.#datasetContext.propertyValueByAlias<ValueType>(alias);
+
+		// Guard: this context may have been destroyed while the awaits were in flight.
+		if (!this._host) return;
+
 		this.observe(
-			await this.#datasetContext.propertyVariantId?.(alias),
+			variantIdSource,
 			(variantId) => {
 				this.#variantId.setValue(variantId);
 			},
@@ -171,14 +179,14 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 		);
 
 		this.observe(
-			await this.#datasetContext.propertyValueByAlias<ValueType>(alias),
+			valueSource,
 			(value) => {
 				this.#value.setValue(value);
 			},
 			'observeValue',
 		);
 
-		this.observe(this.#datasetContext.readOnly, (value) => {
+		this.observe(this.#datasetContext?.readOnly, (value) => {
 			const unique = 'UMB_DATASET';
 
 			if (value) {

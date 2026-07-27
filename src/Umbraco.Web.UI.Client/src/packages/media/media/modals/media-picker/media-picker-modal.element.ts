@@ -23,20 +23,18 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { debounce, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
-import { UmbFileDropzoneItemStatus, type UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
+import type { UmbDropzoneChangeEvent } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
-import type {
-	UUIInputEvent,
-	UUIPaginationEvent,
-	UUIPopoverContainerElement,
-} from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -54,6 +52,11 @@ import type {
 	UmbRichMediaClipboardEntryValueModel,
 } from '../../clipboard/types.js';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type {
+	UUIInputEvent,
+	UUIPaginationEvent,
+	UUIPopoverContainerElement,
+} from '@umbraco-cms/backoffice/external/uui';
 
 import './components/index.js';
 import '@umbraco-cms/backoffice/imaging';
@@ -75,6 +78,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
 
 	#folderTypeUniques = new Set<string>();
+
+	#hasMediaRootAccess = false;
+	#mediaStartNodeUniques: Array<string> = [];
 
 	/* TODO: We currently only rely on the interactionMemory manager in the picker interface which is correctly implemented in the Media Picker
 	Remove this type cast when MediaPicker has implemented the full PickerContext interface */
@@ -111,6 +117,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	@state()
 	private _startNode: UmbMediaItemModel | undefined;
+
+	@state()
+	private _noAccess = false;
 
 	@state()
 	private _searching: boolean = false;
@@ -151,8 +160,19 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			});
 		});
 
-		// The clipboard is only available for property editors that opt in (e.g. the Media Picker). When it is
-		// absent — such as a Content Picker configured for media — the clipboard tab stays hidden.
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			if (!context) return;
+			this.observe(
+				observeMultiple([context.hasMediaRootAccess, context.mediaStartNodeUniques]),
+				([hasMediaRootAccess, mediaStartNodeUniques]) => {
+					this.#hasMediaRootAccess = hasMediaRootAccess ?? false;
+					this.#mediaStartNodeUniques = mediaStartNodeUniques?.map((x) => x.unique) ?? [];
+					this.#checkMediaAccess();
+				},
+				'umbCurrentUserMediaAccessObserver',
+			);
+		});
+
 		this.observe(this.#clipboardManager.isAvailable, (available) => {
 			this._clipboardAvailable = available;
 		});
@@ -166,6 +186,57 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			// @ts-ignore
 			this._selectableFilter = this.data?.pickableFilter;
 		}
+	}
+
+	protected override updated(_changedProperties: PropertyValues): void {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('_currentMediaEntity')) {
+			this.#checkMediaAccess();
+		}
+	}
+
+	async #checkMediaAccess(): Promise<void> {
+		// Root access grants access to the entire media tree.
+		if (this.#hasMediaRootAccess) {
+			this._noAccess = false;
+			return;
+		}
+
+		// Without root access and without any start-nodes the user has no media access at all.
+		if (this.#mediaStartNodeUniques.length === 0) {
+			this._noAccess = true;
+			return;
+		}
+
+		const unique = this._currentMediaEntity.unique;
+
+		// The media root is only accessible with root access (handled above).
+		if (unique === null) {
+			this._noAccess = true;
+			return;
+		}
+
+		// is the current media item a start-node? If so, access is granted.
+		if (this.#mediaStartNodeUniques.includes(unique)) {
+			this._noAccess = false;
+			return;
+		}
+
+		// Get ancestors of the current media item and check if any of them are start-nodes. If so, access is granted:
+		// TODO: This is also requested by the media-picker-folder-path.element.ts, we should optimize that to only become one request.
+		const { data, error } = await this.#mediaTreeRepository.requestTreeItemAncestors({
+			treeItem: { unique, entityType: this._currentMediaEntity.entityType },
+		});
+
+		if (error) {
+			throw new Error(`Failed to get ancestors of media item with unique ${unique}: ${error.message}`);
+		}
+
+		// If unique changed then user navigated in the mean time:
+		if (this._currentMediaEntity.unique !== unique) return;
+
+		const path = data?.map((item) => item.unique) ?? [unique];
+		this._noAccess = !path.some((ancestorUnique) => this.#mediaStartNodeUniques.includes(ancestorUnique));
 	}
 
 	protected override async firstUpdated(_changedProperties: PropertyValues): Promise<void> {
@@ -184,7 +255,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			this._startNode = data?.find((x) => x.unique === startNode?.unique);
 			const locationMemoryItem = data?.find((x) => x.unique === locationFromMemory?.entity.unique);
 
-			// TODO: We probably need to check if the location item is within the start node. If not then fall back to start node.
 			const source = locationMemoryItem || this._startNode;
 
 			if (source) {
@@ -528,7 +598,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				id="dropzone"
 				multiple
 				@change=${this.#onDropzoneChange}
-				.parentUnique=${this._currentMediaEntity.unique}></umb-dropzone-media>
+				.parentUnique=${this._currentMediaEntity.unique}
+				.noAccess=${this._noAccess}></umb-dropzone-media>
 			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()} `;
 	}
 
@@ -579,6 +650,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			<div id="toolbar">
 				<div id="search">
 					<uui-input
+						name="media-search"
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}
 						@input=${this.#onSearch}
@@ -601,7 +673,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					@click=${() => this._dropzone.browse()}
 					label=${this.localize.term('general_upload')}
 					look="outline"
-					color="default"></uui-button>
+					color="default"
+					.disabled=${this._noAccess}></uui-button>
 				<uui-button compact popovertarget="media-picker-view-popover" label="View">
 					<umb-icon name=${this._currentView === 'cards' ? 'icon-grid' : 'icon-table'}></umb-icon>
 				</uui-button>
@@ -876,7 +949,6 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			}
 
 			umb-media-picker-folder-path {
-				overflow: hidden;
 				min-width: 0;
 				flex: 1 1 0%;
 			}

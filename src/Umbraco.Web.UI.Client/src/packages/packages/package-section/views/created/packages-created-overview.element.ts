@@ -68,7 +68,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		return html`
 			<uui-button
 				look="primary"
-				href="section/packages/view/created/package-builder"
+				href="section/packages/view/created/package-builder/create"
 				label=${this.localize.term('packager_createPackage')}></uui-button>
 			${when(
 				this._loading,
@@ -112,7 +112,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 
 	#packageBuilder(pkg: UmbCreatedPackage) {
 		if (!pkg.unique) return;
-		window.history.pushState({}, '', `section/packages/view/created/package-builder/${pkg.unique}`);
+		window.history.pushState({}, '', `section/packages/view/created/package-builder/edit/${pkg.unique}`);
 	}
 
 	#renderPagination() {

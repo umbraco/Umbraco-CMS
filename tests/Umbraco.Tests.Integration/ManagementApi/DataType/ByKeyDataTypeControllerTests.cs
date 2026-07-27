@@ -17,7 +17,7 @@ public class ByKeyDataTypeControllerTests : ManagementApiUserGroupTestBase<ByKey
     private Guid _dataTypeKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var dataType = new DataTypeBuilder()
             .WithId(0)

@@ -35,7 +35,7 @@ internal sealed class FileSystemMainDomLockTests : UmbracoIntegrationTest
     }
 
     [TearDown]
-    public void TearDown()
+    public new void TearDown()
     {
         CleanupTestFile(LockFilePath);
         CleanupTestFile(LockReleaseFilePath);

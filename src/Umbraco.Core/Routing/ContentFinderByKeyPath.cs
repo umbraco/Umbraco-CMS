@@ -65,7 +65,7 @@ public class ContentFinderByKeyPath : ContentFinderByIdentifierPathBase, IConten
             return LogAndReturnFailure();
         }
 
-        var noSlashPath = path.Substring(1);
+        ReadOnlySpan<char> noSlashPath = path.AsSpan(1);
 
         if (Guid.TryParse(noSlashPath, out var nodeKey) == false)
         {

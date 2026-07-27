@@ -29,7 +29,7 @@ public class GetPublicAccessDocumentControllerTests : ManagementApiUserGroupTest
     private Guid _contentErrorPageKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());

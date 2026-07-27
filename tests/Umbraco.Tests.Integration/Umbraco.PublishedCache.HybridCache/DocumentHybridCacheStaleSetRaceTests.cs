@@ -89,7 +89,8 @@ internal sealed class DocumentHybridCacheStaleSetRaceTests : UmbracoIntegrationT
             GetRequiredService<IPublishedModelFactory>(),
             GetRequiredService<IPreviewService>(),
             publishStatus.Object,
-            new NullLogger<DocumentCacheService>());
+            new NullLogger<DocumentCacheService>(),
+            new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
     }
 
     [Test]

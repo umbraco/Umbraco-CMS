@@ -275,15 +275,28 @@ Before returning cached content, verifies ancestor path is published via `_publi
 
 ### In-Memory Content Cache (the L0 converted-content cache)
 
-The converted `IPublishedElement` objects are cached in `ConvertedPublishedContentCache<TKey, TValue>`
-(`Services/ConvertedPublishedContentCache.cs`), used by `DocumentCacheService` (`<string, IPublishedContent>`),
-`MediaCacheService` (`<Guid, IPublishedContent>`) and `ElementCacheService` (`<string, IPublishedElement>`),
-since `ContentCacheNode` → `IPublishedElement`/`IPublishedContent` conversion is expensive.
-This is the single insert/remove/clear path for the L0 cache (the seam a later bounded/eviction-aware
-implementation slots into), and it tracks both the entry count and an approximate retained byte total.
-The cache is currently **unbounded** — only evicted on content change / explicit clear, so walking the
-whole published tree (Delivery API crawl, sitemap, warm-up) retains the whole tree's converted form.
-Bounding it with a scan-resistant policy is tracked separately; the observability below quantifies it.
+The converted `IPublishedElement` objects are cached behind `IConvertedPublishedContentCache<TKey, TValue>`
+(`Services/IConvertedPublishedContentCache.cs`), used by `DocumentCacheService` (`<string, IPublishedContent>`),
+`MediaCacheService` (`<Guid, IPublishedContent>`) and `ElementCacheService` (`<string, IPublishedElement>`).
+This is the single insert/remove/clear path for the L0 cache, and each implementation tracks both the entry
+count and an approximate retained byte total. The implementation is chosen per service by
+`IConvertedPublishedContentCacheFactory` (injected into all three services) from the configured maximum.
+
+The cache is **unbounded by default** — `UnboundedConvertedPublishedContentCache<TKey, TValue>`, a plain
+`ConcurrentDictionary` only evicted on content change / explicit clear, so walking the whole published tree
+(Delivery API crawl, sitemap, warm-up) retains the whole tree's converted form.
+
+A **bounded, scan-resistant** mode is available as an **opt-in package**,
+`Umbraco.Cms.PublishedCache.HybridCache.Bounded` (`src/Umbraco.PublishedCache.HybridCache.Bounded`). It is
+**not** part of the default install — that keeps its `BitFaster.Caching` dependency (the W-TinyLFU
+`ConcurrentLfu` backing) out of every site's dependency graph. Installing the package registers
+`IBoundedConvertedPublishedContentCacheFactory` (via an auto-discovered `IComposer`); then setting
+`CacheSettings.Entry.Document.MaximumLocalCacheItems` / `...Media.MaximumLocalCacheItems` /
+`...Element.MaximumLocalCacheItems` makes the
+corresponding L0 cache bounded, so frequently requested content is retained while rarely accessed content is
+evicted and a one-off full-tree walk cannot grow it without bound. If a maximum is configured but the
+package is absent, the default factory logs a `Warning` and falls back to unbounded (it never fails to boot).
+Default `null` preserves the unbounded behaviour; the observability below quantifies it either way.
 
 ### Memory observability
 

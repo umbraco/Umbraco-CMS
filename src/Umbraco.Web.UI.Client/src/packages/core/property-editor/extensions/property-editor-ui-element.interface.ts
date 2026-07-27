@@ -3,6 +3,7 @@ import type { ManifestPropertyEditorUi } from './property-editor.extension.js';
 
 export interface UmbPropertyEditorUiElement extends HTMLElement {
 	manifest?: ManifestPropertyEditorUi;
+	alias?: string;
 	name?: string;
 	value?: unknown;
 	dataSourceAlias?: string;

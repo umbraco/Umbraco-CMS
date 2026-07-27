@@ -124,6 +124,29 @@ public class DeferredCacheRebuildNotificationHandlerTests
     }
 
     /// <summary>
+    ///     Verifies that a property-removal (RawDataUnaffected) change does not queue a deferred rebuild — the
+    ///     stored blob stays valid, so only the converted cache is cleared (by the refreshers, not here).
+    /// </summary>
+    [Test]
+    public void RawDataUnaffected_Change_Does_Not_Queue()
+    {
+        // Arrange
+        var handler = CreateHandler(ContentTypeRebuildMode.Deferred);
+        var contentType = CreateContentType(100);
+        var notification = new ContentTypeChangedNotification(
+            new ContentTypeChange<IContentType>(contentType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected),
+            new EventMessages());
+
+        // Act
+        handler.Handle(notification);
+
+        // Assert
+        _deferredCacheRebuildService.Verify(
+            x => x.QueueContentTypeRebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+    }
+
+    /// <summary>
     ///     Verifies the handler still queues a rebuild when the notification is dispatched through a
     ///     distributed-cache-only publisher (e.g. the publisher Umbraco Deploy installs on restore/import
     ///     scopes). This is the dispatch-filtering path that the direct <see cref="DeferredCacheRebuildNotificationHandler.Handle(ContentTypeChangedNotification)" />

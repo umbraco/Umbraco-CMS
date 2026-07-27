@@ -33,6 +33,6 @@ public class LazyCompressedStringTests
         sut.DecompressString();
 
         // UTF-16 byte size (chars × 2), consistent with how plain strings are sized in the size estimator.
-        Assert.That(sut.GetApproximateByteCount(), Is.EqualTo(value.Length * 2));
+        Assert.That(sut.GetApproximateByteCount(), Is.EqualTo(value.Length * 2L));
     }
 }

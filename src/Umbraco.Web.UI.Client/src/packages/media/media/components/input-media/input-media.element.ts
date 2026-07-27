@@ -24,8 +24,7 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 import '@umbraco-cms/backoffice/imaging';
 
-const elementName = 'umb-input-media';
-@customElement(elementName)
+@customElement('umb-input-media')
 export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(UmbLitElement) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -71,12 +70,12 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -94,7 +93,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -346,6 +345,6 @@ export { UmbInputMediaElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputMediaElement;
+		'umb-input-media': UmbInputMediaElement;
 	}
 }

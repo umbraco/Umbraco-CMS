@@ -75,7 +75,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -93,7 +93,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -471,10 +471,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				gap: var(--uui-size-space-5);
 				grid-template-columns: repeat(auto-fill, minmax(var(--umb-card-medium-min-width), 1fr));
 				grid-auto-rows: var(--umb-card-medium-min-width);
-			}
-
-			#dropzone {
-				margin-bottom: var(--uui-size-space-5);
 			}
 
 			#btn-add {

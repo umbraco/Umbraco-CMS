@@ -32,7 +32,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
     /// <param name="logger">The <see cref="ILogger{ExamineIndexRebuilder}"/> used for logging operations and errors.</param>
     /// <param name="examineManager">The <see cref="IExamineManager"/> responsible for managing Examine indexes.</param>
     /// <param name="populators">A collection of <see cref="IIndexPopulator"/> instances used to populate the indexes.</param>
-    /// <param name="longRunningOperationService">The <see cref="ILongRunningOperationService"/> used to manage and track long-running operations.</param>
+    /// <param name="backgroundTaskQueue">The <see cref="IBackgroundTaskQueue"/> used to manage and track long-running operations.</param>
     public ExamineIndexRebuilder(
         IMainDom mainDom,
         IRuntimeState runtimeState,
