@@ -27,7 +27,6 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
 import {
 	UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN,
 	UMB_ELEMENT_ENTITY_TYPE,
@@ -59,9 +58,6 @@ export abstract class UmbBlockEntryContext<
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginData extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
 > extends UmbContextBase {
-	// TODO: [V19] Remove together with the legacy label renderer warning. [LK]
-	static #hasWarnedLegacyLabelRenderer = false;
-
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
 
@@ -208,22 +204,6 @@ export abstract class UmbBlockEntryContext<
 	 */
 	public setName(text: string): void {
 		this.#name.setValue(text);
-	}
-
-	// TODO: [V19] Remove `#labelRender` and the related plumbing once the legacy renderer is gone. [LK]
-	#labelRender?: UmbUfmVirtualRenderController;
-
-	/**
-	 * Whether this context should run its own hidden `UmbUfmVirtualRenderController` as the
-	 * source of `getName()`. Subclasses whose entry element owns a canonical `<umb-ufm-render>`
-	 * (and pushes text via {@link setName}) should override this to return `false`.
-	 * @deprecated Scheduled for removal in Umbraco 19. Subclasses must own their own
-	 * `<umb-ufm-render>` and push resolved text via {@link setName} — the hidden virtual
-	 * renderer fallback will be removed entirely.
-	 * @returns {boolean} `true` to create the legacy hidden renderer; `false` to skip it.
-	 */
-	protected _needsLegacyLabelRenderer(): boolean {
-		return true;
 	}
 
 	#generateWorkspaceEditContentPath = (path?: string, contentKey?: string) =>
@@ -407,30 +387,6 @@ export abstract class UmbBlockEntryContext<
 	) {
 		super(host, 'UmbBlockEntryContext');
 
-		// TODO: [V19] Drop this conditional and the legacy renderer plumbing entirely. [LK]
-		if (this._needsLegacyLabelRenderer()) {
-			if (!UmbBlockEntryContext.#hasWarnedLegacyLabelRenderer) {
-				UmbBlockEntryContext.#hasWarnedLegacyLabelRenderer = true;
-				new UmbDeprecation({
-					deprecated: 'UmbBlockEntryContext hidden virtual label renderer (legacy)',
-					solution:
-						'In your UmbBlockEntryContext subclass, override _needsLegacyLabelRenderer() to return false and push the resolved UFM text via setName() — e.g. by listening to @umb-ufm-resolved on a <umb-ufm-render> in your entry element.',
-					removeInVersion: '19.0.0',
-				}).warn();
-			}
-			this.#labelRender = new UmbUfmVirtualRenderController(this);
-			this.observe(
-				this.label,
-				(label) => {
-					if (this.#labelRender) {
-						this.#labelRender.markdown = label;
-					}
-				},
-				null,
-			);
-			this.#watchContentForLabelRender();
-		}
-
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
 			this._manager = manager;
@@ -538,14 +494,6 @@ export abstract class UmbBlockEntryContext<
 		);
 	}
 
-	async #watchContentForLabelRender() {
-		this.observe(await this.contentValues(), (content) => {
-			if (this.#labelRender) {
-				this.#labelRender.value = content;
-			}
-		});
-	}
-
 	getContentKey() {
 		return this._layout.value?.contentKey;
 	}
@@ -590,8 +538,7 @@ export abstract class UmbBlockEntryContext<
 	 * @returns {string} - the value of the label.
 	 */
 	getName() {
-		// TODO: [V19] Drop the `#labelRender?.toString()` fallback once the legacy renderer is gone. [LK]
-		return this.#name.getValue() || this.#labelRender?.toString() || '';
+		return this.#name.getValue() || '';
 	}
 
 	#updateCreatePaths() {
