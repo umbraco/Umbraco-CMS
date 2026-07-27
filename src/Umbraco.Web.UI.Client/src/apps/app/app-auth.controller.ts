@@ -39,12 +39,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 			return true;
 		}
 
-		// Stay put on the logout landing — without this the single-provider auto-init below would
-		// immediately bounce the just-logged-out user back to login.
-		if (this.#isOnLogoutPath()) {
-			return false;
-		}
-
 		// Not authorized. Decide before opening the modal so a single provider doesn't flash it: this
 		// guard runs at router init, after public extensions have registered, so the provider list is
 		// available. Exactly one provider → initiate it directly (full-page); otherwise open the modal
@@ -67,16 +61,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 	}
 
 	/**
-	 * Matches the trailing "logout" segment on the raw path rather than the client's computed logout
-	 * URL: in a split-origin dev setup the server's logout redirect can miss the client's /logout route
-	 * and fall through to the guard, where a base-relative comparison isn't reliable.
-	 * @returns {boolean} True if the current path ends with "logout" (ignoring query/fragment), false otherwise.
-	 */
-	#isOnLogoutPath(): boolean {
-		return window.location.pathname.split('/').filter(Boolean).pop() === 'logout';
-	}
-
-	/**
 	 * Cookie auth: authentication happens in the auth modal (login providers render inline over the
 	 * current view). A real navigation to the server /umbraco/login is only used by the modal's own
 	 * local-login action.
@@ -87,12 +71,6 @@ export class UmbAppAuthController extends UmbControllerBase {
 		if (!this.#authContext) {
 			throw new Error('[Fatal] Auth context is not available');
 		}
-		// Stay put on the logout landing: it already renders the full login view inline (see
-		// app-auth.element.ts), so popping the modal there too would double up the login UI.
-		if (this.#isOnLogoutPath()) {
-			return;
-		}
-
 		// Avoid stacking a second modal instance while one is already open (e.g. a repeated timeout
 		// signal, or isAuthorized() re-checked for another guarded route).
 		if (this.#authModalOpen) return;
