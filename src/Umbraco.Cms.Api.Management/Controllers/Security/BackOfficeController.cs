@@ -560,6 +560,10 @@ public class BackOfficeController : SecurityControllerBase
     ///     Callback for the anonymous external login flow initiated by <see cref="ExternalLogin" />. Signs the
     ///     user into the back-office cookie and redirects to the client lander, without issuing an OpenIddict token.
     /// </summary>
+    /// <returns>
+    ///     A redirect (302) to the client: the post-login lander on success, or the client error path with
+    ///     <c>flow=external-login</c> and a <c>status</c> describing the failure.
+    /// </returns>
     [HttpGet("ExternalLoginCallback")]
     [EndpointSummary("Handles an external login callback.")]
     [EndpointDescription("Handles the callback from an external login provider and signs the user into the back office.")]
@@ -574,7 +578,9 @@ public class BackOfficeController : SecurityControllerBase
         }
 
         IdentitySignInResult result = await _backOfficeSignInManager.ExternalLoginSignInAsync(
-            loginInfo, false, _securitySettings.Value.UserBypassTwoFactorForExternalLogins);
+            loginInfo,
+            isPersistent: false,
+            bypassTwoFactor: _securitySettings.Value.UserBypassTwoFactorForExternalLogins);
 
         if (result.Succeeded)
         {

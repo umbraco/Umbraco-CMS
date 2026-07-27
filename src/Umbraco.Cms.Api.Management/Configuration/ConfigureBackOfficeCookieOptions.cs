@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Umbraco.Cms.Api.Management.Configuration;
 
@@ -22,6 +23,9 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// </summary>
 public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
 {
+    private static readonly PathString _managementApiBasePath =
+        new("/umbraco" + Constants.Web.ManagementApiPath.TrimEnd('/'));
+
     private readonly IDataProtectionProvider _dataProtection;
     private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
@@ -84,7 +88,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         // SameSite=None (requires HTTPS) lets the cookie ride cross-site requests when the back office
         // is served from a different origin than the server (dev server). Invalid values
         // leave the framework default untouched.
-        if (Enum.TryParse(_securitySettings.AuthCookieSameSite, ignoreCase: true, out Microsoft.AspNetCore.Http.SameSiteMode sameSiteMode))
+        if (Enum.TryParse(_securitySettings.AuthCookieSameSite, ignoreCase: true, out SameSiteMode sameSiteMode))
         {
             options.Cookie.SameSite = sameSiteMode;
         }
@@ -279,17 +283,17 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         };
     }
 
-    private bool IsXhr(HttpRequest request) =>
-        string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
-        string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
-
     // Management API requests are always JSON, so an unauthenticated one must get a 401/403 — never a
     // 302 to the HTML login page, which a fetch/JSON client can't follow meaningfully (it lands on
     // login HTML and blows up downstream). The dual-scheme back-office policies now include this
     // cookie scheme, so its challenge fires for API requests too; force the status-code branch for
     // anything under the Management API path, regardless of the X-Requested-With header.
     private static bool IsManagementApiRequest(HttpRequest request) =>
-        request.Path.StartsWithSegments("/umbraco" + Constants.Web.ManagementApiPath.TrimEnd('/'), StringComparison.OrdinalIgnoreCase);
+        request.Path.StartsWithSegments(_managementApiBasePath, StringComparison.OrdinalIgnoreCase);
+
+    private bool IsXhr(HttpRequest request) =>
+        string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
+        string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
 
     /// <summary>
     ///     Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn" /> is set to true

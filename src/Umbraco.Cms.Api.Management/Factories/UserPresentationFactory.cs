@@ -334,7 +334,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             var ticketExpires = _httpContextAccessor.HttpContext?.User
                 .FindFirst(Constants.Security.TicketExpiresClaimType)?.Value;
             if (ticketExpires.IsNullOrWhiteSpace() is false
-                && DateTimeOffset.TryParse(ticketExpires, null, DateTimeStyles.RoundtripKind, out DateTimeOffset parsedExpiry))
+                && DateTimeOffset.TryParse(ticketExpires, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTimeOffset parsedExpiry))
             {
                 timeoutUtc = parsedExpiry;
             }
