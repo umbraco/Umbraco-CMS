@@ -623,22 +623,33 @@ public static partial class StringExtensions
     /// <exception cref="ArgumentNullException">Thrown when text or chars is null.</exception>
     public static string ReplaceMany(this string text, char[] chars, char replacement)
     {
-        if (text == null)
+        ArgumentNullException.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(chars);
+
+        if (chars.Length == 0 || text.Length == 0)
         {
-            throw new ArgumentNullException(nameof(text));
+            return text;
         }
 
-        if (chars == null)
+        // If the text does not contain any of the characters to replace, we can just return the original text.
+        if (!text.AsSpan().ContainsAny(chars))
         {
-            throw new ArgumentNullException(nameof(chars));
+            return text;
         }
 
-        for (var i = 0; i < chars.Length; i++)
+        return string.Create(text.Length, (text, chars, replacement), static (span, state) =>
         {
-            text = text.Replace(chars[i], replacement);
-        }
+            (string? source, char[]? set, char replacement) = state;
+            source.AsSpan().CopyTo(span);
 
-        return text;
+            Span<char> remaining = span;
+            int idx;
+            while ((idx = remaining.IndexOfAny(set)) >= 0)
+            {
+                remaining[idx] = replacement;
+                remaining = remaining[(idx + 1)..];
+            }
+        });
     }
 
     /// <summary>

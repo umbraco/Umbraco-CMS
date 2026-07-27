@@ -320,6 +320,7 @@ public class StringExtensionsTests
 
     [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
     [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
+    [TestCase("val$id!ate|this|str'ing", "95", '*', "val$id!ate|this|str'ing")]
     public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
     {
         var output = input.ReplaceMany(toReplace.ToArray(), replacement);
