@@ -259,6 +259,9 @@ describe('UmbAuthContext', () => {
 	describe('Login URL construction', () => {
 		let originalOpen: typeof window.open;
 		let openedWindows: Array<{ url: string; target?: string; features?: string }>;
+		// The deep-link decision reads window.location, so these tests navigate via history and
+		// restore the runner's own path afterwards.
+		const originalPath = window.location.pathname + window.location.search;
 
 		beforeEach(() => {
 			originalOpen = window.open;
@@ -271,6 +274,7 @@ describe('UmbAuthContext', () => {
 
 		afterEach(() => {
 			window.open = originalOpen;
+			history.replaceState(null, '', originalPath);
 		});
 
 		it('makeAuthorizationRequest (external, popup) opens the external-login challenge for the provider', async () => {
@@ -282,9 +286,31 @@ describe('UmbAuthContext', () => {
 				'http://localhost/umbraco/management/api/v1/security/back-office/external-login',
 			);
 			expect(url.searchParams.get('provider')).to.equal('Google');
-			// The test page path differs from the backoffice path, so it is preserved as returnUrl
-			expect(url.searchParams.get('returnUrl')).to.equal(window.location.pathname + window.location.search);
 			expect(openedWindows[0].target).to.equal('umbracoAuthPopup');
+		});
+
+		// Only routes behind the auth guard are worth returning to. `upgrade` matters as much as the
+		// section routes: when the backend requires an upgrade the client routes there, so login has to
+		// come back. The rest render without a session, so returning would show the login screen again.
+		const returnUrlCases: Array<[path: string, expected: string | null]> = [
+			['/umbraco/section/content/workspace/document/edit/123', '/umbraco/section/content/workspace/document/edit/123'],
+			['/umbraco/upgrade', '/umbraco/upgrade'],
+			['/umbraco/preview', '/umbraco/preview'],
+			['/umbraco/logout', null],
+			['/umbraco/error', null],
+			['/umbraco/auth-callback', null],
+			['/umbraco', null],
+		];
+
+		returnUrlCases.forEach(([path, expected]) => {
+			it(`${expected ? 'carries' : 'omits'} returnUrl on ${path}`, async () => {
+				history.replaceState(null, '', path);
+
+				await context.makeAuthorizationRequest('Google', false);
+
+				const url = new URL(openedWindows[0].url);
+				expect(url.searchParams.get('returnUrl')).to.equal(expected);
+			});
 		});
 
 		it('makeAuthorizationRequest (local, popup) opens the server login app with the auth-callback lander as ReturnUrl', async () => {
