@@ -268,6 +268,71 @@ public class ContentTypeTests
     }
 
     [Test]
+    public void Can_Move_PropertyType_To_No_Group()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+
+        Assert.IsTrue(contentType.MovePropertyType("title", null));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.PropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
+            Assert.That(contentType.NoGroupPropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
+            Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void Can_Move_PropertyType_From_No_Group_Into_Group()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+        contentType.AddPropertyType(new PropertyTypeBuilder().WithAlias("noGroup").WithName("No Group").Build());
+
+        Assert.IsTrue(contentType.MovePropertyType("noGroup", "content"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
+            Assert.That(
+                contentType.PropertyGroups["content"].PropertyTypes!.Select(x => x.Alias),
+                Is.EquivalentTo(new[] { "title", "noGroup" }));
+        });
+    }
+
+    [Test]
+    public void Cannot_Move_PropertyType_To_Unknown_Group()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+
+        Assert.IsFalse(contentType.MovePropertyType("title", "noSuchGroup"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
+            Assert.That(
+                contentType.PropertyGroups["content"].PropertyTypes!.Select(x => x.Alias),
+                Is.EquivalentTo(new[] { "title" }));
+        });
+    }
+
+    private static ContentType BuildContentTypeWithSingleGroup() =>
+        (ContentType)new ContentTypeBuilder()
+            .WithAlias("textPage")
+            .WithName("Text Page")
+            .WithPropertyTypeIdsIncrementingFrom(200)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .AddPropertyType()
+                    .WithAlias("title")
+                    .WithName("Title")
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+
+    [Test]
     public void Can_Deep_Clone_Media_Type()
     {
         // Arrange
