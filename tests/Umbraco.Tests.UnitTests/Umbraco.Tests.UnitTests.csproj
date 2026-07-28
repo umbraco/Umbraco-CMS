@@ -39,6 +39,7 @@
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
+    <ProjectReference Include="..\..\tools\Umbraco.JsonSchema\Umbraco.JsonSchema.csproj" />
   </ItemGroup>
 
   <ItemGroup>
