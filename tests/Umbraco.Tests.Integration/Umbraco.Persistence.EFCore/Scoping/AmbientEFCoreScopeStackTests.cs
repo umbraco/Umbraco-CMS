@@ -25,36 +25,25 @@ internal sealed class AmbientEFCoreScopeStackTests
 
         IEFCoreScope<TestUmbracoDbContext> scopeA = Mock.Of<IEFCoreScope<TestUmbracoDbContext>>();
         IEFCoreScope<TestUmbracoDbContext> scopeB = Mock.Of<IEFCoreScope<TestUmbracoDbContext>>();
-        var pushedA = new TaskCompletionSource();
-        var pushedB = new TaskCompletionSource();
-        var readA = new TaskCompletionSource();
-        var readB = new TaskCompletionSource();
+        (FlowBarriers barriersA, FlowBarriers barriersB) = FlowBarriers.CreatePair();
 
-        // Two barriers, both load-bearing. Every flow pushes before any flow reads, so a shared stack yields the
-        // wrong entry to at least one of them. Every flow also reads before any flow pops, otherwise a pop could
-        // remove the other flow's entry first and leave the remaining read coincidentally correct.
         async Task<IEFCoreScope<TestUmbracoDbContext>?> RunFlow(
             IEFCoreScope<TestUmbracoDbContext> scope,
-            TaskCompletionSource pushed,
-            Task otherPushed,
-            TaskCompletionSource read,
-            Task otherRead)
+            FlowBarriers barriers)
         {
             sut.Push(scope);
-            pushed.SetResult();
-            await otherPushed;
+            await barriers.EveryFlowHasPushed();
 
             IEFCoreScope<TestUmbracoDbContext>? ambientScope = sut.AmbientScope;
-            read.SetResult();
-            await otherRead;
+            await barriers.EveryFlowHasRead();
 
             sut.Pop();
             return ambientScope;
         }
 
         IEFCoreScope<TestUmbracoDbContext>?[] ambient = await Task.WhenAll(
-            Task.Run(() => RunFlow(scopeA, pushedA, pushedB.Task, readA, readB.Task)),
-            Task.Run(() => RunFlow(scopeB, pushedB, pushedA.Task, readB, readA.Task)));
+            Task.Run(() => RunFlow(scopeA, barriersA)),
+            Task.Run(() => RunFlow(scopeB, barriersB)));
 
         Assert.Multiple(() =>
         {
@@ -93,5 +82,40 @@ internal sealed class AmbientEFCoreScopeStackTests
         {
             stack.Pop();
         }
+    }
+}
+
+/// <summary>
+/// The two rendezvous points that make an ambient stack isolation test meaningful. Both are load-bearing:
+/// every flow pushes before any flow reads, so a stack shared between flows hands the wrong entry to at least
+/// one of them; and every flow reads before any flow pops, because a pop that lands first removes the other
+/// flow's entry and leaves the remaining read coincidentally correct, hiding the defect.
+/// </summary>
+internal sealed class FlowBarriers
+{
+    private readonly TaskCompletionSource _pushed = new();
+    private readonly TaskCompletionSource _read = new();
+    private FlowBarriers _other = null!;
+
+    public static (FlowBarriers First, FlowBarriers Second) CreatePair()
+    {
+        var first = new FlowBarriers();
+        var second = new FlowBarriers();
+        first._other = second;
+        second._other = first;
+
+        return (first, second);
+    }
+
+    public Task EveryFlowHasPushed()
+    {
+        _pushed.SetResult();
+        return _other._pushed.Task;
+    }
+
+    public Task EveryFlowHasRead()
+    {
+        _read.SetResult();
+        return _other._read.Task;
     }
 }
