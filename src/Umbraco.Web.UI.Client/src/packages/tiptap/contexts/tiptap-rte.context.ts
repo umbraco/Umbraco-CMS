@@ -41,6 +41,10 @@ export class UmbTiptapRteContext extends UmbContextBase {
 		});
 	}
 
+	/**
+	 * Returns the Umbraco server origin, used to resolve stylesheet URLs against the real server in split-dev setups.
+	 * @returns {string} The server origin, or an empty string if not yet resolved.
+	 */
 	public getServerUrl(): string {
 		return this.#serverUrl;
 	}

@@ -111,4 +111,11 @@ describe('UmbInputTiptapElement (stylesheets)', () => {
 		expect(hrefs).to.include('https://localhost:44339/mycss/already-prefixed.css');
 		expect(hrefs).not.to.include('https://localhost:44339/mycss/mycss/already-prefixed.css');
 	});
+
+	it('leaves a protocol-relative stylesheet URL untouched', async function () {
+		this.timeout(20000);
+		const hrefs = await renderElement('/mycss', 'https://localhost:44339', ['//cdn.example.com/style.css']);
+
+		expect(hrefs).to.include('//cdn.example.com/style.css');
+	});
 });

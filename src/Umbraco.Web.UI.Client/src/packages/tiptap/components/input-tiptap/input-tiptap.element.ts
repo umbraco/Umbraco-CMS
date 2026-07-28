@@ -136,7 +136,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		const serverUrl = this.#context.getServerUrl();
 		const linkHrefs = stylesheets.map((stylesheet) => {
-			if (stylesheet.startsWith('http')) return stylesheet;
+			if (stylesheet.startsWith('http') || stylesheet.startsWith('//')) return stylesheet;
 			const relativeHref = stylesheet.startsWith(rootPath) ? stylesheet : `${rootPath}${stylesheet}`;
 			return `${serverUrl}${relativeHref}`;
 		});
