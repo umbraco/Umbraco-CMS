@@ -6,154 +6,122 @@ using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 {
-    [TestFixture]
-    public class AmbientScopeStackTests
+    /// <summary>
+    /// Both ambient stacks keep their state in a static <see cref="AsyncLocal{T}" /> and share the same defect and
+    /// the same fix, so they share these tests. They expose no common interface, so each concrete stack is reached
+    /// through the abstract members below.
+    /// </summary>
+    /// <typeparam name="TItem">The type the stack holds.</typeparam>
+    public abstract class AmbientStackTestsBase<TItem>
+        where TItem : class
     {
         [Test]
         public async Task Push_IsolatesConcurrentFlowsThatInheritedAnEmptyStack()
         {
-            var sut = new AmbientScopeStack();
-
-            while (sut.AmbientScope is not null)
-            {
-                sut.Pop();
-            }
+            Drain();
 
             // Any scope used before hosted services start leaves a non-null but empty stack on the execution
             // context. Every flow branching off that context inherits the same instance, because AsyncLocal
             // copy-on-write protects the reference, not the object it points at.
-            sut.Push(Mock.Of<IScope>());
-            sut.Pop();
+            Push(CreateItem());
+            Pop();
 
-            IScope scopeA = Mock.Of<IScope>();
-            IScope scopeB = Mock.Of<IScope>();
+            TItem itemA = CreateItem();
+            TItem itemB = CreateItem();
             (FlowBarriers barriersA, FlowBarriers barriersB) = FlowBarriers.CreatePair();
 
-            async Task<IScope?> RunFlow(IScope scope, FlowBarriers barriers)
+            async Task<TItem?> RunFlow(TItem item, FlowBarriers barriers)
             {
-                sut.Push(scope);
+                Push(item);
                 await barriers.EveryFlowHasPushed();
 
-                IScope? ambientScope = sut.AmbientScope;
+                TItem? ambient = Peek();
                 await barriers.EveryFlowHasRead();
 
-                sut.Pop();
-                return ambientScope;
+                Pop();
+                return ambient;
             }
 
-            IScope?[] ambient = await Task.WhenAll(
-                Task.Run(() => RunFlow(scopeA, barriersA)),
-                Task.Run(() => RunFlow(scopeB, barriersB)));
+            TItem?[] ambient = await Task.WhenAll(
+                Task.Run(() => RunFlow(itemA, barriersA)),
+                Task.Run(() => RunFlow(itemB, barriersB)));
 
             Assert.Multiple(() =>
             {
-                Assert.AreSame(scopeA, ambient[0], "Flow A observed another flow's ambient scope.");
-                Assert.AreSame(scopeB, ambient[1], "Flow B observed another flow's ambient scope.");
-                Assert.IsNull(sut.AmbientScope, "A scope pushed in a branching flow leaked into the calling context.");
+                Assert.AreSame(itemA, ambient[0], "Flow A observed another flow's ambient entry.");
+                Assert.AreSame(itemB, ambient[1], "Flow B observed another flow's ambient entry.");
+                Assert.IsNull(Peek(), "An entry pushed in a branching flow leaked into the calling context.");
             });
         }
 
         [Test]
-        public void Push_KeepsNestedScopesOnTheSameStack()
+        public void Push_KeepsNestedEntriesOnTheSameStack()
         {
-            var sut = new AmbientScopeStack();
+            Drain();
 
-            while (sut.AmbientScope is not null)
-            {
-                sut.Pop();
-            }
+            TItem outer = CreateItem();
+            TItem inner = CreateItem();
 
-            IScope outer = Mock.Of<IScope>();
-            IScope inner = Mock.Of<IScope>();
-
-            sut.Push(outer);
-            sut.Push(inner);
+            Push(outer);
+            Push(inner);
 
             Assert.Multiple(() =>
             {
-                Assert.AreSame(inner, sut.AmbientScope);
-                Assert.AreSame(inner, sut.Pop());
-                Assert.AreSame(outer, sut.AmbientScope);
-                Assert.AreSame(outer, sut.Pop());
-                Assert.IsNull(sut.AmbientScope);
+                Assert.AreSame(inner, Peek());
+                Assert.AreSame(inner, Pop());
+                Assert.AreSame(outer, Peek());
+                Assert.AreSame(outer, Pop());
+                Assert.IsNull(Peek());
             });
+        }
+
+        protected abstract TItem? Peek();
+
+        protected abstract void Push(TItem item);
+
+        protected abstract TItem Pop();
+
+        protected abstract TItem CreateItem();
+
+        /// <summary>
+        /// The stack is held in a static <see cref="AsyncLocal{T}" />, so a synchronous test can observe entries
+        /// left behind by an earlier one.
+        /// </summary>
+        private void Drain()
+        {
+            while (Peek() is not null)
+            {
+                Pop();
+            }
         }
     }
 
-    /// <summary>
-    /// The scope context stack shares the defect and the fix of <see cref="AmbientScopeStack" />. It is covered
-    /// separately because isolating only the scope stack moves the corruption here: scopes that stop being wrongly
-    /// treated as nested start pushing a context of their own, onto a stack that is still shared between flows.
-    /// </summary>
     [TestFixture]
-    public class AmbientScopeContextStackTests
+    public class AmbientScopeStackTests : AmbientStackTestsBase<IScope>
     {
-        [Test]
-        public async Task Push_IsolatesConcurrentFlowsThatInheritedAnEmptyStack()
-        {
-            var sut = new AmbientScopeContextStack();
+        private readonly AmbientScopeStack _sut = new();
 
-            while (sut.AmbientContext is not null)
-            {
-                sut.Pop();
-            }
+        protected override IScope? Peek() => _sut.AmbientScope;
 
-            sut.Push(Mock.Of<IScopeContext>());
-            sut.Pop();
+        protected override void Push(IScope item) => _sut.Push(item);
 
-            IScopeContext contextA = Mock.Of<IScopeContext>();
-            IScopeContext contextB = Mock.Of<IScopeContext>();
-            (FlowBarriers barriersA, FlowBarriers barriersB) = FlowBarriers.CreatePair();
+        protected override IScope Pop() => _sut.Pop();
 
-            async Task<IScopeContext?> RunFlow(IScopeContext context, FlowBarriers barriers)
-            {
-                sut.Push(context);
-                await barriers.EveryFlowHasPushed();
+        protected override IScope CreateItem() => Mock.Of<IScope>();
+    }
 
-                IScopeContext? ambientContext = sut.AmbientContext;
-                await barriers.EveryFlowHasRead();
+    [TestFixture]
+    public class AmbientScopeContextStackTests : AmbientStackTestsBase<IScopeContext>
+    {
+        private readonly AmbientScopeContextStack _sut = new();
 
-                sut.Pop();
-                return ambientContext;
-            }
+        protected override IScopeContext? Peek() => _sut.AmbientContext;
 
-            IScopeContext?[] ambient = await Task.WhenAll(
-                Task.Run(() => RunFlow(contextA, barriersA)),
-                Task.Run(() => RunFlow(contextB, barriersB)));
+        protected override void Push(IScopeContext item) => _sut.Push(item);
 
-            Assert.Multiple(() =>
-            {
-                Assert.AreSame(contextA, ambient[0], "Flow A observed another flow's ambient context.");
-                Assert.AreSame(contextB, ambient[1], "Flow B observed another flow's ambient context.");
-                Assert.IsNull(sut.AmbientContext, "A context pushed in a branching flow leaked into the calling context.");
-            });
-        }
+        protected override IScopeContext Pop() => _sut.Pop();
 
-        [Test]
-        public void Push_KeepsNestedContextsOnTheSameStack()
-        {
-            var sut = new AmbientScopeContextStack();
-
-            while (sut.AmbientContext is not null)
-            {
-                sut.Pop();
-            }
-
-            IScopeContext outer = Mock.Of<IScopeContext>();
-            IScopeContext inner = Mock.Of<IScopeContext>();
-
-            sut.Push(outer);
-            sut.Push(inner);
-
-            Assert.Multiple(() =>
-            {
-                Assert.AreSame(inner, sut.AmbientContext);
-                Assert.AreSame(inner, sut.Pop());
-                Assert.AreSame(outer, sut.AmbientContext);
-                Assert.AreSame(outer, sut.Pop());
-                Assert.IsNull(sut.AmbientContext);
-            });
-        }
+        protected override IScopeContext CreateItem() => Mock.Of<IScopeContext>();
     }
 
     /// <summary>
