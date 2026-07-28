@@ -27,26 +27,40 @@ internal sealed class AmbientEFCoreScopeStackTests
         IEFCoreScope<TestUmbracoDbContext> scopeB = Mock.Of<IEFCoreScope<TestUmbracoDbContext>>();
         var pushedA = new TaskCompletionSource();
         var pushedB = new TaskCompletionSource();
+        var readA = new TaskCompletionSource();
+        var readB = new TaskCompletionSource();
 
-        async Task<IEFCoreScope<TestUmbracoDbContext>?> PushThenReadAmbient(
+        // Two barriers, both load-bearing. Every flow pushes before any flow reads, so a shared stack yields the
+        // wrong entry to at least one of them. Every flow also reads before any flow pops, otherwise a pop could
+        // remove the other flow's entry first and leave the remaining read coincidentally correct.
+        async Task<IEFCoreScope<TestUmbracoDbContext>?> RunFlow(
             IEFCoreScope<TestUmbracoDbContext> scope,
             TaskCompletionSource pushed,
-            Task otherPushed)
+            Task otherPushed,
+            TaskCompletionSource read,
+            Task otherRead)
         {
             sut.Push(scope);
             pushed.SetResult();
             await otherPushed;
-            return sut.AmbientScope;
+
+            IEFCoreScope<TestUmbracoDbContext>? ambientScope = sut.AmbientScope;
+            read.SetResult();
+            await otherRead;
+
+            sut.Pop();
+            return ambientScope;
         }
 
         IEFCoreScope<TestUmbracoDbContext>?[] ambient = await Task.WhenAll(
-            Task.Run(() => PushThenReadAmbient(scopeA, pushedA, pushedB.Task)),
-            Task.Run(() => PushThenReadAmbient(scopeB, pushedB, pushedA.Task)));
+            Task.Run(() => RunFlow(scopeA, pushedA, pushedB.Task, readA, readB.Task)),
+            Task.Run(() => RunFlow(scopeB, pushedB, pushedA.Task, readB, readA.Task)));
 
         Assert.Multiple(() =>
         {
             Assert.AreSame(scopeA, ambient[0], "Flow A observed another flow's ambient scope.");
             Assert.AreSame(scopeB, ambient[1], "Flow B observed another flow's ambient scope.");
+            Assert.IsNull(sut.AmbientScope, "A scope pushed in a branching flow leaked into the calling context.");
         });
     }
 

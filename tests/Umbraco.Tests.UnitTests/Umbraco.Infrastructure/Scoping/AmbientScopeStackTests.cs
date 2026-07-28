@@ -29,23 +29,40 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
             IScope scopeB = Mock.Of<IScope>();
             var pushedA = new TaskCompletionSource();
             var pushedB = new TaskCompletionSource();
+            var readA = new TaskCompletionSource();
+            var readB = new TaskCompletionSource();
 
-            async Task<IScope?> PushThenReadAmbient(IScope scope, TaskCompletionSource pushed, Task otherPushed)
+            // Two barriers, both load-bearing. Every flow pushes before any flow reads, so a shared stack yields
+            // the wrong entry to at least one of them. Every flow also reads before any flow pops, otherwise a pop
+            // could remove the other flow's entry first and leave the remaining read coincidentally correct.
+            async Task<IScope?> RunFlow(
+                IScope scope,
+                TaskCompletionSource pushed,
+                Task otherPushed,
+                TaskCompletionSource read,
+                Task otherRead)
             {
                 sut.Push(scope);
                 pushed.SetResult();
                 await otherPushed;
-                return sut.AmbientScope;
+
+                IScope? ambientScope = sut.AmbientScope;
+                read.SetResult();
+                await otherRead;
+
+                sut.Pop();
+                return ambientScope;
             }
 
             IScope?[] ambient = await Task.WhenAll(
-                Task.Run(() => PushThenReadAmbient(scopeA, pushedA, pushedB.Task)),
-                Task.Run(() => PushThenReadAmbient(scopeB, pushedB, pushedA.Task)));
+                Task.Run(() => RunFlow(scopeA, pushedA, pushedB.Task, readA, readB.Task)),
+                Task.Run(() => RunFlow(scopeB, pushedB, pushedA.Task, readB, readA.Task)));
 
             Assert.Multiple(() =>
             {
                 Assert.AreSame(scopeA, ambient[0], "Flow A observed another flow's ambient scope.");
                 Assert.AreSame(scopeB, ambient[1], "Flow B observed another flow's ambient scope.");
+                Assert.IsNull(sut.AmbientScope, "A scope pushed in a branching flow leaked into the calling context.");
             });
         }
 
@@ -101,26 +118,37 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
             IScopeContext contextB = Mock.Of<IScopeContext>();
             var pushedA = new TaskCompletionSource();
             var pushedB = new TaskCompletionSource();
+            var readA = new TaskCompletionSource();
+            var readB = new TaskCompletionSource();
 
-            async Task<IScopeContext?> PushThenReadAmbient(
+            async Task<IScopeContext?> RunFlow(
                 IScopeContext context,
                 TaskCompletionSource pushed,
-                Task otherPushed)
+                Task otherPushed,
+                TaskCompletionSource read,
+                Task otherRead)
             {
                 sut.Push(context);
                 pushed.SetResult();
                 await otherPushed;
-                return sut.AmbientContext;
+
+                IScopeContext? ambientContext = sut.AmbientContext;
+                read.SetResult();
+                await otherRead;
+
+                sut.Pop();
+                return ambientContext;
             }
 
             IScopeContext?[] ambient = await Task.WhenAll(
-                Task.Run(() => PushThenReadAmbient(contextA, pushedA, pushedB.Task)),
-                Task.Run(() => PushThenReadAmbient(contextB, pushedB, pushedA.Task)));
+                Task.Run(() => RunFlow(contextA, pushedA, pushedB.Task, readA, readB.Task)),
+                Task.Run(() => RunFlow(contextB, pushedB, pushedA.Task, readB, readA.Task)));
 
             Assert.Multiple(() =>
             {
                 Assert.AreSame(contextA, ambient[0], "Flow A observed another flow's ambient context.");
                 Assert.AreSame(contextB, ambient[1], "Flow B observed another flow's ambient context.");
+                Assert.IsNull(sut.AmbientContext, "A context pushed in a branching flow leaked into the calling context.");
             });
         }
 
