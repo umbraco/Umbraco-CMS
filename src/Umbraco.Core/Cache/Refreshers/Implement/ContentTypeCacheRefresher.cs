@@ -124,10 +124,26 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         /// <param name="id">The identifier of the content type.</param>
         /// <param name="changeTypes">The types of changes that occurred.</param>
         public JsonPayload(string itemType, int id, ContentTypeChangeTypes changeTypes)
+            : this(itemType, id, changeTypes, false)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
+        /// </summary>
+        /// <param name="itemType">The type name of the content type.</param>
+        /// <param name="id">The identifier of the content type.</param>
+        /// <param name="changeTypes">The types of changes that occurred.</param>
+        /// <param name="isElement">
+        ///     Whether the content type is an Element type. Only meaningful when <paramref name="itemType" /> is
+        ///     <see cref="IContentType" />, as Document and Element types share that item type.
+        /// </param>
+        public JsonPayload(string itemType, int id, ContentTypeChangeTypes changeTypes, bool isElement)
         {
             ItemType = itemType;
             Id = id;
             ChangeTypes = changeTypes;
+            IsElement = isElement;
         }
 
         /// <summary>
@@ -144,6 +160,12 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         ///     Gets the types of changes that occurred.
         /// </summary>
         public ContentTypeChangeTypes ChangeTypes { get; }
+
+        /// <summary>
+        ///     Gets whether the content type is an Element type. Only meaningful when <see cref="ItemType" /> is
+        ///     <see cref="IContentType" />.
+        /// </summary>
+        public bool IsElement { get; }
     }
 
     #endregion
@@ -229,14 +251,28 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             // entries by content type tag) and those that only need the converted content cache cleared.
             // A structural change flagged RawDataUnaffected (a property removal) keeps its stored blob valid,
             // so it belongs with the non-structural changes here — clearing the converted cache is enough.
+            // Document and Element types are both IContentType, so they're further split by IsElement to
+            // avoid scanning the wrong service's (unbounded) converted-content cache for IDs that can't match.
             var rebuildDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.RequiresRawDataRebuild())
+                .Where(x => x.ItemType == nameof(IContentType) && !x.IsElement && x.ChangeTypes.RequiresRawDataRebuild())
+                .Select(x => x.Id)
+                .Distinct()
+                .ToArray();
+
+            var rebuildElementTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IContentType) && x.IsElement && x.ChangeTypes.RequiresRawDataRebuild())
                 .Select(x => x.Id)
                 .Distinct()
                 .ToArray();
 
             var convertedOnlyDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && x.ChangeTypes.RequiresConvertedCacheClearOnly())
+                .Where(x => x.ItemType == nameof(IContentType) && !x.IsElement && x.ChangeTypes.RequiresConvertedCacheClearOnly())
+                .Select(x => x.Id)
+                .Distinct()
+                .ToArray();
+
+            var convertedOnlyElementTypeIds = payloads
+                .Where(x => x.ItemType == nameof(IContentType) && x.IsElement && x.ChangeTypes.RequiresConvertedCacheClearOnly())
                 .Select(x => x.Id)
                 .Distinct()
                 .ToArray();
@@ -254,12 +290,14 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
                 .ToArray();
 
             // Full memory cache rebuild only for changes that affect the stored data.
-            // IContentType payloads cover both Document and Element content types (Elements have no
-            // distinct ItemType of their own), so both cache services must be driven off the same IDs.
             if (rebuildDocumentTypeIds.Length > 0)
             {
                 _documentCacheService.RebuildMemoryCacheByContentTypeAsync(rebuildDocumentTypeIds).GetAwaiter().GetResult();
-                _elementCacheService.RebuildMemoryCacheByContentTypeAsync(rebuildDocumentTypeIds).GetAwaiter().GetResult();
+            }
+
+            if (rebuildElementTypeIds.Length > 0)
+            {
+                _elementCacheService.RebuildMemoryCacheByContentTypeAsync(rebuildElementTypeIds).GetAwaiter().GetResult();
             }
 
             if (rebuildMediaTypeIds.Length > 0)
@@ -278,6 +316,10 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
                 if (rebuildDocumentTypeIds.Length > 0 || convertedOnlyDocumentTypeIds.Length > 0)
                 {
                     _documentCacheService.ClearConvertedContentCache();
+                }
+
+                if (rebuildElementTypeIds.Length > 0 || convertedOnlyElementTypeIds.Length > 0)
+                {
                     _elementCacheService.ClearConvertedContentCache();
                 }
 
@@ -291,7 +333,11 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
                 if (convertedOnlyDocumentTypeIds.Length > 0)
                 {
                     _documentCacheService.ClearConvertedContentCache(convertedOnlyDocumentTypeIds);
-                    _elementCacheService.ClearConvertedContentCache(convertedOnlyDocumentTypeIds);
+                }
+
+                if (convertedOnlyElementTypeIds.Length > 0)
+                {
+                    _elementCacheService.ClearConvertedContentCache(convertedOnlyElementTypeIds);
                 }
 
                 if (convertedOnlyMediaTypeIds.Length > 0)
