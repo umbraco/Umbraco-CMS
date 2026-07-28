@@ -104,7 +104,9 @@ public class UmbracoJsonSchemaGeneratorTests
     {
         NJsonSchema.JsonSchema schema = Generate();
 
+#pragma warning disable CS0618 // Type or member is obsolete
         Assert.That(schema.Properties, Does.Not.ContainKey(nameof(FixtureSettings.Obsoleted)));
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     [Test]
