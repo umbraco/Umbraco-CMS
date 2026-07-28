@@ -14,6 +14,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 [TestFixture]
 public class ContentTypeTests
 {
+    private static readonly string[] _titleAlias = ["title"];
+    private static readonly string[] _titleAndNoGroupAliases = ["title", "noGroup"];
+
     [Test]
     [Ignore("Ignoring this test until we actually enforce this, see comments in ContentTypeBase.PropertyTypesChanged")]
     public void Cannot_Add_Duplicate_Property_Aliases()
@@ -276,8 +279,8 @@ public class ContentTypeTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(contentType.PropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
-            Assert.That(contentType.NoGroupPropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
+            Assert.That(contentType.PropertyTypes.Select(x => x.Alias), Is.EquivalentTo(_titleAlias));
+            Assert.That(contentType.NoGroupPropertyTypes.Select(x => x.Alias), Is.EquivalentTo(_titleAlias));
             Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Is.Empty);
         });
     }
@@ -295,7 +298,7 @@ public class ContentTypeTests
             Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
             Assert.That(
                 contentType.PropertyGroups["content"].PropertyTypes!.Select(x => x.Alias),
-                Is.EquivalentTo(new[] { "title", "noGroup" }));
+                Is.EquivalentTo(_titleAndNoGroupAliases));
         });
     }
 
@@ -311,7 +314,7 @@ public class ContentTypeTests
             Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
             Assert.That(
                 contentType.PropertyGroups["content"].PropertyTypes!.Select(x => x.Alias),
-                Is.EquivalentTo(new[] { "title" }));
+                Is.EquivalentTo(_titleAlias));
         });
     }
 

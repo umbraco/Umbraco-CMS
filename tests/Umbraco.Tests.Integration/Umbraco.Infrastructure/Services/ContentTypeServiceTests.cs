@@ -2160,7 +2160,7 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
 
     private IContentType CreateContentTypeWithSingleGroupedProperty()
     {
-        var basePage = (IContentType)ContentTypeBuilder.CreateBasicContentType();
+        ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
         basePage.AddPropertyGroup("content", "Content");
 
         var titlePropertyType = new PropertyType(
