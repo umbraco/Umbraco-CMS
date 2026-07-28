@@ -5,6 +5,12 @@ import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+/**
+ * The default root path for the stylesheets on the server.
+ * This is used as a fallback if the server configuration is not available.
+ */
+const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
+
 export class UmbTiptapRteContext extends UmbContextBase {
 	#editor?: Editor;
 
@@ -16,8 +22,12 @@ export class UmbTiptapRteContext extends UmbContextBase {
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (serverContext) => {
 			const serverConnection = serverContext?.getServerConnection();
-			this.observe(serverConnection?.umbracoCssPath, (umbracoCssPath) => {
-				this.#stylesheetRootPath.setValue(umbracoCssPath);
+			if (!serverConnection) {
+				this.#stylesheetRootPath.setValue(DEFAULT_STYLESHEET_ROOT_PATH);
+				return;
+			}
+			this.observe(serverConnection.umbracoCssPath, (umbracoCssPath) => {
+				this.#stylesheetRootPath.setValue(umbracoCssPath ?? DEFAULT_STYLESHEET_ROOT_PATH);
 			});
 		});
 	}
