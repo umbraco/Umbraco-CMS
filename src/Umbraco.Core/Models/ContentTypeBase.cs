@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Models;
 public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
 {
     // Custom comparer for enumerable
-    private static readonly DelegateEqualityComparer<IEnumerable<ContentTypeSort>> ContentTypeSortComparer =
+    private static readonly DelegateEqualityComparer<IEnumerable<ContentTypeSort>> _contentTypeSortComparer =
         new(
             (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
             sorts => sorts.GetHashCode());
@@ -228,7 +228,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     public IEnumerable<ContentTypeSort>? AllowedContentTypes
     {
         get => _allowedContentTypes;
-        set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, nameof(AllowedContentTypes), ContentTypeSortComparer);
+        set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, nameof(AllowedContentTypes), _contentTypeSortComparer);
     }
 
     /// <summary>
@@ -289,10 +289,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         get => PropertyTypeCollection;
         set
         {
-            if (PropertyTypeCollection != null)
-            {
-                PropertyTypeCollection.ClearCollectionChangedEvents();
-            }
+            PropertyTypeCollection?.ClearCollectionChangedEvents();
 
             PropertyTypeCollection = new PropertyTypeCollection(SupportsPublishing, value);
             PropertyTypeCollection.CollectionChanged += PropertyTypesChanged;
@@ -376,17 +373,14 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         // group, to the collection of properties that do not belong to a group
         oldPropertyGroup?.PropertyTypes?.RemoveItem(propertyTypeAlias);
 
-        if (newPropertyGroup is null)
-        {
-            if (PropertyTypeCollection.Contains(propertyTypeAlias) == false)
-            {
-                PropertyTypeCollection.Add(propertyType);
-            }
-        }
-        else
+        if (newPropertyGroup is not null)
         {
             PropertyTypeCollection.RemoveItem(propertyTypeAlias);
             newPropertyGroup.PropertyTypes?.Add(propertyType);
+        }
+        else if (PropertyTypeCollection.Contains(propertyTypeAlias) is false)
+        {
+            PropertyTypeCollection.Add(propertyType);
         }
 
         return true;

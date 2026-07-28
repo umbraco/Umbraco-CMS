@@ -303,11 +303,66 @@ public class ContentTypeTests
     }
 
     [Test]
+    public void Can_Move_PropertyType_Between_Groups()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+        contentType.AddPropertyGroup("meta", "Meta");
+
+        Assert.IsTrue(contentType.MovePropertyType("title", "meta"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
+            Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Is.Empty);
+            Assert.That(
+                contentType.PropertyGroups["meta"].PropertyTypes!.Select(x => x.Alias),
+                Is.EquivalentTo(_titleAlias));
+        });
+    }
+
+    [Test]
+    public void Can_Move_Already_Ungrouped_PropertyType_To_No_Group()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+        contentType.MovePropertyType("title", null);
+
+        // Moving a property that is already un-grouped is a no-op, and must not duplicate it.
+        Assert.IsTrue(contentType.MovePropertyType("title", null));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.PropertyTypes.Select(x => x.Alias), Is.EquivalentTo(_titleAlias));
+            Assert.That(contentType.NoGroupPropertyTypes.Select(x => x.Alias), Is.EquivalentTo(_titleAlias));
+            Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Is.Empty);
+        });
+    }
+
+    [Test]
     public void Cannot_Move_PropertyType_To_Unknown_Group()
     {
         var contentType = BuildContentTypeWithSingleGroup();
 
         Assert.IsFalse(contentType.MovePropertyType("title", "noSuchGroup"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
+            Assert.That(
+                contentType.PropertyGroups["content"].PropertyTypes!.Select(x => x.Alias),
+                Is.EquivalentTo(_titleAlias));
+        });
+    }
+
+    [Test]
+    public void Cannot_Move_Unknown_PropertyType()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(contentType.MovePropertyType("noSuchProperty", null));
+            Assert.IsFalse(contentType.MovePropertyType("noSuchProperty", "content"));
+        });
 
         Assert.Multiple(() =>
         {
