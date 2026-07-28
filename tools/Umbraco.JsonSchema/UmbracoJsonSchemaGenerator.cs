@@ -25,7 +25,8 @@ internal sealed class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
                 IgnoreReadOnlyProperties = true,
             },
         })
-    { }
+    {
+    }
 
     /// <inheritdoc />
     private sealed class UmbracoSystemTextJsonReflectionService : SystemTextJsonReflectionService
