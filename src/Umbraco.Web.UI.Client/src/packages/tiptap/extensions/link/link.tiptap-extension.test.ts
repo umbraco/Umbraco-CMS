@@ -2,7 +2,7 @@ import { Document, Editor, Paragraph, Text } from '../../externals.js';
 import { UmbLink } from './link.tiptap-extension.js';
 import { expect } from '@open-wc/testing';
 
-describe('link.tiptap-extension', () => {
+describe('UmbLink', () => {
 	let editor: Editor;
 	let host: HTMLDivElement;
 
