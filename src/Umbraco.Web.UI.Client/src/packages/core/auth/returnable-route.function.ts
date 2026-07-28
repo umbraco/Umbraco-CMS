@@ -7,7 +7,7 @@
  * Deliberately an allowlist: omitting a returnable route only costs a deep link (the user lands on
  * the back office root), while omitting a session-less one loops the login.
  */
-const RETURNABLE_ROUTES = ['section', 'upgrade', 'preview'];
+const RETURNABLE_ROUTES = new Set(['section', 'upgrade', 'preview']);
 
 /**
  * Whether a location is somewhere the user should be returned to after logging in.
@@ -19,5 +19,7 @@ const RETURNABLE_ROUTES = ['section', 'upgrade', 'preview'];
 export function isReturnableRoute(pathname: string, backofficePath: string): boolean {
 	const route = pathname.startsWith(backofficePath) ? pathname.slice(backofficePath.length) : pathname;
 
-	return RETURNABLE_ROUTES.includes(route.split('/').filter(Boolean)[0]);
+	const firstSegment = route.split('/').find(Boolean);
+
+	return firstSegment !== undefined && RETURNABLE_ROUTES.has(firstSegment);
 }
