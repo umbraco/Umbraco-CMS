@@ -37,14 +37,17 @@ CODE=$(curl -sk --max-time 5 -o /dev/null -w "%{http_code}" "https://localhost:4
 ```
 
 - **`200`** → a backend is already up. Reuse it; do **not** stop it afterward (the user had it running).
-- **`000`** → nothing is listening on 44339. Start one yourself, in the background, on 44339, and remember that *you* started it so you can stop it in step 5. No `--no-build` here on purpose, so a cold repo still works. If `CODE` is neither `200` nor `000`, something is already listening on 44339 but isn't serving the expected OpenAPI document. Don’t try to start another instance on the same port; surface the HTTP status and stop:
+- **`000`** → nothing is listening on 44339. Start one yourself, in the background, on 44339, and remember that *you* started it so you can stop it in step 5. No `--no-build` here on purpose, so a cold repo still works.
+- **anything else** → something is already listening on 44339 but isn't serving the expected OpenAPI document. Don't start another instance on the same port; surface the HTTP status and stop.
+
+For the `000` case, start the backend with:
 
 ```bash
 dotnet run --project src/Umbraco.Web.UI --no-launch-profile -- \
   --environment Development --urls https://localhost:44339
 ```
 
-Run that with `run_in_background: true`. First-run startup (build + boot) can take a couple of minutes — the fetch in step 3 waits for it.
+Run that with `run_in_background: true` — that also puts the process under the harness's control so step 5 can stop it cleanly. First-run startup (build + boot) can take a couple of minutes — the fetch in step 3 waits for it.
 
 ### 3. Fetch byte-for-byte straight into the file, then validate
 
@@ -72,26 +75,23 @@ Surface exactly what changed so the user can sanity-check it:
 git diff --stat -- src/Umbraco.Cms.Api.Management/OpenApi.json
 ```
 
-- **No diff** → already up to date; say so.
+- **No diff** → the spec is already up to date; say so. **This does not mean the generated client is in sync** — a previous spec change may never have been followed by a regen, so step 6 still applies.
 - **A focused diff** → summarize the changed schemas/paths at a high level.
 - **A whole-file reformat** → flag it. Byte-for-byte is intentional, but a run that rewrites the *entire* file means the server's serialization differs from what was committed. That's the canonical format going forward and is fine — just make sure the user knows it's a formatting shift, not hundreds of real API changes.
 
 ### 5. Stop the backend if you started it
 
-Only if **you** started it in step 2 (it wasn't already running), stop it — don't leave a stray process, and never kill a server the user already had up:
+Only if **you** started it in step 2 (it wasn't already running) — if the probe returned `200`, skip this step and leave the user's server alone.
 
-```bash
-PIDS=$(lsof -ti tcp:44339)
-for PID in $PIDS; do
-  ps -p "$PID" -o command= | grep -q "Umbraco.Web.UI" && kill "$PID"
-done
-```
+The instance you launched in step 2 ran with `run_in_background: true`, so the harness owns it as a tracked background task. Stop *that task* directly, using the background shell's own stop — not a port scan. This is fully cross-platform (no `lsof`, which isn't installed on Windows) and can only ever stop the process you started, never an unrelated one that happens to be bound to 44339.
 
-### 6. Offer to regenerate the backoffice client
+### 6. Regenerate the backoffice client to check it's in sync
 
-The generated hey-api client is downstream of `OpenApi.json`, so it's worth regenerating when step 4 produced real changes. **Ask the user** before running it — it rewrites generated sources and can be noisy:
+The generated hey-api client is downstream of `OpenApi.json`, but it can drift **independently** of it: a previous spec change that was never followed by a regen leaves a stale client even when step 4 shows no spec diff. So don't gate this on step 4 — regenerating is the only way to know the committed client actually matches the current spec. The generator is deterministic and git-recoverable, so running it against an already-synced client is a no-op (empty diff).
 
-> "OpenApi.json updated. Want me to regenerate the backoffice hey-api client (`npm run generate:server-api`) so the generated types match?"
+**Ask the user** before running it — it rewrites generated sources and can be noisy:
+
+> "Want me to regenerate the backoffice hey-api client (`npm run generate:server-api`) to confirm it's in sync with `OpenApi.json`? It's a no-op if it already matches."
 
 If yes:
 
@@ -100,7 +100,13 @@ npm --prefix src/Umbraco.Web.UI.Client run generate:server-api
 git diff --stat -- src/Umbraco.Web.UI.Client/src/packages/core/backend-api/
 ```
 
-Report the generated diff the same way. If the user declines, note the client is now out of sync with `OpenApi.json` until it's regenerated.
+Read the resulting diff honestly:
+
+- **No diff** → the client is in sync; done.
+- **A diff even though step 4 showed no spec change** → the client had drifted (a prior spec update wasn't regenerated). Surface it — this is exactly the case worth catching, and the regen you just ran fixes it.
+- **A diff matching this run's spec changes** → expected; summarize it.
+
+If the user declines, note the client's sync status is now unverified against `OpenApi.json`.
 
 ## Notes
 
