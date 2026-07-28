@@ -14,6 +14,8 @@ const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
 export class UmbTiptapRteContext extends UmbContextBase {
 	#editor?: Editor;
 
+	#serverUrl = '';
+
 	#stylesheetRootPath = new UmbStringState(undefined);
 	stylesheetRootPath = this.#stylesheetRootPath.asObservable();
 
@@ -24,16 +26,23 @@ export class UmbTiptapRteContext extends UmbContextBase {
 			// Absolute in split-dev-server setups (e.g. `VITE_UMBRACO_API_URL`) so stylesheet
 			// requests hit the real Umbraco server instead of resolving against the Vite
 			// client's own origin; a no-op prefix in production, where it equals `location.origin`.
-			const serverUrl = serverContext?.getServerUrl() ?? '';
+			// Kept separate from `stylesheetRootPath` below, which stays origin-relative so
+			// consumers can still detect whether a configured stylesheet already includes it.
+			this.#serverUrl = serverContext?.getServerUrl() ?? '';
+
 			const serverConnection = serverContext?.getServerConnection();
 			if (!serverConnection) {
-				this.#stylesheetRootPath.setValue(serverUrl + DEFAULT_STYLESHEET_ROOT_PATH);
+				this.#stylesheetRootPath.setValue(DEFAULT_STYLESHEET_ROOT_PATH);
 				return;
 			}
 			this.observe(serverConnection.umbracoCssPath, (umbracoCssPath) => {
-				this.#stylesheetRootPath.setValue(serverUrl + (umbracoCssPath ?? DEFAULT_STYLESHEET_ROOT_PATH));
+				this.#stylesheetRootPath.setValue(umbracoCssPath ?? DEFAULT_STYLESHEET_ROOT_PATH);
 			});
 		});
+	}
+
+	public getServerUrl(): string {
+		return this.#serverUrl;
 	}
 
 	public getEditor(): Editor | undefined {

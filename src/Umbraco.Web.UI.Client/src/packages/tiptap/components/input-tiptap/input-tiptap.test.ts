@@ -58,12 +58,12 @@ describe('UmbInputTiptapElement (stylesheets)', () => {
 		provider?.hostDisconnected();
 	});
 
-	async function renderElement(cssPath: string | undefined, serverUrl = '') {
+	async function renderElement(cssPath: string | undefined, serverUrl = '', stylesheets: Array<string> = ['/rte-test.css']) {
 		stubServerContext(cssPath, serverUrl);
 
 		const config = new UmbPropertyEditorConfigCollection([
 			{ alias: 'extensions', value: ['Umb.Tiptap.Bold', 'Umb.Tiptap.Italic'] },
-			{ alias: 'stylesheets', value: ['/rte-test.css'] },
+			{ alias: 'stylesheets', value: stylesheets },
 		]);
 
 		const element = await fixture<UmbInputTiptapElement>(html`
@@ -102,5 +102,13 @@ describe('UmbInputTiptapElement (stylesheets)', () => {
 		// The base RTE stylesheet is a client-bundled asset (served by Vite itself in dev),
 		// so it must stay origin-relative rather than being prefixed with the server URL.
 		expect(hrefs).to.include('/umbraco/backoffice/css/rte-content.css');
+	});
+
+	it('does not double up the root path when a configured stylesheet already includes it, and still resolves against the server origin', async function () {
+		this.timeout(20000);
+		const hrefs = await renderElement('/mycss', 'https://localhost:44339', ['/mycss/already-prefixed.css']);
+
+		expect(hrefs).to.include('https://localhost:44339/mycss/already-prefixed.css');
+		expect(hrefs).not.to.include('https://localhost:44339/mycss/mycss/already-prefixed.css');
 	});
 });
