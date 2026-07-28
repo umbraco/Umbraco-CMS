@@ -56,8 +56,7 @@ internal sealed class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
             // (https://github.com/umbraco/Umbraco-CMS/issues/23482).
             foreach (ContextualPropertyInfo property in contextualType.Properties)
             {
-                if (property.PropertyInfo.PropertyType != typeof(TimeSpan) &&
-                    property.PropertyInfo.PropertyType != typeof(TimeSpan?))
+                if (IsTimeSpan(property) is false)
                 {
                     continue;
                 }
@@ -70,5 +69,9 @@ internal sealed class UmbracoJsonSchemaGenerator : JsonSchemaGenerator
                 }
             }
         }
+
+        private static bool IsTimeSpan(ContextualPropertyInfo property) =>
+            property.PropertyInfo.PropertyType == typeof(TimeSpan) ||
+            property.PropertyInfo.PropertyType == typeof(TimeSpan?);
     }
 }
