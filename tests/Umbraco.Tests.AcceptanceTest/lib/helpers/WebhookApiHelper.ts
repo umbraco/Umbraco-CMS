@@ -34,7 +34,7 @@ export class WebhookApiHelper {
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/webhook', webhookData);
     // Returns the id of the created webhook
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -57,7 +57,7 @@ export class WebhookApiHelper {
     const allWebhooks = await this.getAll();
     const jsonWebhooks = await allWebhooks.json();
 
-    for (const webhook of jsonWebhooks.items) {
+    for (const webhook of this.api.itemsOf(jsonWebhooks)) {
       if (webhook.name === name) {
         return await this.get(webhook.id);
       }
@@ -69,7 +69,7 @@ export class WebhookApiHelper {
     const allWebhooks = await this.getAll();
     const jsonWebhooks = await allWebhooks.json();
 
-    for (const webhook of jsonWebhooks.items) {
+    for (const webhook of this.api.itemsOf(jsonWebhooks)) {
       if (webhook.name === name) {
         return await this.delete(webhook.id);
       }
@@ -84,8 +84,7 @@ export class WebhookApiHelper {
       }
     });
     const webhookData = await createWebhookResponse.json();
-    const webhookToken = webhookData.uuid;
-    return webhookToken;
+    return webhookData.uuid;
   }
 
   async getWebhookSiteRequestResponse(webhookSiteToken: string, timeoutMs: number = 15000, pollInterval: number = 1000, expectedContentFragment?: string) {

@@ -4,6 +4,7 @@ import {ConstantHelper} from "./ConstantHelper";
 
 export class UserGroupUiHelper extends UiBaseLocators {
   private readonly userGroupsBtn: Locator;
+  private readonly firstUserGroupRow: Locator;
   private readonly chooseSectionBtn: Locator;
   private readonly languageInput: Locator;
   private readonly chooseLanguageBtn: Locator;
@@ -25,6 +26,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   constructor(page: Page) {
     super(page);
     this.userGroupsBtn = page.getByLabel('User groups');
+    this.firstUserGroupRow = page.locator('uui-table-row').first();
     this.permissionVerbBtn = page.locator('umb-input-user-permission-verb');
     this.chooseSectionBtn = page.locator('umb-input-section').getByLabel('Choose');
     this.languageInput = page.locator('umb-input-language');
@@ -46,7 +48,8 @@ export class UserGroupUiHelper extends UiBaseLocators {
 
   async clickUserGroupsButton() {
     await this.click(this.userGroupsBtn);
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
+    // Wait for the list to render (default groups always yield a row) instead of a fixed sleep.
+    await expect(this.firstUserGroupRow).toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   async enterUserGroupName(name: string) {
@@ -79,13 +82,20 @@ export class UserGroupUiHelper extends UiBaseLocators {
     await this.click(this.entityItem.filter({hasText: languageName}).getByLabel('Remove'));
   }
 
+  // Matches the row whose name cell is exactly `name`. A substring match ({hasText}) would also match
+  // longer names (e.g. 'TestUserGroupName' matching leftover 'TestUserGroupNameDescription'), causing
+  // strict-mode multi-match failures.
+  private userGroupRowWithExactName(name: string): Locator {
+    return this.page.locator('uui-table-row').filter({has: this.page.getByText(name, {exact: true})});
+  }
+
   async isUserGroupWithNameVisible(name: string, isVisible = true) {
-    return await this.isVisible(this.page.locator('uui-table-row', {hasText: name}), isVisible);
+    return await this.isVisible(this.userGroupRowWithExactName(name), isVisible);
   }
 
   async clickUserGroupWithName(name: string) {
-    await this.click(this.page.getByRole('link', {name: name}));
-    await this.page.waitForTimeout(ConstantHelper.wait.short);
+    await this.click(this.page.getByRole('link', {name: name, exact: true}));
+    await expect(this.page).toHaveURL(/\/workspace\/user-group\/edit\//);
   }
 
   async clickPermissionsByName(permissionName: string[]) {
@@ -119,7 +129,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async doesUserGroupTableHaveSection(userGroupName: string, sectionName: string, hasSection = true) {
-    await this.isVisible(this.page.locator('uui-table-row', {hasText: userGroupName}).locator('umb-user-group-table-sections-column-layout', {hasText: sectionName}), hasSection);
+    await this.isVisible(this.userGroupRowWithExactName(userGroupName).locator('umb-section-aliases-value-summary', {hasText: sectionName}), hasSection);
   }
 
   async doesUserGroupContainLanguage(languageName: string, isVisible = true) {
@@ -205,8 +215,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async doesUserGroupHaveDescription(userGroupName: string, description: string) {
-    const userGroupRow = this.page.locator('uui-table-row', {hasText: userGroupName});
-    const descriptionCell = userGroupRow.locator('uui-table-cell').nth(2);
+    const descriptionCell = this.userGroupRowWithExactName(userGroupName).locator('uui-table-cell').nth(2);
     await this.hasText(descriptionCell, description);
   }
 }
