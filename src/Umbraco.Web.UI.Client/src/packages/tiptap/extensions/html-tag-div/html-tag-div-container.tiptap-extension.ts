@@ -45,6 +45,8 @@ const BLOCK_TAGS = new Set([
  * `BLOCK_TAGS` entry (e.g. `li` inside `ul`/`ol`, `tr`/`td`/`th`/`thead`/`tbody`/`tfoot` inside
  * `table`, `dt`/`dd` inside `dl`, `figcaption` inside `figure`) are omitted from `BLOCK_TAGS`
  * since their container is what would actually surface as the direct child.
+ * @param {HTMLElement} element The element whose direct children are checked.
+ * @returns {boolean} Returns true if at least one direct child element is block-level.
  */
 function hasBlockLevelChild(element: HTMLElement): boolean {
 	return Array.from(element.children).some((child) => BLOCK_TAGS.has(child.tagName.toLowerCase()));
