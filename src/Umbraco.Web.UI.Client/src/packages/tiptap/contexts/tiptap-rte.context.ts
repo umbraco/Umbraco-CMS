@@ -21,13 +21,17 @@ export class UmbTiptapRteContext extends UmbContextBase {
 		super(host, UMB_TIPTAP_RTE_CONTEXT);
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (serverContext) => {
+			// Absolute in split-dev-server setups (e.g. `VITE_UMBRACO_API_URL`) so stylesheet
+			// requests hit the real Umbraco server instead of resolving against the Vite
+			// client's own origin; a no-op prefix in production, where it equals `location.origin`.
+			const serverUrl = serverContext?.getServerUrl() ?? '';
 			const serverConnection = serverContext?.getServerConnection();
 			if (!serverConnection) {
-				this.#stylesheetRootPath.setValue(DEFAULT_STYLESHEET_ROOT_PATH);
+				this.#stylesheetRootPath.setValue(serverUrl + DEFAULT_STYLESHEET_ROOT_PATH);
 				return;
 			}
 			this.observe(serverConnection.umbracoCssPath, (umbracoCssPath) => {
-				this.#stylesheetRootPath.setValue(umbracoCssPath ?? DEFAULT_STYLESHEET_ROOT_PATH);
+				this.#stylesheetRootPath.setValue(serverUrl + (umbracoCssPath ?? DEFAULT_STYLESHEET_ROOT_PATH));
 			});
 		});
 	}
