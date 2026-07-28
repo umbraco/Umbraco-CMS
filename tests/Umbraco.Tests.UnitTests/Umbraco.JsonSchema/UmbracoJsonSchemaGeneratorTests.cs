@@ -19,8 +19,8 @@ public class UmbracoJsonSchemaGeneratorTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(schema.Properties["Timeout"].Format, Is.Null);
-            Assert.That(schema.Properties["OptionalTimeout"].Format, Is.Null);
+            Assert.That(schema.Properties[nameof(FixtureSettings.Timeout)].Format, Is.Null);
+            Assert.That(schema.Properties[nameof(FixtureSettings.OptionalTimeout)].Format, Is.Null);
         });
     }
 
@@ -31,8 +31,8 @@ public class UmbracoJsonSchemaGeneratorTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(schema.Properties["Timestamp"].Format, Is.EqualTo(JsonFormatStrings.DateTime));
-            Assert.That(schema.Properties["Key"].Format, Is.EqualTo(JsonFormatStrings.Guid));
+            Assert.That(schema.Properties[nameof(FixtureSettings.Timestamp)].Format, Is.EqualTo(JsonFormatStrings.DateTime));
+            Assert.That(schema.Properties[nameof(FixtureSettings.Key)].Format, Is.EqualTo(JsonFormatStrings.Guid));
         });
     }
 
@@ -41,7 +41,7 @@ public class UmbracoJsonSchemaGeneratorTests
     {
         NJsonSchema.JsonSchema schema = Generate();
 
-        NJsonSchema.JsonSchema property = schema.Properties["Level"].ActualSchema;
+        NJsonSchema.JsonSchema property = schema.Properties[nameof(FixtureSettings.Level)].ActualSchema;
 
         Assert.Multiple(() =>
         {
@@ -55,7 +55,7 @@ public class UmbracoJsonSchemaGeneratorTests
     {
         NJsonSchema.JsonSchema schema = Generate();
 
-        Assert.That(schema.Properties["Count"].Default, Is.EqualTo(5));
+        Assert.That(schema.Properties[nameof(FixtureSettings.Count)].Default, Is.EqualTo(5));
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class UmbracoJsonSchemaGeneratorTests
     {
         NJsonSchema.JsonSchema schema = Generate();
 
-        Assert.That(schema.Properties, Does.Not.ContainKey("Obsoleted"));
+        Assert.That(schema.Properties, Does.Not.ContainKey(nameof(FixtureSettings.Obsoleted)));
     }
 
     [Test]
