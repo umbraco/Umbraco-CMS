@@ -322,7 +322,7 @@ stored content without decompressing or walking the converted graph, so it omits
 conversion blow-up); true per-object bytes come from a GC dump. Note the tiers: **L0** is the
 converted-`IPublishedContent` cache reported above; **L1** is Microsoft HybridCache's in-process tier of
 `ContentCacheNode` entries (behind L0); **L2** is the optional distributed tier. The HybridCache **L1** has
-no exposed count/size — measure it from the GC dump until a sized backing cache is wired up (PR 3).
+no exposed count/size — measure it from the GC dump until a sized backing cache is wired up.
 
 ### Known Technical Debt
 
