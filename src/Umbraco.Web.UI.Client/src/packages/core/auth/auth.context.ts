@@ -186,52 +186,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 		// Set up cross-tab coordination via BroadcastChannel
 		this.#channel = new BroadcastChannel('umb:auth');
-		this.#channel.onmessage = (evt: MessageEvent) => {
-			switch (evt.data?.type) {
-				case 'authorized': {
-					// Apply locally — do NOT call #updateSession which would re-broadcast.
-					this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
-					this.#authorizationSignal.next();
-					break;
-				}
-				case 'sessionUpdate':
-					// Peer broadcast already-computed timestamps, so set the session
-					// directly. We still go through the `#inSessionUpdateCallback` guard
-					// so observers triggered re-entrantly skip a redundant /token call.
-					this.#sessionDead = false;
-					this.#inSessionUpdateCallback = true;
-					try {
-						this.#session.setValue({
-							accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
-							expiresAt: evt.data.expiresAt,
-						});
-						this.#isAuthorized.setValue(true);
-					} finally {
-						this.#inSessionUpdateCallback = false;
-					}
-					break;
-				case 'sessionCleared':
-					this.#session.setValue(undefined);
-					this.#isAuthorized.setValue(false);
-					break;
-				case 'signedOut':
-					this.#session.setValue(undefined);
-					this.#isAuthorized.setValue(false);
-					// Redirect to logout page — cookies already cleared by the tab that initiated sign-out
-					location.href = this.#postLogoutRedirectUri;
-					break;
-				case 'sessionRequest': {
-					// Another tab is asking for the current session state (e.g. new tab opening).
-					// Only share the session if it is still valid — an expired session would cause
-					// the recipient (e.g. a popup) to believe it is already authorized and skip
-					// the authorization code exchange.
-					if (this.#isSessionValid()) {
-						this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
-					}
-					break;
-				}
-			}
-		};
+		this.#channel.onmessage = (evt: MessageEvent) => this.#handleChannelMessage(evt);
 
 		if (!isTestEnvironment()) {
 			// Start the session timeout controller
@@ -870,6 +825,56 @@ export class UmbAuthContext extends UmbContextBase {
 		await this.signOut();
 
 		return true;
+	}
+
+	/**
+	 * Handles a cross-tab message from the `umb:auth` BroadcastChannel.
+	 */
+	#handleChannelMessage(evt: MessageEvent) {
+		switch (evt.data?.type) {
+			case 'authorized': {
+				// Apply locally — do NOT call #updateSession which would re-broadcast.
+				this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
+				this.#authorizationSignal.next();
+				break;
+			}
+			case 'sessionUpdate':
+				// Peer broadcast already-computed timestamps, so set the session
+				// directly. We still go through the `#inSessionUpdateCallback` guard
+				// so observers triggered re-entrantly skip a redundant /token call.
+				this.#sessionDead = false;
+				this.#inSessionUpdateCallback = true;
+				try {
+					this.#session.setValue({
+						accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
+						expiresAt: evt.data.expiresAt,
+					});
+					this.#isAuthorized.setValue(true);
+				} finally {
+					this.#inSessionUpdateCallback = false;
+				}
+				break;
+			case 'sessionCleared':
+				this.#session.setValue(undefined);
+				this.#isAuthorized.setValue(false);
+				break;
+			case 'signedOut':
+				this.#session.setValue(undefined);
+				this.#isAuthorized.setValue(false);
+				// Redirect to logout page — cookies already cleared by the tab that initiated sign-out
+				location.href = this.#postLogoutRedirectUri;
+				break;
+			case 'sessionRequest': {
+				// Another tab is asking for the current session state (e.g. new tab opening).
+				// Only share the session if it is still valid — an expired session would cause
+				// the recipient (e.g. a popup) to believe it is already authorized and skip
+				// the authorization code exchange.
+				if (this.#isSessionValid()) {
+					this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
+				}
+				break;
+			}
+		}
 	}
 
 	/**
