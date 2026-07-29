@@ -4,6 +4,7 @@ import type { UmbInputMultiUrlElement } from '../components/input-multi-url/inde
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbPropertyEditorUiPickerMemoryContext } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -22,8 +23,14 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	extends UmbFormControlMixin<Array<UmbLinkPickerLink>, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
+	readonly #pickerMemory = new UmbPropertyEditorUiPickerMemoryContext(this, {
+		memoryUniquePrefix: 'UmbMultiUrlPicker',
+	});
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
+
+		this.#pickerMemory.setPropertyEditorConfig(config);
 
 		this._hideAnchor = Boolean(config.getValueByAlias('hideAnchor'));
 		this._documentLinksConfig = {

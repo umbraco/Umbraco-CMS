@@ -16,6 +16,7 @@ import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '@umbraco-cms/backoffice/block-rte';
+import { UmbPropertyEditorUiPickerMemoryContext } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorUiElement,
 	UmbPropertyEditorConfigCollection,
@@ -36,10 +37,14 @@ export abstract class UmbPropertyEditorUiRteElementBase
 {
 	public name?: string;
 
+	readonly #pickerMemory = new UmbPropertyEditorUiPickerMemoryContext(this, { memoryUniquePrefix: 'UmbRte' });
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
 		this._config = config;
+
+		this.#pickerMemory.setPropertyEditorConfig(config);
 
 		const blocks = config.getValueByAlias<Array<UmbBlockRteTypeModel>>('blocks') ?? [];
 		this.#managerContext.setBlockTypes(blocks);

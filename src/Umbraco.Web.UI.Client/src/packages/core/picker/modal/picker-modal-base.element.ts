@@ -1,9 +1,10 @@
 import type { UmbPickerContext } from '../picker.context.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import { UMB_INTERACTION_MEMORY_SCOPE_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { ManifestModal, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
-import { UMB_PICKER_INPUT_CONTEXT } from '@umbraco-cms/backoffice/picker-input';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 
 export abstract class UmbPickerModalBaseElement<
 	ItemType = UmbEntityModel,
@@ -13,13 +14,13 @@ export abstract class UmbPickerModalBaseElement<
 > extends UmbModalBaseElement<ModalDataType, ModalValueType, ModalManifestType> {
 	protected abstract _pickerContext: UmbPickerContext;
 
-	#pickerInputContext?: typeof UMB_PICKER_INPUT_CONTEXT.TYPE;
+	#memoryScope?: typeof UMB_INTERACTION_MEMORY_SCOPE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_PICKER_INPUT_CONTEXT, (pickerInputContext) => {
-			this.#pickerInputContext = pickerInputContext;
-			this.#observeMemoriesFromInputContext();
+		this.consumeContext(UMB_INTERACTION_MEMORY_SCOPE_CONTEXT, (memoryScope) => {
+			this.#memoryScope = memoryScope;
+			this.#observeMemoriesFromScope();
 		});
 	}
 
@@ -28,20 +29,31 @@ export abstract class UmbPickerModalBaseElement<
 		this.#observeMemoriesFromPicker();
 	}
 
+	protected override updated(changedProperties: PropertyValues): void {
+		super.updated(changedProperties);
+		// The modal manifest is assigned to this element before it is connected, so this should
+		// already be in place by the time the scope context resolves. Re-run on the off chance the
+		// two race the other way, so the memory is never bridged under an empty/placeholder alias.
+		if (changedProperties.has('manifest')) {
+			this.#observeMemoriesFromScope();
+		}
+	}
+
 	#observeMemoriesFromPicker() {
 		this.observe(this._pickerContext.interactionMemory.memories, (memories) => {
-			this.#setMemoriesOnInputContext(memories);
+			this.#setMemoriesOnScope(memories);
 		});
 	}
 
 	#getInteractionMemoryUnique() {
-		// TODO: consider appending with a unique when we have that implemented.
-		return `UmbPickerModal`;
+		const alias = this.manifest?.alias ?? this.modalContext?.alias;
+		return `UmbPickerModal:${alias ?? ''}`;
 	}
 
-	#observeMemoriesFromInputContext() {
+	#observeMemoriesFromScope() {
+		if (!this.#memoryScope) return;
 		this.observe(
-			this.#pickerInputContext?.interactionMemory.memory(this.#getInteractionMemoryUnique()),
+			this.#memoryScope.interactionMemory.memory(this.#getInteractionMemoryUnique()),
 			(memory) => {
 				memory?.memories?.forEach((memory) => this._pickerContext.interactionMemory.setMemory(memory));
 			},
@@ -49,16 +61,16 @@ export abstract class UmbPickerModalBaseElement<
 		);
 	}
 
-	#setMemoriesOnInputContext(pickerMemories: Array<UmbInteractionMemoryModel>) {
+	#setMemoriesOnScope(pickerMemories: Array<UmbInteractionMemoryModel>) {
 		if (pickerMemories?.length > 0) {
 			const pickerModalMemory: UmbInteractionMemoryModel = {
 				unique: this.#getInteractionMemoryUnique(),
 				memories: pickerMemories,
 			};
 
-			this.#pickerInputContext?.interactionMemory.setMemory(pickerModalMemory);
+			this.#memoryScope?.interactionMemory.setMemory(pickerModalMemory);
 		} else {
-			this.#pickerInputContext?.interactionMemory.deleteMemory(this.#getInteractionMemoryUnique());
+			this.#memoryScope?.interactionMemory.deleteMemory(this.#getInteractionMemoryUnique());
 		}
 	}
 }

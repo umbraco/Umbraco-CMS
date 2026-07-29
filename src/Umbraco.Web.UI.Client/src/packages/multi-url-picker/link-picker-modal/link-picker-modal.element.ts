@@ -19,13 +19,27 @@ import {
 	UmbDocumentUrlsDataResolver,
 	type UmbDocumentItemModel,
 } from '@umbraco-cms/backoffice/document';
-import { UmbMediaItemRepository, UmbMediaPickerFolderFilter, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
+import {
+	UMB_MEDIA_PICKER_MODAL,
+	UmbMediaItemRepository,
+	UmbMediaPickerFolderFilter,
+	UmbMediaUrlRepository,
+} from '@umbraco-cms/backoffice/media';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
+import {
+	UMB_INTERACTION_MEMORY_SCOPE_CONTEXT,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
 
 type UmbInputPickerEvent = CustomEvent & { target: { value?: string; culture?: string } };
+
+// Shares its key with the `UmbMediaPickerModalElement` memory bridge (`picker-modal-base.element.ts`),
+// so the media folder location is remembered whether it's reached via "insert media" or via this
+// link picker's own media tab.
+const MEDIA_PICKER_MEMORY_UNIQUE = `UmbPickerModal:${UMB_MEDIA_PICKER_MODAL}`;
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
@@ -49,6 +63,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	@state()
 	private _documentItem?: UmbDocumentItemModel;
 
+	@state()
+	private _mediaInteractionMemories: Array<UmbInteractionMemoryModel> = [];
+
 	#variantContext = new UmbVariantContext(this).inherit();
 	#documentItemDataResolver?: UmbDocumentItemDataResolver<UmbDocumentItemModel>;
 	#documentItemRepository?: UmbDocumentItemRepository;
@@ -56,6 +73,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	#documentUrlsDataResolver?: UmbDocumentUrlsDataResolver;
 	#mediaItemRepository?: UmbMediaItemRepository;
 	#mediaUrlRepository?: UmbMediaUrlRepository;
+	#memoryScope?: typeof UMB_INTERACTION_MEMORY_SCOPE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -63,6 +81,28 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		new UmbObserveValidationStateController(this, '$.type', (invalid) => {
 			this._missingType = invalid;
 		});
+
+		this.consumeContext(UMB_INTERACTION_MEMORY_SCOPE_CONTEXT, (memoryScope) => {
+			this.#memoryScope = memoryScope;
+			this.observe(
+				memoryScope?.interactionMemory.memory(MEDIA_PICKER_MEMORY_UNIQUE),
+				(memory) => {
+					this._mediaInteractionMemories = memory?.memories ?? [];
+				},
+				'umbLinkPickerMediaMemoryObserver',
+			);
+		});
+	}
+
+	#onMediaInteractionMemoriesChange(event: Event) {
+		const target = event.target as UmbInputMediaElement;
+		const memories = target.interactionMemories ?? [];
+
+		if (memories.length > 0) {
+			this.#memoryScope?.interactionMemory.setMemory({ unique: MEDIA_PICKER_MEMORY_UNIQUE, memories });
+		} else {
+			this.#memoryScope?.interactionMemory.deleteMemory(MEDIA_PICKER_MEMORY_UNIQUE);
+		}
 	}
 
 	override async firstUpdated() {
@@ -415,7 +455,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					.max=${1}
 					folder-filter=${UmbMediaPickerFolderFilter.FILES_ONLY}
 					.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
-					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>
+					.interactionMemories=${this._mediaInteractionMemories}
+					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}
+					@interaction-memories-change=${this.#onMediaInteractionMemoriesChange}></umb-input-media>
 			</umb-property-layout>
 		`;
 	}

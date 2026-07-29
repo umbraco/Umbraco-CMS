@@ -12,6 +12,9 @@ import type { UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree
 
 const EMPTY_VALUE = 'empty_value';
 
+// TODO: this tree doesn't remember its expansion/location between opens, unlike UmbTreePickerModalElement.
+// Extending UmbPickerModalBaseElement and adopting the tree-picker-modal.element.ts memory pattern
+// (UmbTreeItemPickerExpansionManager + location/tree interaction memories) would fix it. See #23367. [LK]
 @customElement('umb-document-link-picker-modal')
 export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 	UmbDocumentLinkPickerModalData,
