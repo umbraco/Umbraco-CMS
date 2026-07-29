@@ -4,63 +4,10 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
-export type VerifyResetPasswordTokenRequestModel = {
-    user: ReferenceByIdModel;
-    resetCode: string;
-};
-
-export type ReferenceByIdModel = {
-    id: string;
-};
-
-export type VerifyResetPasswordResponseModel = {
-    passwordConfiguration: PasswordConfigurationResponseModel;
-};
-
-export type PasswordConfigurationResponseModel = {
-    minimumPasswordLength: number;
-    requireNonLetterOrDigit: boolean;
-    requireDigit: boolean;
-    requireLowercase: boolean;
-    requireUppercase: boolean;
-};
-
-export type VerifyInviteUserResponseModel = {
-    passwordConfiguration: PasswordConfigurationResponseModel;
-};
-
-export type VerifyInviteUserRequestModel = {
+export type CreateInitialPasswordUserRequestModel = {
     user: ReferenceByIdModel;
     token: string;
-};
-
-export type ResetPasswordTokenRequestModel = {
-    user: ReferenceByIdModel;
-    resetCode: string;
     password: string;
-};
-
-export type ResetPasswordRequestModel = {
-    email: string;
-};
-
-export type ProblemDetailsBuilderModel = {
-    [key: string]: never;
-};
-
-export type ProblemDetails = {
-    type?: string | null;
-    title?: string | null;
-    status?: number | null;
-    detail?: string | null;
-    instance?: string | null;
-    [key: string]: unknown | string | null | string | null | number | null | string | null | string | null | undefined;
-};
-
-export type NotificationHeaderModel = {
-    message: string;
-    category: string;
-    type: EventMessageTypeModel;
 };
 
 export enum EventMessageTypeModel {
@@ -71,10 +18,63 @@ export enum EventMessageTypeModel {
     WARNING = 'Warning'
 }
 
-export type CreateInitialPasswordUserRequestModel = {
+export type NotificationHeaderModel = {
+    message: string;
+    category: string;
+    type: EventMessageTypeModel;
+};
+
+export type PasswordConfigurationResponseModel = {
+    minimumPasswordLength: number;
+    requireNonLetterOrDigit: boolean;
+    requireDigit: boolean;
+    requireLowercase: boolean;
+    requireUppercase: boolean;
+};
+
+export type ProblemDetails = {
+    type?: string | null;
+    title?: string | null;
+    status?: number | null;
+    detail?: string | null;
+    instance?: string | null;
+    [key: string]: unknown;
+};
+
+export type ProblemDetailsBuilderModel = {
+    [key: string]: never;
+};
+
+export type ReferenceByIdModel = {
+    id: string;
+};
+
+export type ResetPasswordRequestModel = {
+    email: string;
+};
+
+export type ResetPasswordTokenRequestModel = {
+    user: ReferenceByIdModel;
+    resetCode: string;
+    password: string;
+};
+
+export type VerifyInviteUserRequestModel = {
     user: ReferenceByIdModel;
     token: string;
-    password: string;
+};
+
+export type VerifyInviteUserResponseModel = {
+    passwordConfiguration: PasswordConfigurationResponseModel;
+};
+
+export type VerifyResetPasswordResponseModel = {
+    passwordConfiguration: PasswordConfigurationResponseModel;
+};
+
+export type VerifyResetPasswordTokenRequestModel = {
+    user: ReferenceByIdModel;
+    resetCode: string;
 };
 
 export type PostSecurityForgotPasswordData = {
