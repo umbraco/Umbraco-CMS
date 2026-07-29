@@ -37,18 +37,20 @@ export class UmbInteractionMemoryManager extends UmbControllerBase {
 	/**
 	 * Add or update a memory item.
 	 * @param {UmbInteractionMemoryModel} memory - The memory item to add or update.
+	 * @returns {Promise<void>} Resolves once the memory item has been applied.
 	 * @memberof UmbInteractionMemoryManager
 	 */
-	setMemory(memory: UmbInteractionMemoryModel) {
+	async setMemory(memory: UmbInteractionMemoryModel): Promise<void> {
 		this.#memories.appendOne(memory);
 	}
 
 	/**
 	 * Delete a memory item by its unique identifier.
 	 * @param {string} unique - The unique identifier of the memory item.
+	 * @returns {Promise<void>} Resolves once the memory item has been removed.
 	 * @memberof UmbInteractionMemoryManager
 	 */
-	deleteMemory(unique: string) {
+	async deleteMemory(unique: string): Promise<void> {
 		this.#memories.removeOne(unique);
 	}
 
@@ -57,9 +59,10 @@ export class UmbInteractionMemoryManager extends UmbControllerBase {
 	 * added or updated. The underlying state only notifies observers when the content actually
 	 * changes, so this emits at most once regardless of how many items differ.
 	 * @param {Array<UmbInteractionMemoryModel>} memories - The authoritative list of memory items to hold.
+	 * @returns {Promise<void>} Resolves once the memory items have been applied.
 	 * @memberof UmbInteractionMemoryManager
 	 */
-	setMemories(memories: Array<UmbInteractionMemoryModel>) {
+	async setMemories(memories: Array<UmbInteractionMemoryModel>): Promise<void> {
 		this.#memories.setValue(memories);
 	}
 
@@ -74,9 +77,10 @@ export class UmbInteractionMemoryManager extends UmbControllerBase {
 
 	/**
 	 * Clear all memory items from the manager.
+	 * @returns {Promise<void>} Resolves once the memory items have been cleared.
 	 * @memberof UmbInteractionMemoryManager
 	 */
-	clear() {
+	async clear(): Promise<void> {
 		this.#memories.clear();
 	}
 }

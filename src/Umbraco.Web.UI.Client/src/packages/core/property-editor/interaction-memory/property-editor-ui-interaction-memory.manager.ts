@@ -51,27 +51,27 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbInteractionM
 	// write can land, so the two can never race — mirroring how `saveMemoriesForPropertyEditor`
 	// below has always been gated.
 
-	override async setMemory(memory: UmbInteractionMemoryModel) {
+	override async setMemory(memory: UmbInteractionMemoryModel): Promise<void> {
 		await this.#init;
-		super.setMemory(memory);
+		await super.setMemory(memory);
 		this.#writeToStore();
 	}
 
-	override async deleteMemory(unique: string) {
+	override async deleteMemory(unique: string): Promise<void> {
 		await this.#init;
-		super.deleteMemory(unique);
+		await super.deleteMemory(unique);
 		this.#writeToStore();
 	}
 
-	override async setMemories(memories: Array<UmbInteractionMemoryModel>) {
+	override async setMemories(memories: Array<UmbInteractionMemoryModel>): Promise<void> {
 		await this.#init;
-		super.setMemories(memories);
+		await super.setMemories(memories);
 		this.#writeToStore();
 	}
 
-	override async clear() {
+	override async clear(): Promise<void> {
 		await this.#init;
-		super.clear();
+		await super.clear();
 		this.#writeToStore();
 	}
 
@@ -104,11 +104,11 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbInteractionM
 	}
 
 	#getInteractionMemoryUnique() {
-		return `${this.#memoryUniquePrefix}PropertyEditorUi${this.#configHashCode ? '-' + this.#configHashCode : ''}`;
+		return `${this.#memoryUniquePrefix}PropertyEditorUi${this.#configHashCode !== undefined ? '-' + this.#configHashCode : ''}`;
 	}
 
 	#writeToStore() {
-		if (!this.#interactionMemoryContext || !this.#configHashCode) return;
+		if (!this.#interactionMemoryContext || this.#configHashCode === undefined) return;
 
 		const memoryUnique = this.#getInteractionMemoryUnique();
 		const memories = this.getAllMemories();
@@ -121,7 +121,7 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbInteractionM
 	}
 
 	async #observeInteractionMemory() {
-		if (!this.#interactionMemoryContext || !this.#configHashCode) return;
+		if (!this.#interactionMemoryContext || this.#configHashCode === undefined) return;
 		const memoryUnique = this.#getInteractionMemoryUnique();
 		if (!memoryUnique) return;
 		this.observe(

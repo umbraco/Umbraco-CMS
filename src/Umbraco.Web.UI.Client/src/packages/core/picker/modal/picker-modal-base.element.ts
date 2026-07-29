@@ -1,8 +1,10 @@
 import type { UmbPickerContext } from '../picker.context.js';
-import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT } from './picker-interaction-memory.context.token.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import {
+	UMB_PICKER_INTERACTION_MEMORY_CONTEXT,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
 import type { ManifestModal, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
 
 /**
@@ -54,7 +56,7 @@ export abstract class UmbPickerModalBaseElement<
 		this.observe(
 			this.#memoryScope.memory(this.#getInteractionMemoryUnique()),
 			(memory) => {
-				memory?.memories?.forEach((memory) => this._pickerContext.interactionMemory.setMemory(memory));
+				this._pickerContext.interactionMemory.setMemories(memory?.memories ?? []);
 			},
 			'umbModalInteractionMemoryObserver',
 		);

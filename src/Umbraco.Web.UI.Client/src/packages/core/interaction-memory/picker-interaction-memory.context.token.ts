@@ -1,4 +1,4 @@
-import type { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryManager } from './interaction-memory.manager.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**

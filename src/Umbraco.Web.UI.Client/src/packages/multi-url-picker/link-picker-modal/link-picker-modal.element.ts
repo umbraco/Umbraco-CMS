@@ -29,8 +29,11 @@ import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
-import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
-import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT, umbPickerModalMemoryUnique } from '@umbraco-cms/backoffice/picker';
+import {
+	UMB_PICKER_INTERACTION_MEMORY_CONTEXT,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
+import { umbPickerModalMemoryUnique } from '@umbraco-cms/backoffice/picker';
 
 type UmbInputPickerEvent = CustomEvent & { target: { value?: string; culture?: string } };
 

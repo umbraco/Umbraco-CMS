@@ -1,10 +1,12 @@
 import { UmbPickerModalBaseElement } from './picker-modal-base.element.js';
-import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT } from './picker-interaction-memory.context.token.js';
 import { UmbPickerContext } from '../picker.context.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { expect } from '@open-wc/testing';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
+import {
+	UMB_PICKER_INTERACTION_MEMORY_CONTEXT,
+	UmbInteractionMemoryManager,
+} from '@umbraco-cms/backoffice/interaction-memory';
 import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 
 @customElement('test-picker-modal-scope-host')
