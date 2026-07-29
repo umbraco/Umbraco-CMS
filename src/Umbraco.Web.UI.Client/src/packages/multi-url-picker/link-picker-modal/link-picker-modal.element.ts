@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_LINK_PICKER_MODAL } from '../document-link-picker-modal/document-link-picker-modal.token.js';
+import { toMediaPickerInputMemories, toMediaPickerScopeMemory } from './media-picker-memory-relay.function.js';
 import type { UmbLinkPickerLink } from './types.js';
 import type {
 	UmbLinkPickerConfig,
@@ -87,7 +88,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			this.observe(
 				memoryScope?.interactionMemory.memory(MEDIA_PICKER_MEMORY_UNIQUE),
 				(memory) => {
-					this._mediaInteractionMemories = memory?.memories ?? [];
+					this._mediaInteractionMemories = toMediaPickerInputMemories(memory);
 				},
 				'umbLinkPickerMediaMemoryObserver',
 			);
@@ -96,10 +97,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	#onMediaInteractionMemoriesChange(event: Event) {
 		const target = event.target as UmbInputMediaElement;
-		const memories = target.interactionMemories ?? [];
+		const memory = toMediaPickerScopeMemory(target.interactionMemories, MEDIA_PICKER_MEMORY_UNIQUE);
 
-		if (memories.length > 0) {
-			this.#memoryScope?.interactionMemory.setMemory({ unique: MEDIA_PICKER_MEMORY_UNIQUE, memories });
+		if (memory) {
+			this.#memoryScope?.interactionMemory.setMemory(memory);
 		} else {
 			this.#memoryScope?.interactionMemory.deleteMemory(MEDIA_PICKER_MEMORY_UNIQUE);
 		}
