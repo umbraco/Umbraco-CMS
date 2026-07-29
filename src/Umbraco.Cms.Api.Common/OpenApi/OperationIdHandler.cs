@@ -104,9 +104,7 @@ public class OperationIdHandler : IOperationIdHandler
         {
             // Strip any characters that are not valid in an identifier, so a minor version like "1.1"
             // does not leak a dot into the operation ID (and thus into generated client code).
-            version = versionAttributeValue is null
-                ? null
-                : OperationIdRegexes.NonAlphanumericRegex().Replace(versionAttributeValue, string.Empty);
+            version = OperationIdRegexes.NonAlphanumericRegex().Replace(versionAttributeValue, string.Empty);
         }
 
         // Return the operation ID with the formatted http method verb in front, e.g. GetTrackedReferenceById

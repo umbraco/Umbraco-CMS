@@ -28,7 +28,7 @@ internal sealed class OperationIdHandlerTests
         };
 
     [Test]
-    public void Strips_the_route_prefix_of_a_minor_api_version()
+    public void Can_Strip_Route_Prefix_Of_Minor_Api_Version()
     {
         ApiDescription apiDescription = CreateApiDescription(
             "PUT",
@@ -39,7 +39,7 @@ internal sealed class OperationIdHandlerTests
     }
 
     [Test]
-    public void Strips_the_route_prefix_of_a_multi_digit_api_version()
+    public void Can_Strip_Route_Prefix_Of_Multi_Digit_Api_Version()
     {
         ApiDescription apiDescription = CreateApiDescription(
             "GET",
@@ -50,7 +50,7 @@ internal sealed class OperationIdHandlerTests
     }
 
     [Test]
-    public void Does_not_append_a_suffix_for_the_default_api_version()
+    public void Can_Omit_Version_Suffix_For_Default_Api_Version()
     {
         ApiDescription apiDescription = CreateApiDescription(
             "PUT",
