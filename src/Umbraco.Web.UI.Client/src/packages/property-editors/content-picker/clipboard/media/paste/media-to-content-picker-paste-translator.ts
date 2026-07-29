@@ -3,7 +3,7 @@ import { UMB_MEDIA_ENTITY_TYPE, type UmbMediaClipboardEntryValueModel } from '@u
 import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbClipboardPastePropertyValueTranslator } from '@umbraco-cms/backoffice/clipboard';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
 type UmbContentPickerValueModel = Array<UmbReferenceByUniqueAndType>;
 
@@ -21,10 +21,13 @@ export class UmbMediaToContentPickerClipboardPastePropertyValueTranslator
 
 	async isCompatibleValue(
 		_propertyValue: UmbContentPickerValueModel,
-		config: UmbPropertyEditorConfigCollection | undefined,
+		config: UmbPropertyEditorConfig | undefined,
 	): Promise<boolean> {
-		// Only accept media into a Content Picker that is configured to pick media.
-		const startNode = config?.getValueByAlias<UmbContentPickerSource>('startNode');
+		// Only accept media into a Content Picker that is configured to pick media. The config arrives as the raw
+		// array of config properties, so it has to be looked up by alias rather than via a config collection.
+		const startNode = config?.find((property) => property.alias === 'startNode')?.value as
+			| UmbContentPickerSource
+			| undefined;
 		return startNode?.type === 'media';
 	}
 }

@@ -3,7 +3,7 @@ import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfig } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('test-media-to-content-picker-paste-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -37,14 +37,20 @@ describe('UmbMediaToContentPickerClipboardPastePropertyValueTranslator', () => {
 		expect(error).to.be.instanceOf(Error);
 	});
 
+	// The config handed to isCompatibleValue comes from UmbPropertyContext.getConfig(), which returns the raw
+	// array of config properties — not an UmbPropertyEditorConfigCollection.
 	it('is compatible when the content picker is configured for media', async () => {
-		const config = new UmbPropertyEditorConfigCollection([{ alias: 'startNode', value: { type: 'media' } }]);
+		const config: UmbPropertyEditorConfig = [{ alias: 'startNode', value: { type: 'media' } }];
 		expect(await pasteTranslator.isCompatibleValue([], config)).to.be.true;
 	});
 
 	it('is not compatible when the content picker is configured for content', async () => {
-		const config = new UmbPropertyEditorConfigCollection([{ alias: 'startNode', value: { type: 'content' } }]);
+		const config: UmbPropertyEditorConfig = [{ alias: 'startNode', value: { type: 'content' } }];
 		expect(await pasteTranslator.isCompatibleValue([], config)).to.be.false;
+	});
+
+	it('is not compatible when the configuration has no start node', async () => {
+		expect(await pasteTranslator.isCompatibleValue([], [])).to.be.false;
 	});
 
 	it('is not compatible when no configuration is provided', async () => {
