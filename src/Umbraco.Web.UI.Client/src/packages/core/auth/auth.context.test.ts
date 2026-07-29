@@ -30,6 +30,18 @@ describe('UmbAuthContext', () => {
 			expect(context).to.have.property('isInitialized');
 		});
 
+		// setInitialized() used to be driven from the core entry point. It now runs in the constructor,
+		// so guard the property that makes that safe: #isInitialized is a ReplaySubject(1), meaning a
+		// subscriber attaching after construction still receives the emission rather than hanging.
+		it('emits isInitialized to a subscriber that attaches after construction', async () => {
+			let emitted = false;
+			context.isInitialized.subscribe(() => {
+				emitted = true;
+			});
+			await aTimeout(0);
+			expect(emitted).to.be.true;
+		});
+
 		it('has a getIsAuthorized method', () => {
 			expect(context).to.have.property('getIsAuthorized').that.is.a('function');
 		});
