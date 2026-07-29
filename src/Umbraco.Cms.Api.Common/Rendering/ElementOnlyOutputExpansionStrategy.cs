@@ -219,13 +219,13 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
             }
 
             // verify that the value does not start with a start bracket
-            if (value.StartsWith('['))
+            if (valueAsSpan.StartsWith('['))
             {
                 throw new ArgumentException("Value cannot start with a bracket");
             }
 
             // verify that there are no empty brackets
-            if (value.Contains("[]"))
+            if (valueAsSpan.Contains("[]", StringComparison.Ordinal))
             {
                 throw new ArgumentException("Value cannot contain empty brackets");
             }
@@ -237,9 +237,25 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
             var currentNode = new Node();
             root.Items.Add(currentNode);
 
-            foreach (char c in value)
+            const string delimiters = "[,]";
+            while (!valueAsSpan.IsEmpty)
             {
-                switch (c)
+                int idx = valueAsSpan.IndexOfAny(delimiters);
+
+                if (idx < 0)
+                {
+                    // No more delimiters: the rest is key text for the current node
+                    currentNode.Key += valueAsSpan.ToString();
+                    break;
+                }
+
+                // Everything before the delimiter is key text for the current node
+                if (idx > 0)
+                {
+                    currentNode.Key += valueAsSpan[..idx].ToString();
+                }
+
+                switch (valueAsSpan[idx])
                 {
                     case '[': // Start a new node, child of the current node
                         stack.Push(currentNode);
@@ -253,10 +269,9 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
                     case ']': // Back to parent of the current node
                         currentNode = stack.Pop();
                         break;
-                    default: // Add char to current node key
-                        currentNode.Key += c;
-                        break;
                 }
+
+                valueAsSpan = valueAsSpan[(idx + 1)..];
             }
 
             return root;
