@@ -13,10 +13,12 @@ This replaces the old manual routine (run the app, open Swagger UI, copy JSON, p
 
 ## Key facts
 
-- **OpenAPI endpoint:** `/umbraco/swagger/management/swagger.json`, served over HTTPS with a dev cert (so fetches need `curl -k`).
+- **OpenAPI endpoint:** `/umbraco/swagger/management/swagger.json`, served over HTTPS with a dev cert. Swagger is only mapped when the environment is **not Production** ([`SwaggerRouteTemplatePipelineFilter.cs:52`](../../../src/Umbraco.Cms.Api.Common/OpenApi/SwaggerRouteTemplatePipelineFilter.cs)) — a backend running in Production returns 404 here even though it's healthy.
 - **Port:** default **`44339`** (the `launchSettings.json` https profile). Assume it unless the user says otherwise.
 - **Target file:** `src/Umbraco.Cms.Api.Management/OpenApi.json` — git-tracked, so git is the safety net for a bad fetch.
-- **Client regeneration:** `npm --prefix src/Umbraco.Web.UI.Client run generate:server-api` (delegates to the `@umbraco-backoffice/core` workspace). Reads the freshly-updated `OpenApi.json` and rewrites the generated client under `src/Umbraco.Web.UI.Client/src/packages/core/backend-api/`.
+- **The mechanical work is a script, not this document.** `npm run generate:openapi` fetches, validates and writes the spec; `npm run generate:server-api` then regenerates the client **from the committed file**. Prefer these over hand-rolled `curl`.
+- **Keep those two commands separate — never chain them into one.** The client generator reads the committed `OpenApi.json` and only that. Pointing it at a live server instead has been tried and removed (b8c2a3366fd): it broke base-url handling, and worse, it produced a client with no matching committed schema. Schema and client belong in the same commit.
+- **This skill exists for the parts a script can't do:** knowing *when* to run it, managing the backend lifecycle, and reading the diff.
 
 ## Procedure
 
@@ -38,7 +40,7 @@ CODE=$(curl -sk --max-time 5 -o /dev/null -w "%{http_code}" "https://localhost:4
 
 - **`200`** → a backend is already up. Reuse it; do **not** stop it afterward (the user had it running).
 - **`000`** → nothing is listening on 44339. Start one yourself, in the background, on 44339, and remember that *you* started it so you can stop it in step 5. No `--no-build` here on purpose, so a cold repo still works.
-- **anything else** → something is already listening on 44339 but isn't serving the expected OpenAPI document. Don't start another instance on the same port; surface the HTTP status and stop.
+- **anything else** → something is already listening on 44339 but isn't serving the expected OpenAPI document. Don't start another instance on the same port; surface the HTTP status and stop. A `404` from an otherwise healthy Umbraco is the common one — that's a backend running in Production, where Swagger isn't mapped. Say so, and let the user decide whether to restart it in Development rather than restarting it for them.
 
 For the `000` case, start the backend with:
 
@@ -49,23 +51,17 @@ dotnet run --project src/Umbraco.Web.UI --no-launch-profile -- \
 
 Run that with `run_in_background: true` — that also puts the process under the harness's control so step 5 can stop it cleanly. First-run startup (build + boot) can take a couple of minutes — the fetch in step 3 waits for it.
 
-### 3. Fetch byte-for-byte straight into the file, then validate
-
-Curl writes the raw response directly into the target — that's the byte-for-byte copy. `--fail` means an HTTP error (4xx/5xx) won't land an error page in the file, and `--retry-connrefused` lets a just-started server be picked up the moment it's listening (no `sleep` loops). Then confirm it parses as JSON; if it doesn't, restore the committed file with git rather than leaving something broken behind:
+### 3. Fetch byte-for-byte straight into the file
 
 ```bash
-TARGET=src/Umbraco.Cms.Api.Management/OpenApi.json
-if curl -sk --fail --retry-connrefused --retry 60 --retry-delay 3 --retry-max-time 300 \
-     "https://localhost:44339/umbraco/swagger/management/swagger.json" -o "$TARGET" \
-   && node -e "JSON.parse(require('fs').readFileSync('$TARGET','utf8'))"; then
-  echo "OK"
-else
-  echo "FETCH/VALIDATE FAILED — restoring"
-  git checkout -- "$TARGET"
-fi
+npm --prefix src/Umbraco.Web.UI.Client run generate:openapi -- --wait
 ```
 
-If it failed: report what happened (a non-`Run` runtime level mid-install/upgrade, or the wrong app on the port are the usual causes) and treat the run as failed — the file is back to its committed state.
+The script writes the raw response body straight into the target — that's the byte-for-byte copy — and only after it parses as JSON, so a failed run leaves `OpenApi.json` untouched rather than restoring it after the fact. `--wait` keeps retrying while nothing is listening yet, so a backend you started in step 2 is picked up the moment it's up (no `sleep` loops); against a server that was already running it returns straight away.
+
+Pass a URL as the first argument if the user is on a non-default port.
+
+A non-zero exit is a failed run — report the script's own message rather than retrying. The usual causes are a backend in Production (Swagger unmapped), a non-`Run` runtime level mid-install/upgrade, or a different app on the port.
 
 ### 4. Show the diff
 
@@ -89,7 +85,7 @@ The instance you launched in step 2 ran with `run_in_background: true`, so the h
 
 The generated hey-api client is downstream of `OpenApi.json`, but it can drift **independently** of it: a previous spec change that was never followed by a regen leaves a stale client even when step 4 shows no spec diff. So don't gate this on step 4 — regenerating is the only way to know the committed client actually matches the current spec. The generator is deterministic and git-recoverable, so running it against an already-synced client is a no-op (empty diff).
 
-**Ask the user** before running it — it rewrites generated sources and can be noisy:
+Get the user's agreement before running it — it rewrites generated sources and can be noisy. **Ask once, not twice.** If you got here from a proactive offer (you suggested the sync yourself at the end of some Management API work), the client regen belongs in that same offer — "shall I sync `OpenApi.json` and the generated client?" — and a yes covers this step. Only ask separately if you're mid-run and it genuinely hasn't come up yet:
 
 > "Want me to regenerate the backoffice hey-api client (`npm run generate:server-api`) to confirm it's in sync with `OpenApi.json`? It's a no-op if it already matches."
 
