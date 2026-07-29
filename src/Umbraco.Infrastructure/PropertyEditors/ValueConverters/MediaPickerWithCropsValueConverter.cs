@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
-    private static readonly ConcurrentDictionary<Type, Func<IPublishedContent, IPublishedValueFallback, ImageCropperValue, MediaWithCrops>> _mediaWithCropsFactories = new();
+    private static readonly ConcurrentDictionary<Type, ConstructorInvoker> _mediaWithCropsFactories = new();
 
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IPublishedMediaCache _publishedMediaCache;
@@ -218,28 +218,15 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         IPublishedValueFallback publishedValueFallback,
         ImageCropperValue localCrops)
     {
-        Func<IPublishedContent, IPublishedValueFallback, ImageCropperValue, MediaWithCrops> factory =
+        ConstructorInvoker factory =
             _mediaWithCropsFactories.GetOrAdd(mediaItem.GetType(), static mediaType =>
             {
                 Type closedType = typeof(MediaWithCrops<>).MakeGenericType(mediaType);
-
                 ConstructorInfo ctor = closedType.GetConstructor(
                     [mediaType, typeof(IPublishedValueFallback), typeof(ImageCropperValue)])!;
-
-                ParameterExpression contentParam = Expression.Parameter(typeof(IPublishedContent), "content");
-                ParameterExpression fallbackParam = Expression.Parameter(typeof(IPublishedValueFallback), "fallback");
-                ParameterExpression cropsParam = Expression.Parameter(typeof(ImageCropperValue), "crops");
-
-                NewExpression newExpr = Expression.New(
-                    ctor,
-                    Expression.Convert(contentParam, mediaType),
-                    fallbackParam,
-                    cropsParam);
-
-                return Expression.Lambda<Func<IPublishedContent, IPublishedValueFallback, ImageCropperValue, MediaWithCrops>>(
-                    newExpr, contentParam, fallbackParam, cropsParam).Compile();
+                return ConstructorInvoker.Create(ctor);
             });
 
-        return factory(mediaItem, publishedValueFallback, localCrops);
+        return (MediaWithCrops) factory.Invoke(mediaItem, publishedValueFallback, localCrops);
     }
 }

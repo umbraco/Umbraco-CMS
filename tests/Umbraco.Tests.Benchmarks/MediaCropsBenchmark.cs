@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Benchmarks
         private static readonly ImageCropperValue LocalCrops = new() { Src = "/media/test.jpg" };
         private static readonly IPublishedContent[] TenMediaItems = Enumerable.Range(0, 10).Select(_ => new StubPublishedContent()).ToArray();
 
-        private static readonly ConcurrentDictionary<Type, Func<IPublishedContent, IPublishedValueFallback, ImageCropperValue, MediaWithCrops>> _factories = new();
+        private static readonly ConcurrentDictionary<Type, ConstructorInvoker> _factories = new();
 
         // -------------------------------------------------------------------------
         // After: compiled Expression delegate (production code path)
@@ -136,35 +136,21 @@ namespace Umbraco.Tests.Benchmarks
         // -------------------------------------------------------------------------
 
         private static MediaWithCrops CreateMediaWithCropsNew(
-            ConcurrentDictionary<Type, Func<IPublishedContent, IPublishedValueFallback, ImageCropperValue, MediaWithCrops>> factories,
+            ConcurrentDictionary<Type, ConstructorInvoker> factories,
             IPublishedContent mediaItem,
             IPublishedValueFallback publishedValueFallback,
             ImageCropperValue localCrops)
         {
-            Func<IPublishedContent, IPublishedValueFallback, ImageCropperValue, MediaWithCrops> factory =
-                factories.GetOrAdd(mediaItem.GetType(), static mediaType => CompileFactory(mediaType));
-            return factory(mediaItem, publishedValueFallback, localCrops);
+            ConstructorInvoker factory = factories.GetOrAdd(mediaItem.GetType(), static mediaType => CompileFactory(mediaType));
+            return (MediaWithCrops)factory.Invoke(mediaItem, publishedValueFallback, localCrops);
         }
 
-        private static Func<IPublishedContent, IPublishedValueFallback, ImageCropperValue, MediaWithCrops>
-            CompileFactory(Type mediaType)
+        private static ConstructorInvoker CompileFactory(Type mediaType)
         {
             Type closedType = typeof(MediaWithCrops<>).MakeGenericType(mediaType);
             ConstructorInfo ctor = closedType.GetConstructor(
-                [mediaType, typeof(IPublishedValueFallback), typeof(ImageCropperValue)]);
-
-            ParameterExpression contentParam = Expression.Parameter(typeof(IPublishedContent), "content");
-            ParameterExpression fallbackParam = Expression.Parameter(typeof(IPublishedValueFallback), "fallback");
-            ParameterExpression cropsParam = Expression.Parameter(typeof(ImageCropperValue), "crops");
-
-            NewExpression newExpr = Expression.New(
-                ctor,
-                Expression.Convert(contentParam, mediaType),
-                fallbackParam,
-                cropsParam);
-
-            return Expression.Lambda<Func<IPublishedContent, IPublishedValueFallback, ImageCropperValue, MediaWithCrops>>(
-                newExpr, contentParam, fallbackParam, cropsParam).Compile();
+                [mediaType, typeof(IPublishedValueFallback), typeof(ImageCropperValue)])!;
+            return ConstructorInvoker.Create(ctor);
         }
     }
 }
