@@ -298,5 +298,9 @@
 	"publishConfig": {
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"
+	},
+	"allowScripts": {
+		"esbuild": true,
+		"msw": true
 	}
 }
