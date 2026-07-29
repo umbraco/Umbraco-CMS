@@ -53,6 +53,17 @@ export class UmbInteractionMemoryManager extends UmbControllerBase {
 	}
 
 	/**
+	 * Replace all memory items with the given list: items no longer present are removed, the rest are
+	 * added or updated. The underlying state only notifies observers when the content actually
+	 * changes, so this emits at most once regardless of how many items differ.
+	 * @param {Array<UmbInteractionMemoryModel>} memories - The authoritative list of memory items to hold.
+	 * @memberof UmbInteractionMemoryManager
+	 */
+	setMemories(memories: Array<UmbInteractionMemoryModel>) {
+		this.#memories.setValue(memories);
+	}
+
+	/**
 	 * Get all memory items from the manager.
 	 * @returns {Array<UmbInteractionMemoryModel>} An array of all memory items.
 	 * @memberof UmbInteractionMemoryManager

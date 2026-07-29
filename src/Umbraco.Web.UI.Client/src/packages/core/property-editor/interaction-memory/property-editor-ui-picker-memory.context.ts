@@ -19,17 +19,24 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  */
 export class UmbPropertyEditorUiPickerMemoryContext extends UmbInteractionMemoryScopeContext {
 	#memoryManager: UmbPropertyEditorUiInteractionMemoryManager;
+
+	// This guard is NOT a redundant re-emit check (states already dedupe that on their own) — it's a
+	// reentrancy breaker. `#memoryManager`'s save/delete methods cross an `await` boundary and echo
+	// back through a third, external store, so a mutation that lands mid-round-trip (e.g. from a
+	// sibling picker modal) sees a genuinely different value at each hop even though the two
+	// observers below are chasing the same logical update. Without this, that produces an
+	// oscillating loop rather than a converging one.
 	#snapshot: Array<UmbInteractionMemoryModel> = [];
 
 	constructor(host: UmbControllerHost, args: { memoryUniquePrefix: string }) {
 		super(host);
 
-		this.#memoryManager = new UmbPropertyEditorUiInteractionMemoryManager(host, args);
+		this.#memoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, args);
 
 		this.observe(this.#memoryManager.memoriesForPropertyEditor, (memories) => {
 			if (jsonStringComparison(memories, this.#snapshot)) return;
 			this.#snapshot = memories;
-			this.#applyMemories(memories);
+			this.interactionMemory.setMemories(memories);
 		});
 
 		this.observe(this.interactionMemory.memories, (memories) => {
@@ -51,16 +58,5 @@ export class UmbPropertyEditorUiPickerMemoryContext extends UmbInteractionMemory
 	 */
 	setPropertyEditorConfig(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#memoryManager.setPropertyEditorConfig(config);
-	}
-
-	#applyMemories(next: Array<UmbInteractionMemoryModel>) {
-		const current = this.interactionMemory.getAllMemories();
-		const nextUniques = new Set(next.map((memory) => memory.unique));
-
-		current
-			.filter((memory) => !nextUniques.has(memory.unique))
-			.forEach((memory) => this.interactionMemory.deleteMemory(memory.unique));
-
-		next.forEach((memory) => this.interactionMemory.setMemory(memory));
 	}
 }

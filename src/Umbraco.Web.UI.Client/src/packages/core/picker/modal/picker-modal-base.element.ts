@@ -4,7 +4,17 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_INTERACTION_MEMORY_SCOPE_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { ManifestModal, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
-import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+
+/**
+ * Builds the interaction-memory key a picker modal bridges its state under, keyed by modal alias so
+ * different picker modals — and the same modal reached through different openers — can share or
+ * isolate their remembered state as appropriate.
+ * @param {(string | undefined)} alias - The picker modal's alias.
+ * @returns {string} The interaction-memory key.
+ */
+export function umbPickerModalMemoryUnique(alias: string | undefined): string {
+	return `UmbPickerModal:${alias ?? ''}`;
+}
 
 export abstract class UmbPickerModalBaseElement<
 	ItemType = UmbEntityModel,
@@ -29,16 +39,6 @@ export abstract class UmbPickerModalBaseElement<
 		this.#observeMemoriesFromPicker();
 	}
 
-	protected override updated(changedProperties: PropertyValues): void {
-		super.updated(changedProperties);
-		// The modal manifest is assigned to this element before it is connected, so this should
-		// already be in place by the time the scope context resolves. Re-run on the off chance the
-		// two race the other way, so the memory is never bridged under an empty/placeholder alias.
-		if (changedProperties.has('manifest')) {
-			this.#observeMemoriesFromScope();
-		}
-	}
-
 	#observeMemoriesFromPicker() {
 		this.observe(this._pickerContext.interactionMemory.memories, (memories) => {
 			this.#setMemoriesOnScope(memories);
@@ -46,8 +46,7 @@ export abstract class UmbPickerModalBaseElement<
 	}
 
 	#getInteractionMemoryUnique() {
-		const alias = this.manifest?.alias ?? this.modalContext?.alias;
-		return `UmbPickerModal:${alias ?? ''}`;
+		return umbPickerModalMemoryUnique(this.manifest?.alias);
 	}
 
 	#observeMemoriesFromScope() {

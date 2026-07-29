@@ -1,5 +1,4 @@
 import { UMB_DOCUMENT_LINK_PICKER_MODAL } from '../document-link-picker-modal/document-link-picker-modal.token.js';
-import { toMediaPickerInputMemories, toMediaPickerScopeMemory } from './media-picker-memory-relay.function.js';
 import type { UmbLinkPickerLink } from './types.js';
 import type {
 	UmbLinkPickerConfig,
@@ -34,13 +33,14 @@ import {
 	UMB_INTERACTION_MEMORY_SCOPE_CONTEXT,
 	type UmbInteractionMemoryModel,
 } from '@umbraco-cms/backoffice/interaction-memory';
+import { umbPickerModalMemoryUnique } from '@umbraco-cms/backoffice/picker';
 
 type UmbInputPickerEvent = CustomEvent & { target: { value?: string; culture?: string } };
 
 // Shares its key with the `UmbMediaPickerModalElement` memory bridge (`picker-modal-base.element.ts`),
 // so the media folder location is remembered whether it's reached via "insert media" or via this
 // link picker's own media tab.
-const MEDIA_PICKER_MEMORY_UNIQUE = `UmbPickerModal:${UMB_MEDIA_PICKER_MODAL}`;
+const MEDIA_PICKER_MEMORY_UNIQUE = umbPickerModalMemoryUnique(UMB_MEDIA_PICKER_MODAL.toString());
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
@@ -88,7 +88,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			this.observe(
 				memoryScope?.interactionMemory.memory(MEDIA_PICKER_MEMORY_UNIQUE),
 				(memory) => {
-					this._mediaInteractionMemories = toMediaPickerInputMemories(memory);
+					// Relay the wrapper entry itself, not its nested `.memories` — `<umb-input-media>`'s own
+					// scope expects the same wrapper shape any scope holds (see picker-modal-base.element.ts).
+					this._mediaInteractionMemories = memory ? [memory] : [];
 				},
 				'umbLinkPickerMediaMemoryObserver',
 			);
@@ -97,7 +99,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	#onMediaInteractionMemoriesChange(event: Event) {
 		const target = event.target as UmbInputMediaElement;
-		const memory = toMediaPickerScopeMemory(target.interactionMemories, MEDIA_PICKER_MEMORY_UNIQUE);
+		// Relay the matching wrapper entry unchanged — do not re-wrap the whole list under the same
+		// key again, which would nest the wrapper inside itself.
+		const memory = target.interactionMemories?.find((memory) => memory.unique === MEDIA_PICKER_MEMORY_UNIQUE);
 
 		if (memory) {
 			this.#memoryScope?.interactionMemory.setMemory(memory);
