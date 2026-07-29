@@ -632,17 +632,20 @@ public static partial class StringExtensions
         }
 
         // If the text does not contain any of the characters to replace, we can just return the original text.
-        if (!text.AsSpan().ContainsAny(chars))
+        int startingIndex = text.AsSpan().IndexOfAny(chars);
+        if (startingIndex == -1)
         {
             return text;
         }
 
-        return string.Create(text.Length, (text, chars, replacement), static (span, state) =>
+        return string.Create(text.Length, (text, startingIndex, chars, replacement), static (span, state) =>
         {
-            (string? source, char[]? set, char replacement) = state;
+            (string? source, int startingIndex, char[]? set, char replacement) = state;
             source.AsSpan().CopyTo(span);
 
-            Span<char> remaining = span;
+            span[startingIndex] = replacement;
+
+            Span<char> remaining = span[(startingIndex + 1)..];
             int idx;
             while ((idx = remaining.IndexOfAny(set)) >= 0)
             {

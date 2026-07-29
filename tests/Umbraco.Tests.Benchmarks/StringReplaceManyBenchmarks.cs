@@ -63,17 +63,20 @@ public class StringReplaceManyBenchmarks
     {
         var result = Text;
 
-        if (!result.AsSpan().ContainsAny(ReplacedChars))
+        var startingIndex = result.AsSpan().IndexOfAny(ReplacedChars);
+        if (startingIndex == -1)
         {
             return result;
         }
 
-        return string.Create(result.Length, (result, ReplacedChars, ReplacementChar), static (span, state) =>
+        return string.Create(result.Length, (result, startingIndex, ReplacedChars, ReplacementChar), static (span, state) =>
         {
-            var (source, set, replacement) = state;
+            var (source, startingIndex, set, replacement) = state;
             source.AsSpan().CopyTo(span);
 
-            var remaining = span;
+            span[startingIndex] = replacement;
+
+            var remaining = span[(startingIndex + 1)..];
             int idx;
             while ((idx = remaining.IndexOfAny(set)) >= 0)
             {
