@@ -1,4 +1,4 @@
-import type { PasswordConfigurationResponseModel } from './api/index.js';
+import type { PasswordConfigurationResponseModel as PasswordConfigurationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type LoginRequestModel = {
 	username: string;
@@ -38,8 +38,10 @@ export type ValidateInviteCodeResponse = {
 	passwordConfiguration?: PasswordConfigurationModel;
 };
 
-export type PasswordConfigurationModel = PasswordConfigurationResponseModel;
+export type { PasswordConfigurationModel };
 
+// TODO (V18): Remove together with isProblemDetails(). Kept here because it was deprecated in V16,
+// so the earliest removal is V18 — it is already gone on main.
 /**
  * @deprecated Use `UmbProblemDetails` from `@umbraco-cms/backoffice/resources` instead.
  */
