@@ -33,6 +33,8 @@ describe('UmbAuthContext', () => {
 		// setInitialized() used to be driven from the core entry point. It now runs in the constructor,
 		// so guard the property that makes that safe: #isInitialized is a ReplaySubject(1), meaning a
 		// subscriber attaching after construction still receives the emission rather than hanging.
+		// Reading the deprecated getter logs a deprecation warning here — expected, since the test
+		// runner's origin resolves to 'unknown' rather than 'core' so the warning isn't suppressed.
 		it('emits isInitialized to a subscriber that attaches after construction', async () => {
 			let emitted = false;
 			context.isInitialized.subscribe(() => {

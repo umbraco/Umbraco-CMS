@@ -11,7 +11,6 @@ import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observa
 import {
 	ReplaySubject,
 	Subject,
-	switchMap,
 	distinctUntilChanged,
 	throttleTime,
 	auditTime,
@@ -91,7 +90,7 @@ export class UmbAuthContext extends UmbContextBase {
 	#postLogoutRedirectUri;
 
 	/**
-	 * Observable that emits true when the auth context is initialized.
+	 * Observable that emits once, without a value, when the auth context is initialized.
 	 * @internal This was only ever public so the core entry point could drive it. It gates nothing
 	 * for consumers: the boot sequence already awaits app entry points before the router evaluates
 	 * its guards, so by the time any extension code runs this has long since completed.
@@ -715,7 +714,8 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @internal Only public because the core entry point calls it from outside this class. Nothing
 	 * outside Umbraco core should ever call this — doing so opens the provider-discovery gate early.
 	 * @deprecated Internal boot hook, never intended for public use. Scheduled for removal in Umbraco 19.
-	 * @remark This is used to let the app context know that the core module is ready, which means that the core auth providers are available.
+	 * @remark The constructor already does this, so calling it again is a no-op on an
+	 * already-completed subject. It emits once, without a value.
 	 */
 	setInitialized() {
 		new UmbDeprecation({
@@ -750,11 +750,14 @@ export class UmbAuthContext extends UmbContextBase {
 		return this.#getAuthProviders(extensionsRegistry);
 	}
 
-	/** Internal, non-warning implementation of {@link getAuthProviders}. */
+	/**
+	 * Internal, non-warning implementation of {@link getAuthProviders}.
+	 * No initialization gate: the constructor completes #isInitialized, so piping through it only
+	 * added a micro-task delay. Ordering is guaranteed by the boot sequence awaiting app entry
+	 * points before the router evaluates its guards.
+	 */
 	#getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
-		return this.#isInitialized.pipe(
-			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
-		);
+		return extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider');
 	}
 
 	/**
