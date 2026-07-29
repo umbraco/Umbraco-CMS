@@ -3,7 +3,7 @@
 TypeScript/Lit login SPA for Umbraco CMS backoffice authentication. Provides the `<umb-auth>` web component used in the login page, supporting local login, MFA, password reset, and user invitation flows.
 
 **Project Type**: TypeScript Library (Vite)
-**Runtime**: Node.js (see `.nvmrc`), npm >= 10.9
+**Runtime**: Node.js >= 24.13, npm >= 11
 **Output**: ES Module library → `../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login/`
 **Dependencies**: Lit, Vite, MSW (Login does **not** declare an npm dep on `@umbraco-cms/backoffice` — see below)
 
@@ -81,6 +81,7 @@ Umbraco.Web.UI.Login/
 │   │   │   └── backoffice.handlers.ts
 │   │   └── data/login.data.ts
 │   ├── utils/
+│   │   ├── is-problem-details.function.ts   # deprecated, removed in V18
 │   │   └── load-custom-view.function.ts
 │   ├── auth.element.ts               # Main <umb-auth> component
 │   ├── types.ts                      # Type definitions
