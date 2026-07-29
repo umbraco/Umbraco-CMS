@@ -282,7 +282,10 @@
 		"web-component-analyzer": "^2.0.0"
 	},
 	"msw": {
-		"workerDirectory": "public"
+		"workerDirectory": [
+			"public",
+			"."
+		]
 	},
 	"keywords": [
 		"Umbraco",
