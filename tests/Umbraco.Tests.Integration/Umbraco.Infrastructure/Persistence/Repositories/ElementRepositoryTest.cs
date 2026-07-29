@@ -361,5 +361,275 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    // TODO ELEMENTS: port over all relevant tests from DocumentRepositoryTest
+    [Test]
+    public void GetPagedResultsByQuery_FilterMatchingSome()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+        var otherElementType = ContentTypeBuilder.CreateSimpleElementType("otherElementType", "Other Element Type");
+        contentTypeRepository.Save(otherElementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
+        var otherTypeElement = ElementBuilder.CreateSimpleElement(otherElementType, "Element Two"); // same name, different type - must not match the type-scoped query
+        repository.Save(element1);
+        repository.Save(element2);
+        repository.Save(otherTypeElement);
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ContentTypeId == elementType.Id);
+        var filterQuery = ScopeProvider.CreateQuery<IElement>().Where(x => x.Name.Contains("Two"));
+        var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filterQuery, Ordering.By("Name")).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, totalRecords);
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual("Element Two", result.First().Name);
+        });
+    }
+
+    [Test]
+    public void GetPagedResultsByQuery_DescendingOrder()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+        var otherElementType = ContentTypeBuilder.CreateSimpleElementType("otherElementType", "Other Element Type");
+        contentTypeRepository.Save(otherElementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element A");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element B");
+        var otherTypeElement = ElementBuilder.CreateSimpleElement(otherElementType, "Element C"); // different type - must be excluded by the type-scoped query
+        repository.Save(element1);
+        repository.Save(element2);
+        repository.Save(otherTypeElement);
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ContentTypeId == elementType.Id);
+        var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("Name", Direction.Descending)).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, totalRecords);
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual("Element B", result.First().Name);
+        });
+    }
+
+    [Test]
+    public void GetAllElementsByIds()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
+        var element3 = ElementBuilder.CreateSimpleElement(elementType, "Element Three");
+        repository.Save(element1);
+        repository.Save(element2);
+        repository.Save(element3);
+
+        var elements = repository.GetMany(element1.Id, element2.Id).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(elements);
+            Assert.AreEqual(2, elements.Length);
+            CollectionAssert.AreEquivalent(new[] { element1.Id, element2.Id }, elements.Select(e => e.Id));
+        });
+    }
+
+    [Test]
+    public void ExistElement()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element = ElementBuilder.CreateSimpleElement(elementType);
+        repository.Save(element);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(repository.Exists(element.Id));
+            Assert.IsFalse(repository.Exists(element.Id + 1));
+        });
+    }
+
+    [Test]
+    public void CountElement()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+        var otherElementType = ContentTypeBuilder.CreateSimpleElementType("otherElementType", "Other Element Type");
+        contentTypeRepository.Save(otherElementType);
+
+        repository.Save(ElementBuilder.CreateSimpleElement(elementType, "Element One"));
+        repository.Save(ElementBuilder.CreateSimpleElement(elementType, "Element Two"));
+        repository.Save(ElementBuilder.CreateSimpleElement(otherElementType, "Element Three")); // different type - must be excluded by the type-scoped query
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ContentTypeId == elementType.Id);
+        var result = repository.Count(query);
+
+        Assert.AreEqual(2, result);
+    }
+
+    [Test]
+    public void PropertyDataAssignedCorrectly()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+
+        var emptyContentType = ContentTypeBuilder.CreateBasicElementType();
+        var hasPropertiesContentType = ContentTypeBuilder.CreateSimpleElementType("elementTypeWithProps", "Element With Props");
+        contentTypeRepository.Save(emptyContentType);
+        contentTypeRepository.Save(hasPropertiesContentType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(hasPropertiesContentType, "Element One");
+        var element2 = ElementBuilder.CreateBasicElement(emptyContentType);
+        var element3 = ElementBuilder.CreateSimpleElement(hasPropertiesContentType, "Element Three");
+
+        repository.Save(element1);
+        repository.Save(element2);
+        repository.Save(element3);
+
+        var result = repository.GetMany(element1.Id, element2.Id, element3.Id).ToArray();
+        var n1 = result[0];
+        var n2 = result[1];
+        var n3 = result[2];
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(element1.Id, n1.Id);
+            Assert.AreEqual(element2.Id, n2.Id);
+            Assert.AreEqual(element3.Id, n3.Id);
+        });
+
+        TestHelper.AssertPropertyValuesAreEqual(element1, n1);
+        TestHelper.AssertPropertyValuesAreEqual(element2, n2);
+        TestHelper.AssertPropertyValuesAreEqual(element3, n3);
+    }
+
+    [Test]
+    public void DeleteElement()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element = ElementBuilder.CreateSimpleElement(elementType);
+        repository.Save(element);
+        var id = element.Id;
+
+        repository.Delete(element);
+
+        Assert.IsNull(repository.Get(id));
+    }
+
+    [Test]
+    public void QueryElementByUniqueId()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element = ElementBuilder.CreateSimpleElement(elementType);
+        element.Key = new Guid("A5C3A9D2-6B0E-4F1A-9E7C-3D8B2C1E4F60");
+        repository.Save(element);
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.Key == new Guid("A5C3A9D2-6B0E-4F1A-9E7C-3D8B2C1E4F60"));
+        var result = repository.Get(query).SingleOrDefault();
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(element.Id, result.Id);
+    }
+
+    [Test]
+    public void GetPagedResultsByQuery_With_Variant_Names()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+
+        // One invariant element type
+        var invariantElementType = (ContentType)ContentTypeBuilder.CreateSimpleElementType("invariantElementType", "Invariant Element Type");
+        invariantElementType.Variations = ContentVariation.Nothing;
+        foreach (var propertyType in invariantElementType.PropertyTypes)
+        {
+            propertyType.Variations = ContentVariation.Nothing;
+        }
+
+        contentTypeRepository.Save(invariantElementType);
+
+        // One variant (by culture) element type, every 2nd property variant by culture, the rest invariant
+        var variantElementType = (ContentType)ContentTypeBuilder.CreateSimpleElementType("variantElementType", "Variant Element Type");
+        variantElementType.Variations = ContentVariation.Culture;
+        var propertyTypes = variantElementType.PropertyTypes.ToList();
+        for (var i = 0; i < propertyTypes.Count; i++)
+        {
+            propertyTypes[i].Variations = i % 2 == 0 ? ContentVariation.Culture : ContentVariation.Nothing;
+        }
+
+        contentTypeRepository.Save(variantElementType);
+
+        var elements = new List<IElement>();
+        for (var i = 0; i < 10; i++)
+        {
+            var isInvariant = i % 2 == 0;
+            var name = (isInvariant ? "INV" : "VAR") + "_" + Guid.NewGuid();
+
+            IElement element = isInvariant
+                ? ElementBuilder.CreateSimpleElement(invariantElementType, name)
+                : ElementBuilder.CreateBasicElement(variantElementType);
+
+            if (!isInvariant)
+            {
+                element.SetCultureName(name, "en-US");
+                element.SetValue("title", name + " Subpage", "en-US");
+                element.SetValue("bodyText", "This is a subpage"); // this one is invariant
+                element.SetValue("author", "John Doe", "en-US");
+            }
+
+            repository.Save(element);
+            elements.Add(element);
+        }
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ParentId == Constants.System.Root);
+        var result = repository.GetPage(query, 0, 20, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("UpdateDate")).ToArray();
+
+        Assert.AreEqual(10, totalRecords);
+        foreach (var r in result)
+        {
+            var isInvariant = r.ContentType.Alias == "invariantElementType";
+            var name = isInvariant ? r.Name : r.CultureInfos["en-US"].Name;
+            var namePrefix = isInvariant ? "INV" : "VAR";
+
+            // ensure the correct name (invariant vs variant) is in the result
+            Assert.IsTrue(name.StartsWith(namePrefix));
+
+            foreach (var p in r.Properties)
+            {
+                // ensure there is a value for the correct variant/invariant property
+                var value = p.GetValue(p.PropertyType.Variations.VariesByNothing() ? null : "en-US");
+                Assert.IsNotNull(value);
+            }
+        }
+    }
 }
