@@ -19,7 +19,11 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 import '@umbraco-cms/backoffice/imaging';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
-import { UmbPropertyClipboardManager } from '@umbraco-cms/backoffice/clipboard';
+import {
+	UmbClipboardCopyRequestEvent,
+	UmbClipboardEntriesPickedEvent,
+	type UmbClipboardPropertyConfig,
+} from '@umbraco-cms/backoffice/clipboard';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -119,6 +123,14 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	/**
+	 * The clipboard affordances to offer. Supplied by the hosting property editor, because it is the one that owns
+	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-entries-picked` events.
+	 * @type {UmbClipboardPropertyConfig}
+	 */
+	@property({ type: Object, attribute: false })
+	clipboardConfig?: UmbClipboardPropertyConfig;
+
 	@property({ type: Boolean })
 	multiple = false;
 
@@ -169,13 +181,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
 
-	@state()
-	private _clipboardAvailable = false;
-
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
 
 	readonly #pickerInputContext = new UmbMediaPickerInputContext(this);
-	readonly #clipboardManager = new UmbPropertyClipboardManager(this);
 	readonly #interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
 		this,
 		this.#pickerInputContext.interactionMemory,
@@ -186,10 +194,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		this.observe(this.#itemManager.items, () => {
 			this.#populateCards();
-		});
-
-		this.observe(this.#clipboardManager.isAvailable, (available) => {
-			this._clipboardAvailable = available;
 		});
 
 		new UmbModalRouteRegistrationController(this, UMB_IMAGE_CROPPER_EDITOR_MODAL)
@@ -315,12 +319,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#openPicker() {
-		this.#pickerInputContext.openPicker(
+	async #openPicker() {
+		const modalValue = await this.#pickerInputContext.openPickerForValue(
 			{
 				multiple: this.multiple,
 				startNode: this.startNode,
 				pickableFilter: this.#pickableFilter,
+				clipboard: this.clipboardConfig?.paste,
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
@@ -330,6 +335,13 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 				includeTrashed: false,
 			},
 		);
+
+		const clipboardSelection = modalValue?.clipboard?.selection;
+		if (clipboardSelection?.length) {
+			// Reported rather than resolved here: a paste translator produces the value of a property editor, so
+			// only the property editor hosting this input can turn these entries into its value.
+			this.dispatchEvent(new UmbClipboardEntriesPickedEvent(clipboardSelection));
+		}
 	}
 
 	async #onRemove(item: UmbRichMediaCardModel) {
@@ -421,11 +433,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		if (this.readonly) return nothing;
 		return html`
 			<uui-action-bar slot="actions">
-				${this._clipboardAvailable
+				${this.clipboardConfig?.copy
 					? html`<uui-button
 							label=${this.localize.term('clipboard_labelForCopyToClipboard')}
 							look="secondary"
-							@click=${() => this.#copyToClipboard(item)}>
+							@click=${() => this.#requestClipboardCopy(item)}>
 							<uui-icon name="icon-clipboard-copy"></uui-icon>
 						</uui-button>`
 					: nothing}
@@ -436,17 +448,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		`;
 	}
 
-	async #copyToClipboard(item: UmbRichMediaCardModel) {
-		const entry = this.value?.find((x) => x.mediaKey === item.media);
-		if (!entry) {
-			throw new Error('Could not find media picker value for item.');
-		}
-
-		await this.#clipboardManager.write({
-			propertyValue: [structuredClone(entry)],
-			itemName: item.name,
-			icon: item.icon,
-		});
+	// Reported rather than written here: a copy translator consumes the value of a property editor, so only the
+	// property editor hosting this input can produce the value for the item. The name and icon travel along
+	// because they are resolved here for rendering and the property value does not carry them.
+	#requestClipboardCopy(item: UmbRichMediaCardModel) {
+		this.dispatchEvent(new UmbClipboardCopyRequestEvent({ unique: item.unique, name: item.name, icon: item.icon }));
 	}
 
 	#renderIsTrashed(item: UmbRichMediaCardModel) {

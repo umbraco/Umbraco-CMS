@@ -2,6 +2,11 @@ import type { UmbContentPickerSource } from '../../types.js';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import {
+	UmbClipboardCopyRequestEvent,
+	UmbClipboardEntriesPickedEvent,
+	type UmbClipboardPropertyConfig,
+} from '@umbraco-cms/backoffice/clipboard';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -64,6 +69,14 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
+
+	/**
+	 * The clipboard affordances to offer, forwarded to the media input. Only the hosting property editor owns the
+	 * value a copy or paste translator works on, so this element passes it along in both directions.
+	 * @type {UmbClipboardPropertyConfig}
+	 */
+	@property({ type: Object, attribute: false })
+	clipboardConfig?: UmbClipboardPropertyConfig;
 
 	@property()
 	public set allowedContentTypeIds(value: string | undefined) {
@@ -138,6 +151,17 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	// Neither event is composed, so both have to be re-dispatched from this component.
+	#onClipboardEntriesPicked(event: UmbClipboardEntriesPickedEvent) {
+		event.stopPropagation();
+		this.dispatchEvent(new UmbClipboardEntriesPickedEvent(event.entryUniques));
+	}
+
+	#onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
+		event.stopPropagation();
+		this.dispatchEvent(new UmbClipboardCopyRequestEvent({ unique: event.unique, name: event.name, icon: event.icon }));
+	}
+
 	#onInteractionMemoriesChange(event: UmbInteractionMemoriesChangeEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputContentElement;
@@ -188,6 +212,9 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				.maxMessage=${this.maxMessage}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}
+				.clipboardConfig=${this.clipboardConfig}
+				@clipboard-copy-request=${this.#onClipboardCopyRequest}
+				@clipboard-entries-picked=${this.#onClipboardEntriesPicked}
 				.interactionMemories=${this.#interactionMemories}
 				@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-input-media>
 		`;

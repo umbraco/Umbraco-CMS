@@ -1,6 +1,11 @@
 import type { UmbMediaCardItemModel } from '../../types.js';
 import { UmbMediaPickerFolderFilter, UmbMediaPickerInputContext } from './input-media.context.js';
 import {
+	UmbClipboardCopyRequestEvent,
+	UmbClipboardEntriesPickedEvent,
+	type UmbClipboardPropertyConfig,
+} from '@umbraco-cms/backoffice/clipboard';
+import {
 	css,
 	customElement,
 	html,
@@ -120,6 +125,14 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	/**
+	 * The clipboard affordances to offer. Supplied by the hosting property editor, because it is the one that owns
+	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-entries-picked` events.
+	 * @type {UmbClipboardPropertyConfig}
+	 */
+	@property({ type: Object, attribute: false })
+	clipboardConfig?: UmbClipboardPropertyConfig;
+
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
@@ -203,11 +216,12 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		);
 	}
 
-	#openPicker() {
-		this.#pickerInputContext.openPicker(
+	async #openPicker() {
+		const modalValue = await this.#pickerInputContext.openPickerForValue(
 			{
 				multiple: this.max > 1,
 				startNode: this.startNode,
+				clipboard: this.clipboardConfig?.paste,
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
@@ -217,6 +231,22 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				includeTrashed: this.includeTrashed,
 				folderFilter: this.folderFilter,
 			},
+		);
+
+		const clipboardSelection = modalValue?.clipboard?.selection;
+		if (clipboardSelection?.length) {
+			// Reported rather than resolved here: a paste translator produces the value of a property editor, so
+			// only the property editor hosting this input can turn these entries into its value.
+			this.dispatchEvent(new UmbClipboardEntriesPickedEvent(clipboardSelection));
+		}
+	}
+
+	// Reported rather than written here: a copy translator consumes the value of a property editor, so only the
+	// property editor hosting this input can produce the value for the item. The name and icon travel along
+	// because they are resolved here for rendering and the property value does not carry them.
+	#requestClipboardCopy(item: UmbMediaCardItemModel) {
+		this.dispatchEvent(
+			new UmbClipboardCopyRequestEvent({ unique: item.unique, name: item.name, icon: item.mediaType.icon }),
 		);
 	}
 
@@ -280,8 +310,22 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				?disabled=${!this._editMediaPath}>
 				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
+				<uui-action-bar slot="actions">
+					${this.#renderCopyAction(item)} ${this.#renderRemoveAction(item)}
+				</uui-action-bar>
 			</uui-card-media>
+		`;
+	}
+
+	#renderCopyAction(item: UmbMediaCardItemModel) {
+		if (this.readonly || !this.clipboardConfig?.copy) return nothing;
+		return html`
+			<uui-button
+				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
+				look="secondary"
+				@click=${() => this.#requestClipboardCopy(item)}>
+				<uui-icon name="icon-clipboard-copy"></uui-icon>
+			</uui-button>
 		`;
 	}
 

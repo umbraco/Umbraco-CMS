@@ -3,6 +3,12 @@ import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import {
+	UMB_CLIPBOARD_PROPERTY_CONTEXT,
+	type UmbClipboardCopyRequestEvent,
+	type UmbClipboardEntriesPickedEvent,
+	type UmbClipboardPropertyConfig,
+} from '@umbraco-cms/backoffice/clipboard';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -91,9 +97,14 @@ export class UmbPropertyEditorUIMediaPickerElement
 	@state()
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
+	@state()
+	private _clipboardConfig?: UmbClipboardPropertyConfig;
+
 	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
 		memoryUniquePrefix: 'UmbMediaPicker',
 	});
+
+	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -106,6 +117,47 @@ export class UmbPropertyEditorUIMediaPickerElement
 		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
 			this._interactionMemories = interactionMemories ?? [];
 		});
+
+		// Absent for property editors that do not register the clipboard property context, hence the optional
+		// handling all the way through: no context means no clipboard affordances at all.
+		this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (context) => {
+			this.#clipboardContext = context;
+
+			this.observe(
+				context?.copyAvailable,
+				(available) => {
+					this.#clipboardCopyAvailable = available ?? false;
+					this.#updateClipboardConfig();
+				},
+				'observeClipboardCopyAvailable',
+			);
+
+			this.observe(
+				context?.pasteAvailable,
+				async (available) => {
+					this.#clipboardPasteTypes = available ? await context!.getSupportedPasteEntryValueTypes() : undefined;
+					this.#updateClipboardConfig();
+				},
+				'observeClipboardPasteAvailable',
+			);
+		});
+	}
+
+	#clipboardCopyAvailable = false;
+	#clipboardPasteTypes?: Array<string>;
+
+	#updateClipboardConfig() {
+		const clipboardContext = this.#clipboardContext;
+		const types = this.#clipboardPasteTypes;
+
+		this._clipboardConfig = clipboardContext
+			? {
+					copy: this.#clipboardCopyAvailable,
+					paste: types?.length
+						? { types, pickableFilter: (entry) => clipboardContext.isEntryPastable(entry) }
+						: undefined,
+				}
+			: undefined;
 	}
 
 	override firstUpdated() {
@@ -119,6 +171,42 @@ export class UmbPropertyEditorUIMediaPickerElement
 	#onChange(event: CustomEvent & { target: UmbInputRichMediaElement }) {
 		const isEmpty = event.target.value?.length === 0;
 		this.value = isEmpty ? undefined : event.target.value;
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	// The copy translators consume this property editor's value, so the value for a copied item is picked out here
+	// rather than in the input — the input only reports which item it was, and what it is called.
+	async #onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
+		const entry = this.value?.find((item) => item.key === event.unique);
+
+		if (!entry) {
+			throw new Error(`Could not find a media picker value for the item with key: ${event.unique}`);
+		}
+
+		await this.#clipboardContext?.write({
+			propertyValue: [structuredClone(entry)],
+			itemName: event.name,
+			icon: event.icon,
+		});
+	}
+
+	// The paste translators resolve to this property editor's value, so the merge belongs here rather than in the
+	// input — the input only reports which clipboard entries were picked.
+	async #onClipboardEntriesPicked(event: UmbClipboardEntriesPickedEvent) {
+		if (!this.#clipboardContext) return;
+
+		const propertyValues = await this.#clipboardContext.readMultiple<UmbMediaPickerValueModel>(event.entryUniques);
+		const pasted = propertyValues.flat();
+
+		const currentValue = this.value ?? [];
+
+		// Everything in the entry is added, however many items it holds and whatever the editor allows — as when
+		// picking, an over-long selection is for validation to report and the user to trim.
+		const additions = pasted.filter((addition) => !currentValue.some((entry) => entry.mediaKey === addition.mediaKey));
+
+		if (!additions.length) return;
+
+		this.value = [...currentValue, ...additions];
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -150,6 +238,9 @@ export class UmbPropertyEditorUIMediaPickerElement
 				?multiple=${this._multiple}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}
+				.clipboardConfig=${this._clipboardConfig}
+				@clipboard-copy-request=${this.#onClipboardCopyRequest}
+				@clipboard-entries-picked=${this.#onClipboardEntriesPicked}
 				.interactionMemories=${this._interactionMemories}
 				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-rich-media>

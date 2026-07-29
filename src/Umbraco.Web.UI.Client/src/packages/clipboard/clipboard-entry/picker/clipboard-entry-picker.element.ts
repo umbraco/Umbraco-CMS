@@ -25,6 +25,9 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	@state()
 	private _items: Array<UmbClipboardEntryDetailModel> = [];
 
+	@state()
+	private _unpickableUniques: Array<string> = [];
+
 	#collectionRepository = new UmbClipboardCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 	#entityContext = new UmbEntityContext(this);
@@ -64,18 +67,36 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 		const sortedEntries = entries.sort((a, b) => new Date(b.updateDate!).getTime() - new Date(a.updateDate!).getTime());
 
 		if (this.config?.filter) {
-			this._items = sortedEntries.filter(this.config.filter);
+			this.#setItems(sortedEntries.filter(this.config.filter));
 			return;
 		}
 
 		if (this.config?.asyncFilter) {
 			const promises = Promise.all(sortedEntries.map(this.config.asyncFilter));
 			const results = await promises;
-			this._items = sortedEntries.filter((_, index) => results[index]);
+			this.#setItems(sortedEntries.filter((_, index) => results[index]));
 			return;
 		}
 
-		this._items = sortedEntries;
+		this.#setItems(sortedEntries);
+	}
+
+	// Resolves before assigning the items, so an entry is never rendered as pickable while its compatibility is
+	// still pending — otherwise it could be selected in that window.
+	async #setItems(entries: Array<UmbClipboardEntryDetailModel>) {
+		this._unpickableUniques = await this.#resolveUnpickable(entries);
+		this._items = entries;
+	}
+
+	// Entries that cannot be picked stay in the list and render as disabled, so it stays clear that the entry
+	// exists and only its compatibility with this destination is the problem.
+	async #resolveUnpickable(entries: Array<UmbClipboardEntryDetailModel>): Promise<Array<string>> {
+		const pickableFilter = this.config?.pickableFilter;
+
+		if (!pickableFilter) return [];
+
+		const results = await Promise.all(entries.map((entry) => pickableFilter(entry)));
+		return entries.filter((_, index) => !results[index]).map((entry) => entry.unique);
 	}
 
 	async #listenToEntityEvents() {
@@ -176,11 +197,13 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	#renderItem(item: UmbClipboardEntryDetailModel) {
 		const label = item.name ?? item.unique;
+		const pickable = !this._unpickableUniques.includes(item.unique);
 		return html`
 			<uui-menu-item
 				label=${label}
 				title=${label}
-				selectable
+				?selectable=${pickable}
+				?disabled=${!pickable}
 				@selected=${() => this.#selectionManager.select(item.unique)}
 				@deselected=${() => this.#selectionManager.deselect(item.unique)}
 				?selected=${this.selection.includes(item.unique)}>

@@ -1,14 +1,11 @@
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '../../context/constants.js';
 import type { MetaPropertyActionCopyToClipboardKind } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
 
 export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionCopyToClipboardKind> {
-	#localize = new UmbLocalizationController(this);
-	#propertyDatasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
@@ -18,10 +15,6 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 		super(host, args);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (context) => {
-				this.#propertyDatasetContext = context;
-			}).asPromise({ preventTimeout: true }),
-
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 				this.#propertyContext = context;
 			}).asPromise({ preventTimeout: true }),
@@ -39,37 +32,21 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 	override async execute() {
 		await this.#init;
 
-		if (!this.#propertyDatasetContext) throw new Error('Property dataset context is not available');
 		if (!this.#propertyContext) throw new Error('Property context is not available');
 		if (!this.#notificationContext) throw new Error('Notification context is not available');
 		if (!this.#clipboardContext) throw new Error('Clipboard context is not available');
-
-		const propertyEditorUiAlias = this.#propertyContext.getEditorManifest()?.alias;
-
-		if (!propertyEditorUiAlias) {
-			throw new Error('Property editor alias is not available');
-		}
-
-		const workspaceName = this.#localize.string(this.#propertyDatasetContext.getName());
-		const propertyLabel = this.#localize.string(this.#propertyContext.getLabel());
-		const entryName = workspaceName ? `${workspaceName} - ${propertyLabel}` : propertyLabel;
 
 		const propertyValue = this.#propertyContext.getValue();
 
 		if (!propertyValue) {
 			// TODO: Add correct message + localization
-			this.#notificationContext!.peek('danger', { data: { message: 'The property does not have a value to copy' } });
+			this.#notificationContext.peek('danger', { data: { message: 'The property does not have a value to copy' } });
 			return;
 		}
 
-		const propertyEditorUiIcon = this.#propertyContext.getEditorManifest()?.meta.icon;
-
-		await this.#clipboardContext.write({
-			name: entryName,
-			icon: propertyEditorUiIcon,
-			propertyValue,
-			propertyEditorUiAlias,
-		});
+		// The property editor UI alias, the entry name and the icon all come from the property this action runs on,
+		// which the clipboard property context reads for itself.
+		await this.#clipboardContext.write({ propertyValue });
 	}
 }
 
