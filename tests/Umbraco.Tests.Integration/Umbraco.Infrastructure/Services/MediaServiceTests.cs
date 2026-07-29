@@ -611,4 +611,92 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(result.Success);
         Assert.AreEqual(reversed, ChildIdsInSortOrder());
     }
+
+    [Test]
+    public async Task Can_Make_Duplicate_Sibling_Names_Unique()
+    {
+        var mediaType = await CreateMediaType();
+
+        var first = SaveMedia(mediaType, "image");
+        var second = SaveMedia(mediaType, "image");
+        var third = SaveMedia(mediaType, "image");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(first.Name, Is.EqualTo("image"));
+            Assert.That(second.Name, Is.EqualTo("image (1)"));
+            Assert.That(third.Name, Is.EqualTo("image (2)"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Make_Duplicate_Sibling_Names_Unique_Ignoring_Case()
+    {
+        var mediaType = await CreateMediaType();
+
+        var first = SaveMedia(mediaType, "Image");
+        var second = SaveMedia(mediaType, "image");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(first.Name, Is.EqualTo("Image"));
+            Assert.That(second.Name, Is.EqualTo("image (1)"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Make_Name_Unique_Without_Being_Confused_By_Similar_Prefixes()
+    {
+        var mediaType = await CreateMediaType();
+
+        // Decoys that share a prefix with "image" but are not the same name; these must not
+        // consume a suffix nor otherwise perturb the result.
+        SaveMedia(mediaType, "image");
+        SaveMedia(mediaType, "imagery");
+        SaveMedia(mediaType, "image detail");
+
+        var duplicate = SaveMedia(mediaType, "image");
+
+        Assert.That(duplicate.Name, Is.EqualTo("image (1)"));
+    }
+
+    [TestCase("50%")]
+    [TestCase("a_b")]
+    [TestCase("x[y")]
+    public async Task Can_Make_Name_With_Like_Metacharacters_Unique(string name)
+    {
+        var mediaType = await CreateMediaType();
+
+        var first = SaveMedia(mediaType, name);
+        var second = SaveMedia(mediaType, name);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(first.Name, Is.EqualTo(name));
+            Assert.That(second.Name, Is.EqualTo($"{name} (1)"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Reuse_Freed_Suffix_When_Making_Name_Unique()
+    {
+        var mediaType = await CreateMediaType();
+
+        SaveMedia(mediaType, "image");
+        var one = SaveMedia(mediaType, "image"); // image (1)
+        SaveMedia(mediaType, "image");           // image (2)
+
+        MediaService.Delete(one); // frees "image (1)"
+
+        var reused = SaveMedia(mediaType, "image");
+
+        Assert.That(reused.Name, Is.EqualTo("image (1)"));
+    }
+
+    private IMedia SaveMedia(IMediaType mediaType, string name)
+    {
+        IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, name, Constants.System.Root);
+        MediaService.Save(media);
+        return media;
+    }
 }
