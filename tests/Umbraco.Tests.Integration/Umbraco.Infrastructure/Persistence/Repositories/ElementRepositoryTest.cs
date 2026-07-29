@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -631,5 +632,38 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
                 Assert.IsNotNull(value);
             }
         }
+    }
+
+    /// <summary>
+    /// Verifies that retrieving all elements from the GUID-based repository returns all items when the cache is
+    /// populated.
+    /// </summary>
+    /// <remarks>
+    /// Verifies the fix for https://github.com/umbraco/Umbraco-CMS/issues/21756 as this test fails before
+    /// the fix is applied.
+    /// </remarks>
+    [Test]
+    public void GetMany_By_Guid_With_Warm_Cache_Returns_All()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _, realCache);
+
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+        var element = ElementBuilder.CreateSimpleElement(elementType);
+        repository.Save(element);
+
+        var guidRepo = (IReadRepository<Guid, IElement>)repository;
+
+        var result = guidRepo.GetMany().ToArray();
+        Assert.IsNotEmpty(result);
+        Assert.That(result.Any(e => e.Key == element.Key));
     }
 }
