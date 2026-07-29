@@ -10,8 +10,11 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 internal static partial class OperationIdRegexes
 {
     // Your IDE may be showing errors here, this is because it's a new dotnet 7 feature (it's fixed in the EAP of Rider)
-    [GeneratedRegex(".*?\\/v[1-9]+/")]
+    [GeneratedRegex(".*?\\/v[0-9]+(?:\\.[0-9]+)?/")]
     public static partial Regex VersionPrefixRegex();
+
+    [GeneratedRegex("[^A-Za-z0-9]")]
+    public static partial Regex NonAlphanumericRegex();
 
     [GeneratedRegex("\\{(.*?)\\:?\\}")]
     public static partial Regex TemplatePlaceholdersRegex();
