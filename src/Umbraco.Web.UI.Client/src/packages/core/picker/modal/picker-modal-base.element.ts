@@ -1,7 +1,7 @@
 import type { UmbPickerContext } from '../picker.context.js';
+import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT } from './picker-interaction-memory.context.token.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { UMB_INTERACTION_MEMORY_SCOPE_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { ManifestModal, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
 
@@ -24,11 +24,11 @@ export abstract class UmbPickerModalBaseElement<
 > extends UmbModalBaseElement<ModalDataType, ModalValueType, ModalManifestType> {
 	protected abstract _pickerContext: UmbPickerContext;
 
-	#memoryScope?: typeof UMB_INTERACTION_MEMORY_SCOPE_CONTEXT.TYPE;
+	#memoryScope?: typeof UMB_PICKER_INTERACTION_MEMORY_CONTEXT.TYPE;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_INTERACTION_MEMORY_SCOPE_CONTEXT, (memoryScope) => {
+		this.consumeContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, (memoryScope) => {
 			this.#memoryScope = memoryScope;
 			this.#observeMemoriesFromScope();
 		});
@@ -52,7 +52,7 @@ export abstract class UmbPickerModalBaseElement<
 	#observeMemoriesFromScope() {
 		if (!this.#memoryScope) return;
 		this.observe(
-			this.#memoryScope.interactionMemory.memory(this.#getInteractionMemoryUnique()),
+			this.#memoryScope.memory(this.#getInteractionMemoryUnique()),
 			(memory) => {
 				memory?.memories?.forEach((memory) => this._pickerContext.interactionMemory.setMemory(memory));
 			},
@@ -67,9 +67,9 @@ export abstract class UmbPickerModalBaseElement<
 				memories: pickerMemories,
 			};
 
-			this.#memoryScope?.interactionMemory.setMemory(pickerModalMemory);
+			this.#memoryScope?.setMemory(pickerModalMemory);
 		} else {
-			this.#memoryScope?.interactionMemory.deleteMemory(this.#getInteractionMemoryUnique());
+			this.#memoryScope?.deleteMemory(this.#getInteractionMemoryUnique());
 		}
 	}
 }

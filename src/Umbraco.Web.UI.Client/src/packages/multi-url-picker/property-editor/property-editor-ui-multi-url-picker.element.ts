@@ -4,7 +4,8 @@ import type { UmbInputMultiUrlElement } from '../components/input-multi-url/inde
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbPropertyEditorUiPickerMemoryContext } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/picker';
+import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -23,7 +24,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	extends UmbFormControlMixin<Array<UmbLinkPickerLink>, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
-	readonly #pickerMemory = new UmbPropertyEditorUiPickerMemoryContext(this, {
+	readonly #pickerMemory = new UmbPropertyEditorUiInteractionMemoryManager(this, {
 		memoryUniquePrefix: 'UmbMultiUrlPicker',
 	});
 
@@ -85,6 +86,8 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 
 	constructor() {
 		super();
+
+		this.provideContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, this.#pickerMemory);
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this._label = context?.getLabel();

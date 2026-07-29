@@ -1,7 +1,8 @@
 import type { UmbInputMarkdownElement } from '../../components/input-markdown-editor/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPropertyEditorUiPickerMemoryContext } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/picker';
+import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -43,9 +44,14 @@ export class UmbPropertyEditorUIMarkdownEditorElement
 	@state()
 	private _overlaySize: UUIModalSidebarSize = 'small';
 
-	readonly #pickerMemory = new UmbPropertyEditorUiPickerMemoryContext(this, {
+	readonly #pickerMemory = new UmbPropertyEditorUiInteractionMemoryManager(this, {
 		memoryUniquePrefix: 'UmbMarkdownEditor',
 	});
+
+	constructor() {
+		super();
+		this.provideContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, this.#pickerMemory);
+	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;

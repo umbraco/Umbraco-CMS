@@ -1,17 +1,19 @@
 import { UmbPickerModalBaseElement } from './picker-modal-base.element.js';
+import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT } from './picker-interaction-memory.context.token.js';
 import { UmbPickerContext } from '../picker.context.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { expect } from '@open-wc/testing';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbInteractionMemoryScopeContext } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 
 @customElement('test-picker-modal-scope-host')
 class UmbTestScopeHostElement extends UmbControllerHostElementMixin(HTMLElement) {
-	public readonly scope: UmbInteractionMemoryScopeContext;
+	public readonly scope: UmbInteractionMemoryManager;
 	constructor() {
 		super();
-		this.scope = new UmbInteractionMemoryScopeContext(this);
+		this.scope = new UmbInteractionMemoryManager(this);
+		this.scope.provideContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, this.scope);
 	}
 }
 
@@ -42,7 +44,7 @@ describe('UmbPickerModalBaseElement', () => {
 		element.manifest = testManifest;
 		scopeHost.appendChild(element);
 
-		scopeHost.scope.interactionMemory.memory('UmbPickerModal:Test.Modal.Alias').subscribe((memory) => {
+		scopeHost.scope.memory('UmbPickerModal:Test.Modal.Alias').subscribe((memory) => {
 			if (!memory) return;
 			expect(memory.memories).to.deep.equal([{ unique: 'location', value: { unique: 'folder-1' } }]);
 			done();
@@ -52,7 +54,7 @@ describe('UmbPickerModalBaseElement', () => {
 	});
 
 	it('restores memories from the scope context once connected', (done) => {
-		scopeHost.scope.interactionMemory.setMemory({
+		scopeHost.scope.setMemory({
 			unique: 'UmbPickerModal:Test.Modal.Alias',
 			memories: [{ unique: 'location', value: { unique: 'folder-2' } }],
 		});
@@ -82,7 +84,7 @@ describe('UmbPickerModalBaseElement', () => {
 	});
 
 	it('keys memories separately per modal alias, leaving other aliases untouched', (done) => {
-		scopeHost.scope.interactionMemory.setMemory({
+		scopeHost.scope.setMemory({
 			unique: 'UmbPickerModal:Other.Modal.Alias',
 			memories: [{ unique: 'location', value: { unique: 'other-folder' } }],
 		});
@@ -91,10 +93,10 @@ describe('UmbPickerModalBaseElement', () => {
 		element.manifest = testManifest;
 		scopeHost.appendChild(element);
 
-		scopeHost.scope.interactionMemory.memory('UmbPickerModal:Test.Modal.Alias').subscribe((memory) => {
+		scopeHost.scope.memory('UmbPickerModal:Test.Modal.Alias').subscribe((memory) => {
 			if (!memory) return;
 			expect(memory.memories).to.deep.equal([{ unique: 'location', value: { unique: 'folder-4' } }]);
-			expect(scopeHost.scope.interactionMemory.getMemory('UmbPickerModal:Other.Modal.Alias')?.memories).to.deep.equal([
+			expect(scopeHost.scope.getMemory('UmbPickerModal:Other.Modal.Alias')?.memories).to.deep.equal([
 				{ unique: 'location', value: { unique: 'other-folder' } },
 			]);
 			done();

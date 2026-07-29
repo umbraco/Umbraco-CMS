@@ -29,11 +29,8 @@ import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
-import {
-	UMB_INTERACTION_MEMORY_SCOPE_CONTEXT,
-	type UmbInteractionMemoryModel,
-} from '@umbraco-cms/backoffice/interaction-memory';
-import { umbPickerModalMemoryUnique } from '@umbraco-cms/backoffice/picker';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT, umbPickerModalMemoryUnique } from '@umbraco-cms/backoffice/picker';
 
 type UmbInputPickerEvent = CustomEvent & { target: { value?: string; culture?: string } };
 
@@ -74,7 +71,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	#documentUrlsDataResolver?: UmbDocumentUrlsDataResolver;
 	#mediaItemRepository?: UmbMediaItemRepository;
 	#mediaUrlRepository?: UmbMediaUrlRepository;
-	#memoryScope?: typeof UMB_INTERACTION_MEMORY_SCOPE_CONTEXT.TYPE;
+	#memoryScope?: typeof UMB_PICKER_INTERACTION_MEMORY_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -83,10 +80,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			this._missingType = invalid;
 		});
 
-		this.consumeContext(UMB_INTERACTION_MEMORY_SCOPE_CONTEXT, (memoryScope) => {
+		this.consumeContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, (memoryScope) => {
 			this.#memoryScope = memoryScope;
 			this.observe(
-				memoryScope?.interactionMemory.memory(MEDIA_PICKER_MEMORY_UNIQUE),
+				memoryScope?.memory(MEDIA_PICKER_MEMORY_UNIQUE),
 				(memory) => {
 					// Relay the wrapper entry itself, not its nested `.memories` — `<umb-input-media>`'s own
 					// scope expects the same wrapper shape any scope holds (see picker-modal-base.element.ts).
@@ -104,9 +101,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const memory = target.interactionMemories?.find((memory) => memory.unique === MEDIA_PICKER_MEMORY_UNIQUE);
 
 		if (memory) {
-			this.#memoryScope?.interactionMemory.setMemory(memory);
+			this.#memoryScope?.setMemory(memory);
 		} else {
-			this.#memoryScope?.interactionMemory.deleteMemory(MEDIA_PICKER_MEMORY_UNIQUE);
+			this.#memoryScope?.deleteMemory(MEDIA_PICKER_MEMORY_UNIQUE);
 		}
 	}
 
