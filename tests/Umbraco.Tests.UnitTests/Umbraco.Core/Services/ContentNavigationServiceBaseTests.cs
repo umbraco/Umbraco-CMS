@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -1991,6 +1992,79 @@ public class ContentNavigationServiceBaseTests
         var descendantsCountAfterRestore = restoredDescendantsKeys.Count();
 
         Assert.AreEqual(initialDescendantsCount, descendantsCountAfterRestore);
+    }
+
+    [Test]
+    public async Task Concurrent_Queries_By_Unmapped_Aliases_Do_Not_Corrupt_The_Alias_Map()
+    {
+        // Arrange
+        // the alias-to-key map is seeded from GetAll(); returning nothing here sends the first
+        // lookup per alias through the miss path, which resolves the type individually and writes
+        // it back to the map (later lookups of the same alias read the cached entry). Concurrent
+        // writes to a non-thread-safe map corrupt its internal state, after which every navigation
+        // query by alias throws (or livelocks) until the process is restarted.
+        var contentTypeKeys = new ConcurrentDictionary<string, Guid>();
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAll()).Returns([]);
+        contentTypeServiceMock
+            .Setup(x => x.Get(It.IsAny<string>()))
+            .Returns((string alias) =>
+            {
+                Guid key = contentTypeKeys.GetOrAdd(alias, _ => Guid.NewGuid());
+                var contentTypeMock = new Mock<IContentType>();
+                contentTypeMock.SetupGet(x => x.Alias).Returns(alias);
+                contentTypeMock.SetupGet(x => x.Key).Returns(key);
+                return contentTypeMock.Object;
+            });
+
+        var navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        const int AliasCount = 512;
+        const int ThreadCount = 8;
+        var exceptions = new ConcurrentQueue<Exception>();
+
+        // all workers start their lookups together to maximise concurrent misses on the map
+        using var startGate = new Barrier(ThreadCount);
+
+        // Act
+        Task workers = Task.WhenAll(Enumerable.Range(0, ThreadCount).Select(thread => Task.Run(() =>
+        {
+            startGate.SignalAndWait();
+            for (var i = 0; i < AliasCount; i++)
+            {
+                try
+                {
+                    navigationService.TryGetRootKeysOfType($"alias{i}", out _);
+                }
+                catch (Exception exception)
+                {
+                    exceptions.Enqueue(exception);
+                }
+            }
+        })));
+
+        // a corrupted dictionary can also livelock readers in an infinite bucket cycle, so a hang
+        // here is a failure mode of its own, not just slowness.
+        Task completed = await Task.WhenAny(workers, Task.Delay(TimeSpan.FromSeconds(30)));
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(workers, completed, "Concurrent alias lookups did not finish; the alias map has likely livelocked.");
+            Assert.IsEmpty(exceptions, $"Concurrent alias lookups threw: {exceptions.FirstOrDefault()}");
+        });
+
+        // observe any worker fault raised outside the per-lookup try (e.g. from the start gate)
+        await workers;
+
+        // the map must still resolve every alias correctly after the concurrent misses
+        for (var i = 0; i < AliasCount; i++)
+        {
+            Assert.IsTrue(navigationService.TryGetRootKeysOfType($"alias{i}", out _));
+        }
     }
 
     private void CreateTestData()

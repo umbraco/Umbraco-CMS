@@ -26,7 +26,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
     private readonly TContentTypeService _typeService;
-    private readonly Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
+    // concurrent because TryGetContentTypeKey lazily adds aliases resolved after the initial load,
+    // on live request threads; a non-concurrent map corrupts under parallel misses.
+    private readonly Lazy<ConcurrentDictionary<string, Guid>> _contentTypeAliasToKeyMap;
 
     /// <summary>
     ///     Bundles a navigation structure dictionary and its root keys into a single reference so that
@@ -109,7 +111,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         _coreScopeProvider = coreScopeProvider;
         _navigationRepository = navigationRepository;
         _typeService = typeService;
-        _contentTypeAliasToKeyMap = new Lazy<Dictionary<string, Guid>>(LoadContentTypes);
+        _contentTypeAliasToKeyMap = new Lazy<ConcurrentDictionary<string, Guid>>(LoadContentTypes);
     }
 
     /// <summary>
@@ -1037,7 +1039,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
     private bool TryGetContentTypeKey(string contentTypeAlias, out Guid? contentTypeKey)
     {
-        Dictionary<string, Guid> aliasToKeyMap = _contentTypeAliasToKeyMap.Value;
+        ConcurrentDictionary<string, Guid> aliasToKeyMap = _contentTypeAliasToKeyMap.Value;
 
         if (aliasToKeyMap.TryGetValue(contentTypeAlias, out Guid key))
         {
@@ -1090,6 +1092,6 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
     }
 
-    private Dictionary<string, Guid> LoadContentTypes()
-        => _typeService.GetAll().ToDictionary(ct => ct.Alias, ct => ct.Key);
+    private ConcurrentDictionary<string, Guid> LoadContentTypes()
+        => new(_typeService.GetAll().Select(ct => new KeyValuePair<string, Guid>(ct.Alias, ct.Key)));
 }
