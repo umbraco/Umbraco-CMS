@@ -1236,6 +1236,51 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.ToTable("cmsPropertyTypeGroup", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RedirectUrlDto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ContentKey")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("contentKey");
+
+                    b.Property<DateTime>("CreateDateUtc")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("createDateUtc");
+
+                    b.Property<string>("Culture")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("culture");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("url");
+
+                    b.Property<string>("UrlHash")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)")
+                        .HasColumnName("urlHash");
+
+                    b.HasKey("Id")
+                        .HasName("PK_umbracoRedirectUrl");
+
+                    b.HasIndex("ContentKey");
+
+                    b.HasIndex("CreateDateUtc")
+                        .HasDatabaseName("IX_umbracoRedirectUrl_culture_hash");
+
+                    b.HasIndex("UrlHash", "ContentKey", "Culture", "CreateDateUtc")
+                        .IsUnique()
+                        .HasDatabaseName("IX_umbracoRedirectUrl")
+                        .HasFilter("[culture] IS NOT NULL");
+
+                    b.ToTable("umbracoRedirectUrl", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RelationDto", b =>
                 {
                     b.Property<int>("Id")
@@ -1735,6 +1780,16 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.Navigation("DataTypeDto");
 
                     b.Navigation("PropertyTypeGroupDto");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RedirectUrlDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
+                        .WithMany()
+                        .HasForeignKey("ContentKey")
+                        .HasPrincipalKey("UniqueId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RelationDto", b =>
