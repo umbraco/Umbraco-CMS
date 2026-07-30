@@ -241,6 +241,7 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 						const propertyValue = await valueResolver.resolve(
 							clipboardEntryDetail.values,
 							propertyEditorUiManifest.alias,
+							config,
 						);
 
 						return pasteTranslator.isCompatibleValue(propertyValue, config, args.filter);
@@ -319,7 +320,14 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 		}
 
 		const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver<ValueType>(this);
-		const propertyValue = await valueResolver.resolve(entry.values, propertyEditorUiManifest.alias);
+		// The config of the property this context lives in. A caller translating on behalf of another property
+		// editor still gets this one — which is correct for blocks, the only such caller, because a block editor
+		// is its own surrounding property.
+		const propertyValue = await valueResolver.resolve(
+			entry.values,
+			propertyEditorUiManifest.alias,
+			this.#propertyContext?.getConfig(),
+		);
 
 		const cloner = new UmbPropertyValueCloneController(this);
 		const clonedValue = await cloner.clone<ValueType>({
@@ -408,8 +416,9 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 		const pasteTranslator = await valueResolver.getPasteTranslator(entry.values, alias);
 		if (!pasteTranslator.isCompatibleValue) return true;
 
-		const propertyValue = await valueResolver.resolve(entry.values, alias);
-		return pasteTranslator.isCompatibleValue(propertyValue, this.#propertyContext?.getConfig());
+		const config = this.#propertyContext?.getConfig();
+		const propertyValue = await valueResolver.resolve(entry.values, alias, config);
+		return pasteTranslator.isCompatibleValue(propertyValue, config);
 	}
 
 	async #deriveEntryName(itemName?: string): Promise<string> {

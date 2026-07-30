@@ -1,5 +1,5 @@
 import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
-import type { UmbCropModel, UmbMediaPickerPropertyValueEntry, UmbMediaPickerValueModel } from '../types.js';
+import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -198,36 +198,12 @@ export class UmbPropertyEditorUIMediaPickerElement
 
 		// Not clamped to the configured limit: as when picking, an over-long selection is for validation to
 		// report and the user to trim.
-		const additions = pasted
-			.filter((addition) => !currentValue.some((entry) => entry.mediaKey === addition.mediaKey))
-			.map((addition) => this.#withSupportedCropsAndFocalPoint(addition));
+		const additions = pasted.filter((addition) => !currentValue.some((entry) => entry.mediaKey === addition.mediaKey));
 
 		if (!additions.length) return;
 
 		this.value = [...currentValue, ...additions];
 		this.dispatchEvent(new UmbChangeEvent());
-	}
-
-	// A pasted entry carries crops and a focal point from wherever it was copied, which this property editor may
-	// not be configured for. Only the framing the user set is worth bringing along — a crop without coordinates is
-	// added by the server anyway, exactly as for a freshly picked media.
-	#withSupportedCropsAndFocalPoint(entry: UmbMediaPickerPropertyValueEntry): UmbMediaPickerPropertyValueEntry {
-		return {
-			...entry,
-			crops: this._preselectedCrops.flatMap((allowed) => {
-				const pastedCrop = entry.crops.find((crop) => crop.alias === allowed.alias);
-				if (!pastedCrop?.coordinates) return [];
-
-				// Coordinates are insets of the source image, so they survive a change of size but not of shape.
-				// Cross-multiplied to compare the aspects without floating point.
-				const sameAspect = allowed.width * pastedCrop.height === pastedCrop.width * allowed.height;
-				if (!sameAspect) return [];
-
-				// The configuration defines the crop; the pasted value only contributes the framing.
-				return [{ ...allowed, coordinates: pastedCrop.coordinates }];
-			}),
-			focalPoint: this._focalPointEnabled ? entry.focalPoint : null,
-		};
 	}
 
 	async #onInputInteractionMemoriesChange(event: UmbChangeEvent) {
