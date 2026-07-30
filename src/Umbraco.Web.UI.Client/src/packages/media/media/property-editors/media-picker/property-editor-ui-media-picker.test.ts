@@ -58,8 +58,16 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 			await aTimeout(0);
 		});
 
-		function setMultiple(multiple: boolean) {
-			element.config = new UmbPropertyEditorConfigCollection([{ alias: 'multiple', value: multiple }]);
+		function setConfig(options?: {
+			multiple?: boolean;
+			crops?: Array<{ alias: string; width: number; height: number }>;
+			enableLocalFocalPoint?: boolean;
+		}) {
+			element.config = new UmbPropertyEditorConfigCollection([
+				{ alias: 'multiple', value: options?.multiple ?? false },
+				{ alias: 'crops', value: options?.crops ?? [] },
+				{ alias: 'enableLocalFocalPoint', value: options?.enableLocalFocalPoint ?? false },
+			]);
 		}
 
 		// Both events come from the input, which is where the property editor listens for them.
@@ -86,7 +94,7 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 
 		describe('paste', () => {
 			it('appends to a multiple picker', async () => {
-				setMultiple(true);
+				setConfig({ multiple: true });
 				element.value = [entry('media-a')];
 				pasteResult = [[entry('media-b')]];
 
@@ -96,7 +104,7 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 			});
 
 			it('does not add media that is already picked', async () => {
-				setMultiple(true);
+				setConfig({ multiple: true });
 				element.value = [entry('media-a')];
 				pasteResult = [[entry('media-a'), entry('media-b')]];
 
@@ -106,7 +114,7 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 			});
 
 			it('adds every media in the entry, leaving an over-long selection to validation', async () => {
-				setMultiple(false);
+				setConfig({ multiple: false });
 				element.value = [entry('media-a')];
 				pasteResult = [[entry('media-b'), entry('media-c')]];
 
@@ -116,20 +124,71 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 				expect(element.value?.map((x) => x.mediaKey)).to.deep.equal(['media-a', 'media-b', 'media-c']);
 			});
 
-			it('keeps the crops and focal point the paste translator resolved', async () => {
-				setMultiple(true);
+			it('keeps a framed crop the configuration supports, at the configured size', async () => {
+				const coordinates = { x1: 0.1, x2: 0.2, y1: 0.3, y2: 0.4 };
+				setConfig({ multiple: true, crops: [{ alias: 'square', width: 100, height: 100 }] });
 				element.value = [];
-				const pasted = {
-					...entry('media-b'),
-					crops: [{ alias: 'square', width: 100, height: 100 }],
-					focalPoint: { left: 0.25, top: 0.75 },
-				};
-				pasteResult = [[pasted]];
+				pasteResult = [[{ ...entry('media-b'), crops: [{ alias: 'square', width: 200, height: 200, coordinates }] }]];
 
 				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
 
-				expect(element.value?.[0].crops).to.deep.equal(pasted.crops);
-				expect(element.value?.[0].focalPoint).to.deep.equal(pasted.focalPoint);
+				// The configuration defines the crop; the paste only contributes the framing.
+				expect(element.value?.[0].crops).to.deep.equal([{ alias: 'square', width: 100, height: 100, coordinates }]);
+			});
+
+			it('drops a framed crop the configuration does not declare', async () => {
+				const coordinates = { x1: 0.1, x2: 0.2, y1: 0.3, y2: 0.4 };
+				setConfig({ multiple: true, crops: [{ alias: 'square', width: 100, height: 100 }] });
+				element.value = [];
+				pasteResult = [
+					[
+						{
+							...entry('media-b'),
+							crops: [
+								{ alias: 'square', width: 100, height: 100, coordinates },
+								{ alias: 'banner', width: 600, height: 200, coordinates },
+							],
+						},
+					],
+				];
+
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
+
+				// A crop this editor cannot edit must not arrive through a paste.
+				expect(element.value?.[0].crops.map((crop) => crop.alias)).to.deep.equal(['square']);
+			});
+
+			it('drops a framed crop whose aspect ratio does not match the configured one', async () => {
+				const coordinates = { x1: 0.1, x2: 0.2, y1: 0.3, y2: 0.4 };
+				setConfig({ multiple: true, crops: [{ alias: 'square', width: 100, height: 100 }] });
+				element.value = [];
+				pasteResult = [[{ ...entry('media-b'), crops: [{ alias: 'square', width: 200, height: 100, coordinates }] }]];
+
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
+
+				// The framing was set against a different shape, so it would no longer mean what the user chose.
+				expect(element.value?.[0].crops).to.deep.equal([]);
+			});
+
+			it('drops a crop with no framing, which the server adds anyway', async () => {
+				setConfig({ multiple: true, crops: [{ alias: 'square', width: 100, height: 100 }] });
+				element.value = [];
+				pasteResult = [[{ ...entry('media-b'), crops: [{ alias: 'square', width: 100, height: 100 }] }]];
+
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
+
+				// Same as a freshly picked media, which arrives with no crops at all.
+				expect(element.value?.[0].crops).to.deep.equal([]);
+			});
+
+			it('drops a pasted focal point when local focal point is not enabled', async () => {
+				setConfig({ multiple: true, enableLocalFocalPoint: false });
+				element.value = [];
+				pasteResult = [[{ ...entry('media-b'), focalPoint: { left: 0.25, top: 0.75 } }]];
+
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
+
+				expect(element.value?.[0].focalPoint).to.be.null;
 			});
 		});
 	});
