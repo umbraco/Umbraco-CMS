@@ -312,41 +312,57 @@ export class UmbDocumentWorkspaceContext
 		await super._handleSave(executionOptions);
 	}
 
-	public async saveAndPreview(urlProviderAlias?: string): Promise<void> {
-		return await this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider');
+	public async saveAndPreview(urlProviderAlias?: string, previewWindow?: WindowProxy | null): Promise<void> {
+		return await this.#handleSaveAndPreview(urlProviderAlias ?? 'umbDocumentUrlProvider', previewWindow);
 	}
 
-	async #handleSaveAndPreview(urlProviderAlias: string) {
-		if (!urlProviderAlias) throw new Error('Url provider alias is missing');
+	async #handleSaveAndPreview(urlProviderAlias: string, previewWindow?: WindowProxy | null) {
+		if (!urlProviderAlias) {
+			previewWindow?.close();
+			throw new Error('Url provider alias is missing');
+		}
 
 		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
+		if (!unique) {
+			previewWindow?.close();
+			throw new Error('Unique is missing');
+		}
 
 		let firstVariantId = UmbVariantId.CreateInvariant();
 
-		// Save document (the active variant) before previewing.
-		const { selected } = await this._determineVariantOptions();
-		if (selected.length > 0) {
-			firstVariantId = UmbVariantId.FromString(selected[0]);
-			const variantIds = [firstVariantId];
-			const saveData = await this._data.constructData(variantIds);
+		try {
+			// Save document (the active variant) before previewing.
+			const { selected } = await this._determineVariantOptions();
+			if (selected.length > 0) {
+				firstVariantId = UmbVariantId.FromString(selected[0]);
+				const variantIds = [firstVariantId];
+				const saveData = await this._data.constructData(variantIds);
 
-			// Run mandatory validation (checks for name, etc.)
-			await this.runMandatoryValidationForSaveData(saveData, variantIds);
+				// Run mandatory validation (checks for name, etc.)
+				await this.runMandatoryValidationForSaveData(saveData, variantIds);
 
-			// Ask server to validate and show validation tooltips (like the Save action does)
-			await this.askServerToValidate(saveData, variantIds);
+				// Ask server to validate and show validation tooltips (like the Save action does)
+				await this.askServerToValidate(saveData, variantIds);
 
-			// Perform save
-			await this.performCreateOrUpdate(variantIds, saveData);
+				// Perform save
+				await this.performCreateOrUpdate(variantIds, saveData);
+			}
+		} catch (error) {
+			// Mandatory validation can reject (a missing name, say), and then no preview follows —
+			// so the tab opened during the click has to be cleaned up.
+			previewWindow?.close();
+			throw error;
 		}
 
-		await this.#previewController.preview({
-			unique,
-			urlProviderAlias,
-			culture: firstVariantId.culture,
-			segment: firstVariantId.segment,
-		});
+		await this.#previewController.preview(
+			{
+				unique,
+				urlProviderAlias,
+				culture: firstVariantId.culture,
+				segment: firstVariantId.segment,
+			},
+			previewWindow,
+		);
 	}
 
 	public createPropertyDatasetContext(
