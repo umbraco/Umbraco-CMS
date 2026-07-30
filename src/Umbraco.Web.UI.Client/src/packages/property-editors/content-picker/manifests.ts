@@ -3,6 +3,7 @@ import { manifest as sourceTypeManifest } from './config/source-type/manifests.j
 import { manifest as schemaManifest } from './Umbraco.MultiNodeTreePicker.js';
 import { manifests as dynamicRootManifests } from './dynamic-root/manifests.js';
 import { manifests as clipboardManifests } from './clipboard/manifests.js';
+import { manifests as conditionManifests } from './conditions/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
@@ -40,4 +41,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 	...dynamicRootManifests,
 	...valueSummaryManifests,
 	...clipboardManifests,
+	...conditionManifests,
 ];

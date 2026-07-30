@@ -37,8 +37,8 @@ describe('UmbMediaToContentPickerClipboardPastePropertyValueTranslator', () => {
 		expect(error).to.be.instanceOf(Error);
 	});
 
-	// The config handed to isCompatibleValue comes from UmbPropertyContext.getConfig(), which returns the raw
-	// array of config properties — not an UmbPropertyEditorConfigCollection.
+	// The config comes from UmbPropertyContext.getConfig(), which returns the raw array of config properties —
+	// not an UmbPropertyEditorConfigCollection.
 	it('is compatible when the content picker is configured for media', async () => {
 		const config: UmbPropertyEditorConfig = [{ alias: 'startNode', value: { type: 'media' } }];
 		expect(await pasteTranslator.isCompatibleValue([], config)).to.be.true;

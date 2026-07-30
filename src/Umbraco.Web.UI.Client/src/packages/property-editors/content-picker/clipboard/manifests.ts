@@ -1,4 +1,5 @@
 import { manifests as mediaManifests } from './media/manifests.js';
+import { UMB_CONTENT_PICKER_SOURCE_TYPE_CONDITION_ALIAS } from '../conditions/constants.js';
 import {
 	UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS,
 	UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
@@ -24,6 +25,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_PROPERTY_HAS_VALUE_CONDITION_ALIAS,
 			},
+			// Only a Content Picker that picks media has media to copy — the clipboard translators are media only.
+			{
+				alias: UMB_CONTENT_PICKER_SOURCE_TYPE_CONDITION_ALIAS,
+				match: 'media',
+			},
 		],
 	},
 	{
@@ -35,6 +41,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_WRITABLE_PROPERTY_CONDITION_ALIAS,
+			},
+			{
+				alias: UMB_CONTENT_PICKER_SOURCE_TYPE_CONDITION_ALIAS,
+				match: 'media',
 			},
 		],
 	},
