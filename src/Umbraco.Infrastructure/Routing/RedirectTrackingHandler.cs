@@ -20,9 +20,9 @@ namespace Umbraco.Cms.Core.Routing;
 /// </remarks>
 public sealed class RedirectTrackingHandler :
     INotificationHandler<ContentPublishingNotification>,
-    INotificationHandler<ContentPublishedNotification>,
+    INotificationAsyncHandler<ContentPublishedNotification>,
     INotificationHandler<ContentMovingNotification>,
-    INotificationHandler<ContentMovedNotification>
+    INotificationAsyncHandler<ContentMovedNotification>
 {
     private const string NotificationStateKey = "Umbraco.Cms.Core.Routing.RedirectTrackingHandler";
 
@@ -47,7 +47,7 @@ public sealed class RedirectTrackingHandler :
     /// This ensures that requests to previous URLs are redirected to the new locations.
     /// </summary>
     /// <param name="notification">The notification containing details about the moved content items.</param>
-    public void Handle(ContentMovedNotification notification) => CreateRedirectsForOldRoutes(notification);
+    public async Task HandleAsync(ContentMovedNotification notification, CancellationToken cancellationToken) => await CreateRedirectsForOldRoutesAsync(notification);
 
     /// <summary>
     /// Handles the content moved notification by creating redirects for old routes when content is moved.
@@ -60,7 +60,7 @@ public sealed class RedirectTrackingHandler :
     /// Handles a <see cref="ContentPublishedNotification"/> to track and manage redirects when content is published.
     /// </summary>
     /// <param name="notification">The notification containing information about the published content.</param>
-    public void Handle(ContentPublishedNotification notification) => CreateRedirectsForOldRoutes(notification);
+    public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken) => await CreateRedirectsForOldRoutesAsync(notification);
 
     /// <summary>
     /// Handles the content moved notification to create redirects for old routes when content is moved.
@@ -84,7 +84,7 @@ public sealed class RedirectTrackingHandler :
         }
     }
 
-    private void CreateRedirectsForOldRoutes(IStatefulNotification notification)
+    private async Task CreateRedirectsForOldRoutesAsync(IStatefulNotification notification)
     {
         // Don't let the notification handlers kick in if redirect tracking is turned off in the config.
         if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
@@ -93,7 +93,7 @@ public sealed class RedirectTrackingHandler :
         }
 
         Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes = GetOldRoutes(notification);
-        _redirectTracker.CreateRedirects(oldRoutes);
+        await _redirectTracker.CreateRedirectsAsync(oldRoutes);
     }
 
     private Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> GetOldRoutes(IStatefulNotification notification)

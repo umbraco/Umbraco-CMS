@@ -110,19 +110,19 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         IContent doc2 = ContentBuilder.CreateBasicContent(contentType2);
         ContentService.Save(doc2);
 
-        RedirectUrlService.RegisterWithStatus("hello/world", doc.Key);
-        RedirectUrlService.RegisterWithStatus("hello2/world2", doc2.Key);
+        await RedirectUrlService.RegisterWithStatusAsync("hello/world", doc.Key);
+        await RedirectUrlService.RegisterWithStatusAsync("hello2/world2", doc2.Key);
 
         // These 2 assertions should probably be moved to a test for the Register() method?
-        Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
-        Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
+        Assert.AreEqual(1, (await RedirectUrlService.GetContentRedirectUrlsAsync(doc.Key)).Count());
+        Assert.AreEqual(1, (await RedirectUrlService.GetContentRedirectUrlsAsync(doc2.Key)).Count());
 
         // change variation
         contentType.Variations = changedContentTypeVariation;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var expectedRedirectUrlCount = shouldUrlRedirectsBeCleared ? 0 : 1;
-        Assert.AreEqual(expectedRedirectUrlCount, RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
-        Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
+        Assert.AreEqual(expectedRedirectUrlCount, (await RedirectUrlService.GetContentRedirectUrlsAsync(doc.Key)).Count());
+        Assert.AreEqual(1, (await RedirectUrlService.GetContentRedirectUrlsAsync(doc2.Key)).Count());
     }
 
     [TestCase(ContentVariation.Nothing, ContentVariation.Culture)]

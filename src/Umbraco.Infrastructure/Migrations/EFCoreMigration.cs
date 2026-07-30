@@ -25,4 +25,5 @@ public enum EFCoreMigration
     AddDictionaryDto = 17,
     AddContentTypeDtos = 18,
     MemberPropertyTypeToEFCore = 19,
+    AddRedirectUrlDto = 20,
 }

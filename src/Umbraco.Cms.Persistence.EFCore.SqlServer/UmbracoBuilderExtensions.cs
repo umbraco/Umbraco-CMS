@@ -30,6 +30,7 @@ public static class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static void AddCustomizers(IUmbracoBuilder builder) =>
-        builder.AddEFCoreModelCustomizer<SqlServerNodeDtoModelCustomizer>();
+    private static void AddCustomizers(IUmbracoBuilder builder) => builder
+            .AddEFCoreModelCustomizer<SqlServerNodeDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerRedirectUrlDtoModelCustomizer>();
 }
