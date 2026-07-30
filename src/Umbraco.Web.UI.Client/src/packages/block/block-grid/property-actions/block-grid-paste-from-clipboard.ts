@@ -1,15 +1,15 @@
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../property-editors/block-grid-editor/constants.js';
 import type { UmbBlockGridValueModel } from '../types.js';
 import type { UmbBlockGridPropertyEditorConfig } from '../property-editors/block-grid-editor/types.js';
-import { UmbPasteFromClipboardPropertyAction } from '@umbraco-cms/backoffice/clipboard';
+import { UmbBlockPasteFromClipboardPropertyAction } from '../../block/property-actions/block-paste-from-clipboard.js';
 
 /**
  * The Block Grid Paste From Clipboard Property Action.
  * @exports
  * @class UmbBlockGridPasteFromClipboardPropertyAction
- * @augments UmbPasteFromClipboardPropertyAction
+ * @augments UmbBlockPasteFromClipboardPropertyAction
  */
-export class UmbBlockGridPasteFromClipboardPropertyAction extends UmbPasteFromClipboardPropertyAction {
+export class UmbBlockGridPasteFromClipboardPropertyAction extends UmbBlockPasteFromClipboardPropertyAction {
 	/**
 	 * Filters the picker based on the block grid property editor config.
 	 * @param {UmbBlockGridValueModel} propertyValue The property editor value.
