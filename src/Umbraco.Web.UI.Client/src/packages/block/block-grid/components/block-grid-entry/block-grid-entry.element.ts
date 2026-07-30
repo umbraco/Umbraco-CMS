@@ -103,7 +103,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isSortMode?: boolean;
 
-	@state()
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
 	private _name?: string;
 
 	@state()
@@ -498,7 +498,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							<uui-tag id="invalidLocation" color="danger">
 								<umb-localize
 									key="blockEditor_invalidDropPosition"
-									.args=${[this._name || this._contentTypeName]}></umb-localize>
+									.args=${[
+										this._contentTypeName ?? this.localize.term('blockEditor_unsupportedBlockName'),
+									]}></umb-localize>
 							</uui-tag>
 						`,
 					)}
