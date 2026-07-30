@@ -59,7 +59,7 @@ export interface UmbMediaClipboardPasteConfig {
  * A property editor hands this down instead of the input asking for it, because everything here is derived from
  * the property editor's own translators and configuration — and because the input must not touch a clipboard
  * value itself: a copy translator consumes, and a paste translator resolves to, the value of a specific property
- * editor. The input reports what the user did (`clipboard-copy-request`, `clipboard-entries-picked`) and the
+ * editor. The input asks for the operation (`clipboard-copy-request`, `clipboard-paste-request`) and the
  * property editor owns the value on both sides.
  */
 export interface UmbMediaClipboardConfig {

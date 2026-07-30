@@ -2,7 +2,7 @@ import type { UmbContentPickerSource } from '../../types.js';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbClipboardCopyRequestEvent, UmbClipboardEntriesPickedEvent } from '@umbraco-cms/backoffice/clipboard';
+import { UmbClipboardCopyRequestEvent, UmbClipboardPasteRequestEvent } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbMediaClipboardConfig } from '@umbraco-cms/backoffice/media';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
@@ -153,9 +153,9 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 	}
 
 	// Neither event is composed, so both have to be re-dispatched from this component.
-	#onClipboardEntriesPicked(event: UmbClipboardEntriesPickedEvent) {
+	#onClipboardPasteRequest(event: UmbClipboardPasteRequestEvent) {
 		event.stopPropagation();
-		this.dispatchEvent(new UmbClipboardEntriesPickedEvent(event.entryUniques));
+		this.dispatchEvent(new UmbClipboardPasteRequestEvent(event.entryUniques));
 	}
 
 	#onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
@@ -215,7 +215,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 				@change=${this.#onChange}
 				.clipboardConfig=${this.mediaClipboardConfig}
 				@clipboard-copy-request=${this.#onClipboardCopyRequest}
-				@clipboard-entries-picked=${this.#onClipboardEntriesPicked}
+				@clipboard-paste-request=${this.#onClipboardPasteRequest}
 				.interactionMemories=${this.#interactionMemories}
 				@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-input-media>
 		`;

@@ -7,7 +7,7 @@ import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
 import {
 	UMB_CLIPBOARD_PROPERTY_CONTEXT,
 	type UmbClipboardCopyRequestEvent,
-	type UmbClipboardEntriesPickedEvent,
+	type UmbClipboardPasteRequestEvent,
 } from '@umbraco-cms/backoffice/clipboard';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
@@ -177,7 +177,7 @@ export class UmbPropertyEditorUIMediaPickerElement
 	}
 
 	// The copy translators consume this property editor's value, so the value for a copied item is picked out here
-	// rather than in the input — the input only reports which item it was, and what it is called.
+	// rather than in the input — the input only asks, naming the item and what it is called.
 	async #onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
 		const entry = this.value?.find((item) => item.key === event.unique);
 
@@ -193,8 +193,8 @@ export class UmbPropertyEditorUIMediaPickerElement
 	}
 
 	// The paste translators resolve to this property editor's value, so the merge belongs here rather than in the
-	// input — the input only reports which clipboard entries were picked.
-	async #onClipboardEntriesPicked(event: UmbClipboardEntriesPickedEvent) {
+	// input — the input only asks, naming the clipboard entries.
+	async #onClipboardPasteRequest(event: UmbClipboardPasteRequestEvent) {
 		if (!this.#clipboardContext) return;
 
 		const propertyValues = await this.#clipboardContext.readMultiple<UmbMediaPickerValueModel>(event.entryUniques);
@@ -242,7 +242,7 @@ export class UmbPropertyEditorUIMediaPickerElement
 				?readonly=${this.readonly}
 				.clipboardConfig=${this._clipboardConfig}
 				@clipboard-copy-request=${this.#onClipboardCopyRequest}
-				@clipboard-entries-picked=${this.#onClipboardEntriesPicked}
+				@clipboard-paste-request=${this.#onClipboardPasteRequest}
 				.interactionMemories=${this._interactionMemories}
 				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-rich-media>

@@ -8,7 +8,7 @@ import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
 import {
 	UMB_CLIPBOARD_PROPERTY_CONTEXT,
 	UmbClipboardCopyRequestEvent,
-	UmbClipboardEntriesPickedEvent,
+	UmbClipboardPasteRequestEvent,
 } from '@umbraco-cms/backoffice/clipboard';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
@@ -128,7 +128,7 @@ describe('UmbPropertyEditorUIContentPickerElement', () => {
 				element.value = [mediaReference('media-a')];
 				pasteResult = [[mediaReference('media-b')]];
 
-				await dispatchFromInput(new UmbClipboardEntriesPickedEvent(['entry-unique']));
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
 
 				expect(element.value?.map((x) => x.unique)).to.deep.equal(['media-a', 'media-b']);
 			});
@@ -138,7 +138,7 @@ describe('UmbPropertyEditorUIContentPickerElement', () => {
 				element.value = [mediaReference('media-a')];
 				pasteResult = [[mediaReference('media-a'), mediaReference('media-b')]];
 
-				await dispatchFromInput(new UmbClipboardEntriesPickedEvent(['entry-unique']));
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
 
 				expect(element.value?.map((x) => x.unique)).to.deep.equal(['media-a', 'media-b']);
 			});
@@ -148,7 +148,7 @@ describe('UmbPropertyEditorUIContentPickerElement', () => {
 				element.value = [mediaReference('media-a')];
 				pasteResult = [[mediaReference('media-b'), mediaReference('media-c')]];
 
-				await dispatchFromInput(new UmbClipboardEntriesPickedEvent(['entry-unique']));
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
 
 				// As when picking: the selection may exceed the configured maximum, and validation reports it.
 				expect(element.value?.map((x) => x.unique)).to.deep.equal(['media-a', 'media-b', 'media-c']);

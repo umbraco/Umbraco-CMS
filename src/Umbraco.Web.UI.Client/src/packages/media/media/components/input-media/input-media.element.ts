@@ -1,7 +1,7 @@
 import type { UmbMediaCardItemModel } from '../../types.js';
 import { UmbMediaPickerFolderFilter, UmbMediaPickerInputContext } from './input-media.context.js';
 import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
-import { UmbClipboardCopyRequestEvent, UmbClipboardEntriesPickedEvent } from '@umbraco-cms/backoffice/clipboard';
+import { UmbClipboardCopyRequestEvent, UmbClipboardPasteRequestEvent } from '@umbraco-cms/backoffice/clipboard';
 import {
 	css,
 	customElement,
@@ -124,7 +124,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	/**
 	 * The clipboard affordances to offer. Supplied by the hosting property editor, because it is the one that owns
-	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-entries-picked` events.
+	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-paste-request` events.
 	 * @type {UmbMediaClipboardConfig}
 	 */
 	@property({ type: Object, attribute: false })
@@ -232,13 +232,13 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 		const clipboardSelection = modalValue?.clipboard?.selection;
 		if (clipboardSelection?.length) {
-			// Reported rather than resolved here: a paste translator produces the value of a property editor, so
+			// Requested rather than resolved here: a paste translator produces the value of a property editor, so
 			// only the property editor hosting this input can turn these entries into its value.
-			this.dispatchEvent(new UmbClipboardEntriesPickedEvent(clipboardSelection));
+			this.dispatchEvent(new UmbClipboardPasteRequestEvent(clipboardSelection));
 		}
 	}
 
-	// Reported rather than written here: a copy translator consumes the value of a property editor, so only the
+	// Requested rather than written here: a copy translator consumes the value of a property editor, so only the
 	// property editor hosting this input can produce the value for the item. The name and icon travel along
 	// because they are resolved here for rendering and the property value does not carry them.
 	#requestClipboardCopy(item: UmbMediaCardItemModel) {

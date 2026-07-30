@@ -20,7 +20,7 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 import '@umbraco-cms/backoffice/imaging';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
-import { UmbClipboardCopyRequestEvent, UmbClipboardEntriesPickedEvent } from '@umbraco-cms/backoffice/clipboard';
+import { UmbClipboardCopyRequestEvent, UmbClipboardPasteRequestEvent } from '@umbraco-cms/backoffice/clipboard';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -122,7 +122,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	/**
 	 * The clipboard affordances to offer. Supplied by the hosting property editor, because it is the one that owns
-	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-entries-picked` events.
+	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-paste-request` events.
 	 * @type {UmbMediaClipboardConfig}
 	 */
 	@property({ type: Object, attribute: false })
@@ -335,9 +335,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		const clipboardSelection = modalValue?.clipboard?.selection;
 		if (clipboardSelection?.length) {
-			// Reported rather than resolved here: a paste translator produces the value of a property editor, so
+			// Requested rather than resolved here: a paste translator produces the value of a property editor, so
 			// only the property editor hosting this input can turn these entries into its value.
-			this.dispatchEvent(new UmbClipboardEntriesPickedEvent(clipboardSelection));
+			this.dispatchEvent(new UmbClipboardPasteRequestEvent(clipboardSelection));
 		}
 	}
 
@@ -445,7 +445,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		`;
 	}
 
-	// Reported rather than written here: a copy translator consumes the value of a property editor, so only the
+	// Requested rather than written here: a copy translator consumes the value of a property editor, so only the
 	// property editor hosting this input can produce the value for the item. The name and icon travel along
 	// because they are resolved here for rendering and the property value does not carry them.
 	#requestClipboardCopy(item: UmbRichMediaCardModel) {

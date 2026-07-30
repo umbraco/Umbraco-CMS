@@ -6,8 +6,8 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import {
 	UMB_CLIPBOARD_PROPERTY_CONTEXT,
-	UmbClipboardEntriesPickedEvent,
 	UmbClipboardCopyRequestEvent,
+	UmbClipboardPasteRequestEvent,
 } from '@umbraco-cms/backoffice/clipboard';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
@@ -91,7 +91,7 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 				element.value = [entry('media-a')];
 				pasteResult = [[entry('media-b')]];
 
-				await dispatchFromInput(new UmbClipboardEntriesPickedEvent(['entry-unique']));
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
 
 				expect(element.value?.map((x) => x.mediaKey)).to.deep.equal(['media-a', 'media-b']);
 			});
@@ -101,7 +101,7 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 				element.value = [entry('media-a')];
 				pasteResult = [[entry('media-a'), entry('media-b')]];
 
-				await dispatchFromInput(new UmbClipboardEntriesPickedEvent(['entry-unique']));
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
 
 				expect(element.value?.map((x) => x.mediaKey)).to.deep.equal(['media-a', 'media-b']);
 			});
@@ -111,7 +111,7 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 				element.value = [entry('media-a')];
 				pasteResult = [[entry('media-b'), entry('media-c')]];
 
-				await dispatchFromInput(new UmbClipboardEntriesPickedEvent(['entry-unique']));
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
 
 				// As when picking: a single-value picker accepts more than it allows, and validation reports it.
 				expect(element.value?.map((x) => x.mediaKey)).to.deep.equal(['media-a', 'media-b', 'media-c']);
@@ -127,7 +127,7 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 				};
 				pasteResult = [[pasted]];
 
-				await dispatchFromInput(new UmbClipboardEntriesPickedEvent(['entry-unique']));
+				await dispatchFromInput(new UmbClipboardPasteRequestEvent(['entry-unique']));
 
 				expect(element.value?.[0].crops).to.deep.equal(pasted.crops);
 				expect(element.value?.[0].focalPoint).to.deep.equal(pasted.focalPoint);

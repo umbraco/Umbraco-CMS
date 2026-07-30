@@ -12,7 +12,7 @@ import { UMB_MEDIA_ENTITY_TYPE, type UmbMediaClipboardConfig } from '@umbraco-cm
 import {
 	UMB_CLIPBOARD_PROPERTY_CONTEXT,
 	type UmbClipboardCopyRequestEvent,
-	type UmbClipboardEntriesPickedEvent,
+	type UmbClipboardPasteRequestEvent,
 } from '@umbraco-cms/backoffice/clipboard';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
@@ -153,7 +153,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	}
 
 	// The copy translators consume this property editor's value, so the value for a copied item is picked out here
-	// rather than in the input — the input only reports which item it was, and what it is called.
+	// rather than in the input — the input only asks, naming the item and what it is called.
 	async #onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
 		const reference = this.value?.find((item) => item.unique === event.unique);
 
@@ -169,8 +169,8 @@ export class UmbPropertyEditorUIContentPickerElement
 	}
 
 	// The paste translators resolve to this property editor's value, so the merge belongs here rather than in the
-	// media input — the input only reports which clipboard entries were picked.
-	async #onClipboardEntriesPicked(event: UmbClipboardEntriesPickedEvent) {
+	// media input — the input only asks, naming the clipboard entries.
+	async #onClipboardPasteRequest(event: UmbClipboardPasteRequestEvent) {
 		if (!this.#clipboardContext) return;
 
 		const propertyValues = await this.#clipboardContext.readMultiple<UmbContentPickerValueType>(event.entryUniques);
@@ -322,7 +322,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				@change=${this.#onChange}
 				.mediaClipboardConfig=${this._clipboardConfig}
 				@clipboard-copy-request=${this.#onClipboardCopyRequest}
-				@clipboard-entries-picked=${this.#onClipboardEntriesPicked}
+				@clipboard-paste-request=${this.#onClipboardPasteRequest}
 				.interactionMemories=${this._interactionMemories}
 				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-content>
