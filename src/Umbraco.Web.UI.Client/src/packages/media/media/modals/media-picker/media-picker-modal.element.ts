@@ -538,7 +538,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#renderNavigation() {
-		if (!this.data?.clipboard) return nothing;
+		if (!this.data?.clipboard?.enabled) return nothing;
 		return html`
 			<uui-tab-group slot="navigation">
 				<uui-tab
@@ -565,7 +565,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				.selection=${this.value?.clipboard?.selection ?? []}
 				.config=${{
 					multiple: this.data?.multiple ?? false,
-					entryTypes: this.data?.clipboard?.types,
+					entryTypes: this.data?.clipboard?.types ?? [],
 					pickableFilter: this.data?.clipboard?.pickableFilter,
 				}}
 				@selection-change=${this.#onClipboardSelectionChange}></umb-clipboard-entry-picker>

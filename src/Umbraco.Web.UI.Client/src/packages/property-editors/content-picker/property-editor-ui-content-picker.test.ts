@@ -75,7 +75,7 @@ describe('UmbPropertyEditorUIContentPickerElement', () => {
 		}
 
 		function clipboardConfigOfInput() {
-			return element.shadowRoot!.querySelector('umb-input-content')!.clipboardConfig;
+			return element.shadowRoot!.querySelector('umb-input-content')!.mediaClipboardConfig;
 		}
 
 		describe('the configuration handed to the input', () => {
@@ -83,8 +83,9 @@ describe('UmbPropertyEditorUIContentPickerElement', () => {
 				setConfig('media');
 				await element.updateComplete;
 
-				expect(clipboardConfigOfInput()?.copy).to.be.true;
-				expect(clipboardConfigOfInput()?.paste?.types).to.deep.equal(['media']);
+				expect(clipboardConfigOfInput()?.copy.enabled).to.be.true;
+				expect(clipboardConfigOfInput()?.paste.enabled).to.be.true;
+				expect(clipboardConfigOfInput()?.paste.types).to.deep.equal(['media']);
 			});
 
 			it('offers nothing when the picker is configured for content', async () => {

@@ -3,11 +3,11 @@ import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
 import {
 	UMB_CLIPBOARD_PROPERTY_CONTEXT,
 	type UmbClipboardCopyRequestEvent,
 	type UmbClipboardEntriesPickedEvent,
-	type UmbClipboardPropertyConfig,
 } from '@umbraco-cms/backoffice/clipboard';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
@@ -98,7 +98,7 @@ export class UmbPropertyEditorUIMediaPickerElement
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
-	private _clipboardConfig?: UmbClipboardPropertyConfig;
+	private _clipboardConfig?: UmbMediaClipboardConfig;
 
 	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
 		memoryUniquePrefix: 'UmbMediaPicker',
@@ -152,10 +152,12 @@ export class UmbPropertyEditorUIMediaPickerElement
 
 		this._clipboardConfig = clipboardContext
 			? {
-					copy: this.#clipboardCopyAvailable,
-					paste: types?.length
-						? { types, pickableFilter: (entry) => clipboardContext.isEntryPastable(entry) }
-						: undefined,
+					copy: { enabled: this.#clipboardCopyAvailable },
+					paste: {
+						enabled: !!types?.length,
+						types: types ?? [],
+						pickableFilter: (entry) => clipboardContext.isEntryPastable(entry),
+					},
 				}
 			: undefined;
 	}

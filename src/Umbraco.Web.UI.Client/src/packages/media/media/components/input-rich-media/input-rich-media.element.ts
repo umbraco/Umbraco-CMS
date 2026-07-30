@@ -1,5 +1,6 @@
 import { UMB_IMAGE_CROPPER_EDITOR_MODAL } from '../../modals/index.js';
 import type { UmbMediaItemModel, UmbCropModel, UmbMediaPickerPropertyValueEntry } from '../../types.js';
+import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
 import { UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../../repository/constants.js';
 import { UmbMediaPickerInputContext } from '../input-media/input-media.context.js';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
@@ -19,11 +20,7 @@ import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 import '@umbraco-cms/backoffice/imaging';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
-import {
-	UmbClipboardCopyRequestEvent,
-	UmbClipboardEntriesPickedEvent,
-	type UmbClipboardPropertyConfig,
-} from '@umbraco-cms/backoffice/clipboard';
+import { UmbClipboardCopyRequestEvent, UmbClipboardEntriesPickedEvent } from '@umbraco-cms/backoffice/clipboard';
 
 type UmbRichMediaCardModel = {
 	unique: string;
@@ -126,10 +123,10 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	/**
 	 * The clipboard affordances to offer. Supplied by the hosting property editor, because it is the one that owns
 	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-entries-picked` events.
-	 * @type {UmbClipboardPropertyConfig}
+	 * @type {UmbMediaClipboardConfig}
 	 */
 	@property({ type: Object, attribute: false })
-	clipboardConfig?: UmbClipboardPropertyConfig;
+	clipboardConfig?: UmbMediaClipboardConfig;
 
 	@property({ type: Boolean })
 	multiple = false;
@@ -433,7 +430,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		if (this.readonly) return nothing;
 		return html`
 			<uui-action-bar slot="actions">
-				${this.clipboardConfig?.copy
+				${this.clipboardConfig?.copy.enabled
 					? html`<uui-button
 							label=${this.localize.term('clipboard_labelForCopyToClipboard')}
 							look="secondary"

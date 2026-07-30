@@ -1,10 +1,7 @@
 import type { UmbMediaCardItemModel } from '../../types.js';
 import { UmbMediaPickerFolderFilter, UmbMediaPickerInputContext } from './input-media.context.js';
-import {
-	UmbClipboardCopyRequestEvent,
-	UmbClipboardEntriesPickedEvent,
-	type UmbClipboardPropertyConfig,
-} from '@umbraco-cms/backoffice/clipboard';
+import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
+import { UmbClipboardCopyRequestEvent, UmbClipboardEntriesPickedEvent } from '@umbraco-cms/backoffice/clipboard';
 import {
 	css,
 	customElement,
@@ -128,10 +125,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	/**
 	 * The clipboard affordances to offer. Supplied by the hosting property editor, because it is the one that owns
 	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-entries-picked` events.
-	 * @type {UmbClipboardPropertyConfig}
+	 * @type {UmbMediaClipboardConfig}
 	 */
 	@property({ type: Object, attribute: false })
-	clipboardConfig?: UmbClipboardPropertyConfig;
+	clipboardConfig?: UmbMediaClipboardConfig;
 
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
@@ -318,7 +315,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#renderCopyAction(item: UmbMediaCardItemModel) {
-		if (this.readonly || !this.clipboardConfig?.copy) return nothing;
+		if (this.readonly || !this.clipboardConfig?.copy.enabled) return nothing;
 		return html`
 			<uui-button
 				label=${this.localize.term('clipboard_labelForCopyToClipboard')}

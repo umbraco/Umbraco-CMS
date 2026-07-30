@@ -8,12 +8,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
-import { UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
+import { UMB_MEDIA_ENTITY_TYPE, type UmbMediaClipboardConfig } from '@umbraco-cms/backoffice/media';
 import {
 	UMB_CLIPBOARD_PROPERTY_CONTEXT,
 	type UmbClipboardCopyRequestEvent,
 	type UmbClipboardEntriesPickedEvent,
-	type UmbClipboardPropertyConfig,
 } from '@umbraco-cms/backoffice/clipboard';
 import { UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
@@ -83,7 +82,7 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
-	private _clipboardConfig?: UmbClipboardPropertyConfig;
+	private _clipboardConfig?: UmbMediaClipboardConfig;
 
 	#dynamicRoot?: UmbContentPickerSource['dynamicRoot'];
 	#dynamicRootRepository = new UmbContentPickerDynamicRootRepository(this);
@@ -143,10 +142,12 @@ export class UmbPropertyEditorUIContentPickerElement
 		this._clipboardConfig =
 			this._type === 'media' && clipboardContext
 				? {
-						copy: this.#clipboardCopyAvailable,
-						paste: types?.length
-							? { types, pickableFilter: (entry) => clipboardContext.isEntryPastable(entry) }
-							: undefined,
+						copy: { enabled: this.#clipboardCopyAvailable },
+						paste: {
+							enabled: !!types?.length,
+							types: types ?? [],
+							pickableFilter: (entry) => clipboardContext.isEntryPastable(entry),
+						},
 					}
 				: undefined;
 	}
@@ -319,7 +320,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}
 				@change=${this.#onChange}
-				.clipboardConfig=${this._clipboardConfig}
+				.mediaClipboardConfig=${this._clipboardConfig}
 				@clipboard-copy-request=${this.#onClipboardCopyRequest}
 				@clipboard-entries-picked=${this.#onClipboardEntriesPicked}
 				.interactionMemories=${this._interactionMemories}

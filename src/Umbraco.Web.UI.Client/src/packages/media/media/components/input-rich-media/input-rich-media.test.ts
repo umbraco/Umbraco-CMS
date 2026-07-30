@@ -32,26 +32,26 @@ describe('UmbInputRichMediaElement', () => {
 		});
 
 		it('offers no copy action when the host cannot copy', async () => {
-			element.clipboardConfig = { copy: false };
+			element.clipboardConfig = { copy: { enabled: false }, paste: { enabled: false, types: [] } };
 			await renderCard();
 			expect(copyAction()).to.be.null;
 		});
 
 		it('offers no copy action when readonly', async () => {
-			element.clipboardConfig = { copy: true };
+			element.clipboardConfig = { copy: { enabled: true }, paste: { enabled: false, types: [] } };
 			element.readonly = true;
 			await renderCard();
 			expect(copyAction()).to.be.null;
 		});
 
 		it('offers a copy action when the host can copy', async () => {
-			element.clipboardConfig = { copy: true };
+			element.clipboardConfig = { copy: { enabled: true }, paste: { enabled: false, types: [] } };
 			await renderCard();
 			expect(copyAction()).to.not.be.null;
 		});
 
 		it('reports the identity of the item, leaving the value to the host', async () => {
-			element.clipboardConfig = { copy: true };
+			element.clipboardConfig = { copy: { enabled: true }, paste: { enabled: false, types: [] } };
 			await renderCard();
 
 			const events: Array<UmbClipboardCopyRequestEvent> = [];
