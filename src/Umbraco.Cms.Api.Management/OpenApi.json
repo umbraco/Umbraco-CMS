@@ -44193,11 +44193,11 @@
       },
       "DocumentUrlInfoModel": {
         "required": [
-          "isExternal",
           "message",
           "provider",
           "culture",
-          "url"
+          "url",
+          "isExternal"
         ],
         "type": "object",
         "properties": {
@@ -54253,9 +54253,11 @@
             "type": "string"
           },
           "httpStatusCode": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "isSuccessStatusCode": {
             "type": "boolean"
