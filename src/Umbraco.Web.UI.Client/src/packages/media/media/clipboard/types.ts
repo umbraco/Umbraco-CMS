@@ -32,7 +32,7 @@ export interface UmbMediaClipboardCopyConfig {
 
 /**
  * What a clipboard entry picker lists for a media input, and which of those entries it may pick. Held separately
- * because this is the part a picker modal needs, and all a picker modal needs.
+ * because it is the part a picker modal needs, and all it needs.
  */
 export interface UmbMediaClipboardPasteConfig {
 	/**
@@ -54,13 +54,8 @@ export interface UmbMediaClipboardPasteConfig {
 }
 
 /**
- * The clipboard affordances a property editor offers the media input it renders.
- *
- * A property editor hands this down instead of the input asking for it, because everything here is derived from
- * the property editor's own translators and configuration — and because the input must not touch a clipboard
- * value itself: a copy translator consumes, and a paste translator resolves to, the value of a specific property
- * editor. The input asks for the operation (`clipboard-copy-request`, `clipboard-paste-request`) and the
- * property editor owns the value on both sides.
+ * The clipboard affordances a property editor offers the media input it renders. Handed down rather than asked
+ * for, because it is derived from the property editor's own translators and configuration.
  */
 export interface UmbMediaClipboardConfig {
 	copy: UmbMediaClipboardCopyConfig;

@@ -44,8 +44,7 @@ export class UmbCopyToClipboardPropertyAction extends UmbPropertyActionBase<Meta
 			return;
 		}
 
-		// The property editor UI alias, the entry name and the icon all come from the property this action runs on,
-		// which the clipboard property context reads for itself.
+		// Alias, entry name and icon are all derived from the property this action runs on.
 		await this.#clipboardContext.write({ propertyValue });
 	}
 }

@@ -89,9 +89,8 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 			this.#datasetContext = context;
 		}).asPromise({ preventTimeout: true });
 
-		// A context consumer rejects its promise when the host disconnects. Nothing awaits these until a clipboard
-		// operation happens, so mark them handled to keep that teardown from surfacing as an unhandled rejection.
-		// Callers still see the rejection through their own await.
+		// Nothing awaits these until a clipboard operation, so the rejection on host disconnect would surface as
+		// unhandled. Callers still see it through their own await.
 		this.#propertyInit.catch(() => undefined);
 		this.#datasetInit.catch(() => undefined);
 	}
@@ -398,9 +397,8 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 	async isEntryPastable(entry: UmbClipboardEntryDetailModel, propertyEditorUiAlias?: string): Promise<boolean> {
 		const alias = await this.#requirePropertyEditorUiAlias(propertyEditorUiAlias);
 
-		// Guards the resolver below, which throws when no translator matches the entry's value types. Reporting the
-		// entry as not pastable is deliberate: this runs per entry while a list is being built, so throwing would
-		// take the whole list down with it.
+		// Answered rather than left to the resolver, which throws: this runs per entry while a list is built, so
+		// one unsupported entry would take the whole list down.
 		const pasteTranslatorManifests = this.getPasteTranslatorManifests(alias);
 		if (!this.hasSupportedPasteTranslator(pasteTranslatorManifests, entry.values)) {
 			return false;
@@ -426,9 +424,8 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 	async #requirePropertyEditorUiAlias(propertyEditorUiAlias?: string): Promise<string> {
 		if (propertyEditorUiAlias) return propertyEditorUiAlias;
 
-		// The property context is provided by the surrounding element, so it can land after a consumer of this
-		// context has asked for something. Waiting keeps "not resolved yet" from being mistaken for a property
-		// editor that cannot be identified.
+		// The property context can land after a caller has asked, and "not resolved yet" would otherwise be
+		// indistinguishable from "no property editor".
 		await this.#propertyInit;
 
 		const alias = this.#propertyEditorUiAlias.getValue();

@@ -118,8 +118,6 @@ export class UmbPropertyEditorUIMediaPickerElement
 			this._interactionMemories = interactionMemories ?? [];
 		});
 
-		// Absent for property editors that do not register the clipboard property context, hence the optional
-		// handling all the way through: no context means no clipboard affordances at all.
 		this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (context) => {
 			this.#clipboardContext = context;
 
@@ -176,8 +174,6 @@ export class UmbPropertyEditorUIMediaPickerElement
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	// The copy translators consume this property editor's value, so the value for a copied item is picked out here
-	// rather than in the input — the input only asks, naming the item and what it is called.
 	async #onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
 		const entry = this.value?.find((item) => item.key === event.unique);
 
@@ -192,8 +188,6 @@ export class UmbPropertyEditorUIMediaPickerElement
 		});
 	}
 
-	// The paste translators resolve to this property editor's value, so the merge belongs here rather than in the
-	// input — the input only asks, naming the clipboard entries.
 	async #onClipboardPasteRequest(event: UmbClipboardPasteRequestEvent) {
 		if (!this.#clipboardContext) return;
 
@@ -202,8 +196,8 @@ export class UmbPropertyEditorUIMediaPickerElement
 
 		const currentValue = this.value ?? [];
 
-		// Everything in the entry is added, however many items it holds and whatever the editor allows — as when
-		// picking, an over-long selection is for validation to report and the user to trim.
+		// Not clamped to the configured limit: as when picking, an over-long selection is for validation to
+		// report and the user to trim.
 		const additions = pasted.filter((addition) => !currentValue.some((entry) => entry.mediaKey === addition.mediaKey));
 
 		if (!additions.length) return;

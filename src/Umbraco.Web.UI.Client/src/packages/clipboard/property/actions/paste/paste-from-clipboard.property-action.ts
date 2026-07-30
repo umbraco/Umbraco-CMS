@@ -35,8 +35,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 		if (!this.#clipboardContext) throw new Error('Clipboard context not found');
 		if (!this.#propertyContext) throw new Error('Property context not found');
 
-		// The property editor UI alias comes from the property this action runs on, which the clipboard property
-		// context reads for itself.
+		// The alias is derived from the property this action runs on.
 		const result = await this.#clipboardContext.pick({
 			multiple: false,
 			filter: this._pickerFilter,

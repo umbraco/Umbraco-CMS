@@ -81,15 +81,15 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 		this.#setItems(sortedEntries);
 	}
 
-	// Resolves before assigning the items, so an entry is never rendered as pickable while its compatibility is
-	// still pending — otherwise it could be selected in that window.
+	// Resolved before the items are assigned, so no entry is ever rendered as pickable while its compatibility
+	// is still pending.
 	async #setItems(entries: Array<UmbClipboardEntryDetailModel>) {
 		this._unpickableUniques = await this.#resolveUnpickable(entries);
 		this._items = entries;
 	}
 
-	// Entries that cannot be picked stay in the list and render as disabled, so it stays clear that the entry
-	// exists and only its compatibility with this destination is the problem.
+	// Unpickable entries stay listed and render disabled, so it is clear the entry exists and only its
+	// compatibility with this destination is the problem.
 	async #resolveUnpickable(entries: Array<UmbClipboardEntryDetailModel>): Promise<Array<string>> {
 		const pickableFilter = this.config?.pickableFilter;
 

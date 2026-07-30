@@ -335,8 +335,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 		const clipboardSelection = modalValue?.clipboard?.selection;
 		if (clipboardSelection?.length) {
-			// Requested rather than resolved here: a paste translator produces the value of a property editor, so
-			// only the property editor hosting this input can turn these entries into its value.
+			// Requested, not resolved: only the hosting property editor can turn entries into its value.
 			this.dispatchEvent(new UmbClipboardPasteRequestEvent(clipboardSelection));
 		}
 	}
@@ -445,9 +444,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		`;
 	}
 
-	// Requested rather than written here: a copy translator consumes the value of a property editor, so only the
-	// property editor hosting this input can produce the value for the item. The name and icon travel along
-	// because they are resolved here for rendering and the property value does not carry them.
+	// Requested, not written: only the hosting property editor can produce the value for the item.
 	#requestClipboardCopy(item: UmbRichMediaCardModel) {
 		this.dispatchEvent(new UmbClipboardCopyRequestEvent({ unique: item.unique, name: item.name, icon: item.icon }));
 	}

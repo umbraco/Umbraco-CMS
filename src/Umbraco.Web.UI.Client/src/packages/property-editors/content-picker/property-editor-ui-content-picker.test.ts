@@ -41,8 +41,7 @@ describe('UmbPropertyEditorUIContentPickerElement', () => {
 			pasteResult = [];
 			written = [];
 
-			// Only the members the element uses. Translating entries and resolving availability belong to the real
-			// clipboard property context, which is covered by its own tests.
+			// Only the members the element uses; the real context is covered by its own tests.
 			const clipboardContext = {
 				getHostElement: () => element,
 				copyAvailable: new UmbBooleanState(true).asObservable(),
@@ -67,7 +66,7 @@ describe('UmbPropertyEditorUIContentPickerElement', () => {
 			]);
 		}
 
-		// The event comes from the content input in production, and the property editor listens for it on it.
+		// The event comes from the content input, which is where the property editor listens for it.
 		async function dispatchFromInput(event: Event) {
 			await element.updateComplete;
 			element.shadowRoot!.querySelector('umb-input-content')!.dispatchEvent(event);
@@ -92,9 +91,7 @@ describe('UmbPropertyEditorUIContentPickerElement', () => {
 				setConfig('content');
 				await element.updateComplete;
 
-				// Every entry value type this editor can translate is a media one, so a content picker would show a
-				// clipboard tab in which the paste translator rejects every entry listed, and a copy action that
-				// writes an empty entry.
+				// Every entry value type this editor can translate is a media one, so there is nothing to offer.
 				expect(clipboardConfigOfInput()).to.be.undefined;
 			});
 

@@ -224,8 +224,8 @@ describe('UmbClipboardPropertyContext', () => {
 		});
 	});
 
-	// The suites below cover what the context derives from the surrounding property, so they provide their own
-	// property and dataset contexts and build their own instance on top of them.
+	// These suites cover what the context derives from the surrounding property, so they provide their own
+	// property and dataset contexts.
 	describe('derived from the surrounding property', () => {
 		let derivingContext: UmbClipboardPropertyContext;
 
@@ -242,14 +242,12 @@ describe('UmbClipboardPropertyContext', () => {
 			umbExtensionsRegistry.clear();
 		});
 
-		// A real UmbPropertyContext is used because it and the clipboard property context share the
-		// 'UmbPropertyContext' base alias — only the real implementations carry the api alias that lets both resolve
-		// independently, as they do in production.
+		// A real UmbPropertyContext, because it shares the 'UmbPropertyContext' base alias with the clipboard
+		// property context — only the real implementations carry the api alias that resolves them independently.
 		function providePropertyContext(options?: { alias?: string | undefined; label?: string }) {
 			const propertyContext = new UmbPropertyContext(hostElement);
-			// Intentionally no setAlias: the alias that matters here is the editor UI alias from the editor
-			// manifest, and leaving the property alias unset keeps UmbPropertyContext from observing the dataset
-			// stub's value methods.
+			// No setAlias: the alias that matters is the editor UI alias, and leaving the property alias unset keeps
+			// UmbPropertyContext from observing the dataset stub's value methods.
 			propertyContext.setLabel(options?.label ?? 'My Property');
 			const alias = options && 'alias' in options ? options.alias : TEST_PROPERTY_EDITOR_UI_ALIAS;
 			propertyContext.setEditorManifest(alias ? ({ alias, meta: { icon: 'icon-document' } } as any) : undefined);
@@ -391,8 +389,8 @@ describe('UmbClipboardPropertyContext', () => {
 				provideDatasetContext('My Workspace');
 				const context = await createContext();
 
-				// This context is an extension behind a dynamic import, so the contexts it derives from can land in
-				// either order — the write has to wait rather than fail.
+				// This context is an extension behind a dynamic import, so what it derives from can land in either
+				// order.
 				const writing = context.write({ propertyValue: 'hello', itemName: 'My Item' });
 				providePropertyContext({ label: 'My Property' });
 				await writing;
@@ -466,8 +464,7 @@ describe('UmbClipboardPropertyContext', () => {
 				provideDatasetContext();
 				const context = await createContext();
 
-				// An empty result would be indistinguishable from "this editor cannot paste anything", so the call
-				// has to wait for the context rather than answer early.
+				// An empty result would be indistinguishable from "this editor cannot paste anything".
 				const types = context.getSupportedPasteEntryValueTypes();
 				providePropertyContext();
 
@@ -519,8 +516,8 @@ describe('UmbClipboardPropertyContext', () => {
 				provideDatasetContext();
 				const context = await createContext();
 
-				// Type filtering happens in the collection, so this is a defensive path — but it must not throw,
-				// because it runs per entry while a list is being built.
+				// A defensive path — type filtering happens in the collection — but it must not throw, because it
+				// runs per entry while a list is built.
 				expect(await context.isEntryPastable(entryWithValueType(TEST_UNSUPPORTED_CLIPBOARD_ENTRY_VALUE_TYPE))).to.be
 					.false;
 			});

@@ -132,9 +132,8 @@ export class UmbPropertyEditorUIContentPickerElement
 	#clipboardCopyAvailable = false;
 	#clipboardPasteTypes?: Array<string>;
 
-	// Every clipboard entry value type this editor can translate, in either direction, is a media one — so a picker
-	// configured for documents or members has nothing to offer. Without this it would show a clipboard tab where
-	// the paste translator rejects every entry listed, and a copy action that writes an empty entry.
+	// Every clipboard entry value type this editor can translate is a media one, so a picker configured for
+	// documents or members has nothing to offer.
 	#updateClipboardConfig() {
 		const clipboardContext = this.#clipboardContext;
 		const types = this.#clipboardPasteTypes;
@@ -152,8 +151,6 @@ export class UmbPropertyEditorUIContentPickerElement
 				: undefined;
 	}
 
-	// The copy translators consume this property editor's value, so the value for a copied item is picked out here
-	// rather than in the input — the input only asks, naming the item and what it is called.
 	async #onClipboardCopyRequest(event: UmbClipboardCopyRequestEvent) {
 		const reference = this.value?.find((item) => item.unique === event.unique);
 
@@ -168,8 +165,6 @@ export class UmbPropertyEditorUIContentPickerElement
 		});
 	}
 
-	// The paste translators resolve to this property editor's value, so the merge belongs here rather than in the
-	// media input — the input only asks, naming the clipboard entries.
 	async #onClipboardPasteRequest(event: UmbClipboardPasteRequestEvent) {
 		if (!this.#clipboardContext) return;
 
@@ -183,8 +178,8 @@ export class UmbPropertyEditorUIContentPickerElement
 
 		if (!additions.length) return;
 
-		// Everything in the entry is added, however many references it holds and whatever the property allows — as
-		// when picking, an over-long selection is for validation to report and the user to trim.
+		// Not clamped to the configured limit: as when picking, an over-long selection is for validation to
+		// report and the user to trim.
 		this.value = [...currentValue, ...additions];
 		this.dispatchEvent(new UmbChangeEvent());
 	}

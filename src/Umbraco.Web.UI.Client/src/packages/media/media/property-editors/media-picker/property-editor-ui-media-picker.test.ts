@@ -40,8 +40,7 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 			written = [];
 			pasteResult = [];
 
-			// Only the members the element uses. Translating entries and resolving availability belong to the real
-			// clipboard property context, which is covered by its own tests.
+			// Only the members the element uses; the real context is covered by its own tests.
 			const clipboardContext = {
 				getHostElement: () => element,
 				copyAvailable: new UmbBooleanState(true).asObservable(),
@@ -63,7 +62,7 @@ describe('UmbPropertyEditorUIMediaPickerElement', () => {
 			element.config = new UmbPropertyEditorConfigCollection([{ alias: 'multiple', value: multiple }]);
 		}
 
-		// Both events come from the input in production, and the property editor listens for them on it.
+		// Both events come from the input, which is where the property editor listens for them.
 		async function dispatchFromInput(event: Event) {
 			await element.updateComplete;
 			element.shadowRoot!.querySelector('umb-input-rich-media')!.dispatchEvent(event);

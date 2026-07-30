@@ -1,7 +1,7 @@
 /**
- * Dispatched to request that clipboard entries are pasted into the dispatcher's value, carrying the uniques of
- * the entries rather than a value. Translating them is the receiver's job, because a paste translator resolves
- * to the value of a specific property editor — so only the element owning that value can ask for the right shape.
+ * Dispatched to request that clipboard entries are pasted, carrying their uniques rather than a value: a paste
+ * translator resolves to the value of a specific property editor, so only the element owning that value can ask
+ * for the right shape.
  */
 export class UmbClipboardPasteRequestEvent extends Event {
 	public static readonly TYPE = 'clipboard-paste-request';

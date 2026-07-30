@@ -23,8 +23,7 @@ export class UmbMediaToContentPickerClipboardPastePropertyValueTranslator
 		_propertyValue: UmbContentPickerValueModel,
 		config: UmbPropertyEditorConfig | undefined,
 	): Promise<boolean> {
-		// Only accept media into a Content Picker that is configured to pick media. The config arrives as the raw
-		// array of config properties, so it has to be looked up by alias rather than via a config collection.
+		// Only accept media into a Content Picker that is configured to pick media.
 		const startNode = config?.find((property) => property.alias === 'startNode')?.value as
 			| UmbContentPickerSource
 			| undefined;

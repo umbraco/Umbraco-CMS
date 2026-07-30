@@ -23,7 +23,7 @@ export class UmbMediaToMediaPickerClipboardPastePropertyValueTranslator
 	}
 
 	async isCompatibleValue(): Promise<boolean> {
-		// A bare media reference is always acceptable for the media picker; crops default to empty.
+		// Allowed media types are not enforced on paste.
 		return true;
 	}
 }

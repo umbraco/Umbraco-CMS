@@ -23,8 +23,7 @@ export class UmbRichMediaToMediaPickerClipboardPastePropertyValueTranslator
 	}
 
 	async isCompatibleValue(): Promise<boolean> {
-		// For now we accept all rich media clipboard values for the media picker.
-		// Compatibility checks (e.g. allowed media types) can be added later if needed.
+		// Allowed media types are not enforced on paste.
 		return true;
 	}
 }
