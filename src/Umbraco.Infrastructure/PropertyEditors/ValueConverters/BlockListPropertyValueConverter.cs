@@ -100,8 +100,8 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
             BlockListConfiguration.BlockConfiguration? block =
                 ConfigurationEditor.ConfigurationAs<BlockListConfiguration>(propertyType.DataType.ConfigurationObject)?.Blocks.FirstOrDefault();
 
-            ModelType? contentElementType = block?.ContentElementTypeKey is Guid contentElementTypeKey && _contentTypeService.Get(contentElementTypeKey) is IContentType contentType ? ModelType.For(contentType.Alias) : null;
-            ModelType? settingsElementType = block?.SettingsElementTypeKey is Guid settingsElementTypeKey && _contentTypeService.Get(settingsElementTypeKey) is IContentType settingsType ? ModelType.For(settingsType.Alias) : null;
+            ModelType? contentElementType = block?.ContentElementTypeKey is Guid contentElementTypeKey && _contentTypeService.GetAsync(contentElementTypeKey).GetAwaiter().GetResult() is IContentType contentType ? ModelType.For(contentType.Alias) : null;
+            ModelType? settingsElementType = block?.SettingsElementTypeKey is Guid settingsElementTypeKey && _contentTypeService.GetAsync(settingsElementTypeKey).GetAwaiter().GetResult() is IContentType settingsType ? ModelType.For(settingsType.Alias) : null;
 
             if (contentElementType is not null)
             {

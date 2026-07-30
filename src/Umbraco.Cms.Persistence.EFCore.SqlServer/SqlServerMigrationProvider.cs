@@ -64,6 +64,8 @@ public class SqlServerMigrationProvider : IMigrationProvider
             EFCoreMigration.AddDistributedJobDto => typeof(Migrations.AddDistributedJobDto),
             EFCoreMigration.AddConsentDto => typeof(Migrations.AddConsentDto),
             EFCoreMigration.AddDictionaryDto => typeof(Migrations.AddDictionaryDtos),
+            EFCoreMigration.AddContentTypeDtos => typeof(Migrations.AddContentTypeDtos),
+            EFCoreMigration.MemberPropertyTypeToEFCore => typeof(Migrations.MemberPropertyTypeToEFCore),
             EFCoreMigration.AddRedirectUrlDto => typeof(Migrations.AddRedirectUrlDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };

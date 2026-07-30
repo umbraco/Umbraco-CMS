@@ -17,7 +17,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Services;
 
 internal sealed class ElementEditingService
-    : ContentEditingServiceBase<IElement, IContentType, IElementService, IContentTypeService>, IElementEditingService
+    : AsyncContentEditingServiceBase<IElement, IContentType, IElementService, IContentTypeService>, IElementEditingService
 {
     private readonly IElementService _elementService;
     private readonly ILogger<ElementEditingService> _logger;
@@ -100,7 +100,7 @@ internal sealed class ElementEditingService
     /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ElementCreateModel createModel, Guid userKey)
     {
-        IContentType? contentType = ContentTypeService.Get(createModel.ContentTypeKey);
+        IContentType? contentType = await ContentTypeService.GetAsync(createModel.ContentTypeKey);
         if (contentType is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
@@ -185,25 +185,24 @@ internal sealed class ElementEditingService
     protected override IElement New(string name, int parentId, IContentType contentType)
         => new Element(name, parentId, contentType);
 
-    protected override IContentType? TryGetAndValidateContentType(
-        Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase,
-        out ContentEditingOperationStatus operationStatus)
+    protected override async Task<Attempt<IContentType?, ContentEditingOperationStatus>> TryGetAndValidateContentTypeAsync(Guid contentTypeKey, ContentEditingModelBase contentEditingModelBase)
     {
-        IContentType? contentType = base.TryGetAndValidateContentType(contentTypeKey, contentEditingModelBase, out operationStatus);
-        if (contentType is null)
+        Attempt<IContentType?, ContentEditingOperationStatus> validateContentTypeAttempt = await base.TryGetAndValidateContentTypeAsync(contentTypeKey, contentEditingModelBase);
+        if (validateContentTypeAttempt.Success is false || validateContentTypeAttempt.Result is null)
         {
-            return null;
+            // preserve the failing status from the base validation (e.g. PropertyTypeNotFound)
+            return validateContentTypeAttempt;
         }
+
+        IContentType contentType = validateContentTypeAttempt.Result;
 
         // Only enforce IsElement + AllowedInLibrary on create; updates only need the content type to exist
-        if (contentEditingModelBase is ContentCreationModelBase
-            && IsAllowedLibraryElement(contentType) is false)
+        if (contentEditingModelBase is ContentCreationModelBase && IsAllowedLibraryElement(contentType) is false)
         {
-            operationStatus = ContentEditingOperationStatus.NotAllowed;
-            return null;
+            return Attempt.FailWithStatus<IContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotAllowed, null);
         }
 
-        return contentType;
+        return Attempt.SucceedWithStatus<IContentType?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, contentType);
     }
 
     protected override async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, IContentType contentType)

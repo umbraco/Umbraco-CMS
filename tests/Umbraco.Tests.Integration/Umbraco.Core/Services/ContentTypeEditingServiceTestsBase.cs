@@ -21,6 +21,8 @@ internal abstract class ContentTypeEditingServiceTestsBase : UmbracoIntegrationT
 
     protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
+    protected IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
+
     protected IContentService ContentService => GetRequiredService<IContentService>();
 
     protected IElementService ElementService => GetRequiredService<IElementService>();

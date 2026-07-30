@@ -70,7 +70,7 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
     /// <returns>
     /// A task representing the asynchronous operation. The task result contains a <see cref="PagedModel{IEntitySlim}"/> with the matching entities and the total result count.
     /// </returns>
-    public Task<PagedModel<IEntitySlim>> SearchAsync(
+    public async Task<PagedModel<IEntitySlim>> SearchAsync(
         UmbracoObjectTypes objectType,
         string query,
         Guid? parentId,
@@ -92,15 +92,17 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
         Guid[]? contentTypeIdsAsArray = contentTypeIds as Guid[] ?? contentTypeIds?.ToArray();
-        var contentTypeAliases = contentTypeIdsAsArray?.Length > 0
-            ? (entityType switch
+        string[]? contentTypeAliases = null;
+        if (contentTypeIdsAsArray?.Length > 0)
+        {
+            contentTypeAliases = (entityType switch
             {
-                UmbracoEntityTypes.Document => _contentTypeService.GetMany(contentTypeIdsAsArray).Select(x => x.Alias),
+                UmbracoEntityTypes.Document => (await _contentTypeService.GetManyAsync(contentTypeIdsAsArray)).Select(x => x.Alias),
                 UmbracoEntityTypes.Media => _mediaTypeService.GetMany(contentTypeIdsAsArray).Select(x => x.Alias),
                 UmbracoEntityTypes.Member => _memberTypeService.GetMany(contentTypeIdsAsArray).Select(x => x.Alias),
                 _ => throw new NotSupportedException("This service only supports searching for documents, media and members")
-            }).ToArray()
-            : null;
+            }).ToArray();
+        }
 
         IEnumerable<ISearchResult> searchResults = _backOfficeExamineSearcher.Search(
             query,
@@ -143,10 +145,10 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
             orderedItems = [];
         }
 
-        return Task.FromResult(new PagedModel<IEntitySlim>
+        return new PagedModel<IEntitySlim>
         {
             Items = orderedItems,
             Total = totalFound
-        });
+        };
     }
 }

@@ -36,7 +36,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task Can_Delete()
     {
-        var content = CreateTestData(3).ToArray();
+        var content = (await CreateTestData(3)).ToArray();
 
         using var scope = NewScopeProvider.CreateScope();
         var repo = CreateRepository();
@@ -56,7 +56,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task Can_Add()
     {
-        var content = CreateTestData(3).ToArray();
+        var content = (await CreateTestData(3)).ToArray();
 
         using var scope = NewScopeProvider.CreateScope();
         var repo = CreateRepository();
@@ -88,7 +88,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
     [LongRunning]
     public async Task Can_Add2()
     {
-        var content = CreateTestData(3).ToArray();
+        var content = (await CreateTestData(3)).ToArray();
 
         using var scope = NewScopeProvider.CreateScope();
         var repo = CreateRepository();
@@ -121,7 +121,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task Can_Update()
     {
-        var content = CreateTestData(3).ToArray();
+        var content = (await CreateTestData(3)).ToArray();
 
         using var scope = NewScopeProvider.CreateScope();
         var repo = CreateRepository();
@@ -149,7 +149,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task Get_By_Id()
     {
-        var content = CreateTestData(3).ToArray();
+        var content = (await CreateTestData(3)).ToArray();
 
         using var scope = NewScopeProvider.CreateScope();
         var repo = CreateRepository();
@@ -169,7 +169,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task Get_All()
     {
-        var content = CreateTestData(30).ToArray();
+        var content = (await CreateTestData(30)).ToArray();
 
         using var scope = NewScopeProvider.CreateScope();
         var repo = CreateRepository();
@@ -228,7 +228,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task Get_All_With_Id()
     {
-        var content = CreateTestData(3).ToArray();
+        var content = (await CreateTestData(3)).ToArray();
 
         using var scope = NewScopeProvider.CreateScope();
         var repo = CreateRepository();
@@ -247,13 +247,13 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
         scope.Complete();
     }
 
-    private IEnumerable<IContent> CreateTestData(int count)
+    private async Task<IEnumerable<IContent>> CreateTestData(int count)
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var ct = ContentTypeBuilder.CreateBasicContentType("testing");
-            ContentTypeRepository.Save(ct);
+            await ContentTypeRepository.SaveAsync(ct, CancellationToken.None);
 
             var result = new List<IContent>();
             for (var i = 0; i < count; i++)
@@ -272,7 +272,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
     {
-        var content = CreateTestData(3).ToArray();
+        var content = (await CreateTestData(3)).ToArray();
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
@@ -294,7 +294,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
     {
-        var content = CreateTestData(3).ToArray();
+        var content = (await CreateTestData(3)).ToArray();
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {

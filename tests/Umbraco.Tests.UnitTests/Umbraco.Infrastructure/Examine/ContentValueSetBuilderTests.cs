@@ -45,7 +45,7 @@ public class ContentValueSetBuilderTests
                 It.IsAny<bool>()))
             .Returns(Mock.Of<ICoreScope>());
         _contentTypeService = new Mock<IContentTypeService>();
-        _contentTypeService.Setup(x => x.GetAll()).Returns(Array.Empty<IContentType>());
+        _contentTypeService.Setup(x => x.GetAllAsync()).ReturnsAsync(Array.Empty<IContentType>());
         _documentUrlService = new Mock<IDocumentUrlService>();
         _documentUrlService.Setup(x => x.IsInitialized).Returns(true);
         _languageService = new Mock<ILanguageService>();

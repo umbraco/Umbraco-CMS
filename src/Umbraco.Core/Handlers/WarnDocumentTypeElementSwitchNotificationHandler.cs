@@ -58,7 +58,7 @@ public class WarnDocumentTypeElementSwitchNotificationHandler :
             .Where(e => e.HasIdentity)
             .Select(e => e.Key);
 
-        IEnumerable<IContentType> persistedItems = _contentTypeService.GetMany(updatedKeys);
+        IEnumerable<IContentType> persistedItems = await _contentTypeService.GetManyAsync(updatedKeys);
 
         var stateInformation = persistedItems
             .ToDictionary(

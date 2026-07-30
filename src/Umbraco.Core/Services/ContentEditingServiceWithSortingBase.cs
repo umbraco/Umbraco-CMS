@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <typeparam name="TContentType">The type of content type.</typeparam>
 /// <typeparam name="TContentService">The type of content service.</typeparam>
 /// <typeparam name="TContentTypeService">The type of content type service.</typeparam>
+// TODO EFCore: Remove this once media and member type have been migrated
 internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentType, TContentService, TContentTypeService>
     : ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
     where TContent : class, IContentBase

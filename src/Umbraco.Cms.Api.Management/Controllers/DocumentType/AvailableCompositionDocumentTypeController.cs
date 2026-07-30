@@ -52,7 +52,7 @@ public class AvailableCompositionDocumentTypeController : DocumentTypeController
             compositionModel.CurrentPropertyAliases,
             compositionModel.IsElement);
 
-        IEnumerable<AvailableDocumentTypeCompositionResponseModel> responseModels = _presentationFactory.MapCompositionModels(availableCompositions);
+        IEnumerable<AvailableDocumentTypeCompositionResponseModel> responseModels = await _presentationFactory.MapCompositionModelsAsync(availableCompositions);
 
         return Ok(responseModels);
     }

@@ -27,7 +27,7 @@ public class PropertyEditorTelemetryProvider : IDetailedTelemetryProvider
     /// </returns>
     public IEnumerable<UsageInformation> GetInformation()
     {
-        IEnumerable<IContentType> contentTypes = _contentTypeService.GetAll();
+        IEnumerable<IContentType> contentTypes = _contentTypeService.GetAllAsync().GetAwaiter().GetResult();
         var propertyTypes = new HashSet<string>();
         var propertyTypeCounts = new List<int>();
         var totalCompositions = 0;

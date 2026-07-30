@@ -27,6 +27,6 @@ public interface IMediaTypeEditingPresentationFactory
     /// Maps a collection of content type composition results to their corresponding media type composition response models.
     /// </summary>
     /// <param name="compositionResults">The collection of content type composition results to map.</param>
-    /// <returns>An enumerable of mapped media type composition response models.</returns>
-    IEnumerable<AvailableMediaTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
+    /// <returns>A task that represents the asynchronous operation. The task result contains the mapped media type composition response models.</returns>
+    Task<IEnumerable<AvailableMediaTypeCompositionResponseModel>> MapCompositionModelsAsync(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
 }

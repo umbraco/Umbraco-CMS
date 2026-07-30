@@ -118,11 +118,13 @@ internal sealed class ConsentRepository : IConsentRepository
         ConsentDto dto = ConsentFactory.BuildDto(entity);
 
         await AmbientScope.ExecuteWithContextAsync<ConsentDto>(async db =>
-        {
-            db.Consents.Update(dto);
-
-            await db.SaveChangesAsync();
-        });
+            await db.Consents.Where(x => x.Id == dto.Id).ExecuteUpdateAsync(setter => setter
+                .SetProperty(x => x.Current, dto.Current)
+                .SetProperty(x => x.Source, dto.Source)
+                .SetProperty(x => x.Context, dto.Context)
+                .SetProperty(x => x.Action, dto.Action)
+                .SetProperty(x => x.State, dto.State)
+                .SetProperty(x => x.Comment, dto.Comment)));
 
         entity.ResetDirtyProperties();
     }

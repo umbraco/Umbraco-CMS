@@ -408,62 +408,8 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
             Database.Insert(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
         }
 
-        // removing a ContentType from a composition (U4-1690)
-        // 1. Find content based on the current ContentType: entity.Id
-        // 2. Find all PropertyTypes on the ContentType that was removed - tracked id (key)
-        // 3. Remove properties based on property types from the removed content type where the content ids correspond to those found in step one
-        if (entity.RemovedContentTypes.Any())
-        {
-            // TODO: Could we do the below with bulk SQL statements instead of looking everything up and then manipulating?
-
-            // find Content based on the current ContentType
-            Sql<ISqlContext> sqlContent = Sql()
-                .SelectAll()
-                .From<ContentDto>()
-                .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
-                .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
-            List<ContentDto>? contentDtos = Database.Fetch<ContentDto>(sqlContent);
-
-            // loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
-            foreach (var key in entity.RemovedContentTypes)
-            {
-                // find PropertyTypes for the removed ContentType
-                Sql<ISqlContext> sqlPropertyType = Sql()
-                    .SelectAll()
-                    .From<PropertyTypeDto>()
-                    .Where<PropertyTypeDto>(x => x.ContentTypeId == key);
-                List<PropertyTypeDto>? propertyTypes =
-                    Database.Fetch<PropertyTypeDto>(sqlPropertyType);
-
-                // loop through the Content that is based on the current ContentType in order to remove the Properties that are
-                // based on the PropertyTypes that belong to the removed ContentType.
-                foreach (ContentDto? contentDto in contentDtos)
-                {
-                    // TODO: This could be done with bulk SQL statements
-                    foreach (PropertyTypeDto? propertyType in propertyTypes)
-                    {
-                        var nodeId = contentDto.NodeId;
-                        var propertyTypeId = propertyType.Id;
-                        Sql<ISqlContext> sqlProperty = Sql()
-                            .Select<PropertyDataDto>(x => x.Id)
-                            .From<PropertyDataDto>()
-                            .InnerJoin<PropertyTypeDto>()
-                            .On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
-                            .InnerJoin<ContentVersionDto>()
-                            .On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
-                            .Where<ContentVersionDto>(x => x.NodeId == nodeId)
-                            .Where<PropertyTypeDto>(x => x.Id == propertyTypeId);
-
-                        // finally delete the properties that match our criteria for removing a ContentType from the composition
-                        Sql<ISqlContext> sqlPropertydata = Sql()
-                            .Delete<PropertyDataDto>()
-                            .WhereIn<PropertyDataDto>(x => x.Id, sqlProperty.Arguments);
-                        Database.Execute(sqlPropertydata);
-                    }
-                }
-            }
-        }
+        // removing a ContentType from a composition (U4-1690): clear orphaned property data
+        ClearPropertyDataForRemovedContentTypes(entity);
 
         // delete the allowed content type entries before re-inserting the collection of allowed content types
         Sql<ISqlContext> sqlAllowedContent = Sql()
@@ -723,6 +669,69 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         }
 
         CommonRepository.ClearCache(); // always
+    }
+
+    /// <summary>
+    /// When content types are removed from a composition (U4-1690), clears the orphaned property data
+    /// on content of <paramref name="entity"/> for property types that belonged to the removed types.
+    /// </summary>
+    private void ClearPropertyDataForRemovedContentTypes(IContentTypeComposition entity)
+    {
+        // 1. Find content based on the current ContentType: entity.Id
+        // 2. Find all PropertyTypes on the ContentType that was removed - tracked id (key)
+        // 3. Remove properties based on property types from the removed content type where the content ids correspond to those found in step one
+        if (entity.RemovedContentTypes.Any())
+        {
+            // TODO: Could we do the below with bulk SQL statements instead of looking everything up and then manipulating?
+
+            // find Content based on the current ContentType
+            Sql<ISqlContext> sqlContent = Sql()
+                .SelectAll()
+                .From<ContentDto>()
+                .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
+                .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
+            List<ContentDto>? contentDtos = Database.Fetch<ContentDto>(sqlContent);
+
+            // loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
+            foreach (var key in entity.RemovedContentTypes)
+            {
+                // find PropertyTypes for the removed ContentType
+                Sql<ISqlContext> sqlPropertyType = Sql()
+                    .SelectAll()
+                    .From<PropertyTypeDto>()
+                    .Where<PropertyTypeDto>(x => x.ContentTypeId == key);
+                List<PropertyTypeDto>? propertyTypes =
+                    Database.Fetch<PropertyTypeDto>(sqlPropertyType);
+
+                // loop through the Content that is based on the current ContentType in order to remove the Properties that are
+                // based on the PropertyTypes that belong to the removed ContentType.
+                foreach (ContentDto? contentDto in contentDtos)
+                {
+                    // TODO: This could be done with bulk SQL statements
+                    foreach (PropertyTypeDto? propertyType in propertyTypes)
+                    {
+                        var nodeId = contentDto.NodeId;
+                        var propertyTypeId = propertyType.Id;
+                        Sql<ISqlContext> sqlProperty = Sql()
+                            .Select<PropertyDataDto>(x => x.Id)
+                            .From<PropertyDataDto>()
+                            .InnerJoin<PropertyTypeDto>()
+                            .On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
+                            .InnerJoin<ContentVersionDto>()
+                            .On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
+                            .Where<ContentVersionDto>(x => x.NodeId == nodeId)
+                            .Where<PropertyTypeDto>(x => x.Id == propertyTypeId);
+
+                        // finally delete the properties that match our criteria for removing a ContentType from the composition
+                        Sql<ISqlContext> sqlPropertydata = Sql()
+                            .Delete<PropertyDataDto>()
+                            .WhereIn<PropertyDataDto>(x => x.Id, sqlProperty.Arguments);
+                        Database.Execute(sqlPropertydata);
+                    }
+                }
+            }
+        }
     }
 
     protected void ValidateAlias(IPropertyType pt)

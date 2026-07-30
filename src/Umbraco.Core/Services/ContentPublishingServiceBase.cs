@@ -260,7 +260,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             }).ToArray()
         };
 
-        IContentType? contentType = _contentTypeService.Get(content.ContentType.Key)!;
+        IContentType? contentType = (await _contentTypeService.GetAsync(content.ContentType.Key))!;
         ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType, cultures);
         return validationResult;
     }

@@ -239,7 +239,7 @@ public static class PublishedContentExtensions
             return true;
         }
 
-        IContentType? publishedContentContentType = contentTypeService.Get(content.ContentType.Id);
+        IContentType? publishedContentContentType = contentTypeService.GetAsync(content.ContentType.Id).GetAwaiter().GetResult();
         if (publishedContentContentType == null)
         {
             throw new NullReferenceException("No content type returned for published content (contentType='" +
@@ -1844,7 +1844,7 @@ public static class PublishedContentExtensions
 
     private static Dictionary<string, string> GetAliasesAndNames(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, string alias)
     {
-        IContentTypeBase? type = contentTypeService.Get(alias)
+        IContentTypeBase? type = contentTypeService.GetAsync(alias).GetAwaiter().GetResult()
                                  ?? mediaTypeService.Get(alias)
                                  ?? (IContentTypeBase?)memberTypeService.Get(alias);
         Dictionary<string, string> fields = GetAliasesAndNames(type);

@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Services;
 
+// TODO: Remove this synchronous base once the media and member type services are migrated to the async
+// IAsyncContentTypeBaseService contract. At that point their list view services can move to
+// AsyncContentListViewServiceBase and this class (a near-duplicate) can be deleted.
 internal abstract class ContentListViewServiceBase<TContent, TContentType, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition

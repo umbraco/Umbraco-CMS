@@ -48,7 +48,7 @@ public class AvailableCompositionMediaTypeController : MediaTypeControllerBase
             compositionModel.CurrentCompositeIds,
             compositionModel.CurrentPropertyAliases);
 
-        IEnumerable<AvailableMediaTypeCompositionResponseModel> responseModels = _presentationFactory.MapCompositionModels(availableCompositions);
+        IEnumerable<AvailableMediaTypeCompositionResponseModel> responseModels = await _presentationFactory.MapCompositionModelsAsync(availableCompositions);
 
         return Ok(responseModels);
     }

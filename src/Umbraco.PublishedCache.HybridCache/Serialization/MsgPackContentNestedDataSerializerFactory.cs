@@ -38,7 +38,7 @@ internal sealed class MsgPackContentNestedDataSerializerFactory : IContentCacheD
         var contentTypes = new Dictionary<int, IContentTypeComposition>();
         if ((types & ContentCacheDataSerializerEntityType.Document) == ContentCacheDataSerializerEntityType.Document)
         {
-            foreach (IContentType ct in _contentTypeService.GetAll())
+            foreach (IContentType ct in _contentTypeService.GetAllAsync().GetAwaiter().GetResult())
             {
                 contentTypes[ct.Id] = ct;
             }

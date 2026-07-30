@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Services;
 /// Provides services for creating, updating, and managing content blueprints (templates for content).
 /// </summary>
 internal sealed class ContentBlueprintEditingService
-    : ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentBlueprintEditingService
+    : AsyncContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentBlueprintEditingService
 {
     private readonly IContentBlueprintContainerService _containerService;
 
@@ -40,7 +40,7 @@ internal sealed class ContentBlueprintEditingService
         IContentTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService,
-        ILogger<ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>> logger,
+        ILogger<AsyncContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         IContentValidationService validationService,

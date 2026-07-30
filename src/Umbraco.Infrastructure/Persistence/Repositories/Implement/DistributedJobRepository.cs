@@ -61,12 +61,12 @@ internal class DistributedJobRepository : IDistributedJobRepository
         DistributedJobDto dto = MapToDto(distributedBackgroundJob);
 
         await _scopeAccessor.AmbientScope.ExecuteWithContextAsync<DistributedJobDto>(async db =>
-        {
-             db.DistributedJob
-                .Update(dto);
-
-             await db.SaveChangesAsync();
-        });
+            await db.DistributedJob.Where(x => x.Id == dto.Id).ExecuteUpdateAsync(setter => setter
+                .SetProperty(x => x.Name, dto.Name)
+                .SetProperty(x => x.LastRun, dto.LastRun)
+                .SetProperty(x => x.Period, dto.Period)
+                .SetProperty(x => x.IsRunning, dto.IsRunning)
+                .SetProperty(x => x.LastAttemptedRun, dto.LastAttemptedRun)));
     }
 
     /// <inheritdoc/>
