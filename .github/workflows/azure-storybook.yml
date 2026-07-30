@@ -42,6 +42,10 @@ jobs:
       - name: Build Storybook
         run: npm run storybook:build
         working-directory: src/Umbraco.Web.UI.Client
+      # Static Web Apps reads this from the uploaded directory, so it has to travel with the build output.
+      - name: Copy Static Web Apps routing config
+        run: cp staticwebapp.config.json storybook-static/
+        working-directory: src/Umbraco.Web.UI.Client
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
