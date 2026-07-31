@@ -40,7 +40,8 @@ export const HtmlDatasetAttributes = Extension.create<UmbTiptapHtmlDatasetAttrib
 						parseHTML: (element) => {
 							// `data-router-slot` is a live-DOM-only hint for the backoffice router; keeping it out of the
 							// document stops it being serialized back into the stored content. (#22654)
-							const { routerSlot, ...dataset } = { ...element.dataset };
+							const dataset = { ...element.dataset };
+							delete dataset.routerSlot;
 							return dataset;
 						},
 						renderHTML: (attributes) => {
