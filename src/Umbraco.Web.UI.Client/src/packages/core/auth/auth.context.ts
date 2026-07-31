@@ -518,13 +518,18 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Performs the actual refresh request and applies the result.
-	 * A definitive rejection (e.g. `invalid_grant`) marks the session as dead and times the
-	 * user out, so the re-authentication flow starts instead of every subsequent API request
-	 * firing its own doomed refresh attempt. Transient failures (network errors, 5xx) leave
-	 * the session state untouched so a later attempt can retry.
+	 * A definitive rejection (e.g. `invalid_grant`) marks the session as dead, so every
+	 * subsequent API request does not fire its own doomed refresh attempt. When the rejected
+	 * refresh belonged to an established session, the user is also timed out so the
+	 * re-authentication flow starts. Transient failures (network errors, 5xx) leave the
+	 * session state untouched so a later attempt can retry.
 	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false.
 	 */
 	async #performRefresh(): Promise<boolean> {
+		// A rejection with no session in hand means nobody is signed in — not that a session
+		// expired. Timing out there re-authenticates in a popup and leaves the caller to
+		// navigate, where a cold boot needs the ordinary login redirect.
+		const hadSession = !!this.#session.getValue();
 		const result = await this.#client.refreshToken();
 		if (result.response) {
 			this.#updateSession(result.response.expiresIn, result.response.issuedAt);
@@ -532,7 +537,9 @@ export class UmbAuthContext extends UmbContextBase {
 		}
 		if (result.fatal) {
 			this.#sessionDead = true;
-			this.timeOut();
+			if (hadSession) {
+				this.timeOut();
+			}
 		}
 		return false;
 	}
