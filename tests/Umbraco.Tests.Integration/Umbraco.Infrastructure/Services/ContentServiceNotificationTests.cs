@@ -403,6 +403,94 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Read_Saved_Notification_When_Save_And_Publishing_Invariant()
+    {
+        // A combined save-and-publish must still raise the paired Saved notification, just like a plain Save does
+        // (https://github.com/umbraco/Umbraco-CMS/issues/23523).
+        IContent document = new Content("content", -1, _contentType);
+
+        var savingWasCalled = false;
+        var savedWasCalled = false;
+        var publishingWasCalled = false;
+        var publishedWasCalled = false;
+
+        ContentNotificationHandler.SavingContent = _ => savingWasCalled = true;
+        ContentNotificationHandler.SavedContent = notification =>
+        {
+            IContent saved = notification.SavedEntities.First();
+
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[saved.Key]);
+
+            savedWasCalled = true;
+        };
+        ContentNotificationHandler.PublishingContent = _ => publishingWasCalled = true;
+        ContentNotificationHandler.PublishedContent = _ => publishedWasCalled = true;
+
+        try
+        {
+            var result = ContentService.SaveAndPublish(document, []);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(savingWasCalled);
+            Assert.IsTrue(savedWasCalled, "ContentSavedNotification should fire when saving and publishing.");
+            Assert.IsTrue(publishingWasCalled);
+            Assert.IsTrue(publishedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.SavingContent = null;
+            ContentNotificationHandler.SavedContent = null;
+            ContentNotificationHandler.PublishingContent = null;
+            ContentNotificationHandler.PublishedContent = null;
+        }
+    }
+
+    [Test]
+    public async Task Can_Read_Saved_Notification_When_Save_And_Publishing_Variant()
+    {
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
+
+        _contentType.Variations = ContentVariation.Culture;
+        foreach (IPropertyType propertyType in _contentType.PropertyTypes)
+        {
+            propertyType.Variations = ContentVariation.Culture;
+        }
+
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
+
+        IContent document = new Content("content", -1, _contentType);
+        document.SetCultureName("hello", "en-US");
+        document.SetCultureName("bonjour", "fr-FR");
+
+        var savedWasCalled = false;
+
+        ContentNotificationHandler.SavedContent = notification =>
+        {
+            IContent saved = notification.SavedEntities.First();
+
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+
+            // both cultures were changed as part of the save-and-publish, so both are reported as saved
+            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[saved.Key]);
+
+            savedWasCalled = true;
+        };
+
+        try
+        {
+            var result = ContentService.SaveAndPublish(document, ["en-US", "fr-FR"]);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(savedWasCalled, "ContentSavedNotification should fire when saving and publishing.");
+        }
+        finally
+        {
+            ContentNotificationHandler.SavedContent = null;
+        }
+    }
+
+    [Test]
     public async Task Can_Set_Mandatory_Value_When_Publishing()
     {
         var titleProperty = _contentType.PropertyTypes.First(x => x.Alias == "title");
