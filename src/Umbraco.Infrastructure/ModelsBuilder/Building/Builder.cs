@@ -1,7 +1,6 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 

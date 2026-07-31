@@ -4,7 +4,6 @@ using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services;
 
