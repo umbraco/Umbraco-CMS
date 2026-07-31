@@ -91,6 +91,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddDatabase();
 
         builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
+        builder.Services.AddSingleton<IContentRoutingReadiness, ContentRoutingReadiness>();
         builder.Services.AddSingleton<IRuntime, CoreRuntime>();
         builder.Services.AddSingleton<PendingPackageMigrations>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
@@ -287,7 +288,9 @@ public static partial class UmbracoBuilderExtensions
     /// <returns>The same <see cref="Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder"/> instance so that multiple calls can be chained.</returns>
     public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
     {
-        builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IBlockListPropertyIndexValueFactory, BlockListPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IBlockGridPropertyIndexValueFactory, BlockGridPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<ISingleBlockPropertyIndexValueFactory, SingleBlockPropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IDateOnlyPropertyIndexValueFactory, DateOnlyPropertyIndexValueFactory>();
@@ -468,6 +471,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MemberTypeChangedNotification, MemberTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ContentTreeChangeNotification, ContentTreeChangeDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ElementTreeChangeNotification, ElementTreeChangeDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<EntityContainerDeletedNotification, ElementContainerDeletedDistributedCacheNotificationHandler>()
             ;
 
         // add notification handlers for auditing
@@ -499,6 +503,7 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentUnpublishedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MediaSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<MemberSavedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<ElementSavedNotification, ContentRelationsUpdate>()

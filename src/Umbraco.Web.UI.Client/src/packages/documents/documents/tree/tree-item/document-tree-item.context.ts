@@ -35,15 +35,22 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	// TODO: Move to API
 	readonly ancestors = this._treeItem.asObservablePart((item) => item?.ancestors ?? []);
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
-	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
+
+	// A collection is only browsed via its Collection view when the user can actually access it.
+	// When the node is a "no access" ancestor of the user's start node, it must remain expandable
+	// in the tree so the user can browse down to their start node.
+	readonly #collapsibleCollection = mergeObservables(
+		[this.hasCollection, this.noAccess],
+		([hasCollection, noAccess]) => hasCollection && !noAccess,
+	);
 
 	override setIsMenu(isMenu: boolean) {
 		super.setIsMenu(isMenu);
 		if (isMenu) {
 			this.observe(
-				this.hasCollection,
-				(hasCollection) => {
-					if (hasCollection) {
+				this.#collapsibleCollection,
+				(collapsibleCollection) => {
+					if (collapsibleCollection) {
 						this._treeItemChildrenManager.setTargetTakeSize(1, 1);
 
 						this.observe(
@@ -55,6 +62,8 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 							},
 							'observeCollectionHasActiveDescendant',
 						);
+					} else {
+						this.removeUmbControllerByAlias('observeCollectionHasActiveDescendant');
 					}
 				},
 				'_whenMenuObserveHasCollection',
@@ -89,7 +98,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override showChildren() {
-		if (this.getIsMenu() && this.#item.getHasCollection()) {
+		if (this.getIsMenu() && this.#getCollapsibleCollection()) {
 			// Collections cannot be expanded via a menu, instead we open the Collection for the user.
 			this.#openCollection();
 			return;
@@ -98,11 +107,15 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override hideChildren() {
-		if (this.getIsMenu() && this.#item.getHasCollection()) {
+		if (this.getIsMenu() && this.#getCollapsibleCollection()) {
 			// Collections in a menu will collapse when already showing children, and instead we open the Collection for the user.
 			this.#openCollection();
 		}
 		super.hideChildren();
+	}
+
+	#getCollapsibleCollection(): boolean {
+		return this.#item.getHasCollection() && this.getTreeItem()?.noAccess !== true;
 	}
 
 	#openCollection() {

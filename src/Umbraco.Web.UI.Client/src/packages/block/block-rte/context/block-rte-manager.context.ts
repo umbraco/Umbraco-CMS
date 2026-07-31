@@ -3,6 +3,7 @@ import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 import '../components/block-rte-entry/index.js';
 
@@ -53,7 +54,7 @@ export class UmbBlockRteManagerContext<
 	 */
 	async createWithPresets(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		// This property is used by some implementations, but not used in this, do not remove. [NL]
 
 		_originData?: UmbBlockRteWorkspaceOriginData,
@@ -80,6 +81,14 @@ export class UmbBlockRteManagerContext<
 		this.notifyBlockInserted(layoutEntry, originData);
 
 		return true;
+	}
+
+	override async insertExternalContent(elementKey: string, originData?: UmbBlockRteWorkspaceOriginData) {
+		await super.insertExternalContent(elementKey, originData);
+		if (originData) {
+			const layout = { key: UmbId.new(), contentKey: elementKey, isExternalContent: true } as BlockLayoutType;
+			this.notifyBlockInserted(layout, originData);
+		}
 	}
 
 	/**

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 public partial class ContentPublishingServiceTests
 {
-    public static new void ConfigureDisableUnpublishWhenReferencedTrue(IUmbracoBuilder builder)
+    public static void ConfigureDisableUnpublishWhenReferencedTrue(IUmbracoBuilder builder)
         => builder.Services.Configure<ContentSettings>(config =>
             config.DisableUnpublishWhenReferenced = true);
 

@@ -166,8 +166,19 @@ public interface ISqlSyntaxProvider
     /// </summary>
     string DbProvider { get; }
 
+    /// <summary>
+    /// Gets the dictionary of scalar mappers used by the SQL syntax provider.
+    /// Scalar mappers are responsible for converting database scalar values to .NET types during data retrieval operations.
+    /// The dictionary maps .NET types to their corresponding <see cref="IScalarMapper"/> implementations.
+    /// </summary>
     IDictionary<Type, IScalarMapper>? ScalarMappers { get; }
 
+    /// <summary>
+    /// Determines the appropriate database type based on the specified current type and an optional connection string.
+    /// </summary>
+    /// <param name="current">The current <see cref="DatabaseType"/>.</param>
+    /// <param name="connectionString">An optional connection string used to help determine the updated database type.</param>
+    /// <returns>The resolved <see cref="DatabaseType"/>.</returns>
     DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString);
 
     /// <summary>

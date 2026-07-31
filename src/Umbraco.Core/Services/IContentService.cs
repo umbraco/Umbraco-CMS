@@ -355,6 +355,33 @@ public interface IContentService : IPublishableContentService<IContent>
     OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Moves a document under a new parent, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="content">The document to move.</param>
+    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the document along with it. When restoring a document out of the recycle
+    ///     bin this can be set to <c>false</c> to restore only the document itself, leaving its descendants in the
+    ///     recycle bin as top-level bin items.
+    /// </param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+    OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+    {
+        // Only the whole-tree move can be satisfied by delegating to the existing method; there is no way to honour
+        // includeDescendants: false without the concrete implementation, so fail fast rather than silently move
+        // the descendants after all.
+        if (includeDescendants is false)
+        {
+            throw new NotImplementedException("This IContentService implementation does not support moving without descendants. Override the Move overload that takes an includeDescendants parameter to support it.");
+        }
+
+        return Move(content, parentId, userId);
+    }
+
+    /// <summary>
     ///     Copies a document.
     /// </summary>
     /// <param name="content">The document to copy.</param>
@@ -417,6 +444,22 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns>The operation result.</returns>
     OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Sorts the children of a parent by persisting the supplied (already ordered) child identifiers
+    ///     as the new sort order, in a single set-based update.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent, or <see cref="Constants.System.Root"/> for the root.</param>
+    /// <param name="orderedChildIds">The child document identifiers, in the desired order.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+    /// <remarks>
+    ///     Unlike <see cref="Sort(IEnumerable{int}?, int)" />, this does not load the children or fire per-item
+    ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
 
     #endregion
 

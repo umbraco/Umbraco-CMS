@@ -29,23 +29,45 @@ export class UmbBlockActionDefaultElement<
 		this.#api = api;
 		this._href = undefined;
 
-		// TODO: getHref() and getValidationDataPath() resolve once. If the underlying observable values
-		// change, the button won't update. Consider making these reactive in a future iteration. [LK]
-		this.#api?.getHref?.().then((href) => {
-			this._href = href;
-		});
+		if (api?.href) {
+			this.observe(api.href, (href) => (this._href = href), 'observeHref');
+		} else {
+			this.removeUmbControllerByAlias('observeHref');
+			api?.getHref?.().then((href) => {
+				this._href = href;
+			});
+		}
 
-		this.#api?.getValidationDataPath?.().then((path) => {
-			this.removeUmbControllerByAlias('observeValidation');
-			if (path) {
-				new UmbObserveValidationStateController(
-					this,
-					path,
-					(hasMessages) => (this._invalid = hasMessages),
-					'observeValidation',
-				);
-			}
-		});
+		if (api?.validationDataPath) {
+			this.observe(
+				api.validationDataPath,
+				(path) => {
+					this.removeUmbControllerByAlias('observeValidation');
+					if (path) {
+						new UmbObserveValidationStateController(
+							this,
+							path,
+							(hasMessages) => (this._invalid = hasMessages),
+							'observeValidation',
+						);
+					}
+				},
+				'observeValidationDataPath',
+			);
+		} else {
+			this.removeUmbControllerByAlias('observeValidationDataPath');
+			api?.getValidationDataPath?.().then((path) => {
+				this.removeUmbControllerByAlias('observeValidation');
+				if (path) {
+					new UmbObserveValidationStateController(
+						this,
+						path,
+						(hasMessages) => (this._invalid = hasMessages),
+						'observeValidation',
+					);
+				}
+			});
+		}
 	}
 
 	@state()

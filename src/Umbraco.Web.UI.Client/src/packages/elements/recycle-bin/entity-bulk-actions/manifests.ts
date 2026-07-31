@@ -17,6 +17,7 @@ const trash: ManifestEntityBulkActionTrashWithRelationKind = {
 	kind: UMB_ENTITY_BULK_ACTION_TRASH_WITH_RELATION_KIND,
 	alias: 'Umb.EntityBulkAction.Element.Trash',
 	name: 'Trash Element Entity Bulk Action',
+	api: () => import('./trash/element-bulk-trash-with-relation.action.js'),
 	weight: 10,
 	forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 	meta: {

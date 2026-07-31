@@ -44,7 +44,7 @@ internal sealed class RequestStartItemProvider : RequestHeaderHandler, IRequestS
             return _requestedStartContent;
         }
 
-        var headerValue = RequestedStartItem()?.Trim(Constants.CharArrays.ForwardSlash);
+        var headerValue = RequestedStartItem()?.Trim('/');
         if (headerValue.IsNullOrWhiteSpace())
         {
             return null;

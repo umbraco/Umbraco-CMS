@@ -99,12 +99,18 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_17_4_0.AddExternalMemberTables>("{D7E8F9A0-B1C2-4D3E-A5F6-7890ABCDEF12}");
         To<V_17_4_0.FixLabelDataTypeDbTypeFromConfiguration>("{3F9B6A1C-7D84-4E2B-9C15-6A2E8F3D5B47}");
 
+        // To 17.6.0
+        To<V_17_6_0.AddContentTypeIdIndexForContent>("{3A1A8047-74AE-491A-B2C4-0BAE4A1289EC}");
+
         // To 18.0.0
         To<V_18_0_0.AddElementContainerPermissions>("{D00BB11A-DDF8-47C4-B58E-150C123BB3BB}");
         To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
         To<V_18_0_0.AddElementSectionForAdmins>("{6FE4656E-8B8D-452F-AE2A-438A615B61BC}");
 
         // To 19.0.0
+        To<V_19_0_0.AddExternalBlockElementRelationType>("{2D8F1B6E-4C3A-4E7D-9A1B-5F0C7E2D8A93}");
+
+        // To EFCore
         To<V_18_0_0.AddWebhookDto>("{F3CC0076-0692-41E5-9B2B-C58D46E556D4}");
         To<V_18_0_0.AddLastSyncedDto>("{5CFD4E2B-4024-42FE-9C70-295D0141ECAF}");
         To<V_18_0_0.AddKeyValueDto>("{ABDB0A9C-7476-4E00-B4C2-638FDF347AA0}");
@@ -154,9 +160,9 @@ public partial class UmbracoPlan : MigrationPlan
             if (match.Success)
             {
                 trackedVersion = new SemVersion(
-                    int.Parse(match.Groups[1].Value),
-                    int.Parse(match.Groups[2].Value),
-                    int.Parse(match.Groups[3].Value));
+                    int.Parse(match.Groups[1].ValueSpan),
+                    int.Parse(match.Groups[2].ValueSpan),
+                    int.Parse(match.Groups[3].ValueSpan));
             }
 
             if (string.Equals(transition.TargetState, state, StringComparison.OrdinalIgnoreCase))

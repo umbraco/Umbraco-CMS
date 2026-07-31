@@ -127,7 +127,7 @@ public abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockVal
     }
 
     private static bool IsBlockEditorDataEmpty([NotNullWhen(false)] BlockEditorData<TValue, TLayout>? editorData)
-        => editorData is null || editorData.BlockValue.ContentData.Count == 0;
+        => editorData is null || editorData.BlockValue.Layout.Count == 0;
 
     // We don't throw on error here because we want to be able to parse what we can, even if some of the data is invalid. In cases where migrating
     // from nested content to blocks, we don't want to trigger a fatal error for retrieving references, as this isn't vital to the operation.

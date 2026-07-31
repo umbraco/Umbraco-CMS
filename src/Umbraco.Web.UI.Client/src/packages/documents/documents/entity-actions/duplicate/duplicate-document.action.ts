@@ -2,6 +2,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../e
 import { UmbDocumentItemRepository } from '../../item/index.js';
 import { UMB_DUPLICATE_DOCUMENT_MODAL } from './modal/index.js';
 import { UmbDuplicateDocumentRepository } from './repository/index.js';
+import { UmbDocumentTreeRepository } from '../../tree/index.js';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -9,6 +10,7 @@ import {
 	UmbDocumentTypeDetailRepository,
 	UmbDocumentTypeStructureRepository,
 } from '@umbraco-cms/backoffice/document-type';
+import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
 	override async execute() {
@@ -16,15 +18,22 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
 		const duplicateRepository = new UmbDuplicateDocumentRepository(this);
-		const selectableFilter = await this.#getSelectableFilterByDocumentUnique(this.args.unique);
+		const [selectableFilter, ancestors] = await Promise.all([
+			this.#getSelectableFilterByDocumentUnique(this.args.unique),
+			this.#requestAncestors(),
+		]);
 
 		const value = await umbOpenModal(this, UMB_DUPLICATE_DOCUMENT_MODAL, {
 			data: {
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 				selectableFilter,
+				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
 			},
-		});
+		}).catch(() => undefined);
+
+		// The modal was cancelled.
+		if (!value) return;
 
 		const destinationUnique = value.destination.unique;
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');
@@ -41,6 +50,20 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		}
 
 		this.#reloadMenu(destinationUnique);
+	}
+
+	async #requestAncestors() {
+		try {
+			const treeRepository = new UmbDocumentTreeRepository(this);
+			const { data } = await treeRepository.requestTreeItemAncestors({
+				treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
+			});
+			// Exclude self — the API returns the descendant as part of the ancestors list, but we only want to expand its parents.
+			return data?.filter((item) => item.unique !== this.args.unique) ?? [];
+		} catch {
+			// Tree pre-expansion is a UX convenience — if it fails the modal still opens normally.
+			return [];
+		}
 	}
 
 	async #getSelectableFilterByDocumentUnique(documentUnique: string) {

@@ -134,7 +134,7 @@ test('can rename an element folder with update permission enabled', async ({umbr
   // Act
   await umbracoUi.library.clickActionsMenuForElement(folderName);
   await umbracoUi.library.clickRenameActionMenuOption();
-  await umbracoUi.library.enterFolderName(newFolderName);
+  await umbracoUi.library.enterRenameFolderName(newFolderName);
   await umbracoUi.library.clickConfirmRenameFolderButtonAndWaitForElementFolderToBeRenamed();
 
   // Assert
@@ -197,7 +197,8 @@ test('can delete a trashed folder from the recycle bin when delete folder permis
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
-  await umbracoUi.library.isItemVisibleInRecycleBin(folderName);
+  await umbracoUi.library.clickCaretButtonForName('Recycle Bin');
+  await umbracoUi.library.isItemVisibleInRecycleBin(folderName, true, false);
 
   // Act
   await umbracoUi.library.clickDeleteButtonForTrashedElememtWithName(folderName);
@@ -314,10 +315,8 @@ test.skip('cannot see an element inside a folder when read folder permission is 
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
   await umbracoUi.library.goToWorkspacePath(`/workspace/element-folder/edit/${folderId}`);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
   await umbracoUi.library.goToWorkspacePath(`/workspace/element/edit/${innerElementId}`);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
   await umbracoUi.library.isElementReadOnly();
 });
 
@@ -348,5 +347,5 @@ test('cannot rename a folder when only element update permission is enabled', as
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
-  await umbracoUi.library.isActionsMenuForNameVisible(folderName, false);
+  await umbracoUi.library.isElementInTreeVisible(folderName, false);
 });

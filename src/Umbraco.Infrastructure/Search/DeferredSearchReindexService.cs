@@ -5,11 +5,13 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
@@ -34,9 +36,11 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILogger<DeferredSearchReindexService> _logger;
     private readonly CancellationTokenSource _shutdownCts;
+    private readonly IRelationService _relationService;
     private readonly ConcurrentDictionary<int, byte> _pendingContentTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMediaTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMemberTypeIds = new();
+    private readonly ConcurrentDictionary<int, byte> _pendingElementIds = new();
     private int _processing; // 0 = idle, 1 = active
 
     /// <summary>
@@ -51,6 +55,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     /// <param name="scopeProvider">The scope provider, used to create scopes for repository access.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="hostApplicationLifetime">The application lifetime, used to cancel in-flight reindexing on shutdown.</param>
+    /// <param name="relationService">The relation service, used to traverse element-to-document relations.</param>
     public DeferredSearchReindexService(
         IDocumentRepository documentRepository,
         IMediaRepository mediaRepository,
@@ -60,7 +65,8 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         IOptionsMonitor<IndexingSettings> indexingSettings,
         ICoreScopeProvider scopeProvider,
         ILogger<DeferredSearchReindexService> logger,
-        IHostApplicationLifetime hostApplicationLifetime)
+        IHostApplicationLifetime hostApplicationLifetime,
+        IRelationService relationService)
     {
         _documentRepository = documentRepository;
         _mediaRepository = mediaRepository;
@@ -71,6 +77,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         _scopeProvider = scopeProvider;
         _logger = logger;
         _shutdownCts = CancellationTokenSource.CreateLinkedTokenSource(hostApplicationLifetime.ApplicationStopping);
+        _relationService = relationService;
     }
 
     /// <inheritdoc />
@@ -101,6 +108,17 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         foreach (var id in memberTypeIds)
         {
             _pendingMemberTypeIds.TryAdd(id, 0);
+        }
+
+        ScheduleProcessing();
+    }
+
+    /// <inheritdoc />
+    public void QueueReindexOnElementChange(IReadOnlyCollection<int> elementIds)
+    {
+        foreach (var id in elementIds)
+        {
+            _pendingElementIds.TryAdd(id, 0);
         }
 
         ScheduleProcessing();
@@ -140,6 +158,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                 var contentTypeIds = DrainIds(_pendingContentTypeIds);
                 var mediaTypeIds = DrainIds(_pendingMediaTypeIds);
                 var memberTypeIds = DrainIds(_pendingMemberTypeIds);
+                var elementIds = DrainIds(_pendingElementIds);
 
                 try
                 {
@@ -164,6 +183,13 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                         _logger.LogInformation("Deferred reindex completed for member type IDs: {MemberTypeIds}", memberTypeIds);
                     }
 
+                    if (elementIds.Length > 0)
+                    {
+                        _logger.LogInformation("Deferred reindex starting for documents referencing element IDs: {ElementIds}", elementIds);
+                        ReindexDocumentsReferencingElements(elementIds);
+                        _logger.LogInformation("Deferred reindex completed for documents referencing element IDs: {ElementIds}", elementIds);
+                    }
+
                     consecutiveFailures = 0;
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -171,6 +197,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                     RequeueIds(_pendingContentTypeIds, contentTypeIds);
                     RequeueIds(_pendingMediaTypeIds, mediaTypeIds);
                     RequeueIds(_pendingMemberTypeIds, memberTypeIds);
+                    RequeueIds(_pendingElementIds, elementIds);
                     throw;
                 }
                 catch (Exception ex)
@@ -180,6 +207,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                     RequeueIds(_pendingContentTypeIds, contentTypeIds);
                     RequeueIds(_pendingMediaTypeIds, mediaTypeIds);
                     RequeueIds(_pendingMemberTypeIds, memberTypeIds);
+                    RequeueIds(_pendingElementIds, elementIds);
 
                     if (consecutiveFailures >= MaxConsecutiveFailures)
                     {
@@ -263,6 +291,99 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
             c => _umbracoIndexingHandler.ReIndexForMember(c));
     }
 
+    private void ReindexDocumentsReferencingElements(int[] elementIds)
+    {
+        // External block element content only participates in the index when the feature is enabled; with it off there
+        // is nothing to refresh, so skip the traversal and reindex entirely.
+        if (_indexingSettings.CurrentValue.IndexExternalBlockElements is false)
+        {
+            return;
+        }
+
+        IReadOnlyCollection<int> documentIds = FindDocumentIdsReferencingElements(elementIds);
+        if (documentIds.Count == 0)
+        {
+            return;
+        }
+
+        var publishChecked = new Dictionary<int, bool>();
+        foreach (IEnumerable<int> batch in documentIds.InGroupsOf(_indexingSettings.CurrentValue.BatchSize))
+        {
+            var batchIds = batch.ToArray();
+            IContent[] documents;
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                documents = _documentRepository.GetMany(batchIds).ToArray();
+            }
+
+            foreach (IContent document in documents)
+            {
+                // External element content is flattened only into the external (published) index, so a document that
+                // is not effectively published has no entry that could contain it - reindexing it would be a no-op.
+                if (document.Published is false)
+                {
+                    continue;
+                }
+
+                // The published-ancestor check depends only on the ancestor chain, so cache it per parent —
+                // sibling documents under the same parent share the result.
+                if (publishChecked.TryGetValue(document.ParentId, out var ancestorPublished) is false)
+                {
+                    ancestorPublished = _publishStatusQueryService.HasPublishedAncestorPath(document.Key);
+                    publishChecked[document.ParentId] = ancestorPublished;
+                }
+
+                if (ancestorPublished is false)
+                {
+                    continue;
+                }
+
+                _umbracoIndexingHandler.ReIndexForContent(document, true);
+            }
+        }
+    }
+
+    internal IReadOnlyCollection<int> FindDocumentIdsReferencingElements(IEnumerable<int> elementIds)
+    {
+        var documentIds = new HashSet<int>();
+        var visitedElementIds = new HashSet<int>(elementIds);
+        var currentLevel = new HashSet<int>(visitedElementIds);
+
+        while (currentLevel.Count > 0)
+        {
+            var childIds = currentLevel.ToArray();
+
+            // Query one object type per call: fetching multiple types in a single call is not fully supported at the
+            // moment (the published state is not filled correctly), so documents and elements are fetched separately.
+            // This could be improved in the future to support a single multi-type query.
+            foreach (IUmbracoEntity document in GetParentEntities(childIds, UmbracoObjectTypes.Document))
+            {
+                documentIds.Add(document.Id);
+            }
+
+            var nextLevel = new HashSet<int>();
+            foreach (IEntitySlim element in GetParentEntities(childIds, UmbracoObjectTypes.Element).Cast<IEntitySlim>())
+            {
+                // Only climb through a published element: an unpublished element's content (and anything nested in it)
+                // is not part of any document's published index, so a change below it should not propagate upward.
+                if (visitedElementIds.Add(element.Id) && element is IPublishableContentEntitySlim { Published: true })
+                {
+                    nextLevel.Add(element.Id);
+                }
+            }
+
+            currentLevel = nextLevel;
+        }
+
+        return documentIds;
+    }
+
+    private IEnumerable<IUmbracoEntity> GetParentEntities(int[] childIds, UmbracoObjectTypes entityType)
+        => _relationService.GetParentEntitiesByChildIds(
+            childIds,
+            [Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias],
+            entityType);
+
     /// <summary>
     ///     Pages through a repository without acquiring distributed locks and invokes an action for each item.
     /// </summary>
@@ -328,7 +449,8 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     private bool HasPendingIds() =>
         _pendingContentTypeIds.IsEmpty is false ||
         _pendingMediaTypeIds.IsEmpty is false ||
-        _pendingMemberTypeIds.IsEmpty is false;
+        _pendingMemberTypeIds.IsEmpty is false ||
+        _pendingElementIds.IsEmpty is false;
 
     private static int[] DrainIds(ConcurrentDictionary<int, byte> dictionary)
     {

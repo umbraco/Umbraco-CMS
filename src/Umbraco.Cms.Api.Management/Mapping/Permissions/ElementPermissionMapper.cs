@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
@@ -17,18 +19,40 @@ namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
 /// </remarks>
 public class ElementPermissionMapper : IPermissionPresentationMapper, IPermissionMapper
 {
-    private readonly Lazy<IEntityService> _entityService;
-    private readonly Lazy<IUserService> _userService;
+    private readonly Lazy<IElementPermissionService> _elementPermissionService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
     /// </summary>
-    /// <param name="entityService">Lazy-loaded service for interacting with entities.</param>
-    /// <param name="userService">Lazy-loaded service for interacting with users and their permissions.</param>
-    public ElementPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
+    /// <param name="elementPermissionService">The element permission service.</param>
+    public ElementPermissionMapper(Lazy<IElementPermissionService> elementPermissionService)
+        => _elementPermissionService = elementPermissionService;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
+    /// </summary>
+    /// <remarks>
+    /// This constructor exists only to give the dependency injection container an unambiguous (greediest) constructor
+    /// to select while the obsolete constructors remain. Use the constructor taking only the
+    /// <see cref="Lazy{T}"/> of <see cref="IElementPermissionService"/>.
+    /// </remarks>
+    [Obsolete("This constructor exists only to satisfy dependency injection. Please use the constructor taking only Lazy<IElementPermissionService>. Scheduled for removal in Umbraco 20.")]
+    public ElementPermissionMapper(
+        Lazy<IEntityService> entityService,
+        Lazy<IUserService> userService,
+        Lazy<IElementPermissionService> elementPermissionService)
+        : this(elementPermissionService)
     {
-        _entityService = entityService;
-        _userService = userService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementPermissionMapper"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor taking only Lazy<IElementPermissionService>. Scheduled for removal in Umbraco 20.")]
+    public ElementPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
+        : this(
+            new Lazy<IElementPermissionService>(StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>))
+    {
     }
 
     /// <inheritdoc cref="IPermissionMapper" />
@@ -108,25 +132,18 @@ public class ElementPermissionMapper : IPermissionPresentationMapper, IPermissio
             .Distinct()
             .ToArray();
 
-        // Batch retrieve all elements by their keys.
-        var elements = _entityService.Value.GetAll<IElement>(elementKeysWithGranularPermissions)
-            .ToDictionary(elem => elem.Key, elem => elem.Path);
+        // Resolve permissions through IElementPermissionService so custom implementations are respected.
+        IEnumerable<NodePermissions> permissions = _elementPermissionService.Value
+            .GetPermissionsAsync(user, elementKeysWithGranularPermissions)
+            .GetAwaiter()
+            .GetResult();
 
-        // Iterate through each element key that has granular permissions.
-        foreach (Guid elementKey in elementKeysWithGranularPermissions)
+        foreach (NodePermissions nodePermission in permissions)
         {
-            // Retrieve the path from the pre-fetched elements.
-            if (!elements.TryGetValue(elementKey, out var path) || string.IsNullOrEmpty(path))
-            {
-                continue;
-            }
-
-            // With the path we can call the same logic as used server-side for authorizing access to resources.
-            EntityPermissionSet permissionsForPath = _userService.Value.GetPermissionsForPath(user, path);
             yield return new ElementPermissionPresentationModel
             {
-                Element = new ReferenceByIdModel(elementKey),
-                Verbs = permissionsForPath.GetAllPermissions(),
+                Element = new ReferenceByIdModel(nodePermission.NodeKey),
+                Verbs = nodePermission.Permissions,
             };
         }
     }

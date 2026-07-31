@@ -32,7 +32,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 900,
 		api: () => import('./change-password-current-user.action.js'),
 		meta: {
-			label: '#general_changePassword',
+			label: '#user_changePassword',
 			icon: 'lock',
 		},
 		conditions: [

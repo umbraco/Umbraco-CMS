@@ -17,12 +17,14 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { encodeFilePath, UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN, UMB_ELEMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/element';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -48,15 +50,28 @@ export abstract class UmbBlockEntryContext<
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockOriginData extends UmbBlockWorkspaceOriginData = UmbBlockWorkspaceOriginData,
 > extends UmbContextBase {
-	//
+	// TODO: [V19] Remove together with the legacy label renderer warning. [LK]
+	static #hasWarnedLegacyLabelRenderer = false;
+
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
 
+	#key?: string;
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
 	readonly unsupported = this.#unsupported.asObservable();
+	#structurallyUnsupported = false;
 
 	protected readonly localize = new UmbLocalizationController(this);
+
+	#isExternalContent = new UmbBooleanState(false);
+	readonly isExternalContent = this.#isExternalContent.asObservable();
+
+	#isAllowedInLibrary = new UmbBooleanState(undefined);
+	readonly isAllowedInLibrary = this.#isAllowedInLibrary.asObservable();
+
+	#externalContentVariantState = new UmbStringState(undefined);
+	readonly externalContentVariantState = this.#externalContentVariantState.asObservable();
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -140,7 +155,7 @@ export abstract class UmbBlockEntryContext<
 	public readonly layout = this._layout.asObservable();
 	public readonly contentKey = this._layout.asObservablePart((x) => x?.contentKey);
 	public readonly settingsKey = this._layout.asObservablePart((x) => (x ? (x.settingsKey ?? null) : undefined));
-	public readonly unique = this._layout.asObservablePart((x) => x?.contentKey);
+	public readonly unique = this._layout.asObservablePart((x) => x?.key);
 
 	/**
 	 * Get the layout of the block.
@@ -156,7 +171,34 @@ export abstract class UmbBlockEntryContext<
 		return this.#label.getValue();
 	}
 
-	#labelRender = new UmbUfmVirtualRenderController(this);
+	#name = new UmbStringState<string>('');
+	/** Observable of the block's resolved label text (UFM rendered as plain text). */
+	public readonly name = this.#name.asObservable();
+
+	/**
+	 * Set the resolved name text. Intended to be called by the block entry element
+	 * when its canonical `<umb-ufm-render>` reports updated text via `umb-ufm-resolved`.
+	 * @param {string} text the resolved text.
+	 */
+	public setName(text: string): void {
+		this.#name.setValue(text);
+	}
+
+	// TODO: [V19] Remove `#labelRender` and the related plumbing once the legacy renderer is gone. [LK]
+	#labelRender?: UmbUfmVirtualRenderController;
+
+	/**
+	 * Whether this context should run its own hidden `UmbUfmVirtualRenderController` as the
+	 * source of `getName()`. Subclasses whose entry element owns a canonical `<umb-ufm-render>`
+	 * (and pushes text via {@link setName}) should override this to return `false`.
+	 * @deprecated Scheduled for removal in Umbraco 19. Subclasses must own their own
+	 * `<umb-ufm-render>` and push resolved text via {@link setName} — the hidden virtual
+	 * renderer fallback will be removed entirely.
+	 * @returns {boolean} `true` to create the legacy hidden renderer; `false` to skip it.
+	 */
+	protected _needsLegacyLabelRenderer(): boolean {
+		return true;
+	}
 
 	#generateWorkspaceEditContentPath = (path?: string, contentKey?: string) =>
 		path && contentKey ? path + 'edit/' + encodeFilePath(contentKey) + '/view/content' : '';
@@ -166,9 +208,18 @@ export abstract class UmbBlockEntryContext<
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
+
+	#externalContentWorkspacePath = new UmbStringState(undefined);
+
 	public readonly workspaceEditContentPath = mergeObservables(
-		[this.contentKey, this.workspacePath],
-		([contentKey, path]) => this.#generateWorkspaceEditContentPath(path, contentKey),
+		[this.contentKey, this.workspacePath, this.isExternalContent, this.#externalContentWorkspacePath.asObservable()],
+		([contentKey, path, isExternalContent, externalContentPath]) => {
+			if (!contentKey) return '';
+			if (isExternalContent && externalContentPath) {
+				return externalContentPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
+			}
+			return this.#generateWorkspaceEditContentPath(path, contentKey);
+		},
 	);
 	public readonly workspaceEditSettingsPath = mergeObservables(
 		[this.contentKey, this.workspacePath],
@@ -330,10 +381,25 @@ export abstract class UmbBlockEntryContext<
 	) {
 		super(host, 'UmbBlockEntryContext');
 
-		this.observe(this.label, (label) => {
-			this.#labelRender.markdown = label;
-		});
-		this.#watchContentForLabelRender();
+		// TODO: [V19] Drop this conditional and the legacy renderer plumbing entirely. [LK]
+		if (this._needsLegacyLabelRenderer()) {
+			if (!UmbBlockEntryContext.#hasWarnedLegacyLabelRenderer) {
+				UmbBlockEntryContext.#hasWarnedLegacyLabelRenderer = true;
+				new UmbDeprecation({
+					deprecated: 'UmbBlockEntryContext hidden virtual label renderer (legacy)',
+					solution:
+						'In your UmbBlockEntryContext subclass, override _needsLegacyLabelRenderer() to return false and push the resolved UFM text via setName() — e.g. by listening to @umb-ufm-resolved on a <umb-ufm-render> in your entry element.',
+					removeInVersion: '19.0.0',
+				}).warn();
+			}
+			this.#labelRender = new UmbUfmVirtualRenderController(this);
+			this.observe(this.label, (label) => {
+				if (this.#labelRender) {
+					this.#labelRender.markdown = label;
+				}
+			});
+			this.#watchContentForLabelRender();
+		}
 
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
@@ -356,6 +422,17 @@ export abstract class UmbBlockEntryContext<
 				this.#pathAddendum.setAddendum(contentKey);
 				if (!contentKey) return;
 				this.#observeContentData();
+			},
+			null,
+		);
+
+		this.observe(
+			this.contentKey,
+			(contentKey) => {
+				if (!contentKey) return;
+				this.#contentKey = contentKey;
+				this.#observeContentData();
+				this.#gotVariantId();
 			},
 			null,
 		);
@@ -433,7 +510,9 @@ export abstract class UmbBlockEntryContext<
 
 	async #watchContentForLabelRender() {
 		this.observe(await this.contentValues(), (content) => {
-			this.#labelRender.value = content;
+			if (this.#labelRender) {
+				this.#labelRender.value = content;
+			}
 		});
 	}
 
@@ -442,14 +521,37 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	/**
+	 * Set the key of this entry — the unique identity of the block layout item.
+	 * @param {string} key the block key.
+	 */
+	setKey(key: string) {
+		this.#key = key;
+		this.#observeLayout();
+	}
+
+	getKey() {
+		return this.#key;
+	}
+
+	/**
 	 * Set the contentKey of this entry.
 	 * @function setContentKey
 	 * @param {string} contentKey the entry content key.
 	 * @returns {void}
+	 * @deprecated Use `setKey` instead. Will be removed in Umbraco 20.
 	 */
 	setContentKey(contentKey: string) {
+		new UmbDeprecation({
+			deprecated: 'UmbBlockEntryContext.setContentKey',
+			solution: 'Use setKey() with the block layout key instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this.#contentKey = contentKey;
-		this.#observeLayout();
+		// Backwards compat: if no key set yet, use contentKey
+		if (!this.#key) {
+			this.#key = contentKey;
+			this.#observeLayout();
+		}
 	}
 
 	/**
@@ -458,7 +560,8 @@ export abstract class UmbBlockEntryContext<
 	 * @returns {string} - the value of the label.
 	 */
 	getName() {
-		return this.#labelRender.toString();
+		// TODO: [V19] Drop the `#labelRender?.toString()` fallback once the legacy renderer is gone. [LK]
+		return this.#name.getValue() || this.#labelRender?.toString() || '';
 	}
 
 	#updateCreatePaths() {
@@ -481,12 +584,16 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	#observeLayout() {
-		if (!this._entries || !this.#contentKey) return;
+		if (!this._entries || !this.#key) return;
 
 		this.observe(
-			this._entries.layoutOf(this.#contentKey),
+			this._entries.byKey(this.#key),
 			(layout) => {
 				this._layout.setValue(layout);
+				// Derive contentKey from the layout so internal flows have it without external setters.
+				if (layout?.contentKey) {
+					this.#contentKey = layout.contentKey;
+				}
 			},
 			'observeParentLayout',
 		);
@@ -522,24 +629,66 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeWorkspacePath',
 		);
+
+		if (this._entries) {
+			this.observe(
+				mergeObservables(
+					[this.contentElementTypeKey, this._entries.libraryAllowedElementTypeKeys],
+					([contentElementTypeKey, libraryAllowedElementTypeKeys]) =>
+						contentElementTypeKey ? libraryAllowedElementTypeKeys.includes(contentElementTypeKey) : undefined,
+				),
+				(isAllowedInLibrary) => {
+					this.#isAllowedInLibrary.setValue(isAllowedInLibrary);
+				},
+				'observeIsAllowedInLibrary',
+			);
+		}
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('element')
+			.addUniquePaths(['unique'])
+			.onSetup(() => {
+				return {
+					data: { entityType: UMB_ELEMENT_ENTITY_TYPE, preset: {} },
+					modal: { size: 'large' },
+				};
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this.#externalContentWorkspacePath.setValue(routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE }));
+			});
 	}
 
 	protected abstract _gotEntries(): void;
 
 	#observeContentData() {
-		if (!this._manager || !this.#contentKey) return;
+		const contentKey = this.#contentKey ?? this._layout.value?.contentKey;
+		if (!this._manager || !contentKey) return;
 
-		// observe content:
+		// Observe content and external-content state together to avoid race conditions.
+		// Both are evaluated in the same tick, preventing the unsupported flag
+		// from flashing true while external content is being fetched.
 		this.observe(
-			this._manager.contentOf(this.#contentKey),
-			(content) => {
-				if (this.#unsupported.getValue() !== true) {
-					// If we could not find content, then we do not know the contentTypeKey and then the content is broken. [NL]
-					this.#unsupported.setValue(!content);
+			mergeObservables(
+				[this._manager.contentOf(contentKey), this._manager.isExternalContentOf(contentKey)],
+				([content, isExternalContent]) => ({ content, isExternalContent: isExternalContent ?? false }),
+			),
+			({ content, isExternalContent }) => {
+				this.#isExternalContent.setValue(isExternalContent);
+				if (!this.#structurallyUnsupported) {
+					this.#unsupported.setValue(!content && !isExternalContent);
 				}
 				this.#content.setValue(content);
 			},
 			'observeContent',
+		);
+
+		// Observe the variant state of external content (published, draft, etc.)
+		this.observe(
+			this._manager.externalContentStateOf(contentKey),
+			(state) => {
+				this.#externalContentVariantState.setValue(state ?? undefined);
+			},
+			'observeExternalContentVariantState',
 		);
 	}
 	#observeSettingsData() {
@@ -630,7 +779,8 @@ export abstract class UmbBlockEntryContext<
 		this.#contentStructurePromiseResolve?.();
 
 		if (!this.#contentStructure) {
-			// If we got no content structure, then this is element type did not load and there for it is not supported any longer.
+			// If we got no content structure, then this element type did not load and the block is not supported any longer.
+			this.#structurallyUnsupported = true;
 			this.#unsupported.setValue(true);
 		}
 
@@ -676,6 +826,7 @@ export abstract class UmbBlockEntryContext<
 				this._blockType.setValue(blockType as BlockType);
 				if (!blockType) {
 					// If the block type is undefined, then we do not have this Block Type and the Block is then unsupported. [NL]
+					this.#structurallyUnsupported = true;
 					this.#unsupported.setValue(true);
 				}
 			},
@@ -747,11 +898,22 @@ export abstract class UmbBlockEntryContext<
 		this.delete();
 	}
 
+	async requestTransferToExternalContent() {
+		if (!this.#key) return;
+		const name = this.getName();
+		await this._manager?.requestTransferToExternalContent(this.#key, name);
+	}
+
+	async requestDisconnectFromExternalContent() {
+		if (!this.#key) return;
+		await this._manager?.requestDisconnectFromExternalContent(this.#key);
+	}
+
 	public delete() {
 		if (!this._entries) return;
-		const contentKey = this._layout.value?.contentKey;
-		if (!contentKey) return;
-		this._entries.delete(contentKey);
+		const key = this._layout.value?.key;
+		if (!key) return;
+		this._entries.delete(key);
 	}
 
 	public expose() {

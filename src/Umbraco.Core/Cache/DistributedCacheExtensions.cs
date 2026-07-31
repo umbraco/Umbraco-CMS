@@ -467,6 +467,20 @@ public static class DistributedCacheExtensions
 
     #endregion
 
+    #region ElementContainerCacheRefresher
+
+    /// <summary>
+    ///     Invalidates the id/key map for the specified deleted element containers (folders).
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="deletedContainers">The element containers that were deleted.</param>
+    public static void RemoveElementContainerCache(this DistributedCache dc, IEnumerable<EntityContainer> deletedContainers)
+        => dc.RefreshByPayload(
+            ElementContainerCacheRefresher.UniqueId,
+            deletedContainers.Select(container => new ElementContainerCacheRefresher.JsonPayload(container.Id, container.Key)));
+
+    #endregion
+
     #region Published Snapshot
 
     /// <summary>

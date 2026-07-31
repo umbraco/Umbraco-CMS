@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 
@@ -59,6 +60,7 @@ public class RichTextPropertyIndexValueFactoryTests
 
         var factory = new RichTextPropertyIndexValueFactory(
             propertyEditorCollection,
+            Mock.Of<IElementService>(),
             jsonSerializer,
             indexingSettings,
             logger);

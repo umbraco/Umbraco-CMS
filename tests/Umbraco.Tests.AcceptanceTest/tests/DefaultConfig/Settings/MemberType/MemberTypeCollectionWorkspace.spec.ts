@@ -17,56 +17,47 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test('can create a member type using create options', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoUi.memberType.clickMemberTypesMenu();
-
   // Act
-  await umbracoUi.memberType.clickCreateActionWithOptionName('Member Type');
+  await umbracoUi.memberType.clickActionsMenuAtRoot();
+  await umbracoUi.memberType.clickCreateActionMenuOption();
+  await umbracoUi.memberType.clickMemberTypeButton();
   await umbracoUi.memberType.enterMemberTypeName(memberTypeName);
   await umbracoUi.memberType.clickSaveButtonAndWaitForMemberTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.memberType.doesNameExist(memberTypeName)).toBeTruthy();
-  // Check if the created member type is displayed in the collection view and has correct icon
-  await umbracoUi.memberType.clickMemberTypesMenu();
-  await umbracoUi.memberType.doesCollectionTreeItemTableRowHaveName(memberTypeName);
-  await umbracoUi.memberType.doesCollectionTreeItemTableRowHaveIcon(memberTypeName, 'icon-user');
+  // Check the created member type is displayed in the tree
   await umbracoUi.memberType.isMemberTypeTreeItemVisible(memberTypeName);
 });
 
 test('can create a member type folder using create options', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoUi.memberType.clickMemberTypesMenu();
-
   // Act
-  await umbracoUi.memberType.clickCreateActionWithOptionName('Folder');
+  await umbracoUi.memberType.clickActionsMenuAtRoot();
+  await umbracoUi.memberType.clickCreateActionMenuOption();
+  await umbracoUi.memberType.clickFolderButton();
   await umbracoUi.memberType.enterFolderName(memberTypeFolderName);
   await umbracoUi.memberType.clickConfirmCreateFolderButtonAndWaitForMemberTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.memberType.doesNameExist(memberTypeFolderName)).toBeTruthy();
-  // Check if the created folder is displayed in the collection view and has correct icon
-  await umbracoUi.memberType.clickMemberTypesMenu();
-  await umbracoUi.memberType.doesCollectionTreeItemTableRowHaveName(memberTypeFolderName);
-  await umbracoUi.memberType.doesCollectionTreeItemTableRowHaveIcon(memberTypeFolderName, 'icon-folder');
+  // Check the created folder is displayed in the tree
+  await umbracoUi.memberType.isMemberTypeTreeItemVisible(memberTypeFolderName);
 });
 
 test('can create a member type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const parentFolderId = await umbracoApi.memberType.createFolder(memberTypeFolderName);
-  await umbracoUi.memberType.goToMemberType(memberTypeFolderName);
+  await umbracoUi.memberType.reloadMemberTypeTree();
 
   // Act
-  await umbracoUi.memberType.clickCreateActionWithOptionName('Member Type');
+  await umbracoUi.memberType.clickActionsMenuForMemberType(memberTypeFolderName);
+  await umbracoUi.memberType.clickCreateActionMenuOption();
+  await umbracoUi.memberType.clickMemberTypeButton();
   await umbracoUi.memberType.enterMemberTypeName(memberTypeName);
   await umbracoUi.memberType.clickSaveButtonAndWaitForMemberTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.memberType.doesNameExist(memberTypeName)).toBeTruthy();
-  // Check if the created member type is displayed in the collection view and has correct icon
-  await umbracoUi.memberType.goToMemberType(memberTypeFolderName);
-  await umbracoUi.memberType.doesCollectionTreeItemTableRowHaveName(memberTypeName);
-  await umbracoUi.memberType.doesCollectionTreeItemTableRowHaveIcon(memberTypeName, 'icon-user');
   // Verify the member type is inside the parent folder
   const parentFolderChildren = await umbracoApi.memberType.getChildren(parentFolderId);
   expect(parentFolderChildren[0].name).toBe(memberTypeName);
@@ -77,18 +68,17 @@ test('can create a member type folder in a folder using create options', async (
   const childFolderName = 'Test Child Folder';
   await umbracoApi.memberType.ensureNameNotExists(childFolderName);
   const parentFolderId = await umbracoApi.memberType.createFolder(memberTypeFolderName);
-  await umbracoUi.memberType.goToMemberType(memberTypeFolderName);
+  await umbracoUi.memberType.reloadMemberTypeTree();
 
   // Act
-  await umbracoUi.memberType.clickCreateActionWithOptionName('Folder');
+  await umbracoUi.memberType.clickActionsMenuForMemberType(memberTypeFolderName);
+  await umbracoUi.memberType.clickCreateActionMenuOption();
+  await umbracoUi.memberType.clickFolderButton();
   await umbracoUi.memberType.enterFolderName(childFolderName);
   await umbracoUi.memberType.clickConfirmCreateFolderButtonAndWaitForMemberTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.memberType.doesNameExist(childFolderName)).toBeTruthy();
-  // Check if the created folder is displayed in the collection view and has correct icon
-  await umbracoUi.memberType.doesCollectionTreeItemTableRowHaveName(childFolderName);
-  await umbracoUi.memberType.doesCollectionTreeItemTableRowHaveIcon(childFolderName, 'icon-folder');
   // Verify the child folder is inside the parent folder
   const parentFolderChildren = await umbracoApi.memberType.getChildren(parentFolderId);
   expect(parentFolderChildren[0].name).toBe(childFolderName);

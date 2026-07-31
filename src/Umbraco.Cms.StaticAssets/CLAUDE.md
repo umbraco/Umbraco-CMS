@@ -227,6 +227,8 @@ CSS themes in `wwwroot/umbraco/backoffice/css/`:
 - `umbraco-blockgridlayout.css` - Block grid styles
 - `rte-content.css` - Rich text editor content styles
 
+The UUI theme files (`light.css`, `dark.css`, `high-contrast.css`) are copied from `@umbraco-ui/uui` during the backoffice build; see `Umbraco.Web.UI.Client/src/packages/core/themes/manifests.ts`.
+
 ---
 
 ## Quick Reference

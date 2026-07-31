@@ -1,5 +1,10 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockExposeModel } from '../types.js';
+import type {
+	UmbBlockDataModel,
+	UmbBlockDataValueModel,
+	UmbBlockExposeModel,
+	UmbBlockLayoutBaseModel,
+} from '../types.js';
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -26,6 +31,9 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
+import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
+import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-to-element-library/transfer-to-element-library-modal.token.js';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -69,11 +77,21 @@ export abstract class UmbBlockManagerContext<
 	protected _liveEditingMode = new UmbBooleanState(undefined);
 	public readonly liveEditingMode = this._liveEditingMode.asObservable();
 
-	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentKey);
+	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.key);
 	public readonly layouts = this._layouts.asObservable();
 
 	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly contents = this.#contents.asObservable();
+
+	readonly #externalContentValues = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+	readonly #externalContentVariants = new UmbArrayState(
+		<
+			Array<{ key: string; variants: Array<{ culture: string | null; segment: string | null; state: string | null }> }>
+		>[],
+		(x) => x.key,
+	);
+	#elementRepository = new UmbElementDetailRepository(this);
+	#pendingElementFetches = new Set<string>();
 
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
@@ -112,7 +130,8 @@ export abstract class UmbBlockManagerContext<
 	 * @param {Array<BlockLayoutType>} layouts - All layouts.
 	 */
 	setLayouts(layouts: Array<BlockLayoutType>) {
-		this._layouts.setValue(layouts);
+		// Backwards compatibility: ensure all layouts have a key (persisted data may not have one)
+		this._layouts.setValue(layouts.map((layout) => (layout.key ? layout : { ...layout, key: layout.contentKey })));
 	}
 
 	/**
@@ -178,6 +197,18 @@ export abstract class UmbBlockManagerContext<
 			this.blockTypes,
 			(blockTypes) => {
 				this.#ensureContentTypes(blockTypes);
+			},
+			null,
+		);
+
+		// Auto-resolve content for any layout marked as external, whenever layouts change.
+		this.observe(
+			this._layouts.asObservable(),
+			(layouts) => {
+				const keys = layouts
+					.filter((layout) => layout.isExternalContent && layout.contentKey)
+					.map((layout) => layout.contentKey as string);
+				if (keys.length) this.#fetchExternalContent(keys);
 			},
 			null,
 		);
@@ -293,8 +324,82 @@ export abstract class UmbBlockManagerContext<
 		return this._layouts.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
 	contentOf(key: string) {
-		return this.#contents.asObservablePart((source) => source.find((x) => x.key === key));
+		return mergeObservables(
+			[
+				this.#contents.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.#externalContentValues.asObservablePart((source) => source.find((x) => x.key === key)),
+			],
+			([localContent, externalContent]) => localContent ?? externalContent ?? undefined,
+		);
 	}
+
+	/**
+	 * Returns an observable that emits true when the layout for the given contentKey
+	 * has `isExternalContent` set (i.e., the block references external content).
+	 */
+	isExternalContentOf(key: string) {
+		return this._layouts.asObservablePart(
+			(source) => source.find((x) => x.contentKey === key)?.isExternalContent === true,
+		);
+	}
+
+	/**
+	 * Returns an observable of the external content variant state.
+	 * Emits the state string (e.g., 'Published', 'Draft') or null if not resolved yet.
+	 */
+	externalContentStateOf(key: string) {
+		return mergeObservables(
+			[
+				this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.variantId,
+			],
+			([entry, variantId]) => {
+				if (!entry?.variants.length) return null;
+				if (!variantId) return entry.variants[0]?.state ?? null;
+				const match = entry.variants.find((v) => v.culture === variantId.culture && v.segment === variantId.segment);
+				return match?.state ?? entry.variants[0]?.state ?? null;
+			},
+		);
+	}
+
+	// TODO: migrate to UmbRepositoryDetailsManager for true batched fetches [LK]
+	async #fetchExternalContent(keys: Array<string>) {
+		for (const key of keys) {
+			if (this.#pendingElementFetches.has(key)) continue;
+			if (this.#externalContentValues.getValue().some((x) => x.key === key)) continue;
+			this.#pendingElementFetches.add(key);
+			try {
+				const { data } = await this.#elementRepository.requestByUnique(key);
+				if (data) {
+					const blockData: UmbBlockDataModel = {
+						key: data.unique,
+						contentTypeKey: data.documentType.unique,
+						values: data.values.map(
+							(v): UmbBlockDataValueModel => ({
+								alias: v.alias,
+								editorAlias: v.editorAlias,
+								culture: v.culture,
+								segment: v.segment,
+								value: v.value,
+							}),
+						),
+					};
+					this.#externalContentValues.appendOne(blockData);
+					this.#externalContentVariants.appendOne({
+						key: data.unique,
+						variants: data.variants.map((v) => ({
+							culture: v.culture ?? null,
+							segment: v.segment ?? null,
+							state: v.state ?? null,
+						})),
+					});
+				}
+			} finally {
+				this.#pendingElementFetches.delete(key);
+			}
+		}
+	}
+
 	settingsOf(key: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
@@ -355,7 +460,10 @@ export abstract class UmbBlockManagerContext<
 		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);
 	}
 	getContentOf(contentKey: string) {
-		return this.#contents.value.find((x) => x.key === contentKey);
+		return (
+			this.#contents.value.find((x) => x.key === contentKey) ??
+			this.#externalContentValues.value.find((x) => x.key === contentKey)
+		);
 	}
 	getSettingsOf(settingsKey: string) {
 		return this.#settings.value.find((x) => x.key === settingsKey);
@@ -399,6 +507,114 @@ export abstract class UmbBlockManagerContext<
 		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));
 	}
 
+	/**
+	 * Insert a block whose content is an external content reference.
+	 * Only creates a layout entry — no contentData entry is added.
+	 * The layout observer handles fetching the element data.
+	 */
+	insertExternalContent(elementKey: string, _originData?: BlockOriginDataType) {
+		const layout = { key: UmbId.new(), contentKey: elementKey, isExternalContent: true } as BlockLayoutType;
+		this._layouts.appendOne(layout);
+	}
+
+	/**
+	 * Request to transfer a local block's content to external content (Element Library).
+	 * @param {string} key the block layout key.
+	 */
+	async requestTransferToExternalContent(key: string, name?: string) {
+		const layout = this._layouts.getValue().find((x) => x.key === key);
+		if (!layout) return;
+		const contentKey = layout.contentKey;
+		const content = this.getContentOf(contentKey);
+		if (!content) return;
+
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
+		if (!modalManager) return;
+		const result = await modalManager
+			.open(this, UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL, { data: { name } })
+			.onSubmit()
+			.catch(() => undefined);
+		if (!result) return;
+
+		const { data: scaffold } = await this.#elementRepository.createScaffold({
+			documentType: { unique: content.contentTypeKey, collection: null },
+			values: content.values,
+			variants: [
+				{
+					culture: null,
+					segment: null,
+					state: null,
+					name: result.name,
+					publishDate: null,
+					createDate: null,
+					updateDate: null,
+				},
+			],
+		});
+		if (!scaffold) return;
+
+		const { data: created } = await this.#elementRepository.create(scaffold, result.parentUnique);
+		if (!created) return;
+
+		this.#contents.removeOne(contentKey);
+		this.removeExposesOf(contentKey);
+		this._layouts.updateOne(key, {
+			contentKey: created.unique,
+			isExternalContent: true,
+		} as Partial<BlockLayoutType>);
+	}
+
+	/**
+	 * Request to disconnect a block from external content (Element Library).
+	 * @param {string} key the block layout key.
+	 */
+	async requestDisconnectFromExternalContent(key: string) {
+		const layout = this._layouts.getValue().find((x) => x.key === key);
+		if (!layout) return;
+		const elementKey = layout.contentKey;
+
+		try {
+			await umbConfirmModal(this, {
+				headline: '#blockEditor_disconnectFromElementLibrary',
+				content: '#blockEditor_disconnectFromElementLibraryConfirm',
+				confirmLabel: '#blockEditor_disconnectFromElementLibrary',
+				color: 'warning',
+			});
+		} catch {
+			return; // user cancelled
+		}
+
+		const { data: element } = await this.#elementRepository.requestByUnique(elementKey);
+		if (!element) return;
+
+		const contentTypeKey = element.documentType.unique;
+		const newContent: UmbBlockDataModel = {
+			key: UmbId.new(),
+			contentTypeKey,
+			values: element.values.map(
+				(v): UmbBlockDataValueModel => ({
+					alias: v.alias,
+					editorAlias: v.editorAlias,
+					culture: v.culture,
+					segment: v.segment,
+					value: v.value,
+				}),
+			),
+		};
+		this.#contents.appendOne(newContent);
+		this._layouts.updateOne(key, {
+			contentKey: newContent.key,
+			isExternalContent: undefined,
+		} as Partial<BlockLayoutType>);
+		this.#externalContentValues.removeOne(elementKey);
+		this.#externalContentVariants.removeOne(elementKey);
+		// Only set expose if the content type structure is loaded (it may not be for external content
+		// whose type was not in the block type list)
+		if (this.getStructure(contentTypeKey)) {
+			this.#setInitialBlockExpose(newContent);
+		}
+	}
+
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
 		this.#contents.updateOne(key, { [propertyAlias]: value });
 	}
@@ -419,7 +635,7 @@ export abstract class UmbBlockManagerContext<
 
 	abstract createWithPresets(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		originData?: BlockOriginDataType,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
@@ -520,7 +736,7 @@ export abstract class UmbBlockManagerContext<
 
 	protected async _createBlockData(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 	) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
@@ -528,9 +744,12 @@ export abstract class UmbBlockManagerContext<
 			throw new Error(`Cannot create block, missing block type for ${contentElementTypeKey}`);
 		}
 
+		const contentKey = UmbId.new();
+
 		// Create layout entry:
 		const layout: BlockLayoutType = {
-			contentKey: UmbId.new(),
+			key: contentKey,
+			contentKey,
 			...(partialLayoutEntry as Partial<BlockLayoutType>),
 		} as BlockLayoutType;
 

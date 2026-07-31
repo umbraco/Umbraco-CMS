@@ -4,6 +4,7 @@ import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MediaService, type MediaItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbMediaItemModel } from '../types.js';
 
 /**
@@ -27,34 +28,25 @@ export class UmbMediaSearchServerDataSource
 
 	async #fetchAncestors(ids: Array<string>) {
 		if (!ids.length) return { data: new Map() };
-		const { data, error } = await tryExecute(this.#host, MediaService.getItemMediaAncestors({ query: { id: ids } }));
+
+		const requestController = new UmbItemDataApiGetRequestController(this.#host, {
+			uniques: ids,
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			api: ({ uniques }) => MediaService.getItemMediaAncestors({ query: { id: uniques } }),
+		});
+		const { data, error } = await requestController.request();
 
 		if (error) return { error };
+
+		// A failed batch resolves without rejecting, leaving an `undefined` hole in `data` rather than
+		// surfacing an error, so guard against it before mapping below.
+		if (data?.some((entry) => entry == null))
+			return { error: new Error('Error fetching ancestors for one or more media items.') };
 
 		const ancestorsByItemId = new Map<string, Array<UmbMediaItemModel>>();
 		if (data) {
 			for (const entry of data) {
-				ancestorsByItemId.set(
-					entry.id,
-					entry.ancestors.map((ancestor: MediaItemResponseModel) => ({
-						entityType: UMB_MEDIA_ENTITY_TYPE,
-						hasChildren: ancestor.hasChildren,
-						isTrashed: ancestor.isTrashed,
-						unique: ancestor.id,
-						mediaType: {
-							collection: ancestor.mediaType.collection ? { unique: ancestor.mediaType.collection.id } : null,
-							icon: ancestor.mediaType.icon,
-							unique: ancestor.mediaType.id,
-						},
-						name: ancestor.variants[0]?.name ?? '',
-						parent: ancestor.parent ? { unique: ancestor.parent.id } : null,
-						variants: ancestor.variants.map((variant) => ({
-							culture: variant.culture || null,
-							name: variant.name,
-						})),
-						flags: ancestor.flags,
-					})),
-				);
+				ancestorsByItemId.set(entry.id, entry.ancestors.map(mapAncestorToItemModel));
 			}
 		}
 		return { data: ancestorsByItemId };
@@ -118,4 +110,25 @@ export class UmbMediaSearchServerDataSource
 
 		return { error };
 	}
+}
+
+function mapAncestorToItemModel(ancestor: MediaItemResponseModel): UmbMediaItemModel {
+	return {
+		entityType: UMB_MEDIA_ENTITY_TYPE,
+		hasChildren: ancestor.hasChildren,
+		isTrashed: ancestor.isTrashed,
+		unique: ancestor.id,
+		mediaType: {
+			collection: ancestor.mediaType.collection ? { unique: ancestor.mediaType.collection.id } : null,
+			icon: ancestor.mediaType.icon,
+			unique: ancestor.mediaType.id,
+		},
+		name: ancestor.variants[0]?.name ?? '',
+		parent: ancestor.parent ? { unique: ancestor.parent.id } : null,
+		variants: ancestor.variants.map((variant) => ({
+			culture: variant.culture || null,
+			name: variant.name,
+		})),
+		flags: ancestor.flags,
+	};
 }

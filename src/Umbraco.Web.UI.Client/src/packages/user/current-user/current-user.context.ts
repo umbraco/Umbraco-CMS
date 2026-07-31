@@ -67,6 +67,21 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		return this.#loadPromise;
 	}
 
+	/**
+	 * Invalidates the loaded current user, so that the next call to {@link load} fetches it from the server again.
+	 * Call this when the loaded user can no longer be trusted, e.g. when authorization is lost — a subsequent
+	 * sign-in may be for a different user.
+	 * @remarks The `#currentUser` state is deliberately NOT cleared here. The backoffice stays mounted behind
+	 * the login overlay during a session timeout, and several consumers observe the unfiltered observable
+	 * parts (e.g. recycle-bin conditions, sensitive-data property gating, language read-only checks) without
+	 * guarding against `undefined` — clearing would tear down or read-only-flip open workspaces mid-edit for
+	 * the common case of the same user signing back in. Consumers of the filtered {@link currentUser}
+	 * observable hold their last value until the fresh user has been fetched and then re-evaluate.
+	 */
+	public invalidate(): void {
+		this.#loadPromise = undefined;
+	}
+
 	async #doLoad(): Promise<void> {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
@@ -85,7 +100,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	}
 
 	#loadDebounced = debounce(() => {
-		this.#loadPromise = undefined;
+		this.invalidate();
 		this.load();
 	}, 100);
 

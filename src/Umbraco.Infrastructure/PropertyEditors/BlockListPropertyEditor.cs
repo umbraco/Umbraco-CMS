@@ -25,7 +25,7 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
     public BlockListPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
+        IBlockListPropertyIndexValueFactory blockValuePropertyIndexValueFactory,
         IJsonSerializer jsonSerializer)
         : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory, jsonSerializer)
         => _ioHelper = ioHelper;

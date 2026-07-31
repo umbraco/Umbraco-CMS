@@ -670,7 +670,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 				alias: 'blocks',
 				value: [
 					{
-						label: 'Mocked Block Type for Block List',
+						label: 'Mocked Block Type for Block List: ${elementProperty}',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 						settingsElementTypeKey: 'all-property-editors-document-type-id',
 						iconColor: '#F5C1BC',

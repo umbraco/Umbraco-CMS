@@ -11,8 +11,13 @@ test('can log out via the user menu', {tag: '@smoke'}, async ({umbracoUi, umbrac
   await umbracoUi.login.clickLogoutButtonAndWaitForUserLogout();
 
   // Assert
-  expect(await umbracoApi.user.getCurrentUserStatus()).toBe(401);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the logout process to complete and the login page to be visible
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.login.isLoginPageVisible();
+  await expect.poll(() => umbracoApi.user.getCurrentUserStatus()).toBe(401);
+  // Let the logout navigation settle before re-navigating, or the in-flight cookie-clear is
+  // interrupted and the still-valid session silently re-authorises back into the backoffice.
+  await umbracoUi.page.waitForURL(/\/umbraco\/logout/, {timeout: ConstantHelper.timeout.navigation});
+  await umbracoUi.page.waitForLoadState('networkidle');
+  await expect(async () => {
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.login.isLoginPageVisible();
+  }).toPass();
 });

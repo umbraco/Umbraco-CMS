@@ -71,31 +71,65 @@ public class AddDimensionsToSvg : AsyncMigrationBase
             ? vectorGraphicsMediaType.PropertyTypes.Max(x => x.SortOrder)
             : 0;
 
-        // Add new properties (AddPropertyType handles duplicates, so the migration is idempotent).
-        vectorGraphicsMediaType.AddPropertyType(new PropertyType(_shortStringHelper, labelPixelDataType, Constants.Conventions.Media.Width)
+        // The keys are set explicitly to match the clean install (DatabaseDataCreator) so that upgraded
+        // and clean-installed sites end up identical - otherwise the keys would be randomly generated.
+        var addedWidth = AddMissingPropertyType(
+            vectorGraphicsMediaType,
+            labelPixelDataType,
+            propertyGroup,
+            Constants.Conventions.Media.Width,
+            "Width",
+            Constants.Conventions.Media.PropertyTypeKeys.VectorGraphicsWidth,
+            highestSort + 1);
+        var addedHeight = AddMissingPropertyType(
+            vectorGraphicsMediaType,
+            labelPixelDataType,
+            propertyGroup,
+            Constants.Conventions.Media.Height,
+            "Height",
+            Constants.Conventions.Media.PropertyTypeKeys.VectorGraphicsHeight,
+            highestSort + 2);
+
+        if (addedWidth is false && addedHeight is false)
         {
-            Name = "Width",
-            SortOrder = highestSort + 1,
-            PropertyGroupId = new Lazy<int>(()=> propertyGroup.Id),
-        });
-        vectorGraphicsMediaType.AddPropertyType(new PropertyType(_shortStringHelper, labelPixelDataType, Constants.Conventions.Media.Height)
-        {
-            Name = "Height",
-            SortOrder = highestSort + 2,
-            PropertyGroupId = new Lazy<int>(()=> propertyGroup.Id),
-        });
+            _logger.LogInformation("Vector Graphics Media Type already has width/height properties, skipping update.");
+            return;
+        }
 
         Attempt<ContentTypeOperationStatus> attempt = await _mediaTypeService.UpdateAsync(vectorGraphicsMediaType, Constants.Security.SuperUserKey);
         if (attempt.Success is false)
         {
-            if (attempt.Exception is not null)
-            {
-                _logger.LogError(attempt.Exception, "Failed to update media type '{Alias}' during migration.", vectorGraphicsMediaType.Alias);
-            }
-            else
-            {
-                _logger.LogWarning("Failed to update media type '{Alias}' during migration. Status: {ResultStatus}", vectorGraphicsMediaType.Alias, attempt.Result);
-            }
+            LogFailedUpdate(vectorGraphicsMediaType, attempt);
+        }
+    }
+
+    private bool AddMissingPropertyType(IMediaType mediaType, IDataType dataType, PropertyGroup propertyGroup, string alias, string name, string key, int sortOrder)
+    {
+        if (mediaType.PropertyTypes.Any(x => x.Alias == alias))
+        {
+            return false;
+        }
+
+        mediaType.AddPropertyType(new PropertyType(_shortStringHelper, dataType, alias)
+        {
+            Key = new Guid(key),
+            Name = name,
+            SortOrder = sortOrder,
+            PropertyGroupId = new Lazy<int>(() => propertyGroup.Id),
+        });
+
+        return true;
+    }
+
+    private void LogFailedUpdate(IMediaType mediaType, Attempt<ContentTypeOperationStatus> attempt)
+    {
+        if (attempt.Exception is not null)
+        {
+            _logger.LogError(attempt.Exception, "Failed to update media type '{Alias}' during migration.", mediaType.Alias);
+        }
+        else
+        {
+            _logger.LogWarning("Failed to update media type '{Alias}' during migration. Status: {ResultStatus}", mediaType.Alias, attempt.Result);
         }
     }
 }

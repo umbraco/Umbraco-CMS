@@ -17,7 +17,10 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_LIST_ENTRIES_CONTEXT.TYPE
 > {
 	#inlineEditingMode = new UmbBooleanState(undefined);
-	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
+	readonly inlineEditingMode = mergeObservables(
+		[this.#inlineEditingMode.asObservable(), this.isExternalContent],
+		([inlineEditingMode, isExternalContent]) => inlineEditingMode === true && !isExternalContent,
+	);
 	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart((x) =>
 		x ? (x.forceHideContentEditorInOverlay ?? false) : undefined,
 	);
@@ -34,6 +37,12 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT, UMB_BLOCK_LIST_ENTRIES_CONTEXT);
+	}
+
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block List entry element owns the canonical `<umb-ufm-render>` and pushes
+		// resolved text via `setName()`. No hidden virtual renderer is needed here.
+		return false;
 	}
 
 	protected override _gotManager() {

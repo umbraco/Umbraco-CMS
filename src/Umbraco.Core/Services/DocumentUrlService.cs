@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 /// Implements <see href="IDocumentUrlService" /> operations for handling document URLs.
 /// </summary>
-public class DocumentUrlService : IDocumentUrlService
+public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
 {
     /// <summary>
     /// Represents the key used to identify the URL generation rebuild operation.
@@ -50,6 +51,33 @@ public class DocumentUrlService : IDocumentUrlService
 
     /// <inheritdoc/>
     public bool IsInitialized { get; private set; }
+
+    /// <inheritdoc />
+    public string CacheName => "Document URL segments";
+
+    /// <inheritdoc />
+    public long GetApproximateCount() => _documentUrlCache.Count;
+
+    /// <inheritdoc />
+    // The dictionary is enumerated directly (not via .Values, which snapshot-copies the whole collection).
+    public long? GetApproximateBytes()
+        => SampledSizeEstimator.Estimate(_documentUrlCache.Count, _documentUrlCache, static kvp => EstimateUrlSegmentCacheBytes(kvp.Value));
+
+    private static long EstimateUrlSegmentCacheBytes(UrlSegmentCache entry)
+    {
+        // UrlCacheKey (struct: Guid + nullable int + bool) + dictionary bucket + the cache object header.
+        long bytes = 64 + (entry.PrimarySegment.Length * 2L);
+        if (entry.AlternateSegments is not null)
+        {
+            bytes += 24; // array header
+            foreach (var segment in entry.AlternateSegments)
+            {
+                bytes += 16 + ((segment?.Length ?? 0) * 2L);
+            }
+        }
+
+        return bytes;
+    }
 
     /// <summary>
     /// Struct-based cache key for memory-efficient URL segment caching.

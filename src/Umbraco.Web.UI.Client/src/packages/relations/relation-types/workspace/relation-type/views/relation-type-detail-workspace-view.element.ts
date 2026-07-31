@@ -179,7 +179,7 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 	}
 
 	#renderRelations() {
-		if (this._loading) return html`<uui-loader></uui-loader>`;
+		if (this._loading) return html`<umb-view-loader></umb-view-loader>`;
 		return html`
 			<div>
 				<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
@@ -227,13 +227,8 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 				grid-template-columns: 1fr 350px;
 			}
 
-			uui-loader {
-				text-align: center;
-			}
-
 			uui-pagination {
 				margin-top: var(--uui-size-layout-1);
-				display: block;
 			}
 		`,
 	];

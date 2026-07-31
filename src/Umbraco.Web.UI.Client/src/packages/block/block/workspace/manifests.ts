@@ -79,11 +79,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
-		],
-		// eslint-disable-next-line @typescript-eslint/naming-convention
-		TODO_conditions: [
 			{
-				alias: 'Umb.Condition.BlockEntryShowContentEdit',
+				alias: 'Umb.Condition.BlockWorkspaceHasContent',
 			},
 		],
 	} as any,

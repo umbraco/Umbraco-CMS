@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 {
     [TearDown]
-    public void TearDown()
+    public new void TearDown()
     {
         var testHelper = new TestHelper();
 

@@ -102,7 +102,6 @@ test('can select multiple elements in the element picker', async ({umbracoApi, u
   // Act
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.addElementPicker(elementPickerName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for element to be added
   await umbracoUi.library.addElementPicker(secondElementPickerName);
   await umbracoUi.library.clickSaveAndPublishButtonAndWaitForElementToBePublished();
 
@@ -161,7 +160,7 @@ test('can validate minimum amount in element picker', async ({umbracoApi, umbrac
   await umbracoUi.library.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.library.isValidationMessageVisible('You need to add at least ' + minAmount + ' items');
+  await umbracoUi.library.isTextWithExactNameVisible('Minimum ' + minAmount + ' entries, requires 1 more.');
   await umbracoUi.library.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 
@@ -181,7 +180,6 @@ test('can validate maximum amount in element picker', async ({umbracoApi, umbrac
   // Act
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.addElementPicker(elementPickerName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for element to be added
 
   // Assert
   await umbracoUi.library.isChooseButtonVisible(false);
