@@ -16,6 +16,7 @@ public class ImagingSettings
     /// </summary>
     /// <remarks>
     /// Setting or updating this value will cause all existing generated URLs to become invalid and return a 400 Bad Request response code.
+    /// The <see cref="ImagingResizeSettings.MaxWidth" />/<see cref="ImagingResizeSettings.MaxHeight" /> limits are still enforced even when this key is set.
     /// </remarks>
     public byte[] HMACSecretKey { get; set; } = Array.Empty<byte>();
 

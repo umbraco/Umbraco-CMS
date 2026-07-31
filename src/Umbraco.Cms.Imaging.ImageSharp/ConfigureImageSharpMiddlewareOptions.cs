@@ -53,7 +53,6 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
             // Enforce the configured maximum dimensions regardless of HMAC. HMAC authorizes *who*
             // may request processing; MaxWidth/MaxHeight bound *how large* the output may be, and
             // that ceiling stays useful for signed requests too (e.g. if the secret key leaks).
-
             if (context.Commands.Contains(ResizeWebProcessor.Width))
             {
                 if (!int.TryParse(

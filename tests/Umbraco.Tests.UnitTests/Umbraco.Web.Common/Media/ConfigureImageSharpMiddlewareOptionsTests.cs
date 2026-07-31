@@ -57,6 +57,16 @@ public class ConfigureImageSharpMiddlewareOptionsTests
     }
 
     [Test]
+    public async Task Cannot_Request_Negative_Height_When_Hmac_Configured()
+    {
+        ImageCommandContext context = BuildContext((ResizeWebProcessor.Height, "-100"));
+
+        await ConfigureAndParse(withHmac: true, context);
+
+        Assert.IsFalse(context.Commands.Contains(ResizeWebProcessor.Height));
+    }
+
+    [Test]
     public async Task Can_Request_Dimensions_Within_Maximum_When_Hmac_Configured()
     {
         ImageCommandContext context = BuildContext(
