@@ -41,7 +41,7 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
     /// <summary>
     /// Search values for the characters that are we looking for in the Node.Parse
     /// </summary>
-    private static SearchValues<char> _nodeSearchValues = SearchValues.Create("[,]");
+    private static readonly SearchValues<char> _nodeSearchValues = SearchValues.Create("[,]");
 
     private readonly IApiPropertyRenderer _propertyRenderer;
     private readonly IApiPublishedContentCache _apiPublishedContentCache;
@@ -249,12 +249,12 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
 
                 if (idx < 0)
                 {
-                    // No more delimiters: the rest is key text for the current node
+                    // No more delimiters: the rest is key text for the current node.
                     currentNode.Key += valueAsSpan.ToString();
                     break;
                 }
 
-                // Everything before the delimiter is key text for the current node
+                // Everything before the delimiter is key text for the current node.
                 if (idx > 0)
                 {
                     currentNode.Key = valueAsSpan[..idx].ToString();
@@ -262,16 +262,16 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
 
                 switch (valueAsSpan[idx])
                 {
-                    case '[': // Start a new node, child of the current node
+                    case '[': // Start a new node, child of the current node.
                         stack.Push(currentNode);
                         currentNode = new Node();
                         stack.Peek().Items.Add(currentNode);
                         break;
-                    case ',': // Start a new node, but at the same level of the current node
+                    case ',': // Start a new node, but at the same level of the current node.
                         currentNode = new Node();
                         stack.Peek().Items.Add(currentNode);
                         break;
-                    case ']': // Back to parent of the current node
+                    case ']': // Back to parent of the current node.
                         currentNode = stack.Pop();
                         break;
                 }
