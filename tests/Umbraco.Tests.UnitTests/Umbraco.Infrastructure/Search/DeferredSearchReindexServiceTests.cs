@@ -495,10 +495,11 @@ public class DeferredSearchReindexServiceTests
         await service.WaitForWorkerIdleAsync(cts.Token);
 
         _relationService.Verify(
-            x => x.GetParentEntitiesByChildIds(
+            x => x.GetParentEntitiesByChildIdsAsync(
                 It.IsAny<IEnumerable<int>>(),
                 It.IsAny<IEnumerable<string>>(),
-                It.IsAny<UmbracoObjectTypes>()),
+                It.IsAny<UmbracoObjectTypes>(),
+                It.IsAny<CancellationToken>()),
             Times.Never);
         _umbracoIndexingHandler.Verify(
             x => x.ReIndexForContent(It.IsAny<IContent>(), It.IsAny<bool>()),
@@ -508,11 +509,12 @@ public class DeferredSearchReindexServiceTests
     private void SetupRelationGraph(Dictionary<int, (int id, Guid objectType)[]> graph)
     {
         _relationService
-            .Setup(r => r.GetParentEntitiesByChildIds(
+            .Setup(r => r.GetParentEntitiesByChildIdsAsync(
                 It.IsAny<IEnumerable<int>>(),
                 It.IsAny<IEnumerable<string>>(),
-                It.IsAny<UmbracoObjectTypes>()))
-            .Returns((IEnumerable<int> childIds, IEnumerable<string> aliases, UmbracoObjectTypes type) =>
+                It.IsAny<UmbracoObjectTypes>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IEnumerable<int> childIds, IEnumerable<string> aliases, UmbracoObjectTypes type, CancellationToken _) =>
             {
                 // The service queries one object type per call, so mirror the real repository and return only the
                 // parents of the requested type.

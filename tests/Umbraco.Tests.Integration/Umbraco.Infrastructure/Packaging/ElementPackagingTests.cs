@@ -96,7 +96,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         // Remove the originals so the install genuinely re-creates them (import skips items whose key already exists).
         ElementService.Delete(element);
-        ContentTypeService.Delete(elementType);
+        await ContentTypeService.DeleteAsync(elementType, Constants.Security.SuperUserKey);
 
         Assert.That(ElementService.GetById(elementKey), Is.Null);
 
@@ -166,7 +166,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
         ElementService.Delete(element);
         await ElementContainerService.DeleteAsync(containerB.Key, Constants.Security.SuperUserKey);
         await ElementContainerService.DeleteAsync(containerA.Key, Constants.Security.SuperUserKey);
-        ContentTypeService.Delete(elementType);
+        await ContentTypeService.DeleteAsync(elementType, Constants.Security.SuperUserKey);
 
         Assert.That(ElementService.GetById(elementKey), Is.Null);
 

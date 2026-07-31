@@ -22,8 +22,8 @@ public class RelateOnTrashNotificationHandlerTests
         IRelation leftBehindItemRelation = Mock.Of<IRelation>(x => x.RelationType == relationType);
 
         var relationService = new Mock<IRelationService>();
-        relationService.Setup(x => x.GetByChildId(1001)).Returns([restoredItemRelation]);
-        relationService.Setup(x => x.GetByChildId(1002)).Returns([leftBehindItemRelation]);
+        relationService.Setup(x => x.GetByChildIdAsync(1001)).ReturnsAsync([restoredItemRelation]);
+        relationService.Setup(x => x.GetByChildIdAsync(1002)).ReturnsAsync([leftBehindItemRelation]);
 
         RelateOnTrashNotificationHandler handler = CreateHandler(relationService.Object);
 
@@ -40,9 +40,9 @@ public class RelateOnTrashNotificationHandlerTests
 
         handler.Handle(new ContentMovedNotification([restoredItem, leftBehindItem], new EventMessages()));
 
-        relationService.Verify(x => x.Delete(restoredItemRelation), Times.Once);
-        relationService.Verify(x => x.Delete(leftBehindItemRelation), Times.Never);
-        relationService.Verify(x => x.GetByChildId(1002), Times.Never);
+        relationService.Verify(x => x.DeleteRelationAsync(restoredItemRelation), Times.Once);
+        relationService.Verify(x => x.DeleteRelationAsync(leftBehindItemRelation), Times.Never);
+        relationService.Verify(x => x.GetByChildIdAsync(1002), Times.Never);
     }
 
     [Test]
@@ -54,8 +54,8 @@ public class RelateOnTrashNotificationHandlerTests
         IRelation leftBehindItemRelation = Mock.Of<IRelation>(x => x.RelationType == relationType);
 
         var relationService = new Mock<IRelationService>();
-        relationService.Setup(x => x.GetByChildId(2001)).Returns([restoredItemRelation]);
-        relationService.Setup(x => x.GetByChildId(2002)).Returns([leftBehindItemRelation]);
+        relationService.Setup(x => x.GetByChildIdAsync(2001)).ReturnsAsync([restoredItemRelation]);
+        relationService.Setup(x => x.GetByChildIdAsync(2002)).ReturnsAsync([leftBehindItemRelation]);
 
         RelateOnTrashNotificationHandler handler = CreateHandler(relationService.Object);
 
@@ -70,9 +70,9 @@ public class RelateOnTrashNotificationHandlerTests
 
         handler.Handle(new MediaMovedNotification([restoredItem, leftBehindItem], new EventMessages()));
 
-        relationService.Verify(x => x.Delete(restoredItemRelation), Times.Once);
-        relationService.Verify(x => x.Delete(leftBehindItemRelation), Times.Never);
-        relationService.Verify(x => x.GetByChildId(2002), Times.Never);
+        relationService.Verify(x => x.DeleteRelationAsync(restoredItemRelation), Times.Once);
+        relationService.Verify(x => x.DeleteRelationAsync(leftBehindItemRelation), Times.Never);
+        relationService.Verify(x => x.GetByChildIdAsync(2002), Times.Never);
     }
 
     private static RelateOnTrashNotificationHandler CreateHandler(IRelationService relationService)

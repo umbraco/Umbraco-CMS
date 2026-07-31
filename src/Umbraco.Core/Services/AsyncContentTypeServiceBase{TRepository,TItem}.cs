@@ -269,7 +269,7 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
     /// </summary>
     /// <param name="contentTypes">The content types to analyze for changes.</param>
     /// <returns>A collection of content type changes indicating which types were affected and how.</returns>
-    private async Task<IEnumerable<ContentTypeChange<TItem>>> ComposeContentTypeChangesAsync(params TItem[] contentTypes)
+    internal async Task<IEnumerable<ContentTypeChange<TItem>>> ComposeContentTypeChangesAsync(params TItem[] contentTypes)
     {
         // find all content types impacted by the changes,
         // - content type alias changed
@@ -1106,6 +1106,10 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
 
     /// <inheritdoc />
     public async Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(int skip, int take)
+        => await GetAllAllowedInLibraryAsync(null, skip, take);
+
+    /// <inheritdoc />
+    public async Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(Guid? parentKey, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(ReadLockIds);
@@ -1114,7 +1118,7 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
 
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
-            contentTypes = await filter.FilterAllowedInLibraryAsync(contentTypes);
+            contentTypes = await filter.FilterAllowedInLibraryAsync(contentTypes, parentKey);
         }
 
         contentTypes = contentTypes.ToArray();

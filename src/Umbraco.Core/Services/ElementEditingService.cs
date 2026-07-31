@@ -361,7 +361,7 @@ internal sealed class ElementEditingService
             parentId = container.Id;
         }
 
-        IContentType? contentType = ContentTypeService.Get(element.ContentType.Key);
+        IContentType? contentType = await ContentTypeService.GetAsync(element.ContentType.Key);
         if (contentType is null)
         {
             return Attempt.Fail(ContentEditingOperationStatus.ContentTypeNotFound);

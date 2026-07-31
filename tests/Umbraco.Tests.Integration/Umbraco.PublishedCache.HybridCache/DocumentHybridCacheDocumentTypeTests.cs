@@ -155,7 +155,7 @@ internal sealed class DocumentHybridCacheDocumentTypeTests : UmbracoIntegrationT
         // Act - classify both types in a single call (the path that exercises the by-Id multi-type guard).
         IContentTypeService contentTypeService = ContentTypeService;
         var service = (global::Umbraco.Cms.Core.Services.ContentTypeService)contentTypeService;
-        List<ContentTypeChange<IContentType>> changes = service.ComposeContentTypeChanges(composing, composition).ToList();
+        List<ContentTypeChange<IContentType>> changes = (await service.ComposeContentTypeChangesAsync(composing, composition)).ToList();
 
         // Assert - the composing type keeps a full rebuild; the guard prevents the removal-only flag.
         // (It can surface as more than one change entry — the guard must leave none of them flagged.)

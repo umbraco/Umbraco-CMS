@@ -1033,14 +1033,14 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
         var relationService = GetRequiredService<IRelationService>();
 
         // The document (parent) must be related to the element (child) via the external-block-element relation type.
-        var externalBlockRelations = relationService
-            .GetByParent(content, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias)
+        var externalBlockRelations = (await relationService
+            .GetByParentIdAsync(content.Id, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias))
             .ToArray();
         Assert.AreEqual(1, externalBlockRelations.Length, "Expected exactly one umbExternalBlockElement relation from the document to the element.");
 
         // And it must NOT be related via the generic umbElement relation type.
-        var elementRelations = relationService
-            .GetByParent(content, Constants.Conventions.RelationTypes.RelatedElementAlias)
+        var elementRelations = (await relationService
+            .GetByParentIdAsync(content.Id, Constants.Conventions.RelationTypes.RelatedElementAlias))
             .ToArray();
         Assert.AreEqual(0, elementRelations.Length, "External block content must not create a generic umbElement relation.");
     }

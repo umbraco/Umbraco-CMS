@@ -22,7 +22,7 @@ internal sealed class DeferredSearchReindexServiceElementTests : BlockEditorWith
     private DeferredSearchReindexService Service
         => (DeferredSearchReindexService)GetRequiredService<IDeferredSearchReindexService>();
 
-    private int ElementId(Guid key) => IdKeyMap.GetIdForKey(key, UmbracoObjectTypes.Element).Result;
+    private async Task<int> ElementId(Guid key) => (await IdKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Element)).Result;
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -44,7 +44,7 @@ internal sealed class DeferredSearchReindexServiceElementTests : BlockEditorWith
         var elementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
         var content = CreateDocumentEmbeddingElement(contentType, elementKey);
 
-        var elementId = ElementId(elementKey);
+        var elementId = await ElementId(elementKey);
         var documentIds = Service.FindDocumentIdsReferencingElements([elementId]);
 
         Assert.Contains(content.Id, documentIds.ToArray());
@@ -64,11 +64,11 @@ internal sealed class DeferredSearchReindexServiceElementTests : BlockEditorWith
         ContentService.Save(document);
         PublishContent(document, ["*"]);
 
-        var elementId = ElementId(elementKey);
+        var elementId = await ElementId(elementKey);
 
         // The picker created a umbElement relation from the document to the element...
         var relationService = GetRequiredService<IRelationService>();
-        var pickerRelations = relationService.GetByParent(document, Constants.Conventions.RelationTypes.RelatedElementAlias).ToArray();
+        var pickerRelations = (await relationService.GetByParentIdAsync(document.Id, Constants.Conventions.RelationTypes.RelatedElementAlias)).ToArray();
         Assert.AreEqual(1, pickerRelations.Length, "The element picker should create a umbElement relation to the element.");
 
         // ...but a picker reference does not index the element's content, so the document must not be reindexed.
@@ -111,7 +111,7 @@ internal sealed class DeferredSearchReindexServiceElementTests : BlockEditorWith
         // Document D that embeds A as external block content.
         var document = CreateDocumentEmbeddingElement(contentType, outerElementKey);
 
-        var innerElementId = ElementId(innerElementKey);
+        var innerElementId = await ElementId(innerElementKey);
         var documentIds = Service.FindDocumentIdsReferencingElements([innerElementId]);
 
         Assert.Contains(document.Id, documentIds.ToArray(), "Editing the inner element must reindex the document that transitively embeds it.");

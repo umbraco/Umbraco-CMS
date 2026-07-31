@@ -379,10 +379,10 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     }
 
     private IEnumerable<IUmbracoEntity> GetParentEntities(int[] childIds, UmbracoObjectTypes entityType)
-        => _relationService.GetParentEntitiesByChildIds(
+        => _relationService.GetParentEntitiesByChildIdsAsync(
             childIds,
             [Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias],
-            entityType);
+            entityType).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Pages through a repository without acquiring distributed locks and invokes an action for each item.

@@ -50,10 +50,8 @@ public class NavigationServiceMemoryReportingTests
 
     private static IMemoryCacheSizeReporter AsReporter(object service) => (IMemoryCacheSizeReporter)service;
 
-    private static void AssertReportsNodeCountIncludingRecycleBin<TContentType, TContentTypeService>(
-        ContentNavigationServiceBase<TContentType, TContentTypeService> sut)
-        where TContentType : class, IContentTypeComposition
-        where TContentTypeService : IContentTypeBaseService<TContentType>
+    private static void AssertReportsNodeCountIncludingRecycleBin<TService>(TService sut)
+        where TService : INavigationManagementService, IMemoryCacheSizeReporter
     {
         var reporter = AsReporter(sut);
 

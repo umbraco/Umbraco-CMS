@@ -106,13 +106,14 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             return null;
         }
 
+        return await GetNodeAsync(key);
+    }
+
     /// <inheritdoc />
     public long GetApproximateCount() => _publishedContentCache.Count;
 
     /// <inheritdoc />
     public long? GetApproximateBytes() => _publishedContentCache.ApproximateSizeInBytes;
-
-    public Task<IPublishedContent?> GetByKeyAsync(Guid key) => GetNodeAsync(key);
 
     public async Task<IPublishedContent?> GetByIdAsync(int id)
     {

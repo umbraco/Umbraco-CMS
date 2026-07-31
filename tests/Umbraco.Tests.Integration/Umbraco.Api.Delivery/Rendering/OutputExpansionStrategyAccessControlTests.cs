@@ -128,7 +128,7 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
     public async Task ContentPicker_Protected_Reference_Has_Properties_Cleared_When_Member_Has_No_Access()
     {
         (IContent target, IContent host) = await ArrangeContentPickerScenarioAsync();
-        ProtectContent(target);
+        await ProtectContent(target);
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
@@ -143,7 +143,7 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
     public async Task ContentPicker_Protected_Reference_Retains_Properties_When_Member_Has_Access()
     {
         (IContent target, IContent host) = await ArrangeContentPickerScenarioAsync();
-        ProtectContent(target);
+        await ProtectContent(target);
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
@@ -200,7 +200,7 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
     public async Task MultiNodeTreePicker_Protected_Reference_Has_Properties_Cleared_When_Member_Has_No_Access()
     {
         (IContent target, IContent host) = await ArrangeMultiNodeTreePickerScenarioAsync();
-        ProtectContent(target);
+        await ProtectContent(target);
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
@@ -216,7 +216,7 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
     public async Task MultiNodeTreePicker_Protected_Reference_Retains_Properties_When_Member_Has_Access()
     {
         (IContent target, IContent host) = await ArrangeMultiNodeTreePickerScenarioAsync();
-        ProtectContent(target);
+        await ProtectContent(target);
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
@@ -398,10 +398,10 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
         refresher.Refresh(payloads);
     }
 
-    private void ProtectContent(IContent content)
+    private async Task ProtectContent(IContent content)
     {
         PublicAccessRule[] rules = [new PublicAccessRule { RuleType = "TestType", RuleValue = "TestVal" }];
-        var result = PublicAccessService.Save(new PublicAccessEntry(content, content, content, rules));
+        Attempt<OperationResult?> result = await PublicAccessService.SaveAsync(new PublicAccessEntry(content, content, content, rules));
         Assert.IsTrue(result.Success);
     }
 

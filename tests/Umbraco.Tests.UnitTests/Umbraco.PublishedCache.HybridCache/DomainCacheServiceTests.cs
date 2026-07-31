@@ -118,12 +118,12 @@ internal sealed class DomainCacheServiceTests
         Assert.IsEmpty(sut.GetAll(true));
 
         // A Refresh payload for a previously unknown domain adds it to the cache.
-        domainService.Setup(x => x.GetById(5)).Returns(CreateDomain(5, "https://site.example/", 2002, "en-US", isWildcard: false));
+        domainService.Setup(x => x.GetByIdAsync(5)).ReturnsAsync(CreateDomain(5, "https://site.example/", 2002, "en-US", isWildcard: false));
         sut.Refresh([new DomainCacheRefresher.JsonPayload(5, DomainChangeTypes.Refresh)]);
         Domain[] afterAdd = sut.GetAll(false).ToArray();
 
         // A second Refresh for the same id with changed data must update in place, not duplicate the entry.
-        domainService.Setup(x => x.GetById(5)).Returns(CreateDomain(5, "https://renamed.example/", 3003, "en-US", isWildcard: false));
+        domainService.Setup(x => x.GetByIdAsync(5)).ReturnsAsync(CreateDomain(5, "https://renamed.example/", 3003, "en-US", isWildcard: false));
         sut.Refresh([new DomainCacheRefresher.JsonPayload(5, DomainChangeTypes.Refresh)]);
         Domain[] afterUpdate = sut.GetAll(false).ToArray();
 

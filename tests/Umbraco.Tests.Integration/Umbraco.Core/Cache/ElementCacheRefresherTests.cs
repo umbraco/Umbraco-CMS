@@ -29,7 +29,7 @@ internal sealed class ElementCacheRefresherTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private int ElementId(Guid key) => IdKeyMap.GetIdForKey(key, UmbracoObjectTypes.Element).Result;
+    private async Task<int> ElementId(Guid key) => (await IdKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Element)).Result;
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -51,7 +51,7 @@ internal sealed class ElementCacheRefresherTests : UmbracoIntegrationTest
     {
         var elementType = await CreateElementType();
         var elementKey = await CreateAndPublishElement(elementType.Key);
-        var elementId = ElementId(elementKey);
+        var elementId = await ElementId(elementKey);
 
         _sink.Payloads.Clear();
 
@@ -66,7 +66,7 @@ internal sealed class ElementCacheRefresherTests : UmbracoIntegrationTest
     {
         var elementType = await CreateElementType();
         var elementKey = await CreateAndPublishElement(elementType.Key);
-        var elementId = ElementId(elementKey);
+        var elementId = await ElementId(elementKey);
 
         _sink.Payloads.Clear();
 

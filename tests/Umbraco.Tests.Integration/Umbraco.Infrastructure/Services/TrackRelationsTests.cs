@@ -249,7 +249,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         (IContent source, IContent targetA, IContent targetB) = await CreatePublishedContentPickerScenario();
 
         // The published document references target A via the content picker.
-        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id }));
+        Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id }));
 
         // Unpublish. The document no longer has a live published version, but the property's PublishedValue still holds target A.
         Assert.IsTrue(ContentService.Unpublish(source).Success);
@@ -260,7 +260,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         ContentService.Save(draft);
 
         // The stale relation to target A (from the previously-published snapshot) must be gone; only the draft reference to B remains.
-        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
+        Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
     }
 
     [Test]
@@ -274,13 +274,13 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         IContent draft = ContentService.GetById(source.Id)!;
         draft.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetB.Key).ToString());
         ContentService.Save(draft);
-        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id, targetB.Id }));
+        Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id, targetB.Id }));
 
         // Unpublish. There is no longer a live published version, so the stale published reference to A must be removed,
         // leaving only the draft reference to B.
         Assert.IsTrue(ContentService.Unpublish(draft).Success);
 
-        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
+        Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
     }
 
     [Test]
@@ -316,7 +316,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
         // The automatic relation exists for the published content before its content type (and the content
         // itself) is deleted.
-        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { target.Id }));
+        Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { target.Id }));
 
         // Deleting the content type cascades to permanently deleting the published content within the same scope
         // that later raises ContentUnpublishedNotification for it. Before the fix, ContentRelationsUpdate would
@@ -325,7 +325,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(ContentTypeOperationStatus.Success, status);
 
         Assert.IsNull(ContentService.GetById(source.Id));
-        Assert.IsEmpty(RelationService.GetByChildId(target.Id));
+        Assert.IsEmpty(await RelationService.GetByChildIdAsync(target.Id));
     }
 
     private async Task<(IContent Source, IContent TargetA, IContent TargetB)> CreatePublishedContentPickerScenario()

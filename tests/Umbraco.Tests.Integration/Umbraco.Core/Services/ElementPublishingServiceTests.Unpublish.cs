@@ -163,7 +163,7 @@ public partial class ElementPublishingServiceTests
             Constants.Security.SuperUserKey);
 
         // Embedding an element as external block content records this relation, which must protect it from unpublish.
-        RelationService.Relate(referencingElement.Id, referencedElement.Id, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias);
+        await RelationService.RelateAsync(referencingElement.Id, referencedElement.Id, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias);
 
         var unpublishAttempt = await ElementPublishingService.UnpublishAsync(
             referencedElement.Key,

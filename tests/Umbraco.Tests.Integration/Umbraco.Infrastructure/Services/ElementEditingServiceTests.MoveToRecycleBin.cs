@@ -133,7 +133,7 @@ public partial class ElementEditingServiceTests
         var referencedElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
 
         // Embedding an element as external block content records this relation, which must protect it the same way.
-        RelationService.Relate(
+        await RelationService.RelateAsync(
             referencingElement.Id,
             referencedElement.Id,
             Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias);

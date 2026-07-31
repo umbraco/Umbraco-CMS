@@ -230,7 +230,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 memberTypeService,
                 dataTypeContainerService,
                 StaticServiceProvider.Instance.GetRequiredService<IElementService>(),
-                StaticServiceProvider.Instance.GetRequiredService<IElementContainerService>())
+                StaticServiceProvider.Instance.GetRequiredService<IElementContainerService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IContentTypeContainerService>())
         {
         }
 
@@ -436,6 +437,32 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
             => ImportContentBase(roots, parentId, importedDocumentTypes, userId, alias => typeService.Get(alias), service);
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentBase"/> items using the (asynchronous) document type service.
+        /// </summary>
+        /// <param name="roots">The root contents to import from</param>
+        /// <param name="parentId">Optional parent Id for the content being imported</param>
+        /// <param name="importedDocumentTypes">A dictionary of already imported document types (basically used as a cache)</param>
+        /// <param name="userId">Optional Id of the user performing the import</param>
+        /// <param name="typeService">The document type service</param>
+        /// <param name="service">The content service base</param>
+        /// <returns>An enumerable list of generated content</returns>
+        public IEnumerable<TContentBase> ImportContentBase<TContentBase>(
+            IEnumerable<XElement> roots,
+            int parentId,
+            IDictionary<string, IContentType> importedDocumentTypes,
+            int userId,
+            IContentTypeService typeService,
+            IContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            => ImportContentBase(
+                roots,
+                parentId,
+                importedDocumentTypes,
+                userId,
+                alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
+                service);
 
         private IEnumerable<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
             IEnumerable<XElement> roots,

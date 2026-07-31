@@ -358,74 +358,17 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             List<RelationDto> dtos = await BaseQuery(db).OrderBy(x => x.RelationType).ToListAsync();
             return await BuildEntitiesAsync(dtos);
         });
+
     /// <inheritdoc />
+    /// <remarks>
+    ///     TODO: Implement when <see cref="EntityRepository"/> is migrated to EF Core. See <see cref="GetPagedParentEntitiesByChildIdAsync"/>.
+    /// </remarks>
     public IEnumerable<IUmbracoEntity> GetParentEntitiesByChildIds(
         int[] childIds,
         int[] relationTypes,
         Guid entityType)
-    {
-        if (childIds.Length == 0)
-        {
-            return [];
-        }
-
-        // A parent relates to a separate row per child, so it can be returned more than once (within a batch or
-        // across batches); de-duplicate by node id so each parent entity is returned once.
-        var results = new Dictionary<int, IUmbracoEntity>();
-        var childIdsPerQuery = Constants.Sql.MaxParameterCount - relationTypes.Length - 1;
-        foreach (IEnumerable<int> group in childIds.InGroupsOf(childIdsPerQuery))
-        {
-            var batch = group.ToArray();
-            IEnumerable<IUmbracoEntity> parents = _entityRepository.GetPagedResultsByQuery(
-                Query<IUmbracoEntity>(),
-                [entityType],
-                0,
-                int.MaxValue,
-                out _,
-                null,
-                null,
-                sql =>
-                {
-                    SqlJoinRelations(sql);
-
-                    sql.WhereIn<RelationDto>(rel => rel.ChildId, batch);
-                    sql.Where<RelationDto, NodeDto>((rel, node) => node.NodeId == rel.ParentId);
-
-                    if (relationTypes.Length > 0)
-                    {
-                        sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
-                    }
-                });
-
-            foreach (IUmbracoEntity parent in parents)
-            {
-                results.TryAdd(parent.Id, parent);
-            }
-        }
-
-        return results.Values;
-    }
-
-    /// <summary>
-    /// Retrieves a paged collection of child entities related to the specified parent entity by its ID.
-    /// </summary>
-    /// <param name="parentId">The identifier of the parent entity.</param>
-    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
-    /// <param name="pageSize">The number of child entities to include per page.</param>
-    /// <param name="totalRecords">When this method returns, contains the total number of child entities related to the parent.</param>
-    /// <param name="relationTypes">An optional array of relation type IDs to filter the relations. Pass an empty array to include all relation types.</param>
-    /// <param name="entityTypes">A set of entity type GUIDs to filter the child entities. This parameter is variadic (params).</param>
-    /// <returns>An enumerable collection of child entities that match the specified criteria.</returns>
-    public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
-
-        // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
-        // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
-        // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
-        // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
-        // will just return the bare minimum entity data.
-        _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
-            {
-                SqlJoinRelations(sql);
+        => throw new NotImplementedException(
+            "GetParentEntitiesByChildIds depends on EntityRepository being migrated to EF Core.");
 
     /// <inheritdoc />
     protected override async Task<IEnumerable<IRelation>?> PerformGetManyAsync(int[]? keys)

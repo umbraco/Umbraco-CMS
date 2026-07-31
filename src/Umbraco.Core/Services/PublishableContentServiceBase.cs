@@ -933,7 +933,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        var allLangs = _languageRepository.GetMany().ToList();
+        var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -987,7 +987,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
 
-        var allLangs = _languageRepository.GetMany().ToList();
+        var allLangs = _languageRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToList();
 
         // Change state to publishing
         content.PublishedState = PublishedState.Publishing;

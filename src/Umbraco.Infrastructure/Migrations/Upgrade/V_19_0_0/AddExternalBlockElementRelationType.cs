@@ -24,13 +24,13 @@ public class AddExternalBlockElementRelationType : AsyncMigrationBase
         => _relationService = relationService;
 
     /// <inheritdoc />
-    protected override Task MigrateAsync()
+    protected override async Task MigrateAsync()
     {
-        IRelationType? relationType = _relationService.GetRelationTypeByAlias(
+        IRelationType? relationType = await _relationService.GetRelationTypeByAliasAsync(
             Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias);
         if (relationType != null)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         // Generate the same unique key a fresh install would produce.
@@ -49,8 +49,6 @@ public class AddExternalBlockElementRelationType : AsyncMigrationBase
         {
             Key = key
         };
-        _relationService.Save(relationType);
-
-        return Task.CompletedTask;
+        await _relationService.SaveAsync(relationType);
     }
 }
