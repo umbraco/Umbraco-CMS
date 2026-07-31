@@ -2133,11 +2133,8 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public void Can_Move_PropertyType_From_No_Group_Into_Group()
     {
-        IContentType basePage = CreateContentTypeWithSingleGroupedProperty();
-
-        basePage.MovePropertyType("title", null);
-        ContentTypeService.Save(basePage);
-        basePage = ContentTypeService.Get(basePage.Id);
+        IContentType basePage = CreateContentTypeWithSingleUngroupedProperty();
+        Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias, "the property type should start un-grouped");
 
         Assert.IsTrue(basePage.MovePropertyType("title", "content"));
 
@@ -2162,8 +2159,28 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
     {
         ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
         basePage.AddPropertyGroup("content", "Content");
+        Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType(), "content", "Content"));
 
-        var titlePropertyType = new PropertyType(
+        ContentTypeService.Save(basePage);
+
+        return ContentTypeService.Get(basePage.Id);
+    }
+
+    private IContentType CreateContentTypeWithSingleUngroupedProperty()
+    {
+        ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
+        basePage.AddPropertyGroup("content", "Content");
+
+        // the single argument overload adds the property type without a group
+        Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType()));
+
+        ContentTypeService.Save(basePage);
+
+        return ContentTypeService.Get(basePage.Id);
+    }
+
+    private PropertyType CreateTitlePropertyType() =>
+        new(
             ShortStringHelper,
             Constants.PropertyEditors.Aliases.TextBox,
             ValueStorageType.Nvarchar,
@@ -2175,12 +2192,6 @@ internal sealed class ContentTypeServiceTests : UmbracoIntegrationTest
             SortOrder = 1,
             DataTypeId = Constants.DataTypes.Textbox,
         };
-        Assert.IsTrue(basePage.AddPropertyType(titlePropertyType, "content", "Content"));
-
-        ContentTypeService.Save(basePage);
-
-        return ContentTypeService.Get(basePage.Id);
-    }
 
     [Test]
     public void Can_Add_PropertyGroup_With_Same_Name_On_Parent_and_Child()

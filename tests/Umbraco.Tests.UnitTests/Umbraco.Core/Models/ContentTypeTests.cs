@@ -342,8 +342,8 @@ public class ContentTypeTests
     [Test]
     public void Can_Move_Already_Ungrouped_PropertyType_To_No_Group()
     {
-        var contentType = BuildContentTypeWithSingleGroup();
-        contentType.MovePropertyType("title", null);
+        var contentType = BuildContentTypeWithUngroupedProperty();
+        Assert.That(contentType.NoGroupPropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
 
         // Moving a property that is already un-grouped is a no-op, and must not duplicate it.
         Assert.IsTrue(contentType.MovePropertyType("title", null));
@@ -406,6 +406,27 @@ public class ContentTypeTests
                     .WithName("Title")
                     .WithSortOrder(1)
                     .Done()
+                .Done()
+            .Build();
+
+    /// <remarks>
+    ///     A property type added at the builder root belongs to no group, so this yields an empty
+    ///     property group alongside an un-grouped property type.
+    /// </remarks>
+    private static ContentType BuildContentTypeWithUngroupedProperty() =>
+        (ContentType)new ContentTypeBuilder()
+            .WithAlias("textPage")
+            .WithName("Text Page")
+            .WithPropertyTypeIdsIncrementingFrom(200)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("title")
+                .WithName("Title")
+                .WithSortOrder(1)
                 .Done()
             .Build();
 
