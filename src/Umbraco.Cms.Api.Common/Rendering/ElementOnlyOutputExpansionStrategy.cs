@@ -1,3 +1,4 @@
+using System.Buffers;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -36,6 +37,11 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
     ///     The name of the fields query parameter.
     /// </summary>
     protected const string FieldsParameterName = "fields";
+
+    /// <summary>
+    /// Search values for the characters that are we looking for in the Node.Parse
+    /// </summary>
+    private static SearchValues<char> _nodeSearchValues = SearchValues.Create("[,]");
 
     private readonly IApiPropertyRenderer _propertyRenderer;
     private readonly IApiPublishedContentCache _apiPublishedContentCache;
@@ -237,10 +243,9 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
             var currentNode = new Node();
             root.Items.Add(currentNode);
 
-            const string delimiters = "[,]";
             while (!valueAsSpan.IsEmpty)
             {
-                int idx = valueAsSpan.IndexOfAny(delimiters);
+                int idx = valueAsSpan.IndexOfAny(_nodeSearchValues);
 
                 if (idx < 0)
                 {
@@ -252,7 +257,7 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
                 // Everything before the delimiter is key text for the current node
                 if (idx > 0)
                 {
-                    currentNode.Key += valueAsSpan[..idx].ToString();
+                    currentNode.Key = valueAsSpan[..idx].ToString();
                 }
 
                 switch (valueAsSpan[idx])
