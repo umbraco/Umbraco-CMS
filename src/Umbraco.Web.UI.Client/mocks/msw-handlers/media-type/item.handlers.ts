@@ -1,7 +1,6 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMediaTypeMockDb } from '../../db/media-type.db.js';
 import { UMB_SLUG } from './slug.js';
-import { pageResponse } from '../../utils.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const itemHandlers = [
@@ -39,11 +38,15 @@ export const itemHandlers = [
 	}),
 
 	http.get(umbracoPath(`/item${UMB_SLUG}/allowed`), ({ request }) => {
-		const fileExtension = new URL(request.url).searchParams.get('fileExtension');
+		const url = new URL(request.url);
+		const fileExtension = url.searchParams.get('fileExtension');
 		if (!fileExtension) return;
 
-		const response = umbMediaTypeMockDb.getAllowedByFileExtension(fileExtension);
+		const skip = Number(url.searchParams.get('skip')) || 0;
+		const take = Number(url.searchParams.get('take')) || 100;
 
-		return HttpResponse.json(pageResponse(response, request));
+		const response = umbMediaTypeMockDb.getAllowedByFileExtension(fileExtension, skip, take);
+
+		return HttpResponse.json(response);
 	}),
 ];

@@ -50,37 +50,3 @@ export function createProblemDetails(problemDetails: {
 }): object {
 	return problemDetails;
 }
-
-/**
- * Applies the `skip` and `take` query parameters of a request to an already-collected paged response, so a mocked
- * endpoint pages like the real one does. `total` remains the full count.
- * @param {object} response The full set of items, with their total.
- * @param {Request} request The intercepted request to read `skip` and `take` from.
- * @returns {object} The requested page of items, with the unchanged total.
- */
-export function pageResponse<ItemType>(
-	response: { items: Array<ItemType>; total: number },
-	request: Request,
-): { items: Array<ItemType>; total: number } {
-	const url = new URL(request.url);
-	const skip = readNumber(url.searchParams.get('skip'), 0);
-	const take = readNumber(url.searchParams.get('take'), 100);
-
-	return { items: response.items.slice(skip, skip + take), total: response.total };
-}
-
-/**
- * Reads a numeric query parameter, falling back when it is absent or unparseable. An explicit `0` is honoured
- * rather than treated as absent.
- * @param {string | null} value The raw query parameter value.
- * @param {number} fallback The value to use when the parameter is absent or not a number.
- * @returns {number} The parsed number, or the fallback.
- */
-function readNumber(value: string | null, fallback: number): number {
-	if (value === null) {
-		return fallback;
-	}
-
-	const parsed = Number(value);
-	return Number.isFinite(parsed) ? parsed : fallback;
-}
