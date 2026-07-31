@@ -5,143 +5,100 @@ using Umbraco.Tests.Benchmarks.Config;
 
 namespace Umbraco.Tests.Benchmarks;
 
+/// <summary>
+///     Compares <see cref="CompositeStringStringKey" /> against <see cref="OldCompositeStringStringKey" />, the
+///     implementation that lower-cased both parts on construction, on the culture/segment lookups performed by
+///     <c>PublishedProperty</c>.
+/// </summary>
+/// <remarks>
+///     <para>
+///         The pairs are chosen to show where the two differ: <see cref="string.ToLowerInvariant" /> returns the
+///         same instance when a part is already lower-case ASCII, so the baseline only allocates for parts that
+///         actually contain an upper-case character - such as the conventional <c>en-US</c> culture form.
+///     </para>
+/// </remarks>
 [QuickRunWithMemoryDiagnoserConfig]
 public class CompositeStringStringKeyBenchmarks
 {
-    // Represents the culture/segment pair used in variant content property lookups.
     private const string Culture = "en-US";
     private const string Segment = "default";
 
-    // Mixed-case variant to exercise case-insensitive lookup correctness.
+    private const string LowerCaseCulture = "en-us";
+
     private const string CultureMixedCase = "EN-us";
     private const string SegmentMixedCase = "DEFAULT";
 
     private const string SomeValue = "property value";
 
-    private ConcurrentDictionary<OldCompositeStringStringKey, string> _currentDict = null!;
-    private ConcurrentDictionary<NewIgnoreCaseCompositeStringStringKey, string> _proposedDict = null!;
+    private ConcurrentDictionary<OldCompositeStringStringKey, string> _oldDictionary = null!;
+    private ConcurrentDictionary<CompositeStringStringKey, string> _newDictionary = null!;
 
     [GlobalSetup]
     public void Setup()
     {
-        _currentDict = new ConcurrentDictionary<OldCompositeStringStringKey, string>();
-        _currentDict[new OldCompositeStringStringKey(Culture, Segment)] = SomeValue;
+        _oldDictionary = new ConcurrentDictionary<OldCompositeStringStringKey, string>
+        {
+            [new OldCompositeStringStringKey(Culture, Segment)] = SomeValue,
+        };
 
-        _proposedDict = new ConcurrentDictionary<NewIgnoreCaseCompositeStringStringKey, string>();
-        _proposedDict[new NewIgnoreCaseCompositeStringStringKey(Culture, Segment)] = SomeValue;
+        _newDictionary = new ConcurrentDictionary<CompositeStringStringKey, string>
+        {
+            [new CompositeStringStringKey(Culture, Segment)] = SomeValue,
+        };
     }
 
     // --- Construction ---
 
-    [Benchmark(Baseline = true, Description = "Current: construct key (allocates 2 strings)")]
-    public OldCompositeStringStringKey Current_Construct()
+    [Benchmark(Baseline = true, Description = "ToLowerInvariant: construct key")]
+    public OldCompositeStringStringKey Old_Construct()
         => new(Culture, Segment);
 
-    [Benchmark(Description = "Proposed: construct key (zero allocations)")]
-    public NewIgnoreCaseCompositeStringStringKey Proposed_Construct()
+    [Benchmark(Description = "OrdinalIgnoreCase: construct key")]
+    public CompositeStringStringKey New_Construct()
         => new(Culture, Segment);
 
-    // --- Dictionary lookup (same case as stored) ---
+    // --- Dictionary lookup, same casing as the stored key ---
 
-    [Benchmark(Description = "Current: TryGetValue (same case)")]
-    public bool Current_TryGetValue_SameCase()
-        => _currentDict.TryGetValue(new OldCompositeStringStringKey(Culture, Segment), out _);
+    [Benchmark(Description = "ToLowerInvariant: TryGetValue (same case)")]
+    public bool Old_TryGetValue_SameCase()
+        => _oldDictionary.TryGetValue(new OldCompositeStringStringKey(Culture, Segment), out _);
 
-    [Benchmark(Description = "Proposed: TryGetValue (same case)")]
-    public bool Proposed_TryGetValue_SameCase()
-        => _proposedDict.TryGetValue(new NewIgnoreCaseCompositeStringStringKey(Culture, Segment), out _);
+    [Benchmark(Description = "OrdinalIgnoreCase: TryGetValue (same case)")]
+    public bool New_TryGetValue_SameCase()
+        => _newDictionary.TryGetValue(new CompositeStringStringKey(Culture, Segment), out _);
 
-    // --- Dictionary lookup (mixed case — validates case-insensitive semantics) ---
+    // --- Dictionary lookup, different casing from the stored key ---
 
-    [Benchmark(Description = "Current: TryGetValue (mixed case)")]
-    public bool Current_TryGetValue_MixedCase()
-        => _currentDict.TryGetValue(new OldCompositeStringStringKey(CultureMixedCase, SegmentMixedCase), out _);
+    [Benchmark(Description = "ToLowerInvariant: TryGetValue (mixed case)")]
+    public bool Old_TryGetValue_MixedCase()
+        => _oldDictionary.TryGetValue(new OldCompositeStringStringKey(CultureMixedCase, SegmentMixedCase), out _);
 
-    [Benchmark(Description = "Proposed: TryGetValue (mixed case)")]
-    public bool Proposed_TryGetValue_MixedCase()
-        => _proposedDict.TryGetValue(new NewIgnoreCaseCompositeStringStringKey(CultureMixedCase, SegmentMixedCase), out _);
+    [Benchmark(Description = "OrdinalIgnoreCase: TryGetValue (mixed case)")]
+    public bool New_TryGetValue_MixedCase()
+        => _newDictionary.TryGetValue(new CompositeStringStringKey(CultureMixedCase, SegmentMixedCase), out _);
 
-    // | Method                                         | Mean       | Error      | StdDev    | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
-    // |----------------------------------------------- |-----------:|-----------:|----------:|------:|--------:|-------:|----------:|------------:|
-    // | 'Current: construct key (allocates 2 strings)' | 18.5547 ns | 45.7258 ns | 2.5064 ns |  1.01 |    0.16 | 0.0023 |      32 B |        1.00 |
-    // | 'Proposed: construct key (zero allocations)'   |  0.1854 ns |  0.0584 ns | 0.0032 ns |  0.01 |    0.00 |      - |         - |        0.00 |
-    // | 'Current: TryGetValue (same case)'             | 46.4106 ns | 17.0343 ns | 0.9337 ns |  2.53 |    0.29 | 0.0023 |      32 B |        1.00 |
-    // | 'Proposed: TryGetValue (same case)'            | 13.5532 ns |  7.1661 ns | 0.3928 ns |  0.74 |    0.08 |      - |         - |        0.00 |
-    // | 'Current: TryGetValue (mixed case)'            | 47.2566 ns | 12.3332 ns | 0.6760 ns |  2.58 |    0.29 | 0.0053 |      72 B |        2.25 |
-    // | 'Proposed: TryGetValue (mixed case)'           | 22.7429 ns |  4.5167 ns | 0.2476 ns |  1.24 |    0.14 |      - |         - |        0.00 |
-}
+    // --- Dictionary lookup, parts already lower-case (the baseline's non-allocating path) ---
 
-public struct OldCompositeStringStringKey : IEquatable<OldCompositeStringStringKey>
-{
-    private readonly string _key1;
-    private readonly string _key2;
+    [Benchmark(Description = "ToLowerInvariant: TryGetValue (already lower-case)")]
+    public bool Old_TryGetValue_LowerCase()
+        => _oldDictionary.TryGetValue(new OldCompositeStringStringKey(LowerCaseCulture, Segment), out _);
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="OldCompositeStringStringKey" /> struct.
-    /// </summary>
-    public OldCompositeStringStringKey(string? key1, string? key2)
-    {
-        _key1 = key1?.ToLowerInvariant() ?? throw new ArgumentNullException(nameof(key1));
-        _key2 = key2?.ToLowerInvariant() ?? throw new ArgumentNullException(nameof(key2));
-    }
+    [Benchmark(Description = "OrdinalIgnoreCase: TryGetValue (already lower-case)")]
+    public bool New_TryGetValue_LowerCase()
+        => _newDictionary.TryGetValue(new CompositeStringStringKey(LowerCaseCulture, Segment), out _);
 
-    /// <summary>
-    ///     Determines whether two <see cref="OldCompositeStringStringKey" /> instances are equal.
-    /// </summary>
-    /// <param name="key1">The first key to compare.</param>
-    /// <param name="key2">The second key to compare.</param>
-    /// <returns><c>true</c> if the two keys are equal; otherwise, <c>false</c>.</returns>
-    public static bool operator ==(OldCompositeStringStringKey key1, OldCompositeStringStringKey key2)
-        => key1._key2 == key2._key2 && key1._key1 == key2._key1;
-
-    /// <summary>
-    ///     Determines whether two <see cref="OldCompositeStringStringKey" /> instances are not equal.
-    /// </summary>
-    /// <param name="key1">The first key to compare.</param>
-    /// <param name="key2">The second key to compare.</param>
-    /// <returns><c>true</c> if the two keys are not equal; otherwise, <c>false</c>.</returns>
-    public static bool operator !=(OldCompositeStringStringKey key1, OldCompositeStringStringKey key2)
-        => key1._key2 != key2._key2 || key1._key1 != key2._key1;
-
-    /// <inheritdoc />
-    public bool Equals(OldCompositeStringStringKey other)
-        => _key2 == other._key2 && _key1 == other._key1;
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
-        => obj is OldCompositeStringStringKey other && _key2 == other._key2 && _key1 == other._key1;
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-        => (_key2.GetHashCode() * 31) + _key1.GetHashCode();
-}
-
-public readonly struct NewIgnoreCaseCompositeStringStringKey : IEquatable<NewIgnoreCaseCompositeStringStringKey>
-{
-    private readonly string _key1;
-    private readonly string _key2;
-
-    public NewIgnoreCaseCompositeStringStringKey(string? key1, string? key2)
-    {
-        _key1 = key1 ?? throw new ArgumentNullException(nameof(key1));
-        _key2 = key2 ?? throw new ArgumentNullException(nameof(key2));
-    }
-
-    public static bool operator ==(NewIgnoreCaseCompositeStringStringKey left, NewIgnoreCaseCompositeStringStringKey right)
-        => left.Equals(right);
-
-    public static bool operator !=(NewIgnoreCaseCompositeStringStringKey left, NewIgnoreCaseCompositeStringStringKey right)
-        => !left.Equals(right);
-
-    public bool Equals(NewIgnoreCaseCompositeStringStringKey other)
-        => StringComparer.OrdinalIgnoreCase.Equals(_key1, other._key1)
-        && StringComparer.OrdinalIgnoreCase.Equals(_key2, other._key2);
-
-    public override bool Equals(object? obj)
-        => obj is NewIgnoreCaseCompositeStringStringKey other && Equals(other);
-
-    public override int GetHashCode()
-        => HashCode.Combine(
-            StringComparer.OrdinalIgnoreCase.GetHashCode(_key1),
-            StringComparer.OrdinalIgnoreCase.GetHashCode(_key2));
+    // The construction rows are not comparable: BenchmarkDotNet reports ZeroMeasurement for the current key,
+    // as the JIT elides construction of a two-field struct from constants. The allocation column is the
+    // meaningful comparison there.
+    //
+    // | Method                                               | Mean       | Error      | StdDev    | Ratio | Gen0   | Allocated |
+    // |----------------------------------------------------- |-----------:|-----------:|----------:|------:|-------:|----------:|
+    // | 'ToLowerInvariant: construct key'                    | 26.7926 ns |  2.5657 ns | 0.1406 ns | 1.000 | 0.0074 |      32 B |
+    // | 'OrdinalIgnoreCase: construct key'                   |  0.0434 ns |  0.8742 ns | 0.0479 ns | 0.002 |      - |         - |
+    // | 'ToLowerInvariant: TryGetValue (same case)'          | 51.2673 ns |  5.2213 ns | 0.2862 ns | 1.914 | 0.0073 |      32 B |
+    // | 'OrdinalIgnoreCase: TryGetValue (same case)'         | 20.2004 ns | 30.0808 ns | 1.6488 ns | 0.754 |      - |         - |
+    // | 'ToLowerInvariant: TryGetValue (mixed case)'         | 61.1120 ns | 25.7051 ns | 1.4090 ns | 2.281 | 0.0167 |      72 B |
+    // | 'OrdinalIgnoreCase: TryGetValue (mixed case)'        | 32.6253 ns | 14.1231 ns | 0.7741 ns | 1.218 |      - |         - |
+    // | 'ToLowerInvariant: TryGetValue (already lower-case)' | 37.2797 ns | 13.8898 ns | 0.7613 ns | 1.391 |      - |         - |
+    // | 'OrdinalIgnoreCase: TryGetValue (already lower-case)'| 25.2868 ns | 11.6050 ns | 0.6361 ns | 0.944 |      - |         - |
 }
