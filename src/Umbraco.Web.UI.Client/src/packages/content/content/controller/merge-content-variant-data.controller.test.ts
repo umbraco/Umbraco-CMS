@@ -96,6 +96,12 @@ const innerValue = (culture: string | null, value: string): UmbPropertyValueData
 	value,
 });
 
+/** A block holding one `text` value per culture, keyed by culture. */
+const block = (key: string, valuesByCulture: Record<string, string>) => ({
+	key,
+	values: Object.entries(valuesByCulture).map(([culture, value]) => innerValue(culture, value)),
+});
+
 describe('UmbMergeContentVariantDataController', () => {
 	describe('Block-shaped resolver', () => {
 		beforeEach(async () => {
@@ -120,9 +126,9 @@ describe('UmbMergeContentVariantDataController', () => {
 			const persistedData: UmbContentLikeDetailModel = {
 				values: [
 					blockValue([
-						{ key: 'block-a', values: [innerValue('da', 'a-da'), innerValue('de', 'a-de')] },
-						{ key: 'block-b', values: [innerValue('da', 'b-da'), innerValue('de', 'b-de')] },
-						{ key: 'block-c', values: [innerValue('da', 'c-da'), innerValue('de', 'c-de')] },
+						block('block-a', { da: 'a-da', de: 'a-de' }),
+						block('block-b', { da: 'b-da', de: 'b-de' }),
+						block('block-c', { da: 'c-da', de: 'c-de' }),
 					]),
 				],
 			};
@@ -132,8 +138,8 @@ describe('UmbMergeContentVariantDataController', () => {
 			const runtimeData: UmbContentLikeDetailModel = {
 				values: [
 					blockValue([
-						{ key: 'block-b', values: [innerValue('da', 'b-da'), innerValue('de', 'b-de-edited')] },
-						{ key: 'block-c', values: [innerValue('da', 'c-da'), innerValue('de', 'c-de-edited')] },
+						block('block-b', { da: 'b-da', de: 'b-de-edited' }),
+						block('block-c', { da: 'c-da', de: 'c-de-edited' }),
 					]),
 				],
 			};
