@@ -102,21 +102,26 @@ const block = (key: string, valuesByCulture: Record<string, string>) => ({
 	values: Object.entries(valuesByCulture).map(([culture, value]) => innerValue(culture, value)),
 });
 
+/** Registers a property value resolver for the duration of each test in the current describe. */
+const useResolver = (alias: string, api: ManifestPropertyValueResolver['api'], forEditorAlias: string) => {
+	beforeEach(async () => {
+		umbExtensionsRegistry.register({
+			type: 'propertyValueResolver',
+			name: alias,
+			alias,
+			api,
+			forEditorAlias,
+		} as ManifestPropertyValueResolver);
+	});
+
+	afterEach(async () => {
+		umbExtensionsRegistry.unregister(alias);
+	});
+};
+
 describe('UmbMergeContentVariantDataController', () => {
 	describe('Block-shaped resolver', () => {
-		beforeEach(async () => {
-			umbExtensionsRegistry.register({
-				type: 'propertyValueResolver',
-				name: 'test-block-resolver',
-				alias: 'Umb.Test.Resolver.Block',
-				api: TestBlockValueResolver,
-				forEditorAlias: 'test-block-editor',
-			} as ManifestPropertyValueResolver);
-		});
-
-		afterEach(async () => {
-			umbExtensionsRegistry.unregister('Umb.Test.Resolver.Block');
-		});
+		useResolver('Umb.Test.Resolver.Block', TestBlockValueResolver, 'test-block-editor');
 
 		it('pairs inner values by block key, not by array position', async () => {
 			const ctrlHost = new UmbTestControllerHostElement();
@@ -167,21 +172,7 @@ describe('UmbMergeContentVariantDataController', () => {
 	});
 
 	describe('Simple resolver', () => {
-		beforeEach(async () => {
-			const manifest: ManifestPropertyValueResolver = {
-				type: 'propertyValueResolver',
-				name: 'test-resolver-1',
-				alias: 'Umb.Test.Resolver.1',
-				api: TestPropertyValueResolver,
-				forEditorAlias: 'test-editor',
-			};
-
-			umbExtensionsRegistry.register(manifest);
-		});
-
-		afterEach(async () => {
-			umbExtensionsRegistry.unregister('Umb.Test.Resolver.1');
-		});
+		useResolver('Umb.Test.Resolver.1', TestPropertyValueResolver, 'test-editor');
 
 		it('transfers inner values of select variants', async () => {
 			const ctrlHost = new UmbTestControllerHostElement();
