@@ -2,7 +2,6 @@ using Umbraco.Cms.Core.Models.FileSystem;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
-using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Core.Services.FileSystem;
 
@@ -174,7 +173,7 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
     /// </returns>
     private TOperationStatus ValidateCreate(string name, string path, string? parentPath)
     {
-        if (name.ContainsAny(CharArrays.InvalidFileNameChars))
+        if (name.ContainsAny(Constants.CharSearchValues.InvalidFileNameChars))
         {
             return InvalidName;
         }
