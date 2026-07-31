@@ -57,6 +57,10 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
     /// </summary>
     protected Stack<Node?> IncludeProperties { get; } = new();
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ElementOnlyOutputExpansionStrategy"/> class.
+    /// </summary>
+    /// <param name="propertyRenderer">The property renderer for converting property values.</param>
     [Obsolete("Please use the constructor that accepts all parameters. Scheduled for removal in V20.")]
     public ElementOnlyOutputExpansionStrategy(IApiPropertyRenderer propertyRenderer)
         : this(
@@ -247,17 +251,19 @@ public class ElementOnlyOutputExpansionStrategy : IOutputExpansionStrategy
             {
                 int idx = valueAsSpan.IndexOfAny(_nodeSearchValues);
 
+                // Key text is appended rather than assigned (historical behaviour retained after the performance
+                // optimisations in #23506). Valid syntax never resumes key text after a bracket group, but such
+                // values are still accepted, and appending keeps every fragment as before - the outer node in
+                // "a[b]c" stays keyed "ac".
                 if (idx < 0)
                 {
-                    // No more delimiters: the rest is key text for the current node.
-                    currentNode.Key += valueAsSpan.ToString();
+                    currentNode.Key = string.Concat(currentNode.Key, valueAsSpan);
                     break;
                 }
 
-                // Everything before the delimiter is key text for the current node.
                 if (idx > 0)
                 {
-                    currentNode.Key = valueAsSpan[..idx].ToString();
+                    currentNode.Key = string.Concat(currentNode.Key, valueAsSpan[..idx]);
                 }
 
                 switch (valueAsSpan[idx])
