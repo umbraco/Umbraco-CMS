@@ -1,0 +1,137 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
+
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations;
+
+[TestFixture]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
+internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
+{
+    private CountingDatabaseCacheRebuilder _databaseCacheRebuilder;
+
+    [SetUp]
+    public void CreateDatabaseCacheRebuilder() => _databaseCacheRebuilder = new CountingDatabaseCacheRebuilder();
+
+    [Test]
+    public async Task Can_Rebuild_Cache_For_Plan_Requiring_A_Rebuild()
+    {
+        MigrationPlanExecutor executor = CreateExecutor();
+
+        await executor.ExecutePlanAsync(CreatePlan<RebuildCacheMigration>("first"), string.Empty);
+
+        Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task Cannot_Rebuild_Cache_For_Plan_Not_Requiring_A_Rebuild()
+    {
+        MigrationPlanExecutor executor = CreateExecutor();
+
+        await executor.ExecutePlanAsync(CreatePlan<NoopMigration>("first"), string.Empty);
+
+        Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(0));
+    }
+
+    /// <summary>
+    /// The executor is registered as a singleton and executes the Umbraco plan followed by one plan per package with
+    /// pending migrations, so a rebuild requested by one plan must not leak into the plans that follow it
+    /// (https://github.com/umbraco/Umbraco-CMS/discussions/23531).
+    /// </summary>
+    [Test]
+    public async Task Cannot_Rebuild_Cache_For_Subsequent_Plan_Not_Requiring_A_Rebuild()
+    {
+        MigrationPlanExecutor executor = CreateExecutor();
+
+        await executor.ExecutePlanAsync(CreatePlan<RebuildCacheMigration>("first"), string.Empty);
+        await executor.ExecutePlanAsync(CreatePlan<NoopMigration>("second"), string.Empty);
+        await executor.ExecutePlanAsync(CreatePlan<NoopMigration>("third"), string.Empty);
+
+        Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task Can_Rebuild_Cache_Once_Per_Plan_Requiring_A_Rebuild()
+    {
+        MigrationPlanExecutor executor = CreateExecutor();
+
+        await executor.ExecutePlanAsync(CreatePlan<RebuildCacheMigration>("first"), string.Empty);
+        await executor.ExecutePlanAsync(CreatePlan<RebuildCacheMigration>("second"), string.Empty);
+
+        Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(2));
+    }
+
+    private static MigrationPlan CreatePlan<TMigration>(string name)
+        where TMigration : AsyncMigrationBase
+        => new MigrationPlan(name)
+            .From(string.Empty)
+            .To<TMigration>("done");
+
+    private MigrationPlanExecutor CreateExecutor() => new(
+        GetRequiredService<ICoreScopeProvider>(),
+        ScopeAccessor,
+        LoggerFactory,
+        GetRequiredService<IMigrationBuilder>(),
+        GetRequiredService<IUmbracoDatabaseFactory>(),
+        _databaseCacheRebuilder,
+        GetRequiredService<DistributedCache>(),
+        Mock.Of<IKeyValueService>(),
+        GetRequiredService<IServiceScopeFactory>(),
+        AppCaches.NoCache,
+        GetRequiredService<IPublishedContentTypeFactory>());
+
+    public class RebuildCacheMigration : AsyncMigrationBase
+    {
+        public RebuildCacheMigration(IMigrationContext context)
+            : base(context)
+        {
+        }
+
+        protected override Task MigrateAsync()
+        {
+            RebuildCache = true;
+
+            return Task.CompletedTask;
+        }
+    }
+
+    public class NoopMigration : AsyncMigrationBase
+    {
+        public NoopMigration(IMigrationContext context)
+            : base(context)
+        {
+        }
+
+        protected override Task MigrateAsync() => Task.CompletedTask;
+    }
+
+    private sealed class CountingDatabaseCacheRebuilder : IDatabaseCacheRebuilder
+    {
+        public int RebuildCount { get; private set; }
+
+        public Task<Attempt<DatabaseCacheRebuildResult>> RebuildAsync(bool useBackgroundThread)
+        {
+            RebuildCount++;
+
+            return Task.FromResult(Attempt.Succeed(DatabaseCacheRebuildResult.Success));
+        }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        public void RebuildDatabaseCacheIfSerializerChanged() => throw new NotSupportedException();
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+}
