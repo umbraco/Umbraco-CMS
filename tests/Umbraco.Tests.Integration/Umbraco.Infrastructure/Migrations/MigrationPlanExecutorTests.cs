@@ -32,7 +32,7 @@ internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
     {
         MigrationPlanExecutor executor = CreateExecutor();
 
-        await executor.ExecutePlanAsync(CreatePlan<RebuildCacheMigration>("first"), string.Empty);
+        await ExecutePlanAsync<RebuildCacheMigration>(executor, "first");
 
         Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(1));
     }
@@ -42,7 +42,7 @@ internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
     {
         MigrationPlanExecutor executor = CreateExecutor();
 
-        await executor.ExecutePlanAsync(CreatePlan<NoopMigration>("first"), string.Empty);
+        await ExecutePlanAsync<NoopMigration>(executor, "first");
 
         Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(0));
     }
@@ -57,9 +57,9 @@ internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
     {
         MigrationPlanExecutor executor = CreateExecutor();
 
-        await executor.ExecutePlanAsync(CreatePlan<RebuildCacheMigration>("first"), string.Empty);
-        await executor.ExecutePlanAsync(CreatePlan<NoopMigration>("second"), string.Empty);
-        await executor.ExecutePlanAsync(CreatePlan<NoopMigration>("third"), string.Empty);
+        await ExecutePlanAsync<RebuildCacheMigration>(executor, "first");
+        await ExecutePlanAsync<NoopMigration>(executor, "second");
+        await ExecutePlanAsync<NoopMigration>(executor, "third");
 
         Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(1));
     }
@@ -69,17 +69,24 @@ internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
     {
         MigrationPlanExecutor executor = CreateExecutor();
 
-        await executor.ExecutePlanAsync(CreatePlan<RebuildCacheMigration>("first"), string.Empty);
-        await executor.ExecutePlanAsync(CreatePlan<RebuildCacheMigration>("second"), string.Empty);
+        await ExecutePlanAsync<RebuildCacheMigration>(executor, "first");
+        await ExecutePlanAsync<RebuildCacheMigration>(executor, "second");
 
         Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(2));
     }
 
-    private static MigrationPlan CreatePlan<TMigration>(string name)
+    private static async Task ExecutePlanAsync<TMigration>(MigrationPlanExecutor executor, string name)
         where TMigration : AsyncMigrationBase
-        => new MigrationPlan(name)
+    {
+        MigrationPlan plan = new MigrationPlan(name)
             .From(string.Empty)
             .To<TMigration>("done");
+
+        ExecutedMigrationPlan result = await executor.ExecutePlanAsync(plan, string.Empty);
+
+        // Asserted so a plan that errors can't leave the rebuild count coincidentally matching the expectation.
+        Assert.That(result.Successful, Is.True, result.Exception?.ToString());
+    }
 
     private MigrationPlanExecutor CreateExecutor() => new(
         GetRequiredService<ICoreScopeProvider>(),
@@ -89,6 +96,10 @@ internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
         GetRequiredService<IUmbracoDatabaseFactory>(),
         _databaseCacheRebuilder,
         GetRequiredService<DistributedCache>(),
+
+        // Not the real IKeyValueService: this fixture runs against an empty database, so persisting the plan state
+        // in MigrationContext.Complete() would fail on the missing umbracoLock table and every plan would report
+        // itself unsuccessful.
         Mock.Of<IKeyValueService>(),
         GetRequiredService<IServiceScopeFactory>(),
         AppCaches.NoCache,
