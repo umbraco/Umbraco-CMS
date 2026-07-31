@@ -47,11 +47,9 @@ internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
         Assert.That(_databaseCacheRebuilder.RebuildCount, Is.EqualTo(0));
     }
 
-    /// <summary>
-    /// The executor is registered as a singleton and executes the Umbraco plan followed by one plan per package with
-    /// pending migrations, so a rebuild requested by one plan must not leak into the plans that follow it
-    /// (https://github.com/umbraco/Umbraco-CMS/discussions/23531).
-    /// </summary>
+    // The executor is registered as a singleton and executes the Umbraco plan followed by one plan per package with
+    // pending migrations, so a rebuild requested by one plan must not leak into the plans that follow it
+    // (https://github.com/umbraco/Umbraco-CMS/discussions/23531).
     [Test]
     public async Task Cannot_Rebuild_Cache_For_Subsequent_Plan_Not_Requiring_A_Rebuild()
     {
