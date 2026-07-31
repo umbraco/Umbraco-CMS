@@ -255,6 +255,77 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsFalse(availableCompositions.Any(x => x.Composition.Key == childResult.Result!.Key));
     }
 
+    [Test]
+    public async Task Composition_Whose_Property_Alias_Collides_With_Descendant_Own_Property_Is_Available_But_Not_Allowed()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key, "sharedAlias"), Constants.Security.SuperUserKey);
+
+        IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions =
+            await ContentTypeEditingService.GetAvailableCompositionsAsync(
+                parent.Key,
+                Enumerable.Empty<Guid>(),
+                Enumerable.Empty<string>(),
+                false);
+
+        // the composition would push "sharedAlias" onto Child, which already has its own property of that alias
+        Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == composition.Key && x.Allowed == false));
+    }
+
+    [Test]
+    public async Task Composition_Already_Used_By_Child_Is_Available_But_Not_Allowed_For_Parent()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition", "compositionAlias"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+
+        var childModel = ContentTypeCreateModel(
+            "Child",
+            compositions:
+            [
+                new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key },
+                new Composition { CompositionType = CompositionType.Composition, Key = composition.Key },
+            ]);
+        await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey);
+
+        IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions =
+            await ContentTypeEditingService.GetAvailableCompositionsAsync(
+                parent.Key,
+                Enumerable.Empty<Guid>(),
+                Enumerable.Empty<string>(),
+                false);
+
+        // the composition is already effective on Child (Parent's descendant); adding it to Parent too would push
+        // its properties onto Child a second time
+        Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == composition.Key && x.Allowed == false));
+    }
+
+    [Test]
+    public async Task Already_Persisted_Composition_Collision_Does_Not_Exempt_A_Different_Candidate_Sharing_The_Same_Alias()
+    {
+        var compositionB = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition B", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
+        var compositionD = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition D", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key, "sharedAlias"), Constants.Security.SuperUserKey);
+
+        // simulate a pre-existing grandfathered collision: attach B to Parent directly, bypassing validation
+        IContentType parentRaw = ContentTypeService.Get(parent.Key)!;
+        IContentType compositionBRaw = ContentTypeService.Get(compositionB.Key)!;
+        parentRaw.AddContentType(compositionBRaw);
+        ContentTypeService.Save(parentRaw);
+
+        IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions =
+            await ContentTypeEditingService.GetAvailableCompositionsAsync(
+                parent.Key,
+                Enumerable.Empty<Guid>(),
+                Enumerable.Empty<string>(),
+                false);
+
+        // D is a completely different, not-yet-selected composition - B already being grandfathered onto Parent
+        // must not exempt D from the same descendant collision check
+        Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == compositionD.Key && x.Allowed == false));
+    }
+
     private ContentTypeCreateModel CreateBasicContentTypeModelWithSingleProperty(string contentTypeName, string propertyName, bool isElement)
     {
         var container = ContentTypePropertyContainerModel();

@@ -193,6 +193,6 @@ internal sealed partial class MediaTypeEditingServiceTests
         var result = await MediaTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentTypeOperationStatus.DuplicatePropertyTypeAlias, result.Status);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidComposition, result.Status);
     }
 }
