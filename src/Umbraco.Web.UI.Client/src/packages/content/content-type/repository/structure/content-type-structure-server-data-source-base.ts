@@ -3,6 +3,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 // Keep this type internal
 type AllowedContentTypeBaseModel = {
@@ -19,6 +20,7 @@ export interface UmbContentTypeStructureServerDataSourceBaseArgs<
 	getAllowedChildrenOf: (
 		unique: string | null,
 		parentContentUnique: string | null,
+		paging?: UmbOffsetPaginationRequestModel,
 	) => Promise<UmbDataSourceResponse<UmbPagedModel<ServerItemType>>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
@@ -48,14 +50,22 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	}
 
 	/**
-	 * Returns a promise with the allowed content types for the given unique
-	 * @param {string} unique
-	 * @param parentContentUnique
+	 * Returns a promise with a single page of the allowed content types for the given unique
+	 * @param {string | null} unique - The content type to get the allowed children of, or `null` for the root.
+	 * @param {string | null} parentContentUnique - The content item the children will be created under, if any.
+	 * @param {UmbOffsetPaginationRequestModel} paging - The page to return.
 	 * @returns {*}
 	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
-	async getAllowedChildrenOf(unique: string | null, parentContentUnique: string | null) {
-		const { data, error } = await tryExecute(this.#host, this.#getAllowedChildrenOf(unique, parentContentUnique));
+	async getAllowedChildrenOf(
+		unique: string | null,
+		parentContentUnique: string | null,
+		paging?: UmbOffsetPaginationRequestModel,
+	) {
+		const { data, error } = await tryExecute(
+			this.#host,
+			this.#getAllowedChildrenOf(unique, parentContentUnique, paging),
+		);
 
 		if (data) {
 			const items = data.items.map((item) => this.#mapper(item));

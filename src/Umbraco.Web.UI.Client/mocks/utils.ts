@@ -50,3 +50,21 @@ export function createProblemDetails(problemDetails: {
 }): object {
 	return problemDetails;
 }
+
+/**
+ * Applies the `skip` and `take` query parameters of a request to an already-collected paged response, so a mocked
+ * endpoint pages like the real one does. `total` remains the full count.
+ * @param {object} response The full set of items, with their total.
+ * @param {Request} request The intercepted request to read `skip` and `take` from.
+ * @returns {object} The requested page of items, with the unchanged total.
+ */
+export function pageResponse<ItemType>(
+	response: { items: Array<ItemType>; total: number },
+	request: Request,
+): { items: Array<ItemType>; total: number } {
+	const url = new URL(request.url);
+	const skip = Number(url.searchParams.get('skip')) || 0;
+	const take = Number(url.searchParams.get('take')) || 100;
+
+	return { items: response.items.slice(skip, skip + take), total: response.total };
+}

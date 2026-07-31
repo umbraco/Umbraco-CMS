@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -380,6 +381,37 @@ internal sealed class MediaTypeServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(baseline.Total + 1, result.Total);
             Assert.IsTrue(result.Items.Any(x => x.Key == allowedAtRoot.Key));
             Assert.IsFalse(result.Items.Any(x => x.Key == notAllowedAtRoot.Key));
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Last_Page_Of_Allowed_Children()
+    {
+        IMediaType[] children =
+        [
+            MediaTypeBuilder.CreateSimpleMediaType("childOne", "Child One"),
+            MediaTypeBuilder.CreateSimpleMediaType("childTwo", "Child Two"),
+            MediaTypeBuilder.CreateSimpleMediaType("childThree", "Child Three"),
+        ];
+
+        foreach (IMediaType child in children)
+        {
+            await MediaTypeService.CreateAsync(child, Constants.Security.SuperUserKey);
+        }
+
+        children[0].AllowedContentTypes = children
+            .Select((child, index) => new ContentTypeSort(child.Key, index, child.Alias))
+            .ToArray();
+        await MediaTypeService.UpdateAsync(children[0], Constants.Security.SuperUserKey);
+
+        Attempt<PagedModel<IMediaType>?, ContentTypeOperationStatus> result =
+            await MediaTypeService.GetAllowedChildrenAsync(children[0].Key, skip: 2, take: 2);
+
+        Assert.IsTrue(result.Success);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(3, result.Result!.Total);
+            Assert.AreEqual(new[] { children[2].Key }, result.Result.Items.Select(x => x.Key).ToArray());
         });
     }
 }

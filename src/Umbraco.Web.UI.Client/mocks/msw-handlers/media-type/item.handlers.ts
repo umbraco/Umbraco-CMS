@@ -1,6 +1,7 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMediaTypeMockDb } from '../../db/media-type.db.js';
 import { UMB_SLUG } from './slug.js';
+import { pageResponse } from '../../utils.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const itemHandlers = [
@@ -43,6 +44,6 @@ export const itemHandlers = [
 
 		const response = umbMediaTypeMockDb.getAllowedByFileExtension(fileExtension);
 
-		return HttpResponse.json(response);
+		return HttpResponse.json(pageResponse(response, request));
 	}),
 ];
