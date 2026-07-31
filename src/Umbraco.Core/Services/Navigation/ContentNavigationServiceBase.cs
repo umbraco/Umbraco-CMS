@@ -26,16 +26,19 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
     private readonly TContentTypeService _typeService;
-    // concurrent because TryGetContentTypeKey lazily adds aliases resolved after the initial load,
-    // on live request threads; a non-concurrent map corrupts under parallel misses.
+
+    // Concurrent because TryGetContentTypeKey lazily adds aliases resolved after the initial load,
+    // on live request threads; a non-concurrent map corrupts under parallel misses. See #23518.
     private readonly Lazy<ConcurrentDictionary<string, Guid>> _contentTypeAliasToKeyMap;
 
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     ///     Bundles a navigation structure dictionary and its root keys into a single reference so that
     ///     <see cref="HandleRebuildAsync"/> can swap both atomically with one <see cref="Interlocked.Exchange{T}"/>
     ///     call and readers always observe a consistent pair. Also carries the per-snapshot
     ///     descendants cache populated by <see cref="TryGetDescendantsKeysFromStructure"/>.
     /// </summary>
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
     private sealed record NavigationSnapshot(
         ConcurrentDictionary<Guid, NavigationNode> Structure,
         HashSet<Guid> Roots)
