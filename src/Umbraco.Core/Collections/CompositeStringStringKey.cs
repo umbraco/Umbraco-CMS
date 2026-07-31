@@ -4,10 +4,10 @@ namespace Umbraco.Cms.Core.Collections;
 ///     Represents a composite key of (string, string) for fast dictionaries.
 /// </summary>
 /// <remarks>
-///     <para>The string parts of the key are case-insensitive.</para>
+///     <para>The string parts of the key are compared using <see cref="StringComparer.OrdinalIgnoreCase" />.</para>
 ///     <para>Null is NOT a valid value for neither parts.</para>
 /// </remarks>
-public struct CompositeStringStringKey : IEquatable<CompositeStringStringKey>
+public readonly struct CompositeStringStringKey : IEquatable<CompositeStringStringKey>
 {
     private readonly string _key1;
     private readonly string _key2;
