@@ -483,7 +483,8 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
             return false; // Node with this key already exists
         }
 
-        parentNode?.AddChild(_navigation.Structure, key);
+        // If sortOrder supplied → caller is asserting the position, preserve it; otherwise append last.
+        parentNode?.AddChild(_navigation.Structure, key, appendAsLastItem: sortOrder is null);
 
         _navigation.Invalidate();
         return true;
@@ -1069,7 +1070,7 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
             // If the parent node exists in the nodesStructure, add the node to the parent's children (parent is set as well)
             if (nodesStructure.TryGetValue(parentKey, out NavigationNode? parentNode))
             {
-                parentNode.AddChild(nodesStructure, entity.Key);
+                parentNode.AddChild(nodesStructure, entity.Key, appendAsLastItem: false);
             }
         }
     }
