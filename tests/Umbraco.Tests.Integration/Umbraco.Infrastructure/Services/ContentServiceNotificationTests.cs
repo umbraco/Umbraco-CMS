@@ -407,7 +407,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     {
         // A combined save-and-publish must still raise the paired Saved notification, just like a plain Save does
         // (https://github.com/umbraco/Umbraco-CMS/issues/23523).
-        IContent document = new Content("content", -1, _contentType);
+        Content document = new Content("content", -1, _contentType);
 
         var savingWasCalled = false;
         var savedWasCalled = false;
@@ -459,7 +459,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
 
-        IContent document = new Content("content", -1, _contentType);
+        Content document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
         document.SetCultureName("bonjour", "fr-FR");
 

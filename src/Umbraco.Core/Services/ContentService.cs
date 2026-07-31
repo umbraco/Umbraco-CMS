@@ -1722,6 +1722,10 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId"></param>
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
+    /// <param name="raiseSavedNotification">
+    ///     Whether to raise a <see cref="ContentSavedNotification" /> once the document is persisted. Enabled by the
+    ///     save-and-publish entry points, which combine a save and a publish, so the paired Saved notification still fires.
+    /// </param>
     /// <param name="eventMessages"></param>
     /// <returns></returns>
     /// <remarks>
@@ -1781,6 +1785,17 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyList<string>? culturesChanging = variesByCulture
             ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
             : null;
+
+        // For a save-and-publish, capture the saved cultures the same way (and at the same point) as the standalone
+        // Save path - before persistence resets change tracking - so the Saved notification honours the same
+        // SavedCultures contract: the changed cultures for variant content, or the "*" marker for changed invariant content.
+        IReadOnlyCollection<string>? savedCultures = null;
+        if (raiseSavedNotification)
+        {
+            savedCultures = variesByCulture
+                ? culturesChanging
+                : content.IsDirty() ? ["*"] : [];
+        }
 
         var isNew = !content.HasIdentity;
         TreeChangeTypes changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
@@ -1931,7 +1946,7 @@ public class ContentService : RepositoryService, IContentService
                 new ContentSavedNotification(
                     content,
                     eventMessages,
-                    BuildCultureMap(content, variesByCulture ? culturesChanging : ["*"]))
+                    BuildCultureMap(content, savedCultures))
                 .WithState(notificationState));
         }
 
