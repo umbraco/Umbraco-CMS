@@ -63,8 +63,24 @@ export function pageResponse<ItemType>(
 	request: Request,
 ): { items: Array<ItemType>; total: number } {
 	const url = new URL(request.url);
-	const skip = Number(url.searchParams.get('skip')) || 0;
-	const take = Number(url.searchParams.get('take')) || 100;
+	const skip = readNumber(url.searchParams.get('skip'), 0);
+	const take = readNumber(url.searchParams.get('take'), 100);
 
 	return { items: response.items.slice(skip, skip + take), total: response.total };
+}
+
+/**
+ * Reads a numeric query parameter, falling back when it is absent or unparseable. An explicit `0` is honoured
+ * rather than treated as absent.
+ * @param {string | null} value The raw query parameter value.
+ * @param {number} fallback The value to use when the parameter is absent or not a number.
+ * @returns {number} The parsed number, or the fallback.
+ */
+function readNumber(value: string | null, fallback: number): number {
+	if (value === null) {
+		return fallback;
+	}
+
+	const parsed = Number(value);
+	return Number.isFinite(parsed) ? parsed : fallback;
 }
