@@ -321,6 +321,28 @@ public class ContentTypeTests
     }
 
     [Test]
+    public void Can_Move_PropertyType_Into_Group_With_Uninitialised_PropertyTypes()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+        contentType.AddPropertyGroup("meta", "Meta");
+        contentType.PropertyGroups["meta"].PropertyTypes = null;
+
+        Assert.IsTrue(contentType.MovePropertyType("title", "meta"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                contentType.PropertyTypes.Select(x => x.Alias),
+                Is.EquivalentTo(_titleAlias),
+                "the property type should not be orphaned");
+            Assert.That(
+                contentType.PropertyGroups["meta"].PropertyTypes?.Select(x => x.Alias),
+                Is.EquivalentTo(_titleAlias));
+            Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Is.Empty);
+        });
+    }
+
+    [Test]
     public void Can_Move_Already_Ungrouped_PropertyType_To_No_Group()
     {
         var contentType = BuildContentTypeWithSingleGroup();

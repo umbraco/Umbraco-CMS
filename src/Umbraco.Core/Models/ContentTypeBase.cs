@@ -376,7 +376,11 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         if (newPropertyGroup is not null)
         {
             PropertyTypeCollection.RemoveItem(propertyTypeAlias);
-            newPropertyGroup.PropertyTypes?.Add(propertyType);
+
+            // the group's collection is nullable, and adding to a null one would silently orphan
+            // the property, so ensure it exists rather than no-op away the move
+            newPropertyGroup.PropertyTypes ??= new PropertyTypeCollection(SupportsPublishing);
+            newPropertyGroup.PropertyTypes.Add(propertyType);
         }
         else if (PropertyTypeCollection.Contains(propertyTypeAlias) is false)
         {
