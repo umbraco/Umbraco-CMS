@@ -1792,9 +1792,14 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyCollection<string>? savedCultures = null;
         if (raiseSavedNotification)
         {
-            savedCultures = variesByCulture
-                ? culturesChanging
-                : content.IsDirty() ? ["*"] : [];
+            if (variesByCulture)
+            {
+                savedCultures = culturesChanging;
+            }
+            else
+            {
+                savedCultures = content.IsDirty() ? ["*"] : [];
+            }
         }
 
         var isNew = !content.HasIdentity;
