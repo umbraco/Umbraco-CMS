@@ -126,6 +126,17 @@ describe('UmbPropertyEditorUiTiptapStatusbarConfigurationElement', () => {
 		expect(duplicatedAliases()).to.be.empty;
 	});
 
+	it('drops the repeat occurrences of an item already duplicated in the value', async () => {
+		await givenStatusbar([['Test.Statusbar.One', 'Test.Statusbar.Two'], ['Test.Statusbar.One']]);
+
+		await dragAvailableItemToArea('Test.Statusbar.Three', 0);
+
+		expect(element.value).to.deep.equal([
+			['Test.Statusbar.One', 'Test.Statusbar.Two', 'Test.Statusbar.Three'],
+			[],
+		]);
+	});
+
 	it('leaves a drag of another editor to be handled elsewhere', async () => {
 		const event = await dispatchForeignDrop(0);
 
