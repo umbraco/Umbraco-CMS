@@ -34,7 +34,8 @@ internal static class CacheTestsHelper
         AssertProperties(baseContent.Properties, comparisonContent!.Properties);
     }
 
-    internal static void AssertProperties(IPropertyCollection propertyCollection,
+    internal static void AssertProperties(
+        IPropertyCollection propertyCollection,
         IEnumerable<IPublishedProperty> publishedProperties)
     {
         foreach (var prop in propertyCollection)
