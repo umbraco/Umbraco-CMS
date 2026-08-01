@@ -157,10 +157,15 @@ public class BasicAuthenticationMiddleware : IMiddleware
     /// not renewed by the token-authenticated back-office client, so preview would otherwise start
     /// challenging mid-session (https://github.com/umbraco/Umbraco-CMS/issues/23475).
     /// </summary>
+    /// <remarks>
+    /// A successful attempt can still carry a null identity, when the token verified but no back-office
+    /// principal could be built for the user. That must not authenticate the request, so the identity itself
+    /// is what is checked here rather than the attempt's success.
+    /// </remarks>
     private async Task<bool> IsAuthenticatedPreviewRequestAsync()
     {
         Attempt<ClaimsIdentity> previewIdentityAttempt = await _previewService.TryGetPreviewClaimsIdentityAsync();
-        return previewIdentityAttempt.Success;
+        return previewIdentityAttempt.Success && previewIdentityAttempt.Result.IsBackOfficeAuthenticationType();
     }
 
     private void HandleUnauthorized(HttpContext context)
