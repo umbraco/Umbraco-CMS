@@ -248,7 +248,7 @@ public class ElementContainerPermissionServiceTests
     }
 
     [Test]
-    public async Task FilterFallbackPermissionsAsync_Passes_Through_Unchanged()
+    public async Task Can_Pass_Through_Fallback_Permissions_Unchanged()
     {
         // Arrange
         var user = new UserBuilder().WithId(0).Build();
