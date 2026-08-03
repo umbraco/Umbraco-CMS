@@ -666,4 +666,119 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
         Assert.IsNotEmpty(result);
         Assert.That(result.Any(e => e.Key == element.Key));
     }
+
+    [Test]
+    public void UpdateElement()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element = ElementBuilder.CreateSimpleElement(elementType);
+        repository.Save(element);
+
+        var content = repository.Get(element.Id);
+        content.Name = "Updated Name";
+        repository.Save(content);
+
+        var updatedContent = repository.Get(element.Id);
+
+        Assert.AreEqual(content.Id, updatedContent.Id);
+        Assert.AreEqual("Updated Name", updatedContent.Name);
+        Assert.AreEqual(content.VersionId, updatedContent.VersionId);
+
+        Assert.AreEqual("This is the element title", content.GetValue("title"));
+        content.SetValue("title", "Updated Title");
+        repository.Save(content);
+
+        updatedContent = repository.Get(element.Id);
+
+        Assert.AreEqual("Updated Title", updatedContent.GetValue("title"));
+        Assert.AreEqual(content.VersionId, updatedContent.VersionId);
+    }
+
+    [Test]
+    public void ElementIsNotDirtyAfterSave()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element = ElementBuilder.CreateSimpleElement(elementType);
+        element.SetValue("title", "Dirty Title");
+
+        Assert.IsTrue(((Element)element).IsDirty());
+
+        repository.Save(element);
+
+        Assert.IsFalse(((Element)element).IsDirty());
+
+        var content = repository.Get(element.Id);
+        Assert.IsFalse(((Element)content).IsDirty());
+    }
+
+    // Covers issue U4-2791 and U4-2607
+    [Test]
+    public void SaveElementWithAtSignInName()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "test@umbraco.org");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "@lightgiants");
+
+        repository.Save(element1);
+        repository.Save(element2);
+
+        Assert.IsTrue(element1.HasIdentity);
+        Assert.IsTrue(element2.HasIdentity);
+
+        var result1 = repository.Get(element1.Id);
+        Assert.AreEqual(element1.Name, result1.Name);
+
+        var result2 = repository.Get(element2.Id);
+        Assert.AreEqual(element2.Name, result2.Name);
+    }
+
+    [Test]
+    public void GetPagedResultsByQuery_CustomPropertySort()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
+        element1.SetValue("title", "Bravo");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
+        element2.SetValue("title", "Alpha");
+        var element3 = ElementBuilder.CreateSimpleElement(elementType, "Element Three");
+        element3.SetValue("title", "Charlie");
+
+        repository.Save(element1);
+        repository.Save(element2);
+        repository.Save(element3);
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.Name.Contains("Element"));
+
+        var result = repository.GetPage(query, 0, 2, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("title", isCustomField: true)).ToArray();
+
+        Assert.AreEqual(3, totalRecords);
+        Assert.AreEqual(2, result.Length);
+        Assert.AreEqual(element2.Id, result[0].Id); // "Alpha"
+        Assert.AreEqual(element1.Id, result[1].Id); // "Bravo"
+
+        result = repository.GetPage(query, 1, 2, out totalRecords, propertyAliases: null, filter: null, Ordering.By("title", isCustomField: true)).ToArray();
+
+        Assert.AreEqual(1, result.Length);
+        Assert.AreEqual(element3.Id, result[0].Id); // "Charlie"
+    }
 }
