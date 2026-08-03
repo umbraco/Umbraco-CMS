@@ -8,6 +8,7 @@ import type {
 } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbBooleanState,
 	UmbClassState,
@@ -787,7 +788,7 @@ export abstract class UmbBlockEntryContext<
 		const blockName = this.getName();
 		await umbConfirmModal(this, {
 			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
-			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
+			content: html`${this.localize.htmlString('#blockEditor_confirmDeleteBlockMessage', blockName)}`,
 			confirmLabel: '#general_delete',
 			color: 'danger',
 		});

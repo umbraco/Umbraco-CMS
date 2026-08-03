@@ -394,7 +394,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,
-			content: `#defaultdialogs_confirmremove ${name}?`,
+			content: html`${this.localize.term('defaultdialogs_confirmremove')} ${name}?`,
 			confirmLabel: '#actions_remove',
 		});
 

@@ -15,6 +15,8 @@ import {
 import type { UmbItemModel } from '@umbraco-cms/backoffice/entity-item';
 import { UmbModalRouteRegistrationController, type UmbModalRouteSetupReturn } from '@umbraco-cms/backoffice/router';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export class UmbPickerInputContext<
 	PickedItemType extends UmbItemModel = UmbItemModel,
@@ -22,6 +24,8 @@ export class UmbPickerInputContext<
 	PickerModalConfigType extends UmbPickerModalData<PickerItemType> = UmbPickerModalData<PickerItemType>,
 	PickerModalValueType extends UmbPickerModalValue = UmbPickerModalValue,
 > extends UmbContextBase {
+	protected readonly localize = new UmbLocalizationController(this);
+
 	modalAlias?: string | UmbModalToken<UmbPickerModalData<PickerItemType>, PickerModalValueType>;
 	repository?: UmbItemRepository<PickedItemType>;
 
@@ -179,7 +183,7 @@ export class UmbPickerInputContext<
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,
-			content: `#defaultdialogs_confirmremove ${name}?`,
+			content: html`${this.localize.term('defaultdialogs_confirmremove')} ${this.localize.string(name)}?`,
 			confirmLabel: '#actions_remove',
 		});
 

@@ -151,7 +151,7 @@ export class UmbInputBlockTypeElement<
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: '#blockEditor_confirmDeleteBlockTypeTitle',
-			content: this.localize.term('blockEditor_confirmDeleteBlockTypeMessage', [contentType[0]?.name]),
+			content: html`${this.localize.htmlString('#blockEditor_confirmDeleteBlockTypeMessage', contentType[0]?.name ?? '')}`,
 			confirmLabel: '#general_remove',
 		});
 		this.deleteItem(item.contentElementTypeKey);

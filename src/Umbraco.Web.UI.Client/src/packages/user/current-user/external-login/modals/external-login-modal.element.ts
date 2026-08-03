@@ -163,7 +163,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		try {
 			await umbConfirmModal(this, {
 				headline: this.localize.term('defaultdialogs_linkYour', providerDisplayName),
-				content: this.localize.term('defaultdialogs_linkYourConfirm', providerDisplayName),
+				content: html`${this.localize.term('defaultdialogs_linkYourConfirm', providerDisplayName)}`,
 				confirmLabel: '#general_continue',
 				color: 'positive',
 			});
@@ -193,7 +193,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		try {
 			await umbConfirmModal(this, {
 				headline: this.localize.term('defaultdialogs_unLinkYour', providerDisplayName),
-				content: this.localize.term('defaultdialogs_unLinkYourConfirm', providerDisplayName),
+				content: html`${this.localize.term('defaultdialogs_unLinkYourConfirm', providerDisplayName)}`,
 				confirmLabel: '#general_continue',
 				color: 'danger',
 			});

@@ -5,6 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyActionBase, type UmbPropertyActionArgs } from '@umbraco-cms/backoffice/property-action';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
 	#init: Promise<unknown>;
@@ -73,7 +74,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 			// Todo: localize
 			await umbConfirmModal(this, {
 				headline: 'Paste from clipboard',
-				content: `The property already contains a value. Paste from the property action will overwrite the current value.
+				content: html`The property already contains a value. Paste from the property action will overwrite the current value.
 				Do you want to replace the current value with ${item.name}?`,
 				confirmLabel: 'Paste',
 			});

@@ -94,7 +94,7 @@ export class UmbUserWorkspaceClientCredentialsElement extends UmbLitElement {
 
 		await umbConfirmModal(this, {
 			headline: `Delete ${client.unique}`,
-			content: `Are you sure you want to delete ${client.unique}?`,
+			content: html`Are you sure you want to delete ${client.unique}?`,
 			confirmLabel: 'Delete',
 			color: 'danger',
 		});
