@@ -271,6 +271,7 @@ public class BackOfficeController : SecurityControllerBase
             ? await AuthorizeInternal(request)
             : await AuthorizeExternal(request);
     }
+
     /// <summary>
     /// Issues or refreshes access tokens for authenticated users via supported OpenID Connect grant types.
     /// </summary>
@@ -278,7 +279,6 @@ public class BackOfficeController : SecurityControllerBase
     /// Supports authorization code, refresh token, and client credentials grant types. Returns an error if the request is invalid or the user cannot be found.
     /// </remarks>
     /// <returns>An <see cref="IActionResult"/> representing the result of the token issuance or refresh process, including error details if applicable.</returns>
-
     [AllowAnonymous]
     [HttpPost("token")]
     [EndpointSummary("Issues access tokens.")]

@@ -23,8 +23,8 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// </summary>
 public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
 {
-    private static readonly PathString _managementApiBasePath =
-        new("/umbraco" + Constants.Web.ManagementApiPath.TrimEnd('/'));
+    private static readonly PathString ManagementApiBasePath
+        = new($"/{Constants.System.UmbracoPathSegment}{Constants.Web.ManagementApiPath.TrimEnd('/')}");
 
     private readonly IDataProtectionProvider _dataProtection;
     private readonly GlobalSettings _globalSettings;
@@ -290,7 +290,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
     // cookie scheme, so its challenge fires for API requests too; force the status-code branch for
     // anything under the Management API path, regardless of the X-Requested-With header.
     private static bool IsManagementApiRequest(HttpRequest request) =>
-        request.Path.StartsWithSegments(_managementApiBasePath, StringComparison.OrdinalIgnoreCase);
+        request.Path.StartsWithSegments(ManagementApiBasePath, StringComparison.OrdinalIgnoreCase);
 
     private bool IsXhr(HttpRequest request) =>
         string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
