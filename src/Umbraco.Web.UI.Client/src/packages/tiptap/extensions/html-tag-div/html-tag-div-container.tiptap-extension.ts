@@ -36,6 +36,7 @@ const BLOCK_TAGS = new Set([
 	'dl',
 	'form',
 	'fieldset',
+	'umb-rte-block',
 ]);
 
 /**
@@ -45,6 +46,10 @@ const BLOCK_TAGS = new Set([
  * `BLOCK_TAGS` entry (e.g. `li` inside `ul`/`ol`, `tr`/`td`/`th`/`thead`/`tbody`/`tfoot` inside
  * `table`, `dt`/`dd` inside `dl`, `figcaption` inside `figure`) are omitted from `BLOCK_TAGS`
  * since their container is what would actually surface as the direct child.
+ *
+ * `umb-rte-block` is included since it belongs to the `block` node group (`block.tiptap-extension.ts`);
+ * its inline counterpart `umb-rte-block-inline` belongs to the `inline` group, so a `<div>` wrapping
+ * only that is correctly left to the inline `div` node.
  * @param {HTMLElement} element The element whose direct children are checked.
  * @returns {boolean} Returns true if at least one direct child element is block-level.
  */

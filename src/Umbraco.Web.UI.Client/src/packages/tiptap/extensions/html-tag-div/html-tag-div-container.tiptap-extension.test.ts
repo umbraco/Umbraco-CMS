@@ -3,6 +3,7 @@ import { Div } from './html-tag-div.tiptap-extension.js';
 import { DivContainer } from './html-tag-div-container.tiptap-extension.js';
 import { HtmlClassAttribute } from '../html-attr-class/html-attr-class.tiptap-extension.js';
 import { HtmlStyleAttribute } from '../html-attr-style/html-attr-style.tiptap-extension.js';
+import { umbRteBlock, umbRteBlockInline } from '../block/block.tiptap-extension.js';
 import { expect } from '@open-wc/testing';
 
 describe('html-tag-div-container.tiptap-extension', () => {
@@ -22,6 +23,8 @@ describe('html-tag-div-container.tiptap-extension', () => {
 				ListItem,
 				Div,
 				DivContainer,
+				umbRteBlock,
+				umbRteBlockInline,
 				HtmlClassAttribute.configure({ types: ['div', 'divContainer'] }),
 				HtmlStyleAttribute.configure({ types: ['div', 'divContainer'] }),
 			],
@@ -69,5 +72,33 @@ describe('html-tag-div-container.tiptap-extension', () => {
 		editor.commands.setContent('<div class="box"><p>x</p></div>');
 
 		expect(editor.getHTML()).to.equal('<div class="box"><p>x</p></div>');
+	});
+
+	it('preserves an umb-rte-block nested inside a div', () => {
+		editor.commands.setContent('<div><umb-rte-block data-content-key="key-1"></umb-rte-block></div>');
+
+		expect(editor.getHTML()).to.equal('<div><umb-rte-block data-content-key="key-1"></umb-rte-block></div>');
+	});
+
+	it('falls through to the inline div for a div wrapping only an umb-rte-block-inline', () => {
+		editor.commands.setContent('<div><umb-rte-block-inline data-content-key="key-1"></umb-rte-block-inline></div>');
+
+		expect(editor.getHTML()).to.equal(
+			'<div><umb-rte-block-inline data-content-key="key-1"></umb-rte-block-inline></div>',
+		);
+		// Both `div` and `divContainer` render as <div>, so assert on the parsed node type directly
+		// to confirm the inline div (not divContainer) claimed the element.
+		expect(editor.state.doc.firstChild?.type.name).to.equal('div');
+	});
+
+	it('wraps stray inline content in a paragraph when a div mixes inline and block children', () => {
+		editor.commands.setContent('<div>text<p>a</p></div>');
+
+		const html = editor.getHTML();
+		expect(html).to.equal('<div><p>text</p><p>a</p></div>');
+
+		// Re-parsing the normalised output must be idempotent - no further drift on subsequent saves.
+		editor.commands.setContent(html);
+		expect(editor.getHTML()).to.equal(html);
 	});
 });
