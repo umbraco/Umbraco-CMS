@@ -227,13 +227,12 @@ internal class ContentFactory : IEntityFactory<IContent, ContentDto>
 - Converts DTO → Domain entity
 - Always `internal` (implementation detail)
 
-**Service Naming** (from Services/Implement/):
+**Service Naming** (`Services/Implement/`):
 ```csharp
-internal sealed class ContentService : RepositoryService, IContentService
+internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>, IContentSearchService
 ```
-- Pattern: `{Domain}Service : RepositoryService, I{Domain}Service`
-- Inherits `RepositoryService` for scope/repository access
-- Always `internal sealed`
+- Pattern: `{Domain}Service : I{Domain}Service` (base class varies by concern)
+- Only services with genuine Infrastructure dependencies live here (search, packaging, webhooks, log viewing); the `RepositoryService`-based domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/` — see root CLAUDE.md §4
 
 ### Key Code Patterns
 
@@ -375,7 +374,7 @@ using (ICoreScope scope = ScopeProvider.CreateCoreScope())
 - 16 service implementations
 - Services fire notifications before/after operations
 - Services manage scopes (not repositories)
-- Example: `ContentService`, `MediaService`, `UserService`
+- Example: `ContentSearchService`, `PackagingService`, `WebhookFiringService` — the Infrastructure-dependent services; the main domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/`
 
 ### Code Smells to Watch For
 
@@ -810,7 +809,7 @@ dotnet pack src/Umbraco.Infrastructure -c Release
 - **Scope Provider**: `src/Umbraco.Infrastructure/Scoping/ScopeProvider.cs`
 - **Database Factory**: `src/Umbraco.Infrastructure/Persistence/UmbracoDatabaseFactory.cs`
 - **Migration Executor**: `src/Umbraco.Infrastructure/Migrations/MigrationPlanExecutor.cs`
-- **Content Service**: `src/Umbraco.Infrastructure/Services/Implement/ContentService.cs`
+- **Content Search Service**: `src/Umbraco.Infrastructure/Services/Implement/ContentSearchService.cs`
 - **User Repository**: `src/Umbraco.Infrastructure/Persistence/Repositories/Implement/UserRepository.cs`
 
 ### Critical Patterns
