@@ -1414,6 +1414,7 @@ export default {
 	},
 	sections: {
 		content: 'Nội dung',
+		library: 'Thư viện',
 		media: 'Phương tiện',
 		member: 'Thành viên',
 		packages: 'Gói mở rộng',
@@ -1735,8 +1736,16 @@ export default {
 		chooseChildNode: 'Chọn nút con',
 		compositionsDescription:
 			'Kế thừa các tab và thuộc tính từ một loại tài liệu hiện có. Các tab mới sẽ được thêm vào loại tài liệu hiện tại hoặc được hợp nhất nếu một tab có tên giống hệt tồn tại.',
+		compositionsDescriptionMediaType:
+			'Kế thừa các tab và thuộc tính từ một loại phương tiện hiện có. Các tab mới sẽ được thêm vào loại phương tiện hiện tại hoặc được hợp nhất nếu một tab có tên giống hệt tồn tại.',
+		compositionsDescriptionMemberType:
+			'Kế thừa các tab và thuộc tính từ một loại thành viên hiện có. Các tab mới sẽ được thêm vào loại thành viên hiện tại hoặc được hợp nhất nếu một tab có tên giống hệt tồn tại.',
 		compositionInUse: 'Loại nội dung này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMediaType: 'Loại phương tiện này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMemberType: 'Loại thành viên này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
 		noAvailableCompositions: 'Không có loại nội dung nào có sẵn để sử dụng làm thành phần.',
+		noAvailableCompositionsMediaType: 'Không có loại phương tiện nào có sẵn để sử dụng làm thành phần.',
+		noAvailableCompositionsMemberType: 'Không có loại thành viên nào có sẵn để sử dụng làm thành phần.',
 		compositionRemoveWarning:
 			'Việc xóa một thành phần sẽ xóa tất cả dữ liệu thuộc tính liên quan. Khi bạn lưu loại tài liệu, sẽ không có cách nào quay lại.',
 		availableEditors: 'Tạo mới',
@@ -1774,6 +1783,10 @@ export default {
 		compositionUsageHeading: 'Loại tài liệu này đang được sử dụng ở đâu?',
 		compositionUsageSpecification:
 			'Loại tài liệu này hiện đang được sử dụng trong thành phần của các loại nội dung sau:',
+		compositionUsageSpecificationMediaType:
+			'Loại phương tiện này hiện đang được sử dụng trong thành phần của các loại phương tiện sau:',
+		compositionUsageSpecificationMemberType:
+			'Loại thành viên này hiện đang được sử dụng trong thành phần của các loại thành viên sau:',
 		variantsHeading: 'Biến thể',
 		cultureVariantHeading: 'Cho phép thay đổi theo văn hóa',
 		segmentVariantHeading: 'Cho phép phân đoạn',

@@ -57,8 +57,8 @@ public class DeliveryApiMemberOutputCacheEvictionHandlerTests
             .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
-            .Setup(m => m.GetKeyForId(parentDocumentId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(parentDocumentKey));
+            .Setup(m => m.GetKeyForIdAsync(parentDocumentId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(parentDocumentKey));
 
         var notification = CreateNotification(new MemberCacheRefresher.JsonPayload(memberId, null, false));
 
@@ -96,8 +96,8 @@ public class DeliveryApiMemberOutputCacheEvictionHandlerTests
             .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
-            .Setup(m => m.GetKeyForId(parentDocumentId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(parentDocumentKey));
+            .Setup(m => m.GetKeyForIdAsync(parentDocumentId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(parentDocumentKey));
 
         var notification = CreateNotification(
             new MemberCacheRefresher.JsonPayload(10, null, false),

@@ -60,7 +60,7 @@ public class SegmentTestController : SurfaceController
             return HttpNotFound();
         }
 
-        var ct = Services.ContentTypeService.Get(alias);
+        var ct = await Services.ContentTypeService.GetAsync(alias);
         if (ct == null)
         {
             return Content($"No document type found by alias {alias}");
@@ -103,7 +103,7 @@ public class SegmentTestController : SurfaceController
             return HttpNotFound();
         }
 
-        var ct = Services.ContentTypeService.Get(alias);
+        var ct = await Services.ContentTypeService.GetAsync(alias);
         if (ct == null)
         {
             return Content($"No document type found by alias {alias}");

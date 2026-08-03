@@ -77,69 +77,8 @@ public class IdKeyMap : IIdKeyMap, IDisposable
     public void SetMapper(UmbracoObjectTypes umbracoObjectType, Func<int, Guid> id2key, Func<Guid, int> key2id) =>
         _dictionary[umbracoObjectType] = (id2key, key2id);
 
-#if POPULATE_FROM_DATABASE
-        private void PopulateLocked()
-        {
-            // don't if not empty
-            if (_key2Id.Count > 0) return;
-
-            using (var scope = _scopeProvider.CreateCoreScope())
-            {
-                // populate content and media items
-                var types = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media };
-                var values =
- scope.Database.Query<TypedIdDto>("SELECT id, uniqueId, nodeObjectType FROM umbracoNode WHERE nodeObjectType IN @types", new { types });
-                foreach (var value in values)
-                {
-                    var umbracoObjectType = ObjectTypes.GetUmbracoObjectType(value.NodeObjectType);
-                    _id2Key.Add(value.Id, new TypedId<Guid>(value.UniqueId, umbracoObjectType));
-                    _key2Id.Add(value.UniqueId, new TypedId<int>(value.Id, umbracoObjectType));
-                }
-            }
-        }
-
-        private Attempt<int> PopulateAndGetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
-        {
-            try
-            {
-                _locker.EnterWriteLock();
-
-                PopulateLocked();
-
-                return _key2Id.TryGetValue(key, out var id) && id.UmbracoObjectType == umbracoObjectType
-                    ? Attempt.Succeed(id.Id)
-                    : Attempt<int>.Fail();
-
-            }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
-            }
-        }
-
-        private Attempt<Guid> PopulateAndGetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
-        {
-            try
-            {
-                _locker.EnterWriteLock();
-
-                PopulateLocked();
-
-                return _id2Key.TryGetValue(id, out var key) && key.UmbracoObjectType == umbracoObjectType
-                    ? Attempt.Succeed(key.Id)
-                    : Attempt<Guid>.Fail();
-            }
-            finally
-            {
-                if (_locker.IsWriteLockHeld)
-                    _locker.ExitWriteLock();
-            }
-        }
-#endif
-
     /// <inheritdoc />
-    public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
+    public async Task<Attempt<int>> GetIdForKeyAsync(Guid key, UmbracoObjectTypes umbracoObjectType)
     {
         if (key == Constants.System.RecycleBinContentKey && umbracoObjectType == UmbracoObjectTypes.Document)
         {
@@ -176,13 +115,6 @@ public class IdKeyMap : IIdKeyMap, IDisposable
             }
         }
 
-#if POPULATE_FROM_DATABASE
-            // if cache is empty and looking for a document or a media,
-            // populate the cache at once and return what we found
-            if (empty && (umbracoObjectType == UmbracoObjectTypes.Document || umbracoObjectType == UmbracoObjectTypes.Media))
-                return PopulateAndGetIdForKey(key, umbracoObjectType);
-#endif
-
         // optimize for read speed: reading database outside a lock means that we could read
         // multiple times, but we don't lock the cache while accessing the database = better
         int? val = null;
@@ -199,7 +131,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         {
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
-                val = _idKeyMapRepository.GetIdForKey(key, umbracoObjectType);
+                val = await _idKeyMapRepository.GetIdForKeyAsync(key, umbracoObjectType);
                 scope.Complete();
             }
         }
@@ -255,7 +187,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
     }
 
     /// <inheritdoc />
-    public Attempt<int> GetIdForUdi(Udi udi)
+    public async Task<Attempt<int>> GetIdForUdiAsync(Udi udi)
     {
         var guidUdi = udi as GuidUdi;
         if (guidUdi == null)
@@ -264,22 +196,24 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
 
         UmbracoObjectTypes umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(guidUdi.EntityType);
-        return GetIdForKey(guidUdi.Guid, umbracoType);
+        return await GetIdForKeyAsync(guidUdi.Guid, umbracoType);
     }
 
     /// <inheritdoc />
-    public Attempt<Udi?> GetUdiForId(int id, UmbracoObjectTypes umbracoObjectType)
+    public async Task<Attempt<Udi?>> GetUdiForIdAsync(int id, UmbracoObjectTypes umbracoObjectType)
     {
-        Attempt<Guid> keyAttempt = GetKeyForId(id, umbracoObjectType);
-        return keyAttempt.Success
+        Attempt<Guid> keyAttempt = await GetKeyForIdAsync(id, umbracoObjectType);
+        Attempt<Udi?> attempt = keyAttempt.Success
             ? Attempt.Succeed<Udi?>(new GuidUdi(
                 UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType),
                 keyAttempt.Result))
             : Attempt<Udi?>.Fail();
+
+        return attempt;
     }
 
     /// <inheritdoc />
-    public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
+    public async Task<Attempt<Guid>> GetKeyForIdAsync(int id, UmbracoObjectTypes umbracoObjectType)
     {
         if (id == Constants.System.RecycleBinContent && umbracoObjectType == UmbracoObjectTypes.Document)
         {
@@ -316,13 +250,6 @@ public class IdKeyMap : IIdKeyMap, IDisposable
             }
         }
 
-#if POPULATE_FROM_DATABASE
-            // if cache is empty and looking for a document or a media,
-            // populate the cache at once and return what we found
-            if (empty && (umbracoObjectType == UmbracoObjectTypes.Document || umbracoObjectType == UmbracoObjectTypes.Media))
-                return PopulateAndGetKeyForId(id, umbracoObjectType);
-#endif
-
         // optimize for read speed: reading database outside a lock means that we could read
         // multiple times, but we don't lock the cache while accessing the database = better
         Guid? val = null;
@@ -339,7 +266,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         {
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
-                val = _idKeyMapRepository.GetIdForKey(id, umbracoObjectType);
+                val = await _idKeyMapRepository.GetKeyForIdAsync(id, umbracoObjectType);
                 scope.Complete();
             }
         }

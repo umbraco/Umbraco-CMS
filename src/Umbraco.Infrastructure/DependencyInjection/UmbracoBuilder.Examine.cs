@@ -5,9 +5,9 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -86,12 +86,13 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<ContentCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
+        builder.AddNotificationHandler<ElementCacheRefresherNotification, ElementIndexingNotificationHandler>();
         builder.AddNotificationHandler<MediaCacheRefresherNotification, MediaIndexingNotificationHandler>();
         builder.AddNotificationHandler<MemberCacheRefresherNotification, MemberIndexingNotificationHandler>();
         builder.AddNotificationHandler<ExternalMemberCacheRefresherNotification, ExternalMemberIndexingNotificationHandler>();
         builder.AddNotificationAsyncHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();
 
-        builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, RebuildOnStartedHandler>();
 
         return builder;
     }

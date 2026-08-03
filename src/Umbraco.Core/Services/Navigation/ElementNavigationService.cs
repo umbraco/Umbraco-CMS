@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -16,15 +17,25 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     so the rebuild queries both object types to build the full tree hierarchy.
 /// </remarks>
 internal sealed class ElementNavigationService :
-    ContentNavigationServiceBase<IContentType, IContentTypeService>,
+    AsyncContentNavigationServiceBase<IContentType, IContentTypeService>,
     IElementNavigationQueryService,
-    IElementNavigationManagementService
+    IElementNavigationManagementService,
+    IMemoryCacheSizeReporter
 {
     private static readonly Guid[] ElementObjectTypes =
     [
         Constants.ObjectTypes.Element,
         Constants.ObjectTypes.ElementContainer,
     ];
+
+    /// <inheritdoc />
+    public string CacheName => "Element navigation";
+
+    /// <inheritdoc />
+    public long GetApproximateCount() => GetNavigationNodeCount();
+
+    /// <inheritdoc />
+    public long? GetApproximateBytes() => GetNavigationApproximateBytes();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ElementNavigationService"/> class.

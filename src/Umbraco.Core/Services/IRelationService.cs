@@ -108,6 +108,19 @@ public interface IRelationService : IService
     Task<PagedModel<IUmbracoEntity>> GetPagedChildEntitiesByParentIdAsync(int id, int skip, int take, UmbracoObjectTypes[]? entityTypes = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Returns the parent entities of the specified child ids, optionally filtered by relation type alias.
+    /// </summary>
+    /// <param name="childIds">The child entity identifiers.</param>
+    /// <param name="relationTypeAliases">The relation type aliases to filter by, or empty to match all relation types.</param>
+    /// <param name="entityType">The entity type of the parent entities to return.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task<IEnumerable<IUmbracoEntity>> GetParentEntitiesByChildIdsAsync(
+        IEnumerable<int> childIds,
+        IEnumerable<string> relationTypeAliases,
+        UmbracoObjectTypes entityType,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Gets a paged result of <see cref="IRelation" /> objects by child key.
     /// </summary>
     Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias);

@@ -373,8 +373,8 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     {
         IContentTypeComposition? contentType = itemType switch
         {
-            PublishedItemType.Content => _contentTypeService?.Get(key),
-            PublishedItemType.Element => _contentTypeService?.Get(key),
+            PublishedItemType.Content => _contentTypeService is null ? null : _contentTypeService.GetAsync(key).GetAwaiter().GetResult(),
+            PublishedItemType.Element => _contentTypeService is null ? null : _contentTypeService.GetAsync(key).GetAwaiter().GetResult(),
             PublishedItemType.Media => _mediaTypeService?.Get(key),
             PublishedItemType.Member => _memberTypeService?.Get(key),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
@@ -392,8 +392,8 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     {
         IContentTypeComposition? contentType = itemType switch
         {
-            PublishedItemType.Content => _contentTypeService?.Get(alias),
-            PublishedItemType.Element => _contentTypeService?.Get(alias),
+            PublishedItemType.Content => _contentTypeService is null ? null : _contentTypeService.GetAsync(alias).GetAwaiter().GetResult(),
+            PublishedItemType.Element => _contentTypeService is null ? null : _contentTypeService.GetAsync(alias).GetAwaiter().GetResult(),
             PublishedItemType.Media => _mediaTypeService?.Get(alias),
             PublishedItemType.Member => _memberTypeService?.Get(alias),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
@@ -411,8 +411,8 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
     {
         IContentTypeComposition? contentType = itemType switch
         {
-            PublishedItemType.Content => _contentTypeService?.Get(id),
-            PublishedItemType.Element => _contentTypeService?.Get(id),
+            PublishedItemType.Content => _contentTypeService is null ? null : _contentTypeService.GetAsync(id).GetAwaiter().GetResult(),
+            PublishedItemType.Element => _contentTypeService is null ? null : _contentTypeService.GetAsync(id).GetAwaiter().GetResult(),
             PublishedItemType.Media => _mediaTypeService?.Get(id),
             PublishedItemType.Member => _memberTypeService?.Get(id),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),

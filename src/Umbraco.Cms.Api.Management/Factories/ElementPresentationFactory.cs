@@ -36,6 +36,13 @@ internal sealed class ElementPresentationFactory
         _idKeyMap = idKeyMap;
 
     /// <inheritdoc />
+    public Task<PublishedElementResponseModel> CreatePublishedResponseModelAsync(IElement element)
+    {
+        PublishedElementResponseModel responseModel = UmbracoMapper.Map<PublishedElementResponseModel>(element)!;
+        return Task.FromResult(responseModel);
+    }
+
+    /// <inheritdoc />
     public ElementResponseModel CreateResponseModel(IElement element, ContentScheduleCollection schedule)
     {
         ElementResponseModel responseModel = UmbracoMapper.Map<ElementResponseModel>(element)!;
@@ -47,7 +54,7 @@ internal sealed class ElementPresentationFactory
     /// <inheritdoc />
     public async Task<ElementItemResponseModel> CreateItemResponseModelAsync(IElementEntitySlim entity)
     {
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.ElementContainer);
+        Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(entity.ParentId, UmbracoObjectTypes.ElementContainer);
 
         var responseModel = new ElementItemResponseModel
         {

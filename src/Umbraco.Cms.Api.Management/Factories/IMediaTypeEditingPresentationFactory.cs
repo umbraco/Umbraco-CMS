@@ -17,16 +17,16 @@ public interface IMediaTypeEditingPresentationFactory
     MediaTypeCreateModel MapCreateModel(CreateMediaTypeRequestModel requestModel);
 
     /// <summary>
-    /// Maps the given <see cref="Umbraco.Cms.Api.Management.Models.UpdateMediaTypeRequestModel"/> to a <see cref="Umbraco.Cms.Api.Management.Models.MediaTypeUpdateModel"/>.
+    /// Maps the given <see cref="UpdateMediaTypeRequestModel"/> to a <see cref="MediaTypeUpdateModel"/>.
     /// </summary>
     /// <param name="requestModel">The update request model containing media type data.</param>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MediaTypeUpdateModel"/> representing the updated media type.</returns>
+    /// <returns>A <see cref="MediaTypeUpdateModel"/> representing the updated media type.</returns>
     MediaTypeUpdateModel MapUpdateModel(UpdateMediaTypeRequestModel requestModel);
 
     /// <summary>
     /// Maps a collection of content type composition results to their corresponding media type composition response models.
     /// </summary>
     /// <param name="compositionResults">The collection of content type composition results to map.</param>
-    /// <returns>An enumerable of mapped media type composition response models.</returns>
-    IEnumerable<AvailableMediaTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
+    /// <returns>A task that represents the asynchronous operation. The task result contains the mapped media type composition response models.</returns>
+    Task<IEnumerable<AvailableMediaTypeCompositionResponseModel>> MapCompositionModelsAsync(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
 }

@@ -6,6 +6,7 @@ import { UmbScriptPickerInputContext } from '@umbraco-cms/backoffice/script';
 import { UmbStylesheetPickerInputContext } from '@umbraco-cms/backoffice/stylesheet';
 import { UmbTemplatePickerInputContext } from '@umbraco-cms/backoffice/template';
 import type { UmbDataTypeInputElement } from '@umbraco-cms/backoffice/data-type';
+import type { UmbInputElementElement } from '@umbraco-cms/backoffice/element';
 import type { UmbInputLanguageElement } from '@umbraco-cms/backoffice/language';
 import {
 	css,
@@ -175,10 +176,10 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	#renderEditors() {
 		return html`
 			<uui-box headline="Package Content">
-				${this.#renderDocumentSection()} ${this.#renderMediaSection()} ${this.#renderDocumentTypeSection()}
-				${this.#renderMediaTypeSection()} ${this.#renderLanguageSection()} ${this.#renderDictionarySection()}
-				${this.#renderDataTypeSection()} ${this.#renderTemplateSection()} ${this.#renderStylesheetsSection()}
-				${this.#renderScriptsSection()} ${this.#renderPartialViewSection()}
+				${this.#renderDocumentSection()} ${this.#renderMediaSection()} ${this.#renderElementSection()}
+				${this.#renderDocumentTypeSection()} ${this.#renderMediaTypeSection()} ${this.#renderLanguageSection()}
+				${this.#renderDictionarySection()} ${this.#renderDataTypeSection()} ${this.#renderTemplateSection()}
+				${this.#renderStylesheetsSection()} ${this.#renderScriptsSection()} ${this.#renderPartialViewSection()}
 			</uui-box>
 		`;
 	}
@@ -245,6 +246,27 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 						@change=${(e: UUIBooleanInputEvent) => (this._package!.mediaLoadChildNodes = e.target.checked)}>
 						Include child nodes
 					</uui-checkbox>
+				</div>
+			</umb-property-layout>
+		`;
+	}
+
+	#onElementChange(event: { target: UmbInputElementElement }) {
+		if (!this._package) return;
+
+		this._package.elementIds = event.target.selection ?? [];
+		this.requestUpdate('_package');
+	}
+
+	#renderElementSection() {
+		if (!this._package) return nothing;
+		return html`
+			<umb-property-layout label="Elements">
+				<div slot="editor">
+					<umb-input-element
+						.selection=${this._package.elementIds ?? []}
+						@change=${this.#onElementChange}>
+					</umb-input-element>
 				</div>
 			</umb-property-layout>
 		`;

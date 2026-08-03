@@ -8,12 +8,13 @@ namespace Umbraco.Cms.Api.Management.Factories;
 internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IMemberType>, IMemberTypeEditingPresentationFactory
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.MemberTypeEditingPresentationFactory"/> class,
+    /// Initializes a new instance of the <see cref="MemberTypeEditingPresentationFactory"/> class,
     /// providing functionality for creating member type editing presentations.
     /// </summary>
     /// <param name="memberTypeService">The service used to manage and retrieve member types.</param>
-    public MemberTypeEditingPresentationFactory(IMemberTypeService memberTypeService)
-        : base(memberTypeService)
+    /// <param name="containerService">The service used to retrieve member type containers (folders).</param>
+    public MemberTypeEditingPresentationFactory(IMemberTypeService memberTypeService, IMemberTypeContainerService containerService)
+        : base(containerService, () => memberTypeService.GetAll())
     {
     }
 
@@ -46,11 +47,11 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
     }
 
     /// <summary>
-    /// Maps an <see cref="Umbraco.Cms.Api.Management.Models.UpdateMemberTypeRequestModel" /> to a <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeUpdateModel" />.
+    /// Maps an <see cref="UpdateMemberTypeRequestModel" /> to a <see cref="MemberTypeUpdateModel" />.
     /// This includes mapping compositions and updating property sensitivity and visibility based on the request model.
     /// </summary>
     /// <param name="requestModel">The request model containing the updated member type information.</param>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeUpdateModel" /> that reflects the changes specified in the request model.</returns>
+    /// <returns>A <see cref="MemberTypeUpdateModel" /> that reflects the changes specified in the request model.</returns>
     public MemberTypeUpdateModel MapUpdateModel(UpdateMemberTypeRequestModel requestModel)
     {
         MemberTypeUpdateModel updateModel = MapContentTypeEditingModel<
@@ -72,9 +73,9 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
     /// Maps a collection of <see cref="ContentTypeAvailableCompositionsResult"/> objects to their corresponding <see cref="AvailableMemberTypeCompositionResponseModel"/> representations.
     /// </summary>
     /// <param name="compositionResults">The collection of composition results to map.</param>
-    /// <returns>An enumerable of mapped <see cref="AvailableMemberTypeCompositionResponseModel"/> objects.</returns>
-    public IEnumerable<AvailableMemberTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
-        => compositionResults.Select(MapCompositionModel<AvailableMemberTypeCompositionResponseModel>);
+    /// <returns>A task that represents the asynchronous operation. The task result contains the mapped <see cref="AvailableMemberTypeCompositionResponseModel"/> objects.</returns>
+    public Task<IEnumerable<AvailableMemberTypeCompositionResponseModel>> MapCompositionModelsAsync(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        => MapCompositionModelsAsync<AvailableMemberTypeCompositionResponseModel>(compositionResults);
 
     private IEnumerable<Composition> MapCompositions(IEnumerable<MemberTypeComposition> documentTypeCompositions)
         => MapCompositions(documentTypeCompositions

@@ -13,8 +13,8 @@ export class UmbElementUserPermissionCondition
 {
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
-	#elementPermissions: Array<IPermissionPresentationModelElementPermissionPresentationModel> = [];
-	#fallbackPermissions: string[] = [];
+	#elementPermissions?: Array<IPermissionPresentationModelElementPermissionPresentationModel>;
+	#fallbackPermissions?: Array<string>;
 	#ancestors: Array<UmbEntityUnique> = [];
 
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbElementUserPermissionConditionConfig>) {
@@ -24,8 +24,8 @@ export class UmbElementUserPermissionCondition
 			this.observe(
 				context?.currentUser,
 				(currentUser) => {
-					this.#elementPermissions = currentUser?.permissions?.filter(this.#isElementUserPermission) || [];
-					this.#fallbackPermissions = currentUser?.fallbackPermissions || [];
+					this.#elementPermissions = currentUser?.permissions?.filter(this.#isElementUserPermission);
+					this.#fallbackPermissions = currentUser?.fallbackPermissions;
 					this.#checkPermissions();
 				},
 				'umbUserPermissionConditionObserver',
@@ -64,6 +64,11 @@ export class UmbElementUserPermissionCondition
 	#checkPermissions() {
 		if (!this.#entityType) return;
 		if (this.#unique === undefined) return;
+
+		// Wait until the current user's permissions have loaded before evaluating,
+		// so we don't permit/deny based on incomplete data.
+		if (this.#elementPermissions === undefined) return;
+		if (this.#fallbackPermissions === undefined) return;
 
 		const hasElementPermissions = this.#elementPermissions.length > 0;
 

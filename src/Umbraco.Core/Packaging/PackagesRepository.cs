@@ -367,7 +367,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(outInt, UmbracoObjectTypes.DataType);
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(outInt, UmbracoObjectTypes.DataType).GetAwaiter().GetResult();
             if (keyAttempt.Success is false)
             {
                 continue;
@@ -619,7 +619,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IContentType? contentType = _contentTypeService.Get(outInt);
+            IContentType? contentType = _contentTypeService.GetAsync(outInt).GetAwaiter().GetResult();
             if (contentType == null)
             {
                 continue;
@@ -837,7 +837,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     {
         if (dt.ParentId > 0)
         {
-            IContentType? parent = _contentTypeService.Get(dt.ParentId);
+            IContentType? parent = _contentTypeService.GetAsync(dt.ParentId).GetAwaiter().GetResult();
 
             // could be a container
             if (parent != null)

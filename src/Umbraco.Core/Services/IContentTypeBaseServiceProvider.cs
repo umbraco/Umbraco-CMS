@@ -21,7 +21,8 @@ public interface IContentTypeBaseServiceProvider
     ///         to retrieve the content / media / whatever type as <see cref="IContentTypeComposition" />.
     ///     </para>
     /// </remarks>
-    IContentTypeBaseService For(IContentBase contentBase);
+    /// TODO EFCore: Reenable when media type and member type has all been migrated to new base.
+    /// IContentTypeBaseService For(IContentBase contentBase);
 
     /// <summary>
     ///     Gets the content type of an <see cref="IContentBase" /> object.

@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Core.DependencyInjection;
+using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Common.OpenApi;
 
@@ -117,6 +118,26 @@ public class BackOfficeOpenApiDocumentBuilderTests
         Assert.IsTrue(urls is null || urls.All(url => url.Name != "My API" && url.Name != DocumentName));
     }
 
+    [Test]
+    public void Build_With_Mixed_Case_Name_And_WithJsonOptions_Does_Not_Throw()
+    {
+        // AddOpenApi lowercases the document name internally; our registration logic must account for that.
+        Assert.DoesNotThrow(() => Build("MixedCaseDocument", b => b.WithJsonOptions(new JsonOptions())));
+    }
+
+    [Test]
+    public void ShouldInclude_Matches_MapToApi_Case_Insensitively_When_Document_Name_Is_Mixed_Case()
+    {
+        // ShouldInclude matches [MapToApi] case-insensitively so callers are not forced to use exact casing.
+        ServiceCollection services = Build("MixedCaseDocument");
+        ServiceProvider provider = services.BuildServiceProvider();
+        OpenApiOptions options = provider.GetRequiredService<IOptionsMonitor<OpenApiOptions>>().Get("mixedcasedocument");
+
+        Assert.IsTrue(options.ShouldInclude!(CreateApiDescription(new MapToApiAttribute("MixedCaseDocument"))));
+        Assert.IsTrue(options.ShouldInclude!(CreateApiDescription(new MapToApiAttribute("MIXEDCASEDOCUMENT"))));
+        Assert.IsTrue(options.ShouldInclude!(CreateApiDescription(new MapToApiAttribute("mixedcasedocument"))));
+    }
+
     private static OpenApiOptions BuildAndResolveOptions(Action<BackOfficeOpenApiDocumentBuilder>? configure = null)
     {
         ServiceCollection services = Build(configure);
@@ -132,10 +153,13 @@ public class BackOfficeOpenApiDocumentBuilderTests
     }
 
     private static ServiceCollection Build(Action<BackOfficeOpenApiDocumentBuilder>? configure = null)
+        => Build(DocumentName, configure);
+
+    private static ServiceCollection Build(string documentName, Action<BackOfficeOpenApiDocumentBuilder>? configure = null)
     {
         var services = new ServiceCollection();
         IUmbracoBuilder umbracoBuilder = Mock.Of<IUmbracoBuilder>(b => b.Services == services);
-        var documentBuilder = new BackOfficeOpenApiDocumentBuilder(DocumentName);
+        var documentBuilder = new BackOfficeOpenApiDocumentBuilder(documentName);
         configure?.Invoke(documentBuilder);
         documentBuilder.Build(umbracoBuilder);
 

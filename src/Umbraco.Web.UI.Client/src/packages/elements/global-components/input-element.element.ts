@@ -16,6 +16,9 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 	@property({ type: Boolean })
 	folderOnly = false;
 
+	@property({ type: Array })
+	allowedContentTypeIds?: string[];
+
 	@property({ type: Number })
 	min = 0;
 
@@ -68,6 +71,7 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 		const dataSourceConfig = [
 			{ alias: 'folderOnly', value: this.folderOnly },
 			{ alias: 'startNode', value: this.startNode },
+			{ alias: 'allowedContentTypeIds', value: this.allowedContentTypeIds },
 		];
 		return html`
 			<umb-input-entity-data

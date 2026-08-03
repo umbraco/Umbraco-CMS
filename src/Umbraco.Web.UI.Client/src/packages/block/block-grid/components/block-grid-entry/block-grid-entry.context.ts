@@ -52,7 +52,10 @@ export class UmbBlockGridEntryContext
 		return [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1];
 	}
 
-	readonly inlineEditingMode = this._blockType.asObservablePart((x) => x?.inlineEditing === true);
+	readonly inlineEditingMode = mergeObservables(
+		[this._blockType.asObservablePart((x) => x?.inlineEditing === true), this.isExternalContent],
+		([inlineEditing, isExternalContent]) => inlineEditing === true && !isExternalContent,
+	);
 
 	#relevantColumnSpanOptions = new UmbArrayState<number>([], (x) => x);
 	readonly relevantColumnSpanOptions = this.#relevantColumnSpanOptions.asObservable();
@@ -81,6 +84,12 @@ export class UmbBlockGridEntryContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
+	}
+
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block Grid entry element owns the canonical `<umb-ufm-render>` (via its child
+		// views) and pushes resolved text via `setName()`. No hidden virtual renderer needed.
+		return false;
 	}
 
 	layoutsOfArea(areaKey: string) {

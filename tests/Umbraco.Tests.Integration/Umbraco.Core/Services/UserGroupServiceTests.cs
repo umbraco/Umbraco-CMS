@@ -3,7 +3,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -14,8 +13,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
-
-    private IShortStringHelper ShortStringHelper => GetRequiredService<IShortStringHelper>();
 
     [Test]
     public async Task Can_Create_User_Group()

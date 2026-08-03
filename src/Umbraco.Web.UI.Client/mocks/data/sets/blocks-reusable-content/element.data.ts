@@ -1,0 +1,81 @@
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
+import type { UmbMockElementModel } from '../../mock-data-set.types.js';
+
+export const data: Array<UmbMockElementModel> = [
+	{
+		ancestors: [],
+		id: 'library-element-one-id',
+		createDate: '2024-01-15T10:00:00.000Z',
+		parent: null,
+		documentType: {
+			id: 'b818bb55-31e1-4537-9c42-17471a176089',
+			icon: 'icon-attachment color-deep-purple',
+		},
+		hasChildren: false,
+		isTrashed: false,
+		isFolder: false,
+		name: 'Element One (Library)',
+		variants: [
+			{
+				state: UmbElementVariantState.PUBLISHED,
+				culture: null,
+				segment: null,
+				name: 'Element One (Library)',
+				createDate: '2024-01-15T10:00:00.000Z',
+				updateDate: '2024-01-15T10:00:00.000Z',
+				publishDate: '2024-01-15T10:00:00.000Z',
+				id: 'library-element-one',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.TextBox',
+				alias: 'title',
+				culture: null,
+				segment: null,
+				value: 'Reusable Element One',
+			},
+		],
+		flags: [],
+		noAccess: false,
+	},
+	{
+		ancestors: [],
+		id: 'library-element-two-id',
+		createDate: '2024-01-15T10:00:00.000Z',
+		parent: null,
+		documentType: {
+			id: 'f7f156a0-a3f3-42ec-8b9c-e788157bd84e',
+			icon: 'icon-blueprint color-deep-purple',
+		},
+		hasChildren: false,
+		isTrashed: false,
+		isFolder: false,
+		name: 'Element Two (Library)',
+		variants: [
+			{
+				state: UmbElementVariantState.PUBLISHED,
+				culture: null,
+				segment: null,
+				name: 'Element Two (Library)',
+				createDate: '2024-01-15T10:00:00.000Z',
+				updateDate: '2024-01-15T10:00:00.000Z',
+				publishDate: '2024-01-15T10:00:00.000Z',
+				id: 'library-element-two',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.ContentPicker',
+				alias: 'link',
+				culture: null,
+				segment: null,
+				value: '17cd53f2-93b3-4e34-ade2-916e7a6639ed',
+			},
+		],
+		flags: [],
+		noAccess: false,
+	},
+];

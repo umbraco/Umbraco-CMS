@@ -55,7 +55,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     [ProducesResponseType(typeof(TemplateQueryResultResponseModel), StatusCodes.Status200OK)]
     [EndpointSummary("Executes a template query.")]
     [EndpointDescription("Executes a template query with the provided parameters and returns the matching content results with execution metrics.")]
-    public Task<ActionResult<TemplateQueryResultResponseModel>> Execute(
+    public async Task<ActionResult<TemplateQueryResultResponseModel>> Execute(
         CancellationToken cancellationToken,
         TemplateQueryExecuteModel query)
     {
@@ -67,11 +67,11 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
         var results = contents.ToList();
         timer.Stop();
 
-        var contentTypeIconsByKey = _contentTypeService
-            .GetMany(results.Select(content => content.ContentType.Key).Distinct())
+        var contentTypeIconsByKey = (await _contentTypeService
+            .GetManyAsync(results.Select(content => content.ContentType.Key).Distinct()))
             .ToDictionary(contentType => contentType.Key, contentType => contentType.Icon);
 
-        return Task.FromResult<ActionResult<TemplateQueryResultResponseModel>>(Ok(new TemplateQueryResultResponseModel
+        return Ok(new TemplateQueryResultResponseModel
         {
             QueryExpression = queryExpression.ToString(),
             ResultCount = results.Count,
@@ -81,7 +81,7 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
                 Icon = contentTypeIconsByKey[content.ContentType.Key] ?? "icon-document",
                 Name = content.Name
             })
-        }));
+        });
     }
 
     private IEnumerable<IPublishedContent> BuildQuery(TemplateQueryExecuteModel model, StringBuilder queryExpression)

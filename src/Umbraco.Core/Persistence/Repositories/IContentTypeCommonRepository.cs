@@ -12,9 +12,9 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 public interface IContentTypeCommonRepository
 {
     /// <summary>
-    ///     Gets and cache all types.
+    ///     Gets and caches all types.
     /// </summary>
-    IEnumerable<IContentTypeComposition>? GetAllTypes();
+    Task<IEnumerable<IContentTypeComposition>?> GetAllTypesAsync();
 
     /// <summary>
     ///     Clears the cache.

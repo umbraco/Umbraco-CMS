@@ -24,13 +24,14 @@ internal sealed class ContentTypeSchemaServiceTests : UmbracoIntegrationTestWith
         GetRequiredService<IMediaTypeService>();
 
     [Test]
-    public void Can_Get_DocumentTypes()
+    public async Task Can_Get_DocumentTypes()
     {
         // Act
         var result = ContentTypeSchemaService.GetDocumentTypes();
 
         // Assert - count should match the content type service
-        Assert.That(result, Has.Count.EqualTo(ContentTypeService.Count()));
+        var contentTypeCount = await ContentTypeService.CountAsync();
+        Assert.That(result, Has.Count.EqualTo(contentTypeCount));
 
         var contentTypeSchema = result.FirstOrDefault(ct => ct.Alias == ContentType.Alias);
         Assert.That(contentTypeSchema, Is.Not.Null);

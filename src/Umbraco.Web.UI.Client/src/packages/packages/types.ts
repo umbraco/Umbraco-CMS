@@ -22,6 +22,8 @@ export type UmbCreatedPackageDefinition = UmbCreatedPackage & {
 	contentLoadChildNodes: boolean;
 	mediaIds: Array<string>;
 	mediaLoadChildNodes: boolean;
+	// TODO (V20): make required and non-nullable
+	elementIds?: null | Array<string>;
 	documentTypes: Array<string>;
 	mediaTypes: Array<string>;
 	dataTypes: Array<string>;

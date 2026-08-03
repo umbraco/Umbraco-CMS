@@ -1,13 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -18,11 +16,11 @@ internal sealed class ConsentServiceTests : UmbracoIntegrationTest
     private IConsentService ConsentService => GetRequiredService<IConsentService>();
 
     [Test]
-    public void CanCrudConsent()
+    public async Task CanCrudConsent()
     {
         // can register
         var consent =
-            ConsentService.RegisterConsent("user/1234", "app1", "do-something", ConsentState.Granted, "no comment");
+            await ConsentService.RegisterConsentAsync("user/1234", "app1", "do-something", ConsentState.Granted, "no comment");
         Assert.AreNotEqual(0, consent.Id);
 
         Assert.IsTrue(consent.Current);
@@ -35,63 +33,63 @@ internal sealed class ConsentServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(consent.IsGranted());
 
         // can register more
-        ConsentService.RegisterConsent("user/1234", "app1", "do-something-else", ConsentState.Granted, "no comment");
-        ConsentService.RegisterConsent("user/1236", "app1", "do-something", ConsentState.Granted, "no comment");
-        ConsentService.RegisterConsent("user/1237", "app2", "do-something", ConsentState.Granted, "no comment");
+        await ConsentService.RegisterConsentAsync("user/1234", "app1", "do-something-else", ConsentState.Granted, "no comment");
+        await ConsentService.RegisterConsentAsync("user/1236", "app1", "do-something", ConsentState.Granted, "no comment");
+        await ConsentService.RegisterConsentAsync("user/1237", "app2", "do-something", ConsentState.Granted, "no comment");
 
         // can get by source
-        var consents = ConsentService.LookupConsent("user/1235").ToArray();
+        var consents = (await ConsentService.LookupConsentAsync("user/1235")).ToArray();
         Assert.IsEmpty(consents);
 
-        consents = ConsentService.LookupConsent("user/1234").ToArray();
+        consents = (await ConsentService.LookupConsentAsync("user/1234")).ToArray();
         Assert.AreEqual(2, consents.Length);
         Assert.IsTrue(consents.All(x => x.Source == "user/1234"));
         Assert.IsTrue(consents.Any(x => x.Action == "do-something"));
         Assert.IsTrue(consents.Any(x => x.Action == "do-something-else"));
 
         // can get by context
-        consents = ConsentService.LookupConsent(context: "app3").ToArray();
+        consents = (await ConsentService.LookupConsentAsync(context: "app3")).ToArray();
         Assert.IsEmpty(consents);
 
-        consents = ConsentService.LookupConsent(context: "app2").ToArray();
+        consents = (await ConsentService.LookupConsentAsync(context: "app2")).ToArray();
         Assert.AreEqual(1, consents.Length);
 
-        consents = ConsentService.LookupConsent(context: "app1").ToArray();
+        consents = (await ConsentService.LookupConsentAsync(context: "app1")).ToArray();
         Assert.AreEqual(3, consents.Length);
         Assert.IsTrue(consents.Any(x => x.Action == "do-something"));
         Assert.IsTrue(consents.Any(x => x.Action == "do-something-else"));
 
         // can get by action
-        consents = ConsentService.LookupConsent(action: "do-whatever").ToArray();
+        consents = (await ConsentService.LookupConsentAsync(action: "do-whatever")).ToArray();
         Assert.IsEmpty(consents);
 
-        consents = ConsentService.LookupConsent(context: "app1", action: "do-something").ToArray();
+        consents = (await ConsentService.LookupConsentAsync(context: "app1", action: "do-something")).ToArray();
         Assert.AreEqual(2, consents.Length);
         Assert.IsTrue(consents.All(x => x.Action == "do-something"));
         Assert.IsTrue(consents.Any(x => x.Source == "user/1234"));
         Assert.IsTrue(consents.Any(x => x.Source == "user/1236"));
 
         // can revoke
-        consent = ConsentService.RegisterConsent(
+        consent = await ConsentService.RegisterConsentAsync(
             "user/1234",
             "app1",
             "do-something",
             ConsentState.Revoked,
             "no comment");
 
-        consents = ConsentService.LookupConsent("user/1234", "app1", "do-something").ToArray();
+        consents = (await ConsentService.LookupConsentAsync("user/1234", "app1", "do-something")).ToArray();
         Assert.AreEqual(1, consents.Length);
         Assert.IsTrue(consents[0].Current);
         Assert.AreEqual(ConsentState.Revoked, consents[0].State);
 
         // can filter
-        consents = ConsentService.LookupConsent(context: "app1", action: "do-", actionStartsWith: true).ToArray();
+        consents = (await ConsentService.LookupConsentAsync(context: "app1", action: "do-", actionStartsWith: true)).ToArray();
         Assert.AreEqual(3, consents.Length);
         Assert.IsTrue(consents.All(x => x.Context == "app1"));
         Assert.IsTrue(consents.All(x => x.Action.StartsWith("do-")));
 
         // can get history
-        consents = ConsentService.LookupConsent("user/1234", "app1", "do-something", includeHistory: true).ToArray();
+        consents = (await ConsentService.LookupConsentAsync("user/1234", "app1", "do-something", includeHistory: true)).ToArray();
         Assert.AreEqual(1, consents.Length);
         Assert.IsTrue(consents[0].Current);
         Assert.AreEqual(ConsentState.Revoked, consents[0].State);
@@ -103,8 +101,8 @@ internal sealed class ConsentServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(ConsentState.Granted, history[0].State);
 
         // cannot be stupid
-        Assert.Throws<ArgumentException>(() =>
-            ConsentService.RegisterConsent(
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await ConsentService.RegisterConsentAsync(
                 "user/1234",
                 "app1",
                 "do-something",
@@ -113,13 +111,13 @@ internal sealed class ConsentServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CanRegisterConsentWithoutComment()
+    public async Task CanRegisterConsentWithoutComment()
     {
         // Attept to add consent without a comment
-        ConsentService.RegisterConsent("user/1234", "app1", "consentWithoutComment", ConsentState.Granted);
+        await ConsentService.RegisterConsentAsync("user/1234", "app1", "consentWithoutComment", ConsentState.Granted);
 
         // Attempt to retrieve the consent we just added without a comment
-        var consents = ConsentService.LookupConsent("user/1234", action: "consentWithoutComment").ToArray();
+        var consents = (await ConsentService.LookupConsentAsync("user/1234", action: "consentWithoutComment")).ToArray();
 
         // Confirm we got our expected consent record
         Assert.AreEqual(1, consents.Length);

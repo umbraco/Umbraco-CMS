@@ -1188,7 +1188,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         private IMember? GetMemberFromRepository(Guid id)
-            => _idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.Member) switch
+            => _idKeyMap.Value.GetIdForKeyAsync(id, UmbracoObjectTypes.Member).GetAwaiter().GetResult() switch
             {
                 { Success: false } => null,
                 { Result: var intId } => _memberRepository.Get(intId),

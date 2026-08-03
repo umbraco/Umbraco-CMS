@@ -665,7 +665,7 @@ internal sealed class ServerEventSender :
         var seen = new HashSet<Guid>();
         foreach (PublicAccessEntry entity in entities)
         {
-            Attempt<Guid> getKeyAttempt = _idKeyMap.GetKeyForId(entity.ProtectedNodeId, UmbracoObjectTypes.Document);
+            Attempt<Guid> getKeyAttempt = await _idKeyMap.GetKeyForIdAsync(entity.ProtectedNodeId, UmbracoObjectTypes.Document);
             if (getKeyAttempt.Success is false)
             {
                 continue;

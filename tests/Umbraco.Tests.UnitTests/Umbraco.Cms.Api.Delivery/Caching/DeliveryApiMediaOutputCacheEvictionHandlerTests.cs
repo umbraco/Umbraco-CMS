@@ -103,8 +103,8 @@ public class DeliveryApiMediaOutputCacheEvictionHandlerTests
             .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
-            .Setup(m => m.GetKeyForId(parentDocumentId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(parentDocumentKey));
+            .Setup(m => m.GetKeyForIdAsync(parentDocumentId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(parentDocumentKey));
 
         var notification = CreateNotification(new MediaCacheRefresher.JsonPayload(mediaId, Guid.NewGuid(), TreeChangeTypes.RefreshNode));
 

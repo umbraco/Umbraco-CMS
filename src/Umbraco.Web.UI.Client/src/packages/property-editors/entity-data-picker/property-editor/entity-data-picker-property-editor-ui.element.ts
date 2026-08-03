@@ -4,10 +4,12 @@ import type { UmbEntityDataPickerPickerViewsConfigurationPropertyValue } from '.
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -71,8 +73,24 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 	@state()
 	private _pickerViews?: UmbEntityDataPickerPickerViewsConfigurationPropertyValue;
 
+	@state()
+	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
+
+	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+		memoryUniquePrefix: 'UmbEntityDataPicker',
+	});
+
+	constructor() {
+		super();
+
+		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
+			this._interactionMemories = interactionMemories ?? [];
+		});
+	}
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#propertyEditorConfigCollection = config;
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
 
 		const minMax = config?.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this._min = minMax?.min ?? 0;
@@ -167,6 +185,17 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 		}
 	}
 
+	async #onInputInteractionMemoriesChange(event: UmbChangeEvent) {
+		const target = event.target as UmbInputEntityDataElement;
+		const interactionMemories = target.interactionMemories;
+
+		if (interactionMemories && interactionMemories.length > 0) {
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(interactionMemories);
+		} else {
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
+		}
+	}
+
 	override render() {
 		return html`<umb-input-entity-data
 			.selection=${this.value?.ids ?? []}
@@ -178,7 +207,9 @@ export class UmbEntityDataPickerPropertyEditorUIElement
 			.max=${this._max}
 			.max-message=${this._maxMessage}
 			?readonly=${this.readonly}
-			@change=${this.#onChange}></umb-input-entity-data>`;
+			@change=${this.#onChange}
+			.interactionMemories=${this._interactionMemories}
+			@interaction-memories-change=${this.#onInputInteractionMemoriesChange}></umb-input-entity-data>`;
 	}
 }
 

@@ -31,7 +31,7 @@ export class TemplateApiHelper {
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/template', templateData);
     // Returns the id of the created template
-    return response.headers().location.split("/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -45,7 +45,7 @@ export class TemplateApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/template/children?parentId=${id}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getItems(ids: string[]) {
@@ -100,7 +100,10 @@ export class TemplateApiHelper {
           return await this.delete(child.id);
         }
       } else if (child.isContainer || child.hasChildren) {
-        await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -110,7 +113,7 @@ export class TemplateApiHelper {
     const rootTemplates = await this.getAllAtRoot();
     const jsonTemplates = await rootTemplates.json();
 
-    for (const template of jsonTemplates.items) {
+    for (const template of this.api.itemsOf(jsonTemplates)) {
       if (template.name === name) {
         return this.get(template.id);
       } else if (template.isContainer || template.hasChildren) {
@@ -127,7 +130,7 @@ export class TemplateApiHelper {
     const rootTemplates = await this.getAllAtRoot();
     const jsonTemplates = await rootTemplates.json();
 
-    for (const template of jsonTemplates.items) {
+    for (const template of this.api.itemsOf(jsonTemplates)) {
       if (template.name === name) {
         if (template.isContainer || template.hasChildren) {
           await this.recurseDeleteChildren(template.id);
@@ -515,6 +518,112 @@ export class TemplateApiHelper {
       '\n\t}' +
       '\n}';
     return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
+  private buildElementPickerLoopTemplate(elementPickerPropertyName: string, perElementLines: string[], options: {captureFirst?: boolean; afterLoopLines?: string[]} = {}) {
+    const propertyAlias = AliasHelper.toAlias(elementPickerPropertyName);
+    const {captureFirst = false, afterLoopLines = []} = options;
+    return '\n@using Umbraco.Cms.Core.Models.PublishedContent' +
+      '\n@{' +
+      '\n\tvar elements = Model.Value<IEnumerable<IPublishedElement>>("' + propertyAlias + '");' +
+      '\n}' +
+      '\n@if (elements != null' + (captureFirst ? ' && elements.Any()' : '') + ')' +
+      '\n{' +
+      (captureFirst ? '\n\tvar first = elements.First();' : '') +
+      '\n\tforeach (var element in elements)' +
+      '\n\t{' +
+      perElementLines.map(line => '\n\t\t' + line).join('') +
+      '\n\t}' +
+      '\n}' +
+      afterLoopLines.map(line => '\n' + line).join('');
+  }
+
+  async createTemplateWithDisplayingElementPickerExtensionMethods(name: string, elementPickerPropertyName: string, elementTypeAlias: string, pageDocumentTypeAlias: string) {
+    const templateContent = this.buildElementPickerLoopTemplate(elementPickerPropertyName, [
+      '<p>Name: @element.Name()</p>',
+      '<p>HasCultureEn: @element.HasCulture("en-US")</p>',
+      '<p>HasCultureDa: @element.HasCulture("da")</p>',
+      '<p>CultureDate: @element.CultureDate().Year</p>',
+      '<p>IsDocumentType: @element.IsDocumentType("' + elementTypeAlias + '")</p>',
+      '<p>NotDocumentType: @element.IsDocumentType("nonExistingAlias")</p>',
+      '<p>CreatorName: @element.CreatorName()</p>',
+      '<p>WriterName: @element.WriterName()</p>',
+    ], {
+      afterLoopLines: [
+        '<p>PageName: @Model.Name</p>',
+        '<p>PageIsDocumentType: @Model.IsDocumentType("' + pageDocumentTypeAlias + '")</p>',
+        '<p>PageCreatorName: @Model.CreatorName()</p>',
+      ],
+    });
+    return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
+  async createTemplateWithDisplayingElementPickerVarianceAndIdentityMethods(name: string, elementPickerPropertyName: string, elementTypeAlias: string, pageDocumentTypeAlias: string) {
+    const upperElementTypeAlias = elementTypeAlias.toUpperCase();
+    const templateContent = this.buildElementPickerLoopTemplate(elementPickerPropertyName, [
+      '<p>Name-en: [@element.Name("en-US")]</p>',
+      '<p>Name-da: [@element.Name("da")]</p>',
+      '<p>Name-fr: [@element.Name("fr")]</p>',
+      '<p>InvariantOrEn: @element.IsInvariantOrHasCulture("en-US")</p>',
+      '<p>InvariantOrDa: @element.IsInvariantOrHasCulture("da")</p>',
+      '<p>InvariantOrFr: @element.IsInvariantOrHasCulture("fr")</p>',
+      '<p>HasCultureUpper: @element.HasCulture("EN-US")</p>',
+      '<p>HasCultureEmpty: @element.HasCulture("")</p>',
+      '<p>IsDocTypeUpper: @element.IsDocumentType("' + upperElementTypeAlias + '")</p>',
+      '<p>CultureDateDa: @element.CultureDate("da").Year</p>',
+      '<p>CultureDateFr: @element.CultureDate("fr").Year</p>',
+      '<p>HasValueTextstringDa: @element.HasValue("textstring", "da")</p>',
+      '<p>HasValueMissing: @element.HasValue("nonExistingProp")</p>',
+      '<p>IsEqualFirst-@(element.Name()): @element.IsEqual(first)</p>',
+      '<p>IsNotEqualFirst-@(element.Name()): @element.IsNotEqual(first)</p>',
+    ], {
+      captureFirst: true,
+      afterLoopLines: [
+        '<p>PageHasCultureEn: @Model.HasCulture("en-US")</p>',
+        '<p>PageInvariantOrFr: @Model.IsInvariantOrHasCulture("fr")</p>',
+        '<p>PageCultureDateEn: @Model.CultureDate("en-US").Year</p>',
+        '<p>PageIsEqualSelf: @Model.IsEqual(Model)</p>',
+      ],
+    });
+    return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
+  async createTemplateWithDisplayingElementPickerCompositionMethods(name: string, elementPickerPropertyName: string, baseElementTypeAlias: string, childElementTypeAlias: string) {
+    const templateContent = this.buildElementPickerLoopTemplate(elementPickerPropertyName, [
+      '<p>IsDocTypeBase: @element.IsDocumentType("' + baseElementTypeAlias + '")</p>',
+      '<p>IsDocTypeBaseRecursive: @element.IsDocumentType("' + baseElementTypeAlias + '", true)</p>',
+      '<p>IsComposedOfBase: @element.IsComposedOf("' + baseElementTypeAlias + '")</p>',
+      '<p>IsDocTypeChild: @element.IsDocumentType("' + childElementTypeAlias + '")</p>',
+    ]);
+    return this.createTemplateWithDisplayingValue(name, templateContent);
+  }
+
+  async createTemplateWithDisplayingElementPickerFallbackMethods(name: string, elementPickerPropertyName: string, propertyAlias: string) {
+    await this.ensureNameNotExists(name);
+    const alias = AliasHelper.toAlias(name);
+    const elementPickerAlias = AliasHelper.toAlias(elementPickerPropertyName);
+    const content =
+      '@using Umbraco.Cms.Core.Models.PublishedContent' +
+      '\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage' +
+      '\n@inject IPublishedValueFallback PublishedValueFallback' +
+      '\n@{' +
+      '\n\tLayout = null;' +
+      '\n\tvar elements = Model.Value<IEnumerable<IPublishedElement>>("' + elementPickerAlias + '");' +
+      '\n}' +
+      '\n<div data-mark="content-render-value">' +
+      '\n@if (elements != null)' +
+      '\n{' +
+      '\n\tforeach (var element in elements)' +
+      '\n\t{' +
+      '\n\t\t<p>HasValueDaNoFallback: @element.HasValue("' + propertyAlias + '", "da")</p>' +
+      '\n\t\t<p>HasValueDaFallbackLanguage: @element.HasValue(PublishedValueFallback, "' + propertyAlias + '", "da", null, Fallback.ToLanguage)</p>' +
+      '\n\t\t<p>TextDaNoFallback: [@(element.Value<string>("' + propertyAlias + '", "da"))]</p>' +
+      '\n\t\t<p>TextDaFallbackLanguage: [@(element.Value<string>("' + propertyAlias + '", "da", null, Fallback.ToLanguage))]</p>' +
+      '\n\t}' +
+      '\n}' +
+      '\n</div>\n';
+    const templateId = await this.create(name, alias, content);
+    return templateId === undefined ? '' : templateId;
   }
 
   async createTemplateWithDisplayingBlockGridItems(name: string, blockGridPropertyName: string, elementPropertyAlias: string, noBlocksMessage: string = 'No blocks available') {

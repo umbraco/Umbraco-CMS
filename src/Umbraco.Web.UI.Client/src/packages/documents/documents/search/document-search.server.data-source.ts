@@ -4,6 +4,7 @@ import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService, type DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbDocumentItemModel } from '../types.js';
 
 /**
@@ -27,39 +28,25 @@ export class UmbDocumentSearchServerDataSource
 
 	async #fetchAncestors(ids: Array<string>) {
 		if (!ids.length) return { data: new Map() };
-		const { data, error } = await tryExecute(
-			this.#host,
-			DocumentService.getItemDocumentAncestors({ query: { id: ids } }),
-		);
+
+		const requestController = new UmbItemDataApiGetRequestController(this.#host, {
+			uniques: ids,
+			// eslint-disable-next-line local-rules/no-direct-api-import
+			api: ({ uniques }) => DocumentService.getItemDocumentAncestors({ query: { id: uniques } }),
+		});
+		const { data, error } = await requestController.request();
 
 		if (error) return { error };
+
+		// A failed batch resolves without rejecting, leaving an `undefined` hole in `data` rather than
+		// surfacing an error, so guard against it before mapping below.
+		if (data?.some((entry) => entry == null))
+			return { error: new Error('Error fetching ancestors for one or more document items.') };
 
 		const ancestorsByItemId = new Map<string, Array<UmbDocumentItemModel>>();
 		if (data) {
 			for (const entry of data) {
-				ancestorsByItemId.set(
-					entry.id,
-					entry.ancestors.map((ancestor: DocumentItemResponseModel) => ({
-						documentType: {
-							unique: ancestor.documentType.id,
-							icon: ancestor.documentType.icon,
-							collection: ancestor.documentType.collection ? { unique: ancestor.documentType.collection.id } : null,
-						},
-						entityType: UMB_DOCUMENT_ENTITY_TYPE,
-						hasChildren: ancestor.hasChildren,
-						isProtected: ancestor.isProtected,
-						isTrashed: ancestor.isTrashed,
-						parent: ancestor.parent ? { unique: ancestor.parent.id } : null,
-						unique: ancestor.id,
-						variants: ancestor.variants.map((variant) => ({
-							name: variant.name,
-							culture: variant.culture || null,
-							state: variant.state,
-							flags: variant.flags,
-						})),
-						flags: ancestor.flags,
-					})),
-				);
+				ancestorsByItemId.set(entry.id, entry.ancestors.map(mapAncestorToItemModel));
 			}
 		}
 		return { data: ancestorsByItemId };
@@ -126,4 +113,27 @@ export class UmbDocumentSearchServerDataSource
 
 		return { error };
 	}
+}
+
+function mapAncestorToItemModel(ancestor: DocumentItemResponseModel): UmbDocumentItemModel {
+	return {
+		documentType: {
+			unique: ancestor.documentType.id,
+			icon: ancestor.documentType.icon,
+			collection: ancestor.documentType.collection ? { unique: ancestor.documentType.collection.id } : null,
+		},
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
+		hasChildren: ancestor.hasChildren,
+		isProtected: ancestor.isProtected,
+		isTrashed: ancestor.isTrashed,
+		parent: ancestor.parent ? { unique: ancestor.parent.id } : null,
+		unique: ancestor.id,
+		variants: ancestor.variants.map((variant) => ({
+			name: variant.name,
+			culture: variant.culture || null,
+			state: variant.state,
+			flags: variant.flags,
+		})),
+		flags: ancestor.flags,
+	};
 }

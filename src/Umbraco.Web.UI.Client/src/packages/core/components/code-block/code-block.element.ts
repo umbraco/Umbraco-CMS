@@ -1,6 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 //TODO consider adding a highlight prop to the code block, that could spin up/access monaco instance and highlight the code
 
@@ -19,15 +21,29 @@ export class UmbCodeBlockElement extends UmbLitElement {
 	@state()
 	private _copyState: 'idle' | 'success' = 'idle';
 
+	#notificationContext?: UmbNotificationContext;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => (this.#notificationContext = instance));
+	}
 
 	async copyCode() {
 		const text = this.textContent;
-		if (text) {
+		if (!text) return;
+
+		try {
+			// navigator.clipboard only exists in secure contexts (https or localhost) and the
+			// write can also be denied by permissions policy, so failures must be surfaced.
 			await navigator.clipboard.writeText(text);
 			this._copyState = 'success';
 			setTimeout(() => {
 				this._copyState = 'idle';
 			}, 2000);
+		} catch {
+			this.#notificationContext?.peek('danger', {
+				data: { message: this.localize.term('speechBubbles_cannotCopyToClipboard') },
+			});
 		}
 	}
 

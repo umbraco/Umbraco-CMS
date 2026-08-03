@@ -11,36 +11,76 @@ public class ContentTypeDto
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNamePk;
     public const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
 
-    /// <summary>Gets or sets the primary key of the content type.</summary>
+    // Public constants to bind properties between DTOs and configurations.
+    public const string AliasColumnName = "alias";
+    public const string IconColumnName = "icon";
+    public const string ThumbnailColumnName = "thumbnail";
+    public const string DescriptionColumnName = "description";
+    public const string ListViewColumnName = "listView";
+    public const string IsElementColumnName = "isElement";
+    public const string AllowedInLibraryColumnName = "allowedInLibrary";
+    public const string AllowAtRootColumnName = "allowAtRoot";
+    public const string VariationsColumnName = "variations";
+
+    private string? _alias;
+
+    /// <summary>
+    /// Gets or sets the primary key of the content type.
+    /// </summary>
     public int PrimaryKey { get; set; }
 
-    /// <summary>Gets or sets the unique identifier of the node associated with this content type.</summary>
+    /// <summary>
+    /// Gets or sets the unique identifier of the node associated with this content type.
+    /// </summary>
     public int NodeId { get; set; }
 
-    /// <summary>Gets or sets the alias that uniquely identifies the content type.</summary>
-    public string? Alias { get; set; }
+    /// <summary>
+    /// Gets or sets the alias that uniquely identifies the content type.
+    /// </summary>
+    public string? Alias { get => _alias; set => _alias = value == null ? null : string.Intern(value); }
 
-    /// <summary>Gets or sets the icon associated with the content type.</summary>
+    /// <summary>
+    /// Gets or sets the icon associated with the content type.
+    /// </summary>
     public string? Icon { get; set; }
 
-    /// <summary>Gets or sets the thumbnail image file name associated with the content type.</summary>
+    /// <summary>
+    /// Gets or sets the thumbnail image file name associated with the content type.
+    /// </summary>
     public string? Thumbnail { get; set; }
 
-    /// <summary>Gets or sets the description of the content type.</summary>
+    /// <summary>
+    /// Gets or sets the description of the content type.
+    /// </summary>
     public string? Description { get; set; }
 
-    /// <summary>Gets or sets the unique identifier of the list view configuration associated with this content type.</summary>
+    /// <summary>
+    /// Gets or sets the unique identifier of the list view configuration associated with this content type, if any.
+    /// </summary>
     public Guid? ListView { get; set; }
 
-    /// <summary>Gets or sets a value indicating whether this content type is an element.</summary>
+    /// <summary>
+    /// Gets or sets a value indicating whether this content type is an element.
+    /// </summary>
     public bool IsElement { get; set; }
 
-    /// <summary>Gets or sets a value indicating whether this content type is allowed in the library.</summary>
+    /// <summary>
+    /// Gets or sets a value indicating whether this content type is allowed in the library.
+    /// </summary>
     public bool AllowedInLibrary { get; set; }
 
-    /// <summary>Gets or sets a value indicating whether this content type is allowed at the root level.</summary>
+    /// <summary>
+    /// Gets or sets a value indicating whether this content type is allowed at the root level.
+    /// </summary>
     public bool AllowAtRoot { get; set; }
 
-    /// <summary>Gets or sets the variation flags for the content type.</summary>
+    /// <summary>
+    /// Gets or sets the variation flags for the content type.
+    /// </summary>
     public byte Variations { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="EFCore.NodeDto"/> associated with this content type.
+    /// </summary>
+    public NodeDto NodeDto { get; set; } = null!;
 }

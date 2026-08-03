@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
+    public new void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
     [TearDown]
     public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
@@ -818,7 +818,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     {
         // Arrange
         // set configuration
-        var dataTypeKey = IdKeyMap.GetKeyForId(1041, UmbracoObjectTypes.DataType).Result;
+        var dataTypeKey = (await IdKeyMap.GetKeyForIdAsync(1041, UmbracoObjectTypes.DataType)).Result;
         var dataType = await DataTypeService.GetAsync(dataTypeKey);
         dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
             .FromConfigurationObject(
@@ -1080,7 +1080,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     {
         // Arrange
         // set configuration
-        var dataTypeKey = IdKeyMap.GetKeyForId(1041, UmbracoObjectTypes.DataType).Result;
+        var dataTypeKey = (await IdKeyMap.GetKeyForIdAsync(1041, UmbracoObjectTypes.DataType)).Result;
         var dataType = await DataTypeService.GetAsync(dataTypeKey);
         dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
             .FromConfigurationObject(
@@ -1128,7 +1128,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     {
         // Arrange
         // set configuration
-        var dataTypeKey = IdKeyMap.GetKeyForId(1041, UmbracoObjectTypes.DataType).Result;
+        var dataTypeKey = (await IdKeyMap.GetKeyForIdAsync(1041, UmbracoObjectTypes.DataType)).Result;
         var dataType = await DataTypeService.GetAsync(dataTypeKey);
         dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
             .FromConfigurationObject(

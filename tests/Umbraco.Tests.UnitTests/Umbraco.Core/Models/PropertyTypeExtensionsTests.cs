@@ -46,15 +46,15 @@ public class PropertyTypeExtensionsTests
 
         var expected = Mock.Of<IDataType>();
         var idKeyMap = new Mock<IIdKeyMap>();
-        idKeyMap.Setup(x => x.GetKeyForId(DataTypeId, UmbracoObjectTypes.DataType))
-            .Returns(Attempt.Succeed(_dataTypeKey));
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(DataTypeId, UmbracoObjectTypes.DataType))
+            .ReturnsAsync(Attempt.Succeed(_dataTypeKey));
         var dataTypeService = new Mock<IDataTypeService>();
         dataTypeService.Setup(x => x.GetAsync(_dataTypeKey)).ReturnsAsync(expected);
 
         IDataType? result = propertyType.GetDataType(dataTypeService.Object, idKeyMap.Object);
 
         Assert.AreSame(expected, result);
-        idKeyMap.Verify(x => x.GetKeyForId(DataTypeId, UmbracoObjectTypes.DataType), Times.Once);
+        idKeyMap.Verify(x => x.GetKeyForIdAsync(DataTypeId, UmbracoObjectTypes.DataType), Times.Once);
     }
 
     [Test]
@@ -66,8 +66,8 @@ public class PropertyTypeExtensionsTests
             .Build();
 
         var idKeyMap = new Mock<IIdKeyMap>();
-        idKeyMap.Setup(x => x.GetKeyForId(DataTypeId, UmbracoObjectTypes.DataType))
-            .Returns(Attempt<Guid>.Fail());
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(DataTypeId, UmbracoObjectTypes.DataType))
+            .ReturnsAsync(Attempt<Guid>.Fail());
         var dataTypeService = new Mock<IDataTypeService>(MockBehavior.Strict);
 
         IDataType? result = propertyType.GetDataType(dataTypeService.Object, idKeyMap.Object);

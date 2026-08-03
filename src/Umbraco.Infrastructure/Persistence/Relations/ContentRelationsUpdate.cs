@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Relations;
 internal sealed class ContentRelationsUpdate :
     IDistributedCacheNotificationHandler<ContentSavedNotification>,
     IDistributedCacheNotificationHandler<ContentPublishedNotification>,
+    IDistributedCacheNotificationHandler<ContentUnpublishedNotification>,
     IDistributedCacheNotificationHandler<MediaSavedNotification>,
     IDistributedCacheNotificationHandler<MemberSavedNotification>,
     IDistributedCacheNotificationHandler<ElementSavedNotification>,
@@ -30,6 +31,7 @@ internal sealed class ContentRelationsUpdate :
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IRelationRepository _relationRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
+    private readonly IEntityRepository _entityRepository;
     private readonly ILogger<ContentRelationsUpdate> _logger;
 
     /// <summary>
@@ -41,6 +43,7 @@ internal sealed class ContentRelationsUpdate :
         PropertyEditorCollection propertyEditors,
         IRelationRepository relationRepository,
         IRelationTypeRepository relationTypeRepository,
+        IEntityRepository entityRepository,
         ILogger<ContentRelationsUpdate> logger)
     {
         _scopeProvider = scopeProvider;
@@ -48,6 +51,7 @@ internal sealed class ContentRelationsUpdate :
         _propertyEditors = propertyEditors;
         _relationRepository = relationRepository;
         _relationTypeRepository = relationTypeRepository;
+        _entityRepository = entityRepository;
         _logger = logger;
     }
 
@@ -62,6 +66,12 @@ internal sealed class ContentRelationsUpdate :
 
     /// <inheritdoc/>
     public void Handle(IEnumerable<ContentPublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.PublishedEntities));
+
+    /// <inheritdoc/>
+    public void Handle(ContentUnpublishedNotification notification) => PersistRelations(notification.UnpublishedEntities, checkNodeExists: true);
+
+    /// <inheritdoc/>
+    public void Handle(IEnumerable<ContentUnpublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.UnpublishedEntities), checkNodeExists: true);
 
     /// <inheritdoc/>
     public void Handle(MediaSavedNotification notification) => PersistRelations(notification.SavedEntities);
@@ -87,21 +97,35 @@ internal sealed class ContentRelationsUpdate :
     /// <inheritdoc/>
     public void Handle(IEnumerable<ElementPublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.PublishedEntities));
 
-    private void PersistRelations(IEnumerable<IContentBase> entities)
+    private void PersistRelations(IEnumerable<IContentBase> entities, bool checkNodeExists = false)
     {
         using IScope scope = _scopeProvider.CreateScope();
         foreach (IContentBase entity in entities)
         {
-            PersistRelations(scope, entity).GetAwaiter().GetResult();
+            PersistRelations(scope, entity, checkNodeExists).GetAwaiter().GetResult();
         }
 
         scope.Complete();
     }
 
-    private async Task PersistRelations(IScope scope, IContentBase entity)
+    private async Task PersistRelations(IScope scope, IContentBase entity, bool checkNodeExists)
     {
+        // ContentService.DeleteOfTypes raises ContentUnpublishedNotification for content it then permanently
+        // deletes within the same scope, so the node may already be gone by the time this runs - persisting
+        // relations for it would violate the umbracoRelation FK constraint (#23331). Only the unpublish
+        // handlers opt into this check (the one known caller with this pattern); save/publish fire far more
+        // often, so they skip the extra lookup.
+        if (checkNodeExists && _entityRepository.Exists(entity.Id) is false)
+        {
+            return;
+        }
+
+        // Track PublishedValue only for entities that have a published state and are currently published.
+        // For unpublished entities (or entities without a published state) we only track EditedValue to avoid stale PublishedValue relations.
+        var trackPublishedValues = entity is IContent { Published: true };
+
         // Get all references and automatic relation type aliases.
-        ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, _propertyEditors);
+        ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, _propertyEditors, trackPublishedValues);
         ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAllAutomaticRelationTypesAliases(_propertyEditors);
 
         if (references.Count == 0)
@@ -141,34 +165,7 @@ internal sealed class ContentRelationsUpdate :
         }).ToDictionary(x => x.UniqueId, x => x.NodeId);
 
         // Get all valid relations.
-        var relations = new List<(int ChildId, int RelationTypeId)>(references.Count);
-        foreach (UmbracoEntityReference reference in references)
-        {
-            if (string.IsNullOrEmpty(reference.RelationTypeAlias))
-            {
-                // Reference does not specify a relation type alias, so skip adding a relation.
-                _logger.LogDebug("The reference to {Udi} does not specify a relation type alias, so it will not be saved as relation.", reference.Udi);
-            }
-            else if (automaticRelationTypeAliases.Contains(reference.RelationTypeAlias) is false)
-            {
-                // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code.
-                _logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
-            }
-            else if (relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out IRelationType? relationType) is false)
-            {
-                // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed).
-                _logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
-            }
-            else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
-            {
-                // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints).
-                _logger.LogInformation("The reference to {Udi} can not be saved as relation, because it doesn't have a node ID.", reference.Udi);
-            }
-            else
-            {
-                relations.Add((id, relationType.Id));
-            }
-        }
+        List<(int ChildId, int RelationTypeId)> relations = ResolveValidRelations(references, automaticRelationTypeAliases, relationTypeLookup, keysLookup);
 
         // Get existing relations for this parent and filter to the (small) set of automatic relation types.
         // Relations are unique by parent ID, child ID and relation type ID.
@@ -227,6 +224,44 @@ internal sealed class ContentRelationsUpdate :
         return (await _relationRepository.GetByParentIdAsync(entityId))
             .Where(x => relationTypeIds.Contains(x.RelationTypeId))
             .ToArray();
+    }
+
+    private List<(int ChildId, int RelationTypeId)> ResolveValidRelations(
+        ISet<UmbracoEntityReference> references,
+        ISet<string> automaticRelationTypeAliases,
+        Dictionary<string, IRelationType> relationTypeLookup,
+        Dictionary<Guid, int> keysLookup)
+    {
+        var relations = new List<(int ChildId, int RelationTypeId)>(references.Count);
+        foreach (UmbracoEntityReference reference in references)
+        {
+            if (string.IsNullOrEmpty(reference.RelationTypeAlias))
+            {
+                // Reference does not specify a relation type alias, so skip adding a relation.
+                _logger.LogDebug("The reference to {Udi} does not specify a relation type alias, so it will not be saved as relation.", reference.Udi);
+            }
+            else if (automaticRelationTypeAliases.Contains(reference.RelationTypeAlias) is false)
+            {
+                // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code.
+                _logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
+            }
+            else if (relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out IRelationType? relationType) is false)
+            {
+                // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed).
+                _logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
+            }
+            else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
+            {
+                // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints).
+                _logger.LogInformation("The reference to {Udi} can not be saved as relation, because it doesn't have a node ID.", reference.Udi);
+            }
+            else
+            {
+                relations.Add((id, relationType.Id));
+            }
+        }
+
+        return relations;
     }
 
     private sealed class NodeIdKey

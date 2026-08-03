@@ -134,8 +134,14 @@ internal sealed class RelationTypeRepository : AsyncEntityRepositoryBase<int, IR
             CheckNullObjectTypeValues(item);
 
             EFCoreRelationTypeDto dto = RelationTypeFactory.BuildEFCoreDto(item);
-            db.RelationTypes.Update(dto);
-            await db.SaveChangesAsync();
+            await db.RelationTypes.Where(x => x.Id == dto.Id).ExecuteUpdateAsync(setter => setter
+                .SetProperty(x => x.UniqueId, dto.UniqueId)
+                .SetProperty(x => x.Dual, dto.Dual)
+                .SetProperty(x => x.ParentObjectType, dto.ParentObjectType)
+                .SetProperty(x => x.ChildObjectType, dto.ChildObjectType)
+                .SetProperty(x => x.Name, dto.Name)
+                .SetProperty(x => x.Alias, dto.Alias)
+                .SetProperty(x => x.IsDependency, dto.IsDependency));
 
             item.ResetDirtyProperties();
         });

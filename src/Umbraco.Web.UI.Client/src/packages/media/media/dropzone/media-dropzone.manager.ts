@@ -1,5 +1,6 @@
 import { UmbMediaDetailRepository } from '../repository/detail/index.js';
 import type { UmbMediaDetailModel, UmbMediaValueModel } from '../types.js';
+import { toFriendlyName } from '../utils/to-friendly-name.function.js';
 import { UMB_DROPZONE_MEDIA_TYPE_PICKER_MODAL } from './modals/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -242,14 +243,14 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 	// Scaffold
 	async #getItemScaffold(item: UmbUploadableItem, mediaTypeUnique: string): Promise<UmbMediaDetailModel> {
 		// TODO: Use a scaffolding feature to ensure consistency. [NL]
-		const name = item.temporaryFile ? item.temporaryFile.file.name : (item.folder?.name ?? '');
+		const name = item.temporaryFile ? toFriendlyName(item.temporaryFile.file.name) : (item.folder?.name ?? '');
 		const umbracoFile: UmbMediaValueModel = {
 			editorAlias: '',
 			alias: 'umbracoFile',
 			value: { temporaryFileId: item.temporaryFile?.temporaryUnique },
 			culture: null,
 			segment: null,
-};
+		};
 
 		const preset: Partial<UmbMediaDetailModel> = {
 			unique: item.unique,

@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Represents a repository for <see cref="IContentType" /> entities (document types).
 /// </summary>
-public interface IContentTypeRepository : IContentTypeRepositoryBase<IContentType>
+public interface IContentTypeRepository : IAsyncContentTypeRepositoryBase<IContentType>
 {
     /// <summary>
     ///     Gets all entities of the specified <see cref="IPropertyType" /> query

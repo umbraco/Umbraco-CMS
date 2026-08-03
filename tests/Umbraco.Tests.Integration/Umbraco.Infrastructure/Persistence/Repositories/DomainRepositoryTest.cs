@@ -33,7 +33,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             await LanguageRepository.SaveAsync(lang, CancellationToken.None);
 
             var ct = ContentTypeBuilder.CreateBasicContentType("test", "Test");
-            ContentTypeRepository.Save(ct);
+            await ContentTypeRepository.SaveAsync(ct, CancellationToken.None);
             var content = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
             DocumentRepository.Save(content);
             scope.Complete();

@@ -27,7 +27,7 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
     /// <inheritdoc />
     public override IEnumerable<ValueSet> GetValueSets(params IMember[] members)
     {
-        IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAll().ToDictionary(x => x.Key);
+        IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAllAsync().GetAwaiter().GetResult().ToDictionary(x => x.Key);
 
         foreach (IMember m in members)
         {

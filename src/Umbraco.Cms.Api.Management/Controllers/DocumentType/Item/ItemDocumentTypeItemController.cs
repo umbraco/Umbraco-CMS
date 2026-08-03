@@ -39,17 +39,17 @@ public class ItemDocumentTypeItemController : DocumentTypeItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a collection of document type items.")]
     [EndpointDescription("Gets a collection of document type items identified by the provided Ids.")]
-    public Task<IActionResult> Item(
+    public async Task<IActionResult> Item(
         CancellationToken cancellationToken,
         [FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         if (ids.Count is 0)
         {
-            return Task.FromResult<IActionResult>(Ok(Enumerable.Empty<DocumentTypeItemResponseModel>()));
+            return Ok(Enumerable.Empty<DocumentTypeItemResponseModel>());
         }
 
-        IEnumerable<IContentType> contentTypes = _contentTypeService.GetMany(ids);
+        IEnumerable<IContentType> contentTypes = await _contentTypeService.GetManyAsync(ids);
         List<DocumentTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IContentType, DocumentTypeItemResponseModel>(contentTypes);
-        return Task.FromResult<IActionResult>(Ok(responseModels));
+        return Ok(responseModels);
     }
 }

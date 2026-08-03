@@ -366,6 +366,53 @@ public class RelationService : AsyncRepositoryService, IRelationService
     }
 
     /// <inheritdoc />
+    public async Task<IEnumerable<IUmbracoEntity>> GetParentEntitiesByChildIdsAsync(
+        IEnumerable<int> childIds,
+        IEnumerable<string> relationTypeAliases,
+        UmbracoObjectTypes entityType,
+        CancellationToken cancellationToken = default)
+    {
+        var childIdsArray = childIds as int[] ?? childIds.ToArray();
+        if (childIdsArray.Length == 0)
+        {
+            return [];
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateScope();
+
+        ICollection<string> aliases = relationTypeAliases as ICollection<string> ?? relationTypeAliases.ToArray();
+        int[]? relationTypeIds = await ResolveRelationTypeIdFilterAsync(aliases, cancellationToken);
+        if (relationTypeIds is { Length: 0 })
+        {
+            return [];
+        }
+
+        IEnumerable<IUmbracoEntity> result = _relationRepository.GetParentEntitiesByChildIds(
+            childIdsArray,
+            relationTypeIds ?? [],
+            entityType.GetGuid());
+
+        scope.Complete();
+        return result;
+    }
+
+    // Resolves relation type aliases to their ids. Returns null when no alias filter is requested (match all
+    // relation types); returns an empty array when a filter was requested but no alias matched (match none).
+    private async Task<int[]?> ResolveRelationTypeIdFilterAsync(ICollection<string> relationTypeAliases, CancellationToken cancellationToken)
+    {
+        if (relationTypeAliases.Count == 0)
+        {
+            return null;
+        }
+
+        IEnumerable<IRelationType> relationTypes = await _relationTypeRepository.GetManyAsync(Array.Empty<int>(), cancellationToken);
+        return relationTypes
+            .Where(relationType => relationTypeAliases.Contains(relationType.Alias))
+            .Select(relationType => relationType.Id)
+            .ToArray();
+    }
+
+    /// <inheritdoc />
     public async Task<int> CountRelationTypesAsync(CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
@@ -708,6 +755,8 @@ public class RelationService : AsyncRepositoryService, IRelationService
             UmbracoObjectTypes.MemberType,
             UmbracoObjectTypes.DataType,
             UmbracoObjectTypes.MemberGroup,
+            UmbracoObjectTypes.Element,
+            UmbracoObjectTypes.ElementContainer,
             UmbracoObjectTypes.ROOT,
             UmbracoObjectTypes.RecycleBin,
         ];

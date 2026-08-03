@@ -6,14 +6,12 @@ using System.Globalization;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Extensions;
@@ -25,8 +23,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models;
 [TestFixture]
 public class ContentTests
 {
-    private readonly IContentTypeService _contentTypeService = Mock.Of<IContentTypeService>();
-
     private readonly PropertyEditorCollection _propertyEditorCollection = new (new DataEditorCollection(() => []));
 
     [TestCase("name-fr", false)]
@@ -37,8 +33,6 @@ public class ContentTests
             .WithAlias("contentType")
             .WithContentVariation(ContentVariation.Culture)
             .Build();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = new ContentBuilder()
             .WithId(1)
@@ -113,6 +107,46 @@ public class ContentTests
         Assert.IsTrue(content.IsPropertyDirty("PublishCultureInfos")); // it's true now since we've updated a name
     }
 
+    [TestCase("en-us", "en-US")]
+    [TestCase("en-GB", "en-GB")]
+    public void Can_Set_Culture_Info_With_Normalized_Culture_Code_Casing(string culture, string expectedCulture)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("contentType")
+            .WithContentVariation(ContentVariation.Culture)
+            .Build();
+        var content = new ContentBuilder()
+            .WithId(1)
+            .WithVersionId(1)
+            .WithName("content")
+            .WithContentType(contentType)
+            .Build();
+
+        content.SetCultureInfo(culture, "name", DateTime.UtcNow);
+
+        Assert.AreEqual(expectedCulture, content.CultureInfos[culture].Culture);
+    }
+
+    [TestCase("en-us", "en-US")]
+    [TestCase("en-GB", "en-GB")]
+    public void Can_Set_Publish_Info_With_Normalized_Culture_Code_Casing(string culture, string expectedCulture)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("contentType")
+            .WithContentVariation(ContentVariation.Culture)
+            .Build();
+        var content = new ContentBuilder()
+            .WithId(1)
+            .WithVersionId(1)
+            .WithName("content")
+            .WithContentType(contentType)
+            .Build();
+
+        content.SetPublishInfo(culture, "name", DateTime.UtcNow);
+
+        Assert.AreEqual(expectedCulture, content.PublishCultureInfos[culture].Culture);
+    }
+
     [Test]
     public void Get_Non_Grouped_Properties()
     {
@@ -132,8 +166,6 @@ public class ContentTests
 
         // Ensure that nothing is marked as dirty
         contentType.ResetDirtyProperties(false);
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
 
@@ -147,8 +179,6 @@ public class ContentTests
     public void All_Dirty_Properties_Get_Reset()
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -166,8 +196,6 @@ public class ContentTests
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -182,8 +210,6 @@ public class ContentTests
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -201,8 +227,6 @@ public class ContentTests
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -220,8 +244,6 @@ public class ContentTests
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
         content.Id = 10;
@@ -301,8 +323,6 @@ public class ContentTests
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
         contentType.Id = 99;
         contentType.Variations = ContentVariation.Culture;
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -414,8 +434,6 @@ public class ContentTests
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
         contentType.Id = 99;
         contentType.Variations = ContentVariation.Culture;
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -486,8 +504,6 @@ public class ContentTests
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
         contentType.Id = 99;
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
         var i = 200;
@@ -517,8 +533,6 @@ public class ContentTests
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -538,8 +552,6 @@ public class ContentTests
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -603,8 +615,6 @@ public class ContentTests
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -628,8 +638,6 @@ public class ContentTests
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -656,8 +664,6 @@ public class ContentTests
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -680,8 +686,6 @@ public class ContentTests
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
         var simpleContentType = ContentTypeBuilder.CreateSimpleContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -701,8 +705,6 @@ public class ContentTests
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
         var simpleContentType = ContentTypeBuilder.CreateSimpleContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -721,8 +723,6 @@ public class ContentTests
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
         var simpleContentType = ContentTypeBuilder.CreateSimpleContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -756,8 +756,6 @@ public class ContentTests
     public void Can_Verify_Content_Is_Published()
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
@@ -828,8 +826,6 @@ public class ContentTests
         // Arrange
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
         contentType.ResetDirtyProperties(); // reset
-        Mock.Get(_contentTypeService).As<IContentTypeBaseService>().Setup(x => x.Get(It.IsAny<int>()))
-            .Returns(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "test", -1);
         content.ResetDirtyProperties();

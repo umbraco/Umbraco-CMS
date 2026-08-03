@@ -51,7 +51,7 @@ export class ScriptUiHelper extends UiBaseLocators{
   async goToScript(scriptName: string) {
     await this.goToSection(ConstantHelper.sections.settings);
     await this.reloadScriptTree();
-    await this.click(this.page.getByLabel(scriptName, {exact: true}));
+    await this.clickTreeItemWithName(scriptName);
   }
 
   async enterScriptName(scriptContent: string) {
@@ -64,7 +64,7 @@ export class ScriptUiHelper extends UiBaseLocators{
 
   async openScriptAtRoot(scriptName: string) {
     await this.reloadScriptTree();
-    await this.click(this.page.getByLabel(scriptName, {exact: true}));
+    await this.clickTreeItemWithName(scriptName);
   }
 
   async reloadScriptTree() {

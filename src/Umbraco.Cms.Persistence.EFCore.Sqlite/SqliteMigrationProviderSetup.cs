@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
+using Umbraco.Cms.Persistence.EFCore.Migrations;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
@@ -15,6 +16,9 @@ public class SqliteMigrationProviderSetup : IMigrationProviderSetup
     /// <inheritdoc />
     public void Setup(DbContextOptionsBuilder builder, string? connectionString)
     {
-        builder.UseSqlite(connectionString, x => x.MigrationsAssembly(GetType().Assembly.FullName));
+        builder.UseSqlite(connectionString, x =>
+        {
+            x.MigrationsAssembly(GetType().Assembly.FullName);
+        });
     }
 }

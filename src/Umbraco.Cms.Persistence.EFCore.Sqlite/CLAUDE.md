@@ -20,6 +20,7 @@ This provider project implements SQLite-specific functionality for the EF Core p
 4. **Migration Provider** - Executes SQLite-specific EF Core migrations
 5. **Migration Provider Setup** - Configures DbContext to use SQLite for migrations
 6. **Migrations** - SQLite-specific migration files (OpenIddict tables, webhooks, etc.)
+7. **Retrying Execution Strategy** - Retries transient SQLite lock errors on EF Core operations
 
 ### Folder Structure
 
@@ -39,7 +40,8 @@ Umbraco.Cms.Persistence.EFCore.Sqlite/
 ├── SqliteEFCoreDistributedLockingMechanism.cs    # Distributed locking
 ├── SqliteMigrationProvider.cs                    # IMigrationProvider impl
 ├── SqliteMigrationProviderSetup.cs               # IMigrationProviderSetup impl
-└── UmbracoBuilderExtensions.cs                   # IUmbracoBuilder extensions
+├── UmbracoBuilderExtensions.cs                   # IUmbracoBuilder extensions
+└── SqliteRetryingExecutionStrategy.cs            # IExecutionStrategy for transient lock errors
 ```
 
 ### Relationship with Infrastructure
@@ -95,7 +97,19 @@ SQLite-specific distributed locking implementation. Moved from Infrastructure to
 
 ### SqliteMigrationProviderSetup
 
-Configures `DbContextOptionsBuilder` with `UseSqlite` and migrations assembly.
+Configures `DbContextOptionsBuilder` with `UseSqlite`, the migrations assembly, and the
+`SqliteRetryingExecutionStrategy` (see below). Invoked from
+`UmbracoDbContext.ConfigureOptions` for every `UmbracoDbContext` instance, so all EF Core
+access to the Umbraco database (including OpenIddict's token store) inherits the retry.
+
+### SqliteRetryingExecutionStrategy
+
+Custom `Microsoft.EntityFrameworkCore.Storage.ExecutionStrategy` that retries on transient
+SQLite errors (`SQLITE_BUSY`, `SQLITE_LOCKED`) using `SqliteExceptionExtensions.IsBusyOrLocked`
+from the parent project. Defaults inherit `ExecutionStrategy.DefaultMaxRetryCount` (6) and
+`ExecutionStrategy.DefaultMaxDelay` (30s), giving a ~56-second retry budget — see the class's
+XML doc for the rationale and the unattended-upgrade escape hatch for very long migrations.
+Added to resolve issue #22939 (OpenIddict token reads failing during long migrations).
 
 ### UmbracoBuilderExtensions
 
@@ -178,6 +192,7 @@ However, SQLite **does** require a global collation customizer. NPoco's `SqliteS
 | `SqliteEFCoreDistributedLockingMechanism.cs` | Distributed locking |
 | `SqliteMigrationProvider.cs` | Migration execution |
 | `SqliteMigrationProviderSetup.cs` | Migration DbContext configuration |
+| `SqliteRetryingExecutionStrategy.cs` | Retry on transient SQLite BUSY/LOCKED errors |
 | `EFCoreSqliteComposer.cs` | DI registration |
 | `UmbracoBuilderExtensions.cs` | Builder extensions |
 | `Migrations/*.cs` | Migration files |

@@ -16,24 +16,23 @@ public class DataTypeDtoConfiguration : IEntityTypeConfiguration<DataTypeDto>
             .ValueGeneratedNever();
 
         builder.Property(x => x.EditorAlias)
-            .HasColumnName(DataTypeDto.EditorAliasColumnName)
-            .IsRequired();
+            .HasColumnName(DataTypeDto.EditorAliasColumnName);
 
         builder.Property(x => x.EditorUiAlias)
-            .HasColumnName("propertyEditorUiAlias");
+            .HasColumnName(DataTypeDto.EditorUiAliasColumnName);
 
         builder.Property(x => x.DbType)
             .HasColumnName(DataTypeDto.DbTypeColumnName)
-            .HasMaxLength(50)
-            .IsRequired();
+            .HasMaxLength(50);
 
         builder.Property(x => x.Configuration)
-            .HasColumnName("config");
+            .HasColumnName(DataTypeDto.ConfigurationColumnName);
 
-        // FK: NodeId -> umbracoNode.id
-        builder.HasOne<NodeDto>()
+        // FK to umbracoNode (NodeId -> NodeDto.NodeId)
+        builder.HasOne(x => x.NodeDto)
             .WithMany()
             .HasForeignKey(x => x.NodeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName($"FK_{DataTypeDto.TableName}_{NodeDto.TableName}");
     }
 }

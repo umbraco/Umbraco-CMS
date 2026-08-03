@@ -119,10 +119,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Creating_100_Items()
+    public async Task Creating_100_Items()
     {
         // Arrange
-        var contentType = ContentTypeService.Get(ContentType.Id);
+        var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
 
         // Act
@@ -139,10 +139,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Creating_1000_Items()
+    public async Task Creating_1000_Items()
     {
         // Arrange
-        var contentType = ContentTypeService.Get(ContentType.Id);
+        var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
 
         // Act
@@ -159,10 +159,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Getting_100_Uncached_Items()
+    public async Task Getting_100_Uncached_Items()
     {
         // Arrange
-        var contentType = ContentTypeService.Get(ContentType.Id);
+        var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
         ContentService.Save(pages, -1);
 
@@ -187,10 +187,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Getting_1000_Uncached_Items()
+    public async Task Getting_1000_Uncached_Items()
     {
         // Arrange
-        var contentType = ContentTypeService.Get(ContentType.Id);
+        var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
         ContentService.Save(pages, -1);
 
@@ -214,10 +214,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Getting_100_Cached_Items()
+    public async Task Getting_100_Cached_Items()
     {
         // Arrange
-        var contentType = ContentTypeService.Get(ContentType.Id);
+        var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 100);
         ContentService.Save(pages, -1);
 
@@ -244,10 +244,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Getting_1000_Cached_Items()
+    public async Task Getting_1000_Cached_Items()
     {
         // Arrange
-        var contentType = ContentTypeService.Get(ContentType.Id);
+        var contentType = await ContentTypeService.GetAsync(ContentType.Id);
         var pages = ContentBuilder.CreateTextpageContent(contentType, -1, 1000);
         ContentService.Save(pages, -1);
 

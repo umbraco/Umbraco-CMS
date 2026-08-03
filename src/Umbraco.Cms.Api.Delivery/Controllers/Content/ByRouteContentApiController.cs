@@ -68,7 +68,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             return Ok(ApiContentResponseBuilder.Build(contentItem));
         }
 
-        IApiContentRoute? redirectRoute = _requestRedirectService.GetRedirectRoute(path);
+        IApiContentRoute? redirectRoute = await _requestRedirectService.GetRedirectRouteAsync(path);
         return redirectRoute != null
             ? RedirectTo(redirectRoute)
             : NotFound();
@@ -89,7 +89,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             return null;
         }
 
-        if (Guid.TryParse(path.AsSpan(PreviewContentRequestPathPrefix.Length).TrimEnd("/"), out Guid contentId) is false)
+        if (Guid.TryParse(path.AsSpan(PreviewContentRequestPathPrefix.Length).TrimEnd('/'), out Guid contentId) is false)
         {
             return null;
         }

@@ -1,26 +1,19 @@
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Services;
 
 internal sealed class ContentTypeSearchService : IContentTypeSearchService
 {
-    private readonly ISqlContext _sqlContext;
     private readonly IContentTypeService _contentTypeService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeSearchService"/> class.
     /// </summary>
-    /// <param name="sqlContext">Provides database context for SQL operations.</param>
     /// <param name="contentTypeService">Service for managing content types.</param>
-    public ContentTypeSearchService(ISqlContext sqlContext, IContentTypeService contentTypeService)
-    {
-        _sqlContext = sqlContext;
-        _contentTypeService = contentTypeService;
-    }
+    public ContentTypeSearchService(IContentTypeService contentTypeService)
+        => _contentTypeService = contentTypeService;
 
     /// <summary>
     /// Asynchronously searches for content types whose names contain the specified query string or whose key matches the query as a GUID.
@@ -39,16 +32,19 @@ internal sealed class ContentTypeSearchService : IContentTypeSearchService
         // if the query is a GUID, search for that explicitly
         Guid.TryParse(query, out Guid guidQuery);
 
-        IQuery<IContentType> nameQuery = isElement is not null ?
-            _sqlContext.Query<IContentType>().Where(x => (x.Name!.Contains(query) || x.Key == guidQuery) && x.IsElement == isElement) :
-            _sqlContext.Query<IContentType>().Where(x => x.Name!.Contains(query) || x.Key == guidQuery);
+        // The content-type repository is backed by a full-dataset cache, so filtering the materialized set
+        // in-memory is cheap and avoids an IQuery round-trip (not supported by the async EF Core repository).
+        IContentType[] contentTypes = (await _contentTypeService.GetAllAsync())
+            .Where(x => ((x.Name?.InvariantContains(query) ?? false) || x.Key == guidQuery)
+                        && (isElement is null || x.IsElement == isElement))
+            .ToArray();
 
-        IContentType[] contentTypes = (await _contentTypeService.GetByQueryAsync(nameQuery, cancellationToken)).ToArray();
-
-        return new PagedModel<IContentType>
+        var pagedModel = new PagedModel<IContentType>
         {
             Items = contentTypes.Skip(skip).Take(take),
-            Total = contentTypes.Count()
+            Total = contentTypes.Length,
         };
+
+        return pagedModel;
     }
 }

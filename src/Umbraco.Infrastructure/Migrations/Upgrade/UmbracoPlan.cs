@@ -99,12 +99,18 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_17_4_0.AddExternalMemberTables>("{D7E8F9A0-B1C2-4D3E-A5F6-7890ABCDEF12}");
         To<V_17_4_0.FixLabelDataTypeDbTypeFromConfiguration>("{3F9B6A1C-7D84-4E2B-9C15-6A2E8F3D5B47}");
 
+        // To 17.6.0
+        To<V_17_6_0.AddContentTypeIdIndexForContent>("{3A1A8047-74AE-491A-B2C4-0BAE4A1289EC}");
+
         // To 18.0.0
         To<V_18_0_0.AddElementContainerPermissions>("{D00BB11A-DDF8-47C4-B58E-150C123BB3BB}");
         To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
         To<V_18_0_0.AddElementSectionForAdmins>("{6FE4656E-8B8D-452F-AE2A-438A615B61BC}");
 
         // To 19.0.0
+        To<V_19_0_0.AddExternalBlockElementRelationType>("{2D8F1B6E-4C3A-4E7D-9A1B-5F0C7E2D8A93}");
+
+        // To EFCore
         To<V_18_0_0.AddWebhookDto>("{F3CC0076-0692-41E5-9B2B-C58D46E556D4}");
         To<V_18_0_0.AddLastSyncedDto>("{5CFD4E2B-4024-42FE-9C70-295D0141ECAF}");
         To<V_18_0_0.AddKeyValueDto>("{ABDB0A9C-7476-4E00-B4C2-638FDF347AA0}");
@@ -120,7 +126,12 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddDistributedJobDto>("{62FE7B44-AA9A-4B2F-8ECF-263E4E6C2AFA}");
         To<V_18_0_0.AddContentVersionKeyColumn>("{04DD2827-59B0-4A00-AC28-77C32F1CEE60}");
         To<V_18_0_0.AddDocumentRepositoryDtos>("{D7E8F9A0-B1C2-4D3E-A4F5-6B7C8D9E0F1A}");
-        To<V_18_0_0.AddContentTypeDtos>("{32DA93C3-5CDD-481E-AE6B-30296329F4FD}");
+        To<V_18_0_0.AddConsentDto>("{34EEA465-0378-4319-85B7-DBD2C7613741}");
+        To<V_18_0_0.AddDictionaryDto>("{6F1A9C3E-8B2D-4A5F-9E0C-7D3B1A2F4E6D}");
+        To<V_18_0_0.AddContentTypeDtos>("{56319F0E-879F-43DE-9865-3B85A63D3C5B}");
+        To<V_18_0_0.AddMemberPropertyTypeDto>("{11905736-2BC5-492C-8DCA-17500E774855}");
+        To<V_18_0_0.AddRedirectUrlDto>("{72B8BF0F-28C1-4FE3-ABD7-122D5E962C1C}");
+        To<V_18_0_0.AddContentTypeDtosBasic>("{9C4E7A1F-2B8D-4E6C-A3F5-1D8B6C9E0A72}");
     }
 
     /// <summary>
@@ -153,9 +164,9 @@ public partial class UmbracoPlan : MigrationPlan
             if (match.Success)
             {
                 trackedVersion = new SemVersion(
-                    int.Parse(match.Groups[1].Value),
-                    int.Parse(match.Groups[2].Value),
-                    int.Parse(match.Groups[3].Value));
+                    int.Parse(match.Groups[1].ValueSpan),
+                    int.Parse(match.Groups[2].ValueSpan),
+                    int.Parse(match.Groups[3].ValueSpan));
             }
 
             if (string.Equals(transition.TargetState, state, StringComparison.OrdinalIgnoreCase))

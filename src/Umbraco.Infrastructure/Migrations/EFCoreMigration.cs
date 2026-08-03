@@ -23,5 +23,10 @@ public enum EFCoreMigration
     AddDistributedJobDto = 15,
     AddDocumentRepositoryDtos = 16,
     AddContentVersionKeyColumn = 17,
-    AddContentTypeDtos = 18,
+    AddConsentDto = 18,
+    AddDictionaryDto = 19,
+    AddContentTypeDtos = 20,
+    MemberPropertyTypeToEFCore = 21,
+    AddRedirectUrlDto = 22,
+    AddContentTypeDtosBasic = 23,
 }

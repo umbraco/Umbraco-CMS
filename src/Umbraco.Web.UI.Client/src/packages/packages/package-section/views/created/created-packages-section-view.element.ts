@@ -38,7 +38,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 		// TODO: find a way to make this reuseable across:
 		this.#workspaces?.map((workspace: ManifestWorkspace) => {
 			routes.push({
-				path: `${workspace.meta.entityType}/:unique`,
+				path: `${workspace.meta.entityType}/edit/:unique`,
 				component: () => createExtensionElement(workspace),
 				setup: (component, info) => {
 					if (component) {
@@ -47,7 +47,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 				},
 			});
 			routes.push({
-				path: workspace.meta.entityType,
+				path: `${workspace.meta.entityType}/create`,
 				component: () => createExtensionElement(workspace),
 			});
 		});

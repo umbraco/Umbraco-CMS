@@ -10,18 +10,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations;
 /// </summary>
 internal sealed class MigrationContext : IMigrationContext
 {
-    private readonly Action? _onCompleteAction;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="MigrationContext" /> class.
     /// </summary>
     /// <param name="plan">The <see cref="MigrationPlan"/> that defines the migration steps to execute.</param>
     /// <param name="database">The <see cref="IUmbracoDatabase"/> instance to use for database operations during migrations, or <c>null</c> if not required.</param>
     /// <param name="logger">The <see cref="ILogger{MigrationContext}"/> instance used for logging migration activities.</param>
-    /// <param name="onCompleteAction">An optional <see cref="Action"/> to invoke when the migration completes.</param>
-    public MigrationContext(MigrationPlan plan, IUmbracoDatabase? database, ILogger<MigrationContext> logger, Action? onCompleteAction = null)
+    public MigrationContext(MigrationPlan plan, IUmbracoDatabase? database, ILogger<MigrationContext> logger)
     {
-        _onCompleteAction = onCompleteAction;
         Plan = plan;
         Database = database ?? throw new ArgumentNullException(nameof(database));
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -53,17 +49,7 @@ internal sealed class MigrationContext : IMigrationContext
     public bool IsCompleted { get; private set; } = false;
 
     /// <summary>
-    /// Marks the migration context as completed and invokes the completion action if it has not already been completed.
+    /// Marks the migration context as completed.
     /// </summary>
-    public void Complete()
-    {
-        if (IsCompleted)
-        {
-            return;
-        }
-
-        _onCompleteAction?.Invoke();
-
-        IsCompleted = true;
-    }
+    public void Complete() => IsCompleted = true;
 }

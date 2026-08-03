@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -415,8 +416,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
-        // expect PropertyRemoved (which includes RefreshMain) when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
+        // expect PropertyRemoved (which includes RefreshMain) flagged RawDataUnaffected when the only change is
+        // removing properties — the stored cmsContentNu blob stays valid, so no raw rebuild is required
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [TestCase(false)]
@@ -463,8 +465,9 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
-        // expect PropertyRemoved (which includes RefreshMain) when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
+        // expect PropertyRemoved (which includes RefreshMain) flagged RawDataUnaffected when the only change is
+        // removing properties — the stored cmsContentNu blob stays valid, so no raw rebuild is required
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [Test]
@@ -506,8 +509,9 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.PropertyTypes.Count());
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
-        // expect PropertyRemoved (which includes RefreshMain) when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved);
+        // expect PropertyRemoved (which includes RefreshMain) flagged RawDataUnaffected when the only change is
+        // removing properties — the stored cmsContentNu blob stays valid, so no raw rebuild is required
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.PropertyRemoved | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [TestCase(false)]
@@ -1292,8 +1296,7 @@ internal sealed partial class ContentTypeEditingServiceTests
     [Test]
     public async Task Cannot_Add_Inheritance_When_Created_In_A_Folder()
     {
-        EntityContainer container = ContentTypeService.CreateContainer(Constants.System.Root, Guid.NewGuid(), "Test folder").Result!.Entity;
-
+        EntityContainer container = (await ContentTypeContainerService.CreateAsync(null, "Test folder", Constants.System.RootKey, Constants.Security.SuperUserKey)).Result;
         var parentContentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
         var contentType = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Child", containerKey: container.Key), Constants.Security.SuperUserKey)).Result!;
 

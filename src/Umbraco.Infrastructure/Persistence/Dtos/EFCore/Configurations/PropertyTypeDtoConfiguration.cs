@@ -25,72 +25,69 @@ public class PropertyTypeDtoConfiguration : IEntityTypeConfiguration<PropertyTyp
             .HasColumnName(PropertyTypeDto.PropertyTypeGroupIdColumnName);
 
         builder.Property(x => x.Alias)
-            .HasColumnName("Alias");
+            .HasColumnName(PropertyTypeDto.AliasColumnName);
 
         builder.Property(x => x.Name)
-            .HasColumnName("Name");
+            .HasColumnName(PropertyTypeDto.NameColumnName);
 
         builder.Property(x => x.SortOrder)
-            .HasColumnName("sortOrder")
+            .HasColumnName(PropertyTypeDto.SortOrderColumnName)
             .HasDefaultValue(0);
 
         builder.Property(x => x.Mandatory)
-            .HasColumnName("mandatory")
+            .HasColumnName(PropertyTypeDto.MandatoryColumnName)
             .HasDefaultValue(false);
 
         builder.Property(x => x.MandatoryMessage)
-            .HasColumnName("mandatoryMessage")
+            .HasColumnName(PropertyTypeDto.MandatoryMessageColumnName)
             .HasMaxLength(500);
 
         builder.Property(x => x.ValidationRegExp)
-            .HasColumnName("validationRegExp");
+            .HasColumnName(PropertyTypeDto.ValidationRegExpColumnName);
 
         builder.Property(x => x.ValidationRegExpMessage)
-            .HasColumnName("validationRegExpMessage")
+            .HasColumnName(PropertyTypeDto.ValidationRegExpMessageColumnName)
             .HasMaxLength(500);
 
         builder.Property(x => x.Description)
-            .HasColumnName("Description")
+            .HasColumnName(PropertyTypeDto.DescriptionColumnName)
             .HasMaxLength(2000);
 
         builder.Property(x => x.LabelOnTop)
-            .HasColumnName("labelOnTop")
+            .HasColumnName(PropertyTypeDto.LabelOnTopColumnName)
             .HasDefaultValue(false);
 
         builder.Property(x => x.Variations)
-            .HasColumnName("variations")
-            .HasDefaultValue((byte)1);
+            .HasColumnName(PropertyTypeDto.VariationsColumnName);
 
         builder.Property(x => x.UniqueId)
-            .HasColumnName("UniqueId");
+            .HasColumnName(PropertyTypeDto.UniqueIdColumnName);
 
-        // IX_cmsPropertyTypeUniqueID
+        // IX_cmsPropertyTypeAlias (non-unique on Alias)
+        builder.HasIndex(x => x.Alias)
+            .HasDatabaseName("IX_cmsPropertyTypeAlias");
+
+        // IX_cmsPropertyTypeUniqueID (unique on UniqueId)
         builder.HasIndex(x => x.UniqueId)
             .IsUnique()
-            .HasDatabaseName($"IX_{PropertyTypeDto.TableName}UniqueID");
+            .HasDatabaseName("IX_cmsPropertyTypeUniqueID");
 
-        // IX_cmsPropertyTypeAlias
-        builder.HasIndex(x => x.Alias)
-            .HasDatabaseName($"IX_{PropertyTypeDto.TableName}Alias");
-
-        // FK: DataTypeId -> umbracoDataType.nodeId (PK of DataTypeDto)
-        builder.HasOne<DataTypeDto>()
+        // FK to cmsDataType (DataTypeId -> DataTypeDto.NodeId, which is its primary key)
+        builder.HasOne(x => x.DataTypeDto)
             .WithMany()
             .HasForeignKey(x => x.DataTypeId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName($"FK_{PropertyTypeDto.TableName}_{DataTypeDto.TableName}");
 
-        // FK: ContentTypeId -> cmsContentType.nodeId (non-PK, unique column on ContentTypeDto)
-        // Using Restrict to avoid multiple cascade paths (PropertyTypeGroup also cascades from ContentType).
-        builder.HasOne<ContentTypeDto>()
-            .WithMany()
-            .HasForeignKey(x => x.ContentTypeId)
-            .HasPrincipalKey(nameof(ContentTypeDto.NodeId))
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // FK: PropertyTypeGroupId -> cmsPropertyTypeGroup.id (optional)
-        builder.HasOne<PropertyTypeGroupDto>()
-            .WithMany()
+        // FK to cmsPropertyTypeGroup (PropertyTypeGroupId -> PropertyTypeGroupDto.Id)
+        builder.HasOne(x => x.PropertyTypeGroupDto)
+            .WithMany(x => x.PropertyTypeDtos)
             .HasForeignKey(x => x.PropertyTypeGroupId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName($"FK_{PropertyTypeDto.TableName}_{PropertyTypeGroupDto.TableName}");
+
+        // No EF Core navigation is declared for the content-type FK: it references the alternate key
+        // (nodeId) rather than its primary key.
+        // TODO (EF Core): the FK to cmsContentType.nodeId is currently created by NPoco's schema; revisit this comment once NPoco is removed.
     }
 }

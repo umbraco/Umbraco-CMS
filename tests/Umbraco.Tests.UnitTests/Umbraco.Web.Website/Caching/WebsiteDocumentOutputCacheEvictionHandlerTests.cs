@@ -215,8 +215,8 @@ public class WebsiteDocumentOutputCacheEvictionHandlerTests
             .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
-            .Setup(m => m.GetKeyForId(parentId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(parentKey));
+            .Setup(m => m.GetKeyForIdAsync(parentId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(parentKey));
 
         var notification = CreateNotification(new ContentCacheRefresher.JsonPayload
         {
@@ -247,8 +247,8 @@ public class WebsiteDocumentOutputCacheEvictionHandlerTests
             .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
-            .Setup(m => m.GetKeyForId(parentId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(parentKey));
+            .Setup(m => m.GetKeyForIdAsync(parentId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(parentKey));
 
         var notification = CreateNotification(
             new ContentCacheRefresher.JsonPayload { Id = 10, Key = Guid.NewGuid(), ChangeTypes = TreeChangeTypes.RefreshNode },

@@ -83,7 +83,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content);
@@ -113,7 +113,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content);
@@ -150,7 +150,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content);
@@ -189,7 +189,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content);
@@ -227,7 +227,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content);
@@ -263,7 +263,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content);
@@ -306,7 +306,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -350,7 +350,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -395,7 +395,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -432,7 +432,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -473,7 +473,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -517,7 +517,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -561,7 +561,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -606,7 +606,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -650,7 +650,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
             var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             content1.PublishCulture(CultureImpact.Invariant, DateTime.UtcNow, GetRequiredService<PropertyEditorCollection>());
@@ -736,7 +736,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -793,7 +793,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -844,7 +844,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -882,7 +882,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -976,7 +976,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-            ContentTypeRepository.Save(contentType);
+            await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
             DocumentRepository.Save(content1);
@@ -1131,7 +1131,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
-        ContentTypeRepository.Save(contentType);
+        await ContentTypeRepository.SaveAsync(contentType, CancellationToken.None);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType);
         var content2 = ContentBuilder.CreateSimpleContent(contentType);

@@ -179,7 +179,7 @@ public sealed class BlockEditorVarianceHandler
             .ContentData
             .Select(cd => cd.ContentTypeKey)
             .Distinct()
-            .Select(_contentTypeService.Get)
+            .Select(key => _contentTypeService.GetAsync(key).GetAwaiter().GetResult())
             .WhereNotNull()
             .ToDictionary(c => c.Key);
 

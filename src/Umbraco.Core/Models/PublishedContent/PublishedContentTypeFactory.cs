@@ -135,7 +135,7 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
 
                 // Convert int IDs to Guid keys via IIdKeyMap (filter out failed lookups), then load by keys.
                 Guid[] keys = ids
-                    .Select(id => _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.DataType))
+                    .Select(id => _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.DataType).GetAwaiter().GetResult())
                     .Where(attempt => attempt.Success)
                     .Select(attempt => attempt.Result)
                     .ToArray();

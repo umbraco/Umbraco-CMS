@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
@@ -95,6 +96,21 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         ReadLock(scope);
         return Task.FromResult(_entityContainerRepository.GetMany());
+    }
+
+    /// <inheritdoc />
+    public Task<IEnumerable<EntityContainer>> GetAncestorsAsync(TTreeEntity entity)
+    {
+        var ancestorIds = entity.AncestorIds();
+        if (ancestorIds.Length == 0)
+        {
+            return Task.FromResult(Enumerable.Empty<EntityContainer>());
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        ReadLock(scope);
+        return Task.FromResult<IEnumerable<EntityContainer>>(
+            _entityContainerRepository.GetMany(ancestorIds).OrderBy(container => container.Level).ToArray());
     }
 
     /// <inheritdoc />

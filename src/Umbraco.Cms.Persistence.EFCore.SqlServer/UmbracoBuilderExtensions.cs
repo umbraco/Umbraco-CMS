@@ -37,5 +37,6 @@ public static class UmbracoBuilderExtensions
             .AddEFCoreModelCustomizer<SqlServerDocumentVersionDtoModelCustomizer>()
             .AddEFCoreModelCustomizer<SqlServerDocumentUrlDtoModelCustomizer>()
             .AddEFCoreModelCustomizer<SqlServerTagDtoModelCustomizer>()
-            .AddEFCoreModelCustomizer<SqlServerTagRelationshipDtoModelCustomizer>();
+            .AddEFCoreModelCustomizer<SqlServerTagRelationshipDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerRedirectUrlDtoModelCustomizer>();
 }

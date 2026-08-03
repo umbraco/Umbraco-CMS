@@ -35,10 +35,10 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
     [ProducesResponseType(typeof(TemplateQuerySettingsResponseModel), StatusCodes.Status200OK)]
     [EndpointSummary("Gets template query settings.")]
     [EndpointDescription("Gets the available configuration settings for template queries including document type aliases, properties, and operators.")]
-    public Task<ActionResult<TemplateQuerySettingsResponseModel>> Settings(CancellationToken cancellationToken)
+    public async Task<ActionResult<TemplateQuerySettingsResponseModel>> Settings(CancellationToken cancellationToken)
     {
-        var contentTypeAliases = _contentTypeService
-            .GetAll()
+        var contentTypeAliases = (await _contentTypeService
+            .GetAllAsync())
             .Where(contentType => contentType.IsElement == false)
             .Select(contentType => contentType.Alias)
             .ToArray();
@@ -47,11 +47,11 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
 
         IEnumerable<TemplateQueryOperatorViewModel> operators = GetOperators();
 
-        return Task.FromResult<ActionResult<TemplateQuerySettingsResponseModel>>(Ok(new TemplateQuerySettingsResponseModel
+        return Ok(new TemplateQuerySettingsResponseModel
         {
             DocumentTypeAliases = contentTypeAliases,
             Properties = properties,
             Operators = operators
-        }));
+        });
     }
 }

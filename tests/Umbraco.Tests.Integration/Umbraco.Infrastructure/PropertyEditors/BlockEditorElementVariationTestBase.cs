@@ -83,6 +83,7 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
             .WithAlias(alias)
             .WithName("My Element Type")
             .WithIsElement(true)
+            .WithAllowedInLibrary(true)
             .WithContentVariation(variation)
             .AddPropertyType()
             .WithAlias("invariantText")

@@ -114,7 +114,7 @@ internal sealed class RedirectTracker : IRedirectTracker
             {
                 try
                 {
-                    var route = _publishedUrlProvider.GetUrl(publishedContent.Key, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
+                    var route = _publishedUrlProvider.GetUrl(publishedContent.Key, UrlMode.Relative, culture).TrimEnd('/');
                     if (IsValidRoute(route) && HasPublishedUrlSegment(publishedContent.Key, culture))
                     {
                         StoreRoute(oldRoutes, publishedContent, culture, route, domainRootId.Value);
@@ -227,7 +227,7 @@ internal sealed class RedirectTracker : IRedirectTracker
             .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true));
 
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
-        _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd(Constants.CharArrays.ForwardSlash);
+        _publishedUrlProvider.GetUrl(contentKey, UrlMode.Relative, languageIsoCode).TrimEnd('/');
 
     /// <summary>
     /// Strips the domain's path prefix from a relative URL so that the route stored for redirect
@@ -274,7 +274,7 @@ internal sealed class RedirectTracker : IRedirectTracker
     }
 
     /// <inheritdoc/>
-    public void CreateRedirects(IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes)
+    public async Task CreateRedirectsAsync(IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes)
     {
         if (!oldRoutes.Any())
         {
@@ -307,9 +307,9 @@ internal sealed class RedirectTracker : IRedirectTracker
 
                 // Ensure we don't create a self-referencing redirect. This can occur if a document is renamed and then the name is reverted back
                 // to the original. We resolve this by removing any existing redirect that points to the new route.
-                RemoveSelfReferencingRedirect(contentKey, newRoute);
+                await RemoveSelfReferencingRedirectAsync(contentKey, newRoute);
 
-                _redirectUrlService.Register(oldRoute, contentKey, culture);
+                await _redirectUrlService.RegisterWithStatusAsync(oldRoute, contentKey, culture);
             }
             catch (Exception ex)
             {
@@ -334,14 +334,14 @@ internal sealed class RedirectTracker : IRedirectTracker
         _documentUrlService.IsInitialized is false
         || _documentUrlService.GetUrlSegment(contentKey, culture, isDraft: false) is not null;
 
-    private void RemoveSelfReferencingRedirect(Guid contentKey, string route)
+    private async Task RemoveSelfReferencingRedirectAsync(Guid contentKey, string route)
     {
-        IEnumerable<IRedirectUrl> allRedirectUrls = _redirectUrlService.GetContentRedirectUrls(contentKey);
+        IEnumerable<IRedirectUrl> allRedirectUrls = await _redirectUrlService.GetContentRedirectUrlsAsync(contentKey);
         foreach (IRedirectUrl redirectUrl in allRedirectUrls)
         {
             if (redirectUrl.Url == route)
             {
-                _redirectUrlService.Delete(redirectUrl.Key);
+                await _redirectUrlService.DeleteWithStatusAsync(redirectUrl.Key);
             }
         }
     }

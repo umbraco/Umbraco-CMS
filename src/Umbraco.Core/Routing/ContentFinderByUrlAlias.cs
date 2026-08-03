@@ -75,11 +75,11 @@ public class ContentFinderByUrlAlias : IContentFinder
     /// </summary>
     /// <param name="frequest">The <c>PublishedRequest</c>.</param>
     /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-    public Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            return Task.FromResult(false);
+            return false;
         }
 
         IPublishedContent? node = null;
@@ -87,7 +87,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         // no alias if "/"
         if (frequest.Uri.AbsolutePath != "/")
         {
-            node = FindContentByAlias(
+            node = await FindContentByAlias(
                 umbracoContext.Content,
                 frequest.Domain?.ContentId ?? 0,
                 frequest.Culture,
@@ -106,10 +106,10 @@ public class ContentFinderByUrlAlias : IContentFinder
             }
         }
 
-        return Task.FromResult(node != null);
+        return node != null;
     }
 
-    private IPublishedContent? FindContentByAlias(
+    private async Task<IPublishedContent?> FindContentByAlias(
         IPublishedContentCache? cache,
         int rootNodeId,
         string? culture,
@@ -128,9 +128,9 @@ public class ContentFinderByUrlAlias : IContentFinder
         }
 
         // Get all matching document keys for the alias
-        IEnumerable<Guid> documentKeys = _documentUrlAliasService.GetDocumentKeysByAliasAsync(
+        IEnumerable<Guid> documentKeys = await _documentUrlAliasService.GetDocumentKeysByAliasAsync(
             normalizedAlias,
-            culture).GetAwaiter().GetResult();
+            culture);
 
         Guid? matchingKey = null;
 
@@ -138,7 +138,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         Guid? domainRootKey = null;
         if (rootNodeId > 0)
         {
-            Attempt<Guid> attempt = _idKeyMap.GetKeyForId(rootNodeId, UmbracoObjectTypes.Document);
+            Attempt<Guid> attempt = await _idKeyMap.GetKeyForIdAsync(rootNodeId, UmbracoObjectTypes.Document);
             domainRootKey = attempt.Success ? attempt.Result : null;
         }
 

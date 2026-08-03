@@ -11,6 +11,9 @@
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 export default {
 	actions: {
+		copyInProgress: 'Bitte warten, Kopieren läuft...',
+		deleteInProgress: 'Bitte warten, Entfernen läuft...',
+		moveInProgress: 'Bitte warten, Verschieben läuft...',
 		assigndomain: 'Kulturen und Hostnamen',
 		auditTrail: 'Protokoll',
 		browse: 'Durchsuchen',
@@ -1057,7 +1060,7 @@ export default {
 		greeting5: 'Willkommen',
 		greeting6: 'Willkommen',
 		instruction: 'Hier anmelden:',
-		signInWith: 'Anmelden mit',
+		signInWith: 'Anmelden mit {0}',
 		timeout: 'Sitzung abgelaufen',
 		forgottenPassword: 'Kennwort vergessen?',
 		forgottenPasswordInstruction:
@@ -1217,6 +1220,9 @@ export default {
 		paMembers: 'Mitglieder basierte Zugriffsberechtigung',
 		paMembersHelp: 'Falls Sie Mitglieder basierte Zugriffsberechtigung gewähren wollen',
 	},
+	unpublish: {
+		inProgress: 'Bitte warten, Rücknahme der Veröffentlichung läuft...',
+	},
 	publish: {
 		invalidPublishBranchPermissions:
 			'Die Zugriffsrechte des Benutzers sind ungenügend, um alle Unterknoten zu veröffentlichen',
@@ -1310,7 +1316,7 @@ export default {
 	},
 	sections: {
 		content: 'Inhalte',
-		forms: 'Formulare',
+		library: 'Bibliothek',
 		media: 'Medien',
 		member: 'Mitglieder',
 		packages: 'Pakete',
@@ -1347,6 +1353,8 @@ export default {
 		sortEmptyState: 'Dieser Knoten hat keine Unterknoten zum Sortieren',
 	},
 	speechBubbles: {
+		editMultiContentPublishedPartialText: '%0% von %1% Dokumenten veröffentlicht.',
+		editMultiContentUnpublishedPartialText: 'Bei %0% von %1% Dokumenten wurde die Veröffentlichung zurückgenommen.',
 		validationFailedHeader: 'Validierung',
 		validationFailedMessage: 'Validierungsfehler müssen behoben werden, bevor das Element gesichert werden kann',
 		operationFailedHeader: 'Fehlgeschlagen',
@@ -1583,9 +1591,19 @@ export default {
 		chooseChildNode: 'Wählen Sie einen Unterknoten',
 		compositionsDescription:
 			'Übernimm Tabs und Eigenschaften vone einem vorhandenen Inhaltstyp. Neue Tabs werden zum vorliegenden Inhaltstyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.',
+		compositionsDescriptionMediaType:
+			'Übernimm Tabs und Eigenschaften vone einem vorhandenen Medientyp. Neue Tabs werden zum vorliegenden Medientyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.',
+		compositionsDescriptionMemberType:
+			'Übernimm Tabs und Eigenschaften vone einem vorhandenen Mitgliedstyp. Neue Tabs werden zum vorliegenden Mitgliedstyp hinzugefügt oder mit einem gleichnamigen Tab zusammengeführt.',
 		compositionInUse:
 			'Dieser Inhaltstyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.',
+		compositionInUseMediaType:
+			'Dieser Medientyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.',
+		compositionInUseMemberType:
+			'Dieser Mitgliedstyp wird in einer Mischung verwendet und kann deshalb nicht selbst zusammengemischt werden.',
 		noAvailableCompositions: 'Es sind keine Inhaltstypen für eine Mischung vorhanden.',
+		noAvailableCompositionsMediaType: 'Es sind keine Medientypen für eine Mischung vorhanden.',
+		noAvailableCompositionsMemberType: 'Es sind keine Mitgliedstypen für eine Mischung vorhanden.',
 		availableEditors: 'Neu anlegen',
 		reuse: 'Vorhandenen nutzen',
 		editorSettings: 'Editor-Einstellungen',
@@ -1620,6 +1638,10 @@ export default {
 		compositionUsageHeading: 'Wo wird diese Mischung verwendet?',
 		compositionUsageSpecification:
 			'\n      Diese Mischung wird aktuell in den Mischungen folgender Dokumenttypen verwendet:\n    ',
+		compositionUsageSpecificationMediaType:
+			'\n      Diese Mischung wird aktuell in den Mischungen folgender Medientypen verwendet:\n    ',
+		compositionUsageSpecificationMemberType:
+			'\n      Diese Mischung wird aktuell in den Mischungen folgender Mitgliedstypen verwendet:\n    ',
 		variantsHeading: 'Kultur basierte Variationen zulassen',
 		variantsDescription: 'Editoren erlauben, Inhalt dieses Typs in verschiedenen Sprachen anzulegen',
 		allowVaryByCulture: 'Kultur basierte Variationen zulassen',

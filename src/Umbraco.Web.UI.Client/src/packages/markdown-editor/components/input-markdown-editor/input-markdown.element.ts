@@ -455,6 +455,8 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 				disable-line-numbers
 				disable-minimap
 				disable-folding
+				word-wrap
+				auto-height
 				@input=${this.#onInput}
 				@keypress=${this.#onKeyPress}
 				@loaded=${this.#onCodeEditorLoaded}>
@@ -615,7 +617,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 					0 2px 2px -2px rgba(34, 47, 62, 0.1),
 					0 8px 8px -4px rgba(34, 47, 62, 0.07);
 
-				background-color: var(--uui-color-surface-alt);
+				background-color: var(--uui-color-surface);
 				color: var(--color-text);
 
 				position: sticky;
@@ -647,7 +649,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 			}
 
 			umb-code-editor {
-				height: 200px;
+				min-height: 200px;
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
 				border-top: 0;

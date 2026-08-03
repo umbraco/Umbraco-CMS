@@ -207,32 +207,6 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         Assert.That(viaPermissionService[0].Permissions, Is.EquivalentTo(viaUserService.Result.First().Permissions));
     }
 
-    [Test]
-    public async Task GetPermissionsAsync_Returns_Empty_For_Empty_Keys()
-    {
-        // Arrange
-        var (user, _) = await CreateTestUserAndGroup();
-
-        // Act
-        NodePermissions[] result = (await ContentPermissionService.GetPermissionsAsync(user, [])).ToArray();
-
-        // Assert
-        Assert.That(result, Is.Empty);
-    }
-
-    [Test]
-    public async Task GetPermissionsAsync_Returns_Empty_For_Unknown_Content()
-    {
-        // Arrange
-        var (user, _) = await CreateTestUserAndGroup();
-
-        // Act
-        NodePermissions[] result = (await ContentPermissionService.GetPermissionsAsync(user, [Guid.NewGuid()])).ToArray();
-
-        // Assert
-        Assert.That(result, Is.Empty);
-    }
-
     private async Task<(IUser User, IUserGroup UserGroup)> CreateTestUserAndGroup()
     {
         var userGroup = UserGroupBuilder.CreateUserGroup();

@@ -39,7 +39,7 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
     protected ContentType ContentType { get; private set; }
 
     [SetUp]
-    public virtual async Task Setup() => await CreateTestDataAsync();
+    public new virtual async Task Setup() => await CreateTestDataAsync();
 
     public virtual async Task CreateTestDataAsync()
     {

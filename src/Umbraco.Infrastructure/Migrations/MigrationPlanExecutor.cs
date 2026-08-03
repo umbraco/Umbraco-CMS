@@ -270,9 +270,16 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     private async Task<MigrationContext> RunUnscopedMigrationAsync(MigrationPlan.Transition transition, MigrationPlan plan)
     {
         using IUmbracoDatabase database = _databaseFactory.CreateDatabase();
-        var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>(), async void () => await OnCompleteAsync(plan, transition.TargetState));
+        var context = new MigrationContext(plan, database, _loggerFactory.CreateLogger<MigrationContext>());
 
         await RunMigrationAsync(transition.MigrationType, context).ConfigureAwait(false);
+
+        // The migration is responsible for committing its own scope; only persist the state once
+        // it has actually signalled completion.
+        if (context.IsCompleted)
+        {
+            await OnCompleteAsync(plan, transition.TargetState).ConfigureAwait(false);
+        }
 
         return context;
     }
@@ -284,28 +291,36 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
 
     private async Task<MigrationContext> RunScopedMigrationAsync(MigrationPlan.Transition transition, MigrationPlan plan)
     {
+        MigrationContext context;
+
         // We want to suppress scope (service, etc...) notifications during a migration plan
         // execution. This is because if a package that doesn't have their migration plan
         // executed is listening to service notifications to perform some persistence logic,
         // that packages notification handlers may explode because that package isn't fully installed yet.
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        using (scope.Notifications.Suppress())
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            var context = new MigrationContext(
-                plan,
-                _scopeAccessor.AmbientScope?.Database,
-                _loggerFactory.CreateLogger<MigrationContext>(),
-                async void () => await OnCompleteAsync(plan, transition.TargetState));
+            using (scope.Notifications.Suppress())
+            {
+                context = new MigrationContext(
+                    plan,
+                    _scopeAccessor.AmbientScope?.Database,
+                    _loggerFactory.CreateLogger<MigrationContext>());
 
-            await RunMigrationAsync(transition.MigrationType, context).ConfigureAwait(false);
+                await RunMigrationAsync(transition.MigrationType, context).ConfigureAwait(false);
 
-            // Ensure we mark the context as complete before the scope completes
-            context.Complete();
+                // Ensure we mark the context as complete before the scope completes
+                context.Complete();
 
-            scope.Complete();
-
-            return context;
+                scope.Complete();
+            }
         }
+
+        // Persist the migration state only after the migration's transaction has committed.
+        // The key/value store now runs on its own (EF Core) scope and transaction, so writing it
+        // while the migration scope is still open would contend with that transaction's locks.
+        await OnCompleteAsync(plan, transition.TargetState).ConfigureAwait(false);
+
+        return context;
     }
 
     private async Task RunMigrationAsync(Type migrationType, MigrationContext context)

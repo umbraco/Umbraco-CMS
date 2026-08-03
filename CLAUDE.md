@@ -562,6 +562,8 @@ Allowed, but cheap to write and cheaper to leave behind. Keep them short and tra
 
 Verify any test you add for a bug fix actually catches the bug: either write the failing test first (TDD), or temporarily revert the production change and confirm the test fails before re-applying. A test that passes both ways proves nothing. Watch for coincidental passes — default seed/sort orders can make a buggy path produce the right answer for the test's specific inputs; construct inputs so the broken and fixed behaviours give visibly different results.
 
+For integration tests that exercise caching or cache refreshers, see `tests/Umbraco.Tests.Integration/CLAUDE.md` — the harness disables caching by default, which can produce false greens.
+
 ---
 
 ## Quick Reference

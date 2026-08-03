@@ -19,46 +19,50 @@ public class ContentTypeDtoConfiguration : IEntityTypeConfiguration<ContentTypeD
             .HasColumnName(ContentTypeDto.NodeIdColumnName);
 
         builder.Property(x => x.Alias)
-            .HasColumnName("alias");
+            .HasColumnName(ContentTypeDto.AliasColumnName);
 
         builder.Property(x => x.Icon)
-            .HasColumnName("icon");
+            .HasColumnName(ContentTypeDto.IconColumnName);
 
         builder.Property(x => x.Thumbnail)
-            .HasColumnName("thumbnail");
+            .HasColumnName(ContentTypeDto.ThumbnailColumnName);
 
         builder.Property(x => x.Description)
-            .HasColumnName("description")
+            .HasColumnName(ContentTypeDto.DescriptionColumnName)
             .HasMaxLength(1500);
 
         builder.Property(x => x.ListView)
-            .HasColumnName("listView");
+            .HasColumnName(ContentTypeDto.ListViewColumnName);
 
         builder.Property(x => x.IsElement)
-            .HasColumnName("isElement")
+            .HasColumnName(ContentTypeDto.IsElementColumnName)
             .HasDefaultValue(false);
 
         builder.Property(x => x.AllowedInLibrary)
-            .HasColumnName("allowedInLibrary")
+            .HasColumnName(ContentTypeDto.AllowedInLibraryColumnName)
             .HasDefaultValue(false);
 
         builder.Property(x => x.AllowAtRoot)
-            .HasColumnName("allowAtRoot")
+            .HasColumnName(ContentTypeDto.AllowAtRootColumnName)
             .HasDefaultValue(false);
 
         builder.Property(x => x.Variations)
-            .HasColumnName("variations")
-            .HasDefaultValue((byte)1);
+            .HasColumnName(ContentTypeDto.VariationsColumnName);
 
-        // IX_cmsContentType (unique on NodeId)
+        // IX_cmsContentType (unique on nodeId)
         builder.HasIndex(x => x.NodeId)
             .IsUnique()
-            .HasDatabaseName($"IX_{ContentTypeDto.TableName}");
+            .HasDatabaseName("IX_cmsContentType");
 
-        // FK: NodeId -> umbracoNode.id
-        builder.HasOne<NodeDto>()
+        // IX_cmsContentType_icon
+        builder.HasIndex(x => x.Icon)
+            .HasDatabaseName($"IX_{ContentTypeDto.TableName}_{ContentTypeDto.IconColumnName}");
+
+        // FK to umbracoNode (NodeId -> NodeDto.NodeId)
+        builder.HasOne(x => x.NodeDto)
             .WithMany()
             .HasForeignKey(x => x.NodeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName($"FK_{ContentTypeDto.TableName}_{NodeDto.TableName}");
     }
 }

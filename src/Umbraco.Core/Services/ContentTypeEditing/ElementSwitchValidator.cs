@@ -34,28 +34,28 @@ public class ElementSwitchValidator : IElementSwitchValidator
     }
 
     /// <inheritdoc />
-    public Task<bool> AncestorsAreAlignedAsync(IContentType contentType)
+    public async Task<bool> AncestorsAreAlignedAsync(IContentType contentType)
     {
         // this call does not return the system roots
         var ancestorIds = contentType.AncestorIds();
         if (ancestorIds.Length == 0)
         {
             // if there are no ancestors, validation passes
-            return Task.FromResult(true);
+            return true;
         }
 
         // if there are any ancestors where IsElement is different from the contentType, the validation fails
-        return Task.FromResult(_contentTypeService.GetMany(ancestorIds)
-            .Any(ancestor => ancestor.IsElement != contentType.IsElement) is false);
+        return (await _contentTypeService.GetManyAsync(ancestorIds))
+            .Any(ancestor => ancestor.IsElement != contentType.IsElement) is false;
     }
 
     /// <inheritdoc />
-    public Task<bool> DescendantsAreAlignedAsync(IContentType contentType)
+    public async Task<bool> DescendantsAreAlignedAsync(IContentType contentType)
     {
-        IEnumerable<IContentType> descendants = _contentTypeService.GetDescendants(contentType.Id, false);
+        IEnumerable<IContentType> descendants = await _contentTypeService.GetDescendantsAsync(contentType.Id, false);
 
         // if there are any descendants where IsElement is different from the contentType, the validation fails
-        return Task.FromResult(descendants.Any(descendant => descendant.IsElement != contentType.IsElement) is false);
+        return descendants.Any(descendant => descendant.IsElement != contentType.IsElement) is false;
     }
 
     /// <inheritdoc />
@@ -83,6 +83,6 @@ public class ElementSwitchValidator : IElementSwitchValidator
     public Task<bool> ElementToDocumentHasNoContentAsync(IContentTypeBase contentType) =>
         HasNoContentNodesAsync(contentType);
 
-    private Task<bool> HasNoContentNodesAsync(IContentTypeBase contentType) =>
-        Task.FromResult(_contentTypeService.HasContentNodes(contentType.Id) is false);
+    private async Task<bool> HasNoContentNodesAsync(IContentTypeBase contentType) =>
+        await _contentTypeService.HasContentNodesAsync(contentType.Id) is false;
 }

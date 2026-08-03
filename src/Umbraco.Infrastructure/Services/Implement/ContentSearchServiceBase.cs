@@ -66,7 +66,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IContentSearchServi
         var parentIdAsInt = Constants.System.Root;
         if (parentId.HasValue)
         {
-            Attempt<int> keyToId = _idKeyMap.GetIdForKey(parentId.Value, ObjectType);
+            Attempt<int> keyToId = await _idKeyMap.GetIdForKeyAsync(parentId.Value, ObjectType);
             if (keyToId.Success is false)
             {
                 _logger.LogWarning("Could not obtain an ID for parent key: {parentId} (object type: {contentType}", parentId, typeof(TContent).FullName);

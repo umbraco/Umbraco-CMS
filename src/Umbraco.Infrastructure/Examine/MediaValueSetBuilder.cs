@@ -55,7 +55,7 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     /// <inheritdoc />
     public override IEnumerable<ValueSet> GetValueSets(params IMedia[] media)
     {
-        IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAll().ToDictionary(x => x.Key);
+        IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAllAsync().GetAwaiter().GetResult().ToDictionary(x => x.Key);
 
         foreach (IMedia m in media)
         {

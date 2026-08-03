@@ -28,7 +28,7 @@ public static class PropertyTypeExtensions
         Guid dataTypeKey = propertyType.DataTypeKey;
         if (dataTypeKey == Guid.Empty)
         {
-            Attempt<Guid> keyAttempt = idKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
+            Attempt<Guid> keyAttempt = idKeyMap.GetKeyForIdAsync(propertyType.DataTypeId, UmbracoObjectTypes.DataType).GetAwaiter().GetResult();
             if (keyAttempt.Success is false)
             {
                 return null;

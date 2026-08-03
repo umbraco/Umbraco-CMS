@@ -651,8 +651,8 @@ public class VariationTests
             .ReturnsAsync(new DataType(textBoxEditor, serializer));
 
         var idKeyMap = new Mock<IIdKeyMap>();
-        idKeyMap.Setup(x => x.GetKeyForId(Constants.DataTypes.Textbox, UmbracoObjectTypes.DataType))
-            .Returns(Attempt.Succeed(textboxKey));
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(Constants.DataTypes.Textbox, UmbracoObjectTypes.DataType))
+            .ReturnsAsync(Attempt.Succeed(textboxKey));
 
         var propertyEditorCollection =
             new PropertyEditorCollection(new DataEditorCollection(() => new[] { textBoxEditor }));

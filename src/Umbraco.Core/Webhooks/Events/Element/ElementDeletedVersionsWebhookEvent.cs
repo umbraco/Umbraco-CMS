@@ -44,9 +44,11 @@ public class ElementDeletedVersionsWebhookEvent : WebhookEventBase<ElementDelete
     /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(ElementDeletedVersionsNotification notification)
     {
+        Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(notification.Id, UmbracoObjectTypes.Element).GetAwaiter().GetResult();
+
         return new
         {
-            Id = _idKeyMap.GetKeyForId(notification.Id, UmbracoObjectTypes.Element).Result,
+            Id = attempt.Result,
             notification.DeletePriorVersions,
             notification.SpecificVersion,
             notification.DateToRetain,

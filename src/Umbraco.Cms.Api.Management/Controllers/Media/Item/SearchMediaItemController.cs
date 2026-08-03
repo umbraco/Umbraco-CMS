@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 public class SearchMediaItemController : MediaItemControllerBase
 {
     private readonly IIndexedEntitySearchService _indexedEntitySearchService;
-    private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly IDataTypeService _dataTypeService;
 
     /// <summary>
@@ -31,9 +30,9 @@ public class SearchMediaItemController : MediaItemControllerBase
         IIndexedEntitySearchService indexedEntitySearchService,
         IMediaPresentationFactory mediaPresentationFactory,
         IDataTypeService dataTypeService)
+        : base(mediaPresentationFactory)
     {
         _indexedEntitySearchService = indexedEntitySearchService;
-        _mediaPresentationFactory = mediaPresentationFactory;
         _dataTypeService = dataTypeService;
     }
 
@@ -85,7 +84,7 @@ public class SearchMediaItemController : MediaItemControllerBase
             ignoreUserStartNodes);
         var result = new PagedModel<MediaItemResponseModel>
         {
-            Items = searchResult.Items.OfType<IMediaEntitySlim>().Select(_mediaPresentationFactory.CreateItemResponseModel),
+            Items = await MapMediaItemsAsync(searchResult.Items),
             Total = searchResult.Total,
         };
 

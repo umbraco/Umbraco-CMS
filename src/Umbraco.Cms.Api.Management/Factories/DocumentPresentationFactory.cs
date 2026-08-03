@@ -88,7 +88,7 @@ internal sealed class DocumentPresentationFactory
     /// <inheritdoc/>
     public async Task<DocumentItemResponseModel> CreateItemResponseModelAsync(IDocumentEntitySlim entity)
     {
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.Document);
+        Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(entity.ParentId, UmbracoObjectTypes.Document);
 
         var responseModel = new DocumentItemResponseModel
         {
@@ -119,10 +119,7 @@ internal sealed class DocumentPresentationFactory
         return responseModel;
     }
 
-    /// <inheritdoc/>
-    public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus>
-        CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
-        => CreateCulturePublishScheduleModels(requestModel.PublishSchedules);
+
 
     /// <inheritdoc/>
     protected override DocumentVariantItemResponseModel CreateVariantItemResponseModel(

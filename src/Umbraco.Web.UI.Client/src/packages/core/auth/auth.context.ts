@@ -51,6 +51,12 @@ export class UmbAuthContext extends UmbContextBase {
 	#session = new UmbObjectState<UmbAuthSession | undefined>(undefined);
 	readonly session$ = this.#session.asObservable();
 
+	// Set when a refresh was definitively rejected by the server (e.g. invalid_grant).
+	// Distinguishes "no session yet" from "session is dead" so concurrent and subsequent
+	// API requests don't each fire their own doomed /token call. Cleared when a new
+	// session is established (login, peer tab, completed re-authentication).
+	#sessionDead = false;
+
 	// True only during the synchronous #updateSession() call inside the lock callback.
 	// Prevents re-entrant /token calls when session$ observers fire synchronously
 	// (e.g. keepUserLoggedIn=true with short expiresIn triggers #onSessionExpiring
@@ -177,6 +183,7 @@ export class UmbAuthContext extends UmbContextBase {
 					// Peer broadcast already-computed timestamps, so set the session
 					// directly. We still go through the `#inSessionUpdateCallback` guard
 					// so observers triggered re-entrantly skip a redundant /token call.
+					this.#sessionDead = false;
 					this.#inSessionUpdateCallback = true;
 					try {
 						this.#session.setValue({
@@ -425,6 +432,7 @@ export class UmbAuthContext extends UmbContextBase {
 		// Ask existing tabs for their session state (avoids a /token call for new tabs)
 		const peerSession = await this.#requestSessionFromPeers();
 		if (peerSession) {
+			this.#sessionDead = false;
 			this.#session.setValue(peerSession);
 			this.#isAuthorized.setValue(true);
 			return;
@@ -474,16 +482,15 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @returns True if the refresh was successful, otherwise false.
 	 */
 	async makeRefreshTokenRequest(): Promise<boolean> {
+		// A previous refresh was definitively rejected — retrying cannot succeed
+		// until a new session is established.
+		if (this.#sessionDead) return false;
+
 		// Fallback for environments without Web Locks (some enterprise/kiosk browsers)
 		if (!navigator.locks) {
 			console.warn('[UmbAuth] navigator.locks is not available — token refresh coordination disabled.');
 			if (this.#isAccessTokenValid()) return true;
-			const response = await this.#client.refreshToken();
-			if (response) {
-				this.#updateSession(response.expiresIn, response.issuedAt);
-				return true;
-			}
-			return false;
+			return this.#performRefresh();
 		}
 
 		// Capture the session before entering the lock queue. Inside the lock we check
@@ -501,15 +508,33 @@ export class UmbAuthContext extends UmbContextBase {
 		if (this.#inSessionUpdateCallback) return true;
 
 		return navigator.locks.request('umb:token-refresh', async () => {
+			// A queued caller may have latched the session as dead while we waited for the lock
+			if (this.#sessionDead) return false;
 			if (this.#session.getValue() !== sessionBefore && this.#isAccessTokenValid()) return true;
 
-			const response = await this.#client.refreshToken();
-			if (response) {
-				this.#updateSession(response.expiresIn, response.issuedAt);
-				return true;
-			}
-			return false;
+			return this.#performRefresh();
 		});
+	}
+
+	/**
+	 * Performs the actual refresh request and applies the result.
+	 * A definitive rejection (e.g. `invalid_grant`) marks the session as dead and times the
+	 * user out, so the re-authentication flow starts instead of every subsequent API request
+	 * firing its own doomed refresh attempt. Transient failures (network errors, 5xx) leave
+	 * the session state untouched so a later attempt can retry.
+	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false.
+	 */
+	async #performRefresh(): Promise<boolean> {
+		const result = await this.#client.refreshToken();
+		if (result.response) {
+			this.#updateSession(result.response.expiresIn, result.response.issuedAt);
+			return true;
+		}
+		if (result.fatal) {
+			this.#sessionDead = true;
+			this.timeOut();
+		}
+		return false;
 	}
 
 	/**
@@ -540,6 +565,9 @@ export class UmbAuthContext extends UmbContextBase {
 	 * - Otherwise: returns immediately with no network call.
 	 */
 	async #ensureTokenReady(): Promise<void> {
+		// The session is dead and re-authentication is already in progress — let the request
+		// proceed (and 401) so the interceptor queues it for replay after re-authentication.
+		if (this.#sessionDead) return;
 		if (!this.#isAccessTokenValid()) {
 			await this.validateToken();
 			return;
@@ -782,6 +810,7 @@ export class UmbAuthContext extends UmbContextBase {
 		// The access_token lives for 1/4 of the refresh_token lifetime.
 		// Multiply to get the full session expiry.
 		const expiresAt = issuedAt + expiresIn * TOKEN_EXPIRY_MULTIPLIER;
+		this.#sessionDead = false;
 		this.#inSessionUpdateCallback = true;
 		try {
 			this.#session.setValue({ accessTokenExpiresAt, expiresAt });

@@ -33,6 +33,13 @@ public interface IEntityTypeContainerService<TTreeEntity>
     Task<IEnumerable<EntityContainer>> GetAllAsync();
 
     /// <summary>
+    /// Gets the ancestor containers on the entity's tree path, ordered by level.
+    /// </summary>
+    /// <param name="entity">The entity whose ancestor containers to get.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the ancestor containers ordered by level.</returns>
+    Task<IEnumerable<EntityContainer>> GetAncestorsAsync(TTreeEntity entity);
+
+    /// <summary>
     /// Gets the parent container of a container.
     /// </summary>
     /// <param name="container">The container whose parent container to get.</param>

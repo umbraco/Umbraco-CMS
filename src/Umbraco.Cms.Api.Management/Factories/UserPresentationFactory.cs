@@ -40,6 +40,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly SecuritySettings _securitySettings;
     private readonly Dictionary<Type, IPermissionPresentationMapper> _permissionPresentationMappersByType;
     private readonly IContentPermissionService _contentPermissionService;
+    private readonly IElementPermissionService _elementPermissionService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
@@ -56,6 +57,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     /// <param name="externalLoginProviders">Manages back office external login providers.</param>
     /// <param name="permissionPresentationMappers">Collection of mappers for permission presentation models.</param>
     /// <param name="contentPermissionService">Service for managing content permissions.</param>
+    /// <param name="elementPermissionService">Service for managing element permissions.</param>
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
@@ -68,7 +70,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         IOptionsSnapshot<SecuritySettings> securitySettings,
         IBackOfficeExternalLoginProviders externalLoginProviders,
         IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers,
-        IContentPermissionService contentPermissionService)
+        IContentPermissionService contentPermissionService,
+        IElementPermissionService elementPermissionService)
     {
         _entityService = entityService;
         _appCaches = appCaches;
@@ -82,6 +85,53 @@ public class UserPresentationFactory : IUserPresentationFactory
         _absoluteUrlBuilder = absoluteUrlBuilder;
         _permissionPresentationMappersByType = permissionPresentationMappers.ToDictionary(x => x.PresentationModelToHandle);
         _contentPermissionService = contentPermissionService;
+        _elementPermissionService = elementPermissionService;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for accessing and managing entities.</param>
+    /// <param name="appCaches">Provides application-level caching functionality.</param>
+    /// <param name="mediaFileManager">Manages media file storage and retrieval.</param>
+    /// <param name="imageUrlGenerator">Generates URLs for images.</param>
+    /// <param name="userGroupPresentationFactory">Factory for creating user group presentation models.</param>
+    /// <param name="absoluteUrlBuilder">Builds absolute URLs for resources.</param>
+    /// <param name="emailSender">Handles sending emails.</param>
+    /// <param name="passwordConfigurationPresentationFactory">Factory for password configuration presentation models.</param>
+    /// <param name="securitySettings">Provides access to security-related configuration settings.</param>
+    /// <param name="externalLoginProviders">Manages back office external login providers.</param>
+    /// <param name="permissionPresentationMappers">Collection of mappers for permission presentation models.</param>
+    /// <param name="contentPermissionService">Service for managing content permissions.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    public UserPresentationFactory(
+        IEntityService entityService,
+        AppCaches appCaches,
+        MediaFileManager mediaFileManager,
+        IImageUrlGenerator imageUrlGenerator,
+        IUserGroupPresentationFactory userGroupPresentationFactory,
+        IAbsoluteUrlBuilder absoluteUrlBuilder,
+        IEmailSender emailSender,
+        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
+        IOptionsSnapshot<SecuritySettings> securitySettings,
+        IBackOfficeExternalLoginProviders externalLoginProviders,
+        IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers,
+        IContentPermissionService contentPermissionService)
+        : this(
+            entityService,
+            appCaches,
+            mediaFileManager,
+            imageUrlGenerator,
+            userGroupPresentationFactory,
+            absoluteUrlBuilder,
+            emailSender,
+            passwordConfigurationPresentationFactory,
+            securitySettings,
+            externalLoginProviders,
+            permissionPresentationMappers,
+            contentPermissionService,
+            StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>())
+    {
     }
 
     /// <summary>
@@ -123,7 +173,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             securitySettings,
             externalLoginProviders,
             permissionPresentationMappers,
-            StaticServiceProvider.Instance.GetRequiredService<IContentPermissionService>())
+            StaticServiceProvider.Instance.GetRequiredService<IContentPermissionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>())
     {
     }
 
@@ -280,9 +331,13 @@ public class UserPresentationFactory : IUserPresentationFactory
         ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.ElementContainer);
 
         HashSet<IPermissionPresentationModel> permissions = GetAggregatedGranularPermissions(user, presentationGroups);
+
+        // Filter the user group default (fallback) permissions through document and element permission services so custom
+        // implementations control UI visibility for actions that rely on default permissions (no granular assignment).
         ISet<string> fallbackPermissions = await _contentPermissionService.FilterFallbackPermissionsAsync(
             user,
             presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet());
+        fallbackPermissions = await _elementPermissionService.FilterFallbackPermissionsAsync(user, fallbackPermissions);
 
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
 

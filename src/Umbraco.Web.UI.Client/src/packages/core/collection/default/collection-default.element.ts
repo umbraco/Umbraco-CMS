@@ -125,7 +125,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	#renderEmptyState() {
-		if (!this._initialLoadDone) return nothing;
+		if (!this._initialLoadDone) return html`<umb-view-loader></umb-view-loader>`;
 
 		return html`
 			<div id="empty-state" class="uui-text">

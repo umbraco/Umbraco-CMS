@@ -60,7 +60,7 @@ public sealed class UmbracoServices
     /// Retrieves all content, media, and member type models from the respective Umbraco services.
     /// </summary>
     /// <returns>
-    /// A list of <see cref="Umbraco.Cms.Infrastructure.ModelsBuilder.TypeModel"/> objects representing all content, media, and member types defined in the system.
+    /// A list of <see cref="TypeModel"/> objects representing all content, media, and member types defined in the system.
     /// </returns>
     public IList<TypeModel> GetAllTypes()
     {
@@ -72,7 +72,7 @@ public sealed class UmbracoServices
         // in more than one place.
         types.AddRange(GetTypes(
             PublishedItemType.Content,
-            _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
+            _contentTypeService.GetAllAsync().GetAwaiter().GetResult().Cast<IContentTypeComposition>().ToArray()));
         types.AddRange(GetTypes(
             PublishedItemType.Media,
             _mediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
@@ -91,7 +91,7 @@ public sealed class UmbracoServices
     /// </returns>
     public IList<TypeModel> GetContentTypes()
     {
-        IContentTypeComposition[] contentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+        IContentTypeComposition[] contentTypes = _contentTypeService.GetAllAsync().GetAwaiter().GetResult().Cast<IContentTypeComposition>().ToArray();
         return GetTypes(PublishedItemType.Content, contentTypes); // aliases have to be unique here
     }
 

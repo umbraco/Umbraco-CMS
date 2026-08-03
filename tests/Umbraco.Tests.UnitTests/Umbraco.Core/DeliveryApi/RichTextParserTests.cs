@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
@@ -715,6 +716,7 @@ public class RichTextParserTests : PropertyValueConverterTests
             urlProvider,
             cacheManager.Content,
             cacheManager.Media,
+            new NoopImageUrlTokenGenerator(),
             Mock.Of<ILogger<ApiRichTextMarkupParser>>());
     }
 
