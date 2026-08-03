@@ -5,7 +5,7 @@ import { HtmlClassAttribute } from '../html-attr-class/html-attr-class.tiptap-ex
 import { HtmlStyleAttribute } from '../html-attr-style/html-attr-style.tiptap-extension.js';
 import { expect } from '@open-wc/testing';
 
-describe('html-tag-div.tiptap-extension', () => {
+describe('html-tag-div-container.tiptap-extension', () => {
 	let editor: Editor;
 	let host: HTMLDivElement;
 
