@@ -9,6 +9,8 @@ describe('UmbLink', () => {
 	let host: HTMLDivElement;
 
 	function createEditor(extensions: Array<AnyExtension>) {
+		editor?.destroy();
+		host?.remove();
 		host = document.createElement('div');
 		document.body.appendChild(host);
 		editor = new Editor({ element: host, extensions: [Document, Paragraph, Text, UmbLink, ...extensions] });
@@ -74,7 +76,7 @@ describe('UmbLink', () => {
 			expect(anchor?.dataset.routerSlot).to.equal('disabled');
 		});
 
-		it('does not absorb data-router-slot when the live anchor is parsed back into the document (regression)', () => {
+		it('does not absorb data-router-slot when the live anchor is re-parsed by the schema (regression)', () => {
 			editor.commands.setContent('<p><a href="https://example.com">link</a></p>');
 			editor.commands.setContent(host.querySelector('.tiptap')?.innerHTML ?? '');
 
