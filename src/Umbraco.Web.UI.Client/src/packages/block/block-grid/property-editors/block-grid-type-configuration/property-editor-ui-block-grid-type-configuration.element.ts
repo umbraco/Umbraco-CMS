@@ -177,7 +177,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		}
 	}
 
-	// TODO: Implement confirm dialog [NL]
 	async #deleteGroup(groupKey: string) {
 		const groupName = this.#blockGroups?.find((group) => group.key === groupKey)?.name ?? '';
 		await umbConfirmModal(this, {
