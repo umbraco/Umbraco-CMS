@@ -496,7 +496,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						this._invalidLocation,
 						() => html`
 							<uui-tag id="invalidLocation" color="danger">
-								<umb-localize key="blockEditor_invalidDropPosition" .args=${[this._label]}></umb-localize>
+								<umb-localize
+									key="blockEditor_invalidDropPosition"
+									.args=${[
+										this._contentTypeName ?? this.localize.term('blockEditor_unsupportedBlockName'),
+									]}></umb-localize>
 							</uui-tag>
 						`,
 					)}

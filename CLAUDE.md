@@ -436,13 +436,22 @@ APIs use `Asp.Versioning.Mvc`:
 
 ### Updating `OpenApi.json` (Management API)
 
-When a PR changes Management API controllers or models, the `OpenApi.json` file in the Management API project must be updated:
+When a PR changes Management API controllers or models, the `OpenApi.json` file in the Management API project must be updated, along with the generated backoffice client that is derived from it.
 
-1. Run the Umbraco instance locally
-2. Open Swagger UI and navigate to the swagger.json link (e.g. `https://localhost:44339/umbraco/swagger/management/swagger.json`)
-3. Copy the full JSON content and paste it into `src/Umbraco.Cms.Api.Management/OpenApi.json`
+With the Umbraco instance running locally (in a non-Production environment — Swagger isn't mapped in Production):
 
-**Important**: Commit only the substantive changes — not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone.
+```bash
+npm --prefix src/Umbraco.Web.UI.Client run generate:openapi
+npm --prefix src/Umbraco.Web.UI.Client run generate:server-api
+```
+
+The first fetches the document from `/umbraco/swagger/management/swagger.json` byte-for-byte into `src/Umbraco.Cms.Api.Management/OpenApi.json`; the second regenerates the hey-api client from that committed file. Both results must be committed together.
+
+They are two separate commands on purpose. The client generator only ever reads the committed schema — never a running site — so the schema and the client it produced always land in the same commit.
+
+The `/umb-update-openapi` skill wraps this: it starts and stops a backend for you if one isn't already running, and explains the diff. Reach for it when you want the whole round trip handled.
+
+**Important**: The fetch is byte-for-byte on purpose, so the endpoint stays the source of truth. Don't reformat the result — commit only the substantive changes, not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone.
 
 ### Backoffice npm Package
 
