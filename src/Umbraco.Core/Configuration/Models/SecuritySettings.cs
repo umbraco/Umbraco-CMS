@@ -56,7 +56,7 @@ public class SecuritySettings
     /// <summary>
     ///     The default authentication cookie SameSite mode.
     /// </summary>
-    internal const CookieSameSiteMode StaticAuthCookieSameSite = CookieSameSiteMode.Lax;
+    internal const string StaticAuthCookieSameSite = "Strict";
 
     /// <summary>
     ///     The default value for using email as username.
@@ -152,7 +152,7 @@ public class SecuritySettings
     ///     Gets or sets the SameSite mode for the back-office authentication cookie.
     /// </summary>
     /// <remarks>
-    ///     Only set <see cref="CookieSameSiteMode.None" /> (which also requires HTTPS) when the back
+    ///     Only set "None" (which also requires HTTPS) when the back
     ///     office is served from a different origin than the server, such as a local front-end dev
     ///     server or a containerised setup, so the cookie is sent on cross-site requests. A normal
     ///     deployment serves both from the same origin and does not need it.
@@ -162,7 +162,7 @@ public class SecuritySettings
     ///     </para>
     /// </remarks>
     [DefaultValue(StaticAuthCookieSameSite)]
-    public CookieSameSiteMode AuthCookieSameSite { get; set; } = StaticAuthCookieSameSite;
+    public string AuthCookieSameSite { get; set; } = StaticAuthCookieSameSite;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the user's email address is to be considered as their username.

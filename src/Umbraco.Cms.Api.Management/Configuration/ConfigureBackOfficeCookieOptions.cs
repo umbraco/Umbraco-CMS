@@ -10,6 +10,7 @@ using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
@@ -88,7 +89,9 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         // SameSite=None (requires HTTPS) lets the cookie ride cross-site requests when the back office
         // is served from a different origin than the server (dev server). CookieSameSiteMode mirrors
         // SameSiteMode's numeric values, so the cast is safe.
-        options.Cookie.SameSite = (SameSiteMode)_securitySettings.AuthCookieSameSite;
+        options.Cookie.SameSite = Enum.TryParse(_securitySettings.AuthCookieSameSite, ignoreCase: true, out SameSiteMode result)
+            ? result
+            : throw new ConfigurationException("The provided AuthCookieSameSite value from SecuritySettings could not be parsed into as SameSiteMode value.");
 
         // NOTE: matches route in BackOfficeLoginController
         const string backOfficeLoginPath = "/umbraco/login";
