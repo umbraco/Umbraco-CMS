@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Extensions;
@@ -61,4 +62,14 @@ public interface IElementContainerPermissionService
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ElementAuthorizationStatus"/>.</returns>
     Task<ElementAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<string> permissionsToCheck);
+
+    /// <summary>
+    ///     Gets the resolved permissions for the given element containers.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to resolve permissions for.</param>
+    /// <param name="containerKeys">The identifiers of the element containers to resolve permissions for.</param>
+    /// <returns>A task resolving into the resolved <see cref="NodePermissions"/> for each container.</returns>
+    // TODO (V20): Remove the default implementation.
+    Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> containerKeys)
+        => Task.FromResult(Enumerable.Empty<NodePermissions>());
 }

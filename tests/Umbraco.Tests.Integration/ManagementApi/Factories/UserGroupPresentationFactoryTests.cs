@@ -33,6 +33,8 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
 
     public IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
 
+    public IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
+
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         services.AddTransient<IUserGroupPresentationFactory, UserGroupPresentationFactory>();
@@ -41,6 +43,8 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         services.AddSingleton<IPermissionPresentationMapper, DocumentPermissionMapper>();
         services.AddSingleton<IPermissionMapper, DocumentPropertyValuePermissionMapper>();
         services.AddSingleton<IPermissionPresentationMapper, DocumentPropertyValuePermissionMapper>();
+        services.AddSingleton<IPermissionMapper, ElementContainerPermissionMapper>();
+        services.AddSingleton<IPermissionPresentationMapper, ElementContainerPermissionMapper>();
     }
 
     [Test]
@@ -340,6 +344,229 @@ internal sealed class UserGroupPresentationFactoryTests : UmbracoIntegrationTest
         Assert.IsNotNull(userGroup);
 
         Assert.AreEqual(2, userGroup.GranularPermissions.Count);
+    }
+
+    [Test]
+    public async Task Can_Create_Usergroup_With_Combined_Granular_Permissions_For_ElementContainer()
+    {
+        var containerResult = await ElementContainerService.CreateAsync(
+            null,
+            "Test Container",
+            null,
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(containerResult.Success);
+        var folderKey = containerResult.Result!.Key;
+
+        var createModel = new CreateUserGroupRequestModel
+        {
+            Alias = "testAlias",
+            FallbackPermissions = new HashSet<string>(),
+            HasAccessToAllLanguages = true,
+            Languages = new List<string>(),
+            Name = "Test Name",
+            Sections = ["Umb.Section.Content"],
+            Permissions = new HashSet<IPermissionPresentationModel>
+            {
+                new ElementContainerPermissionPresentationModel
+                {
+                    ElementContainer = new ReferenceByIdModel(folderKey),
+                    Verbs = new HashSet<string>(["Umb.ElementContainer.Create", "Umb.Element.Create"]),
+                },
+            },
+        };
+
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
+        Assert.IsTrue(attempt.Success);
+
+        var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
+        var userGroup = userGroupCreateAttempt.Result;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(userGroupCreateAttempt.Success);
+            Assert.IsNotNull(userGroup);
+        });
+
+        var containerGranularPermissions = userGroup!.GranularPermissions.OfType<ElementContainerGranularPermission>().ToArray();
+        Assert.AreEqual(2, containerGranularPermissions.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(containerGranularPermissions.All(x => x.Key == folderKey));
+            Assert.That(
+                containerGranularPermissions.Select(x => x.Permission),
+                Is.EquivalentTo(new[] { "Umb.ElementContainer.Create", "Umb.Element.Create" }));
+        });
+
+        // Reload to prove the rows persist and deserialize back via MapFromDto, not just the in-memory save object.
+        var reloadedGroup = await UserGroupService.GetAsync(userGroup.Key);
+        Assert.IsNotNull(reloadedGroup);
+
+        var reloadedContainerGranularPermissions = reloadedGroup!.GranularPermissions.OfType<ElementContainerGranularPermission>().ToArray();
+        Assert.AreEqual(2, reloadedContainerGranularPermissions.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(reloadedContainerGranularPermissions.All(x => x.Key == folderKey));
+            Assert.That(
+                reloadedContainerGranularPermissions.Select(x => x.Permission),
+                Is.EquivalentTo(new[] { "Umb.ElementContainer.Create", "Umb.Element.Create" }));
+        });
+    }
+
+    [Test]
+    public async Task Usergroup_Granular_Permissions_For_ElementContainer_Merge_Back_Into_One_Presentation_Model()
+    {
+        var containerResult = await ElementContainerService.CreateAsync(
+            null,
+            "Test Container",
+            null,
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(containerResult.Success);
+        var folderKey = containerResult.Result!.Key;
+
+        var createModel = new CreateUserGroupRequestModel
+        {
+            Alias = "testAlias",
+            FallbackPermissions = new HashSet<string>(),
+            HasAccessToAllLanguages = true,
+            Languages = new List<string>(),
+            Name = "Test Name",
+            Sections = ["Umb.Section.Content"],
+            Permissions = new HashSet<IPermissionPresentationModel>
+            {
+                new ElementContainerPermissionPresentationModel
+                {
+                    ElementContainer = new ReferenceByIdModel(folderKey),
+                    Verbs = new HashSet<string>(["Umb.ElementContainer.Create", "Umb.Element.Create"]),
+                },
+            },
+        };
+
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
+        var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
+        var userGroup = userGroupCreateAttempt.Result;
+        Assert.IsTrue(userGroupCreateAttempt.Success);
+
+        var responseModel = await UserGroupPresentationFactory.CreateAsync(userGroup);
+        var elementContainerPresentationModels = responseModel.Permissions.OfType<ElementContainerPermissionPresentationModel>().ToArray();
+        Assert.AreEqual(1, elementContainerPresentationModels.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(folderKey, elementContainerPresentationModels[0].ElementContainer.Id);
+            Assert.That(
+                elementContainerPresentationModels[0].Verbs,
+                Is.EquivalentTo(new[] { "Umb.ElementContainer.Create", "Umb.Element.Create" }));
+        });
+    }
+
+    [Test]
+    public async Task Can_Create_Usergroup_With_Empty_Granular_Permissions_For_ElementContainer()
+    {
+        var containerResult = await ElementContainerService.CreateAsync(
+            null,
+            "Test Container",
+            null,
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(containerResult.Success);
+        var folderKey = containerResult.Result!.Key;
+
+        var createModel = new CreateUserGroupRequestModel
+        {
+            Alias = "testAlias",
+            FallbackPermissions = new HashSet<string>(),
+            HasAccessToAllLanguages = true,
+            Languages = new List<string>(),
+            Name = "Test Name",
+            Sections = ["Umb.Section.Content"],
+            Permissions = new HashSet<IPermissionPresentationModel>
+            {
+                new ElementContainerPermissionPresentationModel
+                {
+                    ElementContainer = new ReferenceByIdModel(folderKey),
+                    Verbs = new HashSet<string>(),
+                },
+            },
+        };
+
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
+        Assert.IsTrue(attempt.Success);
+
+        var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
+        var userGroup = userGroupCreateAttempt.Result;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(userGroupCreateAttempt.Success);
+            Assert.IsNotNull(userGroup);
+            Assert.IsNotEmpty(userGroup.GranularPermissions);
+            Assert.AreEqual(folderKey, userGroup.GranularPermissions.First().Key);
+            Assert.AreEqual(string.Empty, userGroup.GranularPermissions.First().Permission);
+        });
+
+        var reloadedGroup = await UserGroupService.GetAsync(userGroup.Key);
+        Assert.IsNotNull(reloadedGroup);
+
+        var reloadedPermission = reloadedGroup!.GranularPermissions.OfType<ElementContainerGranularPermission>().SingleOrDefault();
+        Assert.IsNotNull(reloadedPermission);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(folderKey, reloadedPermission!.Key);
+            Assert.AreEqual(string.Empty, reloadedPermission!.Permission);
+        });
+    }
+
+    [Test]
+    public async Task Usergroup_Granular_Permissions_For_ElementContainer_Are_Cleaned_Up_When_ElementContainer_Is_Deleted()
+    {
+        var container1 = (await ElementContainerService.CreateAsync(
+            null,
+            "Test Container 1",
+            null,
+            Constants.Security.SuperUserKey)).Result!;
+
+        var container2 = (await ElementContainerService.CreateAsync(
+            null,
+            "Test Container 2",
+            null,
+            Constants.Security.SuperUserKey)).Result!;
+
+        var createModel = new CreateUserGroupRequestModel
+        {
+            Alias = "testAlias",
+            FallbackPermissions = new HashSet<string>(),
+            HasAccessToAllLanguages = true,
+            Languages = new List<string>(),
+            Name = "Test Name",
+            Sections = ["Umb.Section.Content"],
+            Permissions = new HashSet<IPermissionPresentationModel>
+            {
+                new ElementContainerPermissionPresentationModel
+                {
+                    ElementContainer = new ReferenceByIdModel(container1.Key),
+                    Verbs = new HashSet<string>(["Umb.ElementContainer.Create", "Umb.Element.Create"]),
+                },
+                new ElementContainerPermissionPresentationModel
+                {
+                    ElementContainer = new ReferenceByIdModel(container2.Key),
+                    Verbs = new HashSet<string>(["Umb.ElementContainer.Create", "Umb.Element.Create"]),
+                },
+            },
+        };
+
+        var attempt = await UserGroupPresentationFactory.CreateAsync(createModel);
+        Assert.IsTrue(attempt.Success);
+
+        var userGroupCreateAttempt = await UserGroupService.CreateAsync(attempt.Result, Constants.Security.SuperUserKey);
+        Assert.IsTrue(userGroupCreateAttempt.Success);
+        Assert.AreEqual(4, userGroupCreateAttempt.Result!.GranularPermissions.Count);
+
+        var deleteResult = await ElementContainerService.DeleteAsync(container1.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(deleteResult.Success);
+
+        var userGroup = await UserGroupService.GetAsync(userGroupCreateAttempt.Result!.Key);
+        Assert.IsNotNull(userGroup);
+
+        Assert.AreEqual(2, userGroup!.GranularPermissions.Count);
+        Assert.IsTrue(userGroup.GranularPermissions.OfType<ElementContainerGranularPermission>().All(p => p.Key == container2.Key));
     }
 
     private async Task<Guid> CreateContent()
