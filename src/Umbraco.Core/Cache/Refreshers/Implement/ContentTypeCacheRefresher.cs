@@ -138,6 +138,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         ///     Whether the content type is an Element type. Only meaningful when <paramref name="itemType" /> is
         ///     <see cref="IContentType" />, as Document and Element types share that item type.
         /// </param>
+        [System.Text.Json.Serialization.JsonConstructor]
         public JsonPayload(string itemType, int id, ContentTypeChangeTypes changeTypes, bool isElement)
         {
             ItemType = itemType;
