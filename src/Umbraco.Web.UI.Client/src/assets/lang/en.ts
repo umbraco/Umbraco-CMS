@@ -562,6 +562,7 @@ export default {
 		confirmdeleteNumberOfItems: 'Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items',
 		confirmdisable: 'Are you sure you want to disable',
 		confirmremove: 'Are you sure you want to remove',
+		confirmRemoveItem: (name: string) => `Are you sure you want to remove${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
@@ -2636,6 +2637,9 @@ export default {
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
 		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
+		confirmPasteHeadline: 'Paste from clipboard',
+		confirmPasteOverwriteMessage:
+			'The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with %0%?',
 		copySuccessHeadline: 'Copied to clipboard',
 	},
 	propertyActions: {

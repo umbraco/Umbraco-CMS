@@ -16,6 +16,7 @@ import {
 	css,
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -181,7 +182,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		const groupName = this.#blockGroups?.find((group) => group.key === groupKey)?.name ?? '';
 		await umbConfirmModal(this, {
 			headline: '#blockEditor_confirmDeleteBlockGroupTitle',
-			content: html`${this.localize.htmlString('#blockEditor_confirmDeleteBlockGroupMessage', groupName)}`,
+			content: this.localize.term('blockEditor_confirmDeleteBlockGroupMessage', escapeHTML(groupName)),
 			color: 'danger',
 			confirmLabel: '#general_delete',
 		});

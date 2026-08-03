@@ -8,7 +8,6 @@ import type {
 } from '../types.js';
 import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { html } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbBooleanState,
 	UmbClassState,
@@ -18,7 +17,12 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath, UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import {
+	encodeFilePath,
+	escapeHTML,
+	UmbDeprecation,
+	UmbReadOnlyVariantGuardManager,
+} from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
@@ -788,7 +792,7 @@ export abstract class UmbBlockEntryContext<
 		const blockName = this.getName();
 		await umbConfirmModal(this, {
 			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
-			content: html`${this.localize.htmlString('#blockEditor_confirmDeleteBlockMessage', blockName)}`,
+			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', escapeHTML(blockName)),
 			confirmLabel: '#general_delete',
 			color: 'danger',
 		});
