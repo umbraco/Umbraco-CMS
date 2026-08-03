@@ -1436,7 +1436,7 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
-		selectAction: "Select Property Editor",
+		selectAction: 'Select Property Editor',
 	},
 	propertyEditorUIGroups: {
 		advanced: 'Advanced',
@@ -2638,8 +2638,8 @@ export default {
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
 		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
 		confirmPasteHeadline: 'Paste from clipboard',
-		confirmPasteOverwriteMessage:
-			'The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with %0%?',
+		confirmPasteOverwriteMessage: (name: string) =>
+			`The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Copied to clipboard',
 	},
 	propertyActions: {
