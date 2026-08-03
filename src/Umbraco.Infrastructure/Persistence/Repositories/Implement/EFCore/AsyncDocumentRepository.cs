@@ -806,7 +806,7 @@ internal sealed class AsyncDocumentRepository
         var contentTypeMap = new Dictionary<int, IContentType?>();
         foreach (int contentTypeId in rows.Select(row => row.Content.ContentTypeId).Distinct())
         {
-            contentTypeMap[contentTypeId] = ContentTypeRepository.Get(contentTypeId);
+            contentTypeMap[contentTypeId] = await ContentTypeRepository.GetAsync(contentTypeId, CancellationToken.None);
         }
 
         (Dictionary<int, IReadOnlyList<ContentVersionCultureVariationDto>> contentVersionCultureVariationsByVersionId,

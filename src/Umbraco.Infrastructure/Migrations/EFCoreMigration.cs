@@ -29,4 +29,5 @@ public enum EFCoreMigration
     MemberPropertyTypeToEFCore = 21,
     AddRedirectUrlDto = 22,
     AddContentTypeDtosBasic = 23,
+    ReconcileEfCoreRepositoriesMerge = 24,
 }

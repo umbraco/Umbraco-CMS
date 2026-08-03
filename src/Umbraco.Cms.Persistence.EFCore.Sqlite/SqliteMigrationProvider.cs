@@ -71,6 +71,7 @@ public class SqliteMigrationProvider : IMigrationProvider
             EFCoreMigration.MemberPropertyTypeToEFCore => typeof(Migrations.MemberPropertyTypeToEFCore),
             EFCoreMigration.AddRedirectUrlDto => typeof(Migrations.AddRedirectUrlDto),
             EFCoreMigration.AddContentTypeDtosBasic => typeof(Migrations.AddContentTypeDtosBasic),
+            EFCoreMigration.ReconcileEfCoreRepositoriesMerge => typeof(Migrations.ReconcileEfCoreRepositoriesMerge),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }
