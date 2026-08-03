@@ -158,9 +158,9 @@ public class BasicAuthenticationMiddleware : IMiddleware
     /// challenging mid-session (https://github.com/umbraco/Umbraco-CMS/issues/23475).
     /// </summary>
     /// <remarks>
-    /// A successful attempt can still carry a null identity, when the token verified but no back-office
-    /// principal could be built for the user. That must not authenticate the request, so the identity itself
-    /// is what is checked here rather than the attempt's success.
+    /// The attempt succeeds whenever the preview token verifies, even when no back-office identity could be
+    /// resolved from it — <see cref="IPreviewService"/> reports success carrying a null identity in that case.
+    /// Checking the identity rather than the attempt keeps an unresolvable token from authenticating the request.
     /// </remarks>
     private async Task<bool> IsAuthenticatedPreviewRequestAsync()
     {
