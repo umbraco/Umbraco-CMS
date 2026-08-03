@@ -43,7 +43,7 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{id:guid}/validate", Name = "PutDocumentByIdValidate")]
+    [HttpPut("{id:guid}/validate")]
     [MapToApiVersion("1.1")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
