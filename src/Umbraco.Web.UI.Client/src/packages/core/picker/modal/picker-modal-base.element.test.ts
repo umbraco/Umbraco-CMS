@@ -1,12 +1,14 @@
 import { UmbPickerModalBaseElement } from './picker-modal-base.element.js';
 import { UmbPickerContext } from '../picker.context.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { expect } from '@open-wc/testing';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import {
-	UMB_PICKER_INTERACTION_MEMORY_CONTEXT,
 	UmbInteractionMemoryManager,
+	UmbInteractionMemoryScopeContext,
 } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 
 @customElement('test-picker-modal-scope-host')
@@ -15,7 +17,7 @@ class UmbTestScopeHostElement extends UmbControllerHostElementMixin(HTMLElement)
 	constructor() {
 		super();
 		this.scope = new UmbInteractionMemoryManager(this);
-		this.scope.provideContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, this.scope);
+		new UmbInteractionMemoryScopeContext(this, this.scope);
 	}
 }
 
@@ -24,6 +26,19 @@ class UmbTestPickerModalElement extends UmbPickerModalBaseElement {
 	protected override _pickerContext = new UmbPickerContext(this);
 	public get pickerContext() {
 		return this._pickerContext;
+	}
+}
+
+// Mirrors how a real picker modal restores state: a synchronous `getMemory()` inside `firstUpdated`
+// (see media-picker-modal.element.ts). The seed has to have landed before that runs.
+@customElement('umb-test-picker-modal-timing')
+class UmbTestPickerModalTimingElement extends UmbPickerModalBaseElement {
+	protected override _pickerContext = new UmbPickerContext(this);
+	public memoryAtFirstUpdated?: UmbInteractionMemoryModel;
+
+	protected override firstUpdated(changedProperties: PropertyValues) {
+		super.firstUpdated(changedProperties);
+		this.memoryAtFirstUpdated = this._pickerContext.interactionMemory.getMemory('location');
 	}
 }
 
@@ -71,6 +86,37 @@ describe('UmbPickerModalBaseElement', () => {
 		});
 
 		scopeHost.appendChild(element);
+	});
+
+	it('keeps its picker memories when its entry disappears from the scope', async () => {
+		const element = new UmbTestPickerModalElement();
+		element.manifest = testManifest;
+		scopeHost.appendChild(element);
+
+		element.pickerContext.interactionMemory.setMemory({ unique: 'location', value: { unique: 'folder-5' } });
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// Simulates the scope being emptied from above while this modal is still open.
+		scopeHost.scope.deleteMemory('UmbPickerModal:Test.Modal.Alias');
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		expect(element.pickerContext.interactionMemory.getMemory('location')?.value).to.deep.equal({
+			unique: 'folder-5',
+		});
+	});
+
+	it('has restored its memories from the scope by the time firstUpdated runs', async () => {
+		scopeHost.scope.setMemory({
+			unique: 'UmbPickerModal:Test.Modal.Alias',
+			memories: [{ unique: 'location', value: { unique: 'folder-6' } }],
+		});
+
+		const element = new UmbTestPickerModalTimingElement();
+		element.manifest = testManifest;
+		scopeHost.appendChild(element);
+		await element.updateComplete;
+
+		expect(element.memoryAtFirstUpdated?.value).to.deep.equal({ unique: 'folder-6' });
 	});
 
 	it('does not throw when no scope context is available', () => {

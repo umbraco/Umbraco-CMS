@@ -3,6 +3,9 @@ import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
 import type { AnyExtension } from '../../externals.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
+import { UmbInteractionMemoryScopeContext } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import {
 	css,
 	customElement,
@@ -35,6 +38,20 @@ const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
 	#context = new UmbTiptapRteContext(this);
+
+	// Holds what the modals opened from this input remember between opens. They are rendered in the
+	// modal portal, not as descendants of this element, so context is the only channel that reaches
+	// them; upwards it is a property and an `interaction-memories-change` event.
+	#interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
+	#interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(this, this.#interactionMemoryScope.memory);
+
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#interactionMemoryBridge.getMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemoryBridge.setMemories(value);
+	}
 
 	#hasToolbar = false;
 

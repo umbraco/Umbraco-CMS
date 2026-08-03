@@ -4,8 +4,8 @@ import type { UmbInputMultiUrlElement } from '../components/input-multi-url/inde
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
@@ -24,14 +24,14 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	extends UmbFormControlMixin<Array<UmbLinkPickerLink>, typeof UmbLitElement, undefined>(UmbLitElement)
 	implements UmbPropertyEditorUiElement
 {
-	readonly #pickerMemory = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+	readonly #interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
 		memoryUniquePrefix: 'UmbMultiUrlPicker',
 	});
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (!config) return;
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
 
-		this.#pickerMemory.setPropertyEditorConfig(config);
+		if (!config) return;
 
 		this._hideAnchor = Boolean(config.getValueByAlias('hideAnchor'));
 		this._documentLinksConfig = {
@@ -84,10 +84,15 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	@state()
 	private _variantId?: string;
 
+	@state()
+	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
+
 	constructor() {
 		super();
 
-		this.provideContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, this.#pickerMemory);
+		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
+			this._interactionMemories = interactionMemories ?? [];
+		});
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this._label = context?.getLabel();
@@ -111,6 +116,17 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
+	async #onInputInteractionMemoriesChange(event: Event) {
+		const target = event.target as UmbInputMultiUrlElement;
+		const interactionMemories = target.interactionMemories;
+
+		if (interactionMemories && interactionMemories.length > 0) {
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(interactionMemories);
+		} else {
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
+		}
+	}
+
 	override render() {
 		return html`
 			<umb-input-multi-url
@@ -125,7 +141,9 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}
-				@change=${this.#onChange}>
+				.interactionMemories=${this._interactionMemories}
+				@change=${this.#onChange}
+				@interaction-memories-change=${this.#onInputInteractionMemoriesChange}>
 			</umb-input-multi-url>
 		`;
 	}

@@ -1,7 +1,7 @@
 import type { UmbInputMarkdownElement } from '../../components/input-markdown-editor/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_PICKER_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbPropertyEditorUiInteractionMemoryManager } from '@umbraco-cms/backoffice/property-editor';
 import type {
 	UmbPropertyEditorConfigCollection,
@@ -44,19 +44,35 @@ export class UmbPropertyEditorUIMarkdownEditorElement
 	@state()
 	private _overlaySize: UUIModalSidebarSize = 'small';
 
-	readonly #pickerMemory = new UmbPropertyEditorUiInteractionMemoryManager(this, {
+	readonly #interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
 		memoryUniquePrefix: 'UmbMarkdownEditor',
 	});
 
+	@state()
+	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
+
 	constructor() {
 		super();
-		this.provideContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, this.#pickerMemory);
+
+		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (memories) => {
+			this._interactionMemories = memories ?? [];
+		});
+	}
+
+	async #onInteractionMemoriesChange(event: Event) {
+		const memories = (event.target as UmbInputMarkdownElement).interactionMemories;
+
+		if (memories && memories.length > 0) {
+			await this.#interactionMemoryManager.saveMemoriesForPropertyEditor(memories);
+		} else {
+			await this.#interactionMemoryManager.deleteMemoriesForPropertyEditor();
+		}
 	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (!config) return;
+		this.#interactionMemoryManager.setPropertyEditorConfig(config);
 
-		this.#pickerMemory.setPropertyEditorConfig(config);
+		if (!config) return;
 
 		this._preview = config.getValueByAlias('preview');
 		this._overlaySize = config.getValueByAlias('overlaySize') ?? 'small';
@@ -80,7 +96,9 @@ export class UmbPropertyEditorUIMarkdownEditorElement
 				@change=${this.#onChange}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
-				.requiredMessage=${this.mandatoryMessage}></umb-input-markdown>
+				.requiredMessage=${this.mandatoryMessage}
+				.interactionMemories=${this._interactionMemories}
+				@interaction-memories-change=${this.#onInteractionMemoriesChange}></umb-input-markdown>
 		`;
 	}
 }

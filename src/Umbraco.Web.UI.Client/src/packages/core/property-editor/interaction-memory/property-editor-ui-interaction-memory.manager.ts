@@ -1,9 +1,7 @@
 import type { UmbPropertyEditorConfigCollection } from '../config/index.js';
-import { simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
-import {
-	UMB_INTERACTION_MEMORY_CONTEXT,
-	UmbInteractionMemoryManager,
-} from '@umbraco-cms/backoffice/interaction-memory';
+import { simpleHashCode, UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UMB_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
@@ -12,23 +10,26 @@ export interface UmbPropertyEditorUiInteractionMemoryManagerArgs {
 }
 
 /**
- * An `UmbInteractionMemoryManager` that also persists its memories to the app-root interaction-memory
- * store, keyed by a prefix plus a hash of the property editor's configuration. This lets a property
- * editor's own remembered state (e.g. a picker modal's last-navigated folder) survive the property
- * editor being recreated, while still exposing the per-key manager API a picker modal expects from a
- * "nearest scope" (see `UMB_PICKER_INTERACTION_MEMORY_CONTEXT`).
+ * Persists a property editor's interaction memories to the app-root interaction-memory store, keyed by
+ * a prefix plus a hash of the property editor's configuration, so they survive the property editor
+ * being recreated.
+ *
+ * This is the only layer that talks to that store. It is deliberately not an
+ * `UmbInteractionMemoryManager`: a modal's memories reach it by being relayed up from the scope the
+ * opener provides, never by a modal writing into it directly.
  * @exports
  * @class UmbPropertyEditorUiInteractionMemoryManager
- * @augments {UmbInteractionMemoryManager}
+ * @augments {UmbControllerBase}
  */
-export class UmbPropertyEditorUiInteractionMemoryManager extends UmbInteractionMemoryManager {
-	/** Alias of `memories`, kept for existing callers. */
-	memoriesForPropertyEditor = this.memories;
+export class UmbPropertyEditorUiInteractionMemoryManager extends UmbControllerBase {
+	#memories = new UmbArrayState<UmbInteractionMemoryModel>([], (x) => x.unique);
+	memoriesForPropertyEditor = this.#memories.asObservable();
 
 	#interactionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
 	#configHashCode?: number;
 	#memoryUniquePrefix: string;
 	#init?: Promise<unknown>;
+	#warnedAboutMissingConfig = false;
 
 	constructor(host: UmbControllerHost, args: UmbPropertyEditorUiInteractionMemoryManagerArgs) {
 		super(host);
@@ -43,41 +44,9 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbInteractionM
 		]);
 	}
 
-	// These four await `#init` before touching local state — not just before writing to the store.
-	// `#observeInteractionMemory` (below) only starts listening once `#init` resolves, and its first
-	// emission applies whatever the store currently holds. If a local mutation applied immediately
-	// (synchronously) it could land *before* that first emission is applied, which would then
-	// clobber it back to empty. Waiting here guarantees the read side is already live before any
-	// write can land, so the two can never race — mirroring how `saveMemoriesForPropertyEditor`
-	// below has always been gated.
-
-	override async setMemory(memory: UmbInteractionMemoryModel): Promise<void> {
-		await this.#init;
-		await super.setMemory(memory);
-		this.#writeToStore();
-	}
-
-	override async deleteMemory(unique: string): Promise<void> {
-		await this.#init;
-		await super.deleteMemory(unique);
-		this.#writeToStore();
-	}
-
-	override async setMemories(memories: Array<UmbInteractionMemoryModel>): Promise<void> {
-		await this.#init;
-		await super.setMemories(memories);
-		this.#writeToStore();
-	}
-
-	override async clear(): Promise<void> {
-		await this.#init;
-		await super.clear();
-		this.#writeToStore();
-	}
-
 	/**
 	 * Sets the property editor config, used to create a unique hash for the interaction memory.
-	 * @param {(UmbPropertyEditorConfigCollection | undefined)} config
+	 * @param {(UmbPropertyEditorConfigCollection | undefined)} config - The property editor configuration.
 	 * @memberof UmbPropertyEditorUiInteractionMemoryManager
 	 */
 	setPropertyEditorConfig(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -88,48 +57,55 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbInteractionM
 	/**
 	 * Creates or updates an interaction memory for this property editor based on the provided memories.
 	 * @param {Array<UmbInteractionMemoryModel>} memories - The memories to include for this property editor.
-	 * @returns {Promise<void>}
+	 * @returns {Promise<void>} Resolves once the memories have been applied.
 	 * @memberof UmbPropertyEditorUiInteractionMemoryManager
 	 */
-	saveMemoriesForPropertyEditor(memories: Array<UmbInteractionMemoryModel>): Promise<void> {
-		return this.setMemories(memories);
+	async saveMemoriesForPropertyEditor(memories: Array<UmbInteractionMemoryModel>): Promise<void> {
+		await this.#init;
+		if (!this.#hasConfigHash()) return;
+
+		this.#memories.setValue(memories);
+		this.#interactionMemoryContext?.memory.setMemory({ unique: this.#getInteractionMemoryUnique(), memories });
 	}
 
 	/**
 	 * Deletes the interaction memory for this property editor.
+	 * @returns {Promise<void>} Resolves once the memories have been removed.
 	 * @memberof UmbPropertyEditorUiInteractionMemoryManager
 	 */
-	deleteMemoriesForPropertyEditor(): Promise<void> {
-		return this.clear();
+	async deleteMemoriesForPropertyEditor(): Promise<void> {
+		await this.#init;
+		if (!this.#hasConfigHash()) return;
+
+		this.#memories.setValue([]);
+		this.#interactionMemoryContext?.memory.deleteMemory(this.#getInteractionMemoryUnique());
+	}
+
+	#hasConfigHash(): boolean {
+		if (this.#configHashCode !== undefined) return true;
+
+		// Without a hash there is no key to store under, so the memories would be silently dropped. It
+		// means `setPropertyEditorConfig` was never called — it has to be called unconditionally, before
+		// any `if (!config) return` guard in the property editor.
+		if (!this.#warnedAboutMissingConfig) {
+			this.#warnedAboutMissingConfig = true;
+			console.warn(
+				`[${this.#memoryUniquePrefix}] Interaction memories cannot be persisted because no property editor configuration has been set. Call setPropertyEditorConfig() before any early return in the property editor's config setter.`,
+			);
+		}
+		return false;
 	}
 
 	#getInteractionMemoryUnique() {
 		return `${this.#memoryUniquePrefix}PropertyEditorUi${this.#configHashCode !== undefined ? '-' + this.#configHashCode : ''}`;
 	}
 
-	#writeToStore() {
+	#observeInteractionMemory() {
 		if (!this.#interactionMemoryContext || this.#configHashCode === undefined) return;
-
-		const memoryUnique = this.#getInteractionMemoryUnique();
-		const memories = this.getAllMemories();
-
-		if (memories.length > 0) {
-			this.#interactionMemoryContext.memory.setMemory({ unique: memoryUnique, memories });
-		} else {
-			this.#interactionMemoryContext.memory.deleteMemory(memoryUnique);
-		}
-	}
-
-	async #observeInteractionMemory() {
-		if (!this.#interactionMemoryContext || this.#configHashCode === undefined) return;
-		const memoryUnique = this.#getInteractionMemoryUnique();
-		if (!memoryUnique) return;
 		this.observe(
-			this.#interactionMemoryContext?.memory.memory(memoryUnique),
+			this.#interactionMemoryContext.memory.memory(this.#getInteractionMemoryUnique()),
 			(memory) => {
-				// Apply via the base setter so this doesn't loop back through #persist — the store is
-				// already holding this exact value, there's nothing new to write.
-				super.setMemories(memory?.memories ?? []);
+				this.#memories.setValue(memory?.memories ?? []);
 			},
 			'observeMemory',
 		);
@@ -137,7 +113,6 @@ export class UmbPropertyEditorUiInteractionMemoryManager extends UmbInteractionM
 
 	#setConfigHash(config: UmbPropertyEditorConfigCollection | undefined) {
 		const configString = config ? JSON.stringify(config.toObject()) : '';
-		const hashCode = simpleHashCode(configString);
-		this.#configHashCode = hashCode;
+		this.#configHashCode = simpleHashCode(configString);
 	}
 }

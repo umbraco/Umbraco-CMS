@@ -20,7 +20,6 @@ import {
 	type UmbDocumentItemModel,
 } from '@umbraco-cms/backoffice/document';
 import {
-	UMB_MEDIA_PICKER_MODAL,
 	UmbMediaItemRepository,
 	UmbMediaPickerFolderFilter,
 	UmbMediaUrlRepository,
@@ -30,17 +29,15 @@ import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffic
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
 import {
-	UMB_PICKER_INTERACTION_MEMORY_CONTEXT,
+	UmbInteractionMemoryManager,
+	UmbModalInteractionMemoryController,
 	type UmbInteractionMemoryModel,
 } from '@umbraco-cms/backoffice/interaction-memory';
-import { umbPickerModalMemoryUnique } from '@umbraco-cms/backoffice/picker';
 
 type UmbInputPickerEvent = CustomEvent & { target: { value?: string; culture?: string } };
 
-// Shares its key with the `UmbMediaPickerModalElement` memory bridge (`picker-modal-base.element.ts`),
-// so the media folder location is remembered whether it's reached via "insert media" or via this
-// link picker's own media tab.
-const MEDIA_PICKER_MEMORY_UNIQUE = umbPickerModalMemoryUnique(UMB_MEDIA_PICKER_MODAL.toString());
+const MODAL_MEMORY_UNIQUE = 'UmbLinkPickerModal';
+const MEDIA_MEMORY_UNIQUE = 'UmbLinkPickerMedia';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
@@ -74,7 +71,8 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	#documentUrlsDataResolver?: UmbDocumentUrlsDataResolver;
 	#mediaItemRepository?: UmbMediaItemRepository;
 	#mediaUrlRepository?: UmbMediaUrlRepository;
-	#memoryScope?: typeof UMB_PICKER_INTERACTION_MEMORY_CONTEXT.TYPE;
+
+	#interactionMemory = new UmbInteractionMemoryManager(this);
 
 	constructor() {
 		super();
@@ -83,30 +81,24 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			this._missingType = invalid;
 		});
 
-		this.consumeContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, (memoryScope) => {
-			this.#memoryScope = memoryScope;
-			this.observe(
-				memoryScope?.memory(MEDIA_PICKER_MEMORY_UNIQUE),
-				(memory) => {
-					// Relay the wrapper entry itself, not its nested `.memories` — `<umb-input-media>`'s own
-					// scope expects the same wrapper shape any scope holds (see picker-modal-base.element.ts).
-					this._mediaInteractionMemories = memory ? [memory] : [];
-				},
-				'umbLinkPickerMediaMemoryObserver',
-			);
+		new UmbModalInteractionMemoryController(this, {
+			memory: this.#interactionMemory,
+			unique: MODAL_MEMORY_UNIQUE,
+		});
+
+		this.observe(this.#interactionMemory.memory(MEDIA_MEMORY_UNIQUE), (memory) => {
+			this._mediaInteractionMemories = memory?.memories ?? [];
 		});
 	}
 
 	#onMediaInteractionMemoriesChange(event: Event) {
 		const target = event.target as UmbInputMediaElement;
-		// Relay the matching wrapper entry unchanged — do not re-wrap the whole list under the same
-		// key again, which would nest the wrapper inside itself.
-		const memory = target.interactionMemories?.find((memory) => memory.unique === MEDIA_PICKER_MEMORY_UNIQUE);
+		const memories = target.interactionMemories ?? [];
 
-		if (memory) {
-			this.#memoryScope?.setMemory(memory);
+		if (memories.length > 0) {
+			this.#interactionMemory.setMemory({ unique: MEDIA_MEMORY_UNIQUE, memories });
 		} else {
-			this.#memoryScope?.deleteMemory(MEDIA_PICKER_MEMORY_UNIQUE);
+			this.#interactionMemory.deleteMemory(MEDIA_MEMORY_UNIQUE);
 		}
 	}
 

@@ -2,8 +2,8 @@ import { UMB_PICKER_INPUT_CONTEXT } from './picker-input.context-token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
-	UMB_PICKER_INTERACTION_MEMORY_CONTEXT,
 	UmbInteractionMemoryManager,
+	UmbInteractionMemoryScopeContext,
 } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -85,9 +85,9 @@ export class UmbPickerInputContext<
 	) {
 		super(host, UMB_PICKER_INPUT_CONTEXT);
 
-		// Also provide this context's memory manager as the nearest interaction-memory scope, so a
-		// picker modal opened without going through a modal route can still persist its state here.
-		this.provideContext(UMB_PICKER_INTERACTION_MEMORY_CONTEXT, this.interactionMemory);
+		// Also act as the interaction-memory scope for the modals this input opens, so they can remember
+		// their state here between opens.
+		new UmbInteractionMemoryScopeContext(this, this.interactionMemory);
 
 		if (modalAlias) {
 			this.setModalAlias(modalAlias);
