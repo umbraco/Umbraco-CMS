@@ -1,4 +1,5 @@
 import type { Editor } from '../externals.js';
+import { resolveStylesheetHref } from './resolve-stylesheet-href.function.js';
 import { UMB_TIPTAP_RTE_CONTEXT } from './tiptap-rte.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -16,7 +17,7 @@ export class UmbTiptapRteContext extends UmbContextBase {
 
 	#serverUrl = '';
 
-	#stylesheetRootPath = new UmbStringState(undefined);
+	readonly #stylesheetRootPath = new UmbStringState(undefined);
 	stylesheetRootPath = this.#stylesheetRootPath.asObservable();
 
 	constructor(host: UmbControllerHost) {
@@ -27,7 +28,7 @@ export class UmbTiptapRteContext extends UmbContextBase {
 			// requests hit the real Umbraco server instead of resolving against the Vite
 			// client's own origin; a no-op prefix in production, where it equals `location.origin`.
 			// Kept separate from `stylesheetRootPath` below, which stays origin-relative so
-			// consumers can still detect whether a configured stylesheet already includes it.
+			// `resolveStylesheetHref` can still detect whether a configured stylesheet already includes it.
 			this.#serverUrl = serverContext?.getServerUrl() ?? '';
 
 			const serverConnection = serverContext?.getServerConnection();
@@ -42,11 +43,16 @@ export class UmbTiptapRteContext extends UmbContextBase {
 	}
 
 	/**
-	 * Returns the Umbraco server origin, used to resolve stylesheet URLs against the real server in split-dev setups.
-	 * @returns {string} The server origin, or an empty string if not yet resolved.
+	 * Resolves a configured stylesheet path to an href on the Umbraco server.
+	 * @param {string} stylesheet The configured stylesheet path, relative to the stylesheet root path.
+	 * @returns {string} The href to use for the stylesheet link.
 	 */
-	public getServerUrl(): string {
-		return this.#serverUrl;
+	public resolveStylesheetHref(stylesheet: string): string {
+		return resolveStylesheetHref(
+			stylesheet,
+			this.#stylesheetRootPath.getValue() ?? DEFAULT_STYLESHEET_ROOT_PATH,
+			this.#serverUrl,
+		);
 	}
 
 	public getEditor(): Editor | undefined {

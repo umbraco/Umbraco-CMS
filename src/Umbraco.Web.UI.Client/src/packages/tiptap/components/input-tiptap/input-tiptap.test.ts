@@ -27,24 +27,20 @@ describe('UmbInputTiptapElement (standalone)', () => {
 describe('UmbInputTiptapElement (stylesheets)', () => {
 	// Regression coverage for #21819: a minimal extension configuration (no extension
 	// contributes `getStyles()`) must still load the configured stylesheets, not just
-	// Umbraco's own base RTE stylesheet. Also covers resolving the configured stylesheet
-	// against the server origin, so it doesn't 404 against a split Vite dev client's own origin.
+	// Umbraco's own base RTE stylesheet. This is specifically a render-path bug —
+	// `#renderStyles()` used to early-return when no extension contributed `getStyles()`,
+	// so the `<link>` elements were never emitted at all — so it needs a real mounted
+	// element with a minimal extension set to catch it. The stylesheet href resolution
+	// itself (root path prefixing, server origin, protocol-relative/absolute URLs) is a
+	// pure string transform covered without mounting anything in
+	// `resolve-stylesheet-href.function.test.ts`, and the root-path fallback is covered
+	// in `tiptap-rte.context.test.ts`.
 	//
-	// The first mount in this suite pays for a cold dynamic import of the shared
-	// `extension-apis.bundle` chunk (Tiptap core + 50+ extension APIs), which can take
-	// several seconds to transform on an uncached test run — hence the generous timeouts.
+	// The mount pays for a cold dynamic import of the shared `extension-apis.bundle` chunk
+	// (Tiptap core + 50+ extension APIs), which can take several seconds to transform on an
+	// uncached test run — hence the generous timeout.
 
 	let provider: UmbContextProvider;
-
-	function stubServerContext(cssPath: string | undefined, serverUrl: string) {
-		const stub = {
-			getHostElement: () => document.body,
-			getServerUrl: () => serverUrl,
-			getServerConnection: () => ({ umbracoCssPath: of(cssPath) }),
-		} as unknown as UmbServerContext;
-		provider = new UmbContextProvider(document.body, UMB_SERVER_CONTEXT, stub);
-		provider.hostConnected();
-	}
 
 	before(() => {
 		umbExtensionsRegistry.registerMany(tiptapManifests);
@@ -58,12 +54,20 @@ describe('UmbInputTiptapElement (stylesheets)', () => {
 		provider?.hostDisconnected();
 	});
 
-	async function renderElement(cssPath: string | undefined, serverUrl = '', stylesheets: Array<string> = ['/rte-test.css']) {
-		stubServerContext(cssPath, serverUrl);
+	it('loads the configured stylesheet alongside the base RTE stylesheet, even when no enabled extension contributes styles', async function () {
+		this.timeout(20000);
+
+		const stub = {
+			getHostElement: () => document.body,
+			getServerUrl: () => '',
+			getServerConnection: () => ({ umbracoCssPath: of('/mycss') }),
+		} as unknown as UmbServerContext;
+		provider = new UmbContextProvider(document.body, UMB_SERVER_CONTEXT, stub);
+		provider.hostConnected();
 
 		const config = new UmbPropertyEditorConfigCollection([
 			{ alias: 'extensions', value: ['Umb.Tiptap.Bold', 'Umb.Tiptap.Italic'] },
-			{ alias: 'stylesheets', value: stylesheets },
+			{ alias: 'stylesheets', value: ['/rte-test.css'] },
 		]);
 
 		const element = await fixture<UmbInputTiptapElement>(html`
@@ -74,48 +78,11 @@ describe('UmbInputTiptapElement (stylesheets)', () => {
 			timeout: 15000,
 		});
 
-		return Array.from(element.shadowRoot!.querySelectorAll('link[rel="stylesheet"]')).map((link) =>
+		const hrefs = Array.from(element.shadowRoot!.querySelectorAll('link[rel="stylesheet"]')).map((link) =>
 			link.getAttribute('href'),
 		);
-	}
-
-	it('loads the configured stylesheet alongside the base RTE stylesheet, even when no enabled extension contributes styles', async function () {
-		this.timeout(20000);
-		const hrefs = await renderElement('/mycss');
 
 		expect(hrefs).to.include('/umbraco/backoffice/css/rte-content.css');
-		expect(hrefs).to.include('/mycss/rte-test.css');
-	});
-
-	it('falls back to the default stylesheet root path when the server reports none', async function () {
-		this.timeout(20000);
-		const hrefs = await renderElement(undefined);
-
-		expect(hrefs).to.include('/css/rte-test.css');
-	});
-
-	it('resolves the configured stylesheet against the server origin, e.g. when running a split Vite dev client', async function () {
-		this.timeout(20000);
-		const hrefs = await renderElement('/mycss', 'https://localhost:44339');
-
-		expect(hrefs).to.include('https://localhost:44339/mycss/rte-test.css');
-		// The base RTE stylesheet is a client-bundled asset (served by Vite itself in dev),
-		// so it must stay origin-relative rather than being prefixed with the server URL.
-		expect(hrefs).to.include('/umbraco/backoffice/css/rte-content.css');
-	});
-
-	it('does not double up the root path when a configured stylesheet already includes it, and still resolves against the server origin', async function () {
-		this.timeout(20000);
-		const hrefs = await renderElement('/mycss', 'https://localhost:44339', ['/mycss/already-prefixed.css']);
-
-		expect(hrefs).to.include('https://localhost:44339/mycss/already-prefixed.css');
-		expect(hrefs).not.to.include('https://localhost:44339/mycss/mycss/already-prefixed.css');
-	});
-
-	it('leaves a protocol-relative stylesheet URL untouched', async function () {
-		this.timeout(20000);
-		const hrefs = await renderElement('/mycss', 'https://localhost:44339', ['//cdn.example.com/style.css']);
-
-		expect(hrefs).to.include('//cdn.example.com/style.css');
+		expect(hrefs).to.include(`${window.location.origin}/mycss/rte-test.css`);
 	});
 });

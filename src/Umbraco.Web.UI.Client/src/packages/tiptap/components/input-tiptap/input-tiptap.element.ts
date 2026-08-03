@@ -30,7 +30,7 @@ const RTE_CONTENT_STYLESHEET = '/umbraco/backoffice/css/rte-content.css';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
-	#context = new UmbTiptapRteContext(this);
+	readonly #context = new UmbTiptapRteContext(this);
 
 	#hasToolbar = false;
 
@@ -126,20 +126,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	#observeStylesheetRootPath() {
 		this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
 			if (stylesheetRootPath === undefined) return;
-			this.#applyConfiguredStylesheets(stylesheetRootPath);
+			this.#applyConfiguredStylesheets();
 		});
 	}
 
-	#applyConfiguredStylesheets(rootPath: string) {
+	#applyConfiguredStylesheets() {
 		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
 		if (!stylesheets?.length) return;
 
-		const serverUrl = this.#context.getServerUrl();
-		const linkHrefs = stylesheets.map((stylesheet) => {
-			if (stylesheet.startsWith('http') || stylesheet.startsWith('//')) return stylesheet;
-			const relativeHref = stylesheet.startsWith(rootPath) ? stylesheet : `${rootPath}${stylesheet}`;
-			return `${serverUrl}${relativeHref}`;
-		});
+		const linkHrefs = stylesheets.map((stylesheet) => this.#context.resolveStylesheetHref(stylesheet));
 
 		// Reassign a new Set so Lit's `@state()` identity check detects the change and re-renders;
 		// `Set.add()` would mutate in place and the configured stylesheets could be missed if the
