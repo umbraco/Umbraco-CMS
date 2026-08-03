@@ -286,7 +286,10 @@ export class UmbPreviewContext extends UmbContextBase {
 		}
 
 		if (websiteWindow) {
-			websiteWindow.location.replace(url);
+			// window.open() resolves a relative URL against this document, but navigating another window
+			// resolves against *its* document — about:blank, which has no base — and silently does
+			// nothing. Resolve here so a relative URL behaves the same either way.
+			websiteWindow.location.replace(new URL(url, window.location.href).toString());
 			websiteWindow.focus();
 			return;
 		}
