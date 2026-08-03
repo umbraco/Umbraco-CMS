@@ -50,9 +50,9 @@ public struct ContentAndSettingsReference : IEquatable<ContentAndSettingsReferen
     public override bool Equals(object? obj) => obj is ContentAndSettingsReference reference && Equals(reference);
 
     /// <inheritdoc />
-    public bool Equals(ContentAndSettingsReference other) => other != null
-                                                             && ContentKey.Equals(other.ContentKey)
-                                                             && SettingsKey.Equals(other.SettingsKey);
+    public bool Equals(ContentAndSettingsReference other) =>
+        ContentKey.Equals(other.ContentKey)
+        && SettingsKey.Equals(other.SettingsKey);
 
     /// <inheritdoc />
     public override int GetHashCode() => (ContentKey, SettingsKey).GetHashCode();
