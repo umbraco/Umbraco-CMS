@@ -25,7 +25,7 @@ public class ContentSettings
     ///     The default preview badge markup template.
     /// </summary>
     internal const string StaticDefaultPreviewBadge = @"
-<script src=""{0}/website/preview.js""></script>
+<script{3} src=""{0}/website/preview.js""></script>
 <umb-website-preview path=""{0}"" url=""{1}"" unique=""{2}""></umb-website-preview>";
 
     /// <summary>
@@ -135,6 +135,21 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the preview badge mark-up.
     /// </summary>
+    /// <remarks>
+    ///     The mark-up is used as a format string with the following placeholders:
+    ///     <list type="bullet">
+    ///         <item><description><c>{0}</c>: the back office path.</description></item>
+    ///         <item><description><c>{1}</c>: the URL of the previewed page.</description></item>
+    ///         <item><description><c>{2}</c>: the key of the previewed content item.</description></item>
+    ///         <item>
+    ///             <description>
+    ///                 <c>{3}</c>: a <c>nonce</c> attribute (including the leading space) for the current request,
+    ///                 or an empty string when no nonce is available. Required for sites using a nonce-based
+    ///                 Content Security Policy.
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </remarks>
     [DefaultValue(StaticDefaultPreviewBadge)]
     public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
 

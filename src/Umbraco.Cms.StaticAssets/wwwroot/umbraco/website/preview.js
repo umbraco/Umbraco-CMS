@@ -131,11 +131,11 @@
 
       wrapper.appendChild(btnExit);
 
-      const style = document.createElement("style");
+      // Adopted stylesheets are not subject to the style-src CSP directive, unlike an inline <style> element.
+      const sheet = new CSSStyleSheet();
+      sheet.replaceSync(styles);
+      shadow.adoptedStyleSheets = [sheet];
 
-      style.textContent = styles;
-
-      shadow.appendChild(style);
       shadow.appendChild(wrapper);
     }
   }

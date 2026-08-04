@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Web.Common.Hosting;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Extensions;
 
@@ -39,8 +40,7 @@ public static class HtmlHelperBackOfficeExtensions
     {
         PackageManifestImportmap packageImports = await packageManifestService.GetPackageManifestImportmapAsync();
 
-        var nonce = cspNonceService.GetNonce();
-        var nonceAttribute = string.IsNullOrEmpty(nonce) ? string.Empty : $" nonce=\"{nonce}\"";
+        var nonceAttribute = cspNonceService.GetNonceAttribute();
 
         var sb = new StringBuilder();
         sb.AppendLine($"<script type=\"importmap\"{nonceAttribute}>");

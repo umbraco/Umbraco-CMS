@@ -88,7 +88,8 @@ public static class HtmlHelperRenderExtensions
                     contentSettings.PreviewBadge,
                     hostingEnvironment.GetBackOfficePath(),
                     WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
-                    umbracoContext.PublishedRequest?.PublishedContent?.Key);
+                    umbracoContext.PublishedRequest?.PublishedContent?.Key,
+                    GetRequiredService<ICspNonceService>(helper).GetNonceAttribute());
             return new HtmlString(htmlBadge);
         }
 
