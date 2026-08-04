@@ -387,11 +387,9 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         // Filter the user group default (fallback) permissions through document and element permission services so custom
         // implementations control UI visibility for actions that rely on default permissions (no granular assignment).
-        ISet<string> fallbackPermissions = await _contentPermissionService.FilterFallbackPermissionsAsync(
+        ISet<string> fallbackPermissions = await FilterFallbackPermissionsAsync(
             user,
             presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet());
-        fallbackPermissions = await _elementPermissionService.FilterFallbackPermissionsAsync(user, fallbackPermissions);
-        fallbackPermissions = await _elementContainerPermissionService.FilterFallbackPermissionsAsync(user, fallbackPermissions);
 
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
 
@@ -420,6 +418,20 @@ public class UserPresentationFactory : IUserPresentationFactory
             IsAdmin = user.IsAdmin(),
             UserGroupIds = presentationUser.UserGroupIds,
         };
+    }
+
+    // Each permission service filters its own copy of the aggregated (unfiltered) fallback permissions, and the
+    // results are intersected. This keeps filtering order-independent, so no service can resurrect a verb another
+    // service removed.
+    private async Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> aggregatedFallbackPermissions)
+    {
+        var filtered = new HashSet<string>(aggregatedFallbackPermissions);
+
+        filtered.IntersectWith(await _contentPermissionService.FilterFallbackPermissionsAsync(user, new HashSet<string>(aggregatedFallbackPermissions)));
+        filtered.IntersectWith(await _elementPermissionService.FilterFallbackPermissionsAsync(user, new HashSet<string>(aggregatedFallbackPermissions)));
+        filtered.IntersectWith(await _elementContainerPermissionService.FilterFallbackPermissionsAsync(user, new HashSet<string>(aggregatedFallbackPermissions)));
+
+        return filtered;
     }
 
     private HashSet<IPermissionPresentationModel> GetAggregatedGranularPermissions(IUser user, IEnumerable<UserGroupResponseModel> presentationGroups)
