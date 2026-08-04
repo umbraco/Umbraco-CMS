@@ -63,17 +63,27 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
                 _publishStatusQueryService.IsDocumentPublished(key, culture)
                 && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
 
+        GetItemsDelegate<Guid, IPublishedContent> getCachedItems = batchKeys => batchKeys
+            .Select(key => _documentCacheService.TryGetCached(key, preview, out IPublishedContent? content) ? (Key: key, Content: content) : default)
+            .Where(pair => pair != default)
+            .ToDictionary(pair => pair.Key, pair => pair.Content!);
+
+        GetItemsDelegate<Guid, IPublishedContent> getPersistedItems = missedKeys
+            => _documentCacheService.GetByKeysAsync(missedKeys, preview)
+                .GetAwaiter().GetResult()
+                .ToDictionary(x => x.Key);
+
         // Materialise in growing chunks: an all-L0-hit chunk stays fully synchronous (no async, no
         // batch), while a cold set collapses its database access into batched reads. Returned lazily
         // so short-circuiting consumers still exit early; callers that enumerate more than once should
         // buffer the result themselves (.ToList() / .ToArray()).
-        return ChunkedPublishedContentEnumerator.Enumerate(
+        return ChunkedTieredEnumerator.Enumerate(
             keys,
-            (Guid key, out IPublishedContent? content) => _documentCacheService.TryGetCached(key, preview, out content),
-            misses => _documentCacheService.GetByKeysAsync(misses, preview).GetAwaiter().GetResult(),
-            content => culture == Constants.System.InvariantCulture
-                       || content.ContentType.VariesByCulture() is false
-                       || content.Cultures.ContainsKey(culture));
+            getCachedItems,
+            getPersistedItems)
+            .Where(content => culture == Constants.System.InvariantCulture
+                               || content.ContentType.VariesByCulture() is false
+                               || content.Cultures.ContainsKey(culture));
     }
 
     /// <inheritdoc />

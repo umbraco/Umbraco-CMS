@@ -36,11 +36,22 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
     /// that need to enumerate the result more than once should buffer it themselves (.ToList() / .ToArray()).
     /// </remarks>
     public IEnumerable<IPublishedContent> FilterAvailable(IEnumerable<Guid> candidateKeys, string? culture)
-        => ChunkedPublishedContentEnumerator.Enumerate(
+    {
+        GetItemsDelegate<Guid, IPublishedContent> getCachedItems = keys => keys
+            .Select(key => _mediaCacheService.TryGetCached(key, out IPublishedContent? content) ? (Key: key, Content: content) : default)
+            .Where(pair => pair != default)
+            .ToDictionary(pair => pair.Key, pair => pair.Content!);
+
+        GetItemsDelegate<Guid, IPublishedContent> getPersistedItems = keys
+            => _mediaCacheService.GetByKeysAsync(keys)
+                .GetAwaiter().GetResult()
+                .ToDictionary(x => x.Key);
+
+        return ChunkedTieredEnumerator.Enumerate(
             candidateKeys,
-            _mediaCacheService.TryGetCached,
-            misses => _mediaCacheService.GetByKeysAsync(misses).GetAwaiter().GetResult(),
-            predicate: null);
+            getCachedItems,
+            getPersistedItems);
+    }
 
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
