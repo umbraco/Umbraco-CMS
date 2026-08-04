@@ -300,31 +300,6 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == composition.Key && x.Allowed == false));
     }
 
-    [Test]
-    public async Task Already_Persisted_Composition_Collision_Does_Not_Exempt_A_Different_Candidate_Sharing_The_Same_Alias()
-    {
-        var compositionB = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition B", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
-        var compositionD = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition D", "sharedAlias"), Constants.Security.SuperUserKey)).Result!;
-        var parent = (await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel("Parent"), Constants.Security.SuperUserKey)).Result!;
-        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key, "sharedAlias"), Constants.Security.SuperUserKey);
-
-        // simulate a pre-existing grandfathered collision: attach B to Parent directly, bypassing validation
-        IContentType parentRaw = ContentTypeService.Get(parent.Key)!;
-        IContentType compositionBRaw = ContentTypeService.Get(compositionB.Key)!;
-        parentRaw.AddContentType(compositionBRaw);
-        ContentTypeService.Save(parentRaw);
-
-        IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions =
-            await ContentTypeEditingService.GetAvailableCompositionsAsync(
-                parent.Key,
-                Enumerable.Empty<Guid>(),
-                Enumerable.Empty<string>(),
-                false);
-
-        // D is a completely different, not-yet-selected composition - B already being grandfathered onto Parent
-        // must not exempt D from the same descendant collision check
-        Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == compositionD.Key && x.Allowed == false));
-    }
 
     private ContentTypeCreateModel CreateBasicContentTypeModelWithSingleProperty(string contentTypeName, string propertyName, bool isElement)
     {

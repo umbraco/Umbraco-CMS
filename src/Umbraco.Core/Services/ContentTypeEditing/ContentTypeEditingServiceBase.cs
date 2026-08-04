@@ -444,23 +444,8 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
         IContentTypeComposition[] allContentTypeCompositions)
     {
-        // get the content type keys we want to use for compositions
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
 
-        // only genuinely new composition keys need to be validated - an already-persisted composition is never
-        // retroactively rejected just because GetAvailableCompositeContentTypes now reports it as not allowed
-        // (e.g. it already collides with a descendant property alias, or is no longer independently addable once
-        // the surrounding tree has grown); this also covers the edge case where compositions are configured for a
-        // content type before child content types are created
-        Guid[] persistedCompositionKeys = contentType?.ContentTypeComposition.Select(c => c.Key).ToArray() ?? [];
-        Guid[] newCompositionKeys = compositionKeys.Except(persistedCompositionKeys).ToArray();
-        if (newCompositionKeys.Length == 0)
-        {
-            return ContentTypeOperationStatus.Success;
-        }
-
-        // verify that all newly-introduced composition keys are allowed - this also catches a composition that
-        // would push a property alias down onto a descendant that already defines it
         Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(
                 contentType,
                 allContentTypeCompositions,
@@ -470,7 +455,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             .Select(x => x.Composition.Key)
             .ToArray();
 
-        return allowedCompositionKeys.ContainsAll(newCompositionKeys) is false
+        return allowedCompositionKeys.ContainsAll(compositionKeys) is false
             ? ContentTypeOperationStatus.InvalidComposition
             : ContentTypeOperationStatus.Success;
     }
