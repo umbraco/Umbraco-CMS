@@ -1638,18 +1638,15 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Verify the patched text block
         var textBlock1 = blockListVal!.ContentData.FirstOrDefault(b => b.Key == setup.TextBlock1Key);
         Assert.IsNotNull(textBlock1);
-        Assert.AreEqual("updated deep value",
-            textBlock1!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+        Assert.AreEqual("updated deep value", textBlock1!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
 
         // Verify da-DK text was NOT changed
-        Assert.AreEqual("original da",
-            textBlock1.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "da-DK")?.Value?.ToString());
+        Assert.AreEqual("original da", textBlock1.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "da-DK")?.Value?.ToString());
 
         // Verify the second text block was NOT changed
         var textBlock2 = blockListVal.ContentData.FirstOrDefault(b => b.Key == setup.TextBlock2Key);
         Assert.IsNotNull(textBlock2);
-        Assert.AreEqual("second block en",
-            textBlock2!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
+        Assert.AreEqual("second block en", textBlock2!.Values.FirstOrDefault(v => v.Alias == "text" && v.Culture == "en-US")?.Value?.ToString());
     }
 
     [Test]

@@ -1,8 +1,5 @@
 import { Link } from '../../externals.js';
 
-// TODO: [LK] Look to use a NodeView to render the link, so that we remove the `data-router-slot` attribute from the HTML value.
-// https://tiptap.dev/docs/editor/extensions/custom-extensions/node-views/javascript
-
 export const UmbLink = Link.extend({
 	name: 'umbLink',
 
@@ -24,9 +21,29 @@ export const UmbLink = Link.extend({
 	addOptions() {
 		return {
 			...this.parent?.(),
-			HTMLAttributes: {
-				'data-router-slot': 'disabled',
-			},
+			// Empty (not omitted): the parent Link extension's own addOptions() defaults `HTMLAttributes` to
+			// `{ target: '_blank', rel: 'noopener noreferrer nofollow', class: null }`, which addAttributes()
+			// then uses as the schema-level default for each link's own `rel`/`target`/`class` attrs. Overriding
+			// with `{}` here keeps those attributes unset by default, same as before `data-router-slot` moved
+			// to the MarkView below.
+			HTMLAttributes: {},
+		};
+	},
+
+	// Renders the live anchor by hand so `data-router-slot="disabled"` (needed to stop the backoffice's
+	// SPA router intercepting clicks on RTE-authored links) stays a live-DOM-only concern and never leaks
+	// into the serialized/stored HTML via `renderHTML` (#22654).
+	addMarkView() {
+		return ({ HTMLAttributes }) => {
+			const dom = document.createElement('a');
+
+			Object.entries(HTMLAttributes).forEach(([key, value]) => {
+				if (value != null) dom.setAttribute(key, value);
+			});
+
+			dom.dataset.routerSlot = 'disabled';
+
+			return { dom };
 		};
 	},
 
