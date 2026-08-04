@@ -1512,7 +1512,7 @@ public class ContentService : RepositoryService, IContentService
             content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
         }
 
-        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1566,7 +1566,7 @@ public class ContentService : RepositoryService, IContentService
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
         content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
 
-        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1722,6 +1722,10 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="userId"></param>
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
+    /// <param name="raiseSavedNotification">
+    ///     Whether to raise a <see cref="ContentSavedNotification" /> once the document is persisted. Enabled by the
+    ///     save-and-publish entry points, which combine a save and a publish, so the paired Saved notification still fires.
+    /// </param>
     /// <param name="eventMessages"></param>
     /// <returns></returns>
     /// <remarks>
@@ -1740,7 +1744,8 @@ public class ContentService : RepositoryService, IContentService
         IDictionary<string, object?>? notificationState,
         int userId,
         bool branchOne = false,
-        bool branchRoot = false)
+        bool branchRoot = false,
+        bool raiseSavedNotification = false)
     {
         if (scope == null)
         {
@@ -1780,6 +1785,22 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyList<string>? culturesChanging = variesByCulture
             ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
             : null;
+
+        // For a save-and-publish, capture the saved cultures the same way (and at the same point) as the standalone
+        // Save path - before persistence resets change tracking - so the Saved notification honours the same
+        // SavedCultures contract: the changed cultures for variant content, or the "*" marker for changed invariant content.
+        IReadOnlyCollection<string>? savedCultures = null;
+        if (raiseSavedNotification)
+        {
+            if (variesByCulture)
+            {
+                savedCultures = culturesChanging;
+            }
+            else
+            {
+                savedCultures = content.IsDirty() ? ["*"] : [];
+            }
+        }
 
         var isNew = !content.HasIdentity;
         TreeChangeTypes changeType = isNew ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
@@ -1920,6 +1941,19 @@ public class ContentService : RepositoryService, IContentService
 
         // Persist the document
         SaveDocument(content);
+
+        // A save-and-publish is also a save, so raise the paired Saved notification (https://github.com/umbraco/Umbraco-CMS/issues/23523).
+        // Positioned here, after the document is actually persisted, so it does not fire on the cancelled-publishing or
+        // concurrency-violation paths above, which return before reaching this point.
+        if (raiseSavedNotification)
+        {
+            scope.Notifications.Publish(
+                new ContentSavedNotification(
+                    content,
+                    eventMessages,
+                    BuildCultureMap(content, savedCultures))
+                .WithState(notificationState));
+        }
 
         // we have tried to unpublish - won't happen in a branch
         if (unpublishing)

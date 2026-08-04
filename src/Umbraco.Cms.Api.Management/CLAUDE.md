@@ -122,6 +122,41 @@ These are firm design rules for this API. Prefer an extra round-trip over bendin
    past the resource's real authorization boundary. Put such fields on the properly-authorized
    detail or batch endpoint instead.
 
+3. **Versioning an endpoint the backoffice calls: pin the operation ID with a route `Name`.**
+   Operation IDs are generated from the route by `OperationIdHandler`, and a non-default
+   `[MapToApiVersion]` is appended to them — so bumping an endpoint to `1.1` would rename the
+   generated client method (`putDocumentByIdValidate` → `putDocumentByIdValidate11`) and churn every
+   call site in the backoffice. The backoffice always calls the latest version, so the version in the
+   method name carries no information.
+
+   Give the **latest** version an explicit name matching what the unversioned route would have
+   produced:
+
+   ```csharp
+   [HttpPut("{id:guid}/validate", Name = "PutDocumentByIdValidate")]
+   [MapToApiVersion("1.1")]
+   ```
+
+   Rules:
+   - Only the **latest** version gets the unversioned name. Older versions keep their generated
+     (version-suffixed) IDs — **except at the default version (`1.0`), which is never suffixed**.
+     An older `1.0` action therefore generates the very name you are pinning, so it needs an
+     explicit versioned name of its own at the same time:
+
+     ```csharp
+     [HttpPut("{id:guid}/validate", Name = "PutDocumentByIdValidate1_0")]
+     [MapToApiVersion("1.0")]
+     ```
+
+   - **Two versions must never carry the same ID** — duplicate operation IDs break OpenAPI
+     generation, and ASP.NET Core will not catch the clash, since route names are only unique when
+     both are explicit. `OpenApiDocumentTests` guards `OpenApi.json` against it. When moving the
+     name to a new version, remove it from the old one, which deliberately renames the old
+     operation.
+   - Match the generated convention (`{HttpMethod}{Path}By{Param}...`) rather than inventing a
+     name, or the API surface ends up a mix of styles.
+   - Update `OpenApi.json` and regenerate the backoffice client afterwards.
+
 ---
 
 ## 2. Commands

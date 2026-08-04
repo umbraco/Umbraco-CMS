@@ -123,6 +123,10 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 					retry: async () => {
 						const { data, response: retryResponse } = await client.request(requestConfig as never);
 
+						if (!retryResponse) {
+							throw new Error('The retried request did not produce a response.');
+						}
+
 						return this.#createResponse(data, retryResponse);
 					},
 					resolve,
