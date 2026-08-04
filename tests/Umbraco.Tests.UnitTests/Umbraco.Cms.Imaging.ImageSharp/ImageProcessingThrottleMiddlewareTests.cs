@@ -36,30 +36,16 @@ public class ImageProcessingThrottleMiddlewareTests
         Assert.That(probe.Peak, Is.EqualTo(Limit), "More images were processed concurrently than configured.");
     }
 
-    [Test]
-    public async Task InvokeAsync_RequestsWithoutProcessingCommands_AreNotThrottled()
+    // A file with no processing command, and an API call that happens to carry one: neither is
+    // something the imaging middleware will process, so neither may queue behind it.
+    [TestCase(ImagePath, "v", "1234")]
+    [TestCase("/umbraco/management/api/v1/tree", "width", "400")]
+    public async Task InvokeAsync_NonProcessingRequests_AreNotThrottled(string path, string key, string value)
     {
         var probe = new ConcurrencyProbe();
         var middleware = CreateMiddleware(probe.HandleAsync);
 
-        Task[] requests = Send(middleware, () => CreateContext(ImagePath, ("v", "1234")));
-
-        await WaitUntilAsync(() => probe.Current >= RequestCount);
-
-        probe.Release();
-        await Task.WhenAll(requests);
-
-        Assert.That(probe.Peak, Is.EqualTo(RequestCount));
-    }
-
-    [Test]
-    public async Task InvokeAsync_RequestsWithoutAFileExtension_AreNotThrottled()
-    {
-        var probe = new ConcurrencyProbe();
-        var middleware = CreateMiddleware(probe.HandleAsync);
-
-        // An API call that happens to carry a "width" must not queue behind image processing.
-        Task[] requests = Send(middleware, () => CreateContext("/umbraco/management/api/v1/tree", ("width", "400")));
+        Task[] requests = Send(middleware, () => CreateContext(path, (key, value)));
 
         await WaitUntilAsync(() => probe.Current >= RequestCount);
 
