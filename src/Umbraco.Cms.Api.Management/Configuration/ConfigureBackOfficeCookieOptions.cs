@@ -87,8 +87,8 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         options.Cookie.Path = "/";
 
         // SameSite=None (requires HTTPS) lets the cookie ride cross-site requests when the back office
-        // is served from a different origin than the server (dev server). CookieSameSiteMode mirrors
-        // SameSiteMode's numeric values, so the cast is safe.
+        // is served from a different origin than the server (dev server). An unparseable value is a
+        // configuration mistake rather than something to paper over, so it fails the boot.
         options.Cookie.SameSite = Enum.TryParse(_securitySettings.AuthCookieSameSite, ignoreCase: true, out SameSiteMode result)
             ? result
             : throw new ConfigurationException("The provided AuthCookieSameSite value from SecuritySettings could not be parsed into as SameSiteMode value.");
