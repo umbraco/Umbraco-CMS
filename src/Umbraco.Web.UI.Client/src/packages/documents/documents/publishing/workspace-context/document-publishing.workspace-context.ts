@@ -5,6 +5,7 @@ import type {
 	UmbDocumentVariantPublishModel,
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
+import { UmbDocumentDetailRepository } from '../../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
@@ -45,6 +46,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
+	#detailRepository = new UmbDocumentDetailRepository(this);
 	#publishedDocumentData?: UmbDocumentDetailModel;
 	#loadingPublishedData = false;
 	#currentUnique?: UmbEntityUnique;
@@ -275,18 +277,25 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		if (!variantIds.length) return;
 
-		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
-		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
-		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
+		const workspaceContext = this.#documentWorkspaceContext;
+		const saveData = await workspaceContext.constructSaveData(variantIds);
 
-		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
+		try {
+			await workspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
+		} catch (error) {
+			// This throws before the submit flow starts, so nothing downstream tells the user why. [JOV]
+			this.#notificationContext?.peek('danger', {
+				data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
+			});
+			return Promise.reject(error);
+		}
+
+		await workspaceContext.askServerToValidate(saveData, variantIds);
+
+		return workspaceContext.validateVariantsAndSubmit(
 			variantIds,
 			async () => {
-				if (!this.#documentWorkspaceContext) {
-					throw new Error('Document workspace context is missing');
-				}
-
-				const primaryVariantName = this.#documentWorkspaceContext.getName(variantIds[0]) ?? '';
+				const primaryVariantName = workspaceContext.getName(variantIds[0]) ?? '';
 
 				const waitNotice = this.#notificationContext?.peek('warning', {
 					data: {
@@ -295,16 +304,37 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					},
 				});
 
-				try {
-					// Save the document before publishing it and its descendants
-					await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+				// The publish already succeeded server-side once we reach the read-back; a failed read-back must
+				// not be reported as a publish failure, so we fall back to the submitted data.
+				let reloadAfterPublishFailed = false;
 
-					const { error } = await this.#publishingRepository.publishWithDescendants(
-						unique,
-						variantIds,
-						result.includeUnpublishedDescendants ?? false,
-					);
-					if (error) throw error;
+				try {
+					// Saving through performCreateOrUpdate merges the server response into the selected variants
+					// only, so edits in variants that were not published stay dirty rather than being discarded.
+					await workspaceContext.performCreateOrUpdate(variantIds, saveData, {
+						update: async (data, ids) => {
+							const { data: saved, error: saveError } = await this.#detailRepository.save(data);
+							if (!saved || saveError) {
+								throw new Error('Error saving document', { cause: saveError });
+							}
+
+							const { error } = await this.#publishingRepository.publishWithDescendants(
+								unique,
+								ids,
+								result.includeUnpublishedDescendants ?? false,
+							);
+							if (error) {
+								throw new Error('Error publishing document with descendants', { cause: error });
+							}
+
+							try {
+								return await workspaceContext.loadWithoutPersist();
+							} catch {
+								reloadAfterPublishFailed = true;
+								return data;
+							}
+						},
+					});
 				} catch (error) {
 					// The save may have succeeded, so the operation must not resolve as if it published. [JOV]
 					this.#notificationContext?.peek('danger', {
@@ -321,9 +351,12 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					},
 				});
 
-				// reload the document so all states are updated after the publish operation
-				// TODO: It seems wrong to make a full reload, I think we should only load the selected variants. [NL]
-				await this.#documentWorkspaceContext.reload();
+				if (reloadAfterPublishFailed) {
+					this.#notificationContext?.peek('warning', {
+						data: { message: this.#localize.term('speechBubbles_editContentPublishedReloadFailed') },
+					});
+				}
+
 				await this.#loadAndProcessLastPublished();
 
 				// request reload of this entity
@@ -334,14 +367,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
 				this.#eventContext?.dispatchEvent(childrenEvent);
 			},
-			async (reason?: any) => {
+			async (reason?: unknown) => {
 				// If data of the selection is not valid, then just save:
-				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				if (!notificationContext) {
-					throw new Error('Notification context is missing');
-				}
-				notificationContext.peek('danger', {
+				await workspaceContext.performCreateOrUpdate(variantIds, saveData);
+				this.#notificationContext?.peek('danger', {
 					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
 				});
 				// Reject even though the save was successful, as we did not publish. [NL]

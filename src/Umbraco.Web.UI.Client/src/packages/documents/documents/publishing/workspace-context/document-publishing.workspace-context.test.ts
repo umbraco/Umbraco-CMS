@@ -10,34 +10,33 @@ import {
 } from '../../workspace/context/document-workspace-context.test-utils.js';
 import { UMB_DISCARD_CHANGES_MODAL, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbDocumentPublishingServerDataSource } from '../repository/document-publishing.server.data-source.js';
+import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
+const DA = UmbVariantId.Create({ culture: 'da', segment: null });
 
 /**
- * Records the aliases of every modal opened while `run` executes. The test host auto-submits modals,
- * so what a flow asks for is observable, but the user's answer is not. Failures are swallowed: the
- * unpublish entity action needs contexts the test host does not provide, and it runs after the point
- * these tests are about.
+ * Forces the value every modal is submitted with while `run` executes. The test host's modal manager
+ * submits with whatever value the context holds when `open` returns, so setting it here decides the
+ * answer — which the auto-submitting mock alone cannot express.
  */
-async function recordOpenedModals(run: () => Promise<unknown>): Promise<Array<string>> {
-	const aliases: Array<string> = [];
+async function answerModalsWith(value: unknown, run: () => Promise<unknown>): Promise<void> {
 	const originalOpen = UmbModalManagerContext.prototype.open;
 	UmbModalManagerContext.prototype.open = function (
 		this: UmbModalManagerContext,
 		...args: Parameters<typeof originalOpen>
 	) {
-		aliases.push(String(args[1]));
-		return originalOpen.apply(this, args as never);
+		const modalContext = originalOpen.apply(this, args as never);
+		modalContext.setValue(value as never);
+		return modalContext;
 	} as typeof originalOpen;
 
 	try {
-		await run().catch(() => undefined);
+		await run();
 	} finally {
 		UmbModalManagerContext.prototype.open = originalOpen;
 	}
-
-	return aliases;
 }
 
 /**
@@ -60,7 +59,10 @@ async function countPublishWithDescendantsCalls(run: () => Promise<unknown>): Pr
 	return calls;
 }
 
-describe('UmbDocumentPublishingWorkspaceContext', () => {
+describe('UmbDocumentPublishingWorkspaceContext', function () {
+	// The publish-with-descendants mock polls once with a one second delay before completing.
+	this.timeout(10000);
+
 	let hostElement: UmbTestDocumentWorkspaceHostElement;
 	let context: UmbDocumentWorkspaceContext;
 	let publishingContext: UmbDocumentPublishingWorkspaceContext;
@@ -115,6 +117,23 @@ describe('UmbDocumentPublishingWorkspaceContext', () => {
 			expect(context.getName(EN_US)).to.equal('Renamed root');
 		});
 
+		// Saving merges the server response into the published variants only, so an edit in a variant that
+		// was not selected must survive rather than be replaced by a wholesale reload.
+		it('keeps edits in variants that were not published', async () => {
+			await context.setPropertyValue('variantText', 'Edited English', EN_US);
+			await context.setPropertyValue('variantText', 'Redigeret dansk', DA);
+
+			await answerModalsWith({ selection: [EN_US.toString()], includeUnpublishedDescendants: false }, () =>
+				publishingContext.publishWithDescendants(),
+			);
+
+			expect(context.getPropertyValue('variantText', DA), 'da edit still in the editor').to.equal('Redigeret dansk');
+			expect(
+				context.getChangedVariants().some((v) => v.culture === 'da'),
+				'da is still reported as changed',
+			).to.be.true;
+		});
+
 		// Saving first means the save's mandatory validation now gates the whole operation.
 		it('publishes nothing when the document fails mandatory validation', async () => {
 			await context.setName('', EN_US);
@@ -131,19 +150,68 @@ describe('UmbDocumentPublishingWorkspaceContext', () => {
 	});
 
 	describe('unpublish', () => {
+		/**
+		 * Stubs out the unpublish entity action — it needs contexts the test host does not provide — so
+		 * whether the flow got past the guard is observable, and optionally answers every modal with cancel.
+		 */
+		async function runUnpublish(options: { cancelModals?: boolean } = {}) {
+			const modals: Array<string> = [];
+			let reachedUnpublish = false;
+
+			const originalOpen = UmbModalManagerContext.prototype.open;
+			UmbModalManagerContext.prototype.open = function (
+				this: UmbModalManagerContext,
+				...args: Parameters<typeof originalOpen>
+			) {
+				modals.push(String(args[1]));
+				const modalContext = originalOpen.apply(this, args as never);
+				if (options.cancelModals) {
+					modalContext.reject();
+				}
+				return modalContext;
+			} as typeof originalOpen;
+
+			const originalExecute = UmbContentUnpublishEntityAction.prototype.executeWithResult;
+			UmbContentUnpublishEntityAction.prototype.executeWithResult = async function () {
+				reachedUnpublish = true;
+				return false;
+			};
+
+			try {
+				await publishingContext.unpublish();
+			} finally {
+				UmbModalManagerContext.prototype.open = originalOpen;
+				UmbContentUnpublishEntityAction.prototype.executeWithResult = originalExecute;
+			}
+
+			return { modals, reachedUnpublish };
+		}
+
 		// Unpublishing reloads the workspace, which throws away unsaved edits, so the user gets a say.
-		it('asks to discard unsaved changes', async () => {
+		it('asks to discard unsaved changes, and unpublishes once discarded', async () => {
 			await context.setName('Renamed root', EN_US);
 
-			const opened = await recordOpenedModals(() => publishingContext.unpublish());
+			const { modals, reachedUnpublish } = await runUnpublish();
 
-			expect(opened).to.include(UMB_DISCARD_CHANGES_MODAL.toString());
+			expect(modals, 'asked to discard').to.include(UMB_DISCARD_CHANGES_MODAL.toString());
+			expect(reachedUnpublish, 'went on to unpublish').to.be.true;
+		});
+
+		it('does not unpublish when the discard is cancelled', async () => {
+			await context.setName('Renamed root', EN_US);
+
+			const { modals, reachedUnpublish } = await runUnpublish({ cancelModals: true });
+
+			expect(modals, 'asked to discard').to.include(UMB_DISCARD_CHANGES_MODAL.toString());
+			expect(reachedUnpublish, 'stopped before unpublishing').to.be.false;
+			expect(context.getName(EN_US), 'the edit is untouched').to.equal('Renamed root');
 		});
 
 		it('does not ask when there is nothing to discard', async () => {
-			const opened = await recordOpenedModals(() => publishingContext.unpublish());
+			const { modals, reachedUnpublish } = await runUnpublish();
 
-			expect(opened).to.not.include(UMB_DISCARD_CHANGES_MODAL.toString());
+			expect(modals, 'no discard prompt').to.not.include(UMB_DISCARD_CHANGES_MODAL.toString());
+			expect(reachedUnpublish, 'went straight to unpublishing').to.be.true;
 		});
 	});
 });
