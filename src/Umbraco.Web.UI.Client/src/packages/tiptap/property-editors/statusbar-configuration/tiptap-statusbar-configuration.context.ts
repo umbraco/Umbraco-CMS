@@ -164,9 +164,17 @@ export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase {
 		}
 
 		this.#extensionsInUse.clear();
-		value.forEach((area) => area.forEach((alias) => this.#extensionsInUse.add(alias)));
 
-		const statusbar = value.map((area) => ({ unique: UmbId.new(), data: area }));
+		// An extension can only be used once, so any repeat occurrence is dropped rather than carried along. (#23524)
+		const statusbar = value.map((area) => {
+			const aliases: Array<string> = [];
+			for (const alias of area) {
+				if (this.#extensionsInUse.has(alias)) continue;
+				this.#extensionsInUse.add(alias);
+				aliases.push(alias);
+			}
+			return { unique: UmbId.new(), data: aliases };
+		});
 
 		this.#statusbar.setValue(statusbar);
 	}
