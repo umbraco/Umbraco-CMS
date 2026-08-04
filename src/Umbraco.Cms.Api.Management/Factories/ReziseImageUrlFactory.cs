@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -19,7 +17,6 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
 {
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly ContentSettings _contentSettings;
-    private readonly ContentImagingSettings _imagingSettings;
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
 
@@ -27,22 +24,19 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.ReziseImageUrlFactory"/> class.
     /// </summary>
     /// <param name="imageUrlGenerator">The service used to generate image URLs.</param>
-    /// <param name="contentSettings">The options containing content settings configuration.</param>
+    /// <param name="contentSettings">The options for content settings.</param>
     /// <param name="mediaUrlGenerators">A collection of media URL generators.</param>
     /// <param name="absoluteUrlBuilder">The service used to build absolute URLs.</param>
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ReziseImageUrlFactory(
         IImageUrlGenerator imageUrlGenerator,
         IOptions<ContentSettings> contentSettings,
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IAbsoluteUrlBuilder absoluteUrlBuilder)
-        : this(
-            imageUrlGenerator,
-            contentSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentImagingSettings>>(),
-            mediaUrlGenerators,
-            absoluteUrlBuilder)
     {
+        _imageUrlGenerator = imageUrlGenerator;
+        _contentSettings = contentSettings.Value;
+        _mediaUrlGenerators = mediaUrlGenerators;
+        _absoluteUrlBuilder = absoluteUrlBuilder;
     }
 
     /// <summary>
@@ -50,21 +44,18 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
     /// </summary>
     /// <param name="imageUrlGenerator">The service used to generate image URLs.</param>
     /// <param name="contentSettings">The options for content settings.</param>
-    /// <param name="imagingSettings">The options for content imaging settings.</param>
+    /// <param name="imagingSettings">The options for content imaging settings. This parameter is ignored; imaging settings are read from <see cref="ContentSettings.Imaging"/>.</param>
     /// <param name="mediaUrlGenerators">A collection of media URL generators.</param>
     /// <param name="absoluteUrlBuilder">The service used to build absolute URLs.</param>
+    [Obsolete("Use the constructor that does not accept IOptions<ContentImagingSettings>; imaging settings are read from ContentSettings.Imaging. Scheduled for removal in Umbraco 19.")]
     public ReziseImageUrlFactory(
         IImageUrlGenerator imageUrlGenerator,
         IOptions<ContentSettings> contentSettings,
         IOptions<ContentImagingSettings> imagingSettings,
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IAbsoluteUrlBuilder absoluteUrlBuilder)
+        : this(imageUrlGenerator, contentSettings, mediaUrlGenerators, absoluteUrlBuilder)
     {
-        _imageUrlGenerator = imageUrlGenerator;
-        _contentSettings = contentSettings.Value;
-        _imagingSettings = imagingSettings.Value;
-        _mediaUrlGenerators = mediaUrlGenerators;
-        _absoluteUrlBuilder = absoluteUrlBuilder;
     }
 
     /// <inheritdoc />
@@ -152,7 +143,7 @@ public class ReziseImageUrlFactory : IReziseImageUrlFactory
             return null;
         }
 
-        var isNativeImageFormat = _imagingSettings.ImageFileTypes
+        var isNativeImageFormat = _contentSettings.Imaging.ImageFileTypes
             .Any(format => format.Equals(extension, StringComparison.OrdinalIgnoreCase));
 
         return isNativeImageFormat ? null : "webp";

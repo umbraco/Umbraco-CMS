@@ -45,12 +45,14 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
         // Use configurable maximum width and height
         options.OnParseCommandsAsync = context =>
         {
-            if (context.Commands.Count == 0 || _imagingSettings.HMACSecretKey.Length > 0)
+            if (context.Commands.Count == 0)
             {
-                // Nothing to parse or using HMAC authentication
                 return Task.CompletedTask;
             }
 
+            // Enforce the configured maximum dimensions regardless of HMAC. HMAC authorizes *who*
+            // may request processing; MaxWidth/MaxHeight bound *how large* the output may be, and
+            // that ceiling stays useful for signed requests too (e.g. if the secret key leaks).
             if (context.Commands.Contains(ResizeWebProcessor.Width))
             {
                 if (!int.TryParse(

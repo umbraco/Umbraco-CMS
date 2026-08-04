@@ -320,7 +320,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         var sb = new StringBuilder();
         foreach (ColumnDefinition column in columns)
         {
-            sb.AppendLine(", " + Format(column));
+            sb.Append(", ").AppendLine(Format(column));
         }
 
         return sb.ToString().TrimStart(',');

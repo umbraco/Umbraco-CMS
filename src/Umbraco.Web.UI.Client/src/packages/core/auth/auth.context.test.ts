@@ -205,6 +205,12 @@ describe('UmbAuthContext', () => {
 
 		it('times the user out on a definitive invalid_grant failure', async () => {
 			fetchResponder = invalidGrantResponse;
+
+			// A peer tab establishes the session that is about to be rejected
+			const now = Math.floor(Date.now() / 1000);
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await aTimeout(50);
+
 			let timeOutCalls = 0;
 			context.timeOut = () => {
 				timeOutCalls++;
@@ -213,6 +219,19 @@ describe('UmbAuthContext', () => {
 			await context.validateToken();
 
 			expect(timeOutCalls).to.equal(1);
+		});
+
+		it('does not time the user out when there was no session to lose', async () => {
+			fetchResponder = invalidGrantResponse;
+			let timeOutCalls = 0;
+			context.timeOut = () => {
+				timeOutCalls++;
+			};
+
+			await context.setInitialState();
+
+			expect(timeOutCalls).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.false;
 		});
 
 		it('retries /token after a transient network failure', async () => {
