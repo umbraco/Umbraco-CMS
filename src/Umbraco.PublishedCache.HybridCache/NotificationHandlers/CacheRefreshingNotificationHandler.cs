@@ -115,10 +115,11 @@ internal sealed class CacheRefreshingNotificationHandler :
         // In deferred mode, the rebuild is queued from the ContentTypeChangedNotification handler instead,
         // which fires after the scope is disposed — avoiding database lock contention between the
         // deferred rebuild's transaction and the original save transaction.
-        var rebuildIds = notification.Changes
+        IContentType[] rebuildTypes = notification.Changes
             .Where(x => x.ChangeTypes.RequiresRawDataRebuild())
-            .Select(x => x.Item.Id)
+            .Select(x => x.Item)
             .ToArray();
+        var rebuildIds = rebuildTypes.Select(x => x.Id).ToArray();
 
         if (rebuildIds.Length > 0)
         {
@@ -126,7 +127,7 @@ internal sealed class CacheRefreshingNotificationHandler :
             {
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    _logger.LogDebug("Content type change: rebuilding the document database cache for content type(s) {ContentTypeIds}.", rebuildIds);
+                    _logger.LogDebug("Content type change: rebuilding the document database cache for content type(s) {ContentTypeIds} (keys {ContentTypeKeys}).", rebuildIds, rebuildTypes.Select(x => x.Key));
                 }
 
                 _documentCacheService.Rebuild(rebuildIds);
@@ -135,7 +136,7 @@ internal sealed class CacheRefreshingNotificationHandler :
             {
                 // In deferred mode this handler does nothing here; DeferredCacheRebuildNotificationHandler
                 // performs the rebuild in response to ContentTypeChangedNotification after the scope commits.
-                _logger.LogDebug("Content type change: document database cache rebuild for content type(s) {ContentTypeIds} left to the deferred rebuild (ContentTypeRebuildMode.Deferred).", rebuildIds);
+                _logger.LogDebug("Content type change: document database cache rebuild for content type(s) {ContentTypeIds} (keys {ContentTypeKeys}) left to the deferred rebuild (ContentTypeRebuildMode.Deferred).", rebuildIds, rebuildTypes.Select(x => x.Key));
             }
         }
 
@@ -143,16 +144,17 @@ internal sealed class CacheRefreshingNotificationHandler :
         // raw data is unaffected (a property removal): the stored cmsContentNu blob stays valid, so only the
         // converted content cache needs clearing. Selective clearing is safe here because no model factory
         // reset occurs in this handler.
-        var clearConvertedCacheIds = notification.Changes
+        IContentType[] clearConvertedCacheTypes = notification.Changes
             .Where(x => x.ChangeTypes.RequiresConvertedCacheClearOnly())
-            .Select(x => x.Item.Id)
+            .Select(x => x.Item)
             .ToArray();
+        var clearConvertedCacheIds = clearConvertedCacheTypes.Select(x => x.Id).ToArray();
 
         if (clearConvertedCacheIds.Length > 0)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Content type change: clearing the converted document cache only (no database rebuild) for content type(s) {ContentTypeIds}.", clearConvertedCacheIds);
+                _logger.LogDebug("Content type change: clearing the converted document cache only (no database rebuild) for content type(s) {ContentTypeIds} (keys {ContentTypeKeys}).", clearConvertedCacheIds, clearConvertedCacheTypes.Select(x => x.Key));
             }
 
             _documentCacheService.ClearConvertedContentCache(clearConvertedCacheIds);
@@ -201,10 +203,11 @@ internal sealed class CacheRefreshingNotificationHandler :
         // In deferred mode, the rebuild is queued from the MediaTypeChangedNotification handler instead,
         // which fires after the scope is disposed — avoiding database lock contention between the
         // deferred rebuild's transaction and the original save transaction.
-        var rebuildIds = notification.Changes
+        IMediaType[] rebuildTypes = notification.Changes
             .Where(x => x.ChangeTypes.RequiresRawDataRebuild())
-            .Select(x => x.Item.Id)
+            .Select(x => x.Item)
             .ToArray();
+        var rebuildIds = rebuildTypes.Select(x => x.Id).ToArray();
 
         if (rebuildIds.Length > 0)
         {
@@ -212,7 +215,7 @@ internal sealed class CacheRefreshingNotificationHandler :
             {
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    _logger.LogDebug("Media type change: rebuilding the media database cache for media type(s) {MediaTypeIds}.", rebuildIds);
+                    _logger.LogDebug("Media type change: rebuilding the media database cache for media type(s) {MediaTypeIds} (keys {MediaTypeKeys}).", rebuildIds, rebuildTypes.Select(x => x.Key));
                 }
 
                 _mediaCacheService.Rebuild(rebuildIds);
@@ -221,7 +224,7 @@ internal sealed class CacheRefreshingNotificationHandler :
             {
                 // In deferred mode this handler does nothing here; DeferredCacheRebuildNotificationHandler
                 // performs the rebuild in response to MediaTypeChangedNotification after the scope commits.
-                _logger.LogDebug("Media type change: media database cache rebuild for media type(s) {MediaTypeIds} left to the deferred rebuild (ContentTypeRebuildMode.Deferred).", rebuildIds);
+                _logger.LogDebug("Media type change: media database cache rebuild for media type(s) {MediaTypeIds} (keys {MediaTypeKeys}) left to the deferred rebuild (ContentTypeRebuildMode.Deferred).", rebuildIds, rebuildTypes.Select(x => x.Key));
             }
         }
 
@@ -229,16 +232,17 @@ internal sealed class CacheRefreshingNotificationHandler :
         // raw data is unaffected (a property removal): the stored cmsContentNu blob stays valid, so only the
         // converted content cache needs clearing. Selective clearing is safe here because no model factory
         // reset occurs in this handler.
-        var clearConvertedCacheIds = notification.Changes
+        IMediaType[] clearConvertedCacheTypes = notification.Changes
             .Where(x => x.ChangeTypes.RequiresConvertedCacheClearOnly())
-            .Select(x => x.Item.Id)
+            .Select(x => x.Item)
             .ToArray();
+        var clearConvertedCacheIds = clearConvertedCacheTypes.Select(x => x.Id).ToArray();
 
         if (clearConvertedCacheIds.Length > 0)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Media type change: clearing the converted media cache only (no database rebuild) for media type(s) {MediaTypeIds}.", clearConvertedCacheIds);
+                _logger.LogDebug("Media type change: clearing the converted media cache only (no database rebuild) for media type(s) {MediaTypeIds} (keys {MediaTypeKeys}).", clearConvertedCacheIds, clearConvertedCacheTypes.Select(x => x.Key));
             }
 
             _mediaCacheService.ClearConvertedContentCache(clearConvertedCacheIds);
