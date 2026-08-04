@@ -316,13 +316,17 @@ internal sealed class AsyncDocumentRepository
                     joined => joined.pubGroup.DefaultIfEmpty(),
                     (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
 
+            bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
-                ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
+                !isCustomFieldOrdering
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
                 && ordering?.IsInvariant == false;
 
-            IReadOnlyList<DocumentRow> rows = isCultureNameOrdering
-                ? await FetchCultureNameOrdered()
-                : await FetchDefaultOrdered();
+            IReadOnlyList<DocumentRow> rows = isCustomFieldOrdering
+                ? await FetchCustomFieldOrdered()
+                : isCultureNameOrdering
+                    ? await FetchCultureNameOrdered()
+                    : await FetchDefaultOrdered();
 
             if (rows.Count == 0)
             {
@@ -330,6 +334,33 @@ internal sealed class AsyncDocumentRepository
             }
 
             List<IContent> items = await AssembleEntitiesAsync(rows, db, propertyAliases, loadTemplates);
+
+            async Task<IReadOnlyList<DocumentRow>> FetchCustomFieldOrdered()
+            {
+                List<int> candidateNodeIds = await db.Nodes
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId)
+                    .Select(node => node.NodeId)
+                    .ToListAsync(cancellationToken);
+
+                return await FetchCustomFieldOrderedPageAsync(
+                    db,
+                    candidateNodeIds,
+                    ordering!,
+                    skip,
+                    take,
+                    pageNodeIds => baseQuery
+                        .Where(joined => pageNodeIds.Contains(joined.node.NodeId))
+                        .Select(joined => new DocumentRow(
+                            joined.node,
+                            joined.document,
+                            joined.content,
+                            joined.contentVersion,
+                            joined.documentVersion,
+                            joined.pub!.contentVersion,
+                            joined.pub!.documentVersion))
+                        .ToListAsync(cancellationToken),
+                    cancellationToken);
+            }
 
             async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
             {
@@ -417,7 +448,6 @@ internal sealed class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
-    /// <inheritdoc />
     public override Task<PagedModel<IContent>> GetDescendantsAsync(
         Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
         => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: true, cancellationToken);
@@ -487,13 +517,17 @@ internal sealed class AsyncDocumentRepository
                     joined => joined.pubGroup.DefaultIfEmpty(),
                     (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
 
+            bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
-                ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
+                !isCustomFieldOrdering
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
                 && ordering?.IsInvariant == false;
 
-            IReadOnlyList<DocumentRow> rows = isCultureNameOrdering
-                ? await FetchCultureNameOrdered()
-                : await FetchDefaultOrdered();
+            IReadOnlyList<DocumentRow> rows = isCustomFieldOrdering
+                ? await FetchCustomFieldOrdered()
+                : isCultureNameOrdering
+                    ? await FetchCultureNameOrdered()
+                    : await FetchDefaultOrdered();
 
             if (rows.Count == 0)
             {
@@ -501,6 +535,33 @@ internal sealed class AsyncDocumentRepository
             }
 
             List<IContent> items = await AssembleEntitiesAsync(rows, db, loadTemplates: loadTemplates);
+
+            async Task<IReadOnlyList<DocumentRow>> FetchCustomFieldOrdered()
+            {
+                List<int> candidateNodeIds = await db.Nodes
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey && EF.Functions.Like(node.Path, $"%{pathMatch}%"))
+                    .Select(node => node.NodeId)
+                    .ToListAsync(cancellationToken);
+
+                return await FetchCustomFieldOrderedPageAsync(
+                    db,
+                    candidateNodeIds,
+                    ordering!,
+                    skip,
+                    take,
+                    pageNodeIds => baseQuery
+                        .Where(joined => pageNodeIds.Contains(joined.node.NodeId))
+                        .Select(joined => new DocumentRow(
+                            joined.node,
+                            joined.document,
+                            joined.content,
+                            joined.contentVersion,
+                            joined.documentVersion,
+                            joined.pub!.contentVersion,
+                            joined.pub!.documentVersion))
+                        .ToListAsync(cancellationToken),
+                    cancellationToken);
+            }
 
             async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
             {
@@ -691,11 +752,185 @@ internal sealed class AsyncDocumentRepository
             "contenttypealias" => descending
                 ? source.OrderByDescending(contentTypeAliasSelector)
                 : source.OrderBy(contentTypeAliasSelector),
-            // TODO: implement custom property field ordering (requires PropertyData subquery join)
+            // Custom-field ordering (ordering.IsCustomField) is intercepted by callers before reaching
+            // this method — see ResolveCustomFieldOrderedNodeIdsAsync.
             _ => descending
                 ? source.OrderByDescending(sortOrderSelector)
                 : source.OrderBy(sortOrderSelector),
         };
+    }
+
+    // The four typed PropertyData value columns, plus the SortableValue override some property editors
+    // (e.g. IDataValueSortable) populate to take priority over the raw column. Mirrors the column
+    // priority in ContentRepositoryBase.ApplyCustomOrdering (NPoco), but compares each with its native
+    // .NET type instead of reformatting into a zero-padded string.
+    private sealed record PropertyOrderingValue(
+        string? SortableValue,
+        int? IntegerValue,
+        decimal? DecimalValue,
+        DateTime? DateValue,
+        string? VarcharValue);
+
+    // Resolves and sorts (but does not page) the full candidate node ID set by a custom property field.
+    // Values are fetched via ordinary translatable LINQ (no raw SQL, no per-provider SQL fragments) —
+    // the sort itself happens in-memory since no single SQL column can hold all four typed columns
+    // (int/decimal/date/varchar) plus the string SortableValue override in one comparable form.
+    private async Task<List<int>> ResolveCustomFieldOrderedNodeIdsAsync(
+        UmbracoDbContext db,
+        List<int> candidateNodeIds,
+        string alias,
+        string culture,
+        Direction direction,
+        CancellationToken cancellationToken)
+    {
+        int languageId = await db.Language
+            .Where(language => language.IsoCode == culture)
+            .Select(language => language.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var valueByNodeId = new Dictionary<int, PropertyOrderingValue>();
+        foreach (IEnumerable<int> batch in candidateNodeIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            var batchIds = batch.ToList();
+            var batchRows = await db.ContentVersions
+                .Where(contentVersion => contentVersion.Current && batchIds.Contains(contentVersion.NodeId))
+                .Join(
+                    db.PropertyData,
+                    contentVersion => contentVersion.Id,
+                    propertyData => propertyData.VersionId,
+                    (contentVersion, propertyData) => new { contentVersion.NodeId, propertyData })
+                .Join(
+                    db.PropertyTypes.Where(propertyType => propertyType.Alias == alias),
+                    joined => joined.propertyData.PropertyTypeId,
+                    propertyType => propertyType.Id,
+                    (joined, propertyType) => joined)
+                .Where(joined => joined.propertyData.LanguageId == null || joined.propertyData.LanguageId == languageId)
+                .Select(joined => new
+                {
+                    joined.NodeId,
+                    joined.propertyData.Id,
+                    joined.propertyData.SortableValue,
+                    joined.propertyData.IntegerValue,
+                    joined.propertyData.DecimalValue,
+                    joined.propertyData.DateValue,
+                    joined.propertyData.VarcharValue,
+                })
+                .ToListAsync(cancellationToken);
+
+            // Deterministic tie-break for the (rare) case of multiple PropertyData rows per node
+            // (e.g. segmented variants) — matches NPoco's equivalent ambiguity, not a new gap.
+            foreach (var group in batchRows.GroupBy(row => row.NodeId))
+            {
+                var row = group.OrderBy(row => row.Id).First();
+                valueByNodeId[group.Key] = new PropertyOrderingValue(row.SortableValue, row.IntegerValue, row.DecimalValue, row.DateValue, row.VarcharValue);
+            }
+        }
+
+        List<int> ordered = new(candidateNodeIds);
+        ordered.Sort((left, right) => CompareNodesByOrderingValue(left, right, valueByNodeId, direction));
+        return ordered;
+    }
+
+    // Re-sequences a set of already-fetched rows to match a previously computed node ID order. A node ID
+    // present in orderedNodeIds is silently skipped if it has no corresponding row — the ordering-key
+    // resolution and the row fetch are two separate round trips (unlike the other ordering paths, which
+    // select/page within a single query), so a node concurrently deleted/moved between them would
+    // otherwise fail the whole page with a KeyNotFoundException instead of just omitting that one node.
+    private static List<DocumentRow> ReorderRowsByNodeIds(List<DocumentRow> rows, List<int> orderedNodeIds)
+    {
+        Dictionary<int, DocumentRow> rowsByNodeId = rows.ToDictionary(row => row.Node.NodeId);
+        return orderedNodeIds
+            .Where(rowsByNodeId.ContainsKey)
+            .Select(nodeId => rowsByNodeId[nodeId])
+            .ToList();
+    }
+
+    // Shared by both GetChildrenCoreAsync and GetDescendantsCoreAsync's custom-field ordering path: resolves
+    // the full ordered candidate ID list, pages it, and fetches+re-sequences the page's rows. Callers differ
+    // only in how candidateNodeIds is filtered (children vs. descendants) and how fetchRowsForPageNodeIds
+    // queries baseQuery (a distinct anonymous-typed query per caller) — everything else is identical.
+    private async Task<IReadOnlyList<DocumentRow>> FetchCustomFieldOrderedPageAsync(
+        UmbracoDbContext db,
+        List<int> candidateNodeIds,
+        Ordering ordering,
+        int skip,
+        int take,
+        Func<List<int>, Task<List<DocumentRow>>> fetchRowsForPageNodeIds,
+        CancellationToken cancellationToken)
+    {
+        List<int> orderedNodeIds = await ResolveCustomFieldOrderedNodeIdsAsync(
+            db, candidateNodeIds, ordering.OrderBy!, ordering.Culture ?? string.Empty, ordering.Direction, cancellationToken);
+
+        List<int> pageNodeIds = orderedNodeIds.Skip(skip).Take(take).ToList();
+        if (pageNodeIds.Count == 0)
+        {
+            return [];
+        }
+
+        List<DocumentRow> unorderedRows = await fetchRowsForPageNodeIds(pageNodeIds);
+        return ReorderRowsByNodeIds(unorderedRows, pageNodeIds);
+    }
+
+    // Nodes without a value sort first ascending / last descending, matching both SQL Server's and
+    // SQLite's default NULL placement — the same placement NPoco's LEFT JOIN implicitly relies on.
+    private static int CompareNodesByOrderingValue(
+        int leftNodeId,
+        int rightNodeId,
+        Dictionary<int, PropertyOrderingValue> valueByNodeId,
+        Direction direction)
+    {
+        bool hasLeft = valueByNodeId.TryGetValue(leftNodeId, out PropertyOrderingValue? left);
+        bool hasRight = valueByNodeId.TryGetValue(rightNodeId, out PropertyOrderingValue? right);
+
+        if (!hasLeft && !hasRight)
+        {
+            return leftNodeId.CompareTo(rightNodeId);
+        }
+
+        if (!hasLeft || !hasRight)
+        {
+            int missingFirst = !hasLeft ? -1 : 1;
+            return direction == Direction.Descending ? -missingFirst : missingFirst;
+        }
+
+        int comparison = CompareOrderingValues(left!, right!);
+        if (comparison == 0)
+        {
+            return leftNodeId.CompareTo(rightNodeId);
+        }
+
+        return direction == Direction.Descending ? -comparison : comparison;
+    }
+
+    // Column priority mirrors NPoco's CASE expression (ContentRepositoryBase.ApplyCustomOrdering):
+    // SortableValue overrides everything else, then IntegerValue, DecimalValue, DateValue, VarcharValue.
+    // Unlike NPoco — which collapses every row to one string and does a single flat ORDER BY — this forms
+    // a strict tier per row (whichever column is populated), so a mismatched pair (e.g. one row only has
+    // IntegerValue, another only has VarcharValue, because the alias is reused across content types with
+    // different storage types) compares by tier, not by NPoco's arbitrary cross-type string comparison.
+    private static int CompareOrderingValues(PropertyOrderingValue left, PropertyOrderingValue right)
+    {
+        if (left.SortableValue is not null || right.SortableValue is not null)
+        {
+            return string.CompareOrdinal(left.SortableValue ?? string.Empty, right.SortableValue ?? string.Empty);
+        }
+
+        if (left.IntegerValue is not null || right.IntegerValue is not null)
+        {
+            return Nullable.Compare(left.IntegerValue, right.IntegerValue);
+        }
+
+        if (left.DecimalValue is not null || right.DecimalValue is not null)
+        {
+            return Nullable.Compare(left.DecimalValue, right.DecimalValue);
+        }
+
+        if (left.DateValue is not null || right.DateValue is not null)
+        {
+            return Nullable.Compare(left.DateValue, right.DateValue);
+        }
+
+        return string.CompareOrdinal(left.VarcharValue ?? string.Empty, right.VarcharValue ?? string.Empty);
     }
 
     private Task<List<IContent>> PerformGetRangeAsync(Guid[]? keys) =>
@@ -810,7 +1045,8 @@ internal sealed class AsyncDocumentRepository
         }
 
         (Dictionary<int, IReadOnlyList<ContentVersionCultureVariationDto>> contentVersionCultureVariationsByVersionId,
-         Dictionary<int, IReadOnlyList<DocumentCultureVariationDto>> documentCultureVariationsByNodeId) =
+         Dictionary<int, IReadOnlyList<DocumentCultureVariationDto>> documentCultureVariationsByNodeId,
+         Dictionary<int, string?> isoCodeByLanguageId) =
             await LoadVariationsAsync(db, allVersionIds, nodeIds, contentTypeMap);
 
         var entities = new List<IContent>(rows.Count);
@@ -868,12 +1104,13 @@ internal sealed class AsyncDocumentRepository
                     row.PublishedContentVersion?.Id ?? 0,
                     LanguageRepository));
 
-            await ApplyVariationsAsync(
+            ApplyVariations(
                 entity,
                 row.ContentVersion.Id,
                 row.PublishedContentVersion?.Id ?? 0,
                 contentVersionCultureVariationsByVersionId,
-                documentCultureVariationsByNodeId.GetValueOrDefault(row.Node.NodeId, []));
+                documentCultureVariationsByNodeId.GetValueOrDefault(row.Node.NodeId, []),
+                isoCodeByLanguageId);
 
             entities.Add(entity);
         }
@@ -924,7 +1161,8 @@ internal sealed class AsyncDocumentRepository
 
     private async Task<(
         Dictionary<int, IReadOnlyList<ContentVersionCultureVariationDto>> ContentVersionCultureVariationsByVersionId,
-        Dictionary<int, IReadOnlyList<DocumentCultureVariationDto>> DocumentCultureVariationsByNodeId)> LoadVariationsAsync(
+        Dictionary<int, IReadOnlyList<DocumentCultureVariationDto>> DocumentCultureVariationsByNodeId,
+        Dictionary<int, string?> IsoCodeByLanguageId)> LoadVariationsAsync(
             UmbracoDbContext db,
             List<int> versionIds,
             int[] nodeIds,
@@ -934,7 +1172,7 @@ internal sealed class AsyncDocumentRepository
         // the common case for sites with only invariant content types.
         if (!contentTypeMap.Values.Any(contentType => contentType?.VariesByCulture() ?? false))
         {
-            return (new(), new());
+            return (new(), new(), new());
         }
 
         // Content version culture variations — batched for the same 2100-parameter reason as property data.
@@ -967,23 +1205,29 @@ internal sealed class AsyncDocumentRepository
                 .GroupBy(variation => variation.NodeId)
                 .ToDictionary(group => group.Key, IReadOnlyList<DocumentCultureVariationDto> (group) => group.ToList());
 
-        return (contentVersionCultureVariationsByVersionId, documentCultureVariationsByNodeId);
+        // The language table is tiny — one round trip resolves every LanguageId we might encounter below,
+        // avoiding a per-culture-per-row lookup through the repository.
+        Dictionary<int, string?> isoCodeByLanguageId = await db.Language
+            .Select(language => new { language.Id, language.IsoCode })
+            .ToDictionaryAsync(language => language.Id, language => language.IsoCode);
+
+        return (contentVersionCultureVariationsByVersionId, documentCultureVariationsByNodeId, isoCodeByLanguageId);
     }
 
-    private async Task ApplyVariationsAsync(
+    private static void ApplyVariations(
         IContent entity,
         int currentVersionId,
         int publishedVersionId,
         Dictionary<int, IReadOnlyList<ContentVersionCultureVariationDto>> contentVersionCultureVariationsByVersionId,
-        IReadOnlyList<DocumentCultureVariationDto> documentCultureVariations)
+        IReadOnlyList<DocumentCultureVariationDto> documentCultureVariations,
+        IReadOnlyDictionary<int, string?> isoCodeByLanguageId)
     {
         // Draft culture names
         if (contentVersionCultureVariationsByVersionId.TryGetValue(currentVersionId, out IReadOnlyList<ContentVersionCultureVariationDto>? draftVariations))
         {
             foreach (ContentVersionCultureVariationDto variation in draftVariations)
             {
-                // TODO: Look into adding language keys to variation to fix this obsolete.
-                string? culture = await LanguageRepository.GetIsoCodeByIdAsync(variation.LanguageId);
+                string? culture = ResolveIsoCode(variation.LanguageId, isoCodeByLanguageId);
                 entity.SetCultureInfo(culture, variation.Name, variation.UpdateDate.EnsureUtc());
             }
         }
@@ -994,7 +1238,7 @@ internal sealed class AsyncDocumentRepository
         {
             foreach (ContentVersionCultureVariationDto variation in publishedVariations)
             {
-                string? culture = await LanguageRepository.GetIsoCodeByIdAsync(variation.LanguageId);
+                string? culture = ResolveIsoCode(variation.LanguageId, isoCodeByLanguageId);
                 entity.SetPublishInfo(culture, variation.Name, variation.UpdateDate.EnsureUtc());
             }
         }
@@ -1003,9 +1247,24 @@ internal sealed class AsyncDocumentRepository
         var editedCultures = new List<string?>();
         foreach (DocumentCultureVariationDto variation in documentCultureVariations.Where(variation => variation.Edited))
         {
-            editedCultures.Add(await LanguageRepository.GetIsoCodeByIdAsync(variation.LanguageId));
+            editedCultures.Add(ResolveIsoCode(variation.LanguageId, isoCodeByLanguageId));
         }
 
         entity.SetCultureEdited(editedCultures);
+    }
+
+    // Matches the throw-on-not-found behavior of the obsolete ILanguageRepository.GetIsoCodeByIdAsync
+    // bridge this class no longer calls — a LanguageId that isn't in the map indicates a dangling FK,
+    // which should fail loudly rather than silently drop the culture (most consequential for the
+    // edited-cultures list, which otherwise has no other error signal — SetCultureEdited silently
+    // filters out null/blank entries).
+    private static string? ResolveIsoCode(int languageId, IReadOnlyDictionary<int, string?> isoCodeByLanguageId)
+    {
+        if (!isoCodeByLanguageId.TryGetValue(languageId, out string? isoCode))
+        {
+            throw new ArgumentException($"Id {languageId} does not correspond to an existing language.", nameof(languageId));
+        }
+
+        return isoCode;
     }
 }

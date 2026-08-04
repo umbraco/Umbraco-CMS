@@ -1123,4 +1123,172 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(first.GetCultureName("en-US"), Is.EqualTo("Alpha"),
             "Culture name ordering must put 'Alpha' before 'Zeta', not fall back to invariant name order ('A-Second' before 'Z-First')");
     }
+
+    // --- Group 13: Custom property field ordering ---
+
+    private async Task<IContentType> CreateIntPropertyContentTypeAsync()
+    {
+        var propertyCollection = new PropertyTypeCollection(true)
+        {
+            new PropertyType(ShortStringHelper, "priority", ValueStorageType.Integer)
+            {
+                Alias = "priority",
+                DataTypeId = -51,
+            },
+        };
+
+        var contentType = ContentTypeBuilder.CreateBasicContentType("umbPriority", "Priority");
+        contentType.PropertyGroups.Add(new PropertyGroup(propertyCollection) { Alias = "content", Name = "Content" });
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType;
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_OrderedByCustomIntProperty_OrdersByPropertyValue()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_textpage.Id).Build();
+        docHigh.SetValue("priority", 30);
+        ContentService.Save(docHigh, -1);
+
+        var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
+        docLow.SetValue("priority", 5);
+        ContentService.Save(docLow, -1);
+
+        var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").WithParentId(_textpage.Id).Build();
+        docMid.SetValue("priority", 15);
+        ContentService.Save(docMid, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null,
+            ordering: Ordering.By("priority", isCustomField: true),
+            CancellationToken.None);
+        scope.Complete();
+
+        IContent[] custom = result.Items.Where(item => item.ContentType.Alias == contentType.Alias).ToArray();
+        Assert.That(custom.Select(c => c.Key), Is.EqualTo(new[] { docLow.Key, docMid.Key, docHigh.Key }),
+            "Ascending custom-field ordering should sort by the integer property value, low to high");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_OrderedByCustomProperty_Descending_ReversesOrder()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_textpage.Id).Build();
+        docHigh.SetValue("priority", 30);
+        ContentService.Save(docHigh, -1);
+
+        var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
+        docLow.SetValue("priority", 5);
+        ContentService.Save(docLow, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null,
+            ordering: Ordering.By("priority", Direction.Descending, isCustomField: true),
+            CancellationToken.None);
+        scope.Complete();
+
+        IContent[] custom = result.Items.Where(item => item.ContentType.Alias == contentType.Alias).ToArray();
+        Assert.That(custom.Select(c => c.Key), Is.EqualTo(new[] { docHigh.Key, docLow.Key }),
+            "Descending custom-field ordering should reverse the value order, high to low");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_OrderedByCustomProperty_NodesWithoutValueSortFirst()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        var docWithValue = new ContentBuilder().WithContentType(contentType).WithName("HasValue").WithParentId(_textpage.Id).Build();
+        docWithValue.SetValue("priority", 10);
+        ContentService.Save(docWithValue, -1);
+
+        // Force this node's SortOrder ahead of its siblings, so a fallback-to-SortOrder implementation
+        // would (wrongly) place it first — only real custom-field ordering puts it last.
+        docWithValue.SortOrder = -100;
+        ContentService.Save(docWithValue, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null,
+            ordering: Ordering.By("priority", isCustomField: true),
+            CancellationToken.None);
+        scope.Complete();
+
+        IContent[] children = result.Items.ToArray();
+        int valueIndex = Array.FindIndex(children, c => c.Key == docWithValue.Key);
+        Assert.That(valueIndex, Is.EqualTo(children.Length - 1),
+            "The only node with a 'priority' value should sort last — siblings with no value for the custom field must sort first ascending");
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_OrderedByCustomProperty_OrdersByPropertyValue()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_subpage.Id).Build();
+        docHigh.SetValue("priority", 30);
+        ContentService.Save(docHigh, -1);
+
+        var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
+        docLow.SetValue("priority", 5);
+        ContentService.Save(docLow, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            _textpage.Key, skip: 0, take: 100,
+            ordering: Ordering.By("priority", isCustomField: true),
+            CancellationToken.None);
+        scope.Complete();
+
+        IContent[] custom = result.Items.Where(item => item.ContentType.Alias == contentType.Alias).ToArray();
+        Assert.That(custom.Select(c => c.Key), Is.EqualTo(new[] { docLow.Key, docHigh.Key }),
+            "Custom-field ordering must apply across the whole descendant tree, not just direct children");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_OrderedByCustomProperty_WithPaging_ReturnsCorrectPage()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        // Created out of value order (3, 1, 2) so SortOrder (creation order) disagrees with the
+        // expected value order — a fallback-to-SortOrder implementation would land on the wrong node.
+        var doc3 = new ContentBuilder().WithContentType(contentType).WithName("Three").WithParentId(_textpage.Id).Build();
+        doc3.SetValue("priority", 30);
+        ContentService.Save(doc3, -1);
+
+        var doc1 = new ContentBuilder().WithContentType(contentType).WithName("One").WithParentId(_textpage.Id).Build();
+        doc1.SetValue("priority", 10);
+        ContentService.Save(doc1, -1);
+
+        var doc2 = new ContentBuilder().WithContentType(contentType).WithName("Two").WithParentId(_textpage.Id).Build();
+        doc2.SetValue("priority", 20);
+        ContentService.Save(doc2, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // Full ascending order is: _subpage, _subpage2 (no value), then doc1=10, doc2=20, doc3=30.
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 3, take: 1, propertyAliases: null,
+            ordering: Ordering.By("priority", isCustomField: true),
+            CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(5), "Total should count all children regardless of ordering");
+        Assert.That(result.Items.Count(), Is.EqualTo(1));
+        Assert.That(result.Items.Single().Key, Is.EqualTo(doc2.Key),
+            "Skip=3 should land on doc2 once the two valueless siblings and doc1 are skipped");
+    }
 }
