@@ -25,6 +25,9 @@ public sealed class DocumentServerEventAccessFilter : EntityStartNodeAccessFilte
     public override IEnumerable<string> FilteredEventSources => [Constants.ServerEvents.EventSource.Document];
 
     /// <inheritdoc />
+    protected override IEnumerable<string> AuthorizingSectionAliases => [Constants.Applications.Content];
+
+    /// <inheritdoc />
     protected override int RecycleBinId => Constants.System.RecycleBinContent;
 
     /// <inheritdoc />

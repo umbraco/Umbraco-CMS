@@ -1431,6 +1431,28 @@ internal sealed class ServerEventSenderTests
     }
 
     [Test]
+    public async Task HandleAsync_ContentMovedToRecycleBinNotification_UsesOriginalPathInContext()
+    {
+        // Arrange - after the move the entity's own path is under the recycle bin, but the routing
+        // context must carry the pre-trash path so start-node recipients are still notified.
+        var entityKey = Guid.NewGuid();
+        var originalPath = "-1,555,999";
+        var entity = Mock.Of<IContent>(e => e.Key == entityKey && e.Path == "-1,-20,999");
+        var moveInfo = new MoveToRecycleBinEventInfo<IContent>(entity, originalPath);
+
+        var notification = new ContentMovedToRecycleBinNotification(moveInfo, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert
+        Assert.That(recordingRouter.RoutedContexts, Has.Count.EqualTo(1));
+        Assert.That(recordingRouter.RoutedContexts[0].EntityPath, Is.EqualTo(originalPath));
+    }
+
+    [Test]
     public async Task HandleAsync_MediaMovedToRecycleBinNotification_RoutesTrashedEvent()
     {
         // Arrange

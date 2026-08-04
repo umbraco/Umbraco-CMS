@@ -90,6 +90,7 @@ public class ServerEventRouterTests
 
         // Must NOT broadcast to the whole group.
         hubClientsMock.Verify(x => x.Group(It.IsAny<string>()), Times.Never);
+
         // Must only notify the authorized connections.
         hubClientsMock.Verify(x => x.Clients(authorizedConnections), Times.Once);
         hubMock.Verify(x => x.notify(serverEvent), Times.Once);
@@ -224,5 +225,5 @@ public class ServerEventRouterTests
 
     private Mock<ILogger<ServerEventRouter>> CreateLoggerMock() => new Mock<ILogger<ServerEventRouter>>();
 
-    private Mock<IServerEventEntityAccessService> CreateFilterMock() => new Mock<IServerEventEntityAccessService>();
+    private static Mock<IServerEventEntityAccessService> CreateFilterMock() => new Mock<IServerEventEntityAccessService>();
 }

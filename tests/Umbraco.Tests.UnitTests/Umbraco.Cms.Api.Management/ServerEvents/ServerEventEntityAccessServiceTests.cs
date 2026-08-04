@@ -108,7 +108,7 @@ public class ServerEventEntityAccessServiceTests
         var entityService = CreateEntityServiceMock();
         var filter = new DocumentServerEventAccessFilter(entityService.Object, AppCaches.Disabled);
 
-        IUser restricted = new UserBuilder().WithStartContentIds(new[] { HomeNodeId }).Build();
+        IUser restricted = BuildContentUser(Guid.NewGuid(), HomeNodeId, Constants.Applications.Content);
 
         Assert.That(await filter.HasAccessAsync(restricted, PathContext("-1,2,4")), Is.True);
         Assert.That(await filter.HasAccessAsync(restricted, PathContext("-1,3")), Is.False);
@@ -120,27 +120,40 @@ public class ServerEventEntityAccessServiceTests
         var entityService = CreateEntityServiceMock();
         var filter = new MediaServerEventAccessFilter(entityService.Object, AppCaches.Disabled);
 
-        IUser restricted = new UserBuilder().WithStartMediaIds(new[] { HomeNodeId }).Build();
+        IUser restricted = BuildMediaUser(Guid.NewGuid(), HomeNodeId, Constants.Applications.Media);
 
         Assert.That(await filter.HasAccessAsync(restricted, PathContext("-1,2,4")), Is.True);
         Assert.That(await filter.HasAccessAsync(restricted, PathContext("-1,3")), Is.False);
     }
 
+    [Test]
+    public async Task Cannot_Grant_Document_Access_Without_Content_Section()
+    {
+        var entityService = CreateEntityServiceMock();
+        var filter = new DocumentServerEventAccessFilter(entityService.Object, AppCaches.Disabled);
+
+        // The start node covers the path, but the user only has the Media section, not Content.
+        IUser user = BuildContentUser(Guid.NewGuid(), HomeNodeId, Constants.Applications.Media);
+
+        Assert.That(await filter.HasAccessAsync(user, PathContext("-1,2,4")), Is.False);
+    }
+
     private static ServerEventRoutingContext PathContext(string entityPath) => new() { EntityPath = entityPath };
 
-    private static IServerEventEntityAccessService CreateSut(bool mediaStartNodes = false)
+    private static ServerEventEntityAccessService CreateSut(bool mediaStartNodes = false)
     {
         var connectionManager = new UserConnectionManager();
         connectionManager.AddConnection(_adminKey, AdminConnection);
         connectionManager.AddConnection(_restrictedKey, RestrictedConnection);
 
         // The admin has root access (start node -1); the restricted user is scoped to "Home".
+        // Both are granted the relevant section so they pass the source-level authorization.
         IUser admin = mediaStartNodes
-            ? new UserBuilder().WithKey(_adminKey).WithStartMediaIds(new[] { Constants.System.Root }).Build()
-            : new UserBuilder().WithKey(_adminKey).WithStartContentIds(new[] { Constants.System.Root }).Build();
+            ? BuildMediaUser(_adminKey, Constants.System.Root, Constants.Applications.Media)
+            : BuildContentUser(_adminKey, Constants.System.Root, Constants.Applications.Content);
         IUser restricted = mediaStartNodes
-            ? new UserBuilder().WithKey(_restrictedKey).WithStartMediaIds(new[] { HomeNodeId }).Build()
-            : new UserBuilder().WithKey(_restrictedKey).WithStartContentIds(new[] { HomeNodeId }).Build();
+            ? BuildMediaUser(_restrictedKey, HomeNodeId, Constants.Applications.Media)
+            : BuildContentUser(_restrictedKey, HomeNodeId, Constants.Applications.Content);
 
         var userService = new Mock<IUserService>();
         userService
@@ -157,6 +170,28 @@ public class ServerEventEntityAccessServiceTests
 
         return new ServerEventEntityAccessService(connectionManager, userService.Object, filters);
     }
+
+    // Builds a user scoped to a single content start node and granted the given sections (via a group
+    // whose start node matches, so it does not widen access to the root default).
+    private static IUser BuildContentUser(Guid key, int startNode, params string[] sections) =>
+        new UserBuilder()
+            .WithKey(key)
+            .WithStartContentIds(new[] { startNode })
+            .AddUserGroup()
+                .WithAllowedSections(sections)
+                .WithStartContentId(startNode)
+            .Done()
+            .Build();
+
+    private static IUser BuildMediaUser(Guid key, int startNode, params string[] sections) =>
+        new UserBuilder()
+            .WithKey(key)
+            .WithStartMediaIds(new[] { startNode })
+            .AddUserGroup()
+                .WithAllowedSections(sections)
+                .WithStartMediaId(startNode)
+            .Done()
+            .Build();
 
     private static Mock<IEntityService> CreateEntityServiceMock()
     {

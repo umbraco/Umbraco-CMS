@@ -529,7 +529,11 @@ internal sealed class ServerEventSender :
                             EventSource = source,
                             Key = movedEvent.Entity.Key,
                         },
-                        new ServerEventRoutingContext { EntityPath = (movedEvent.Entity as IUmbracoEntity)?.Path });
+
+                        // Use the pre-trash path: after the move the entity's own Path is under the
+                        // recycle bin (-1,-20,...), which HasPathAccess rejects for every non-root user,
+                        // so start-node recipients would never be told their content was trashed.
+                        new ServerEventRoutingContext { EntityPath = movedEvent.OriginalPath });
                 }
             }
         }
