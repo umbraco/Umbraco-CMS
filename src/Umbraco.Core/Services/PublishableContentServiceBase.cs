@@ -952,7 +952,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
         }
 
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
+        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, branchOne: false, branchRoot: false, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1003,7 +1003,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
         content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
 
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
+        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, branchOne: false, branchRoot: false, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1340,10 +1340,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="userId"></param>
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
-    /// <param name="raiseSavedNotification">
-    ///     Whether to raise a "saved" notification once the content is persisted. Enabled by the save-and-publish entry
-    ///     points, which combine a save and a publish, so the paired saved notification still fires.
-    /// </param>
     /// <param name="eventMessages"></param>
     /// <returns></returns>
     /// <remarks>
@@ -1362,8 +1358,37 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         IDictionary<string, object?>? notificationState,
         int userId,
         bool branchOne = false,
-        bool branchRoot = false,
-        bool raiseSavedNotification = false)
+        bool branchRoot = false)
+        => CommitContentChangesInternal(
+            scope,
+            content,
+            eventMessages,
+            allLangs,
+            notificationState,
+            userId,
+            branchOne,
+            branchRoot,
+            raiseSavedNotification: false);
+
+    /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool)" />
+    /// <param name="raiseSavedNotification">
+    ///     Whether to raise a "saved" notification once the content is persisted. Enabled by the save-and-publish entry
+    ///     points, which combine a save and a publish, so the paired saved notification still fires.
+    /// </param>
+    /// <remarks>
+    ///     Deliberately declares no optional parameters: the parameterless-tail overload above preserves the original
+    ///     signature for binary compatibility, and giving this one a default too would make existing calls ambiguous.
+    /// </remarks>
+    private PublishResult CommitContentChangesInternal(
+        ICoreScope scope,
+        TContent content,
+        EventMessages eventMessages,
+        IReadOnlyCollection<ILanguage> allLangs,
+        IDictionary<string, object?>? notificationState,
+        int userId,
+        bool branchOne,
+        bool branchRoot,
+        bool raiseSavedNotification)
     {
         if (scope == null)
         {
