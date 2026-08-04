@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.PublishStatus;
 
 [TestFixture]
-public class ChunkedPublishedContentEnumeratorTests
+public class ChunkedTieredEnumeratorTests
 {
     // Held as static readonly fields (rather than inline array literals) so the assertion calls do not
     // allocate a fresh array each time.
@@ -17,11 +17,11 @@ public class ChunkedPublishedContentEnumeratorTests
     public void Enumerate_AllCached_ReturnsAllInOrder_WithoutMaterialising()
     {
         var (keys, items) = BuildItems(10);
-        TryGetCachedDelegate tryGetCached = WarmFrom(items); // everything in L0
-        var (materialise, calls) = Materialiser(items);
+        GetItemsDelegate<Guid, IPublishedContent> warmTier = WarmFrom(items); // everything in L0
+        var (materialiseTier, calls) = Materialiser(items);
 
-        IPublishedContent[] result = ChunkedPublishedContentEnumerator
-            .Enumerate(keys, tryGetCached, materialise, predicate: null)
+        IPublishedContent[] result = ChunkedTieredEnumerator
+            .Enumerate(keys, warmTier, materialiseTier)
             .ToArray();
 
         Assert.Multiple(() =>
@@ -29,7 +29,7 @@ public class ChunkedPublishedContentEnumeratorTests
             Assert.AreEqual(10, result.Length);
             CollectionAssert.AreEqual(Enumerable.Range(0, 10), result.Select(x => x.Id));
 
-            // All served from the sync L0 probe — the batched materialiser is never invoked.
+            // All served from the sync L0 tier — the batched materialiser is never invoked.
             Assert.IsEmpty(calls);
         });
     }
@@ -38,11 +38,10 @@ public class ChunkedPublishedContentEnumeratorTests
     public void Enumerate_NoneCached_MaterialisesAllInOrder_InAFewBatches()
     {
         var (keys, items) = BuildItems(10);
-        TryGetCachedDelegate tryGetCached = AllMiss();
-        var (materialise, calls) = Materialiser(items);
+        var (materialiseTier, calls) = Materialiser(items);
 
-        IPublishedContent[] result = ChunkedPublishedContentEnumerator
-            .Enumerate(keys, tryGetCached, materialise, predicate: null)
+        IPublishedContent[] result = ChunkedTieredEnumerator
+            .Enumerate(keys, AllMiss(), materialiseTier)
             .ToArray();
 
         Assert.Multiple(() =>
@@ -64,10 +63,10 @@ public class ChunkedPublishedContentEnumeratorTests
     public void Enumerate_FirstOnly_MaterialisesSingleItem()
     {
         var (keys, items) = BuildItems(10);
-        var (materialise, calls) = Materialiser(items);
+        var (materialiseTier, calls) = Materialiser(items);
 
-        IPublishedContent? first = ChunkedPublishedContentEnumerator
-            .Enumerate(keys, AllMiss(), materialise, predicate: null)
+        IPublishedContent? first = ChunkedTieredEnumerator
+            .Enumerate(keys, AllMiss(), materialiseTier)
             .FirstOrDefault();
 
         Assert.Multiple(() =>
@@ -82,10 +81,10 @@ public class ChunkedPublishedContentEnumeratorTests
     public void Enumerate_Take_MaterialisesOnlyRequested()
     {
         var (keys, items) = BuildItems(10);
-        var (materialise, calls) = Materialiser(items);
+        var (materialiseTier, calls) = Materialiser(items);
 
-        IPublishedContent[] taken = ChunkedPublishedContentEnumerator
-            .Enumerate(keys, AllMiss(), materialise, predicate: null)
+        IPublishedContent[] taken = ChunkedTieredEnumerator
+            .Enumerate(keys, AllMiss(), materialiseTier)
             .Take(3)
             .ToArray();
 
@@ -99,13 +98,15 @@ public class ChunkedPublishedContentEnumeratorTests
     }
 
     [Test]
-    public void Enumerate_AppliesPredicate()
+    public void Enumerate_FilteringIsLeftToTheCaller()
     {
         var (keys, items) = BuildItems(10);
-        var (materialise, _) = Materialiser(items);
+        var (materialiseTier, _) = Materialiser(items);
 
-        IPublishedContent[] result = ChunkedPublishedContentEnumerator
-            .Enumerate(keys, WarmFrom(items), materialise, x => x.Id % 2 == 0)
+        // Enumerate itself applies no filtering — callers chain .Where() on the (lazy) result.
+        IPublishedContent[] result = ChunkedTieredEnumerator
+            .Enumerate(keys, WarmFrom(items), materialiseTier)
+            .Where(item => item.Id % 2 == 0)
             .ToArray();
 
         CollectionAssert.AreEqual(_evenIds, result.Select(x => x.Id));
@@ -118,10 +119,10 @@ public class ChunkedPublishedContentEnumeratorTests
 
         // Even-index items are warm in L0; odd-index items must be batch-materialised.
         var warm = items.Where(kvp => kvp.Value.Id % 2 == 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-        var (materialise, _) = Materialiser(items);
+        var (materialiseTier, _) = Materialiser(items);
 
-        IPublishedContent[] result = ChunkedPublishedContentEnumerator
-            .Enumerate(keys, WarmFrom(warm), materialise, predicate: null)
+        IPublishedContent[] result = ChunkedTieredEnumerator
+            .Enumerate(keys, WarmFrom(warm), materialiseTier)
             .ToArray();
 
         // Regardless of which tier served each item, the output stays in input order.
@@ -135,10 +136,10 @@ public class ChunkedPublishedContentEnumeratorTests
 
         // Only the first five keys exist in the backing store; the rest resolve to nothing.
         var backing = items.Where(kvp => kvp.Value.Id < 5).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-        var (materialise, _) = Materialiser(backing);
+        var (materialiseTier, _) = Materialiser(backing);
 
-        IPublishedContent[] result = ChunkedPublishedContentEnumerator
-            .Enumerate(keys, AllMiss(), materialise, predicate: null)
+        IPublishedContent[] result = ChunkedTieredEnumerator
+            .Enumerate(keys, AllMiss(), materialiseTier)
             .ToArray();
 
         CollectionAssert.AreEqual(_firstFiveIds, result.Select(x => x.Id));
@@ -147,10 +148,10 @@ public class ChunkedPublishedContentEnumeratorTests
     [Test]
     public void Enumerate_EmptyInput_ReturnsEmpty()
     {
-        var (materialise, calls) = Materialiser(new Dictionary<Guid, IPublishedContent>());
+        var (materialiseTier, calls) = Materialiser(new Dictionary<Guid, IPublishedContent>());
 
-        IPublishedContent[] result = ChunkedPublishedContentEnumerator
-            .Enumerate([], AllMiss(), materialise, predicate: null)
+        IPublishedContent[] result = ChunkedTieredEnumerator
+            .Enumerate([], AllMiss(), materialiseTier)
             .ToArray();
 
         Assert.Multiple(() =>
@@ -177,41 +178,45 @@ public class ChunkedPublishedContentEnumeratorTests
         return (keys, items);
     }
 
-    // A sync L0 probe backed by the given "warm" set.
-    private static TryGetCachedDelegate WarmFrom(Dictionary<Guid, IPublishedContent> warm)
-        => (Guid key, out IPublishedContent? content) =>
+    // A sync L0 tier backed by the given "warm" set.
+    private static GetItemsDelegate<Guid, IPublishedContent> WarmFrom(Dictionary<Guid, IPublishedContent> warm)
+        => keys =>
         {
-            if (warm.TryGetValue(key, out IPublishedContent? cached))
+            var found = new Dictionary<Guid, IPublishedContent>();
+            foreach (Guid key in keys)
             {
-                content = cached;
-                return true;
+                if (warm.TryGetValue(key, out IPublishedContent? cached))
+                {
+                    found[key] = cached;
+                }
             }
 
-            content = null;
-            return false;
+            return found;
         };
 
-    private static TryGetCachedDelegate AllMiss()
-        => (Guid _, out IPublishedContent? content) =>
-        {
-            content = null;
-            return false;
-        };
+    private static GetItemsDelegate<Guid, IPublishedContent> AllMiss()
+        => _ => new Dictionary<Guid, IPublishedContent>();
 
-    // A batched materialiser backed by the given store, recording the keys of each invocation so
+    // A batched materialising tier backed by the given store, recording the keys of each invocation so
     // tests can assert how much was materialised.
-    private static (MaterialiseMissesDelegate Materialise, List<IReadOnlyList<Guid>> Calls) Materialiser(
+    private static (GetItemsDelegate<Guid, IPublishedContent> Materialise, List<IReadOnlyList<Guid>> Calls) Materialiser(
         Dictionary<Guid, IPublishedContent> store)
     {
         var calls = new List<IReadOnlyList<Guid>>();
-        MaterialiseMissesDelegate materialise = missKeys =>
+        GetItemsDelegate<Guid, IPublishedContent> materialise = keys =>
         {
-            calls.Add(missKeys.ToArray());
-            return missKeys
-                .Select(k => store.TryGetValue(k, out IPublishedContent? item) ? item : null)
-                .Where(item => item is not null)
-                .Select(item => item!)
-                .ToArray();
+            calls.Add(keys.ToArray());
+
+            var found = new Dictionary<Guid, IPublishedContent>();
+            foreach (Guid key in keys)
+            {
+                if (store.TryGetValue(key, out IPublishedContent? item))
+                {
+                    found[key] = item;
+                }
+            }
+
+            return found;
         };
 
         return (materialise, calls);
