@@ -136,6 +136,135 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Read_Saved_Notification_When_Save_And_Publishing_Invariant()
+    {
+        // A combined save-and-publish must still raise the paired Saved notification, just like a plain Save does
+        // (https://github.com/umbraco/Umbraco-CMS/issues/23523).
+        Element element = new Element("content", -1, _elementType);
+
+        var savedWasCalled = false;
+        var publishedWasCalled = false;
+
+        ElementNotificationHandler.SavedElement = notification =>
+        {
+            IElement saved = notification.SavedEntities.First();
+
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[saved.Key]);
+
+            savedWasCalled = true;
+        };
+
+        ElementNotificationHandler.PublishedElement = _ => publishedWasCalled = true;
+
+        try
+        {
+            var result = ElementService.SaveAndPublish(element, []);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
+            Assert.IsTrue(publishedWasCalled);
+        }
+        finally
+        {
+            ElementNotificationHandler.SavedElement = null;
+            ElementNotificationHandler.PublishedElement = null;
+        }
+    }
+
+    [Test]
+    public async Task Can_Read_Saved_Notification_When_Save_And_Publishing_Variant()
+    {
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
+        await MakeElementTypeVariant();
+
+        Element element = new Element("content", -1, _elementType);
+        element.SetCultureName("hello", "en-US");
+        element.SetCultureName("bonjour", "fr-FR");
+
+        var savedWasCalled = false;
+
+        ElementNotificationHandler.SavedElement = notification =>
+        {
+            IElement saved = notification.SavedEntities.First();
+
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+
+            // both cultures were changed as part of the save-and-publish, so both are reported as saved
+            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[saved.Key]);
+
+            savedWasCalled = true;
+        };
+
+        try
+        {
+            var result = ElementService.SaveAndPublish(element, ["en-US", "fr-FR"]);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
+        }
+        finally
+        {
+            ElementNotificationHandler.SavedElement = null;
+        }
+    }
+
+    [Test]
+    public async Task Can_Read_All_Changed_Cultures_As_Saved_When_Publishing_A_Subset()
+    {
+        // The saved cultures must reflect what was *changed*, not what was *published*: both cultures are edited here
+        // but only one is published, so the Saved notification reports both while the Published notification reports one.
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
+        await MakeElementTypeVariant();
+
+        Element element = new Element("content", -1, _elementType);
+        element.SetCultureName("hello", "en-US");
+        element.SetCultureName("bonjour", "fr-FR");
+
+        var savedWasCalled = false;
+        var publishedWasCalled = false;
+
+        ElementNotificationHandler.SavedElement = notification =>
+        {
+            IElement saved = notification.SavedEntities.First();
+
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+
+            // both cultures were changed, so both are reported as saved - even though only en-US is being published
+            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[saved.Key]);
+
+            savedWasCalled = true;
+        };
+
+        ElementNotificationHandler.PublishedElement = notification =>
+        {
+            IElement published = notification.PublishedEntities.First();
+
+            Assert.IsNotNull(notification.PublishedCultures);
+            Assert.IsTrue(notification.PublishedCultures.ContainsKey(published.Key));
+
+            // only en-US was published
+            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.PublishedCultures[published.Key]);
+
+            publishedWasCalled = true;
+        };
+
+        try
+        {
+            var result = ElementService.SaveAndPublish(element, ["en-US"]);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
+            Assert.IsTrue(publishedWasCalled, "ElementPublishedNotification should fire when saving and publishing.");
+        }
+        finally
+        {
+            ElementNotificationHandler.SavedElement = null;
+            ElementNotificationHandler.PublishedElement = null;
+        }
+    }
+
+    [Test]
     public void Can_Read_Published_Cultures_For_Invariant()
     {
         IElement element = new Element("content", -1, _elementType);
