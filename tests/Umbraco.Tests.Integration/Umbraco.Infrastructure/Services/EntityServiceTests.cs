@@ -663,40 +663,37 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task EntityService_Can_Get_Paged_Element_Children()
     {
-        var data = await CreateNestedElementTestData(rootElementCount: 10);
+        var data = await GetSharedElementTreeData();
 
-        var entities = EntityService.GetPagedChildren(data.RootKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.Element], 0, 3, false, out var total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(3));
-        Assert.That(total, Is.EqualTo(5));
-        entities = EntityService.GetPagedChildren(data.RootKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.Element], 3, 3, false, out total).ToArray();
+        var entities = EntityService.GetPagedChildren(data.RootKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.Element], 0, 2, false, out var total).ToArray();
         Assert.That(entities.Length, Is.EqualTo(2));
-        Assert.That(total, Is.EqualTo(5));
+        Assert.That(total, Is.EqualTo(3));
+        entities = EntityService.GetPagedChildren(data.RootKey, [UmbracoObjectTypes.ElementContainer], [UmbracoObjectTypes.Element], 2, 2, false, out total).ToArray();
+        Assert.That(entities.Length, Is.EqualTo(1));
+        Assert.That(total, Is.EqualTo(3));
     }
 
     [Test]
     [LongRunning]
     public async Task EntityService_Can_Get_Paged_Element_Descendants()
     {
-        const int rootElementCount = 5;
-        const int branchCount = 10;
-        const int leavesPerBranch = 4;
-        var data = await CreateNestedElementTestData(rootElementCount, branchCount, leavesPerBranch);
+        var data = await GetSharedElementTreeData();
 
-        // Half of each collection is trashed and moves out of this subtree, leaving 27 descendants:
-        // 2 root elements + 5 branches x (1 + 4 leaves). Page size (15) forces a genuine two-page split.
+        // Half of each collection is trashed and moves out of this subtree, leaving 28 descendants:
+        // 3 root elements + 5 branches x (1 + 4 leaves). Page size (15) forces a genuine two-page split.
         var entities = EntityService.GetPagedDescendants(data.RootKey, UmbracoObjectTypes.ElementContainer, [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 15, out var total).ToArray();
         Assert.That(entities.Length, Is.EqualTo(15));
-        Assert.That(total, Is.EqualTo(27));
+        Assert.That(total, Is.EqualTo(28));
         entities = EntityService.GetPagedDescendants(data.RootKey, UmbracoObjectTypes.ElementContainer, [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 15, 15, out total).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(12));
-        Assert.That(total, Is.EqualTo(27));
+        Assert.That(entities.Length, Is.EqualTo(13));
+        Assert.That(total, Is.EqualTo(28));
     }
 
     [Test]
     [LongRunning]
     public async Task EntityService_Can_Get_Paged_Element_Descendants_Including_Recycled()
     {
-        var data = await CreateNestedElementTestData();
+        var data = await GetSharedElementTreeData();
 
         // search at root to see if it returns recycled
         var entities = EntityService.GetPagedDescendants([UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element], 0, 1000, out _)
@@ -713,7 +710,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public async Task EntityService_Can_Get_Paged_Element_Descendants_Without_Recycled()
     {
-        var data = await CreateNestedElementTestData();
+        var data = await GetSharedElementTreeData();
 
         // search at root to see if it excludes recycled
         var entities = EntityService
@@ -731,7 +728,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public async Task EntityService_Can_Get_Paged_Trashed_Element_Children()
     {
-        var data = await CreateNestedElementTestData();
+        var data = await GetSharedElementTreeData();
 
         // get paged containers at recycle bin root
         var entities = EntityService
@@ -763,13 +760,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [LongRunning]
     public async Task EntityService_Can_Get_Paged_Element_Descendants_With_Search()
     {
-        const int rootElementCount = 5;
-        const int branchCount = 10;
-        const int leavesPerBranch = 4;
-        var data = await CreateNestedElementTestData(rootElementCount, branchCount, leavesPerBranch);
+        var data = await GetSharedElementTreeData();
 
         // Half of each collection is trashed and moves out of this subtree: 5 "ssss" branches remain, and
-        // 2 root elements + 5 branches x 4 leaves = 22 "tttt" elements. Page size (1000) proves the result
+        // 3 root elements + 5 branches x 4 leaves = 23 "tttt" elements. Page size (1000) proves the result
         // is capped at what's available, not the requested page size.
         var entities = EntityService.GetPagedDescendants(
             data.RootKey,
@@ -789,17 +783,17 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             1000,
             out total,
             SqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains("tttt"))).ToArray();
-        Assert.That(entities.Length, Is.EqualTo(22));
-        Assert.That(total, Is.EqualTo(22));
+        Assert.That(entities.Length, Is.EqualTo(23));
+        Assert.That(total, Is.EqualTo(23));
     }
 
     [Test]
     public async Task EntityService_Can_Find_All_Elements_By_UmbracoObjectTypes()
     {
-        var data = await CreateNestedElementTestData();
+        var data = await GetSharedElementTreeData();
 
         var elements = EntityService.GetAll(UmbracoObjectTypes.Element).ToArray();
-        Assert.That(elements.Length, Is.EqualTo(45));
+        Assert.That(elements.Length, Is.EqualTo(47));
         Assert.That(elements.Any(x => x.Id == data.RootId), Is.False);
     }
 
@@ -1446,14 +1440,21 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         List<int> TrashedContainerIds,
         List<int> TrashedElementIds);
 
+    private NestedElementTestData? _sharedElementTreeData;
+
+    // Shared by all Element tests below: a root with 7 direct Elements and 10 sub-container branches of
+    // 4 leaves each, built once and reused - half of each collection is trashed.
+    private async Task<NestedElementTestData> GetSharedElementTreeData() =>
+        _sharedElementTreeData ??= await CreateNestedElementTestData(rootElementCount: 7, branchCount: 10, leavesPerBranch: 4);
+
     // Builds a root ElementContainer with rootElementCount Elements directly under it, plus branchCount
     // sub-containers each with leavesPerBranch Elements as leaves. Always trashes every other root Element
     // individually and every other sub-container as a whole - the two different trash mechanisms Elements
     // support.
     private async Task<NestedElementTestData> CreateNestedElementTestData(
-        int rootElementCount = 5,
-        int branchCount = 10,
-        int leavesPerBranch = 4)
+        int rootElementCount,
+        int branchCount,
+        int leavesPerBranch)
     {
         var containerResult = await ElementContainerService.CreateAsync(Guid.NewGuid(), $"Root Container {Guid.NewGuid()}", null, Constants.Security.SuperUserKey);
         var root = containerResult.Result;

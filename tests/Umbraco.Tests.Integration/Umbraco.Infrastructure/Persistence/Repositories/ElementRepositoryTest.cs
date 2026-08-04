@@ -664,7 +664,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
         var result = guidRepo.GetMany().ToArray();
         Assert.IsNotEmpty(result);
-        Assert.That(result.Any(e => e.Key == element.Key));
+        Assert.IsTrue(result.Any(e => e.Key == element.Key));
     }
 
     [Test]
