@@ -139,10 +139,20 @@ These are firm design rules for this API. Prefer an extra round-trip over bendin
 
    Rules:
    - Only the **latest** version gets the unversioned name. Older versions keep their generated
-     (version-suffixed) IDs.
+     (version-suffixed) IDs — **except at the default version (`1.0`), which is never suffixed**.
+     An older `1.0` action therefore generates the very name you are pinning, so it needs an
+     explicit versioned name of its own at the same time:
+
+     ```csharp
+     [HttpPut("{id:guid}/validate", Name = "PutDocumentByIdValidate1_0")]
+     [MapToApiVersion("1.0")]
+     ```
+
    - **Two versions must never carry the same ID** — duplicate operation IDs break OpenAPI
-     generation. When moving the name to a new version, remove it from the old one, which
-     deliberately renames the old operation.
+     generation, and ASP.NET Core will not catch the clash, since route names are only unique when
+     both are explicit. `OpenApiDocumentTests` guards `OpenApi.json` against it. When moving the
+     name to a new version, remove it from the old one, which deliberately renames the old
+     operation.
    - Match the generated convention (`{HttpMethod}{Path}By{Param}...`) rather than inventing a
      name, or the API surface ends up a mix of styles.
    - Update `OpenApi.json` and regenerate the backoffice client afterwards.
