@@ -87,7 +87,7 @@ export class UmbDocumentValidationServerDataSource {
 		// Maybe use: tryExecuteAndNotify
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.putDocumentByIdValidate11({
+			DocumentService.putDocumentByIdValidate({
 				path: { id: model.unique },
 				body,
 			}),

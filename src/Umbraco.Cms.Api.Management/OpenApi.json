@@ -11327,7 +11327,7 @@
         ],
         "summary": "Validates updating a document.",
         "description": "Validates the request model for updating a document without actually updating it.",
-        "operationId": "PutDocumentByIdValidate1_1",
+        "operationId": "PutDocumentByIdValidate",
         "parameters": [
           {
             "name": "id",

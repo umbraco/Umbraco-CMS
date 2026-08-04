@@ -7608,7 +7608,7 @@ export type PutDocumentByIdUpdateAndPublishResponses = {
     200: unknown;
 };
 
-export type PutDocumentByIdValidate11Data = {
+export type PutDocumentByIdValidateData = {
     body?: ValidateUpdateDocumentRequestModel;
     path: {
         id: string;
@@ -7617,7 +7617,7 @@ export type PutDocumentByIdValidate11Data = {
     url: '/umbraco/management/api/v1.1/document/{id}/validate';
 };
 
-export type PutDocumentByIdValidate11Errors = {
+export type PutDocumentByIdValidateErrors = {
     /**
      * Bad Request
      */
@@ -7636,9 +7636,9 @@ export type PutDocumentByIdValidate11Errors = {
     404: ProblemDetails;
 };
 
-export type PutDocumentByIdValidate11Error = PutDocumentByIdValidate11Errors[keyof PutDocumentByIdValidate11Errors];
+export type PutDocumentByIdValidateError = PutDocumentByIdValidateErrors[keyof PutDocumentByIdValidateErrors];
 
-export type PutDocumentByIdValidate11Responses = {
+export type PutDocumentByIdValidateResponses = {
     /**
      * OK
      */
