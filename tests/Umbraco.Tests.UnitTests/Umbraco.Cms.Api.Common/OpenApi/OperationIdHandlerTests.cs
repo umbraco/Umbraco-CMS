@@ -1,6 +1,5 @@
 using System.Reflection;
 using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -166,17 +165,17 @@ internal sealed class OperationIdHandlerTests
     private sealed class TestController
     {
         [MapToApiVersion("1.1")]
-        public void MinorVersion()
+        public static void MinorVersion()
         {
         }
 
         [MapToApiVersion("2.0")]
-        public void DeliveryVersion()
+        public static void DeliveryVersion()
         {
         }
 
         [MapToApiVersion("1.0")]
-        public void DefaultVersion()
+        public static void DefaultVersion()
         {
         }
     }
