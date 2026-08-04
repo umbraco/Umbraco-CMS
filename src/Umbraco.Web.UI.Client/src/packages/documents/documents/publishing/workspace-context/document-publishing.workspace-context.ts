@@ -244,7 +244,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	}
 
 	/**
-	 * Publish the document with descendants
+	 * Save the document and publish it with descendants
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */
@@ -275,46 +275,75 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		if (!variantIds.length) return;
 
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		const localize = new UmbLocalizationController(this);
+		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
+		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
+		await this.#documentWorkspaceContext.askServerToValidate(saveData, variantIds);
 
-		const primaryVariantName = this.#documentWorkspaceContext.getName(variantIds[0]) ?? '';
-
-		const waitNotice = notificationContext?.peek('warning', {
-			data: {
-				headline: localize.term('publish_publishAll', primaryVariantName),
-				message: localize.term('publish_inProgress'),
-			},
-		});
-
-		const { error } = await this.#publishingRepository.publishWithDescendants(
-			unique,
+		return this.#documentWorkspaceContext.validateVariantsAndSubmit(
 			variantIds,
-			result.includeUnpublishedDescendants ?? false,
+			async () => {
+				if (!this.#documentWorkspaceContext) {
+					throw new Error('Document workspace context is missing');
+				}
+
+				const primaryVariantName = this.#documentWorkspaceContext.getName(variantIds[0]) ?? '';
+
+				const waitNotice = this.#notificationContext?.peek('warning', {
+					data: {
+						headline: this.#localize.term('publish_publishAll', primaryVariantName),
+						message: this.#localize.term('publish_inProgress'),
+					},
+				});
+
+				let error;
+				try {
+					// Save the document before publishing it and its descendants
+					await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+
+					({ error } = await this.#publishingRepository.publishWithDescendants(
+						unique,
+						variantIds,
+						result.includeUnpublishedDescendants ?? false,
+					));
+				} finally {
+					waitNotice?.close();
+				}
+
+				if (error) return;
+
+				this.#notificationContext?.peek('positive', {
+					data: {
+						message: this.#localize.term('publish_nodePublishAll', primaryVariantName),
+					},
+				});
+
+				// reload the document so all states are updated after the publish operation
+				// TODO: It seems wrong to make a full reload, I think we should only load the selected variants. [NL]
+				await this.#documentWorkspaceContext.reload();
+				await this.#loadAndProcessLastPublished();
+
+				// request reload of this entity
+				const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+				this.#eventContext?.dispatchEvent(structureEvent);
+
+				// request reload of the children
+				const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
+				this.#eventContext?.dispatchEvent(childrenEvent);
+			},
+			async (reason?: any) => {
+				// If data of the selection is not valid, then just save:
+				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
+				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+				if (!notificationContext) {
+					throw new Error('Notification context is missing');
+				}
+				notificationContext.peek('danger', {
+					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
+				});
+				// Reject even though the save was successful, as we did not publish. [NL]
+				return Promise.reject(reason);
+			},
 		);
-
-		waitNotice?.close();
-
-		if (!error) {
-			notificationContext?.peek('positive', {
-				data: {
-					message: localize.term('publish_nodePublishAll', primaryVariantName),
-				},
-			});
-
-			// reload the document so all states are updated after the publish operation
-			// TODO: It seems wrong to make a full reload, I think we should only load the selected variants. [NL]
-			await this.#documentWorkspaceContext.reload();
-			await this.#loadAndProcessLastPublished();
-
-			// request reload of this entity
-			const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-			this.#eventContext?.dispatchEvent(structureEvent);
-
-			// request reload of the children
-			const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
-			this.#eventContext?.dispatchEvent(childrenEvent);
-		}
 	}
 
 	/**

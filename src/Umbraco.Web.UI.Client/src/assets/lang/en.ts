@@ -368,6 +368,8 @@ export default {
 		selectAllVariants: 'Select all variants',
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
+		saveAndPublishDescendantsModalTitle: 'Save and publish with descendants',
+		saveAndScheduleModalTitle: 'Save and schedule publishing',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
 		sharedAcrossCultures: 'Shared across cultures',
