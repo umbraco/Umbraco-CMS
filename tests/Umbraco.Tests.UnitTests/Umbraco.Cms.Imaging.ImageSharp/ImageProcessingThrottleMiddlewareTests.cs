@@ -114,6 +114,27 @@ public class ImageProcessingThrottleMiddlewareTests
     }
 
     [Test]
+    public async Task InvokeAsync_RequestsWithNoPath_AreNotThrottled()
+    {
+        var handled = false;
+        var middleware = CreateMiddleware(_ =>
+        {
+            handled = true;
+            return Task.CompletedTask;
+        });
+
+        // PathString.Empty exposes a null Value, which the extension check has to treat as
+        // "not an image request" rather than faulting the pipeline.
+        var context = new DefaultHttpContext();
+        context.Request.Path = PathString.Empty;
+        context.Request.QueryString = QueryString.Create("width", "400");
+
+        await middleware.InvokeAsync(context);
+
+        Assert.That(handled, Is.True);
+    }
+
+    [Test]
     public async Task InvokeAsync_ReleasesTheSlot_WhenTheRequestThrows()
     {
         var shouldThrow = true;
