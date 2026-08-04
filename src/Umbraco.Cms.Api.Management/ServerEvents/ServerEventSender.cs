@@ -531,8 +531,8 @@ internal sealed class ServerEventSender :
                         },
 
                         // Use the pre-trash path: after the move the entity's own Path is under the
-                        // recycle bin (-1,-20,...), which HasPathAccess rejects for every non-root user,
-                        // so start-node recipients would never be told their content was trashed.
+                        // recycle bin, which HasPathAccess rejects for every non-root user, so start-node
+                        // recipients would never be told their content or media was trashed.
                         new ServerEventRoutingContext { EntityPath = movedEvent.OriginalPath });
                 }
             }
