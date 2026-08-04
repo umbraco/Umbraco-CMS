@@ -85,18 +85,33 @@ internal sealed class OperationIdHandlerTests
     public void Can_Generate_Operation_Id(OperationIdCase testCase, string expected)
         => Assert.AreEqual(expected, CreateSut().Handle(CreateApiDescription(testCase)));
 
+    private static IEnumerable<TestCaseData> CanHandleCases()
+    {
+        yield return new TestCaseData(typeof(ValidateUpdateDocumentController), true)
+            .SetName("Handles Management API controllers");
+
+        yield return new TestCaseData(typeof(QueryContentApiController), true)
+            .SetName("Handles Delivery API controllers");
+
+        // This fixture's own TestController sits outside Umbraco.Cms.Api, so it stands in for a
+        // controller belonging to another assembly.
+        yield return new TestCaseData(typeof(TestController), false)
+            .SetName("Ignores controllers outside the Umbraco.Cms.Api namespaces");
+    }
+
+    [TestCaseSource(nameof(CanHandleCases))]
+    public void Can_Determine_Whether_A_Controller_Is_Handled(Type controllerType, bool expected)
+        => Assert.AreEqual(
+            expected,
+            CreateSut().CanHandle(CreateApiDescription(new OperationIdCase { ControllerType = controllerType })));
+
     [Test]
     public void Cannot_Handle_An_Action_Descriptor_That_Is_Not_A_Controller_Action()
-    {
-        var apiDescription = new ApiDescription
-        {
-            HttpMethod = "GET",
-            RelativePath = "umbraco/management/api/v1/thing",
-            ActionDescriptor = new ActionDescriptor(),
-        };
+        => Assert.IsFalse(CreateSut().CanHandle(CreateNonControllerApiDescription()));
 
-        Assert.Throws<ArgumentException>(() => CreateSut().Handle(apiDescription));
-    }
+    [Test]
+    public void Cannot_Generate_An_Operation_Id_For_A_Non_Controller_Action()
+        => Assert.Throws<ArgumentException>(() => CreateSut().Handle(CreateNonControllerApiDescription()));
 
     [Test]
     public void Cannot_Handle_A_Missing_Relative_Path()
@@ -106,6 +121,14 @@ internal sealed class OperationIdHandlerTests
 
         Assert.Throws<InvalidOperationException>(() => CreateSut().Handle(apiDescription));
     }
+
+    private static ApiDescription CreateNonControllerApiDescription()
+        => new()
+        {
+            HttpMethod = "GET",
+            RelativePath = "umbraco/management/api/v1/thing",
+            ActionDescriptor = new ActionDescriptor(),
+        };
 
     private static ApiDescription CreateApiDescription(OperationIdCase testCase)
         => new()
