@@ -11,7 +11,7 @@ TypeScript/Lit login SPA for Umbraco CMS backoffice authentication. Provides the
 
 ## ⚠️ Type resolution against the sibling Umbraco.Web.UI.Client
 
-Login uses the in-repo Client's TypeScript source for types via **generated `tsconfig.json` path aliases**, not via an npm dependency. This keeps Login's types aligned with the in-repo v18 backoffice (UUI 2.0 etc.) without waiting for an npm release.
+Login uses the in-repo Client's TypeScript source for types via **generated `tsconfig.json` path aliases**, not via an npm dependency. This keeps Login's types aligned with the in-repo backoffice of whichever branch it sits on (UUI 2.x etc.) without waiting for an npm release.
 
 **The three layers:**
 
