@@ -1262,6 +1262,12 @@ public class ContentService : RepositoryService, IContentService
                 ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
                 : null;
 
+            // the saved notification reports the changed cultures for variant content, or the "*" marker for invariant
+            // content - but only when something actually changed. Captured here before saving resets change tracking.
+            IReadOnlyCollection<string>? savedCultures = content.ContentType.VariesByCulture()
+                ? culturesChanging
+                : content.IsDirty() ? ["*"] : [];
+
             // TODO: Currently there's no way to change track which variant properties have changed, we only have change
             // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
             // in this particular case, determining which cultures have changed works with the above with names since it will
@@ -1274,7 +1280,11 @@ public class ContentService : RepositoryService, IContentService
             }
 
             scope.Notifications.Publish(
-                new ContentSavedNotification(content, eventMessages).WithStateFrom(savingNotification));
+                new ContentSavedNotification(
+                    content,
+                    eventMessages,
+                    BuildCultureMap(content, savedCultures))
+                .WithStateFrom(savingNotification));
 
             // TODO: we had code here to FORCE that this event can never be suppressed. But that just doesn't make a ton of sense?!
             // I understand that if its suppressed that the caches aren't updated, but that would be expected. If someone
@@ -1316,6 +1326,7 @@ public class ContentService : RepositoryService, IContentService
                 return OperationResult.Cancel(eventMessages);
             }
 
+            var savedCultures = new Dictionary<Guid, IReadOnlyCollection<string>>();
             foreach (IContent content in contentsA)
             {
                 if (content.HasIdentity == false)
@@ -1325,11 +1336,25 @@ public class ContentService : RepositoryService, IContentService
 
                 content.WriterId = userId;
 
+                // capture the changing cultures before saving resets change tracking on the entity. Invariant content
+                // reports the "*" marker, but only when something actually changed (mirroring the variant delta).
+                IReadOnlyCollection<string>? culturesChanging = content.ContentType.VariesByCulture()
+                    ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToArray()
+                    : content.IsDirty() ? ["*"] : [];
+                if (culturesChanging is { Count: > 0 })
+                {
+                    savedCultures[content.Key] = culturesChanging;
+                }
+
                 _documentRepository.Save(content);
             }
 
             scope.Notifications.Publish(
-                new ContentSavedNotification(contentsA, eventMessages).WithStateFrom(savingNotification));
+                new ContentSavedNotification(
+                    contentsA,
+                    eventMessages,
+                    savedCultures)
+                .WithStateFrom(savingNotification));
 
             // TODO: See note above about supressing events
             scope.Notifications.Publish(
@@ -1904,7 +1929,11 @@ public class ContentService : RepositoryService, IContentService
             {
                 // events and audit
                 scope.Notifications.Publish(
-                    new ContentUnpublishedNotification(content, eventMessages).WithState(notificationState));
+                    new ContentUnpublishedNotification(
+                        content,
+                        eventMessages,
+                        BuildCultureMap(content, variesByCulture ? culturesUnpublishing : ["*"]))
+                    .WithState(notificationState));
                 scope.Notifications.Publish(new ContentTreeChangeNotification(
                     content,
                     TreeChangeTypes.RefreshBranch,
@@ -1975,7 +2004,12 @@ public class ContentService : RepositoryService, IContentService
                             variesByCulture ? culturesUnpublishing.IsCollectionEmpty() ? null : culturesUnpublishing : null,
                             eventMessages));
                     scope.Notifications.Publish(
-                        new ContentPublishedNotification(content, eventMessages).WithState(notificationState));
+                        new ContentPublishedNotification(
+                            content,
+                            eventMessages,
+                            BuildCultureMap(content, variesByCulture ? culturesPublishing : ["*"]),
+                            BuildCultureMap(content, variesByCulture ? culturesUnpublishing : null))
+                        .WithState(notificationState));
                 }
 
                 // it was not published and now is... descendants that were 'published' (but
@@ -2405,6 +2439,23 @@ public class ContentService : RepositoryService, IContentService
                 throw new InvalidOperationException("Cannot mix PublishCulture and SaveAndPublishBranch.");
             }
 
+            // captures the cultures published per document, so the notification can report them per item
+            var publishedCulturesByDocument = new Dictionary<Guid, IReadOnlyCollection<string>>();
+            var variesByCulture = document.ContentType.VariesByCulture();
+
+            void TrackPublishedCultures(IContent publishedDocument, HashSet<string>? documentCulturesToPublish)
+            {
+                // a branch can mix variant and invariant content types, so determine variance per document rather
+                // than from the branch root; snapshot the cultures so the notification never holds a mutable set
+                string[] cultures = publishedDocument.ContentType.VariesByCulture()
+                    ? documentCulturesToPublish?.ToArray() ?? []
+                    : ["*"];
+                if (cultures.Length > 0)
+                {
+                    publishedCulturesByDocument[publishedDocument.Key] = cultures;
+                }
+            }
+
             // deal with the branch root - if it fails, abort
             HashSet<string>? culturesToPublish = shouldPublish(document);
             PublishResult? result = PublishBranchItem(scope, document, culturesToPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?>? notificationState);
@@ -2415,6 +2466,8 @@ public class ContentService : RepositoryService, IContentService
                 {
                     return results;
                 }
+
+                TrackPublishedCultures(document, culturesToPublish);
             }
 
             HashSet<string> culturesPublished = culturesToPublish ?? [];
@@ -2452,6 +2505,7 @@ public class ContentService : RepositoryService, IContentService
                         if (result.Success)
                         {
                             culturesPublished.UnionWith(culturesToPublish ?? []);
+                            TrackPublishedCultures(d, culturesToPublish);
                             continue;
                         }
                     }
@@ -2468,7 +2522,6 @@ public class ContentService : RepositoryService, IContentService
 
             // trigger events for the entire branch
             // (SaveAndPublishBranchOne does *not* do it)
-            var variesByCulture = document.ContentType.VariesByCulture();
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(
                     document,
@@ -2476,7 +2529,14 @@ public class ContentService : RepositoryService, IContentService
                     variesByCulture ? culturesPublished.IsCollectionEmpty() ? null : culturesPublished : ["*"],
                     null,
                     eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(notificationState));
+            scope.Notifications.Publish(
+                new ContentPublishedNotification(
+                    publishedDocuments,
+                    eventMessages,
+                    true,
+                    publishedCulturesByDocument,
+                    null)
+                .WithState(notificationState));
 
             scope.Complete();
         }
@@ -2547,6 +2607,26 @@ public class ContentService : RepositoryService, IContentService
             ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
             : null;
 
+    // Builds the per-document culture map carried on the content notifications, keyed by content Key. Persisting the
+    // entity resets its change tracking, so the cultures are captured here when the notification is raised, because a
+    // handler cannot recompute them from the entity afterwards. ToArray() takes a copy so the notification holds a
+    // stable snapshot: some callers pass a live view over the entity's own collection (e.g. content.PublishedCultures)
+    // that would otherwise change as the entity is mutated. A null source means the category of change does not apply to
+    // this notification, so the map is null; a non-null-but-empty source means the change was tracked but affected no
+    // cultures for this document, so we return a present-but-empty map rather than conflating that with "not tracked".
+    private static Dictionary<Guid, IReadOnlyCollection<string>>? BuildCultureMap(IContent content, IEnumerable<string>? cultures)
+    {
+        if (cultures is null)
+        {
+            return null;
+        }
+
+        string[] cultureList = cultures.ToArray();
+        return cultureList.Length == 0
+            ? new Dictionary<Guid, IReadOnlyCollection<string>>()
+            : new Dictionary<Guid, IReadOnlyCollection<string>> { [content.Key] = cultureList };
+    }
+
     #endregion
 
     #region Delete
@@ -2571,7 +2651,10 @@ public class ContentService : RepositoryService, IContentService
             // just raise the event
             if (content.Trashed == false && content.Published)
             {
-                scope.Notifications.Publish(new ContentUnpublishedNotification(content, eventMessages));
+                scope.Notifications.Publish(new ContentUnpublishedNotification(
+                    content,
+                    eventMessages,
+                    BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
             }
 
             DeleteLocked(scope, content, eventMessages);
@@ -2758,7 +2841,31 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content">The <see cref="IContent" /> to move</param>
     /// <param name="parentId">Id of the Content's new Parent</param>
     /// <param name="userId">Optional Id of the User moving the Content</param>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
     public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+        => Move(content, parentId, true, userId);
+
+    /// <summary>
+    ///     Moves an <see cref="IContent" /> object to a new location by changing its parent id.
+    /// </summary>
+    /// <remarks>
+    ///     If the <see cref="IContent" /> object is already published it will be
+    ///     published after being moved to its new location. Otherwise it'll just
+    ///     be saved with a new parent id.
+    /// </remarks>
+    /// <param name="content">The <see cref="IContent" /> to move.</param>
+    /// <param name="parentId">Id of the Content's new Parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the content along with it. When restoring an item out of the recycle bin
+    ///     this can be set to <c>false</c> to restore only the item itself, leaving its descendants in the recycle bin
+    ///     as top-level bin items.
+    /// </param>
+    /// <param name="userId">Optional Id of the User moving the Content.</param>
+    /// <returns>The operation result.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+    public OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -2800,6 +2907,10 @@ public class ContentService : RepositoryService, IContentService
             // leave it unchanged
             var trashed = content.Trashed ? false : (bool?)null;
 
+            // when restoring a single item out of the recycle bin without its descendants, those descendants stay
+            // trashed and are re-homed under the recycle bin root - see PerformMoveLocked
+            var leaveDescendantsInRecycleBin = includeDescendants is false && content.Trashed && parentId != Constants.System.RecycleBinContent;
+
             // if the content was trashed under another content, and so has a published version,
             // it cannot move back as published but has to be unpublished first - that's for the
             // root content, everything underneath will retain its published status
@@ -2810,10 +2921,25 @@ public class ContentService : RepositoryService, IContentService
                 content.PublishedState = PublishedState.Unpublishing;
             }
 
-            PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
+            PerformMoveLocked(content, parentId, parent, userId, moves, trashed, includeDescendants);
 
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+            if (leaveDescendantsInRecycleBin)
+            {
+                // The single RefreshBranch above cannot reconcile the descendants left in the bin (they are no longer
+                // descendants of the restored item), so also refresh the re-homed direct children. The navigation
+                // reconciler then moves them - and their sub-trees - back under the recycle bin root.
+                IContent[] rehomedChildren = moves
+                    .Select(x => x.Item1)
+                    .Where(x => x.ParentId == Constants.System.RecycleBinContent)
+                    .ToArray();
+                scope.Notifications.Publish(
+                    new ContentTreeChangeNotification(content.Yield().Concat(rehomedChildren), TreeChangeTypes.RefreshBranch, eventMessages));
+            }
+            else
+            {
+                scope.Notifications.Publish(
+                    new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
+            }
 
             // changes
             MoveEventInfo<IContent>[] moveInfo = moves
@@ -2836,7 +2962,7 @@ public class ContentService : RepositoryService, IContentService
 
     // MUST be called from within WriteLock
     // trash indicates whether we are trashing, un-trashing, or not changing anything
-    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, ICollection<(IContent, string)> moves, bool? trash)
+    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, bool includeDescendants = true)
     {
         content.WriterId = userId;
         content.ParentId = parentId;
@@ -2844,6 +2970,7 @@ public class ContentService : RepositoryService, IContentService
         // get the level delta (old pos to new pos)
         // note that recycle bin (id:-20) level is 0!
         var levelDelta = 1 - content.Level + (parent?.Level ?? 0);
+        var originalLevel = content.Level;
 
         var paths = new Dictionary<int, string>();
 
@@ -2866,6 +2993,13 @@ public class ContentService : RepositoryService, IContentService
                 ? parentId == Constants.System.RecycleBinContent ? "-1,-20" : Constants.System.RootString
                 : parent.Path) + "," + content.Id;
 
+        // When restoring a single item out of the recycle bin without its descendants, the descendants must stay
+        // trashed: the item's direct children are re-homed to the recycle bin root (and the rest of the subtree keeps
+        // its relative structure), so nothing is orphaned and it can still be restored on its own later.
+        var leaveDescendantsInRecycleBin = includeDescendants is false
+            && parentId != Constants.System.RecycleBinContent
+            && originalPath.Contains(Constants.System.RecycleBinContentString);
+
         const int pageSize = 500;
         IQuery<IContent>? query = GetPagedDescendantQuery(originalPath);
         long total;
@@ -2879,13 +3013,43 @@ public class ContentService : RepositoryService, IContentService
             {
                 moves.Add((descendant, descendant.Path)); // capture original path
 
-                // update path and level since we do not update parentId
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                descendant.Level += levelDelta;
-                PerformMoveContentLocked(descendant, userId, trash);
+                if (leaveDescendantsInRecycleBin)
+                {
+                    LeaveDescendantInRecycleBinLocked(descendant, content.Id, originalLevel, userId, paths);
+                }
+                else
+                {
+                    PerformMoveDescendantLocked(descendant, levelDelta, userId, trash, paths);
+                }
             }
         }
         while (total > pageSize);
+    }
+
+    // Re-homes a descendant of a restored item within the recycle bin: the restored item's direct children become
+    // top-level recycle bin items, while deeper descendants keep their relative structure below their (now re-homed)
+    // ancestor. The trashed state is left untouched so these items remain in the recycle bin.
+    private void LeaveDescendantInRecycleBinLocked(IContent descendant, int restoredItemId, int originalLevel, int userId, Dictionary<int, string> paths)
+    {
+        var isDirectChild = descendant.ParentId == restoredItemId;
+        descendant.Path = paths[descendant.Id] = isDirectChild
+            ? Constants.System.RecycleBinContentPathPrefix + descendant.Id
+            : paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level -= originalLevel;
+        if (isDirectChild)
+        {
+            descendant.ParentId = Constants.System.RecycleBinContent;
+        }
+
+        PerformMoveContentLocked(descendant, userId, null);
+    }
+
+    // Moves a descendant along with the item being moved, updating its path and level (parentId is unchanged).
+    private void PerformMoveDescendantLocked(IContent descendant, int levelDelta, int userId, bool? trash, Dictionary<int, string> paths)
+    {
+        descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+        descendant.Level += levelDelta;
+        PerformMoveContentLocked(descendant, userId, trash);
     }
 
     private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
@@ -3923,7 +4087,10 @@ public class ContentService : RepositoryService, IContentService
                 // just raise the event
                 if (content.Trashed == false && content.Published)
                 {
-                    scope.Notifications.Publish(new ContentUnpublishedNotification(content, eventMessages));
+                    scope.Notifications.Publish(new ContentUnpublishedNotification(
+                        content,
+                        eventMessages,
+                        BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
                 }
 
                 // if current content has children, move them to trash

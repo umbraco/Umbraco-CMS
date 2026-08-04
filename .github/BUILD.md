@@ -124,14 +124,19 @@ npm ci --no-fund --no-audit --prefer-offline
 
 If working across both front and back-end, follow both methods and use `dotnet watch`, or re-run `dotnet run` (or `dotnet build` followed by `dotnet run --no-build`) whenever you need to update the back-end code.
 
-Request and response models used by the management APIs are made available client-side as generated code. If you make changes to the management API, you can re-generate the typed client code with:
+Request and response models used by the management APIs are made available client-side as generated code. If you make changes to the management API, run the back-end and then re-generate with:
 
 ```
 cd <solution root>\src\Umbraco.Web.UI.Client
-npm run generate:server-api-dev
+npm run generate:openapi
+npm run generate:server-api
 ```
 
-Please also update the `OpenApi.json` file held in the solution by copying and pasting the output from `/umbraco/swagger/management/swagger.json`.
+The first command updates the `OpenApi.json` file held in the solution from the running site's `/umbraco/swagger/management/swagger.json`. The second regenerates the typed client code from that file. Both results need committing.
+
+These are kept as two separate commands deliberately: the client code is always generated from the committed `OpenApi.json`, never straight from a running site, so the schema and the client can't drift apart.
+
+Note that Swagger is only served when the site is running in a non-Production environment. `npm run generate:server-api` on its own needs no running site.
 
 ## Building from source
 

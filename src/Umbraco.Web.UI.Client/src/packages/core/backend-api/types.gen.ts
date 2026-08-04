@@ -938,6 +938,7 @@ export type DocumentUrlInfoModel = {
     url: string | null;
     message: string | null;
     provider: string;
+    isExternal: boolean;
 };
 
 export type DocumentUrlInfoResponseModel = {
@@ -3266,6 +3267,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
+    httpStatusCode?: number | null;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;

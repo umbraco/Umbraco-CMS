@@ -314,7 +314,6 @@ test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umb
   const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
-  
 
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
@@ -379,7 +378,6 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();

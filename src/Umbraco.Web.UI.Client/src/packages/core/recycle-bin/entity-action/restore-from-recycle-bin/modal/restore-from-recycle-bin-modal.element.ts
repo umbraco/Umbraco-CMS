@@ -202,6 +202,6 @@ export default UmbRestoreFromRecycleBinModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-restore-from-recycle-bin-modal']: UmbRestoreFromRecycleBinModalElement;
+		'umb-restore-from-recycle-bin-modal': UmbRestoreFromRecycleBinModalElement;
 	}
 }

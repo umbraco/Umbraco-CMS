@@ -54,7 +54,7 @@
   public static readonly access = {
     denied: 'Access denied'
   }
-  
+
   public static readonly approvedColorSettings = {
     0: ['Include labels?', 'Displays colored field and a label for each color in the color picker, rather than just a colored field.'],
     1: ['Colors', 'Add, remove or sort colors (and labels).'],
@@ -76,7 +76,8 @@
 
   public static readonly dropdownSettings = {
     0: ['Enable multiple choice', ''],
-    1: ['Add options', '']
+    1: ['Add options', ''],
+    2: ['Placeholder', '']
   }
 
   public static readonly imageCropperSettings = {
@@ -135,7 +136,8 @@
 
   public static readonly textareaSettings = {
     0: ['Maximum allowed characters', 'If empty - no character limit'],
-    1: ['Number of rows', 'If empty or zero, the textarea is set to auto-height']
+    1: ['Number of rows', 'If empty or zero, the textarea is set to auto-height'],
+    2: ['Placeholder', 'Placeholder text shown inside the textarea when empty']
   }
 
   public static readonly textstringSettings = {
@@ -273,8 +275,19 @@
     created: 201
   }
 
+  public static readonly httpMethods = {
+    get: 'GET',
+    post: 'POST',
+    put: 'PUT',
+    delete: 'DELETE'
+  }
+
+  // Matched against response URLs via url().includes(), so entries are either full paths
+  // (e.g. '/umbraco/management/api/v1/document') or path fragments (e.g. '/update-and-publish').
   public static readonly apiEndpoints = {
+    profilingStatus: '/umbraco/management/api/v1/profiling/status',
     document: '/umbraco/management/api/v1/document',
+    updateAndPublish: '/update-and-publish',
     documentType: '/umbraco/management/api/v1/document-type',
     documentTypeFolder: '/umbraco/management/api/v1/document-type/folder',
     documentBlueprint: '/umbraco/management/api/v1/document-blueprint',
@@ -305,7 +318,10 @@
     domains: '/domains',
     notifications: '/notifications',
     currentUser: '/umbraco/management/api/v1/user/current',
-    revoke: '/umbraco/management/api/v1/security/back-office/revoke'
+    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    documentSearch: '/umbraco/management/api/v1/item/document/search',
+    mediaSearch: '/umbraco/management/api/v1/item/media/search',
+    memberSearch: '/umbraco/management/api/v1/item/member/search'
   }
 
   public static readonly userGroupDescriptionValues = {
@@ -332,7 +348,7 @@
     confirmation: 'We sent an email with password reset instructions, if the email address matches a registered user.',
     notFoundUserError: 'The specified user was not found.'
   }
-  
+
   public static readonly auditTrailMessages = {
     contentSaved: 'Content saved',
     contentSavedAndPublished: 'Content saved and Published',

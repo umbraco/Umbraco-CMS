@@ -98,7 +98,7 @@ Umbraco.Web.UI.Login/
 ├── package.json                      # npm configuration (29 lines)
 ├── tsconfig.json                     # TypeScript config (25 lines)
 ├── vite.config.ts                    # Vite build config (20 lines)
-├── .nvmrc                            # Node version (22)
+├── .nvmrc                            # Node version (24)
 └── .prettierrc.json                  # Prettier config
 ```
 
@@ -230,11 +230,12 @@ Form waits for localization availability before rendering. Retries 40 times with
 
 ### External Dependencies
 
-- `@umbraco-cms/backoffice` ^16.2.0 - Umbraco UI components, Lit element base
-- `vite` ^7.2.0 - Build tooling
-- `typescript` ^5.9.3 - Type checking
-- `msw` ^2.11.3 - API mocking
-- `@hey-api/openapi-ts` ^0.85.0 - API client generation
+- `vite` - Build tooling
+- `typescript` - Type checking
+- `msw` - API mocking
+- `@hey-api/openapi-ts` - API client generation
+
+`@umbraco-cms/backoffice` is **not** an npm dependency — its types resolve from the sibling Client's source via generated tsconfig path aliases.
 
 ### Known Technical Debt
 
@@ -298,4 +299,4 @@ Built files go to:
 | -------------------------- | ------------------------------------- |
 | `Umbraco.Cms.StaticAssets` | Receives built output                 |
 | `Umbraco.Web.UI.Client`    | Backoffice SPA (similar architecture) |
-| `@umbraco-cms/backoffice`  | NPM dependency for UI components      |
+| `@umbraco-cms/backoffice`  | Type source via tsconfig path aliases (not an npm dep) |

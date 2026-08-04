@@ -177,7 +177,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
 
     private async Task<Attempt<UrlInfo?>> VerifyCollisionAsync(IContent content, string url, string culture)
     {
-        var uri = new Uri(url.TrimEnd(Constants.CharArrays.ForwardSlash), UriKind.RelativeOrAbsolute);
+        var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
         if (uri.IsAbsoluteUri is false)
         {
             uri = uri.MakeAbsolute(_umbracoContextAccessor.GetRequiredUmbracoContext().CleanedUmbracoUrl);

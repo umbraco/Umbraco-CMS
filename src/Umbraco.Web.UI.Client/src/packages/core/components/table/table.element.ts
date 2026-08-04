@@ -309,7 +309,10 @@ export class UmbTableElement extends UmbLitElement {
 			throw new Error('Select all is not allowed in the current table configuration.');
 		}
 
-		this.selection = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
+		// Merge the current page's selectable rows into the existing selection so selections
+		// accumulate across pages rather than replacing the previous page's selection.
+		const currentPageIds = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
+		this.selection = [...new Set([...this.selection, ...currentPageIds])];
 		this._selectionMode = true;
 		this.dispatchEvent(new UmbTableSelectedEvent());
 	}
@@ -319,8 +322,10 @@ export class UmbTableElement extends UmbLitElement {
 			throw new Error('Select all is not allowed in the current table configuration.');
 		}
 
-		this.selection = [];
-		this._selectionMode = false;
+		// Only remove the current page's rows, leaving any selection from other pages intact.
+		const currentPageIds = new Set(this.items.map((item) => item.id));
+		this.selection = this.selection.filter((id) => !currentPageIds.has(id));
+		this._selectionMode = this.selection.length > 0;
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
@@ -394,6 +399,12 @@ export class UmbTableElement extends UmbLitElement {
 
 	private _renderHeaderCheckboxCell() {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
+		// Compute the header state against the current page only — the selection can span multiple
+		// pages, so comparing its total length against the page size gives the wrong state.
+		const selectableIds = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
+		const selectionSet = new Set(this.selection);
+		const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectionSet.has(id));
+		const indeterminate = !allSelected && selectableIds.some((id) => selectionSet.has(id));
 		return html`
 			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
@@ -403,7 +414,8 @@ export class UmbTableElement extends UmbLitElement {
 							aria-label=${this.localize.term('general_selectAll')}
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
-							?checked=${this.selection.length === this.items.length}></uui-checkbox>
+							?checked=${allSelected}
+							.indeterminate=${indeterminate}></uui-checkbox>
 					`,
 				)}
 			</uui-table-head-cell>

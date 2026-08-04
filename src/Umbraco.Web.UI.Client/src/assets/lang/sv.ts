@@ -14,6 +14,9 @@ export default {
 		umbContent: 'Innehåll',
 	},
 	actions: {
+		copyInProgress: 'Kopiering pågår - vänligen vänta...',
+		deleteInProgress: 'Borttagning pågår - vänligen vänta...',
+		moveInProgress: 'Flyttning pågår - vänligen vänta...',
 		assigndomain: 'Hantera domännamn',
 		auditTrail: 'Hantera versioner',
 		browse: 'Surfa på sidan',
@@ -797,6 +800,9 @@ export default {
 		paSimpleHelp:
 			'Välj detta alternativ om du vill skydda sidan med ett enkelt användarnamn och lösenord. Alla loggar då in med samma inloggningsuppgifter.',
 	},
+	unpublish: {
+		inProgress: 'Avpublicering pågår - vänligen vänta...',
+	},
 	publish: {
 		contentPublishedFailedAwaitingRelease: ' %0% kunde inte publiceras på grund av dess tidsinställda publicering.',
 		contentPublishedFailedByEvent:
@@ -895,6 +901,8 @@ export default {
 		sortIndividuallyHeadline: 'Sortera individuellt',
 	},
 	speechBubbles: {
+		editMultiContentPublishedPartialText: '%0% av %1% dokument publicerade.',
+		editMultiContentUnpublishedPartialText: '%0% av %1% dokument avpublicerade.',
 		contentPublishedFailedByEvent: 'Publiceringen avbröts av ett tredjepartstillägg',
 		contentTypeDublicatePropertyType: 'Egenskapstyp finns redan',
 		contentTypePropertyTypeCreated: 'Egenskapstyp skapad',
@@ -1191,6 +1199,7 @@ export default {
 		selectLanguageHint: 'Välj ett språk för länken',
 		selectLanguageDefault: 'Auto (besökarens språk)',
 		configCultureSpecificDocumentLinksLabel: 'Kulturspecifika dokumentlänkar',
-		configCultureSpecificDocumentLinksDescription: 'Aktivera möjligheten att ange en kultur vid länkning till dokument.',
+		configCultureSpecificDocumentLinksDescription:
+			'Aktivera möjligheten att ange en kultur vid länkning till dokument.',
 	},
 } as UmbLocalizationDictionary;

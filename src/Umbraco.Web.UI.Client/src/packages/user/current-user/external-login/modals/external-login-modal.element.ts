@@ -1,6 +1,7 @@
 import { UmbCurrentUserRepository } from '../../repository/index.js';
 import type { UmbCurrentUserExternalLoginProviderModel } from '../../types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -163,7 +164,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		try {
 			await umbConfirmModal(this, {
 				headline: this.localize.term('defaultdialogs_linkYour', providerDisplayName),
-				content: this.localize.term('defaultdialogs_linkYourConfirm', providerDisplayName),
+				content: this.localize.term('defaultdialogs_linkYourConfirm', escapeHTML(providerDisplayName)),
 				confirmLabel: '#general_continue',
 				color: 'positive',
 			});
@@ -193,7 +194,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 		try {
 			await umbConfirmModal(this, {
 				headline: this.localize.term('defaultdialogs_unLinkYour', providerDisplayName),
-				content: this.localize.term('defaultdialogs_unLinkYourConfirm', providerDisplayName),
+				content: this.localize.term('defaultdialogs_unLinkYourConfirm', escapeHTML(providerDisplayName)),
 				confirmLabel: '#general_continue',
 				color: 'danger',
 			});

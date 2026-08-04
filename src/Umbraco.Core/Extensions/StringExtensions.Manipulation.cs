@@ -194,7 +194,7 @@ public static partial class StringExtensions
         for (var i = 0; i < queryStrings.Length; i++)
         {
             queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand)
-                .TrimEnd(Constants.CharArrays.Ampersand);
+                .TrimEnd('&');
         }
 
         var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
