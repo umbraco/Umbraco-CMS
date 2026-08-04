@@ -15,7 +15,7 @@ import { UMB_DOCUMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { UmbDocumentVariantState } from '../../variant-state.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -360,6 +360,15 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
+
+		// Unpublishing reloads the workspace, which discards any unsaved edit, so let the user confirm that.
+		if (this.#documentWorkspaceContext.getHasUnpersistedChanges()) {
+			const discardChanges = await umbOpenModal(this, UMB_DISCARD_CHANGES_MODAL).then(
+				() => true,
+				() => false,
+			);
+			if (!discardChanges) return;
+		}
 
 		const action = new UmbContentUnpublishEntityAction(this, {
 			unique,
