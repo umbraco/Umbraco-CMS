@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
@@ -31,6 +33,7 @@ internal sealed class AsyncDocumentRepository
       IAsyncDocumentRepository
 {
     private readonly ITemplateRepository _templateRepository;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AsyncDocumentRepository" /> class.
@@ -49,6 +52,7 @@ internal sealed class AsyncDocumentRepository
     /// <param name="cacheSyncService">The cache synchronization service.</param>
     /// <param name="contentTypeRepository">The content type repository.</param>
     /// <param name="templateRepository">The template repository, used to validate template IDs on load.</param>
+    /// <param name="idKeyMap">The ID/key map, used to resolve data type configuration for sortable property values.</param>
     internal AsyncDocumentRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
@@ -63,7 +67,8 @@ internal sealed class AsyncDocumentRepository
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService,
         IContentTypeRepository contentTypeRepository,
-        ITemplateRepository templateRepository)
+        ITemplateRepository templateRepository,
+        IIdKeyMap idKeyMap)
         : base(
             scopeAccessor,
             appCaches,
@@ -80,6 +85,7 @@ internal sealed class AsyncDocumentRepository
             contentTypeRepository)
     {
         _templateRepository = templateRepository;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -109,12 +115,274 @@ internal sealed class AsyncDocumentRepository
         => await PerformGetRangeAsync(keys);
 
     /// <inheritdoc />
-    protected override Task PersistNewItemAsync(IContent item) =>
-        throw new NotImplementedException();
+    protected override async Task PersistNewItemAsync(IContent item) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            item.AddingEntity();
+
+            var publishing = item.PublishedState == PublishedState.Publishing;
+
+            AssignDefaultTemplateIfMissing(item);
+
+            // TODO (EF Core): port sibling name-uniqueness (SimilarNodeName.GetUniqueName) and variant name
+            // handling, see NPoco PublishableContentRepositoryBase.SanitizeNames.
+            SanitizeNames(item);
+
+            item.SanitizeEntityPropertiesForXmlStorage();
+
+            DocumentDto dto = BuildEntityDto(item);
+
+            await PersistNewNodeAsync(db, item, dto);
+            await PersistNewContentAsync(db, item, dto);
+            await PersistNewVersionsAsync(db, item, dto);
+
+            (bool edited, HashSet<string>? editedCultures) = await PersistNewPropertyDataAsync(db, item);
+
+            // if !publishing, we may have a new name != current publish name, also impacts 'edited'
+            if (!publishing && item.PublishName != item.Name)
+            {
+                edited = true;
+            }
+
+            // at that point, when publishing, the entity still has its old Published value
+            // so we need to explicitly update the dto to persist the correct value
+            if (publishing)
+            {
+                dto.Published = true;
+            }
+
+            dto.NodeId = item.Id;
+            item.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
+            db.Documents.Add(dto);
+            await db.SaveChangesAsync();
+
+            if (item.ContentType.VariesByCulture())
+            {
+                (List<ContentVersionCultureVariationDto> contentVariations, List<DocumentCultureVariationDto> entityVariations, editedCultures, _) =
+                    await ResolveCultureVariationChangesAsync(item, publishing, isNew: true, editedCultures, dto.CurrentVersion.ContentVersionDto.VersionDate);
+
+                if (contentVariations.Count > 0)
+                {
+                    db.ContentVersionCultureVariations.AddRange(contentVariations);
+                }
+
+                if (entityVariations.Count > 0)
+                {
+                    db.DocumentCultureVariations.AddRange(entityVariations);
+                }
+
+                await db.SaveChangesAsync();
+            }
+
+            await OnUowRefreshedEntityAsync(item, CancellationToken.None);
+
+            // Flip the entity's in-memory published state to match what was just persisted — mirrors
+            // NPoco's PersistNewItem, and PersistUpdatedItemAsync's equivalent block below. Without this,
+            // a caller inspecting the same IContent instance right after SaveAsync returns (rather than
+            // re-fetching via GetAsync) would see stale Published/PublishDate/etc. values.
+            ApplyPostPublishFlagFlips(item);
+
+            item.ResetDirtyProperties();
+
+            return true;
+        });
 
     /// <inheritdoc />
     protected override Task PersistUpdatedItemAsync(IContent item) =>
-        throw new NotImplementedException();
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            var isEntityDirty = item.IsDirty();
+            var editedSnapshot = item.Edited;
+
+            if ((item.PublishedState == PublishedState.Published || item.PublishedState == PublishedState.Unpublished)
+                && !isEntityDirty && !item.IsAnyUserPropertyDirty())
+            {
+                // no change to save, do nothing, don't even update dates
+                return true;
+            }
+
+            // whatever we do, we must check that we are saving the current version
+            ContentVersionDto? version = await db.ContentVersions.FirstOrDefaultAsync(contentVersion => contentVersion.Id == item.VersionId);
+            if (version is null || !version.Current)
+            {
+                throw new InvalidOperationException("Cannot save a non-current version.");
+            }
+
+            item.UpdatingEntity();
+
+            // Check if this entity is being moved as a descendant as part of a bulk moving operation.
+            // TODO (EF Core): fast path not implemented, see NPoco PersistUpdatedItem — this phase always
+            // takes the general path below regardless of isMoving.
+            var isMoving = item.IsMoving();
+
+            var publishing = item.PublishedState == PublishedState.Publishing;
+
+            if (publishing && item.PublishedVersionId > 0)
+            {
+                // The published version is not published anymore — a new one is about to take its place.
+                await db.DocumentVersions.Where(documentVersion => documentVersion.Id == item.PublishedVersionId)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(documentVersion => documentVersion.Published, false));
+            }
+
+            SanitizeNames(item);
+            item.SanitizeEntityPropertiesForXmlStorage();
+
+            if (item.IsPropertyDirty(nameof(item.ParentId)))
+            {
+                NodeDto parent = await GetParentNodeDtoAsync(db, item.ParentId);
+                item.Path = string.Concat(parent.Path, ",", item.Id);
+                item.Level = parent.Level + 1;
+                item.SortOrder = await GetNewChildSortOrderAsync(db, item.ParentId, 0);
+            }
+
+            DocumentDto dto = BuildEntityDto(item);
+
+            NodeDto nodeDto = dto.ContentDto.NodeDto;
+            ValidatePath(nodeDto);
+            await db.Nodes.Where(node => node.NodeId == item.Id).ExecuteUpdateAsync(setters => setters
+                .SetProperty(node => node.Text, nodeDto.Text)
+                .SetProperty(node => node.ParentId, nodeDto.ParentId)
+                .SetProperty(node => node.Level, nodeDto.Level)
+                .SetProperty(node => node.Path, nodeDto.Path)
+                .SetProperty(node => node.SortOrder, nodeDto.SortOrder)
+                .SetProperty(node => node.Trashed, nodeDto.Trashed)
+                .SetProperty(node => node.UserId, nodeDto.UserId));
+
+            await db.Content.Where(content => content.NodeId == item.Id).ExecuteUpdateAsync(setters => setters
+                .SetProperty(content => content.ContentTypeId, dto.ContentDto.ContentTypeId));
+
+            ContentVersionDto contentVersionDto = dto.CurrentVersion.ContentVersionDto;
+            DocumentVersionDto entityVersionDto = dto.CurrentVersion;
+
+            // Preserve the existing flag — `version` is the ContentVersionDto fetched above for the
+            // current-version assertion.
+            contentVersionDto.PreventCleanup = version.PreventCleanup;
+
+            await db.ContentVersions.Where(contentVersion => contentVersion.Id == item.VersionId).ExecuteUpdateAsync(setters => setters
+                .SetProperty(contentVersion => contentVersion.VersionDate, contentVersionDto.VersionDate)
+                .SetProperty(contentVersion => contentVersion.UserId, contentVersionDto.UserId)
+                .SetProperty(contentVersion => contentVersion.Current, contentVersionDto.Current)
+                .SetProperty(contentVersion => contentVersion.Text, contentVersionDto.Text)
+                .SetProperty(contentVersion => contentVersion.PreventCleanup, contentVersionDto.PreventCleanup));
+
+            await db.DocumentVersions.Where(documentVersion => documentVersion.Id == item.VersionId).ExecuteUpdateAsync(setters => setters
+                .SetProperty(documentVersion => documentVersion.TemplateId, entityVersionDto.TemplateId)
+                .SetProperty(documentVersion => documentVersion.Published, entityVersionDto.Published));
+
+            if (publishing)
+            {
+                // The row just flipped above (now Current=false, Published=true) becomes the published
+                // version; a new draft pair is inserted to take over as the current version. Built as a
+                // genuinely new DTO instance (not a mutate-and-reinsert of the tracked one) so a fresh Key
+                // can be assigned explicitly — see the equivalent New-path comment in PersistNewVersionsAsync.
+                item.PublishedVersionId = item.VersionId;
+
+                var newContentVersionDto = new ContentVersionDto
+                {
+                    NodeId = item.Id,
+                    Key = Guid.NewGuid(),
+                    VersionDate = contentVersionDto.VersionDate,
+                    UserId = contentVersionDto.UserId,
+                    Current = true,
+                    Text = item.Name,
+                    PreventCleanup = false, // new draft version disregards the existing prevent-cleanup flag
+                };
+                db.ContentVersions.Add(newContentVersionDto);
+                await db.SaveChangesAsync();
+                item.VersionId = newContentVersionDto.Id;
+
+                var newDocumentVersionDto = new DocumentVersionDto
+                {
+                    Id = item.VersionId,
+                    TemplateId = entityVersionDto.TemplateId,
+                    Published = false,
+                    ContentVersionDto = newContentVersionDto,
+                };
+                db.DocumentVersions.Add(newDocumentVersionDto);
+                await db.SaveChangesAsync();
+
+                dto.PublishedVersion = entityVersionDto;
+                dto.CurrentVersion = newDocumentVersionDto;
+            }
+
+            var versionToDelete = publishing ? item.PublishedVersionId : item.VersionId;
+
+            (bool edited, HashSet<string>? editedCultures) = await PersistUpdatedPropertyDataAsync(
+                db, item, versionToDelete, publishing ? item.PublishedVersionId : 0);
+
+            // if !publishing, we may have a new name != current publish name, also impacts 'edited'
+            if (!publishing && item.PublishName != item.Name)
+            {
+                edited = true;
+            }
+
+            if (!publishing && editedSnapshot)
+            {
+                edited = true;
+            }
+
+            if (item.ContentType.VariesByCulture())
+            {
+                (List<ContentVersionCultureVariationDto> contentVariations, List<DocumentCultureVariationDto> entityVariations, editedCultures, bool cultureEdited) =
+                    await ResolveCultureVariationChangesAsync(item, publishing, isNew: false, editedCultures, contentVersionDto.VersionDate);
+
+                if (cultureEdited)
+                {
+                    edited = true;
+                }
+
+                // Replace (rather than update) the content version variations — only for versionToDelete,
+                // and the entity variations — for the whole node, unconditionally. Mirrors NPoco's
+                // delete-then-reinsert for these two tables (no diff-reconcile needed here, unlike PropertyData).
+                await db.ContentVersionCultureVariations.Where(variation => variation.VersionId == versionToDelete).ExecuteDeleteAsync();
+                await db.DocumentCultureVariations.Where(variation => variation.NodeId == item.Id).ExecuteDeleteAsync();
+
+                if (contentVariations.Count > 0)
+                {
+                    db.ContentVersionCultureVariations.AddRange(contentVariations);
+                }
+
+                if (entityVariations.Count > 0)
+                {
+                    db.DocumentCultureVariations.AddRange(entityVariations);
+                }
+
+                await db.SaveChangesAsync();
+            }
+
+            if (item.PublishedState == PublishedState.Publishing)
+            {
+                dto.Published = true;
+            }
+            else if (item.PublishedState == PublishedState.Unpublishing)
+            {
+                dto.Published = false;
+            }
+
+            item.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
+
+            await db.Documents.Where(document => document.NodeId == item.Id).ExecuteUpdateAsync(setters => setters
+                .SetProperty(document => document.Published, dto.Published)
+                .SetProperty(document => document.Edited, dto.Edited));
+
+            // TODO (EF Core): call SetEntityTags once an EF Core ITagRepository exists — see NPoco
+            // PublishableContentRepositoryBase.PersistUpdatedItem. No ITagRepository is injected anywhere
+            // in the EF Core repository chain yet, so tag-based content does not round-trip tag values
+            // through this repository.
+
+            await OnUowRefreshedEntityAsync(item, CancellationToken.None);
+
+            ApplyPostPublishFlagFlips(item);
+
+            item.ResetDirtyProperties();
+
+            // We need to flush the isolated cache by key explicitly here. The ContentCacheRefresher does
+            // the same thing, but by the time it's invoked, custom notification handlers might have
+            // already consumed the cached version.
+            IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>(item.Key));
+
+            return true;
+        });
 
     // --- AsyncContentRepositoryBase abstract overrides ---
 
@@ -657,8 +925,18 @@ internal sealed class AsyncDocumentRepository
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    protected override Task OnUowRefreshedEntityAsync(IContent entity, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    protected override Task OnUowRefreshedEntityAsync(IContent entity, CancellationToken cancellationToken)
+    {
+        // ContentRefreshNotification is [Obsolete] ("use saved notifications instead") but is still the ONLY
+        // live signal CacheRefreshingNotificationHandler (Umbraco.PublishedCache.HybridCache) listens for to
+        // refresh the published-content cache — NPoco's DocumentRepository.OnUowRefreshedEntity fires the exact
+        // same obsolete notification today, in production. Skipping it would silently stop HybridCache from
+        // refreshing for EF-Core-saved documents. Mirror NPoco's current (also-obsolete) behavior faithfully.
+#pragma warning disable CS0618 // Type or member is obsolete
+        EventAggregator.Publish(new ContentRefreshNotification(entity, new EventMessages()));
+#pragma warning restore CS0618
+        return Task.CompletedTask;
+    }
 
     // --- AsyncPublishableContentRepositoryBase abstract overrides ---
 
@@ -668,7 +946,7 @@ internal sealed class AsyncDocumentRepository
 
     /// <inheritdoc />
     protected override DocumentDto BuildEntityDto(IContent entity) =>
-        throw new NotImplementedException();
+        ContentBaseFactory.BuildDocumentDto(entity, NodeObjectTypeKey, entity.PublishedState == PublishedState.Publishing);
 
     // --- IAsyncDocumentRepository: permissions ---
 
@@ -1266,5 +1544,502 @@ internal sealed class AsyncDocumentRepository
         }
 
         return isoCode;
+    }
+
+    // --- PersistNewItemAsync helpers ---
+
+    // Flips the entity's in-memory published state to match what was just persisted — shared by
+    // PersistNewItemAsync and PersistUpdatedItemAsync. Mirrors NPoco's PersistNewItem/PersistUpdatedItem.
+    private static void ApplyPostPublishFlagFlips(IContent item)
+    {
+        if (item.PublishedState == PublishedState.Publishing)
+        {
+            item.Published = true;
+            item.PublishTemplateId = item.TemplateId;
+            item.PublisherId = item.WriterId;
+            item.PublishName = item.Name;
+            item.PublishDate = item.UpdateDate;
+
+            // TODO (EF Core): call SetEntityTags once an EF Core ITagRepository exists — see
+            // NPoco PublishableContentRepositoryBase.PersistNewItem/PersistUpdatedItem. No ITagRepository
+            // is injected anywhere in the EF Core repository chain yet, so tag-based content does not
+            // round-trip tag values through this repository.
+        }
+        else if (item.PublishedState == PublishedState.Unpublishing)
+        {
+            item.Published = false;
+            item.PublishTemplateId = null;
+            item.PublisherId = null;
+            item.PublishName = null;
+            item.PublishDate = null;
+
+            // TODO (EF Core): call ClearEntityTags once an EF Core ITagRepository exists — see
+            // NPoco PublishableContentRepositoryBase.PersistNewItem/PersistUpdatedItem.
+        }
+    }
+
+    private static void AssignDefaultTemplateIfMissing(IContent entity)
+    {
+        if (entity.TemplateId.HasValue is false)
+        {
+            entity.TemplateId = entity.ContentType.DefaultTemplate?.Id;
+        }
+    }
+
+    // Scoped-down stand-in for NPoco's PublishableContentRepositoryBase.SanitizeNames: this phase is
+    // invariant-only, so only the "must have a name at all" check applies here.
+    private static void SanitizeNames(IContent entity)
+    {
+        if (string.IsNullOrWhiteSpace(entity.Name))
+        {
+            throw new InvalidOperationException("Cannot save content with an empty name.");
+        }
+    }
+
+    // Inserts (or converts a reserved placeholder into) the umbracoNode row, resolving Path/Level/SortOrder
+    // from the parent, then patches the Path once the real NodeId is known. Mirrors NPoco's PersistNewItem
+    // node-handling block.
+    private async Task PersistNewNodeAsync(UmbracoDbContext db, IContent item, DocumentDto dto)
+    {
+        NodeDto parent = await GetParentNodeDtoAsync(db, item.ParentId);
+        var level = parent.Level + 1;
+
+        var calculateSortOrder = (item is { HasIdentity: false, SortOrder: 0 } && item.IsPropertyDirty(nameof(item.SortOrder)) is false)
+                                  || await SortorderExistsAsync(db, item.ParentId, item.SortOrder);
+        var sortOrder = calculateSortOrder ? await GetNewChildSortOrderAsync(db, item.ParentId, 0) : item.SortOrder;
+
+        NodeDto nodeDto = dto.ContentDto.NodeDto;
+        nodeDto.Path = parent.Path;
+        nodeDto.Level = Convert.ToInt16(level);
+        nodeDto.SortOrder = sortOrder;
+
+        // Supports blueprint/import flows that pre-reserve a Key<->NodeId mapping via a placeholder
+        // IdReservation node before the real entity is created.
+        var reservedId = await GetReservedIdAsync(db, nodeDto.UniqueId);
+        if (reservedId > 0)
+        {
+            nodeDto.NodeId = reservedId;
+            nodeDto.Path = string.Concat(parent.Path, ",", reservedId);
+            ValidatePath(nodeDto);
+
+            await db.Nodes.Where(node => node.NodeId == reservedId).ExecuteUpdateAsync(setters => setters
+                .SetProperty(node => node.UniqueId, nodeDto.UniqueId)
+                .SetProperty(node => node.ParentId, nodeDto.ParentId)
+                .SetProperty(node => node.Level, nodeDto.Level)
+                .SetProperty(node => node.Path, nodeDto.Path)
+                .SetProperty(node => node.SortOrder, nodeDto.SortOrder)
+                .SetProperty(node => node.Trashed, nodeDto.Trashed)
+                .SetProperty(node => node.UserId, nodeDto.UserId)
+                .SetProperty(node => node.Text, nodeDto.Text)
+                .SetProperty(node => node.NodeObjectType, nodeDto.NodeObjectType)
+                .SetProperty(node => node.CreateDate, nodeDto.CreateDate));
+        }
+        else
+        {
+            db.Nodes.Add(nodeDto);
+            await db.SaveChangesAsync();
+
+            // The node stays tracked from the Add above, so mutating it directly and saving again is
+            // enough to patch the Path — no ExecuteUpdateAsync needed despite the context's global
+            // NoTracking query setting (that setting only affects query results, not tracked Adds).
+            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            ValidatePath(nodeDto);
+            await db.SaveChangesAsync();
+        }
+
+        item.Id = nodeDto.NodeId;
+        item.Path = nodeDto.Path;
+        item.SortOrder = sortOrder;
+        item.Level = level;
+    }
+
+    private static async Task PersistNewContentAsync(UmbracoDbContext db, IContent item, DocumentDto dto)
+    {
+        ContentDto contentDto = dto.ContentDto;
+        contentDto.NodeId = item.Id;
+        db.Content.Add(contentDto);
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task PersistNewVersionsAsync(UmbracoDbContext db, IContent item, DocumentDto dto)
+    {
+        ContentVersionDto contentVersionDto = dto.CurrentVersion.ContentVersionDto;
+        contentVersionDto.NodeId = item.Id;
+        db.ContentVersions.Add(contentVersionDto);
+        await db.SaveChangesAsync();
+        item.VersionId = contentVersionDto.Id;
+
+        DocumentVersionDto documentVersionDto = dto.CurrentVersion;
+        documentVersionDto.Id = item.VersionId;
+        db.DocumentVersions.Add(documentVersionDto);
+        await db.SaveChangesAsync();
+
+        if (item.PublishedState == PublishedState.Publishing)
+        {
+            // The pair just inserted (Current=false, Published=true) becomes the published version.
+            // A second (Current=true, Published=false) pair is inserted for the new draft — built as a
+            // genuinely new DTO instance (not a mutate-and-reinsert of the first) so a fresh Key can be
+            // assigned explicitly. Unlike NPoco's ContentVersion table, the EF Core ContentVersionDto.Key
+            // column has no DB-side default, so omitting this would silently duplicate the first row's Key.
+            item.PublishedVersionId = item.VersionId;
+            dto.PublishedVersion = documentVersionDto;
+
+            var newContentVersionDto = new ContentVersionDto
+            {
+                NodeId = item.Id,
+                Key = Guid.NewGuid(),
+                VersionDate = contentVersionDto.VersionDate,
+                UserId = contentVersionDto.UserId,
+                Current = true,
+                Text = item.Name,
+            };
+            db.ContentVersions.Add(newContentVersionDto);
+            await db.SaveChangesAsync();
+            item.VersionId = newContentVersionDto.Id;
+
+            var newDocumentVersionDto = new DocumentVersionDto
+            {
+                Id = item.VersionId,
+                TemplateId = documentVersionDto.TemplateId,
+                Published = false,
+                ContentVersionDto = newContentVersionDto,
+            };
+            db.DocumentVersions.Add(newDocumentVersionDto);
+            await db.SaveChangesAsync();
+
+            dto.CurrentVersion = newDocumentVersionDto;
+        }
+    }
+
+    private async Task<(bool Edited, HashSet<string>? EditedCultures)> PersistNewPropertyDataAsync(UmbracoDbContext db, IContent item)
+    {
+        List<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildEFCoreDtos(
+            item.ContentType.Variations,
+            item.VersionId,
+            item.PublishedVersionId,
+            item.Properties,
+            LanguageRepository,
+            out bool edited,
+            out HashSet<string>? editedCultures).ToList();
+
+        SetEntitySortableValues(item, propertyDataDtos);
+
+        if (propertyDataDtos.Count > 0)
+        {
+            db.PropertyData.AddRange(propertyDataDtos);
+            await db.SaveChangesAsync();
+        }
+
+        return (edited, editedCultures);
+    }
+
+    // Populates PropertyDataDto.SortableValue for any property whose editor implements IDataValueSortable,
+    // so custom-field ordering (see ResolveCustomFieldOrderedNodeIdsAsync) can prioritize it over the raw
+    // typed columns. Mirrors NPoco's ContentRepositoryBase.SetEntitySortableValues exactly.
+    private void SetEntitySortableValues(IContentBase entity, IEnumerable<PropertyDataDto> propertyDtos)
+    {
+        var dtosByPropertyTypeId = propertyDtos.GroupBy(dto => dto.PropertyTypeId).ToDictionary(group => group.Key, group => group.ToList());
+
+        foreach (IProperty property in entity.Properties)
+        {
+            if (PropertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false)
+            {
+                continue;
+            }
+
+            if (editor.GetValueEditor() is not IDataValueSortable sortableProvider)
+            {
+                continue;
+            }
+
+            if (dtosByPropertyTypeId.TryGetValue(property.PropertyTypeId, out List<PropertyDataDto>? dtos) is false)
+            {
+                continue;
+            }
+
+            object? configurationObject = property.PropertyType.GetDataType(DataTypeService, _idKeyMap)?.ConfigurationObject;
+
+            foreach (PropertyDataDto dto in dtos)
+            {
+                object? value = dto.TextValue ?? dto.VarcharValue ?? (object?)dto.DateValue ?? dto.DecimalValue ?? dto.IntegerValue;
+                dto.SortableValue = sortableProvider.GetSortableValue(value, configurationObject);
+            }
+        }
+    }
+
+    // --- PersistUpdatedItemAsync helpers ---
+
+    // Diff-reconciles PropertyData rows for the given version against the freshly built values for the
+    // entity's current properties: matches existing rows by (PropertyTypeId, VersionId, LanguageId,
+    // Segment), updates matches in place, inserts new rows for unmatched values, and deletes rows that no
+    // longer have a corresponding value. Mirrors NPoco's ContentRepositoryBase.ReplacePropertyValues,
+    // omitting only the row-level pessimistic lock (ForUpdate()) NPoco takes before the fetch — EF Core has
+    // no direct equivalent, and the ambient scope's own transaction already provides isolation.
+    private async Task<(bool Edited, HashSet<string>? EditedCultures)> PersistUpdatedPropertyDataAsync(
+        UmbracoDbContext db, IContent item, int versionId, int publishedVersionId)
+    {
+        // Tracked (overriding the context's global NoTracking default) so the toUpdate loop below can mutate
+        // these instances directly and have EF Core batch them into a single SaveChangesAsync round-trip,
+        // instead of issuing one ExecuteUpdateAsync per row.
+        List<PropertyDataDto> existingPropertyData = await db.PropertyData
+            .AsTracking()
+            .Where(propertyData => propertyData.VersionId == versionId)
+            .ToListAsync();
+
+        var propertyTypeToPropertyData = new Dictionary<(int PropertyTypeId, int VersionId, int? LanguageId, string? Segment), PropertyDataDto>();
+        var trackedById = new Dictionary<int, PropertyDataDto>();
+        var existingPropertyDataIds = new List<int>();
+        foreach (PropertyDataDto propertyData in existingPropertyData)
+        {
+            existingPropertyDataIds.Add(propertyData.Id);
+            propertyTypeToPropertyData[(propertyData.PropertyTypeId, propertyData.VersionId, propertyData.LanguageId, propertyData.Segment)] = propertyData;
+            trackedById[propertyData.Id] = propertyData;
+        }
+
+        List<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildEFCoreDtos(
+            item.ContentType.Variations,
+            item.VersionId,
+            publishedVersionId,
+            item.Properties,
+            LanguageRepository,
+            out bool edited,
+            out HashSet<string>? editedCultures).ToList();
+
+        SetEntitySortableValues(item, propertyDataDtos);
+
+        var toUpdate = new List<PropertyDataDto>();
+        var toInsert = new List<PropertyDataDto>();
+        foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
+        {
+            // Check if this already exists and update, else insert a new one.
+            if (propertyTypeToPropertyData.TryGetValue(
+                    (propertyDataDto.PropertyTypeId, propertyDataDto.VersionId, propertyDataDto.LanguageId, propertyDataDto.Segment),
+                    out PropertyDataDto? existing))
+            {
+                propertyDataDto.Id = existing.Id;
+                toUpdate.Add(propertyDataDto);
+            }
+            else
+            {
+                toInsert.Add(propertyDataDto);
+            }
+
+            // Track which ones have been processed. For entries in toInsert, propertyDataDto.Id is still
+            // 0 here — Remove(0) is a harmless no-op unless an existing row happens to have Id 0, which
+            // can't happen for a real PK.
+            existingPropertyDataIds.Remove(propertyDataDto.Id);
+        }
+
+        // Mutate the tracked instances directly rather than issuing one ExecuteUpdateAsync per row — EF Core
+        // batches these together with the toInsert Adds below into a single SaveChangesAsync round-trip.
+        foreach (PropertyDataDto propertyDataDto in toUpdate)
+        {
+            PropertyDataDto tracked = trackedById[propertyDataDto.Id];
+            tracked.LanguageId = propertyDataDto.LanguageId;
+            tracked.Segment = propertyDataDto.Segment;
+            tracked.IntegerValue = propertyDataDto.IntegerValue;
+            tracked.DecimalValue = propertyDataDto.DecimalValue;
+            tracked.DateValue = propertyDataDto.DateValue;
+            tracked.VarcharValue = propertyDataDto.VarcharValue;
+            tracked.TextValue = propertyDataDto.TextValue;
+            tracked.SortableValue = propertyDataDto.SortableValue;
+        }
+
+        if (toInsert.Count > 0)
+        {
+            db.PropertyData.AddRange(toInsert);
+        }
+
+        if (toUpdate.Count > 0 || toInsert.Count > 0)
+        {
+            await db.SaveChangesAsync();
+        }
+
+        // For any remaining that haven't been processed, they need to be deleted. Batched per this repo's
+        // 2100-parameter convention (Infrastructure/CLAUDE.md §6) since a document with many
+        // culture/segment-variant properties can plausibly exceed it.
+        if (existingPropertyDataIds.Count > 0)
+        {
+            foreach (IEnumerable<int> batch in existingPropertyDataIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                List<int> batchIds = batch.ToList();
+                await db.PropertyData.Where(propertyData => batchIds.Contains(propertyData.Id)).ExecuteDeleteAsync();
+            }
+        }
+
+        return (edited, editedCultures);
+    }
+
+    // --- Culture variation helpers (shared by PersistNewItemAsync/PersistUpdatedItemAsync) ---
+
+    // Shared culture-variation computation for PersistNewItemAsync/PersistUpdatedItemAsync: determines which
+    // cultures have an edited name, updates SetCultureEdited/AdjustDates on the entity, and builds the DTOs
+    // to persist. The DB-write strategy (plain AddRange vs. delete-then-reinsert) differs between callers and
+    // stays at each call site. The isNew flag mirrors a real NPoco asymmetry — PersistNewItem never feeds a
+    // culture-name mismatch into the enclosing method's own 'edited' flag, PersistUpdatedItem does — so the
+    // returned Edited is only meaningful when isNew is false; callers must preserve this, not merge it away.
+    private async Task<(
+        List<ContentVersionCultureVariationDto> ContentVariations,
+        List<DocumentCultureVariationDto> EntityVariations,
+        HashSet<string>? EditedCultures,
+        bool Edited)> ResolveCultureVariationChangesAsync(
+            IContent item, bool publishing, bool isNew, HashSet<string>? editedCultures, DateTime versionDate)
+    {
+        var edited = false;
+        foreach (ContentCultureInfos cultureInfo in item.CultureInfos!)
+        {
+            if (cultureInfo.Name != item.GetPublishName(cultureInfo.Culture))
+            {
+                if (!isNew)
+                {
+                    edited = true;
+                }
+
+                (editedCultures ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase)).Add(cultureInfo.Culture);
+            }
+        }
+
+        item.SetCultureEdited(editedCultures!);
+        item.AdjustDates(versionDate, publishing);
+
+        List<ContentVersionCultureVariationDto> contentVariations = await BuildContentVariationDtosAsync(item, publishing);
+        List<DocumentCultureVariationDto> entityVariations = await BuildEntityVariationDtosAsync(item, editedCultures!);
+
+        return (contentVariations, entityVariations, editedCultures, edited);
+    }
+
+    // Builds ContentVersionCultureVariationDto rows for the 'current' (non-published) version, one per
+    // culture with a name, plus — only when publishing — additional rows for the 'published' version's
+    // published cultures. Mirrors PublishableContentRepositoryBase.GetContentVariationDtos, but awaits
+    // LanguageRepository properly instead of that method's sync-over-async GetAwaiter().GetResult() calls,
+    // since this helper is genuinely async (no non-async NPoco caller to match).
+    private async Task<List<ContentVersionCultureVariationDto>> BuildContentVariationDtosAsync(IContent entity, bool publishing)
+    {
+        var dtos = new List<ContentVersionCultureVariationDto>();
+
+        if (entity.CultureInfos is not null)
+        {
+            foreach (ContentCultureInfos cultureInfo in entity.CultureInfos)
+            {
+                int languageId = await LanguageRepository.GetIdByIsoCodeAsync(cultureInfo.Culture)
+                    ?? throw new InvalidOperationException("Not a valid culture.");
+
+                dtos.Add(new ContentVersionCultureVariationDto
+                {
+                    VersionId = entity.VersionId,
+                    LanguageId = languageId,
+                    Name = cultureInfo.Name,
+                    UpdateDate = entity.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
+                });
+            }
+        }
+
+        // if not publishing, we're just updating the 'current' (non-published) version, so there are no
+        // DTOs to create for the 'published' version which remains unchanged.
+        if (!publishing)
+        {
+            return dtos;
+        }
+
+        if (entity.PublishCultureInfos is not null)
+        {
+            foreach (ContentCultureInfos cultureInfo in entity.PublishCultureInfos)
+            {
+                int languageId = await LanguageRepository.GetIdByIsoCodeAsync(cultureInfo.Culture)
+                    ?? throw new InvalidOperationException("Not a valid culture.");
+
+                dtos.Add(new ContentVersionCultureVariationDto
+                {
+                    VersionId = entity.PublishedVersionId,
+                    LanguageId = languageId,
+                    Name = cultureInfo.Name,
+                    UpdateDate = entity.GetPublishDate(cultureInfo.Culture) ?? DateTime.MinValue,
+                });
+            }
+        }
+
+        return dtos;
+    }
+
+    // Builds one DocumentCultureVariationDto per culture the entity is available or published in. Mirrors
+    // PublishableContentRepositoryBase.GetEntityVariationDtos field-by-field — the EF Core DTO carries only
+    // LanguageId (no in-memory-only Culture convenience field like the NPoco DTO), so Culture is not set here.
+    private async Task<List<DocumentCultureVariationDto>> BuildEntityVariationDtosAsync(IContent entity, HashSet<string>? editedCultures)
+    {
+        var dtos = new List<DocumentCultureVariationDto>();
+
+        IEnumerable<string> allCultures = entity.AvailableCultures.Union(entity.PublishedCultures); // union = distinct
+        foreach (string culture in allCultures)
+        {
+            int languageId = await LanguageRepository.GetIdByIsoCodeAsync(culture)
+                ?? throw new InvalidOperationException("Not a valid culture.");
+
+            dtos.Add(new DocumentCultureVariationDto
+            {
+                NodeId = entity.Id,
+                LanguageId = languageId,
+                Name = entity.GetCultureName(culture) ?? entity.GetPublishName(culture),
+                Available = entity.IsCultureAvailable(culture),
+                Published = entity.IsCulturePublished(culture),
+                // note: can't use IsCultureEdited at that point - hasn't been updated yet - see PersistUpdatedItem
+                Edited = entity.IsCultureAvailable(culture) &&
+                         (!entity.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture))),
+            });
+        }
+
+        return dtos;
+    }
+
+    private static Task<NodeDto> GetParentNodeDtoAsync(UmbracoDbContext db, int parentId) =>
+        db.Nodes.FirstAsync(node => node.NodeId == parentId);
+
+    private Task<bool> SortorderExistsAsync(UmbracoDbContext db, int parentId, int sortOrder) =>
+        db.Nodes.AnyAsync(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentId && node.SortOrder == sortOrder);
+
+    private async Task<int> GetNewChildSortOrderAsync(UmbracoDbContext db, int parentId, int first)
+    {
+        int? maxSortOrder = await db.Nodes
+            .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentId)
+            .Select(node => (int?)node.SortOrder)
+            .MaxAsync();
+
+        return maxSortOrder + 1 ?? first;
+    }
+
+    private static async Task<int> GetReservedIdAsync(UmbracoDbContext db, Guid uniqueId)
+    {
+        int? id = await db.Nodes
+            .Where(node => node.UniqueId == uniqueId && node.NodeObjectType == Constants.ObjectTypes.IdReservation)
+            .Select(node => (int?)node.NodeId)
+            .FirstOrDefaultAsync();
+
+        return id ?? 0;
+    }
+
+    // Quick sanity check that a freshly built Path is well-formed, mirroring NPoco's
+    // NodeDto.ValidatePathWithException (Persistence/Models/PathValidationExtensions.cs), which is
+    // defined against the NPoco NodeDto type and so cannot be reused directly against the EF Core one.
+    private static void ValidatePath(NodeDto node)
+    {
+        if (node.NodeId == default && string.IsNullOrWhiteSpace(node.Path))
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(node.Path))
+        {
+            throw new InvalidDataException($"The content item {node.NodeId} has an empty path: {node.Path} with parentID: {node.ParentId}");
+        }
+
+        string[] pathParts = node.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+        if (pathParts.Length < 2)
+        {
+            throw new InvalidDataException($"The content item {node.NodeId} has an invalid path: {node.Path} with parentID: {node.ParentId}");
+        }
+
+        if (node.ParentId != default && pathParts[^2] != node.ParentId.ToInvariantString())
+        {
+            throw new InvalidDataException($"The content item {node.NodeId} has an invalid path: {node.Path} with parentID: {node.ParentId}");
+        }
     }
 }

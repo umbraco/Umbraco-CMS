@@ -363,6 +363,82 @@ internal sealed class ContentBaseFactory
         return dto;
     }
 
+    /// <summary>
+    ///     Creates an EF Core <see cref="EFCoreDtos.DocumentDto"/> instance from the specified <see cref="IContent"/>
+    ///     entity, for persistence via the EF Core write path (mirrors <see cref="BuildDto(IContent, Guid)"/>).
+    /// </summary>
+    /// <param name="entity">The content entity to convert into a DTO.</param>
+    /// <param name="objectType">The unique identifier representing the object type.</param>
+    /// <param name="publishing">Whether the entity is being published as part of the same save.</param>
+    /// <returns>An EF Core <see cref="EFCoreDtos.DocumentDto"/> representing the specified content entity.</returns>
+    public static EFCoreDtos.DocumentDto BuildDocumentDto(IContent entity, Guid objectType, bool publishing) =>
+        new()
+        {
+            NodeId = entity.Id,
+            Published = entity.Published,
+            ContentDto = BuildEFCoreContentDto(entity, objectType),
+            CurrentVersion = BuildEFCoreDocumentVersionDto(entity, publishing),
+        };
+
+    private static EFCoreDtos.ContentDto BuildEFCoreContentDto(IContentBase entity, Guid objectType) =>
+        new()
+        {
+            NodeId = entity.Id,
+            ContentTypeId = entity.ContentTypeId,
+            NodeDto = BuildEFCoreNodeDto(entity, objectType),
+        };
+
+    private static EFCoreDtos.NodeDto BuildEFCoreNodeDto(IContentBase entity, Guid objectType) =>
+        new()
+        {
+            NodeId = entity.Id,
+            UniqueId = entity.Key,
+            ParentId = entity.ParentId,
+            Level = Convert.ToInt16(entity.Level),
+            Path = entity.Path,
+            SortOrder = entity.SortOrder,
+            Trashed = entity.Trashed,
+            // EF Core writes the backing field directly, bypassing the UserId getter's 0-to-null coalescing,
+            // so an unknown creator must be coalesced here to avoid violating the nodeUser FK.
+            UserId = entity.CreatorId == 0 ? null : entity.CreatorId,
+            Text = entity.Name,
+            NodeObjectType = objectType,
+            CreateDate = entity.CreateDate,
+        };
+
+    // always build the current / VersionPk dto
+    // we're never going to build / save old versions (which are immutable)
+    private static EFCoreDtos.ContentVersionDto BuildEFCoreContentVersionDto(IContentBase entity) =>
+        new()
+        {
+            Id = entity.VersionId,
+            // EF Core has no DB-side default configured for this column (NPoco's has NEWID()); omitting
+            // this explicit assignment would silently persist Guid.Empty.
+            Key = Guid.NewGuid(),
+            NodeId = entity.Id,
+            VersionDate = entity.UpdateDate,
+            // See the UserId comment in BuildEFCoreNodeDto - EF Core bypasses the 0-to-null coalescing getter.
+            UserId = entity.WriterId == 0 ? null : entity.WriterId,
+            Current = true, // always building the current one
+            Text = entity.Name,
+        };
+
+    // always build the current / VersionPk dto
+    // we're never going to build / save old versions (which are immutable)
+    private static EFCoreDtos.DocumentVersionDto BuildEFCoreDocumentVersionDto(IContent entity, bool publishing)
+    {
+        EFCoreDtos.ContentVersionDto contentVersionDto = BuildEFCoreContentVersionDto(entity);
+        contentVersionDto.Current = !publishing;
+
+        return new EFCoreDtos.DocumentVersionDto
+        {
+            Id = entity.VersionId,
+            TemplateId = entity.TemplateId,
+            Published = publishing, // mirrors PersistNewItem's inline "if (publishing) entityVersionDto.Published = true;"
+            ContentVersionDto = contentVersionDto,
+        };
+    }
+
     // always build the current / VersionPk dto
     // we're never going to build / save old versions (which are immutable)
     private static ElementVersionDto BuildElementVersionDto(IElement entity, ContentDto contentDto)

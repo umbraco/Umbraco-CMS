@@ -8,12 +8,17 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -41,6 +46,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
+    private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     [SetUp]
     public async Task SetUpData()
@@ -96,7 +103,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Mock.Of<IRepositoryCacheVersionService>(),
         Mock.Of<ICacheSyncService>(),
         GetRequiredService<IContentTypeRepository>(),
-        GetRequiredService<ITemplateRepository>());
+        GetRequiredService<ITemplateRepository>(),
+        GetRequiredService<IIdKeyMap>());
 
     // --- PerformGetAsync ---
 
@@ -1290,5 +1298,637 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.Items.Count(), Is.EqualTo(1));
         Assert.That(result.Items.Single().Key, Is.EqualTo(doc2.Key),
             "Skip=3 should land on doc2 once the two valueless siblings and doc1 are skipped");
+    }
+
+    // Creates a content type with a single property using the REAL DateTimeWithTimeZone property editor —
+    // the one editor in the codebase implementing IDataValueSortable — so SortableValue population can be
+    // exercised end-to-end through the repository write path (not through ContentEditingService/ContentService).
+    private async Task<IContentType> CreateSortableDateTimePropertyContentTypeAsync()
+    {
+        PropertyEditorCollection propertyEditors = GetRequiredService<PropertyEditorCollection>();
+        IDataEditor propertyEditor = propertyEditors[Constants.PropertyEditors.Aliases.DateTimeWithTimeZone];
+
+        var dataType = new DataType(propertyEditor, GetRequiredService<IConfigurationEditorJsonSerializer>())
+        {
+            Name = "DateTime With TimeZone (Sortable Test)",
+            DatabaseType = ValueStorageType.Ntext,
+        };
+        Attempt<IDataType, DataTypeOperationStatus> dataTypeResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(dataTypeResult.Success, $"Failed to create data type: {dataTypeResult.Status}");
+
+        var propertyCollection = new PropertyTypeCollection(true)
+        {
+            new PropertyType(ShortStringHelper, "eventDate", ValueStorageType.Ntext)
+            {
+                Alias = "eventDate",
+                DataTypeId = dataTypeResult.Result.Id,
+            },
+        };
+
+        var contentType = ContentTypeBuilder.CreateBasicContentType("umbEventDate", "EventDate");
+        contentType.PropertyGroups.Add(new PropertyGroup(propertyCollection) { Alias = "content", Name = "Content" });
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType;
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_SortablePropertyEditor_PopulatesSortableValue()
+    {
+        IContentType contentType = await CreateSortableDateTimePropertyContentTypeAsync();
+
+        // Storage-format value (not editor format) — a JSON-serialized DateTimeDto, matching what
+        // DateTimeDataValueEditor.FromEditor would have produced.
+        var eventDate = new DateTimeOffset(2024, 3, 15, 13, 30, 0, TimeSpan.FromHours(2));
+        var dateTimeDto = new DateTimeValueConverterBase.DateTimeDto { Date = eventDate };
+        IJsonSerializer jsonSerializer = GetRequiredService<IJsonSerializer>();
+        string storageValue = jsonSerializer.Serialize(dateTimeDto);
+
+        var content = new ContentBuilder().WithContentType(contentType).WithName("Sortable Event").WithParentId(_textpage.Id).Build();
+        content.SetValue("eventDate", storageValue);
+
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        PropertyDataDto? propertyData = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.PropertyData.FirstOrDefaultAsync(pd => pd.VersionId == content.VersionId));
+
+        scope.Complete();
+
+        string expectedSortableValue = eventDate.ToUniversalTime().ToString("O", System.Globalization.CultureInfo.InvariantCulture);
+
+        Assert.That(propertyData, Is.Not.Null);
+        Assert.That(propertyData!.SortableValue, Is.EqualTo(expectedSortableValue),
+            "SortableValue must be populated on write for a property whose editor implements IDataValueSortable");
+    }
+
+    // --- Group 14: PersistNewItemAsync (write path, Phase 1) ---
+
+    [Test]
+    public async Task PersistNewItemAsync_InvariantUnpublishedWithProperties_PersistsAndReadsBack()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "New Page", _textpage.Id);
+        content.SetValue("title", "Some Value");
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.HasIdentity, Is.True);
+            Assert.That(result.Id, Is.GreaterThan(0));
+            Assert.That(result.ParentId, Is.EqualTo(_textpage.Id));
+            Assert.That(result.Level, Is.EqualTo(2));
+            Assert.That(result.Path, Is.EqualTo($"{_textpage.Path},{result.Id}"));
+            Assert.That(result.Published, Is.False);
+            Assert.That(result.Edited, Is.True);
+            Assert.That(result.GetValue<string>("title"), Is.EqualTo("Some Value"),
+                "the property value must round-trip through PropertyData insertion");
+        });
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_AssignsRootParentPathAndLevel_WhenParentIsRoot()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Root Page", -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.ParentId, Is.EqualTo(-1));
+            Assert.That(result.Level, Is.EqualTo(1));
+            Assert.That(result.Path, Is.EqualTo($"-1,{result.Id}"));
+        });
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_SortOrderCollision_AssignsNextAvailableSortOrder()
+    {
+        var parent = ContentBuilder.CreateSimpleContent(_contentType, "Sort Order Parent", -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        await repository.SaveAsync(parent, CancellationToken.None);
+
+        var first = ContentBuilder.CreateSimpleContent(_contentType, "First Sibling", parent.Id);
+        first.SortOrder = 5;
+        await repository.SaveAsync(first, CancellationToken.None);
+
+        var second = ContentBuilder.CreateSimpleContent(_contentType, "Second Sibling", parent.Id);
+        second.SortOrder = 5;
+        await repository.SaveAsync(second, CancellationToken.None);
+
+        scope.Complete();
+
+        Assert.That(first.SortOrder, Is.EqualTo(5));
+        Assert.That(second.SortOrder, Is.EqualTo(6),
+            "second save should detect the SortOrder collision with its sibling and bump to the next available slot");
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_FiresContentRefreshNotification()
+    {
+        var eventAggregatorMock = new Mock<IEventAggregator>();
+        var repository = new AsyncDocumentRepository(
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
+            AppCaches.Disabled,
+            LoggerFactory,
+            GetRequiredService<ILanguageRepository>(),
+            GetRequiredService<IRelationRepository>(),
+            GetRequiredService<IRelationTypeRepository>(),
+            GetRequiredService<PropertyEditorCollection>(),
+            GetRequiredService<DataValueReferenceFactoryCollection>(),
+            GetRequiredService<IDataTypeService>(),
+            eventAggregatorMock.Object,
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>(),
+            GetRequiredService<IContentTypeRepository>(),
+            GetRequiredService<ITemplateRepository>(),
+            GetRequiredService<IIdKeyMap>());
+
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Notify Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        await repository.SaveAsync(content, CancellationToken.None);
+        scope.Complete();
+
+        eventAggregatorMock.Verify(x => x.Publish(It.IsAny<ContentRefreshNotification>()), Times.Once);
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_DefaultTemplateAssigned_WhenNoTemplateSpecified()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Template Default Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.TemplateId, Is.EqualTo(_template.Id),
+            "the content type's default template should be assigned when no template was explicitly set");
+    }
+
+    // --- Group 15: PersistUpdatedItemAsync (write path, Phase 2) ---
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_NoDirtyProperties_ReturnsWithoutError()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "No Change Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+        DateTime originalUpdateDate = content.UpdateDate;
+
+        await repository.SaveAsync(content, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(content.UpdateDate, Is.EqualTo(originalUpdateDate),
+            "a no-op save must not touch UpdateDate, proving the early-return guard skipped the write");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_ChangesName_PersistsAndReadsBack()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Original Name", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+        DateTime originalUpdateDate = content.UpdateDate;
+
+        content.Name = "Updated Name";
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.Name, Is.EqualTo("Updated Name"));
+            Assert.That(content.UpdateDate, Is.GreaterThan(originalUpdateDate));
+        });
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_AddsNewPropertyValue_PersistsValue()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Add Property Page", _textpage, setPropertyValues: false);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        content.SetValue("title", "Newly Added Value");
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.GetValue<string>("title"), Is.EqualTo("Newly Added Value"),
+            "a property with no prior PropertyData row must be inserted (toInsert branch)");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_ChangesExistingPropertyValue_PersistsNewValue()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Change Property Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        content.SetValue("title", "Changed Value");
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.GetValue<string>("title"), Is.EqualTo("Changed Value"),
+            "an existing PropertyData row must be updated in place (toUpdate branch)");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_RemovesPropertyValue_DeletesRow()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Remove Property Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        content.SetValue("title", null); // clear the value entirely
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.GetValue<string>("title"), Is.Null.Or.Empty,
+            "clearing a property's value must delete the orphaned PropertyData row (delete branch)");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_ParentIdDirty_RecomputesPathLevelSortOrder()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Move Me Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        content.ParentId = _subpage.Id;
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.ParentId, Is.EqualTo(_subpage.Id));
+            Assert.That(result.Level, Is.EqualTo(3));
+            Assert.That(result.Path, Is.EqualTo($"{_subpage.Path},{result.Id}"));
+        });
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_NonCurrentVersion_ThrowsInvalidOperationException()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Stale Version Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions
+                .Where(contentVersion => contentVersion.Id == content.VersionId)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(contentVersion => contentVersion.Current, false)));
+
+        content.Name = "Renamed After Going Stale";
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await repository.SaveAsync(content, CancellationToken.None));
+
+        scope.Complete();
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_FiresContentRefreshNotification()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Notify Update Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        var eventAggregatorMock = new Mock<IEventAggregator>();
+        var notifyingRepository = new AsyncDocumentRepository(
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
+            AppCaches.Disabled,
+            LoggerFactory,
+            GetRequiredService<ILanguageRepository>(),
+            GetRequiredService<IRelationRepository>(),
+            GetRequiredService<IRelationTypeRepository>(),
+            GetRequiredService<PropertyEditorCollection>(),
+            GetRequiredService<DataValueReferenceFactoryCollection>(),
+            GetRequiredService<IDataTypeService>(),
+            eventAggregatorMock.Object,
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>(),
+            GetRequiredService<IContentTypeRepository>(),
+            GetRequiredService<ITemplateRepository>(),
+            GetRequiredService<IIdKeyMap>());
+
+        content.Name = "Notify Update Page Renamed";
+        await notifyingRepository.SaveAsync(content, CancellationToken.None);
+        scope.Complete();
+
+        eventAggregatorMock.Verify(x => x.Publish(It.IsAny<ContentRefreshNotification>()), Times.Once);
+    }
+
+    // --- Group 16: Culture variant persistence (write path, Phase 3) ---
+
+    [Test]
+    public async Task PersistNewItemAsync_CultureVariant_PersistsNamesPerCulture()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+        IContent content = ContentBuilder.CreateBasicContent(contentType);
+        content.SetCultureName("English Name", "en-US");
+        content.SetCultureName("Nom Français", "fr");
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.GetCultureName("en-US"), Is.EqualTo("English Name"));
+            Assert.That(result.GetCultureName("fr"), Is.EqualTo("Nom Français"));
+        });
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_CultureVariant_ChangesNameForOneCulture_LeavesOthersUnchanged()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+        IContent content = ContentBuilder.CreateBasicContent(contentType);
+        content.SetCultureName("English Name", "en-US");
+        content.SetCultureName("Nom Français", "fr");
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        content.SetCultureName("Nom Modifié", "fr");
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.GetCultureName("fr"), Is.EqualTo("Nom Modifié"));
+            Assert.That(result.GetCultureName("en-US"), Is.EqualTo("English Name"),
+                "changing one culture's name must not affect the other culture's persisted name");
+        });
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_CultureVariant_RemovesACulture_DeletesVariationRows()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+        IContent content = ContentBuilder.CreateBasicContent(contentType);
+        content.SetCultureName("English Name", "en-US");
+        content.SetCultureName("Nom Français", "fr");
+
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+        int versionId = content.VersionId;
+        int nodeId = content.Id;
+
+        content.SetCultureName(null, "fr");
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+
+        List<ContentVersionCultureVariationDto> contentVariations = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersionCultureVariations.Where(variation => variation.VersionId == versionId).ToListAsync());
+
+        List<DocumentCultureVariationDto> entityVariations = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.DocumentCultureVariations.Where(variation => variation.NodeId == nodeId).ToListAsync());
+
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result!.AvailableCultures, Does.Not.Contain("fr"),
+                "the removed culture must no longer be reported as available after read-back");
+            Assert.That(result.GetCultureName("fr"), Is.Null);
+            Assert.That(result.GetCultureName("en-US"), Is.EqualTo("English Name"));
+            Assert.That(contentVariations, Has.Count.EqualTo(1),
+                "only en-US's ContentVersionCultureVariation row should remain for this version");
+            Assert.That(entityVariations, Has.Count.EqualTo(1),
+                "only en-US's DocumentCultureVariation row should remain for this node");
+        });
+    }
+
+    // --- Group 17: Save-and-publish double-insert dance (write path, Phase 4) ---
+
+    [Test]
+    public async Task PersistNewItemAsync_PublishOnCreate_WritesTwoVersionRowPairs()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Publish On Create Page", _textpage.Id);
+        content.PublishedState = PublishedState.Publishing;
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+        int nodeId = content.Id;
+
+        List<ContentVersionDto> contentVersions = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.Where(contentVersion => contentVersion.NodeId == nodeId).ToListAsync());
+
+        List<DocumentVersionDto> documentVersions = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.DocumentVersions.Where(documentVersion => contentVersions.Select(cv => cv.Id).Contains(documentVersion.Id)).ToListAsync());
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(contentVersions, Has.Count.EqualTo(2), "publishing on create must write two ContentVersion rows");
+        Assert.That(documentVersions, Has.Count.EqualTo(2), "publishing on create must write two DocumentVersion rows");
+
+        ContentVersionDto publishedContentVersion = contentVersions.Single(cv => cv.Current == false);
+        ContentVersionDto draftContentVersion = contentVersions.Single(cv => cv.Current);
+
+        Assert.That(publishedContentVersion.Key, Is.Not.EqualTo(draftContentVersion.Key),
+            "the two version rows must have distinct Keys, not a duplicated Key from the first row");
+
+        DocumentVersionDto publishedDocumentVersion = documentVersions.Single(dv => dv.Id == publishedContentVersion.Id);
+        DocumentVersionDto draftDocumentVersion = documentVersions.Single(dv => dv.Id == draftContentVersion.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(publishedDocumentVersion.Published, Is.True, "the Current=false row must be the Published=true row");
+            Assert.That(draftDocumentVersion.Published, Is.False, "the Current=true row must be Published=false");
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Published, Is.True);
+            Assert.That(result.VersionId, Is.Not.EqualTo(result.PublishedVersionId),
+                "VersionId (draft) and PublishedVersionId must be distinct after publish-on-create");
+            Assert.That(result.PublishedVersionId, Is.EqualTo(publishedContentVersion.Id));
+            Assert.That(result.VersionId, Is.EqualTo(draftContentVersion.Id));
+
+            // The original in-memory instance (not a fresh GetAsync re-fetch) must also reflect the
+            // publish — a caller that inspects `content` right after SaveAsync returns, without
+            // re-fetching, should see the same state as a fresh read.
+            Assert.That(content.Published, Is.True);
+            Assert.That(content.PublishDate, Is.Not.Null);
+            Assert.That(content.PublisherId, Is.EqualTo(content.WriterId));
+        });
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_Publish_UnpublishesOldRowAndInsertsNewDraft()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Publish Then Republish Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // Step 1: save as a plain draft.
+        await repository.SaveAsync(content, CancellationToken.None);
+        int originalDraftVersionId = content.VersionId;
+
+        // Step 2: first publish - exercises the simple "no prior published version" case.
+        content.PublishedState = PublishedState.Publishing;
+        await repository.SaveAsync(content, CancellationToken.None);
+        int firstPublishedVersionId = content.PublishedVersionId;
+        int secondDraftVersionId = content.VersionId;
+
+        Assert.That(firstPublishedVersionId, Is.EqualTo(originalDraftVersionId),
+            "the original draft row becomes the first published row");
+
+        // Step 3: change something, then publish again - exercises the "unpublish the old published
+        // version" branch, since a prior published version now exists.
+        content.SetValue("title", "Changed for second publish");
+        content.PublishedState = PublishedState.Publishing;
+        await repository.SaveAsync(content, CancellationToken.None);
+        int secondPublishedVersionId = content.PublishedVersionId;
+        int thirdDraftVersionId = content.VersionId;
+
+        // firstPublishedVersionId == originalDraftVersionId (asserted above) - the original draft row
+        // became the first published row in step 2, and must now be unpublished (superseded) by step 3.
+        DocumentVersionDto firstPublishedRow = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.DocumentVersions.FirstAsync(documentVersion => documentVersion.Id == firstPublishedVersionId));
+
+        DocumentVersionDto secondPublishedRow = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.DocumentVersions.FirstAsync(documentVersion => documentVersion.Id == secondPublishedVersionId));
+
+        DocumentVersionDto thirdDraftRow = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.DocumentVersions.FirstAsync(documentVersion => documentVersion.Id == thirdDraftVersionId));
+
+        ContentVersionDto secondPublishedContentVersion = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.FirstAsync(contentVersion => contentVersion.Id == secondPublishedVersionId));
+
+        ContentVersionDto thirdDraftContentVersion = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.FirstAsync(contentVersion => contentVersion.Id == thirdDraftVersionId));
+
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(firstPublishedRow.Published, Is.False,
+                "a prior published version must be unpublished once a newer version is published");
+            Assert.That(secondPublishedRow.Published, Is.True, "the second-publish row must be the currently published version");
+            Assert.That(secondPublishedContentVersion.Current, Is.False);
+            Assert.That(thirdDraftRow.Published, Is.False, "a brand new draft row must exist and not be published");
+            Assert.That(thirdDraftContentVersion.Current, Is.True);
+            Assert.That(secondPublishedVersionId, Is.Not.EqualTo(thirdDraftVersionId));
+        });
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_Unpublish_SetsPublishedFalseNoNewVersionRow()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Unpublish Page", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        content.PublishedState = PublishedState.Publishing;
+        await repository.SaveAsync(content, CancellationToken.None);
+        int nodeId = content.Id;
+
+        int rowCountAfterPublish = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.CountAsync(contentVersion => contentVersion.NodeId == nodeId));
+
+        content.PublishedState = PublishedState.Unpublishing;
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        int rowCountAfterUnpublish = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.CountAsync(contentVersion => contentVersion.NodeId == nodeId));
+
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result!.Published, Is.False);
+            Assert.That(rowCountAfterUnpublish, Is.EqualTo(rowCountAfterPublish),
+                "unpublishing must not create a new ContentVersion/DocumentVersion row pair");
+        });
     }
 }
