@@ -35,6 +35,15 @@ import type {
 	UmbWorkspaceActionExecutionOptions,
 } from '@umbraco-cms/backoffice/workspace';
 
+interface UmbDocumentPublishWithDescendantsArgs {
+	workspaceContext: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
+	unique: string;
+	entityType: string;
+	variantIds: Array<UmbVariantId>;
+	saveData: UmbDocumentDetailModel;
+	includeUnpublishedDescendants: boolean;
+}
+
 export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implements UmbPublishableWorkspaceContext {
 	/**
 	 * Manages the pending changes for the published document.
@@ -294,25 +303,21 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		return workspaceContext.validateVariantsAndSubmit(
 			variantIds,
-			() => this.#performPublishWithDescendants(variantIds, saveData, result.includeUnpublishedDescendants ?? false),
+			() =>
+				this.#performPublishWithDescendants({
+					workspaceContext,
+					unique,
+					entityType,
+					variantIds,
+					saveData,
+					includeUnpublishedDescendants: result.includeUnpublishedDescendants ?? false,
+				}),
 			(reason?: unknown) => this.#saveWithoutPublishing(variantIds, saveData, reason),
 		);
 	}
 
-	async #performPublishWithDescendants(
-		variantIds: Array<UmbVariantId>,
-		saveData: UmbDocumentDetailModel,
-		includeUnpublishedDescendants: boolean,
-	): Promise<void> {
-		const workspaceContext = this.#documentWorkspaceContext;
-		if (!workspaceContext) throw new Error('Document workspace context is missing');
-
-		const unique = workspaceContext.getUnique();
-		if (!unique) throw new Error('Unique is missing');
-
-		const entityType = workspaceContext.getEntityType();
-		if (!entityType) throw new Error('Entity type is missing');
-
+	async #performPublishWithDescendants(args: UmbDocumentPublishWithDescendantsArgs): Promise<void> {
+		const { workspaceContext, unique, entityType, variantIds } = args;
 		const primaryVariantName = workspaceContext.getName(variantIds[0]) ?? '';
 
 		const waitNotice = this.#notificationContext?.peek('warning', {
@@ -322,40 +327,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			},
 		});
 
-		// The publish already succeeded server-side once we reach the read-back; a failed read-back must
-		// not be reported as a publish failure, so we fall back to the submitted data.
-		let reloadAfterPublishFailed = false;
-		const loadAfterPublish = async (): Promise<UmbDocumentDetailModel> => {
-			try {
-				return await workspaceContext.loadWithoutPersist();
-			} catch {
-				reloadAfterPublishFailed = true;
-				return saveData;
-			}
-		};
-
+		let readBackFailed: boolean;
 		try {
-			// Saving through performCreateOrUpdate merges the server response into the selected variants
-			// only, so edits in variants that were not published stay dirty rather than being discarded.
-			await workspaceContext.performCreateOrUpdate(variantIds, saveData, {
-				update: async (data, ids) => {
-					const { error: saveError } = await this.#detailRepository.save(data);
-					if (saveError) {
-						throw new Error('Error saving document', { cause: saveError });
-					}
-
-					const { error } = await this.#publishingRepository.publishWithDescendants(
-						unique,
-						ids,
-						includeUnpublishedDescendants,
-					);
-					if (error) {
-						throw new Error('Error publishing document with descendants', { cause: error });
-					}
-
-					return loadAfterPublish();
-				},
-			});
+			readBackFailed = await this.#saveAndPublishDescendants(args);
 		} catch (error) {
 			// The save may have succeeded, so the operation must not resolve as if it published. [JOV]
 			this.#notificationContext?.peek('danger', {
@@ -372,7 +346,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			},
 		});
 
-		if (reloadAfterPublishFailed) {
+		if (readBackFailed) {
 			this.#notificationContext?.peek('warning', {
 				data: { message: this.#localize.term('speechBubbles_editContentPublishedReloadFailed') },
 			});
@@ -380,13 +354,51 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		await this.#loadAndProcessLastPublished();
 
-		// request reload of this entity
-		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-		this.#eventContext?.dispatchEvent(structureEvent);
+		this.#eventContext?.dispatchEvent(new UmbRequestReloadStructureForEntityEvent({ entityType, unique }));
+		this.#eventContext?.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique }));
+	}
 
-		// request reload of the children
-		const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
-		this.#eventContext?.dispatchEvent(childrenEvent);
+	/**
+	 * Saves the selected variants and publishes them with their descendants, merging the server response
+	 * into those variants only so that edits elsewhere in the document survive.
+	 * @returns {Promise<boolean>} whether reading the document back after publishing failed
+	 */
+	async #saveAndPublishDescendants(args: UmbDocumentPublishWithDescendantsArgs): Promise<boolean> {
+		const { workspaceContext, unique, variantIds, saveData, includeUnpublishedDescendants } = args;
+
+		// The publish already succeeded server-side once we reach the read-back; a failed read-back must
+		// not be reported as a publish failure, so we fall back to the submitted data.
+		let readBackFailed = false;
+		const loadAfterPublish = async (): Promise<UmbDocumentDetailModel> => {
+			try {
+				return await workspaceContext.loadWithoutPersist();
+			} catch {
+				readBackFailed = true;
+				return saveData;
+			}
+		};
+
+		await workspaceContext.performCreateOrUpdate(variantIds, saveData, {
+			update: async (data, ids) => {
+				const { error: saveError } = await this.#detailRepository.save(data);
+				if (saveError) {
+					throw new Error('Error saving document', { cause: saveError });
+				}
+
+				const { error } = await this.#publishingRepository.publishWithDescendants(
+					unique,
+					ids,
+					includeUnpublishedDescendants,
+				);
+				if (error) {
+					throw new Error('Error publishing document with descendants', { cause: error });
+				}
+
+				return loadAfterPublish();
+			},
+		});
+
+		return readBackFailed;
 	}
 
 	/**
