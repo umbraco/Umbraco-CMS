@@ -1,6 +1,13 @@
 import { UmbInputTiptapElement } from './input-tiptap.element.js';
-import { expect, fixture, html, oneEvent } from '@open-wc/testing';
+import { manifests as tiptapManifests } from '../../umbraco-package.js';
+import { expect, fixture, html, oneEvent, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import type { UmbServerContext } from '@umbraco-cms/backoffice/server';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	UMB_INTERACTION_MEMORY_SCOPE_CONTEXT,
 	UmbInteractionMemoriesChangeEvent,
@@ -10,10 +17,8 @@ describe('UmbInputTiptapElement (standalone)', () => {
 	// Proves that `<umb-input-tiptap>` is usable on its own — i.e. not gated on being
 	// rendered inside `<umb-property-editor-ui-tiptap>`. We deliberately don't mount
 	// the element here: mounting it spins up an `UmbTiptapRteContext` that consumes
-	// `UMB_SERVER_CONTEXT` (not provided in unit tests), and the pending context
-	// request would surface as an unhandled rejection after the fixture tears down.
-	// The visual end-to-end load path is covered by the Storybook stories instead;
-	// this just nails down the contract that standalone consumers depend on.
+	// `UMB_SERVER_CONTEXT`, so a mounted test has to provide a stub — see the
+	// 'stylesheets' suite below for that setup.
 
 	it('exports the element class so a standalone consumer can import it', () => {
 		expect(UmbInputTiptapElement).to.be.a('function');
@@ -21,6 +26,69 @@ describe('UmbInputTiptapElement (standalone)', () => {
 
 	it('registers the `umb-input-tiptap` custom element at module load time', () => {
 		expect(customElements.get('umb-input-tiptap')).to.equal(UmbInputTiptapElement);
+	});
+});
+
+describe('UmbInputTiptapElement (stylesheets)', () => {
+	// Regression coverage for #21819: a minimal extension configuration (no extension
+	// contributes `getStyles()`) must still load the configured stylesheets, not just
+	// Umbraco's own base RTE stylesheet. This is specifically a render-path bug —
+	// `#renderStyles()` used to early-return when no extension contributed `getStyles()`,
+	// so the `<link>` elements were never emitted at all — so it needs a real mounted
+	// element with a minimal extension set to catch it. The stylesheet href resolution
+	// itself (root path prefixing, server origin, protocol-relative/absolute URLs) is a
+	// pure string transform covered without mounting anything in
+	// `resolve-stylesheet-href.function.test.ts`, and the root-path fallback is covered
+	// in `tiptap-rte.context.test.ts`.
+	//
+	// The mount pays for a cold dynamic import of the shared `extension-apis.bundle` chunk
+	// (Tiptap core + 50+ extension APIs), which can take several seconds to transform on an
+	// uncached test run — hence the generous timeout.
+
+	let provider: UmbContextProvider;
+
+	before(() => {
+		umbExtensionsRegistry.registerMany(tiptapManifests);
+	});
+
+	after(() => {
+		umbExtensionsRegistry.unregisterMany(tiptapManifests.map((manifest) => manifest.alias));
+	});
+
+	afterEach(() => {
+		provider?.hostDisconnected();
+	});
+
+	it('loads the configured stylesheet alongside the base RTE stylesheet, even when no enabled extension contributes styles', async function () {
+		this.timeout(20000);
+
+		const stub = {
+			getHostElement: () => document.body,
+			getServerUrl: () => '',
+			getServerConnection: () => ({ umbracoCssPath: of('/mycss') }),
+		} as unknown as UmbServerContext;
+		provider = new UmbContextProvider(document.body, UMB_SERVER_CONTEXT, stub);
+		provider.hostConnected();
+
+		const config = new UmbPropertyEditorConfigCollection([
+			{ alias: 'extensions', value: ['Umb.Tiptap.Bold', 'Umb.Tiptap.Italic'] },
+			{ alias: 'stylesheets', value: ['/rte-test.css'] },
+		]);
+
+		const element = await fixture<UmbInputTiptapElement>(html`
+			<umb-input-tiptap .label=${'Rich Text Editor'} .configuration=${config}></umb-input-tiptap>
+		`);
+
+		await waitUntil(() => !!element.shadowRoot?.querySelector('#editor[data-loaded]'), 'editor did not finish loading', {
+			timeout: 15000,
+		});
+
+		const hrefs = Array.from(element.shadowRoot!.querySelectorAll('link[rel="stylesheet"]')).map((link) =>
+			link.getAttribute('href'),
+		);
+
+		expect(hrefs).to.include('/umbraco/backoffice/css/rte-content.css');
+		expect(hrefs).to.include(`${window.location.origin}/mycss/rte-test.css`);
 	});
 });
 

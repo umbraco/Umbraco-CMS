@@ -6,6 +6,7 @@ import type {
 	UmbLinkPickerModalValue,
 } from './link-picker-modal.token.js';
 import { css, customElement, html, nothing, query, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import {
 	umbBindToValidation,
 	UmbObserveValidationStateController,
@@ -431,7 +432,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,
-			content: `#defaultdialogs_confirmremove ${name}?`,
+			content: this.localize.term('defaultdialogs_confirmRemoveItem', escapeHTML(name)),
 			confirmLabel: '#actions_remove',
 		});
 
