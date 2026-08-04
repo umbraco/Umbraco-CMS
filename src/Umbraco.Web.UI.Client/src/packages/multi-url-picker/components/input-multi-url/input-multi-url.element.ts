@@ -164,6 +164,12 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	@property({ type: String })
 	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
 
+	/**
+	 * The memories held by the link picker modal opened from this input, e.g. the last-used media
+	 * folder. Bridged from the interaction-memory scope this input provides.
+	 * @type {(Array<UmbInteractionMemoryModel> | undefined)}
+	 * @attr
+	 */
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
 		return this.#interactionMemoryBridge.getMemories();

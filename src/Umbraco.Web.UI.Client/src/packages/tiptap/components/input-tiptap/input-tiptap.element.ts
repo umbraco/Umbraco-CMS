@@ -38,9 +38,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	// Holds what the modals opened from this input remember between opens. They are rendered in the
 	// modal portal, not as descendants of this element, so context is the only channel that reaches
 	// them; upwards it is a property and an `interaction-memories-change` event.
-	#interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
-	#interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(this, this.#interactionMemoryScope.memory);
+	readonly #interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
+	readonly #interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(this, this.#interactionMemoryScope.memory);
 
+	/**
+	 * The memories held by the modals opened from this input, e.g. the last-used folder in a media
+	 * picker opened from the RTE toolbar. Bridged from the interaction-memory scope this input provides.
+	 * @type {(Array<UmbInteractionMemoryModel> | undefined)}
+	 * @attr
+	 */
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
 		return this.#interactionMemoryBridge.getMemories();

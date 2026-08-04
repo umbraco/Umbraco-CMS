@@ -26,7 +26,7 @@ describe('UmbInputMultiUrlElement', () => {
 
 		it('provides itself as the interaction-memory scope for its modals', async () => {
 			const scope = (await element.getContext(UMB_INTERACTION_MEMORY_SCOPE_CONTEXT))?.memory;
-			expect(scope).to.not.be.undefined;
+			expect(scope).to.not.equal(undefined);
 		});
 
 		it('makes memories set on the property reachable through the scope', async () => {
@@ -39,7 +39,7 @@ describe('UmbInputMultiUrlElement', () => {
 			const scope = (await element.getContext(UMB_INTERACTION_MEMORY_SCOPE_CONTEXT))?.memory;
 			element.interactionMemories = [memory];
 			element.interactionMemories = [];
-			expect(scope!.getMemory('UmbLinkPickerModal')).to.be.undefined;
+			expect(scope!.getMemory('UmbLinkPickerModal')).to.equal(undefined);
 		});
 
 		it('dispatches interaction-memories-change and exposes the memory when the scope is written to', async () => {
@@ -56,7 +56,7 @@ describe('UmbInputMultiUrlElement', () => {
 			element.addEventListener(UmbInteractionMemoriesChangeEvent.TYPE, () => (dispatched = true));
 			element.interactionMemories = [memory];
 			await new Promise((resolve) => setTimeout(resolve, 10));
-			expect(dispatched).to.be.false;
+			expect(dispatched).to.equal(false);
 		});
 	});
 });

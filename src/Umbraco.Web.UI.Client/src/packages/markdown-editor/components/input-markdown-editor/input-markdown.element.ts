@@ -49,6 +49,13 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 	#interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
 	#interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(this, this.#interactionMemoryScope.memory);
 
+	/**
+	 * The memories held by the modals opened from this input, e.g. the last-used folder in a media
+	 * picker opened from the markdown editor's toolbar. Bridged from the interaction-memory scope this
+	 * input provides.
+	 * @type {(Array<UmbInteractionMemoryModel> | undefined)}
+	 * @attr
+	 */
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
 		return this.#interactionMemoryBridge.getMemories();

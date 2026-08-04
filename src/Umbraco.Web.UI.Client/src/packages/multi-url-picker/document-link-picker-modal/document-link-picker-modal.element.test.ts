@@ -113,13 +113,13 @@ describe('UmbDocumentLinkPickerModalElement', () => {
 			Object.defineProperty(tree, 'interactionMemories', { value: [{ unique: 'a' }], configurable: true });
 			tree.dispatchEvent(new CustomEvent('interaction-memories-change', { bubbles: true }));
 			await tick();
-			expect(host.scope.getMemory(MODAL_MEMORY_UNIQUE)).to.not.be.undefined;
+			expect(host.scope.getMemory(MODAL_MEMORY_UNIQUE)).to.not.equal(undefined);
 
 			Object.defineProperty(tree, 'interactionMemories', { value: [], configurable: true });
 			tree.dispatchEvent(new CustomEvent('interaction-memories-change', { bubbles: true }));
 			await tick();
 
-			expect(host.scope.getMemory(MODAL_MEMORY_UNIQUE)).to.be.undefined;
+			expect(host.scope.getMemory(MODAL_MEMORY_UNIQUE)).to.equal(undefined);
 		});
 
 		it('restores the tree expansion from the scope and hands it to the tree', async () => {

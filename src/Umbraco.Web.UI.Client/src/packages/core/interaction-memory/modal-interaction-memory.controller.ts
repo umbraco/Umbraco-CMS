@@ -33,11 +33,17 @@ export interface UmbModalInteractionMemoryControllerArgs {
  * @augments {UmbControllerBase}
  */
 export class UmbModalInteractionMemoryController extends UmbControllerBase {
-	#memoryArg: UmbInteractionMemoryManager | (() => UmbInteractionMemoryManager);
+	readonly #memoryArg: UmbInteractionMemoryManager | (() => UmbInteractionMemoryManager);
 	#memory?: UmbInteractionMemoryManager;
-	#unique: string | (() => string | undefined);
+	readonly #unique: string | (() => string | undefined);
 	#scope?: UmbInteractionMemoryManager;
 
+	/**
+	 * Creates an instance of UmbModalInteractionMemoryController.
+	 * @param {UmbControllerHost} host - The modal element to bridge.
+	 * @param {UmbModalInteractionMemoryControllerArgs} args - The manager to bridge and the key to publish it under.
+	 * @memberof UmbModalInteractionMemoryController
+	 */
 	constructor(host: UmbControllerHost, args: UmbModalInteractionMemoryControllerArgs) {
 		super(host);
 
@@ -81,6 +87,11 @@ export class UmbModalInteractionMemoryController extends UmbControllerBase {
 		return typeof this.#unique === 'function' ? this.#unique() : this.#unique;
 	}
 
+	// Reads `unique` once, at the point the scope resolves — deliberately not deferred (see the
+	// `hostConnected` comment above). This relies on `unique` already being resolvable by then, which
+	// holds for every current caller: a function-valued `unique` reads state (e.g. `manifest.alias`)
+	// that is assigned before the modal element connects, never after. A caller that can only supply
+	// `unique` after connecting is not supported by this controller.
 	#observeScope() {
 		const unique = this.#getUnique();
 		this.observe(
