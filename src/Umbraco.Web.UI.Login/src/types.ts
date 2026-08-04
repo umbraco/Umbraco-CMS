@@ -39,24 +39,3 @@ export type ValidateInviteCodeResponse = {
 };
 
 export type { PasswordConfigurationModel };
-
-// TODO (V18): Remove together with isProblemDetails(). Kept here because it was deprecated in V16,
-// so the earliest removal is V18 — it is already gone on main.
-/**
- * @deprecated Use `UmbProblemDetails` from `@umbraco-cms/backoffice/resources` instead.
- */
-export type UmbProblemDetails = {
-	type?: string | null;
-	title?: string | null;
-	status?: number | null;
-	detail?: string | null;
-	instance?: string | null;
-	[key: string]:
-		| unknown
-		| (string | null)
-		| (string | null)
-		| (number | null)
-		| (string | null)
-		| (string | null)
-		| undefined;
-};

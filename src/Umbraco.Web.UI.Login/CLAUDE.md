@@ -81,7 +81,6 @@ Umbraco.Web.UI.Login/
 │   │   │   └── backoffice.handlers.ts
 │   │   └── data/login.data.ts
 │   ├── utils/
-│   │   ├── is-problem-details.function.ts   # deprecated, removed in V18
 │   │   └── load-custom-view.function.ts
 │   ├── auth.element.ts               # Main <umb-auth> component
 │   ├── types.ts                      # Type definitions
