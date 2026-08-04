@@ -295,21 +295,25 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					},
 				});
 
-				let error;
 				try {
 					// Save the document before publishing it and its descendants
 					await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 
-					({ error } = await this.#publishingRepository.publishWithDescendants(
+					const { error } = await this.#publishingRepository.publishWithDescendants(
 						unique,
 						variantIds,
 						result.includeUnpublishedDescendants ?? false,
-					));
+					);
+					if (error) throw error;
+				} catch (error) {
+					// The save may have succeeded, so the operation must not resolve as if it published. [JOV]
+					this.#notificationContext?.peek('danger', {
+						data: { message: this.#localize.term('speechBubbles_editContentPublishedFailed') },
+					});
+					return Promise.reject(error);
 				} finally {
 					waitNotice?.close();
 				}
-
-				if (error) return;
 
 				this.#notificationContext?.peek('positive', {
 					data: {
@@ -347,7 +351,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	}
 
 	/**
-	 * Unpublish the document
+	 * Unpublish the document, asking to discard any unsaved changes first
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */

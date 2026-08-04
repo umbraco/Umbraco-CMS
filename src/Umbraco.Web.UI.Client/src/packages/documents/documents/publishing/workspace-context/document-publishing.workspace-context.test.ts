@@ -9,6 +9,7 @@ import {
 	UmbTestDocumentWorkspaceHostElement,
 } from '../../workspace/context/document-workspace-context.test-utils.js';
 import { UMB_DISCARD_CHANGES_MODAL, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UmbDocumentPublishingServerDataSource } from '../repository/document-publishing.server.data-source.js';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
@@ -37,6 +38,26 @@ async function recordOpenedModals(run: () => Promise<unknown>): Promise<Array<st
 	}
 
 	return aliases;
+}
+
+/**
+ * Counts calls to the publish-with-descendants endpoint while `run` executes.
+ */
+async function countPublishWithDescendantsCalls(run: () => Promise<unknown>): Promise<number> {
+	let calls = 0;
+	const originalPublish = UmbDocumentPublishingServerDataSource.prototype.publishWithDescendants;
+	UmbDocumentPublishingServerDataSource.prototype.publishWithDescendants = function (...args) {
+		calls++;
+		return originalPublish.apply(this, args as never);
+	};
+
+	try {
+		await run();
+	} finally {
+		UmbDocumentPublishingServerDataSource.prototype.publishWithDescendants = originalPublish;
+	}
+
+	return calls;
 }
 
 describe('UmbDocumentPublishingWorkspaceContext', () => {
@@ -92,6 +113,20 @@ describe('UmbDocumentPublishingWorkspaceContext', () => {
 			await publishingContext.publishWithDescendants();
 
 			expect(context.getName(EN_US)).to.equal('Renamed root');
+		});
+
+		// Saving first means the save's mandatory validation now gates the whole operation.
+		it('publishes nothing when the document fails mandatory validation', async () => {
+			await context.setName('', EN_US);
+
+			const publishCalls = await countPublishWithDescendantsCalls(() =>
+				publishingContext.publishWithDescendants().then(
+					() => undefined,
+					() => undefined,
+				),
+			);
+
+			expect(publishCalls, 'descendants were not published').to.equal(0);
 		});
 	});
 
