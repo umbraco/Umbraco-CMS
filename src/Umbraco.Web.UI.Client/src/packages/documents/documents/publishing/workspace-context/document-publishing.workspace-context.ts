@@ -295,7 +295,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		} catch (error) {
 			// This throws before the submit flow starts, so nothing downstream tells the user why. [JOV]
 			this.#notify('danger', 'speechBubbles_editContentPublishedFailedByValidation');
-			return Promise.reject(error);
+			throw error;
 		}
 
 		await workspaceContext.askServerToValidate(saveData, variantIds);
@@ -332,7 +332,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		} catch (error) {
 			// The save may have succeeded, so the operation must not resolve as if it published. [JOV]
 			this.#notify('danger', 'speechBubbles_editContentPublishedFailed');
-			return Promise.reject(error);
+			throw error;
 		} finally {
 			waitNotice?.close();
 		}
@@ -413,7 +413,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 		// TODO: Get rid of the save notification.
 		this.#notify('danger', 'speechBubbles_editContentPublishedFailedByValidation');
-		return Promise.reject(reason);
+		throw reason;
 	}
 
 	/**
