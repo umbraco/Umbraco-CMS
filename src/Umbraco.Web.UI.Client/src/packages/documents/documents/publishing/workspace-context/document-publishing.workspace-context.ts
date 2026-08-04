@@ -294,89 +294,118 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		return workspaceContext.validateVariantsAndSubmit(
 			variantIds,
-			async () => {
-				const primaryVariantName = workspaceContext.getName(variantIds[0]) ?? '';
-
-				const waitNotice = this.#notificationContext?.peek('warning', {
-					data: {
-						headline: this.#localize.term('publish_publishAll', primaryVariantName),
-						message: this.#localize.term('publish_inProgress'),
-					},
-				});
-
-				// The publish already succeeded server-side once we reach the read-back; a failed read-back must
-				// not be reported as a publish failure, so we fall back to the submitted data.
-				let reloadAfterPublishFailed = false;
-
-				try {
-					// Saving through performCreateOrUpdate merges the server response into the selected variants
-					// only, so edits in variants that were not published stay dirty rather than being discarded.
-					await workspaceContext.performCreateOrUpdate(variantIds, saveData, {
-						update: async (data, ids) => {
-							const { data: saved, error: saveError } = await this.#detailRepository.save(data);
-							if (!saved || saveError) {
-								throw new Error('Error saving document', { cause: saveError });
-							}
-
-							const { error } = await this.#publishingRepository.publishWithDescendants(
-								unique,
-								ids,
-								result.includeUnpublishedDescendants ?? false,
-							);
-							if (error) {
-								throw new Error('Error publishing document with descendants', { cause: error });
-							}
-
-							try {
-								return await workspaceContext.loadWithoutPersist();
-							} catch {
-								reloadAfterPublishFailed = true;
-								return data;
-							}
-						},
-					});
-				} catch (error) {
-					// The save may have succeeded, so the operation must not resolve as if it published. [JOV]
-					this.#notificationContext?.peek('danger', {
-						data: { message: this.#localize.term('speechBubbles_editContentPublishedFailed') },
-					});
-					return Promise.reject(error);
-				} finally {
-					waitNotice?.close();
-				}
-
-				this.#notificationContext?.peek('positive', {
-					data: {
-						message: this.#localize.term('publish_nodePublishAll', primaryVariantName),
-					},
-				});
-
-				if (reloadAfterPublishFailed) {
-					this.#notificationContext?.peek('warning', {
-						data: { message: this.#localize.term('speechBubbles_editContentPublishedReloadFailed') },
-					});
-				}
-
-				await this.#loadAndProcessLastPublished();
-
-				// request reload of this entity
-				const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-				this.#eventContext?.dispatchEvent(structureEvent);
-
-				// request reload of the children
-				const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
-				this.#eventContext?.dispatchEvent(childrenEvent);
-			},
-			async (reason?: unknown) => {
-				// If data of the selection is not valid, then just save:
-				await workspaceContext.performCreateOrUpdate(variantIds, saveData);
-				this.#notificationContext?.peek('danger', {
-					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
-				});
-				// Reject even though the save was successful, as we did not publish. [NL]
-				return Promise.reject(reason);
-			},
+			() => this.#performPublishWithDescendants(variantIds, saveData, result.includeUnpublishedDescendants ?? false),
+			(reason?: unknown) => this.#saveWithoutPublishing(variantIds, saveData, reason),
 		);
+	}
+
+	async #performPublishWithDescendants(
+		variantIds: Array<UmbVariantId>,
+		saveData: UmbDocumentDetailModel,
+		includeUnpublishedDescendants: boolean,
+	): Promise<void> {
+		const workspaceContext = this.#documentWorkspaceContext;
+		if (!workspaceContext) throw new Error('Document workspace context is missing');
+
+		const unique = workspaceContext.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		const entityType = workspaceContext.getEntityType();
+		if (!entityType) throw new Error('Entity type is missing');
+
+		const primaryVariantName = workspaceContext.getName(variantIds[0]) ?? '';
+
+		const waitNotice = this.#notificationContext?.peek('warning', {
+			data: {
+				headline: this.#localize.term('publish_publishAll', primaryVariantName),
+				message: this.#localize.term('publish_inProgress'),
+			},
+		});
+
+		// The publish already succeeded server-side once we reach the read-back; a failed read-back must
+		// not be reported as a publish failure, so we fall back to the submitted data.
+		let reloadAfterPublishFailed = false;
+		const loadAfterPublish = async (): Promise<UmbDocumentDetailModel> => {
+			try {
+				return await workspaceContext.loadWithoutPersist();
+			} catch {
+				reloadAfterPublishFailed = true;
+				return saveData;
+			}
+		};
+
+		try {
+			// Saving through performCreateOrUpdate merges the server response into the selected variants
+			// only, so edits in variants that were not published stay dirty rather than being discarded.
+			await workspaceContext.performCreateOrUpdate(variantIds, saveData, {
+				update: async (data, ids) => {
+					const { error: saveError } = await this.#detailRepository.save(data);
+					if (saveError) {
+						throw new Error('Error saving document', { cause: saveError });
+					}
+
+					const { error } = await this.#publishingRepository.publishWithDescendants(
+						unique,
+						ids,
+						includeUnpublishedDescendants,
+					);
+					if (error) {
+						throw new Error('Error publishing document with descendants', { cause: error });
+					}
+
+					return loadAfterPublish();
+				},
+			});
+		} catch (error) {
+			// The save may have succeeded, so the operation must not resolve as if it published. [JOV]
+			this.#notificationContext?.peek('danger', {
+				data: { message: this.#localize.term('speechBubbles_editContentPublishedFailed') },
+			});
+			return Promise.reject(error);
+		} finally {
+			waitNotice?.close();
+		}
+
+		this.#notificationContext?.peek('positive', {
+			data: {
+				message: this.#localize.term('publish_nodePublishAll', primaryVariantName),
+			},
+		});
+
+		if (reloadAfterPublishFailed) {
+			this.#notificationContext?.peek('warning', {
+				data: { message: this.#localize.term('speechBubbles_editContentPublishedReloadFailed') },
+			});
+		}
+
+		await this.#loadAndProcessLastPublished();
+
+		// request reload of this entity
+		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+		this.#eventContext?.dispatchEvent(structureEvent);
+
+		// request reload of the children
+		const childrenEvent = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
+		this.#eventContext?.dispatchEvent(childrenEvent);
+	}
+
+	/**
+	 * Save the selected variants without publishing them, for when validation rejects the publish.
+	 * Rejects even though the save succeeded, to symbolize that we did not publish. [NL]
+	 */
+	async #saveWithoutPublishing(
+		variantIds: Array<UmbVariantId>,
+		saveData: UmbDocumentDetailModel,
+		reason?: unknown,
+	): Promise<void> {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+		// TODO: Get rid of the save notification.
+		this.#notificationContext?.peek('danger', {
+			data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
+		});
+		return Promise.reject(reason);
 	}
 
 	/**
@@ -471,21 +500,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					return Promise.reject(error);
 				});
 			},
-			async (reason?: any) => {
-				// If data of the selection is not valid Then just save:
-				await this.#documentWorkspaceContext!.performCreateOrUpdate(variantIds, saveData);
-				// Notifying that the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-				if (!notificationContext) {
-					throw new Error('Notification context is missing');
-				}
-				// TODO: Get rid of the save notification.
-				notificationContext.peek('danger', {
-					data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
-				});
-				// Reject even thought the save was successful, but we did not publish, which is what we want to symbolize here. [NL]
-				return await Promise.reject(reason);
-			},
+			(reason?: unknown) => this.#saveWithoutPublishing(variantIds, saveData, reason),
 		);
 	}
 
