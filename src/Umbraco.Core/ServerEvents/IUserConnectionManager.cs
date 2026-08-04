@@ -12,17 +12,36 @@ public interface IUserConnectionManager
     /// <returns>The users connections.</returns>
     ISet<string> GetConnections(Guid userKey);
 
+    // TODO (V19): Remove this default implementation and make the member required.
     /// <summary>
-    /// Gets a snapshot of every tracked user connection, keyed by user.
+    /// Records the event sources a user is authorized for, as determined at connect time. This is the
+    /// authorization consulted when routing entity-scoped events by connection id (as opposed to the
+    /// SignalR group broadcast).
     /// </summary>
-    /// <returns>A snapshot mapping each user key to their current connection ids.</returns>
+    /// <param name="userKey">The key of the user.</param>
+    /// <param name="eventSources">The event sources the user is authorized for.</param>
     /// <remarks>
-    /// Returning an empty snapshot here would masquerade as "no users connected" and silently drop
+    /// The default is a no-op so a custom implementation that does not track this still connects; such
+    /// an implementation must also override <see cref="GetConnectionsAuthorizedFor"/> for entity-scoped
+    /// events to be delivered.
+    /// </remarks>
+    void SetAuthorizedEventSources(Guid userKey, IEnumerable<string> eventSources)
+    {
+    }
+
+    // TODO (V19): Remove this default implementation and make the member required.
+    /// <summary>
+    /// Gets the connections whose user is authorized for the given event source, keyed by user.
+    /// </summary>
+    /// <param name="eventSource">The event source to filter by.</param>
+    /// <returns>A snapshot mapping each authorized user's key to their current connection ids.</returns>
+    /// <remarks>
+    /// Returning an empty snapshot here would masquerade as "nobody authorized" and silently drop
     /// entity-scoped server events, so this default throws instead — implementations of
     /// <see cref="IUserConnectionManager"/> must override it.
     /// </remarks>
-    IReadOnlyDictionary<Guid, IReadOnlyCollection<string>> GetAllConnections()
-        => throw new NotImplementedException($"Implementations of {nameof(IUserConnectionManager)} must override {nameof(GetAllConnections)}.");
+    IReadOnlyDictionary<Guid, IReadOnlyCollection<string>> GetConnectionsAuthorizedFor(string eventSource)
+        => throw new NotImplementedException($"Implementations of {nameof(IUserConnectionManager)} must override {nameof(GetConnectionsAuthorizedFor)}.");
 
     /// <summary>
     /// Add a connection to a user.

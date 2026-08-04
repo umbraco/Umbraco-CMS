@@ -16,7 +16,7 @@ internal sealed class ServerEventEntityAccessService : IServerEventEntityAccessS
     /// Initializes a new instance of the <see cref="ServerEventEntityAccessService"/> class.
     /// </summary>
     /// <param name="userConnectionManager">Tracks the currently connected users and their connection ids.</param>
-    /// <param name="userService">Resolves the <see cref="Umbraco.Cms.Core.Models.Membership.IUser"/> for a connected user's key.</param>
+    /// <param name="userService">Resolves the <see cref="IUser"/> for a connected user's key.</param>
     /// <param name="filters">The registered entity access filters that decide, per source, whether a user may receive an event.</param>
     public ServerEventEntityAccessService(
         IUserConnectionManager userConnectionManager,
@@ -42,13 +42,16 @@ internal sealed class ServerEventEntityAccessService : IServerEventEntityAccessS
             return [];
         }
 
-        IReadOnlyDictionary<Guid, IReadOnlyCollection<string>> connectionsByUser = _userConnectionManager.GetAllConnections();
+        // Only consider connections whose user is authorized for this source (the connect-time
+        // authorization that per-connection routing, unlike a group broadcast, does not enforce itself).
+        IReadOnlyDictionary<Guid, IReadOnlyCollection<string>> connectionsByUser =
+            _userConnectionManager.GetConnectionsAuthorizedFor(eventSource);
         if (connectionsByUser.Count == 0)
         {
             return [];
         }
 
-        // Resolve all connected users in a single (cache-backed) call rather than one per user.
+        // Resolve the candidate users in a single (cache-backed) call.
         IEnumerable<IUser> users = await _userService.GetAsync(connectionsByUser.Keys);
 
         List<string> authorizedConnections = [];

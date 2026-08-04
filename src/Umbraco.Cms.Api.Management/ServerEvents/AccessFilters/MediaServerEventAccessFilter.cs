@@ -25,9 +25,6 @@ public sealed class MediaServerEventAccessFilter : EntityStartNodeAccessFilter
     public override IEnumerable<string> FilteredEventSources => [Constants.ServerEvents.EventSource.Media];
 
     /// <inheritdoc />
-    protected override IEnumerable<string> AuthorizingSectionAliases => [Constants.Applications.Media, Constants.Applications.Settings];
-
-    /// <inheritdoc />
     protected override int RecycleBinId => Constants.System.RecycleBinMedia;
 
     /// <inheritdoc />

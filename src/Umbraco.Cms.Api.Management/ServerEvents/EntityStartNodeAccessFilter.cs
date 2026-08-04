@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.ServerEvents;
 
@@ -35,13 +34,6 @@ public abstract class EntityStartNodeAccessFilter : IServerEventEntityAccessFilt
     public abstract IEnumerable<string> FilteredEventSources { get; }
 
     /// <summary>
-    /// Gets the section aliases that authorize a user for this event source. A user must have access
-    /// to at least one of them to receive the event. This re-applies the connect-time event-source
-    /// authorization, which per-connection routing (as opposed to SignalR group broadcast) bypasses.
-    /// </summary>
-    protected abstract IEnumerable<string> AuthorizingSectionAliases { get; }
-
-    /// <summary>
     /// Gets the recycle bin identifier for the entity type being filtered.
     /// </summary>
     protected abstract int RecycleBinId { get; }
@@ -58,13 +50,6 @@ public abstract class EntityStartNodeAccessFilter : IServerEventEntityAccessFilt
     /// <inheritdoc />
     public Task<bool> HasAccessAsync(IUser user, ServerEventRoutingContext context)
     {
-        // The user must be authorized for the source at all (section access), mirroring the
-        // connect-time authorization that per-connection routing no longer enforces.
-        if (user.AllowedSections.ContainsAny(AuthorizingSectionAliases) is false)
-        {
-            return Task.FromResult(false);
-        }
-
         // Start-node access can only be evaluated with a path; without one, fail closed.
         // (Whitespace is treated as missing too, as HasPathAccess throws on a whitespace path.)
         if (string.IsNullOrWhiteSpace(context.EntityPath))

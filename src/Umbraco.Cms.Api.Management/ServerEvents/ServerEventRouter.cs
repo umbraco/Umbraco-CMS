@@ -74,8 +74,7 @@ internal sealed class ServerEventRouter : IServerEventRouter
         }
 
         // Entity-scoped sources are delivered only to the connections the access service authorizes.
-        // The registered filters decide what to gate on (and fail closed when they cannot), so the
-        // router does not inspect the context itself.
+        // The registered filters are responsible for deciding what to gate on.
         try
         {
             IReadOnlyList<string> connections =
