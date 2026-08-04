@@ -17,12 +17,14 @@ export default defineConfig({
 		},
 		{
 			name: '@hey-api/sdk',
-			responseStyle: 'fields',
 			operations: {
 				strategy: 'byTags',
 				container: 'class',
-				containerName: { name: '{{name}}Service', casing: 'PascalCase' }
+				containerName: '{{name}}Service',
+				methods: 'static',
+				nesting: 'operationId',
 			},
+			responseStyle: 'fields',
 		}
 	]
 });

@@ -87,7 +87,7 @@ export class UmbDocumentValidationServerDataSource {
 		// Maybe use: tryExecuteAndNotify
 		const { data, error } = await tryExecute(
 			this.#host,
-			DocumentService.putUmbracoManagementApiV1['1DocumentByIdValidate1'][1]({
+			DocumentService.putDocumentByIdValidate({
 				path: { id: model.unique },
 				body,
 			}),
