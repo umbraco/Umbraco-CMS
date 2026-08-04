@@ -31,6 +31,27 @@ internal sealed class ServerEventEntityAccessService : IServerEventEntityAccessS
     private Dictionary<string, List<IServerEventEntityAccessFilter>> FiltersByEventSource =>
         field ??= GroupFiltersByEventSource();
 
+    private Dictionary<string, List<IServerEventEntityAccessFilter>> GroupFiltersByEventSource()
+    {
+        var grouped = new Dictionary<string, List<IServerEventEntityAccessFilter>>();
+
+        foreach (IServerEventEntityAccessFilter filter in _filters)
+        {
+            foreach (var eventSource in filter.FilteredEventSources)
+            {
+                if (grouped.TryGetValue(eventSource, out List<IServerEventEntityAccessFilter>? filters) is false)
+                {
+                    filters = [];
+                    grouped[eventSource] = filters;
+                }
+
+                filters.Add(filter);
+            }
+        }
+
+        return grouped;
+    }
+
     /// <inheritdoc />
     public bool AppliesTo(string eventSource) => FiltersByEventSource.ContainsKey(eventSource);
 
@@ -94,26 +115,5 @@ internal sealed class ServerEventEntityAccessService : IServerEventEntityAccessS
         }
 
         return true;
-    }
-
-    private Dictionary<string, List<IServerEventEntityAccessFilter>> GroupFiltersByEventSource()
-    {
-        var grouped = new Dictionary<string, List<IServerEventEntityAccessFilter>>();
-
-        foreach (IServerEventEntityAccessFilter filter in _filters)
-        {
-            foreach (var eventSource in filter.FilteredEventSources)
-            {
-                if (grouped.TryGetValue(eventSource, out List<IServerEventEntityAccessFilter>? filters) is false)
-                {
-                    filters = [];
-                    grouped[eventSource] = filters;
-                }
-
-                filters.Add(filter);
-            }
-        }
-
-        return grouped;
     }
 }
