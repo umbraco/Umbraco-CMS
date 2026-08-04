@@ -436,13 +436,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (!entityType) throw new Error('Entity type is missing');
 
 		// Unpublishing reloads the workspace, which discards any unsaved edit, so let the user confirm that.
-		if (this.#documentWorkspaceContext.getHasUnpersistedChanges()) {
-			const discardChanges = await umbOpenModal(this, UMB_DISCARD_CHANGES_MODAL).then(
-				() => true,
-				() => false,
-			);
-			if (!discardChanges) return;
-		}
+		if (!(await this.#confirmDiscardingUnsavedChanges())) return;
 
 		const action = new UmbContentUnpublishEntityAction(this, {
 			unique,
@@ -456,6 +450,19 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
 		await this.#documentWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
+	}
+
+	/**
+	 * Asks whether to discard unsaved changes, for actions that replace the workspace data.
+	 * @returns {Promise<boolean>} false when the user chose to keep their changes
+	 */
+	async #confirmDiscardingUnsavedChanges(): Promise<boolean> {
+		if (!this.#documentWorkspaceContext?.getHasUnpersistedChanges()) return true;
+
+		return umbOpenModal(this, UMB_DISCARD_CHANGES_MODAL).then(
+			() => true,
+			() => false,
+		);
 	}
 
 	async #handleSaveAndPublish(executionOptions?: UmbWorkspaceActionExecutionOptions) {
