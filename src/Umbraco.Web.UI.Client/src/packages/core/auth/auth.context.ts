@@ -359,14 +359,9 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Forces a token refresh against the server (calls `/token`) and returns true if successful.
-	 * Use this when you need to unconditionally refresh — e.g. session timeout keep-alive.
-	 * For per-request token handling, prefer {@link configureClient} which skips the network
-	 * call when the access token is still valid.
-	 * Uses Web Locks to deduplicate concurrent refresh requests across tabs.
 	 * @deprecated Cookie auth has no token to validate — returns {@link getIsAuthorized}. Use {@link keepAlive} to extend the session. Scheduled for removal in Umbraco 21.
 	 * @memberof UmbAuthContext
-	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false
+	 * @returns {Promise<boolean>} Whether a session is currently established.
 	 */
 	async validateToken(): Promise<boolean> {
 		new UmbDeprecation({

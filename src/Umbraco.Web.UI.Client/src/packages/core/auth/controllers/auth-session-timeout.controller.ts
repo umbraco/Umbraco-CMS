@@ -24,7 +24,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		this.#host = host;
 
 		// When the session changes, reschedule the expiry check.
-		// This fires when: initial login, token refresh (this or another tab), BroadcastChannel update.
+		// This fires when: initial login, session renewal (this or another tab), BroadcastChannel update.
 		this.observe(
 			host.session$,
 			(session) => {
