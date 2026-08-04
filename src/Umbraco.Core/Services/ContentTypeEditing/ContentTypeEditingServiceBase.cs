@@ -486,30 +486,24 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     }
 
     /// <summary>
-    ///     Validates that no property alias newly introduced directly on this content type's own properties
-    ///     collides with a property alias already effective on one of its descendants.
+    ///     Validates that no property alias on this content type's own properties collides with a property alias
+    ///     already effective on one of its descendants.
     /// </summary>
     /// <remarks>
-    ///     Descendants inherit this content type's properties (through tree inheritance and/or composition), so a
-    ///     newly introduced alias that a descendant already defines would produce a duplicate effective alias on that
-    ///     descendant. <see cref="ValidateProperties"/> only guards the edited type's own model, so this handles the
-    ///     case where the edited type is itself inherited from or composed by others. Only genuinely new aliases are
-    ///     checked so that pre-existing configurations are never retroactively rejected. Collisions caused by a newly
-    ///     selected composition are caught separately by <see cref="ValidateCompositions"/>.
+    ///     Descendants inherit this content type's properties (through tree inheritance and/or composition), so an
+    ///     alias that a descendant already defines would produce a duplicate effective alias on that descendant.
+    ///     <see cref="ValidateProperties"/> only guards the edited type's own model, so this handles the case where
+    ///     the edited type is itself inherited from or composed by others. Collisions caused by a newly selected
+    ///     composition are caught separately by <see cref="ValidateCompositions"/>.
     /// </remarks>
     private static ContentTypeOperationStatus ValidateDescendantPropertyAliases(
         TContentType? contentType,
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
         IContentTypeComposition[] allContentTypeCompositions)
     {
-        HashSet<string> persistedPropertyAliases = contentType.GetAllPropertyAliases();
         HashSet<string> descendantPropertyAliases = contentType.GetAllDescendantPropertyAliases(allContentTypeCompositions);
 
-        IEnumerable<string> newPropertyAliases = model.Properties
-            .Select(p => p.Alias)
-            .Where(a => persistedPropertyAliases.InvariantContains(a) is false);
-
-        var collidesWithDescendants = newPropertyAliases.Any(descendantPropertyAliases.InvariantContains);
+        var collidesWithDescendants = model.Properties.Select(p => p.Alias).Any(descendantPropertyAliases.InvariantContains);
 
         return collidesWithDescendants
             ? ContentTypeOperationStatus.DuplicatePropertyTypeAlias

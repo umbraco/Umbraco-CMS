@@ -8,29 +8,6 @@ namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
 internal static class ContentTypeEditingHelper
 {
     /// <summary>
-    ///     Gets the property aliases on a <paramref name="contentType"/>: its own properties plus everything it gets
-    ///     from its current compositions and inheritance.
-    /// </summary>
-    /// <param name="contentType">The content type to get the effective property aliases of, or <c>null</c> when there is none yet (e.g. creating a new content type).</param>
-    /// <returns>The property aliases already effective on <paramref name="contentType"/>.</returns>
-    internal static HashSet<string> GetAllPropertyAliases(this IContentTypeComposition? contentType)
-    {
-        if (contentType is null)
-        {
-            return [];
-        }
-
-        return
-        [
-            .. contentType.PropertyTypes
-                .Select(pt => pt.Alias)
-                .Concat(
-                    contentType.ContentTypeComposition.SelectMany(c =>
-                        c.CompositionPropertyTypes.Select(pt => pt.Alias)))
-        ];
-    }
-
-    /// <summary>
     ///     Gets the combined, full effective property alias set (own properties plus everything each one gets from
     ///     its own compositions) of every content type descending from <paramref name="source"/>, across both the
     ///     tree inheritance and composition axes.
