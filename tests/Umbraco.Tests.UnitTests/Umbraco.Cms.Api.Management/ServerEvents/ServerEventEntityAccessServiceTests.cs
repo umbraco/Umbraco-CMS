@@ -30,7 +30,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Cannot_Receive_Document_Event_Outside_Start_Node()
     {
-        IServerEventEntityAccessService sut = CreateSut();
+        ServerEventEntityAccessService sut = CreateSut();
 
         // Node 3 sits under the root but outside the restricted user's "Home" start node.
         IReadOnlyList<string> connections =
@@ -43,7 +43,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Can_Receive_Document_Event_Within_Start_Node()
     {
-        IServerEventEntityAccessService sut = CreateSut();
+        ServerEventEntityAccessService sut = CreateSut();
 
         // Node 4 sits below the restricted user's "Home" start node.
         IReadOnlyList<string> connections =
@@ -56,7 +56,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Cannot_Receive_Media_Event_Outside_Start_Node()
     {
-        IServerEventEntityAccessService sut = CreateSut(mediaStartNodes: true);
+        ServerEventEntityAccessService sut = CreateSut(mediaStartNodes: true);
 
         IReadOnlyList<string> connections =
             await sut.GetAuthorizedConnectionsAsync(Constants.ServerEvents.EventSource.Media, PathContext("-1,3"));
@@ -68,7 +68,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Cannot_Receive_Event_Without_A_Path()
     {
-        IServerEventEntityAccessService sut = CreateSut();
+        ServerEventEntityAccessService sut = CreateSut();
 
         // A document event with no resolvable path must be delivered to nobody, not everybody.
         IReadOnlyList<string> connections =
@@ -80,7 +80,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Cannot_Resolve_Connections_For_Unfiltered_Source()
     {
-        IServerEventEntityAccessService sut = CreateSut();
+        ServerEventEntityAccessService sut = CreateSut();
 
         IReadOnlyList<string> connections =
             await sut.GetAuthorizedConnectionsAsync(Constants.ServerEvents.EventSource.DocumentType, PathContext("-1,3"));
@@ -91,7 +91,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public void Can_Apply_Only_To_Document_And_Media()
     {
-        IServerEventEntityAccessService sut = CreateSut();
+        ServerEventEntityAccessService sut = CreateSut();
 
         Assert.Multiple(() =>
         {
@@ -173,7 +173,7 @@ public class ServerEventEntityAccessServiceTests
 
     // Builds a user scoped to a single content start node and granted the given sections (via a group
     // whose start node matches, so it does not widen access to the root default).
-    private static IUser BuildContentUser(Guid key, int startNode, params string[] sections) =>
+    private static User BuildContentUser(Guid key, int startNode, params string[] sections) =>
         new UserBuilder()
             .WithKey(key)
             .WithStartContentIds(new[] { startNode })
@@ -183,7 +183,7 @@ public class ServerEventEntityAccessServiceTests
             .Done()
             .Build();
 
-    private static IUser BuildMediaUser(Guid key, int startNode, params string[] sections) =>
+    private static User BuildMediaUser(Guid key, int startNode, params string[] sections) =>
         new UserBuilder()
             .WithKey(key)
             .WithStartMediaIds(new[] { startNode })
