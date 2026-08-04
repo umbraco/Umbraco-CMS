@@ -27,6 +27,7 @@ import {
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationColor } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
@@ -293,9 +294,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			await workspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
 		} catch (error) {
 			// This throws before the submit flow starts, so nothing downstream tells the user why. [JOV]
-			this.#notificationContext?.peek('danger', {
-				data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
-			});
+			this.#notify('danger', 'speechBubbles_editContentPublishedFailedByValidation');
 			return Promise.reject(error);
 		}
 
@@ -332,28 +331,27 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			readBackFailed = await this.#saveAndPublishDescendants(args);
 		} catch (error) {
 			// The save may have succeeded, so the operation must not resolve as if it published. [JOV]
-			this.#notificationContext?.peek('danger', {
-				data: { message: this.#localize.term('speechBubbles_editContentPublishedFailed') },
-			});
+			this.#notify('danger', 'speechBubbles_editContentPublishedFailed');
 			return Promise.reject(error);
 		} finally {
 			waitNotice?.close();
 		}
 
-		this.#notificationContext?.peek('positive', {
-			data: {
-				message: this.#localize.term('publish_nodePublishAll', primaryVariantName),
-			},
-		});
-
+		this.#notify('positive', 'publish_nodePublishAll', primaryVariantName);
 		if (readBackFailed) {
-			this.#notificationContext?.peek('warning', {
-				data: { message: this.#localize.term('speechBubbles_editContentPublishedReloadFailed') },
-			});
+			this.#notify('warning', 'speechBubbles_editContentPublishedReloadFailed');
 		}
 
 		await this.#loadAndProcessLastPublished();
+		this.#requestReloadOfEntityAndChildren(unique, entityType);
+	}
 
+	/** Peeks a single-message notification, when a notification context is available. */
+	#notify(color: UmbNotificationColor, messageKey: string, ...args: Array<string>): void {
+		this.#notificationContext?.peek(color, { data: { message: this.#localize.term(messageKey, ...args) } });
+	}
+
+	#requestReloadOfEntityAndChildren(unique: string, entityType: string): void {
 		this.#eventContext?.dispatchEvent(new UmbRequestReloadStructureForEntityEvent({ entityType, unique }));
 		this.#eventContext?.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique }));
 	}
@@ -414,9 +412,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
 		// TODO: Get rid of the save notification.
-		this.#notificationContext?.peek('danger', {
-			data: { message: this.#localize.term('speechBubbles_editContentPublishedFailedByValidation') },
-		});
+		this.#notify('danger', 'speechBubbles_editContentPublishedFailedByValidation');
 		return Promise.reject(reason);
 	}
 
