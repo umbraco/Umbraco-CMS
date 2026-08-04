@@ -19,6 +19,17 @@ internal sealed class UserConnectionManager : IUserConnectionManager
     }
 
     /// <inheritdoc/>
+    public IReadOnlyDictionary<Guid, IReadOnlyCollection<string>> GetAllConnections()
+    {
+        lock (_lock)
+        {
+            return _connections.ToDictionary(
+                pair => pair.Key,
+                pair => (IReadOnlyCollection<string>)pair.Value.ToArray());
+        }
+    }
+
+    /// <inheritdoc/>
     public void AddConnection(Guid userKey, string connectionId)
     {
         lock (_lock)

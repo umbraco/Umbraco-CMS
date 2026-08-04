@@ -15,6 +15,16 @@ public interface IServerEventRouter
     Task RouteEventAsync(ServerEvent serverEvent);
 
     /// <summary>
+    /// Route a server event to the users that have permission to see it, using the supplied routing
+    /// context to gate delivery per recipient (e.g. by start-node access for document and media events).
+    /// </summary>
+    /// <param name="serverEvent">The server event to route.</param>
+    /// <param name="context">Server-side routing context. Not sent to clients.</param>
+    /// <returns></returns>
+    Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context)
+        => RouteEventAsync(serverEvent);
+
+    /// <summary>
     /// Notify a specific user about a server event.
     /// <remarks>Does not consider authorization.</remarks>
     /// </summary>

@@ -139,6 +139,14 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<EventSourceAuthorizerCollectionBuilder>();
 
     /// <summary>
+    ///     Gets the server event entity access filters collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>The <see cref="ServerEventEntityAccessFilterCollectionBuilder" />.</returns>
+    public static ServerEventEntityAccessFilterCollectionBuilder ServerEventEntityAccessFilters(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<ServerEventEntityAccessFilterCollectionBuilder>();
+
+    /// <summary>
     /// Gets the editor validators collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>

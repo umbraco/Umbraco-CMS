@@ -13,6 +13,18 @@ public interface IUserConnectionManager
     ISet<string> GetConnections(Guid userKey);
 
     /// <summary>
+    /// Gets a snapshot of every tracked user connection, keyed by user.
+    /// </summary>
+    /// <returns>A snapshot mapping each user key to their current connection ids.</returns>
+    /// <remarks>
+    /// Returning an empty snapshot here would masquerade as "no users connected" and silently drop
+    /// entity-scoped server events, so this default throws instead — implementations of
+    /// <see cref="IUserConnectionManager"/> must override it.
+    /// </remarks>
+    IReadOnlyDictionary<Guid, IReadOnlyCollection<string>> GetAllConnections()
+        => throw new NotImplementedException($"Implementations of {nameof(IUserConnectionManager)} must override {nameof(GetAllConnections)}.");
+
+    /// <summary>
     /// Add a connection to a user.
     /// </summary>
     /// <param name="userKey">The key of the user to add the connection to.</param>
