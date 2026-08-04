@@ -26,7 +26,11 @@ import '../statusbar/tiptap-statusbar.element.js';
 
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
-const RTE_CONTENT_STYLESHEET = '/umbraco/backoffice/css/rte-content.css';
+/**
+ * The default root path for the stylesheets on the server.
+ * This is used as a fallback if the server configuration is not available.
+ */
+const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
@@ -35,6 +39,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	#hasToolbar = false;
 
 	#hasStatusbar = false;
+
+	#stylesheetRootPath = DEFAULT_STYLESHEET_ROOT_PATH;
 
 	@property({ type: String })
 	override set value(value: string) {
@@ -74,7 +80,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	readonly = false;
 
 	@state()
-	private _stylesheets = new Set([RTE_CONTENT_STYLESHEET]);
+	private _stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
 
 	@state()
 	private _editor?: Editor;
@@ -102,8 +108,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	protected override async firstUpdated() {
-		// no need to await observing the stylesheet root path.
-		this.#observeStylesheetRootPath();
+		// no need to await loading of the stylesheet.
+		this.#loadStylesheetPath();
 		await this.#loadExtensions();
 		await this.#loadEditor();
 	}
@@ -123,28 +129,26 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return this._editor?.isEmpty ?? false;
 	}
 
-	#observeStylesheetRootPath() {
-		this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
-			if (stylesheetRootPath === undefined) return;
-			this.#applyConfiguredStylesheets(stylesheetRootPath);
-		});
-	}
+	async #loadStylesheetPath() {
+		await this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
+			if (stylesheetRootPath) {
+				this.#stylesheetRootPath = stylesheetRootPath;
+			}
+		}).asPromise();
 
-	#applyConfiguredStylesheets(rootPath: string) {
 		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
-		if (!stylesheets?.length) return;
+		if (stylesheets?.length) {
+			const linkHrefs = stylesheets.map((stylesheet) =>
+				stylesheet.startsWith('http') || stylesheet.startsWith(this.#stylesheetRootPath)
+					? stylesheet
+					: `${this.#stylesheetRootPath}${stylesheet}`,
+			);
 
-		const serverUrl = this.#context.getServerUrl();
-		const linkHrefs = stylesheets.map((stylesheet) => {
-			if (stylesheet.startsWith('http') || stylesheet.startsWith('//')) return stylesheet;
-			const relativeHref = stylesheet.startsWith(rootPath) ? stylesheet : `${rootPath}${stylesheet}`;
-			return `${serverUrl}${relativeHref}`;
-		});
-
-		// Reassign a new Set so Lit's `@state()` identity check detects the change and re-renders;
-		// `Set.add()` would mutate in place and the configured stylesheets could be missed if the
-		// editor finishes loading before this (parallel) path resolves.
-		this._stylesheets = new Set([RTE_CONTENT_STYLESHEET, ...linkHrefs]);
+			// Reassign a new Set so Lit's `@state()` identity check detects the change and re-renders;
+			// `Set.add()` would mutate in place and the configured stylesheets could be missed if the
+			// editor finishes loading before this (parallel) path resolves.
+			this._stylesheets = new Set([...this._stylesheets, ...linkHrefs]);
+		}
 	}
 
 	async #loadExtensions() {
@@ -253,20 +257,16 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderStyles() {
+		if (!this._extensionStyles) return;
 		return html`
 			${repeat(
 				this._stylesheets,
 				(stylesheet) => stylesheet,
 				(stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`,
 			)}
-			${when(
-				this._extensionStyles,
-				(styles) => html`
-					<style>
-						${styles}
-					</style>
-				`,
-			)}
+			<style>
+				${this._extensionStyles}
+			</style>
 		`;
 	}
 

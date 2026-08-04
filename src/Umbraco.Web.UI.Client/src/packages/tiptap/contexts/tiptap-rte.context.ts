@@ -5,16 +5,8 @@ import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-/**
- * The default root path for the stylesheets on the server.
- * This is used as a fallback if the server configuration is not available.
- */
-const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
-
 export class UmbTiptapRteContext extends UmbContextBase {
 	#editor?: Editor;
-
-	#serverUrl = '';
 
 	#stylesheetRootPath = new UmbStringState(undefined);
 	stylesheetRootPath = this.#stylesheetRootPath.asObservable();
@@ -23,30 +15,11 @@ export class UmbTiptapRteContext extends UmbContextBase {
 		super(host, UMB_TIPTAP_RTE_CONTEXT);
 
 		this.consumeContext(UMB_SERVER_CONTEXT, (serverContext) => {
-			// Absolute in split-dev-server setups (e.g. `VITE_UMBRACO_API_URL`) so stylesheet
-			// requests hit the real Umbraco server instead of resolving against the Vite
-			// client's own origin; a no-op prefix in production, where it equals `location.origin`.
-			// Kept separate from `stylesheetRootPath` below, which stays origin-relative so
-			// consumers can still detect whether a configured stylesheet already includes it.
-			this.#serverUrl = serverContext?.getServerUrl() ?? '';
-
 			const serverConnection = serverContext?.getServerConnection();
-			if (!serverConnection) {
-				this.#stylesheetRootPath.setValue(DEFAULT_STYLESHEET_ROOT_PATH);
-				return;
-			}
-			this.observe(serverConnection.umbracoCssPath, (umbracoCssPath) => {
-				this.#stylesheetRootPath.setValue(umbracoCssPath ?? DEFAULT_STYLESHEET_ROOT_PATH);
+			this.observe(serverConnection?.umbracoCssPath, (umbracoCssPath) => {
+				this.#stylesheetRootPath.setValue(umbracoCssPath);
 			});
 		});
-	}
-
-	/**
-	 * Returns the Umbraco server origin, used to resolve stylesheet URLs against the real server in split-dev setups.
-	 * @returns {string} The server origin, or an empty string if not yet resolved.
-	 */
-	public getServerUrl(): string {
-		return this.#serverUrl;
 	}
 
 	public getEditor(): Editor | undefined {
