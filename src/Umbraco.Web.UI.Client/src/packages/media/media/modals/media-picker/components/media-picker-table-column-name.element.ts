@@ -47,6 +47,7 @@ export class UmbMediaPickerTableColumnNameElement extends UmbLitElement implemen
 			uui-button {
 				--uui-button-padding-left-factor: 0;
 				text-align: left;
+				margin-bottom: -9px;
 			}
 
 			.name {
