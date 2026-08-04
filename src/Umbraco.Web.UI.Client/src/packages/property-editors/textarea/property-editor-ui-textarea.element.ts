@@ -57,11 +57,15 @@ export class UmbPropertyEditorUITextareaElement
 	private _rows?: number;
 
 	@state()
+	private _placeholder?: string;
+
+	@state()
 	private _css: StyleInfo = {};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = Number(config?.getValueByAlias('maxChars')) || undefined;
 		this._rows = Number(config?.getValueByAlias('rows')) || undefined;
+		this._placeholder = this.localize.string(config?.getValueByAlias<string>('placeholder'));
 		// min/max height where for a short period present in the config, but we do not want this complexity of our configuration.
 		// @deprecated remove config option in v.18, leave good default.
 		const _minHeight = Number(config?.getValueByAlias('minHeight')) || undefined;
@@ -119,6 +123,7 @@ export class UmbPropertyEditorUITextareaElement
 				.autoHeight=${this._rows ? false : true}
 				maxlength=${ifDefined(this._maxChars)}
 				rows=${ifDefined(this._rows)}
+				placeholder=${ifDefined(this._placeholder)}
 				.value=${this.value ?? ''}
 				@input=${this.#onInput}
 				?required=${this.mandatory}

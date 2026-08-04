@@ -306,7 +306,7 @@ test('can rollback a specific content with rollback permission enabled', async (
   // Act
   await umbracoUi.content.clickActionsMenuForContent(firstDocumentName);
   await umbracoUi.content.clickRollbackActionMenuOption();
-  await umbracoUi.content.clickLatestRollBackItem();
+  await umbracoUi.content.clickPreviousRollBackItem();
   await umbracoUi.content.clickRollbackContainerButton();
 
   // Assert

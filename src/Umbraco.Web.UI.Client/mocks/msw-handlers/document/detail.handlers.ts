@@ -4,11 +4,13 @@ import { umbMockManager } from '../../mock-manager.js';
 import { umbDocumentMockDb } from '../../db/document.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
+	CreateAndPublishDocumentRequestModel,
 	CreateDocumentRequestModel,
 	DefaultReferenceResponseModel,
 	GetDocumentByIdAvailableSegmentOptionsResponse,
 	GetDocumentByIdReferencedDescendantsResponse,
 	PagedIReferenceResponseModel,
+	UpdateAndPublishDocumentRequestModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -28,6 +30,21 @@ export const detailHandlers = [
 		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
 
 		const id = umbDocumentMockDb.detail.create(requestBody);
+
+		return HttpResponse.json(null, {
+			status: 201,
+			headers: {
+				Location: request.url + '/' + id,
+				'Umb-Generated-Resource': id,
+			},
+		});
+	}),
+
+	http.post(umbracoPath(`${UMB_SLUG}/create-and-publish`), async ({ request }) => {
+		const requestBody = (await request.json()) as CreateAndPublishDocumentRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
+
+		const id = umbDocumentMockDb.publishing.createAndPublish(requestBody);
 
 		return HttpResponse.json(null, {
 			status: 201,
@@ -153,6 +170,19 @@ export const detailHandlers = [
 		} catch {
 			return new HttpResponse(null, { status: 404 });
 		}
+	}),
+
+	http.put(umbracoPath(`${UMB_SLUG}/:id/update-and-publish`), async ({ request, params }) => {
+		const id = params.id as string;
+		if (!id) return new HttpResponse(null, { status: 400 });
+		if (id === 'forbidden') {
+			// Simulate a forbidden response
+			return new HttpResponse(null, { status: 403 });
+		}
+		const requestBody = (await request.json()) as UpdateAndPublishDocumentRequestModel;
+		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
+		umbDocumentMockDb.publishing.updateAndPublish(id, requestBody);
+		return new HttpResponse(null, { status: 200 });
 	}),
 
 	http.put(umbracoPath(`${UMB_SLUG}/:id`), async ({ request, params }) => {

@@ -15,8 +15,6 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
-    private IShortStringHelper ShortStringHelper => GetRequiredService<IShortStringHelper>();
-
     [Test]
     public async Task Can_Create_User_Group()
     {

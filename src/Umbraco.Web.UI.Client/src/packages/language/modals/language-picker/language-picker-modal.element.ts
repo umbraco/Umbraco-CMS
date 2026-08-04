@@ -28,7 +28,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	}
 
 	override async firstUpdated() {
-		const { data } = await this.#collectionRepository.requestCollection({});
+		const { data } = await this.#collectionRepository.requestAllItems();
 		this._languages = data?.items ?? [];
 	}
 

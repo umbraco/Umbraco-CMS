@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -13,8 +14,17 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 ///     and implements both <see cref="IDocumentNavigationQueryService"/> and <see cref="IDocumentNavigationManagementService"/>
 ///     to provide a complete set of navigation operations for document content.
 /// </remarks>
-internal sealed class DocumentNavigationService : ContentNavigationServiceBase<IContentType, IContentTypeService>, IDocumentNavigationQueryService, IDocumentNavigationManagementService
+internal sealed class DocumentNavigationService : ContentNavigationServiceBase<IContentType, IContentTypeService>, IDocumentNavigationQueryService, IDocumentNavigationManagementService, IMemoryCacheSizeReporter
 {
+    /// <inheritdoc />
+    public string CacheName => "Document navigation";
+
+    /// <inheritdoc />
+    public long GetApproximateCount() => GetNavigationNodeCount();
+
+    /// <inheritdoc />
+    public long? GetApproximateBytes() => GetNavigationApproximateBytes();
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="DocumentNavigationService"/> class.
     /// </summary>

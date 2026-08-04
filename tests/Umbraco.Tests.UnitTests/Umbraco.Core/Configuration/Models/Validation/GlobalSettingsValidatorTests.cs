@@ -48,4 +48,24 @@ public class GlobalSettingsValidatorTests
         var result = validator.Validate("settings", options);
         Assert.True(result.Succeeded);
     }
+
+    [Test]
+    public void Returns_Fail_For_Configuration_With_TimeOut_Exceeding_Browser_Max()
+    {
+        var validator = new GlobalSettingsValidator();
+        var options = new GlobalSettings { TimeOut = TimeSpan.FromDays(25) };
+
+        var result = validator.Validate("settings", options);
+        Assert.False(result.Succeeded);
+    }
+
+    [Test]
+    public void Returns_Success_For_Configuration_With_Valid_TimeOut()
+    {
+        var validator = new GlobalSettingsValidator();
+        var options = new GlobalSettings { TimeOut = TimeSpan.FromHours(12) };
+
+        var result = validator.Validate("settings", options);
+        Assert.True(result.Succeeded);
+    }
 }

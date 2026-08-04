@@ -28,7 +28,12 @@ import {
   NumericDataTypeBuilder,
   TagsDataTypeBuilder,
   MultiNodeTreePickerDataTypeBuilder,
-  DateTimeWithTimeZonePickerDataTypeBuilder, EntityDataPickerDataTypeBuilder
+  DateTimeWithTimeZonePickerDataTypeBuilder,
+  DateOnlyPickerDataTypeBuilder,
+  TimeOnlyPickerDataTypeBuilder,
+  EntityDataPickerDataTypeBuilder,
+  UserPickerDataTypeBuilder,
+  MemberGroupPickerDataTypeBuilder
 } from "../builders";
 import {AliasHelper} from "./AliasHelper";
 
@@ -55,7 +60,7 @@ export class DataTypeApiHelper {
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/data-type', dataType);
     // Returns the id of the created dataType
-    return response.headers().location.split("v1/data-type/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async update(id: string, dataType) {
@@ -97,7 +102,7 @@ export class DataTypeApiHelper {
     const rootDataTypes = await this.getAllAtRoot();
     const jsonDataTypes = await rootDataTypes.json();
 
-    for (const dataType of jsonDataTypes.items) {
+    for (const dataType of this.api.itemsOf(jsonDataTypes)) {
       if (dataType.name === name) {
         return this.get(dataType.id);
       } else if (dataType.isContainer || dataType.hasChildren) {
@@ -114,7 +119,7 @@ export class DataTypeApiHelper {
     const rootDataTypes = await this.getAllAtRoot();
     const jsonDataTypes = await rootDataTypes.json();
 
-    for (const dataType of jsonDataTypes.items) {
+    for (const dataType of this.api.itemsOf(jsonDataTypes)) {
       if (dataType.name === name) {
         if (dataType.isFolder) {
           return await this.recurseDeleteChildren(dataType);
@@ -145,7 +150,7 @@ export class DataTypeApiHelper {
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/data-type/' + dataTypeId + '/copy', folderIdBody);
     // Returns the id of the copied dataType
-    return response.headers().location.split("v1/data-type/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   // FOLDER
@@ -163,7 +168,7 @@ export class DataTypeApiHelper {
 
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/data-type/folder', folderData);
     // Returns the id of the created dataTypeFolder
-    return response.headers().location.split("v1/data-type/folder/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async renameFolder(id: string, name: string) {
@@ -185,7 +190,7 @@ export class DataTypeApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/data-type/children?parentId=' + id + '&skip=0&take=100&foldersOnly=false');
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   private async recurseDeleteChildren(dataFolder) {
@@ -222,7 +227,10 @@ export class DataTypeApiHelper {
         }
         return await this.delete(child.id);
       } else if (child.hasChildren) {
-        return await this.recurseChildren(name, child.id, toDelete);
+        const result = await this.recurseChildren(name, child.id, toDelete);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
@@ -230,7 +238,7 @@ export class DataTypeApiHelper {
 
   async save(dataType) {
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/data-type', dataType)
-    return response.headers().location.split("v1/data-type/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async createDefaultDateTimeDataType(name: string) {
@@ -282,7 +290,7 @@ export class DataTypeApiHelper {
       .build();
     return await this.save(dataType);
   }
-  
+
   async createDateTimeDataTypeWithDateFormat(name: string, dateFormat: string) {
     await this.ensureNameNotExists(name);
 
@@ -317,7 +325,7 @@ export class DataTypeApiHelper {
 
   async createBlockListDataTypeWithTwoBlocks(name: string, firstContentElementTypeId: string, secondContentElementTypeId: string) {
     await this.ensureNameNotExists(name);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(name)
       .addBlock()
@@ -330,10 +338,10 @@ export class DataTypeApiHelper {
 
     return await this.save(blockList);
   }
-  
+
   async createBlockListDataTypeWithABlock(name: string, contentElementTypeId: string) {
     await this.ensureNameNotExists(name);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(name)
       .addBlock()
@@ -343,10 +351,10 @@ export class DataTypeApiHelper {
 
     return await this.save(blockList);
   }
-  
+
   async createBlockListDataTypeWithContentAndSettingsElementType(name: string, contentElementTypeId: string, settingsElementTypeId: string) {
     await this.ensureNameNotExists(name);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(name)
       .addBlock()
@@ -357,16 +365,16 @@ export class DataTypeApiHelper {
 
     return await this.save(blockList);
   }
-  
+
   async createBlockListDataTypeWithMinAndMaxAmount(name: string, minAmount: number = 0, maxAmount: number = 0) {
     await this.ensureNameNotExists(name);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(name)
       .withMinValue(minAmount)
       .withMaxValue(maxAmount)
       .build();
-    
+
     return await this.save(blockList);
   }
 
@@ -391,10 +399,10 @@ export class DataTypeApiHelper {
 
     return await this.save(blockList);
   }
-  
+
   async createBlockListDataTypeWithInlineEditingMode(name: string, enabled: boolean) {
     await this.ensureNameNotExists(name);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(name)
       .withInlineEditingAsDefault(enabled)
@@ -402,10 +410,10 @@ export class DataTypeApiHelper {
 
     return await this.save(blockList);
   }
-  
+
   async createBlockListDataTypeWithPropertyEditorWidth(name: string, width: string) {
     await this.ensureNameNotExists(name);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(name)
       .withMaxPropertyWidth(width)
@@ -413,10 +421,10 @@ export class DataTypeApiHelper {
 
     return await this.save(blockList);
   }
-  
+
   async createBlockListWithBlockWithEditorAppearance(name: string, elementTypeId: string, label: string = '', overlaySize: string = 'small') {
     await this.ensureNameNotExists(name);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(name)
       .addBlock()
@@ -431,7 +439,7 @@ export class DataTypeApiHelper {
 
   async createBlockListWithBlockWithCatalogueAppearance(name: string, elementTypeId: string, backgroundColor: string = '', iconColor: string = '', customStylesheet: string = '') {
     await this.ensureNameNotExists(name);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(name)
       .addBlock()
@@ -444,10 +452,10 @@ export class DataTypeApiHelper {
 
     return await this.save(blockList);
   }
-  
+
   async createBlockListWithBlockWithHideContentEditor(name: string, elementTypeId: string, hideContentEditor: boolean) {
     await this.ensureNameNotExists(name);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(name)
       .addBlock()
@@ -470,7 +478,7 @@ export class DataTypeApiHelper {
     const inlineEditingModeValue = blockList.values.find(value => value.alias === 'useInlineEditingAsDefault');
     return inlineEditingModeValue?.value === enabled;
   }
-  
+
   // Block Grid
   async createEmptyBlockGrid(blockGridName: string) {
     await this.ensureNameNotExists(blockGridName);
@@ -582,7 +590,7 @@ export class DataTypeApiHelper {
 
   async createBlockGridWithAnAreaInABlock(blockGridName: string, contentElementTypeId: string, areaAlias: string = 'area', createButtonLabel :string = '', columnSpan: number = 6, rowSpan: number = 1, minAllowed: number = 0, maxAllowed: number = 2) {
     await this.ensureNameNotExists(blockGridName);
-    
+
     const blockGrid = new BlockGridDataTypeBuilder()
       .withName(blockGridName)
       .addBlock()
@@ -1007,7 +1015,7 @@ export class DataTypeApiHelper {
     const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
     return block.areas.find(area => area.alias === areaAlias);
   }
-  
+
   async doesBlockEditorBlockContainAreaCount(blockGridName: string, elementTypeKey: string, areaCount: number) {
     const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
     return block.areas.length === areaCount;
@@ -1093,7 +1101,7 @@ export class DataTypeApiHelper {
     const block = await this.getBlockWithContentElementTypeId(blockGridName, elementTypeKey);
     return block.thumbnail === thumbnail;
   }
-  
+
   async getBlockWithContentElementTypeId(blockGridName: string, contentElementTypeKey: string) {
     const blockEditor = await this.getByName(blockGridName);
     const blocks = blockEditor.values.find(value => value.alias === 'blocks');
@@ -1135,7 +1143,7 @@ export class DataTypeApiHelper {
       .withName(name)
       .withItems(options)
       .build();
-      
+
     return await this.save(dataType);
   }
 
@@ -1168,7 +1176,7 @@ export class DataTypeApiHelper {
 
     return await this.save(dataType);
   }
-  
+
   async createImageMediaPickerDataTypeWithCrop(name: string, label: string, width: number, height: number) {
     await this.ensureNameNotExists(name);
     const mediaType = await this.api.mediaType.getByName('Image');
@@ -1211,7 +1219,7 @@ export class DataTypeApiHelper {
 
     return await this.save(dataType);
   }
-  
+
   async createTrueFalseDataTypeWithInitialState(name: string) {
     await this.ensureNameNotExists(name);
 
@@ -1400,18 +1408,21 @@ export class DataTypeApiHelper {
       .build();
     return await this.save(dataType);
   }
-  
+
   // List View - Media data type
   async updateListViewMediaDataType(alias: string, newValue: any) {
+    return await this.updateListViewMediaDataTypeValues([{alias: alias, value: newValue}]);
+  }
+
+  async updateListViewMediaDataTypeValues(values: {alias: string, value: any}[]) {
     const listViewMediaData = await this.getByName('List View - Media');
-    const valueData = listViewMediaData.values.find(value => value.alias === alias);
-    if (valueData) {
-      valueData.value = newValue;
-    } else {
-      listViewMediaData.values.push({
-        "alias": alias,
-        "value": newValue
-      });
+    for (const {alias, value} of values) {
+      const valueData = listViewMediaData.values.find(v => v.alias === alias);
+      if (valueData) {
+        valueData.value = value;
+      } else {
+        listViewMediaData.values.push({"alias": alias, "value": value});
+      }
     }
     return await this.update(listViewMediaData.id, listViewMediaData);
   }
@@ -1422,10 +1433,10 @@ export class DataTypeApiHelper {
     const dataType = new TiptapDataTypeBuilder()
       .withName(name)
       .build();
-    
+
     return await this.save(dataType);
   }
-  
+
   async createTiptapDataTypeWithMediaFolder(name: string, mediaFolderId: string) {
     await this.ensureNameNotExists(name);
 
@@ -1454,7 +1465,7 @@ export class DataTypeApiHelper {
         .withBlock(true)
         .done()
       .build();
-    
+
     return await this.save(dataType);
   };
 
@@ -1569,7 +1580,7 @@ export class DataTypeApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.save(dataType);
   }
 
@@ -1587,7 +1598,7 @@ export class DataTypeApiHelper {
 
     return await this.save(dataType);
   }
-  
+
   async createBlockGridWithABlockAndAllowAtRoot(blockGridName: string, contentElementTypeId: string, allowAtRoot: boolean = true) {
     await this.ensureNameNotExists(blockGridName);
 
@@ -1676,13 +1687,13 @@ export class DataTypeApiHelper {
 
     return await this.save(blockList);
   }
-  
+
   async doesBlockGridContainLayoutStylesheet(blockGridName: string, stylesheetName: string) {
     const blockEditor = await this.getByName(blockGridName);
     const layoutStylesheetValue = blockEditor.values.find(value => value.alias === 'layoutStylesheet');
     return layoutStylesheetValue?.value === '/wwwroot/css/' + stylesheetName;
   }
-  
+
   async createRichTextEditorWithABlock(richTextEditorName: string, contentElementTypeId: string) {
     await this.ensureNameNotExists(richTextEditorName);
 
@@ -1731,31 +1742,31 @@ export class DataTypeApiHelper {
 
     return await this.save(richTextEditor);
   }
-  
+
   async createRichTextEditorWithABlockWithBlockSettingEditorSize(richTextEditorName: string, contentElementTypeId: string, editorSize: string) {
     return await this.createRichTextEditorWithABlockWithBlockSettings(richTextEditorName, contentElementTypeId, "", "", "", "", editorSize);
   }
-  
+
   async createRichTextEditorWithABlockWithBlockSettingLabel(richTextEditorName: string, contentElementTypeId: string, label: string) {
     return await this.createRichTextEditorWithABlockWithBlockSettings(richTextEditorName, contentElementTypeId, label);
   }
-  
+
   async createRichTextEditorWithABlockWithBlockSettingBackgroundColor(richTextEditorName: string, contentElementTypeId: string, backgroundColor: string) {
     return await this.createRichTextEditorWithABlockWithBlockSettings(richTextEditorName, contentElementTypeId, "", backgroundColor);
   }
-  
+
   async createRichTextEditorWithABlockWithBlockSettingIconColor(richTextEditorName: string, contentElementTypeId: string, iconColor: string) {
     return await this.createRichTextEditorWithABlockWithBlockSettings(richTextEditorName, contentElementTypeId, "", "", iconColor);
   }
-  
+
   async createRichTextEditorWithABlockWithBlockSettingThumbnail(richTextEditorName: string, contentElementTypeId: string, thumbnail: string) {
     return await this.createRichTextEditorWithABlockWithBlockSettings(richTextEditorName, contentElementTypeId, "", "", "", thumbnail);
   }
-  
+
   async createRichTextEditorWithABlockWithBlockSettingSettingsElementTypeKey(richTextEditorName: string, contentElementTypeId: string, settingsElementTypeId: string) {
     return await this.createRichTextEditorWithABlockWithBlockSettings(richTextEditorName, contentElementTypeId, "", "", "", "", "", settingsElementTypeId);
   }
-  
+
   async createRichTextEditorWithABlockWithBlockSettingDisplayInline(richTextEditorName: string, contentElementTypeId: string, displayInline: boolean) {
     return await this.createRichTextEditorWithABlockWithBlockSettings(richTextEditorName, contentElementTypeId, "", "", "", "", "", "", displayInline);
   }
@@ -1970,7 +1981,7 @@ export class DataTypeApiHelper {
 
   async createBlockListDataTypeWithInlineEditingModeAndABlock(blockListName: string, contentElementTypeId: string, inlineEditing: boolean = true) {
     await this.ensureNameNotExists(blockListName);
-  
+
     const blockList = new BlockListDataTypeBuilder()
       .withName(blockListName)
       .withInlineEditingAsDefault(inlineEditing)
@@ -2010,7 +2021,7 @@ export class DataTypeApiHelper {
         .withWordCount(true)
         .done()
       .build();
-    
+
     return await this.save(dataType);
   }
 
@@ -2023,7 +2034,7 @@ export class DataTypeApiHelper {
         .withElementPath(true)
         .done()
       .build();
-    
+
     return await this.save(dataType);
   }
 
@@ -2038,7 +2049,7 @@ export class DataTypeApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.save(dataType);
   }
 
@@ -2052,7 +2063,7 @@ export class DataTypeApiHelper {
         .withType(startNodeType)
         .done()
       .build();
-      
+
     return await this.save(dataType);
   }
 
@@ -2060,6 +2071,46 @@ export class DataTypeApiHelper {
     await this.ensureNameNotExists(name);
 
     const dataType = new DateTimeWithTimeZonePickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultDateOnlyPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new DateOnlyPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultTimeOnlyPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new TimeOnlyPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultUserPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new UserPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultMemberGroupPickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MemberGroupPickerDataTypeBuilder()
       .withName(name)
       .build();
 
@@ -2081,7 +2132,7 @@ export class DataTypeApiHelper {
     const existingZones = timeZonesData.value.timeZones;
     return timeZones.every(timeZone => existingZones.includes(timeZone));
   }
-  
+
   // Entity Data Picker
   async createEntityDataPickerDataType(name: string, dataSource: string) {
     await this.ensureNameNotExists(name);
@@ -2106,7 +2157,7 @@ export class DataTypeApiHelper {
 
     return await this.save(dataType);
   }
-  
+
   async createBlockGridWithAThumbnail(blockGridName: string, contentElementTypeId: string, thumbnailPath: string) {
     await this.ensureNameNotExists(blockGridName);
 
@@ -2121,7 +2172,7 @@ export class DataTypeApiHelper {
 
     return await this.save(blockGrid);
   }
-  
+
   async createBlockListWithAThumbnail(blockListName: string, contentElementTypeId: string, thumbnailPath: string) {
     await this.ensureNameNotExists(blockListName);
 

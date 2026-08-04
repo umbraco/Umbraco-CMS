@@ -3924,6 +3924,70 @@ const rawData: Array<
 	},
 ];
 
+const TEST_DOCUMENT_TYPES_FOLDER_ID = '25b36f28-5051-4073-a0c7-3887f6f8c695';
+const HOME_DOCUMENT_TYPE_ID = '7184285e-9709-4e13-8c72-1fe52f024b28';
+const ALL_DATA_TYPES_DOCUMENT_TYPE_ID = '8b1d6f2a-7c4e-4a9b-bf13-2e5d9a0c4f76';
+
+// Every data type is normally showcased on its own document type under the "Test Document Types" folder.
+// This aggregate gives a single document type with one tab per data type group (Block Grid, Block List, ...),
+// derived from those individual types so it stays in sync automatically.
+const dataTypeGroups = rawData.filter(
+	(documentType) => documentType.parent?.id === TEST_DOCUMENT_TYPES_FOLDER_ID && documentType.isFolder === false,
+);
+
+rawData.push({
+	allowedTemplates: [],
+	defaultTemplate: null,
+	id: ALL_DATA_TYPES_DOCUMENT_TYPE_ID,
+	alias: 'allDataTypes',
+	name: 'All Data Types',
+	description: null,
+	icon: 'icon-documents color-green',
+	allowedAsRoot: false,
+	variesByCulture: false,
+	variesBySegment: false,
+	isElement: false,
+	hasChildren: false,
+	parent: {
+		id: TEST_DOCUMENT_TYPES_FOLDER_ID,
+	},
+	isFolder: false,
+	properties: dataTypeGroups.flatMap((group) =>
+		group.properties.map((property) => ({
+			...property,
+			id: `pt-adt-${property.id}`,
+			container: {
+				id: `adt-tab-${group.alias}`,
+			},
+		})),
+	),
+	containers: dataTypeGroups.map((group, index) => ({
+		id: `adt-tab-${group.alias}`,
+		parent: null,
+		name: group.name,
+		type: 'Tab',
+		sortOrder: index,
+	})),
+	allowedDocumentTypes: [],
+	compositions: [],
+	cleanup: {
+		preventCleanup: false,
+		keepAllVersionsNewerThanDays: null,
+		keepLatestVersionPerDayForDays: null,
+	},
+	flags: [],
+});
+
+// Allow the aggregate to be created as a child of Home.
+rawData
+	.find((documentType) => documentType.id === HOME_DOCUMENT_TYPE_ID)
+	?.allowedDocumentTypes.push({
+		documentType: {
+			id: ALL_DATA_TYPES_DOCUMENT_TYPE_ID,
+		},
+		sortOrder: 30,
+	});
+
 export const data: Array<UmbMockDocumentTypeModel> = rawData.map((dt) => ({
 	...dt,
 	compositions: dt.compositions.map((c) => ({

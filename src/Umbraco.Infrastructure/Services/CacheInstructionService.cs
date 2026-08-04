@@ -169,7 +169,6 @@ namespace Umbraco.Cms
                 }
             }
 
-            [Obsolete("Please use ProcessAllInstructions instead. Scheduled for removal in Umbraco 19.")]
             /// <summary>
             /// Processes cache instructions from the database using the provided cache refreshers.
             /// </summary>
@@ -178,6 +177,7 @@ namespace Umbraco.Cms
             /// <param name="localIdentity">A string identifying the local instance or caller.</param>
             /// <param name="lastId">The last processed instruction ID; this value is updated to reflect the most recent processed instruction.</param>
             /// <returns>A <see cref="ProcessInstructionsResult"/> representing the result of the processing operation.</returns>
+            [Obsolete("Please use ProcessAllInstructions instead. Scheduled for removal in Umbraco 19.")]
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 CancellationToken cancellationToken,

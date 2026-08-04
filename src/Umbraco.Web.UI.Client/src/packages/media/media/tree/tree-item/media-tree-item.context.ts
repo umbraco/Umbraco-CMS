@@ -9,8 +9,6 @@ export class UmbMediaTreeItemContext extends UmbDefaultTreeItemContext<UmbMediaT
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 
-	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
-
 	constructor(host: UmbControllerHost) {
 		super(host);
 

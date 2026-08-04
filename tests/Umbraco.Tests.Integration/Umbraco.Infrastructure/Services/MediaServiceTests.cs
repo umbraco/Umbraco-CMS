@@ -23,6 +23,57 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Sort_Preserves_Property_Data_When_Items_Loaded_Without_It(bool useSortChildren)
+    {
+        var mediaType = await CreateMediaType();
+
+        var keys = new List<Guid>();
+        for (var i = 0; i < 3; i++)
+        {
+            IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, "Media " + i, -1);
+            media.SetValue("title", "Title " + i);
+            MediaService.Save(media);
+            keys.Add(media.Key);
+        }
+
+        // Mimic a partial load (e.g. a collection view): instances without property data (#23120).
+        List<IMedia> partial = keys
+            .Select(key =>
+            {
+                IMedia media = MediaService.GetById(key);
+                media.Properties = new PropertyCollection();
+                return media;
+            })
+            .ToList();
+
+        // Rotate so every item's sort order changes (and is therefore re-saved).
+        if (useSortChildren)
+        {
+            int[] rotated = [partial[1].Id, partial[2].Id, partial[0].Id];
+
+            var result = MediaService.SortChildren(Constants.System.Root, rotated);
+            Assert.That(result.Success, Is.True);
+        }
+        else
+        {
+            IMedia[] rotated = [partial[1], partial[2], partial[0]];
+            Assert.That(MediaService.Sort(rotated), Is.True);
+        }
+
+        // Every sorted item must retain its property data, and the requested order must be applied.
+        Assert.Multiple(() =>
+        {
+            Assert.That(MediaService.GetById(keys[0]).GetValue<string>("title"), Is.EqualTo("Title 0"));
+            Assert.That(MediaService.GetById(keys[1]).GetValue<string>("title"), Is.EqualTo("Title 1"));
+            Assert.That(MediaService.GetById(keys[2]).GetValue<string>("title"), Is.EqualTo("Title 2"));
+            Assert.That(MediaService.GetById(keys[1]).SortOrder, Is.EqualTo(0));
+            Assert.That(MediaService.GetById(keys[2]).SortOrder, Is.EqualTo(1));
+            Assert.That(MediaService.GetById(keys[0]).SortOrder, Is.EqualTo(2));
+        });
+    }
+
     [Test]
     public async Task Can_Create_Media()
     {
@@ -526,4 +577,126 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     }
 
     #endregion
+
+    [Test]
+    public void SortChildren_Persists_The_Supplied_Order()
+    {
+        var folderMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Folder)!;
+
+        var root = MediaBuilder.CreateMediaFolder(folderMediaType, Constants.System.Root);
+        root.Name = "Root";
+        MediaService.Save(root);
+
+        var childIds = new List<int>();
+        for (var i = 0; i < 5; i++)
+        {
+            var child = MediaBuilder.CreateMediaFolder(folderMediaType, root.Id);
+            child.Name = $"Folder {i}";
+            MediaService.Save(child);
+            childIds.Add(child.Id);
+        }
+
+        int[] ChildIdsInSortOrder() => MediaService
+            .GetPagedChildren(root.Id, 0, 100, out _)
+            .OrderBy(child => child.SortOrder)
+            .Select(child => child.Id)
+            .ToArray();
+
+        // Children were created in ascending sort order.
+        Assert.AreEqual(childIds.ToArray(), ChildIdsInSortOrder());
+
+        var reversed = Enumerable.Reverse(childIds).ToArray();
+        var result = MediaService.SortChildren(root.Id, reversed, Constants.Security.SuperUserId);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(reversed, ChildIdsInSortOrder());
+    }
+
+    [Test]
+    public async Task Can_Make_Duplicate_Sibling_Names_Unique()
+    {
+        var mediaType = await CreateMediaType();
+
+        var first = SaveMedia(mediaType, "image");
+        var second = SaveMedia(mediaType, "image");
+        var third = SaveMedia(mediaType, "image");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(first.Name, Is.EqualTo("image"));
+            Assert.That(second.Name, Is.EqualTo("image (1)"));
+            Assert.That(third.Name, Is.EqualTo("image (2)"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Make_Duplicate_Sibling_Names_Unique_Ignoring_Case()
+    {
+        var mediaType = await CreateMediaType();
+
+        var first = SaveMedia(mediaType, "Image");
+        var second = SaveMedia(mediaType, "image");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(first.Name, Is.EqualTo("Image"));
+            Assert.That(second.Name, Is.EqualTo("image (1)"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Make_Name_Unique_Without_Being_Confused_By_Similar_Prefixes()
+    {
+        var mediaType = await CreateMediaType();
+
+        // Decoys that share a prefix with "image" but are not the same name; these must not
+        // consume a suffix nor otherwise perturb the result.
+        SaveMedia(mediaType, "image");
+        SaveMedia(mediaType, "imagery");
+        SaveMedia(mediaType, "image detail");
+
+        var duplicate = SaveMedia(mediaType, "image");
+
+        Assert.That(duplicate.Name, Is.EqualTo("image (1)"));
+    }
+
+    [TestCase("50%")]
+    [TestCase("a_b")]
+    [TestCase("x[y")]
+    public async Task Can_Make_Name_With_Like_Metacharacters_Unique(string name)
+    {
+        var mediaType = await CreateMediaType();
+
+        var first = SaveMedia(mediaType, name);
+        var second = SaveMedia(mediaType, name);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(first.Name, Is.EqualTo(name));
+            Assert.That(second.Name, Is.EqualTo($"{name} (1)"));
+        });
+    }
+
+    [Test]
+    public async Task Can_Reuse_Freed_Suffix_When_Making_Name_Unique()
+    {
+        var mediaType = await CreateMediaType();
+
+        SaveMedia(mediaType, "image");
+        var one = SaveMedia(mediaType, "image"); // image (1)
+        SaveMedia(mediaType, "image");           // image (2)
+
+        MediaService.Delete(one); // frees "image (1)"
+
+        var reused = SaveMedia(mediaType, "image");
+
+        Assert.That(reused.Name, Is.EqualTo("image (1)"));
+    }
+
+    private IMedia SaveMedia(IMediaType mediaType, string name)
+    {
+        IMedia media = MediaBuilder.CreateSimpleMedia(mediaType, name, Constants.System.Root);
+        MediaService.Save(media);
+        return media;
+    }
 }

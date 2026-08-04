@@ -10,12 +10,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 public static partial class RteBlockHelper
 {
     /// <summary>
-    /// Returns a <see cref="Regex"/> that matches <c>umb-rte-block</c> elements containing a <c>data-content-udi</c> attribute in the input HTML.
+    /// Returns a <see cref="Regex"/> that matches <c>umb-rte-block</c> and <c>umb-rte-block-inline</c>
+    /// elements containing a <c>data-content-udi</c> attribute in the input HTML.
     /// </summary>
-    /// <returns>A <see cref="Regex"/> instance for identifying <c>umb-rte-block</c> elements with a <c>data-content-udi</c> attribute.</returns>
-    // Non-greedy on both [^>]*? and .*? so consecutive sibling <umb-rte-block> elements are matched
-    // individually rather than collapsed into one span (which left all-but-last sibling UDIs un-converted).
-    [GeneratedRegex("<umb-rte-block\\b[^>]*?(?<attribute>data-content-udi)=\"(?<udi>[^\"]+)\"[^>]*>.*?<\\/umb-rte-block>")]
+    /// <returns>A <see cref="Regex"/> instance for identifying <c>umb-rte-block</c>/<c>umb-rte-block-inline</c> elements with a <c>data-content-udi</c> attribute.</returns>
+    // Non-greedy on both [^>]*? and .*? so consecutive sibling blocks are matched individually rather
+    // than collapsed into one span (which left all-but-last sibling UDIs un-converted). The (?:-inline)?
+    // on both the opening and closing tag lets .*? stop at the nearest close of either variant, so a
+    // mix of block and inline siblings never collapse together and isolated inline blocks still match.
+    [GeneratedRegex("<umb-rte-block(?:-inline)?\\b[^>]*?(?<attribute>data-content-udi)=\"(?<udi>[^\"]+)\"[^>]*>.*?<\\/umb-rte-block(?:-inline)?>")]
     public static partial Regex BlockRegex();
 
     /// <summary>

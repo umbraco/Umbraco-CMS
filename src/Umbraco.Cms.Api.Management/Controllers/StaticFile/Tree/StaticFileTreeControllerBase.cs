@@ -45,8 +45,10 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
         _fileSystemTreeService = fileSystemTreeService;
     }
 
+    [Obsolete("Has been moved to the individual services. Scheduled to be removed in Umbraco 19.")]
     protected override IFileSystem FileSystem { get; }
 
+    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19.")]
     protected override string[] GetDirectories(string path) =>
         IsTreeRootPath(path)
             ? _allowedRootFolders
@@ -54,6 +56,7 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
                 ? _fileSystemTreeService.GetDirectories(path)
                 : Array.Empty<string>();
 
+    [Obsolete("Has been moved to FileSystemTreeServiceBase. Scheduled for removal in Umbraco 19.")]
     protected override string[] GetFiles(string path)
         => IsTreeRootPath(path) || IsAllowedPath(path) == false
             ? Array.Empty<string>()

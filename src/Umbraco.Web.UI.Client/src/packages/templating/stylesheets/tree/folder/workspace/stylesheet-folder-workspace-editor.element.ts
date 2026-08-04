@@ -25,6 +25,6 @@ export { UmbStylesheetFolderWorkspaceEditorElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-stylesheet-folder-workspace-editor']: UmbStylesheetFolderWorkspaceEditorElement;
+		'umb-stylesheet-folder-workspace-editor': UmbStylesheetFolderWorkspaceEditorElement;
 	}
 }

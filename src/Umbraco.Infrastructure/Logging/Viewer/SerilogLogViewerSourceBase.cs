@@ -39,7 +39,7 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
     /// </summary>
     /// <returns>A read-only list of saved log searches.</returns>
     /// <remarks>
-    /// This method is obsolete. Use <see cref="ILogViewerService.GetSavedLogQueriesAsync"/> instead.
+    /// This method is obsolete. Use <see cref="Services.ILogViewerService.GetSavedLogQueriesAsync"/> instead.
     /// </remarks>
     [Obsolete("Use ILogViewerService.GetSavedLogQueriesAsync instead. Scheduled for removal in Umbraco 15.")]
     public virtual IReadOnlyList<SavedLogSearch> GetSavedSearches()
@@ -52,7 +52,7 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
     /// <param name="query">The query string for the saved search.</param>
     /// <returns>A read-only list of saved log searches including the newly added one.</returns>
     /// <remarks>
-    /// This method is obsolete. Use <see cref="ILogViewerService.AddSavedLogQueryAsync"/> instead.
+    /// This method is obsolete. Use <see cref="Services.ILogViewerService.AddSavedLogQueryAsync"/> instead.
     /// </remarks>
     [Obsolete("Use ILogViewerService.AddSavedLogQueryAsync instead. Scheduled for removal in Umbraco 15.")]
     public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)

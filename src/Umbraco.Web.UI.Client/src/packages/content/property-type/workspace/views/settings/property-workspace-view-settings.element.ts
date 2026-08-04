@@ -188,9 +188,9 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			<uui-box class="uui-text">
 				<umb-property-layout label=${this.localize.term('general_name')} orientation="vertical" mandatory>
 					<umb-input-with-alias
-						id="name-input"
-						data-mark="input:entity-name"
-						name="name"
+						data-mark="input:propertytype-name"
+						name="propertyTypeName"
+						autocomplete="on"
 						slot="editor"
 						required
 						.value=${this._data?.name ?? ''}
@@ -204,8 +204,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 				<umb-property-layout label=${this.localize.term('general_description')} orientation="vertical">
 					<uui-textarea
-						id="description-input"
-						data-mark="input:entity-description"
+						data-mark="input:propertytype-description"
 						label="${this.localize.term('general_description')}"
 						slot="editor"
 						name="description"
@@ -217,7 +216,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				<umb-property-layout label=${this.localize.term('general_propertyEditor')} orientation="vertical" mandatory>
 					<umb-data-type-flow-input
 						slot="editor"
-						id="data-type-input"
+						data-mark="input:data-type"
 						label="${this.localize.term('general_propertyEditor')}"
 						.value=${this._data?.dataType?.unique ?? ''}
 						.suggestionQuery=${this._data?.name}

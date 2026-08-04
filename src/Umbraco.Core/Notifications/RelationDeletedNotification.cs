@@ -38,7 +38,7 @@ public class RelationDeletedNotification : DeletedNotification<IRelation>
     /// <summary>
     ///     Gets or sets a value indicating whether the relations were deleted automatically
     ///     as a side-effect of content being saved (e.g. umbMedia, umbDocument, umbMember),
-    ///     rather than explicitly via <see cref="IRelationService"/>.
+    ///     rather than explicitly via <see cref="Services.IRelationService"/>.
     /// </summary>
     public bool IsAutomatic { get; set; }
 }

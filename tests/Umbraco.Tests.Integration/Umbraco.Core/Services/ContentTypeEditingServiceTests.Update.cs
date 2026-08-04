@@ -416,7 +416,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
         // expect RefreshMain when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [TestCase(false)]
@@ -464,7 +464,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
         // expect RefreshMain when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [Test]
@@ -507,7 +507,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.AreEqual(0, contentType.NoGroupPropertyTypes.Count());
 
         // expect RefreshMain when removing properties
-        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain);
+        AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected);
     }
 
     [TestCase(false)]
@@ -1512,7 +1512,8 @@ internal sealed partial class ContentTypeEditingServiceTests
             Assert.AreEqual("Same Test Property Alias", compositionProperty.Name);
         });
 
-        // expect RefreshMain, because a property was removed to "make room" for the new compositions
+        // Expect a full rebuild (RefreshMain, not RawDataUnaffected): the removed alias is reintroduced by the
+        // added composition behind a different property type, so the alias-keyed cache blob must be rebuilt.
         AssertContentTypeRefreshPayload(refreshedPayloads, targetContentType.Id, ContentTypeChangeTypes.RefreshMain);
     }
 

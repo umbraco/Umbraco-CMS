@@ -25,6 +25,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
         builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
         builder.Services.AddRecurringBackgroundJob<ReportSiteJob>();
+        builder.Services.AddRecurringBackgroundJob<MemoryCacheSizeReportingJob>();
 
         builder.Services.AddSingleton<IDistributedBackgroundJob, WebhookFiring>();
         builder.Services.AddSingleton<IDistributedBackgroundJob, ContentVersionCleanupJob>();

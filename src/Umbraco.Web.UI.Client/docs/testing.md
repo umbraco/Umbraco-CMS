@@ -108,6 +108,16 @@ it('should do something', async () => {
 });
 ```
 
+**Assertion style**: for length/count checks, prefer Chai's `lengthOf` matcher over asserting on `.length` directly — it works on any value with a numeric `length` (arrays, strings, etc.) and gives a clearer failure message that reports the actual length:
+
+```typescript
+// ✅ Reports "expected [ '1', '2' ] to have a length of 3 but got 2"
+expect(element.selection).to.have.lengthOf(3);
+
+// ❌ Reports only "expected 2 to equal 3" — loses the collection context
+expect(element.selection.length).to.equal(3);
+```
+
 ### Unit Test Guidelines
 
 **What to Test**:

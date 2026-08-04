@@ -1381,8 +1381,16 @@ export default {
 		chooseChildNode: 'Vybrat podřízený uzel',
 		compositionsDescription:
 			'Zdědí záložky a vlastnosti z existujícího typu dokumentu. Nové záložky budou přidány do aktuálního typu dokumentu nebo sloučeny, pokud existuje záložka se stejným názvem.',
+		compositionsDescriptionMediaType:
+			'Zdědí záložky a vlastnosti z existujícího typu média. Nové záložky budou přidány do aktuálního typu média nebo sloučeny, pokud existuje záložka se stejným názvem.',
+		compositionsDescriptionMemberType:
+			'Zdědí záložky a vlastnosti z existujícího typu člena. Nové záložky budou přidány do aktuálního typu člena nebo sloučeny, pokud existuje záložka se stejným názvem.',
 		compositionInUse: 'Tento typ obsahu se používá ve složení, a proto jej nelze poskládat.',
+		compositionInUseMediaType: 'Tento typ média se používá ve složení, a proto jej nelze poskládat.',
+		compositionInUseMemberType: 'Tento typ člena se používá ve složení, a proto jej nelze poskládat.',
 		noAvailableCompositions: 'Nejsou k dispozici žádné typy obsahu, které lze použít jako složení.',
+		noAvailableCompositionsMediaType: 'Nejsou k dispozici žádné typy média, které lze použít jako složení.',
+		noAvailableCompositionsMemberType: 'Nejsou k dispozici žádné typy člena, které lze použít jako složení.',
 		compositionRemoveWarning:
 			'Odebráním složení odstraníte všechna související data vlastností. Jakmile uložíte typ dokumentu, již není cesta zpět.',
 		availableEditors: 'Vytvořit nové',
@@ -1415,6 +1423,8 @@ export default {
 		tabHasNoSortOrder: 'záložka nemá žádné řazení',
 		compositionUsageHeading: 'Kde se toto složení používá?',
 		compositionUsageSpecification: 'Toto složení se v současnosti používá ve složení následujících typů obsahu:',
+		compositionUsageSpecificationMediaType: 'Toto složení se v současnosti používá ve složení následujících typů média:',
+		compositionUsageSpecificationMemberType: 'Toto složení se v současnosti používá ve složení následujících typů člena:',
 		variantsHeading: 'Povolit různé jazyky',
 		variantsDescription: 'Povolit editorům vytvářet obsah tohoto typu v různých jazycích.',
 		allowVaryByCulture: 'Povolit různé jazyky',

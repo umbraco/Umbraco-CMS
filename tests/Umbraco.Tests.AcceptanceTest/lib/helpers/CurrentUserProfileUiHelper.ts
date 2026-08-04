@@ -7,7 +7,7 @@ export class CurrentUserProfileUiHelper extends UiBaseLocators {
 
   constructor(page: Page) {
     super(page);
-    this.changePasswordBtn = page.getByLabel('Change password');
+    this.changePasswordBtn = page.getByLabel('Change your password');
   }
 
   async clickChangePasswordButton() {

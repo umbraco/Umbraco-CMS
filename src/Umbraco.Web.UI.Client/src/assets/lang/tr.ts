@@ -1376,8 +1376,16 @@ export default {
 		chooseChildNode: 'Alt düğümü seçin',
 		compositionsDescription:
 			'Mevcut bir belge türünden sekmeleri ve özellikleri devralın. Mevcut belge türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.',
+		compositionsDescriptionMediaType:
+			'Mevcut bir medya türünden sekmeleri ve özellikleri devralın. Mevcut medya türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.',
+		compositionsDescriptionMemberType:
+			'Mevcut bir üye türünden sekmeleri ve özellikleri devralın. Mevcut üye türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.',
 		compositionInUse: 'Bu içerik türü bir bestede kullanıldığından kendi başına oluşturulamaz.',
+		compositionInUseMediaType: 'Bu medya türü bir bestede kullanıldığından kendi başına oluşturulamaz.',
+		compositionInUseMemberType: 'Bu üye türü bir bestede kullanıldığından kendi başına oluşturulamaz.',
 		noAvailableCompositions: 'Beste olarak kullanılabilecek içerik türü yok.',
+		noAvailableCompositionsMediaType: 'Beste olarak kullanılabilecek medya türü yok.',
+		noAvailableCompositionsMemberType: 'Beste olarak kullanılabilecek üye türü yok.',
 		compositionRemoveWarning:
 			'Bir kompozisyonun kaldırılması, ilişkili tüm özellik verilerini silecektir. Belge türünü kaydettikten sonra geri dönüş yoktur.',
 		availableEditors: 'Yeni oluştur',
@@ -1412,6 +1420,8 @@ export default {
 		tabHasNoSortOrder: 'sekmesinde sıralama düzeni yok',
 		compositionUsageHeading: 'Bu beste nerede kullanılıyor?',
 		compositionUsageSpecification: 'Bu beste şu anda aşağıdaki içerik türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMediaType: 'Bu beste şu anda aşağıdaki medya türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMemberType: 'Bu beste şu anda aşağıdaki üye türlerinin oluşturulmasında kullanılmaktadır:',
 		cultureVariantHeading: 'Kültüre göre değişikliklere izin ver',
 		segmentVariantHeading: 'Segmentasyona izin ver',
 		cultureVariantLabel: 'Kültüre göre değişiklik yapın',

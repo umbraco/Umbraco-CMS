@@ -1042,11 +1042,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <summary>
-        ///     Gets a data type from the repository by its unique key.
-        /// </summary>
-        /// <param name="id">The unique key of the data type.</param>
-        /// <returns>The data type, or null if not found.</returns>
-        /// <summary>
         ///     Creates an audit entry for a data type operation.
         /// </summary>
         /// <param name="type">The audit type.</param>

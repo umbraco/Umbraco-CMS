@@ -946,7 +946,7 @@ export default {
 		greeting5: 'Welkom',
 		greeting6: 'Welkom',
 		instruction: 'log hieronder in',
-		signInWith: 'Inloggen met',
+		signInWith: 'Inloggen met {0}',
 		timeout: 'Sessie is verlopen',
 		bottomText:
 			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p>',
@@ -1457,9 +1457,19 @@ export default {
 		chooseChildNode: 'Kies onderliggende node',
 		compositionsDescription:
 			'Overgeërfde tabs en properties van een bestaand documenttype. Nieuwe tabs\n      worden toegevoegd aan het huidige documenttype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
+		compositionsDescriptionMediaType:
+			'Overgeërfde tabs en properties van een bestaand mediatype. Nieuwe tabs\n      worden toegevoegd aan het huidige mediatype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
+		compositionsDescriptionMemberType:
+			'Overgeërfde tabs en properties van een bestaand lidtype. Nieuwe tabs\n      worden toegevoegd aan het huidige lidtype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
 		compositionInUse:
 			'Dit contenttype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
+		compositionInUseMediaType:
+			'Dit mediatype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
+		compositionInUseMemberType:
+			'Dit lidtype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
 		noAvailableCompositions: 'Er zijn geen contenttypen beschikbaar om als compositie te gebruiken.',
+		noAvailableCompositionsMediaType: 'Er zijn geen mediatypen beschikbaar om als compositie te gebruiken.',
+		noAvailableCompositionsMemberType: 'Er zijn geen lidtypen beschikbaar om als compositie te gebruiken.',
 		compositionRemoveWarning:
 			'Een compositie verwijderen zal alle bijbehorende eigenschapsdata ook\n      verwijderen. Zodra je het documenttype hebt opgeslagen is er geen weg meer terug.\n    ',
 		availableEditors: 'Beschikbare editors',
@@ -1497,6 +1507,10 @@ export default {
 		compositionUsageHeading: 'Waar wordt deze compositie gebruikt?',
 		compositionUsageSpecification:
 			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende inhoudstypen:\n    ',
+		compositionUsageSpecificationMediaType:
+			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende mediatypen:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende lidtypen:\n    ',
 		variantsHeading: 'Variaties toestaan',
 		cultureVariantHeading: 'Variëren per cultuur toestaan',
 		segmentVariantHeading: 'Segmentatie toestaan',
