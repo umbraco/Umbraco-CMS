@@ -221,9 +221,9 @@ public class NewDefaultUrlProvider : IUrlProvider
                 }
 
                 _logger.LogDebug(
-                "Couldn't find any page with nodeId={NodeId}, nodeKey={NodeKey}. This is most likely caused by the page not being published.",
-                id,
-                nodeKey);
+                    "Couldn't find any page with nodeId={NodeId}, nodeKey={NodeKey}. This is most likely caused by the page not being published.",
+                    id,
+                    nodeKey);
             }
             return null;
         }
