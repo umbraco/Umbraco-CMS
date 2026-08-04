@@ -222,6 +222,29 @@ public class ContentTypeCacheRefresherTests
     }
 
     [Test]
+    public void RawDataUnaffected_Element_Change_Selectively_Clears_Converted_Cache_Without_Memory_Rebuild()
+    {
+        // Arrange — as above, but for an Element type: a property removal is structural but RawDataUnaffected,
+        // so only the converted cache needs clearing (no memory rebuild/tag eviction).
+        var refresher = CreateRefresher(Mock.Of<IPublishedModelFactory>());
+        var payloads = new[]
+        {
+            new ContentTypeCacheRefresher.JsonPayload(nameof(IContentType), 100, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RawDataUnaffected, true),
+        };
+
+        _elementCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))));
+
+        // Act
+        refresher.Refresh(payloads);
+
+        // Assert — selective converted-cache clear for Element, no memory rebuild, no full clear.
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
+            Times.Once);
+    }
+
+    [Test]
     public void Combined_Structural_And_Non_Structural_Change_Uses_Rebuild_Not_Clear()
     {
         // When a payload has both RefreshMain and RefreshOther, it should be treated as structural only.
@@ -314,6 +337,7 @@ public class ContentTypeCacheRefresherTests
         var payloads = new[]
         {
             new ContentTypeCacheRefresher.JsonPayload(nameof(IContentType), 100, ContentTypeChangeTypes.Remove),
+            new ContentTypeCacheRefresher.JsonPayload(nameof(IContentType), 101, ContentTypeChangeTypes.Remove, true),
             new ContentTypeCacheRefresher.JsonPayload(nameof(IMediaType), 200, ContentTypeChangeTypes.Remove),
         };
 
@@ -400,6 +424,35 @@ public class ContentTypeCacheRefresherTests
             x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
             Times.Once);
         _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Once);
+    }
+
+    [Test]
+    public void Auto_Factory_Structural_Element_Change_Clears_All_Converted_Content()
+    {
+        // As above, but for an Element type: the factory reset invalidates all model types, so a structural
+        // Element change needs both the memory rebuild and a full converted cache clear.
+        var refresher = CreateRefresher(CreateAutoFactory());
+        var payloads = new[]
+        {
+            new ContentTypeCacheRefresher.JsonPayload(nameof(IContentType), 100, ContentTypeChangeTypes.RefreshMain, true),
+        };
+
+        _elementCacheService
+            .Setup(x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)))
+            .Returns(Task.CompletedTask);
+        _elementCacheService
+            .Setup(x => x.ClearConvertedContentCache());
+
+        // Act
+        refresher.Refresh(payloads);
+
+        // Assert — rebuild and full clear for Element.
+        _elementCacheService.Verify(
+            x => x.RebuildMemoryCacheByContentTypeAsync(It.Is<int[]>(ids => ids.Length == 1 && ids[0] == 100)),
+            Times.Once);
+        _elementCacheService.Verify(
             x => x.ClearConvertedContentCache(),
             Times.Once);
     }

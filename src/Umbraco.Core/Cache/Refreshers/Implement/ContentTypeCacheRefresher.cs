@@ -163,8 +163,8 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         public ContentTypeChangeTypes ChangeTypes { get; }
 
         /// <summary>
-        ///     Gets whether the content type is an Element type. Only meaningful when <see cref="ItemType" /> is
-        ///     <see cref="IContentType" />.
+        ///     Gets a value indicating whether the content type is an Element type.
+        ///     Only meaningful when <see cref="ItemType" /> is <see cref="IContentType" />.
         /// </summary>
         public bool IsElement { get; }
     }
@@ -254,41 +254,19 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
             // so it belongs with the non-structural changes here — clearing the converted cache is enough.
             // Document and Element types are both IContentType, so they're further split by IsElement to
             // avoid scanning the wrong service's (unbounded) converted-content cache for IDs that can't match.
-            var rebuildDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && !x.IsElement && x.ChangeTypes.RequiresRawDataRebuild())
-                .Select(x => x.Id)
-                .Distinct()
-                .ToArray();
+            IEnumerable<JsonPayload> contentTypePayloads = payloads.Where(x => x.ItemType == nameof(IContentType));
+            IEnumerable<JsonPayload> mediaTypePayloads = payloads.Where(x => x.ItemType == nameof(IMediaType));
 
-            var rebuildElementTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && x.IsElement && x.ChangeTypes.RequiresRawDataRebuild())
-                .Select(x => x.Id)
-                .Distinct()
-                .ToArray();
+            IEnumerable<JsonPayload> rebuildContentTypes = contentTypePayloads.Where(x => x.ChangeTypes.RequiresRawDataRebuild());
+            IEnumerable<JsonPayload> convertedOnlyContentTypes = contentTypePayloads.Where(x => x.ChangeTypes.RequiresConvertedCacheClearOnly());
 
-            var convertedOnlyDocumentTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && !x.IsElement && x.ChangeTypes.RequiresConvertedCacheClearOnly())
-                .Select(x => x.Id)
-                .Distinct()
-                .ToArray();
+            var rebuildDocumentTypeIds = DocumentTypeIds(rebuildContentTypes);
+            var rebuildElementTypeIds = ElementTypeIds(rebuildContentTypes);
+            var convertedOnlyDocumentTypeIds = DocumentTypeIds(convertedOnlyContentTypes);
+            var convertedOnlyElementTypeIds = ElementTypeIds(convertedOnlyContentTypes);
 
-            var convertedOnlyElementTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IContentType) && x.IsElement && x.ChangeTypes.RequiresConvertedCacheClearOnly())
-                .Select(x => x.Id)
-                .Distinct()
-                .ToArray();
-
-            var rebuildMediaTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.RequiresRawDataRebuild())
-                .Select(x => x.Id)
-                .Distinct()
-                .ToArray();
-
-            var convertedOnlyMediaTypeIds = payloads
-                .Where(x => x.ItemType == nameof(IMediaType) && x.ChangeTypes.RequiresConvertedCacheClearOnly())
-                .Select(x => x.Id)
-                .Distinct()
-                .ToArray();
+            var rebuildMediaTypeIds = DistinctIds(mediaTypePayloads.Where(x => x.ChangeTypes.RequiresRawDataRebuild()));
+            var convertedOnlyMediaTypeIds = DistinctIds(mediaTypePayloads.Where(x => x.ChangeTypes.RequiresConvertedCacheClearOnly()));
 
             // Full memory cache rebuild only for changes that affect the stored data.
             if (rebuildDocumentTypeIds.Length > 0)
@@ -363,6 +341,15 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
 
     /// <inheritdoc />
     public override void Remove(int id) => throw new NotSupportedException();
+
+    private static int[] DocumentTypeIds(IEnumerable<JsonPayload> payloads)
+        => DistinctIds(payloads.Where(x => !x.IsElement));
+
+    private static int[] ElementTypeIds(IEnumerable<JsonPayload> payloads)
+        => DistinctIds(payloads.Where(x => x.IsElement));
+
+    private static int[] DistinctIds(IEnumerable<JsonPayload> payloads)
+        => payloads.Select(x => x.Id).Distinct().ToArray();
 
     #endregion
 }
