@@ -301,6 +301,8 @@ export default {
 		createFromClipboard: 'Paste from clipboard',
 		nodeIsInTrash: 'This item is in the Recycle Bin',
 		saveModalTitle: 'Uložit',
+		saveAndPublishDescendantsModalTitle: 'Uložit a publikovat s potomky',
+		saveAndScheduleModalTitle: 'Uložit a naplánovat publikování',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Vytvořit novou šablonu obsahu z <em>%0%</em>',

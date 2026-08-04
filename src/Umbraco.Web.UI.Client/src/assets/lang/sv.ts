@@ -237,6 +237,8 @@ export default {
 		noChanges: 'Inga ändringar har gjorts',
 		notCreated: 'Ej skapad',
 		saveModalTitle: 'Spara',
+		saveAndPublishDescendantsModalTitle: 'Spara och publicera med undersidor',
+		saveAndScheduleModalTitle: 'Spara och schemalägg publicering',
 	},
 	contentTypeEditor: {
 		yesDelete: 'Ja, ta bort',

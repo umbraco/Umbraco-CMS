@@ -320,6 +320,8 @@ export default {
 		createFromClipboard: 'Plakken vanaf het klembord',
 		nodeIsInTrash: 'Dit item is in de prullenbak',
 		saveModalTitle: 'Opslaan',
+		saveAndPublishDescendantsModalTitle: 'Opslaan en publiceren met onderliggende nodes',
+		saveAndScheduleModalTitle: 'Opslaan en publicatie plannen',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Nieuw Inhoudssjabloon aanmaken voor <em>%0%</em>',
