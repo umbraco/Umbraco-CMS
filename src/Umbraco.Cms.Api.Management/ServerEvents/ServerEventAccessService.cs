@@ -6,40 +6,40 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.ServerEvents;
 
 /// <inheritdoc />
-internal sealed class ServerEventEntityAccessService : IServerEventEntityAccessService
+internal sealed class ServerEventAccessService : IServerEventAccessService
 {
     private readonly IUserConnectionManager _userConnectionManager;
     private readonly IUserService _userService;
-    private readonly ServerEventEntityAccessFilterCollection _filters;
+    private readonly ServerEventAccessFilterCollection _filters;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ServerEventEntityAccessService"/> class.
+    /// Initializes a new instance of the <see cref="ServerEventAccessService"/> class.
     /// </summary>
     /// <param name="userConnectionManager">Tracks the currently connected users and their connection ids.</param>
     /// <param name="userService">Resolves the <see cref="IUser"/> for a connected user's key.</param>
-    /// <param name="filters">The registered entity access filters that decide, per source, whether a user may receive an event.</param>
-    public ServerEventEntityAccessService(
+    /// <param name="filters">The registered access filters that decide, per source, whether a user may receive an event.</param>
+    public ServerEventAccessService(
         IUserConnectionManager userConnectionManager,
         IUserService userService,
-        ServerEventEntityAccessFilterCollection filters)
+        ServerEventAccessFilterCollection filters)
     {
         _userConnectionManager = userConnectionManager;
         _userService = userService;
         _filters = filters;
     }
 
-    private Dictionary<string, List<IServerEventEntityAccessFilter>> FiltersByEventSource =>
+    private Dictionary<string, List<IServerEventAccessFilter>> FiltersByEventSource =>
         field ??= GroupFiltersByEventSource();
 
-    private Dictionary<string, List<IServerEventEntityAccessFilter>> GroupFiltersByEventSource()
+    private Dictionary<string, List<IServerEventAccessFilter>> GroupFiltersByEventSource()
     {
-        var grouped = new Dictionary<string, List<IServerEventEntityAccessFilter>>();
+        var grouped = new Dictionary<string, List<IServerEventAccessFilter>>();
 
-        foreach (IServerEventEntityAccessFilter filter in _filters)
+        foreach (IServerEventAccessFilter filter in _filters)
         {
             foreach (var eventSource in filter.FilteredEventSources)
             {
-                if (grouped.TryGetValue(eventSource, out List<IServerEventEntityAccessFilter>? filters) is false)
+                if (grouped.TryGetValue(eventSource, out List<IServerEventAccessFilter>? filters) is false)
                 {
                     filters = [];
                     grouped[eventSource] = filters;
@@ -58,7 +58,7 @@ internal sealed class ServerEventEntityAccessService : IServerEventEntityAccessS
     /// <inheritdoc />
     public async Task<IReadOnlyList<string>> GetAuthorizedConnectionsAsync(string eventSource, ServerEventRoutingContext context)
     {
-        if (FiltersByEventSource.TryGetValue(eventSource, out List<IServerEventEntityAccessFilter>? filters) is false)
+        if (FiltersByEventSource.TryGetValue(eventSource, out List<IServerEventAccessFilter>? filters) is false)
         {
             return [];
         }
@@ -102,11 +102,11 @@ internal sealed class ServerEventEntityAccessService : IServerEventEntityAccessS
     /// </remarks>
     /// <param name="filters">The filters registered for the event source.</param>
     /// <param name="user">The user to check.</param>
-    /// <param name="context">The routing context describing the entity the event concerns.</param>
+    /// <param name="context">The routing context describing what the event concerns.</param>
     /// <returns><c>true</c> if the user is granted access by all filters; otherwise <c>false</c>.</returns>
-    private static async Task<bool> HasAccessAsync(List<IServerEventEntityAccessFilter> filters, IUser user, ServerEventRoutingContext context)
+    private static async Task<bool> HasAccessAsync(List<IServerEventAccessFilter> filters, IUser user, ServerEventRoutingContext context)
     {
-        foreach (IServerEventEntityAccessFilter filter in filters)
+        foreach (IServerEventAccessFilter filter in filters)
         {
             if (await filter.HasAccessAsync(user, context) is false)
             {

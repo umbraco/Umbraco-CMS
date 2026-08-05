@@ -16,7 +16,7 @@ internal sealed class ServerEventRouter : IServerEventRouter
     private readonly IUserConnectionManager _connectionManager;
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<ServerEventRouter> _logger;
-    private readonly IServerEventEntityAccessService _entityAccessService;
+    private readonly IServerEventAccessService _accessService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerEventRouter"/> class.
@@ -25,19 +25,19 @@ internal sealed class ServerEventRouter : IServerEventRouter
     /// <param name="connectionManager">Manages user connections for server events.</param>
     /// <param name="runtimeState">Provides information about the current runtime state of the application.</param>
     /// <param name="logger">The logger used for logging events and errors related to the server event router.</param>
-    /// <param name="entityAccessService">Resolves recipients of entity-scoped events by their start-node access.</param>
+    /// <param name="accessService">Resolves the recipients of an event for sources that are filtered per recipient.</param>
     public ServerEventRouter(
         IHubContext<ServerEventHub, IServerEventHub> eventHub,
         IUserConnectionManager connectionManager,
         IRuntimeState runtimeState,
         ILogger<ServerEventRouter> logger,
-        IServerEventEntityAccessService entityAccessService)
+        IServerEventAccessService accessService)
     {
         _eventHub = eventHub;
         _connectionManager = connectionManager;
         _runtimeState = runtimeState;
         _logger = logger;
-        _entityAccessService = entityAccessService;
+        _accessService = accessService;
     }
 
     /// <inheritdoc/>
@@ -66,8 +66,8 @@ internal sealed class ServerEventRouter : IServerEventRouter
             return;
         }
 
-        // Sources without a per-entity access boundary are broadcast to the whole source group.
-        if (_entityAccessService.AppliesTo(serverEvent.EventSource) is false)
+        // Sources with no registered access filter are broadcast to the whole source group.
+        if (_accessService.AppliesTo(serverEvent.EventSource) is false)
         {
             await RouteEventAsync(serverEvent);
             return;
@@ -78,7 +78,7 @@ internal sealed class ServerEventRouter : IServerEventRouter
         try
         {
             IReadOnlyList<string> connections =
-                await _entityAccessService.GetAuthorizedConnectionsAsync(serverEvent.EventSource, context);
+                await _accessService.GetAuthorizedConnectionsAsync(serverEvent.EventSource, context);
 
             if (connections.Count == 0)
             {

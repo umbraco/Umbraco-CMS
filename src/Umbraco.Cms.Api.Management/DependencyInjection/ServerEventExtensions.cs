@@ -14,7 +14,7 @@ internal static class ServerEventExtensions
     internal static IUmbracoBuilder AddServerEvents(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
-        builder.Services.AddSingleton<IServerEventEntityAccessService, ServerEventEntityAccessService>();
+        builder.Services.AddSingleton<IServerEventAccessService, ServerEventAccessService>();
         builder.Services.AddSingleton<IServerEventRouter, ServerEventRouter>();
         builder.Services.AddSingleton<IServerEventUserManager, ServerEventUserManager>();
         builder.Services.AddSingleton<IServerEventAuthorizationService, ServerEventAuthorizationService>();
@@ -23,7 +23,7 @@ internal static class ServerEventExtensions
         builder
             .AddEvents()
             .AddAuthorizers()
-            .AddEntityAccessFilters();
+            .AddAccessFilters();
 
         return builder;
     }
@@ -114,9 +114,9 @@ internal static class ServerEventExtensions
         return builder;
     }
 
-    private static IUmbracoBuilder AddEntityAccessFilters(this IUmbracoBuilder builder)
+    private static IUmbracoBuilder AddAccessFilters(this IUmbracoBuilder builder)
     {
-        builder.ServerEventEntityAccessFilters()
+        builder.ServerEventAccessFilters()
             .Append<DocumentServerEventAccessFilter>()
             .Append<MediaServerEventAccessFilter>();
         return builder;

@@ -225,5 +225,5 @@ public class ServerEventRouterTests
 
     private Mock<ILogger<ServerEventRouter>> CreateLoggerMock() => new Mock<ILogger<ServerEventRouter>>();
 
-    private static Mock<IServerEventEntityAccessService> CreateFilterMock() => new Mock<IServerEventEntityAccessService>();
+    private static Mock<IServerEventAccessService> CreateFilterMock() => new Mock<IServerEventAccessService>();
 }

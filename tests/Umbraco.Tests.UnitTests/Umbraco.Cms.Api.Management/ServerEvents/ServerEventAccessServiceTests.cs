@@ -16,7 +16,7 @@ using Umbraco.Cms.Tests.Common.Builders.Extensions;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.ServerEvents;
 
 [TestFixture]
-public class ServerEventEntityAccessServiceTests
+public class ServerEventAccessServiceTests
 {
     private static readonly Guid _adminKey = Guid.NewGuid();
     private static readonly Guid _restrictedKey = Guid.NewGuid();
@@ -30,7 +30,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Cannot_Receive_Document_Event_Outside_Start_Node()
     {
-        ServerEventEntityAccessService sut = CreateSut();
+        ServerEventAccessService sut = CreateSut();
 
         // Node 3 sits under the root but outside the restricted user's "Home" start node.
         IReadOnlyList<string> connections =
@@ -43,7 +43,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Can_Receive_Document_Event_Within_Start_Node()
     {
-        ServerEventEntityAccessService sut = CreateSut();
+        ServerEventAccessService sut = CreateSut();
 
         // Node 4 sits below the restricted user's "Home" start node.
         IReadOnlyList<string> connections =
@@ -56,7 +56,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Cannot_Receive_Media_Event_Outside_Start_Node()
     {
-        ServerEventEntityAccessService sut = CreateSut(mediaStartNodes: true);
+        ServerEventAccessService sut = CreateSut(mediaStartNodes: true);
 
         IReadOnlyList<string> connections =
             await sut.GetAuthorizedConnectionsAsync(Constants.ServerEvents.EventSource.Media, PathContext("-1,3"));
@@ -68,7 +68,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Cannot_Receive_Event_Without_A_Path()
     {
-        ServerEventEntityAccessService sut = CreateSut();
+        ServerEventAccessService sut = CreateSut();
 
         // A document event with no resolvable path must be delivered to nobody, not everybody.
         IReadOnlyList<string> connections =
@@ -80,7 +80,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public async Task Cannot_Resolve_Connections_For_Unfiltered_Source()
     {
-        ServerEventEntityAccessService sut = CreateSut();
+        ServerEventAccessService sut = CreateSut();
 
         IReadOnlyList<string> connections =
             await sut.GetAuthorizedConnectionsAsync(Constants.ServerEvents.EventSource.DocumentType, PathContext("-1,3"));
@@ -91,7 +91,7 @@ public class ServerEventEntityAccessServiceTests
     [Test]
     public void Can_Apply_Only_To_Document_And_Media()
     {
-        ServerEventEntityAccessService sut = CreateSut();
+        ServerEventAccessService sut = CreateSut();
 
         Assert.Multiple(() =>
         {
@@ -116,11 +116,11 @@ public class ServerEventEntityAccessServiceTests
         userService.Setup(x => x.GetAsync(It.IsAny<IEnumerable<Guid>>())).ReturnsAsync(new[] { user });
 
         var entityService = CreateEntityServiceMock();
-        var filters = new ServerEventEntityAccessFilterCollection(() => new IServerEventEntityAccessFilter[]
+        var filters = new ServerEventAccessFilterCollection(() => new IServerEventAccessFilter[]
         {
             new DocumentServerEventAccessFilter(entityService.Object, AppCaches.Disabled),
         });
-        var sut = new ServerEventEntityAccessService(connectionManager, userService.Object, filters);
+        var sut = new ServerEventAccessService(connectionManager, userService.Object, filters);
 
         IReadOnlyList<string> connections =
             await sut.GetAuthorizedConnectionsAsync(Constants.ServerEvents.EventSource.Document, PathContext("-1,2,4"));
@@ -154,7 +154,7 @@ public class ServerEventEntityAccessServiceTests
 
     private static ServerEventRoutingContext PathContext(string entityPath) => new() { EntityPath = entityPath };
 
-    private static ServerEventEntityAccessService CreateSut(bool mediaStartNodes = false)
+    private static ServerEventAccessService CreateSut(bool mediaStartNodes = false)
     {
         var connectionManager = new UserConnectionManager();
         connectionManager.AddConnection(_adminKey, AdminConnection);
@@ -185,13 +185,13 @@ public class ServerEventEntityAccessServiceTests
 
         var entityService = CreateEntityServiceMock();
 
-        var filters = new ServerEventEntityAccessFilterCollection(() => new IServerEventEntityAccessFilter[]
+        var filters = new ServerEventAccessFilterCollection(() => new IServerEventAccessFilter[]
         {
             new DocumentServerEventAccessFilter(entityService.Object, AppCaches.Disabled),
             new MediaServerEventAccessFilter(entityService.Object, AppCaches.Disabled),
         });
 
-        return new ServerEventEntityAccessService(connectionManager, userService.Object, filters);
+        return new ServerEventAccessService(connectionManager, userService.Object, filters);
     }
 
     private static Mock<IEntityService> CreateEntityServiceMock()
