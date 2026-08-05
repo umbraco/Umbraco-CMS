@@ -1,5 +1,4 @@
 import type { ManifestCollectionView } from './collection-view.extension.js';
-import { UMB_COLLECTION_CURRENT_VIEW_MEMORY_UNIQUE } from '../interaction-memory/constants.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbCollectionViewManager } from './collection-view.manager.js';
 import { aTimeout, expect } from '@open-wc/testing';
@@ -8,6 +7,8 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+
+const CURRENT_VIEW_MEMORY_UNIQUE = 'UmbCollectionCurrentView';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -102,8 +103,7 @@ describe('UmbCollectionViewManager', () => {
 		let hostElement: UmbTestControllerHostElement;
 		let interactionMemory: UmbInteractionMemoryManager;
 
-		const getMemorizedViewAlias = () =>
-			interactionMemory.getMemory(UMB_COLLECTION_CURRENT_VIEW_MEMORY_UNIQUE)?.value?.alias;
+		const getMemorizedViewAlias = () => interactionMemory.getMemory(CURRENT_VIEW_MEMORY_UNIQUE)?.value?.alias;
 
 		const createManager = () => {
 			const memorizingManager = new UmbCollectionViewManager(hostElement, {
@@ -133,7 +133,7 @@ describe('UmbCollectionViewManager', () => {
 
 		it('lands on the remembered view instead of the configured default view', async () => {
 			interactionMemory.setMemory({
-				unique: UMB_COLLECTION_CURRENT_VIEW_MEMORY_UNIQUE,
+				unique: CURRENT_VIEW_MEMORY_UNIQUE,
 				value: { alias: VIEW_1_ALIAS },
 			});
 			expect(await getLandingViewAlias(createManager())).to.equal(VIEW_1_ALIAS);
@@ -147,7 +147,7 @@ describe('UmbCollectionViewManager', () => {
 			const memorizingManager = createManager();
 			await aTimeout(100);
 			interactionMemory.setMemory({
-				unique: UMB_COLLECTION_CURRENT_VIEW_MEMORY_UNIQUE,
+				unique: CURRENT_VIEW_MEMORY_UNIQUE,
 				value: { alias: VIEW_1_ALIAS },
 			});
 			expect(await getLandingViewAlias(memorizingManager)).to.equal(VIEW_1_ALIAS);

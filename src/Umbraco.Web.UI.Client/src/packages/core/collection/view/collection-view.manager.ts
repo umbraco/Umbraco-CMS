@@ -1,5 +1,4 @@
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
-import { UMB_COLLECTION_CURRENT_VIEW_MEMORY_UNIQUE } from '../interaction-memory/constants.js';
 import type { ManifestCollectionView } from './collection-view.extension.js';
 import type { UmbCollectionViewElementBase } from './umb-collection-view-element-base.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -12,6 +11,8 @@ import type {
 	UmbInteractionMemoryManager,
 	UmbInteractionMemoryModel,
 } from '@umbraco-cms/backoffice/interaction-memory';
+
+const CURRENT_VIEW_MEMORY_UNIQUE = 'UmbCollectionCurrentView';
 
 export interface UmbCollectionViewManagerConfig {
 	defaultViewAlias?: string;
@@ -163,13 +164,13 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 	}
 
 	#getMemorizedViewAlias(): string | undefined {
-		return this.#interactionMemoryManager?.getMemory(UMB_COLLECTION_CURRENT_VIEW_MEMORY_UNIQUE)?.value?.alias;
+		return this.#interactionMemoryManager?.getMemory(CURRENT_VIEW_MEMORY_UNIQUE)?.value?.alias;
 	}
 
 	#writeToMemory(view: ManifestCollectionView) {
 		if (!this.#interactionMemoryManager) return;
 		const memory: UmbInteractionMemoryModel = {
-			unique: UMB_COLLECTION_CURRENT_VIEW_MEMORY_UNIQUE,
+			unique: CURRENT_VIEW_MEMORY_UNIQUE,
 			value: { alias: view.alias },
 		};
 		this.#muteMemoryObservation = true;
@@ -179,7 +180,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 	#observeInteractionMemory() {
 		this.observe(
-			this.#interactionMemoryManager!.memory(UMB_COLLECTION_CURRENT_VIEW_MEMORY_UNIQUE),
+			this.#interactionMemoryManager!.memory(CURRENT_VIEW_MEMORY_UNIQUE),
 			(memory) => {
 				if (this.#muteMemoryObservation) return;
 				if (!memory) return;

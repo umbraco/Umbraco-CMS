@@ -1,11 +1,12 @@
 import { UmbCollectionWorkspaceViewInteractionMemoryController } from './collection-workspace-view-interaction-memory.controller.js';
-import { UMB_COLLECTION_FILTER_MEMORY_UNIQUE } from './constants.js';
 import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbInteractionMemoryContext } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+
+const FILTER_MEMORY_UNIQUE = 'UmbCollectionFilter';
 
 @customElement('test-collection-workspace-view-interaction-memory-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -18,7 +19,7 @@ const MEMORY_UNIQUE = `${WORKSPACE_VIEW_ALIAS}:${COLLECTION_ALIAS}:${ENTITY_UNIQ
 const OTHER_MEMORY_UNIQUE = `${WORKSPACE_VIEW_ALIAS}:${COLLECTION_ALIAS}:${OTHER_ENTITY_UNIQUE}`;
 
 const filterMemory: UmbInteractionMemoryModel = {
-	unique: UMB_COLLECTION_FILTER_MEMORY_UNIQUE,
+	unique: FILTER_MEMORY_UNIQUE,
 	value: { filter: 'news' },
 };
 

@@ -1,13 +1,12 @@
 import { UmbDefaultCollectionContext } from './collection-default.context.js';
-import {
-	UMB_COLLECTION_FILTER_MEMORY_UNIQUE,
-	UMB_COLLECTION_ORDER_MEMORY_UNIQUE,
-	UMB_COLLECTION_PAGINATION_MEMORY_UNIQUE,
-} from '../interaction-memory/constants.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbCollectionFilterModel } from '../collection-filter-model.interface.js';
+
+const FILTER_MEMORY_UNIQUE = 'UmbCollectionFilter';
+const ORDER_MEMORY_UNIQUE = 'UmbCollectionOrder';
+const PAGINATION_MEMORY_UNIQUE = 'UmbCollectionPagination';
 
 @customElement('test-collection-default-context-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -38,7 +37,7 @@ describe('UmbDefaultCollectionContext interaction memory', () => {
 
 		it('remembers the filter term', () => {
 			context.setFilter({ filter: 'news' });
-			expect(context.interactionMemory.getMemory(UMB_COLLECTION_FILTER_MEMORY_UNIQUE)?.value).to.eql({
+			expect(context.interactionMemory.getMemory(FILTER_MEMORY_UNIQUE)?.value).to.eql({
 				filter: 'news',
 			});
 		});
@@ -46,12 +45,12 @@ describe('UmbDefaultCollectionContext interaction memory', () => {
 		it('forgets the filter term when it is cleared', () => {
 			context.setFilter({ filter: 'news' });
 			context.setFilter({ filter: '' });
-			expect(context.interactionMemory.getMemory(UMB_COLLECTION_FILTER_MEMORY_UNIQUE)).to.be.undefined;
+			expect(context.interactionMemory.getMemory(FILTER_MEMORY_UNIQUE)).to.be.undefined;
 		});
 
 		it('remembers the ordering', () => {
 			context.setFilter({ orderBy: 'name', orderDirection: 'asc' });
-			expect(context.interactionMemory.getMemory(UMB_COLLECTION_ORDER_MEMORY_UNIQUE)?.value).to.eql({
+			expect(context.interactionMemory.getMemory(ORDER_MEMORY_UNIQUE)?.value).to.eql({
 				orderBy: 'name',
 				orderDirection: 'asc',
 			});
@@ -59,7 +58,7 @@ describe('UmbDefaultCollectionContext interaction memory', () => {
 
 		it('does not remember the ordering when it matches the configured ordering', () => {
 			context.setFilter({ orderBy: 'updateDate', orderDirection: 'desc' });
-			expect(context.interactionMemory.getMemory(UMB_COLLECTION_ORDER_MEMORY_UNIQUE)).to.be.undefined;
+			expect(context.interactionMemory.getMemory(ORDER_MEMORY_UNIQUE)).to.be.undefined;
 		});
 
 		it('does not remember the ordering when it matches the default filter of the collection', () => {
@@ -72,12 +71,12 @@ describe('UmbDefaultCollectionContext interaction memory', () => {
 
 			contextWithDefaultOrder.setFilter({ orderBy: 'name', orderDirection: 'asc' });
 
-			expect(contextWithDefaultOrder.interactionMemory.getMemory(UMB_COLLECTION_ORDER_MEMORY_UNIQUE)).to.be.undefined;
+			expect(contextWithDefaultOrder.interactionMemory.getMemory(ORDER_MEMORY_UNIQUE)).to.be.undefined;
 		});
 
 		it('remembers the page number', () => {
 			context.setFilter({ skip: PAGE_SIZE * 2 });
-			expect(context.interactionMemory.getMemory(UMB_COLLECTION_PAGINATION_MEMORY_UNIQUE)?.value).to.eql({
+			expect(context.interactionMemory.getMemory(PAGINATION_MEMORY_UNIQUE)?.value).to.eql({
 				pageNumber: 3,
 			});
 		});
@@ -85,22 +84,22 @@ describe('UmbDefaultCollectionContext interaction memory', () => {
 		it('does not remember the first page', () => {
 			context.setFilter({ skip: PAGE_SIZE * 2 });
 			context.setFilter({ skip: 0 });
-			expect(context.interactionMemory.getMemory(UMB_COLLECTION_PAGINATION_MEMORY_UNIQUE)).to.be.undefined;
+			expect(context.interactionMemory.getMemory(PAGINATION_MEMORY_UNIQUE)).to.be.undefined;
 		});
 	});
 
 	describe('reading', () => {
 		it('applies the remembered filter term, ordering and page number', () => {
 			context.interactionMemory.setMemory({
-				unique: UMB_COLLECTION_FILTER_MEMORY_UNIQUE,
+				unique: FILTER_MEMORY_UNIQUE,
 				value: { filter: 'news' },
 			});
 			context.interactionMemory.setMemory({
-				unique: UMB_COLLECTION_ORDER_MEMORY_UNIQUE,
+				unique: ORDER_MEMORY_UNIQUE,
 				value: { orderBy: 'name', orderDirection: 'asc' },
 			});
 			context.interactionMemory.setMemory({
-				unique: UMB_COLLECTION_PAGINATION_MEMORY_UNIQUE,
+				unique: PAGINATION_MEMORY_UNIQUE,
 				value: { pageNumber: 3 },
 			});
 
@@ -118,7 +117,7 @@ describe('UmbDefaultCollectionContext interaction memory', () => {
 			context.setConfig({ pageSize: PAGE_SIZE });
 
 			context.interactionMemory.setMemory({
-				unique: UMB_COLLECTION_FILTER_MEMORY_UNIQUE,
+				unique: FILTER_MEMORY_UNIQUE,
 				value: { filter: 'news' },
 			});
 

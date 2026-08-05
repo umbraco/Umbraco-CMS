@@ -11,11 +11,6 @@ import type { UmbCollectionRepository } from '../repository/collection-repositor
 import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
-import {
-	UMB_COLLECTION_FILTER_MEMORY_UNIQUE,
-	UMB_COLLECTION_ORDER_MEMORY_UNIQUE,
-	UMB_COLLECTION_PAGINATION_MEMORY_UNIQUE,
-} from '../interaction-memory/constants.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbValueSummaryCoordinatorContext } from '@umbraco-cms/backoffice/value-summary';
@@ -45,6 +40,10 @@ import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 const LOCAL_STORAGE_KEY = 'umb-collection-view';
+
+const FILTER_MEMORY_UNIQUE = 'UmbCollectionFilter';
+const ORDER_MEMORY_UNIQUE = 'UmbCollectionOrder';
+const PAGINATION_MEMORY_UNIQUE = 'UmbCollectionPagination';
 
 /**
  * The parts of a collection filter that are remembered in the interaction memory.
@@ -404,11 +403,11 @@ export class UmbDefaultCollectionContext<
 
 		if (filter.filter) {
 			this.interactionMemory.setMemory({
-				unique: UMB_COLLECTION_FILTER_MEMORY_UNIQUE,
+				unique: FILTER_MEMORY_UNIQUE,
 				value: { filter: filter.filter },
 			});
 		} else {
-			this.interactionMemory.deleteMemory(UMB_COLLECTION_FILTER_MEMORY_UNIQUE);
+			this.interactionMemory.deleteMemory(FILTER_MEMORY_UNIQUE);
 		}
 
 		const configuredOrder = this.#getConfiguredOrder();
@@ -417,22 +416,22 @@ export class UmbDefaultCollectionContext<
 
 		if (filter.orderBy && !isConfiguredOrder) {
 			this.interactionMemory.setMemory({
-				unique: UMB_COLLECTION_ORDER_MEMORY_UNIQUE,
+				unique: ORDER_MEMORY_UNIQUE,
 				value: { orderBy: filter.orderBy, orderDirection: filter.orderDirection },
 			});
 		} else {
-			this.interactionMemory.deleteMemory(UMB_COLLECTION_ORDER_MEMORY_UNIQUE);
+			this.interactionMemory.deleteMemory(ORDER_MEMORY_UNIQUE);
 		}
 
 		const pageNumber = this.#getPageNumberOfSkip(filter.skip);
 
 		if (pageNumber > 1) {
 			this.interactionMemory.setMemory({
-				unique: UMB_COLLECTION_PAGINATION_MEMORY_UNIQUE,
+				unique: PAGINATION_MEMORY_UNIQUE,
 				value: { pageNumber },
 			});
 		} else {
-			this.interactionMemory.deleteMemory(UMB_COLLECTION_PAGINATION_MEMORY_UNIQUE);
+			this.interactionMemory.deleteMemory(PAGINATION_MEMORY_UNIQUE);
 		}
 	}
 
@@ -444,9 +443,9 @@ export class UmbDefaultCollectionContext<
 		if (!this._configured) return;
 
 		const filter = this.#getFilterValue();
-		const filterMemory = this.interactionMemory.getMemory(UMB_COLLECTION_FILTER_MEMORY_UNIQUE)?.value;
-		const orderMemory = this.interactionMemory.getMemory(UMB_COLLECTION_ORDER_MEMORY_UNIQUE)?.value;
-		const paginationMemory = this.interactionMemory.getMemory(UMB_COLLECTION_PAGINATION_MEMORY_UNIQUE)?.value;
+		const filterMemory = this.interactionMemory.getMemory(FILTER_MEMORY_UNIQUE)?.value;
+		const orderMemory = this.interactionMemory.getMemory(ORDER_MEMORY_UNIQUE)?.value;
+		const paginationMemory = this.interactionMemory.getMemory(PAGINATION_MEMORY_UNIQUE)?.value;
 
 		const memorized: UmbCollectionMemorizedFilter = {};
 
@@ -477,6 +476,7 @@ export class UmbDefaultCollectionContext<
 	/**
 	 * The ordering the collection has when nothing has been remembered. It can come from the default filter of a
 	 * specialized collection context as well as from the configuration.
+	 * @returns {Pick<UmbCollectionMemorizedFilter, 'orderBy' | 'orderDirection'>} The configured ordering.
 	 */
 	#getConfiguredOrder(): Pick<UmbCollectionMemorizedFilter, 'orderBy' | 'orderDirection'> {
 		const defaults = { ...this.#defaultFilter, ...this.#config } as UmbCollectionMemorizedFilter;
