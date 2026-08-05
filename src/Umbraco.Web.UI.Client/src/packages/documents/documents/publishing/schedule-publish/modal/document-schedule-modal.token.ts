@@ -12,6 +12,16 @@ export interface UmbDocumentScheduleSelectionModel {
 export interface UmbDocumentScheduleModalData extends UmbDocumentVariantPickerData {
 	activeVariants: Array<string>;
 	prevalues: Array<UmbDocumentScheduleSelectionModel>;
+	/**
+	 * Cultures published across the entire ancestor chain — i.e. the intersection of
+	 * each ancestor's published cultures. Used to warn when a scheduled publish won't
+	 * take effect because an ancestor isn't published in that culture.
+	 *
+	 * - `undefined` — root document or lookup unavailable; no warnings rendered.
+	 * - `[null]` — every ancestor is published in the invariant variant (covers all child cultures).
+	 * - `[]` — no culture is published in every ancestor; every variant is warned.
+	 */
+	ancestorPublishedCultures?: Array<string | null>;
 }
 
 export interface UmbDocumentScheduleModalValue {
