@@ -325,19 +325,14 @@ public class UserPresentationFactory : IUserPresentationFactory
     /// <inheritdoc/>
     public Task<CurrentUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
     {
-        // When the session has a fixed expiry (i.e. not "keep me logged in"), surface the absolute
-        // timeout so the client can drive its countdown/timeout UX. The value comes from the
-        // authentication ticket-expiry claim written during back-office cookie validation.
+        // Surface the absolute session timeout, so the client can drive its countdown/timeout UX (or explicit keep
+        // the session alive when KeepUserLoggedIn is enabled). The value comes from the authentication ticket-expiry
+        // claim written during back-office cookie validation.
         DateTimeOffset? timeoutUtc = null;
-        if (_securitySettings.KeepUserLoggedIn is false)
+        var ticketExpires = _httpContextAccessor.HttpContext?.User.FindFirst(Constants.Security.TicketExpiresClaimType)?.Value;
+        if (DateTimeOffset.TryParse(ticketExpires, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTimeOffset parsedExpiry))
         {
-            var ticketExpires = _httpContextAccessor.HttpContext?.User
-                .FindFirst(Constants.Security.TicketExpiresClaimType)?.Value;
-            if (ticketExpires.IsNullOrWhiteSpace() is false
-                && DateTimeOffset.TryParse(ticketExpires, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTimeOffset parsedExpiry))
-            {
-                timeoutUtc = parsedExpiry;
-            }
+            timeoutUtc = parsedExpiry;
         }
 
         var model = new CurrentUserConfigurationResponseModel

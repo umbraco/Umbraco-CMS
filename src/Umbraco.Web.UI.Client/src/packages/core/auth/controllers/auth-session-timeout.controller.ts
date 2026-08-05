@@ -35,12 +35,8 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 					// logged back in and broadcast the fresh session).
 					this.#closeTimeoutModal();
 
-					// keepUserLoggedIn: the server keeps the session alive, so we never warn or time
-					// out client-side (never show the timeout overlay). Otherwise, schedule the warning
-					// against the cookie's fixed expiry.
-					if (!host.keepUserLoggedIn) {
-						this.#scheduleCheck(session.expiresAt);
-					}
+					// Schedule the warning against the session expiry
+					this.#scheduleCheck(session.expiresAt);
 				}
 			},
 			'_sessionState',
@@ -133,7 +129,14 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 			return;
 		}
 
-		await this.#openTimeoutModal(secondsRemaining);
+		// If keepUserLoggedIn is true, the client quietly keeps the session alive.
+		// Otherwise, show the timeout overlay.
+		if (this.#host.keepUserLoggedIn) {
+			await this.#tryKeepAlive();
+		}
+		else {
+			await this.#openTimeoutModal(secondsRemaining);
+		}
 	}
 
 	async #closeTimeoutModal() {
