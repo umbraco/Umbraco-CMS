@@ -2245,9 +2245,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> firstPage = await repository.GetPagedRecycleBinAsync(
-            pageIndex: 0, pageSize: 2, ordering: null, CancellationToken.None);
+            skip: 0, take: 2, ordering: null, CancellationToken.None);
         PagedModel<IContent> secondPage = await repository.GetPagedRecycleBinAsync(
-            pageIndex: 1, pageSize: 2, ordering: null, CancellationToken.None);
+            skip: 2, take: 2, ordering: null, CancellationToken.None);
         scope.Complete();
 
         Assert.That(firstPage.Total, Is.EqualTo(3));
@@ -2278,7 +2278,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // No culture, so Ordering.IsInvariant is true and this exercises the plain node.Text ordering
         // path (FetchDefaultOrdered), not the culture-variant name path.
         PagedModel<IContent> result = await repository.GetPagedRecycleBinAsync(
-            pageIndex: 0, pageSize: 10, ordering: Ordering.By("name"), CancellationToken.None);
+            skip: 0, take: 10, ordering: Ordering.By("name"), CancellationToken.None);
         scope.Complete();
 
         IContent[] items = result.Items.ToArray();
@@ -2307,7 +2307,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetPagedRecycleBinAsync(
-            pageIndex: 0, pageSize: 10, ordering: Ordering.By("name", culture: "en-US"), CancellationToken.None);
+            skip: 0, take: 10, ordering: Ordering.By("name", culture: "en-US"), CancellationToken.None);
         scope.Complete();
 
         IContent first = result.Items.First(item => item.Key == docA.Key || item.Key == docB.Key);
@@ -2339,7 +2339,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetPagedRecycleBinAsync(
-            pageIndex: 0, pageSize: 100, ordering: Ordering.By("priority", isCustomField: true), CancellationToken.None);
+            skip: 0, take: 100, ordering: Ordering.By("priority", isCustomField: true), CancellationToken.None);
         scope.Complete();
 
         IContent[] custom = result.Items.Where(item => item.ContentType.Alias == contentType.Alias).ToArray();

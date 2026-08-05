@@ -158,12 +158,12 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <summary>
     ///     Gets a paged list of content items in the recycle bin.
     /// </summary>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
     /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching recycle bin items and the total record count.</returns>
-    Task<PagedModel<TEntity>> GetPagedRecycleBinAsync(long pageIndex, int pageSize, Ordering? ordering, CancellationToken cancellationToken);
+    Task<PagedModel<TEntity>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Checks the data integrity of content items and optionally repairs detected issues.

@@ -1018,12 +1018,9 @@ internal sealed class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
-    public override Task<PagedModel<IContent>> GetPagedRecycleBinAsync(long pageIndex, int pageSize, Ordering? ordering, CancellationToken cancellationToken) =>
+    public override Task<PagedModel<IContent>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            int skip = (int)(pageIndex * pageSize);
-            int take = pageSize;
-
             int total = await db.Nodes
                 .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed)
                 .CountAsync(cancellationToken);

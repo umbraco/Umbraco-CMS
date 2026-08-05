@@ -262,7 +262,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     public abstract Task<IEnumerable<TEntity>> GetRecycleBinAsync(CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    public abstract Task<PagedModel<TEntity>> GetPagedRecycleBinAsync(long pageIndex, int pageSize, Ordering? ordering, CancellationToken cancellationToken);
+    public abstract Task<PagedModel<TEntity>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <inheritdoc />
     public virtual async Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(
