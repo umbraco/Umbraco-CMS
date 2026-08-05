@@ -336,8 +336,7 @@ export class UmbDefaultCollectionContext<
 
 		if (data) {
 			this._items.setValue(data.items);
-			this._totalItems.setValue(data.total);
-			this.pagination.setTotalItems(data.total);
+			this._setTotalItems(data.total);
 		}
 
 		this._loading.setValue(false);
@@ -380,18 +379,23 @@ export class UmbDefaultCollectionContext<
 			() => this.#applyInteractionMemory(),
 			'umbCollectionInteractionMemoryObserver',
 		);
+	}
 
-		// The remembered page can only be given to the pagination manager once the amount of pages is known.
-		this.observe(
-			this.pagination.totalItems,
-			(totalItems) => {
-				if (this.#pageNumberToRestore === undefined || !totalItems) return;
-				const pageNumber = this.#pageNumberToRestore;
-				this.#pageNumberToRestore = undefined;
-				this.pagination.setCurrentPageNumber(pageNumber);
-			},
-			'umbCollectionRestorePageNumberObserver',
-		);
+	/**
+	 * Sets the total amount of items of the collection and moves the pagination to the remembered page.
+	 * @param {number} totalItems - The total amount of items in the collection.
+	 * @memberof UmbCollectionContext
+	 */
+	protected _setTotalItems(totalItems: number) {
+		this._totalItems.setValue(totalItems);
+		this.pagination.setTotalItems(totalItems);
+
+		// The remembered page can only be given to the pagination manager once it knows the amount of pages, as it
+		// corrects a page beyond the last one.
+		if (this.#pageNumberToRestore === undefined) return;
+		const pageNumber = this.#pageNumberToRestore;
+		this.#pageNumberToRestore = undefined;
+		this.pagination.setCurrentPageNumber(pageNumber);
 	}
 
 	/**

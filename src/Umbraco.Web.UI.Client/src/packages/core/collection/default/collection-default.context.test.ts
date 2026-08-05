@@ -16,18 +16,27 @@ type UmbTestCollectionFilterModel = UmbCollectionFilterModel & {
 	orderDirection?: string;
 };
 
+/**
+ * Exposes the protected total items setter, which a collection calls when a request has been answered.
+ */
+class UmbTestCollectionContext extends UmbDefaultCollectionContext<any, UmbTestCollectionFilterModel> {
+	receiveTotalItems(totalItems: number) {
+		this._setTotalItems(totalItems);
+	}
+}
+
 const PAGE_SIZE = 10;
 const DEFAULT_VIEW_ALIAS = 'Umb.CollectionView.Test';
 
 describe('UmbDefaultCollectionContext interaction memory', () => {
 	let hostElement: UmbTestControllerHostElement;
-	let context: UmbDefaultCollectionContext<any, UmbTestCollectionFilterModel>;
+	let context: UmbTestCollectionContext;
 
 	const getFilter = () => context.getFilter() as Record<string, unknown>;
 
 	beforeEach(() => {
 		hostElement = new UmbTestControllerHostElement();
-		context = new UmbDefaultCollectionContext(hostElement, DEFAULT_VIEW_ALIAS);
+		context = new UmbTestCollectionContext(hostElement, DEFAULT_VIEW_ALIAS);
 	});
 
 	describe('writing', () => {
@@ -128,6 +137,32 @@ describe('UmbDefaultCollectionContext interaction memory', () => {
 			context.setConfig({ pageSize: PAGE_SIZE, orderBy: 'updateDate', orderDirection: 'desc' });
 
 			expect(getFilter()).to.include({ orderBy: 'updateDate', orderDirection: 'desc', skip: 0 });
+		});
+	});
+
+	describe('restoring the page number', () => {
+		beforeEach(() => {
+			context.interactionMemory.setMemory({ unique: PAGINATION_MEMORY_UNIQUE, value: { pageNumber: 7 } });
+			context.setConfig({ pageSize: PAGE_SIZE });
+		});
+
+		it('requests the remembered page before the total amount of items is known', () => {
+			expect(getFilter()).to.include({ skip: PAGE_SIZE * 6 });
+			expect(context.pagination.getCurrentPageNumber()).to.equal(1);
+		});
+
+		it('moves the pagination to the remembered page once the total amount of items is known', () => {
+			context.receiveTotalItems(PAGE_SIZE * 100);
+
+			expect(context.pagination.getCurrentPageNumber()).to.equal(7);
+			expect(getFilter()).to.include({ skip: PAGE_SIZE * 6 });
+		});
+
+		it('corrects the remembered page when the collection no longer has that many pages', () => {
+			context.receiveTotalItems(PAGE_SIZE * 3);
+
+			expect(context.pagination.getCurrentPageNumber()).to.equal(3);
+			expect(getFilter()).to.include({ skip: PAGE_SIZE * 2 });
 		});
 	});
 });
