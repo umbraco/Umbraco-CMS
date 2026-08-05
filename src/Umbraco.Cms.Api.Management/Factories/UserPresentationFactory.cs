@@ -385,8 +385,8 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         HashSet<IPermissionPresentationModel> permissions = GetAggregatedGranularPermissions(user, presentationGroups);
 
-        // Filter the user group default (fallback) permissions through document and element permission services so custom
-        // implementations control UI visibility for actions that rely on default permissions (no granular assignment).
+        // Filter the user group default (fallback) permissions through the permission services so custom implementations
+        // control UI visibility for actions that rely on default permissions (no granular assignment).
         ISet<string> fallbackPermissions = await FilterFallbackPermissionsAsync(
             user,
             presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet());
@@ -422,7 +422,9 @@ public class UserPresentationFactory : IUserPresentationFactory
 
     // Each permission service filters its own copy of the aggregated (unfiltered) fallback permissions, and the
     // results are intersected. This keeps filtering order-independent, so no service can resurrect a verb another
-    // service removed.
+    // service removed. Seeding from the aggregated set means only removals are honoured; a verb an implementation
+    // adds is intersected away. Each service needs its own copy because implementations may return (and mutate) the
+    // set they were given - the stock implementations pass the instance straight back.
     private async Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> aggregatedFallbackPermissions)
     {
         var filtered = new HashSet<string>(aggregatedFallbackPermissions);

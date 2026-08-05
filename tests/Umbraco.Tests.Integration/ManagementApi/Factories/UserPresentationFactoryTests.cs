@@ -445,9 +445,44 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         Assert.That(model.FallbackPermissions, Contains.Item("Umb.ElementContainer.Read"));
     }
 
+    [Test]
+    public async Task Cannot_Reinstate_Or_Add_Fallback_Permissions_Filtered_By_Another_Permission_Service()
+    {
+        // The element verb the element permission service strips, which the container permission service then puts
+        // back. Only removals are honoured, so the verb stays out no matter which service asked for it back.
+        var group = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [],
+            [FallbackFilteringElementContainerPermissionService.ReinstatedVerb, "Umb.Element.Read"],
+            [],
+            Constants.System.Root);
+        var user = await CreateUser([group.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+
+        Assert.Multiple(() =>
+        {
+            // Each service filters its own copy of the unfiltered set and the results are intersected, so filtering is
+            // order-independent - a later service cannot resurrect a verb an earlier one removed.
+            Assert.That(model.FallbackPermissions, Does.Not.Contain(FallbackFilteringElementContainerPermissionService.ReinstatedVerb));
+
+            // A verb that was never in the aggregated set is discarded too.
+            Assert.That(model.FallbackPermissions, Does.Not.Contain(FallbackFilteringElementContainerPermissionService.AddedVerb));
+
+            Assert.That(model.FallbackPermissions, Contains.Item("Umb.Element.Read"));
+        });
+    }
+
     private sealed class FallbackFilteringElementContainerPermissionService : IElementContainerPermissionService
     {
         public const string StrippedVerb = "Umb.ElementContainer.Create";
+
+        // Verbs this service tries to put back into the set: one the element permission service removes, and one that
+        // was never in the aggregated set at all. Neither should reach the client - the factory honours removals only.
+        public const string ReinstatedVerb = FallbackFilteringElementPermissionService.StrippedVerb;
+
+        public const string AddedVerb = "Umb.ElementContainer.Injected";
 
         private readonly IElementContainerPermissionService _inner;
 
@@ -457,6 +492,8 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         {
             ISet<string> filtered = await _inner.FilterFallbackPermissionsAsync(user, fallbackPermissions);
             filtered.Remove(StrippedVerb);
+            filtered.Add(ReinstatedVerb);
+            filtered.Add(AddedVerb);
             return filtered;
         }
 
