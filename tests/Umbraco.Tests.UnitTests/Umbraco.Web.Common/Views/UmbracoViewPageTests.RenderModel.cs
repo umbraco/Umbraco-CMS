@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
@@ -276,14 +275,14 @@ public partial class UmbracoViewPageTests
         Assert.IsInstanceOf<ContentType1>(view.Model);
     }
 
-    private ViewDataDictionary<T> GetViewDataDictionary<T>(object model)
+    private static ViewDataDictionary<T> GetViewDataDictionary<T>(object model)
     {
         var sourceViewDataDictionary =
             new ViewDataDictionary<T>(new EmptyModelMetadataProvider(), new ModelStateDictionary());
         return new ViewDataDictionary<T>(sourceViewDataDictionary, model);
     }
 
-    private ViewDataDictionary GetViewDataDictionary(object model)
+    private static ViewDataDictionary GetViewDataDictionary(object model)
     {
         var sourceViewDataDictionary =
             new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
