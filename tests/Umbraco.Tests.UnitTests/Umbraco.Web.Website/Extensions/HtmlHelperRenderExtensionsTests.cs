@@ -38,7 +38,19 @@ public class HtmlHelperRenderExtensionsTests
         });
     }
 
-    private static string RenderPreviewBadge(string? nonce)
+    [Test]
+    public void PreviewBadge_Omits_Nonce_When_Service_Is_Not_Registered()
+    {
+        var badge = RenderPreviewBadge(null, registerCspNonceService: false);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(badge, Does.Contain(@"<script src="""));
+            Assert.That(badge, Does.Not.Contain("nonce"));
+        });
+    }
+
+    private static string RenderPreviewBadge(string? nonce, bool registerCspNonceService = true)
     {
         var umbracoContext = new Mock<IUmbracoContext>();
         umbracoContext.Setup(x => x.InPreviewMode).Returns(true);
@@ -49,7 +61,11 @@ public class HtmlHelperRenderExtensionsTests
 
         var services = new ServiceCollection();
         services.AddSingleton(Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco"));
-        services.AddSingleton(Mock.Of<ICspNonceService>(x => x.GetNonce() == nonce));
+
+        if (registerCspNonceService)
+        {
+            services.AddSingleton(Mock.Of<ICspNonceService>(x => x.GetNonce() == nonce));
+        }
 
         var httpContext = new DefaultHttpContext { RequestServices = services.BuildServiceProvider() };
         httpContext.Request.Path = "/";
