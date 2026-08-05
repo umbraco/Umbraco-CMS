@@ -696,9 +696,14 @@ internal sealed class AsyncDocumentRepository
                         });
 
                 bool descending = ordering!.Direction == Direction.Descending;
+
+                // ThenBy NodeId breaks ties in variantName (e.g. many nodes sharing a fallback node.Text)
+                // so paged results stay stable/non-duplicated across separate fetches — mirrors NPoco's
+                // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY
+                // umbracoNode.id" after any user ordering (see http://issues.umbraco.org/issue/U4-8831).
                 var ordered = descending
-                    ? withVariantName.OrderByDescending(joined => joined.variantName)
-                    : withVariantName.OrderBy(joined => joined.variantName);
+                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
+                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
 
                 return await ordered
                     .Skip(skip)
@@ -897,9 +902,14 @@ internal sealed class AsyncDocumentRepository
                         });
 
                 bool descending = ordering!.Direction == Direction.Descending;
+
+                // ThenBy NodeId breaks ties in variantName (e.g. many nodes sharing a fallback node.Text)
+                // so paged results stay stable/non-duplicated across separate fetches — mirrors NPoco's
+                // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY
+                // umbracoNode.id" after any user ordering (see http://issues.umbraco.org/issue/U4-8831).
                 var ordered = descending
-                    ? withVariantName.OrderByDescending(joined => joined.variantName)
-                    : withVariantName.OrderBy(joined => joined.variantName);
+                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
+                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
 
                 return await ordered
                     .Skip(skip)
@@ -1147,9 +1157,14 @@ internal sealed class AsyncDocumentRepository
                         });
 
                 bool descending = ordering!.Direction == Direction.Descending;
+
+                // ThenBy NodeId breaks ties in variantName (e.g. many nodes sharing a fallback node.Text)
+                // so paged results stay stable/non-duplicated across separate fetches — mirrors NPoco's
+                // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY
+                // umbracoNode.id" after any user ordering (see http://issues.umbraco.org/issue/U4-8831).
                 var ordered = descending
-                    ? withVariantName.OrderByDescending(joined => joined.variantName)
-                    : withVariantName.OrderBy(joined => joined.variantName);
+                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
+                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
 
                 return await ordered
                     .Skip(skip)
@@ -1272,7 +1287,14 @@ internal sealed class AsyncDocumentRepository
     // translate member access on named record-type constructor calls in OrderBy key selectors.
     // The typed Expression<Func<T, TKey>> selectors allow EF Core to generate correct SQL ORDER BY
     // clauses through the anonymous type, which it can trace back to the original DTO columns.
-    private static IOrderedQueryable<T> ApplyDocumentOrdering<T>(
+    /// <summary>
+    ///     Applies document paging/ordering to a query, breaking ties on node id for stable paging.
+    /// </summary>
+    /// <remarks>
+    ///     Internal (not private) so AsyncDocumentRepositoryOrderingTests can exercise the tiebreak logic
+    ///     directly against an in-memory sequence, decoupling it from a real database's incidental row order.
+    /// </remarks>
+    internal static IOrderedQueryable<T> ApplyDocumentOrdering<T>(
         IQueryable<T> source,
         Ordering? ordering,
         Expression<Func<T, int>> sortOrderSelector,
@@ -1285,7 +1307,8 @@ internal sealed class AsyncDocumentRepository
         Expression<Func<T, string?>> contentTypeAliasSelector)
     {
         bool descending = ordering?.Direction == Direction.Descending;
-        return ordering?.OrderBy?.ToLowerInvariant() switch
+        string? orderBy = ordering?.OrderBy?.ToLowerInvariant();
+        IOrderedQueryable<T> ordered = orderBy switch
         {
             // Invariant name ordering (node.Text). Culture-specific name ordering is handled
             // by the callers via a ContentVersionCultureVariation JOIN before reaching this method.
@@ -1316,6 +1339,12 @@ internal sealed class AsyncDocumentRepository
                 ? source.OrderByDescending(sortOrderSelector)
                 : source.OrderBy(sortOrderSelector),
         };
+
+        // Break ties on node id so paged results stay stable/non-duplicated across separate fetches —
+        // mirrors NPoco's ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY
+        // umbracoNode.id" after any user ordering (see http://issues.umbraco.org/issue/U4-8831). Skipped
+        // when already ordering by id, since that's already unique.
+        return orderBy == "id" ? ordered : ordered.ThenBy(idSelector);
     }
 
     // The four typed PropertyData value columns, plus the SortableValue override some property editors
