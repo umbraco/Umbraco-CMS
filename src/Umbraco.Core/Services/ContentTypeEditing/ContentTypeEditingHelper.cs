@@ -15,7 +15,7 @@ internal static class ContentTypeEditingHelper
     /// </summary>
     /// <param name="source">The content type to find descendants of, or <c>null</c> when there are none (e.g. creating a new content type).</param>
     /// <param name="allContentTypes">All existing content type compositions, used to resolve the descendant tree.</param>
-    /// <returns>The lowercased property aliases already effective on every descendant of <paramref name="source"/>, excluding aliases <paramref name="source"/> itself already contributes.</returns>
+    /// <returns>The property aliases (compared case-insensitively) already effective on every descendant of <paramref name="source"/>, excluding aliases <paramref name="source"/> itself already contributes.</returns>
     /// <remarks>
     ///     Inheritance children hold their parent in their own <see cref="IContentTypeComposition.ContentTypeComposition"/>,
     ///     so walking the composition graph downward captures inheritance and composition descendants alike.
@@ -36,7 +36,7 @@ internal static class ContentTypeEditingHelper
             .ToLookup(x => x.ReferencedId, x => x.ContentType);
 
         var descendantIds = new HashSet<int>();
-        var descendantPropertyAliases = new HashSet<string>();
+        var descendantPropertyAliases = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         var stack = new Stack<int>();
         stack.Push(source.Id);
         while (stack.Count > 0)
@@ -53,14 +53,14 @@ internal static class ContentTypeEditingHelper
                     .Concat(descendant.CompositionPropertyTypes);
                 foreach (IPropertyType descendantPropertyType in allProperties)
                 {
-                    descendantPropertyAliases.Add(descendantPropertyType.Alias.ToLowerInvariant());
+                    descendantPropertyAliases.Add(descendantPropertyType.Alias);
                 }
 
                 stack.Push(descendant.Id);
             }
         }
 
-        descendantPropertyAliases.ExceptWith(source.CompositionPropertyTypes.Select(pt => pt.Alias.ToLowerInvariant()));
+        descendantPropertyAliases.ExceptWith(source.CompositionPropertyTypes.Select(pt => pt.Alias));
 
         return descendantPropertyAliases;
     }
