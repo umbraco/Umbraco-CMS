@@ -59,6 +59,23 @@ async function countPublishWithDescendantsCalls(run: () => Promise<unknown>): Pr
 	return calls;
 }
 
+/**
+ * Makes the publish-with-descendants endpoint fail while `run` executes, leaving the preceding save
+ * to succeed — the split Andy Butland reproduced by returning BadRequest from the controller.
+ */
+async function withFailingPublish(run: () => Promise<unknown>): Promise<void> {
+	const originalPublish = UmbDocumentPublishingServerDataSource.prototype.publishWithDescendants;
+	UmbDocumentPublishingServerDataSource.prototype.publishWithDescendants = async () => ({
+		error: new Error('Simulated publish failure'),
+	});
+
+	try {
+		await run();
+	} finally {
+		UmbDocumentPublishingServerDataSource.prototype.publishWithDescendants = originalPublish;
+	}
+}
+
 describe('UmbDocumentPublishingWorkspaceContext', function () {
 	// The publish-with-descendants mock polls once with a one second delay before completing.
 	this.timeout(10000);
@@ -132,6 +149,29 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 				context.getChangedVariants().some((v) => v.culture === 'da'),
 				'da is still reported as changed',
 			).to.be.true;
+		});
+
+		// The save and the publish are separate calls, so a failing publish must still leave the
+		// document saved and the workspace clean rather than dirty against a stale snapshot. (#14925)
+		it('leaves the document saved when only the publish fails', async () => {
+			await context.setName('Renamed root', EN_US);
+
+			let rejected = false;
+			await withFailingPublish(() =>
+				publishingContext.publishWithDescendants().then(
+					() => undefined,
+					() => {
+						rejected = true;
+					},
+				),
+			);
+
+			expect(rejected, 'the action reports failure').to.be.true;
+			expect(context.getHasUnpersistedChanges(), 'workspace is not left dirty').to.be.false;
+
+			const freshContext = new UmbDocumentWorkspaceContext(hostElement);
+			await freshContext.load(VARIANT_DOCUMENT_ID);
+			expect(freshContext.getName(EN_US), 'the save survived the failed publish').to.equal('Renamed root');
 		});
 
 		// Saving first means the save's mandatory validation now gates the whole operation.

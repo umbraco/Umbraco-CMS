@@ -5,7 +5,6 @@ import type {
 	UmbDocumentVariantPublishModel,
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
-import { UmbDocumentDetailRepository } from '../../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
@@ -56,7 +55,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
-	#detailRepository = new UmbDocumentDetailRepository(this);
 	#publishedDocumentData?: UmbDocumentDetailModel;
 	#loadingPublishedData = false;
 	#currentUnique?: UmbEntityUnique;
@@ -328,11 +326,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		let readBackFailed: boolean;
 		try {
+			// Each failure path notifies at the point it happens, so that a publish failure after a
+			// successful save does not claim the document was not saved. (#14925 review)
 			readBackFailed = await this.#saveAndPublishDescendants(args);
-		} catch (error) {
-			// The save may have succeeded, so the operation must not resolve as if it published. [JOV]
-			this.#notify('danger', 'speechBubbles_editContentPublishedFailed');
-			throw error;
 		} finally {
 			waitNotice?.close();
 		}
@@ -343,7 +339,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		}
 
 		await this.#loadAndProcessLastPublished();
-		this.#requestReloadOfEntityAndChildren(unique, entityType);
+		// The save above already dispatched the structure-reload event; the descendants need the children one.
+		this.#eventContext?.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique }));
 	}
 
 	/** Peeks a single-message notification, when a notification context is available. */
@@ -351,52 +348,44 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		this.#notificationContext?.peek(color, { data: { message: this.#localize.term(messageKey, ...args) } });
 	}
 
-	#requestReloadOfEntityAndChildren(unique: string, entityType: string): void {
-		this.#eventContext?.dispatchEvent(new UmbRequestReloadStructureForEntityEvent({ entityType, unique }));
-		this.#eventContext?.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique }));
-	}
-
 	/**
-	 * Saves the selected variants and publishes them with their descendants, merging the server response
-	 * into those variants only so that edits elsewhere in the document survive.
+	 * Saves the selected variants, then publishes them with their descendants. The two are separate
+	 * server calls, so the save goes through the default persistence path first: it merges the response
+	 * into those variants only and dispatches the save events, leaving the workspace correctly saved
+	 * even when the publish leg fails afterwards.
 	 * @returns {Promise<boolean>} whether reading the document back after publishing failed
 	 */
 	async #saveAndPublishDescendants(args: UmbDocumentPublishWithDescendantsArgs): Promise<boolean> {
 		const { workspaceContext, unique, variantIds, saveData, includeUnpublishedDescendants } = args;
 
-		// The publish already succeeded server-side once we reach the read-back; a failed read-back must
-		// not be reported as a publish failure, so we fall back to the submitted data.
-		let readBackFailed = false;
-		const loadAfterPublish = async (): Promise<UmbDocumentDetailModel> => {
-			try {
-				return await workspaceContext.loadWithoutPersist();
-			} catch {
-				readBackFailed = true;
-				return saveData;
-			}
-		};
+		try {
+			await workspaceContext.performCreateOrUpdate(variantIds, saveData);
+		} catch (error) {
+			this.#notify('danger', 'speechBubbles_editContentPublishedFailed');
+			throw error;
+		}
 
-		await workspaceContext.performCreateOrUpdate(variantIds, saveData, {
-			update: async (data, ids) => {
-				const { error: saveError } = await this.#detailRepository.save(data);
-				if (saveError) {
-					throw new Error('Error saving document', { cause: saveError });
-				}
+		const { error } = await this.#publishingRepository.publishWithDescendants(
+			unique,
+			variantIds,
+			includeUnpublishedDescendants,
+		);
+		if (error) {
+			// The document is saved at this point, so do not tell the user that it is not.
+			this.#notify('danger', 'speechBubbles_editContentPublishedFailedByValidation');
+			throw new Error('Error publishing document with descendants', { cause: error });
+		}
 
-				const { error } = await this.#publishingRepository.publishWithDescendants(
-					unique,
-					ids,
-					includeUnpublishedDescendants,
-				);
-				if (error) {
-					throw new Error('Error publishing document with descendants', { cause: error });
-				}
-
-				return loadAfterPublish();
-			},
-		});
-
-		return readBackFailed;
+		// Publishing changed the variant states, so read them back the same variant-scoped way rather
+		// than through reload(), which would replace edits in variants that were not published.
+		try {
+			await workspaceContext.performCreateOrUpdate(variantIds, saveData, {
+				update: () => workspaceContext.loadWithoutPersist(),
+			});
+			return false;
+		} catch {
+			return true;
+		}
 	}
 
 	/**
