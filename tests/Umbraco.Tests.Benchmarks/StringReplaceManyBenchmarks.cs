@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using Umbraco.Extensions;
 using Umbraco.Tests.Benchmarks.Config;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Umbraco.Tests.Benchmarks;
 
@@ -59,32 +59,7 @@ public class StringReplaceManyBenchmarks
     }
 
     [Benchmark(Description = "String.ReplaceMany w/chars - String Create")]
-    public string ReplaceManyStringCreate()
-    {
-        var result = Text;
-
-        var startingIndex = result.AsSpan().IndexOfAny(ReplacedChars);
-        if (startingIndex == -1)
-        {
-            return result;
-        }
-
-        return string.Create(result.Length, (result, startingIndex, ReplacedChars, ReplacementChar), static (span, state) =>
-        {
-            var (source, startingIndex, set, replacement) = state;
-            source.AsSpan().CopyTo(span);
-
-            span[startingIndex] = replacement;
-
-            var remaining = span[(startingIndex + 1)..];
-            int idx;
-            while ((idx = remaining.IndexOfAny(set)) >= 0)
-            {
-                remaining[idx] = replacement;
-                remaining = remaining[(idx + 1)..];
-            }
-        });
-    }
+    public string ReplaceManyStringCreate() => Text.ReplaceMany(ReplacedChars, ReplacementChar);
 
     // this is what v7 originally did
     [Benchmark(Description = "String.ReplaceMany w/dictionary - Aggregate")]
