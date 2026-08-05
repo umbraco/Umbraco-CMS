@@ -112,64 +112,6 @@ npm run generate:localization-keys
 ```
 The script also runs automatically as a `prebuild` hook, and as part of the test scripts.
 
-#### Adding plugin-specific keys
-
-A plugin that wants its own typed localization keys needs two pieces — runtime registration and (optionally) type declaration. They're decoupled: register-only works fine, the type declaration just enables autocomplete and arg-type inference on the plugin's own keys.
-
-**1. Register the strings at runtime** via a `localization` extension. The runtime registers them under the active culture, flattens `group.key` into `group_key`, and merges into the dictionary the controller looks up.
-
-Inline form (best for small overrides):
-
-```json
-// umbraco-package.json
-{
-    "alias": "mypkg.extensions",
-    "name": "MyPkg",
-    "extensions": [
-        {
-            "type": "localization",
-            "alias": "Mypkg.Localize.EnUS",
-            "name": "English",
-            "meta": {
-                "culture": "en-US",
-                "localizations": {
-                    "mypkg": {
-                        "anything": "Some string",
-                        "greeting": "Hello, %0%!"
-                    }
-                }
-            }
-        }
-    ]
-}
-```
-
-For larger packs, point `js` at a separate JavaScript file (e.g. `"js": "/App_Plugins/MyPkg/en-us.js"`) that default-exports the same `{ group: { key: value } }` shape. The JS file form supports function entries that take typed arguments — string entries use the runtime `%0%` / `{0}` placeholder pattern.
-
-**2. Declare the matching types globally** (optional, recommended) — same pattern as `UmbExtensionManifestMap`, plain interface merging, no module-path boilerplate:
-
-```ts
-// types.d.ts (or anywhere in the plugin's source tree)
-declare global {
-    interface UmbKnownLocalizationSet {
-        mypkg_anything: string;
-        mypkg_greeting: (name: string) => string;
-    }
-}
-```
-
-Plugin authors typically drop this in a single `types.d.ts` at the package root and ship it alongside the npm package — consumers of the plugin get autocomplete on the augmented keys automatically, with no extra config.
-
-**3. Use them like built-in keys:**
-
-```ts
-this.localize.term('mypkg_anything');           // autocompletes alongside the built-ins
-this.localize.term('mypkg_greeting', 'Alice');  // 'Alice: string' inferred from the declaration
-html`<umb-localize key="mypkg_anything"></umb-localize>`;
-```
-
-Plugins that skip step 2 still work — their keys hit the `(string & {})` escape hatch in `term()`'s signature, so `localize.term('mypkg_anything')` compiles. They just lose autocomplete and arg-type inference on those keys.
-
 ### Active language
 
 The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`, not by `<html lang>`:
@@ -188,16 +130,6 @@ Two separate concepts — don't conflate them:
 - **Fallback culture** — `en` (`UMB_DEFAULT_LOCALIZATION_CULTURE`). The culture the canonical `en.ts` dictionary ships under (`Umb.Localization.EN`). Always loaded _alongside_ the active locale so any missing key falls back to English.
 
 A third-party language pack overriding canonical keys for a default install should declare `culture: 'en-US'` (matches active locale), not `culture: 'en'`. The keys come _from_ `en.ts`, but the override extension's `culture` must match the active locale, otherwise the registry filters it out.
-
-### Active language
-
-The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`, not by `<html lang>`:
-
-- Razor sets `lang` on the shell element from `GlobalSettings.DefaultUILanguage`. The shell reads its own `lang` on connect and calls `umbLocalizationRegistry.loadLanguage(this.lang)`.
-- After login, `current-user.context` calls `loadLanguage(user.languageIsoCode)` and the shell mirrors the new value back onto its own `lang` attribute via `umbLocalizationRegistry.currentLanguage`.
-- `<html lang>` is the static `"en"` for the noscript fallback text. Don't conflate it with the dynamic UI language.
-
-If you're adding a new shell-like element (rare — most code lives inside `<umb-app>`), give it a `lang` attribute and the same subscribe-and-mirror pattern. For everything else, just use `this.localize` and the inherited context resolves the rest.
 
 ---
 
