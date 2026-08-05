@@ -310,6 +310,56 @@ public partial class ContentEditingServiceTests
     }
 
     /// <summary>
+    /// A segment omitted from the update model is restored for a culture the editing user has no access to,
+    /// rather than being cleared by the omission.
+    /// </summary>
+    [Test]
+    public async Task Can_Retain_Omitted_Segment_Value_For_Culture_Without_Access()
+    {
+        // Arrange: prepare culture and segment variant content, and an editor with access to English only.
+        var content = await CreateCultureAndSegmentVariantContent(ContentVariation.Segment);
+        var editor = await CreateEnglishLanguageOnlyEditor();
+
+        // The update model deliberately omits the seg-2 value of the Danish culture, so the segment is
+        // only present on the existing content.
+        var updateModel = new ContentUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 English title", Culture = "en-US", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 English title", Culture = "en-US", Segment = "seg-2" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default Danish title", Culture = "da-DK" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 Danish title", Culture = "da-DK", Segment = "seg-1" },
+            ],
+            Variants =
+            [
+                new VariantModel { Name = "The Updated English Name", Culture = "en-US" },
+                new VariantModel { Name = "The Updated Danish Name", Culture = "da-DK" },
+            ],
+        };
+
+        // Act: update the content as the English only editor.
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, editor.Key);
+        Assert.IsTrue(result.Success);
+
+        // Assert: every segment of the Danish culture keeps its initial value, including the omitted one.
+        VerifyUpdate(result.Result.Content);
+        VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
+
+        void VerifyUpdate(IContent? updatedContent)
+        {
+            Assert.IsNotNull(updatedContent);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("The initial title in Danish", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
+                Assert.AreEqual("The initial seg-1 title in Danish", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
+                Assert.AreEqual("The initial seg-2 title in Danish", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+            });
+        }
+    }
+
+    /// <summary>
     /// A culture invariant property the editing user is not allowed to change is restored from the existing
     /// content for every segment, not only its segment-less value.
     /// </summary>
