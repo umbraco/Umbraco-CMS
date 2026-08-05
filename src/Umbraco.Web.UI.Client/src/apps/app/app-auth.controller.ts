@@ -4,6 +4,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { directAuthProvider } from './direct-auth-provider.function.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbAppAuthController extends UmbControllerBase {
@@ -52,10 +53,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 				umbExtensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider'),
 			);
 
-			// Go straight to a provider when there is only one to choose, or when one asks to be gone
-			// to directly.
-			const directProvider =
-				providers.length === 1 ? providers[0] : providers.find((provider) => provider.meta?.behavior?.autoRedirect);
+			const directProvider = directAuthProvider(providers);
 
 			if (directProvider) {
 				// redirect: true → full-page navigate (cold boot, nothing to preserve), no modal flash.

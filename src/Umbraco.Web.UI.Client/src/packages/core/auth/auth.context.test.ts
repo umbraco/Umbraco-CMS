@@ -263,6 +263,28 @@ describe('UmbAuthContext', () => {
 				expect(context.getIsAuthorized()).to.be.true;
 			});
 
+			// The session lifetime is fixed for the lifetime of the server, so only the first renewal
+			// needs to read it. With keepUserLoggedIn renewing on an interval, re-reading would double
+			// the request count of every renewal for no new information.
+			it('does not re-read the configuration on subsequent renewals', async () => {
+				const timeoutUtc = new Date(Date.now() + 20 * 60 * 1000).toISOString();
+				stubFetch((input) =>
+					String(input).includes('keep-alive')
+						? new Response(null, { status: 200 })
+						: new Response(JSON.stringify({ timeoutUtc }), { status: 200 }),
+				);
+
+				expect(await context.keepAlive()).to.be.true;
+				// First renewal: keep-alive plus the configuration read that learns the lifetime.
+				expect(fetchCalls).to.have.lengthOf(2);
+
+				expect(await context.keepAlive()).to.be.true;
+				// Second renewal: keep-alive only.
+				expect(fetchCalls).to.have.lengthOf(3);
+				expect(String(fetchCalls[2].input)).to.contain('keep-alive');
+				expect(context.getIsAuthorized()).to.be.true;
+			});
+
 			it('returns false when the keep-alive request fails', async () => {
 				stubFetch(() => new Response(null, { status: 401 }));
 

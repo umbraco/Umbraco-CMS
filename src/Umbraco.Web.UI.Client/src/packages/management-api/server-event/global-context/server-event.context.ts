@@ -93,8 +93,6 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 
 		const skipNegotiation = this.#serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
 
-		// No accessTokenFactory: the auth cookie is the credential and SignalR sends it on both the
-		// negotiate request and the connection itself.
 		const hubOptions: IHttpConnectionOptions = {};
 
 		if (skipNegotiation) {

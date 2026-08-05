@@ -33,6 +33,13 @@ export interface UmbAuthSession {
 export class UmbAuthContext extends UmbContextBase {
 	// Timeout is different from `isAuthorized` because it can occur repeatedly
 	#isTimeout = new Subject<void>();
+	/**
+	 * The session lifetime the server reported, learned from the first configuration read. It is fixed
+	 * for the lifetime of the server, so keep-alive can derive the renewed expiry from it instead of
+	 * re-reading the configuration on every renewal. A server restart invalidates the cookie, so the
+	 * next session starts from a fresh read.
+	 */
+	#sessionLifetimeInSeconds?: number;
 	#isInitialized = new ReplaySubject<void>(1);
 	#isBypassed;
 	#serverUrl;
@@ -282,7 +289,20 @@ export class UmbAuthContext extends UmbContextBase {
 			return false;
 		}
 
-		// The cookie's expiry was renewed server-side; re-read it and refresh the local session.
+		// The cookie's expiry was renewed server-side. Once the session lifetime is known there is
+		// nothing new to learn from the configuration endpoint, so derive the renewed expiry locally
+		// rather than spending a second request on every renewal.
+		if (this.#sessionLifetimeInSeconds !== undefined) {
+			const issuedAt = Math.floor(Date.now() / 1000);
+			this.#setSessionLocally(this.#sessionLifetimeInSeconds, issuedAt);
+			this.#channel.postMessage({
+				type: 'authorized',
+				expiresIn: this.#sessionLifetimeInSeconds,
+				issuedAt,
+			});
+			return true;
+		}
+
 		return this.#establishSessionFromServer();
 	}
 
@@ -330,6 +350,12 @@ export class UmbAuthContext extends UmbContextBase {
 			const expiresIn = data.timeoutUtc
 				? Math.max(0, Math.floor(new Date(data.timeoutUtc).getTime() / 1000) - issuedAt)
 				: ASSUMED_SESSION_LIFETIME_IN_SECONDS;
+
+			// Remember a real expiry only. The assumed value is a guess for the no-expiry case, so
+			// caching it would have keep-alive keep guessing instead of asking once.
+			if (data.timeoutUtc) {
+				this.#sessionLifetimeInSeconds = expiresIn;
+			}
 			this.#setSessionLocally(expiresIn, issuedAt);
 
 			// Tell other tabs a session is (re)established, so they can update their local state too.

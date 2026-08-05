@@ -20,8 +20,6 @@ export async function tryXhrRequest<T>(
 	options: XhrRequestOptions,
 ): Promise<UmbApiResponse<T>> {
 	const config = umbHttpClient.getConfig();
-	// No token: the auth cookie is the credential, and withCredentials sends it. Passing a placeholder
-	// here made every upload carry a bearer token the server then failed to validate.
 	const promise = createXhrRequest<T>({
 		...options,
 		baseUrl: config.baseUrl,
