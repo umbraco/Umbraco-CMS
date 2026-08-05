@@ -2191,4 +2191,193 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             "with Level not dirty, IsMoving() must be false and the general path (which updates VersionDate) must run");
         Assert.That(contentVersionAfterSave.Text, Is.EqualTo("Renamed While Not Moving"));
     }
+
+    // --- Group 20: Recycle bin ---
+
+    [Test]
+    public async Task GetRecycleBinAsync_ReturnsAllTrashedItemsRegardlessOfDepth()
+    {
+        // _trashed (from SetUpData) is already Trashed=true with ParentId = -20 (a direct child of the
+        // recycle bin). Add a deep descendant that is ALSO trashed but whose ParentId points at _trashed,
+        // not -20 — GetRecycleBinAsync mirrors NPoco's ContentRepositoryBase.GetRecycleBin (a flat
+        // Trashed-only filter), so it must include both, not just direct children of the bin.
+        var deepDescendant = ContentBuilder.CreateSimpleContent(_contentType, "Deep Trashed Descendant", _trashed.Id);
+        deepDescendant.Trashed = true;
+        ContentService.Save(deepDescendant, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IEnumerable<IContent> result = await repository.GetRecycleBinAsync(CancellationToken.None);
+        scope.Complete();
+
+        IContent[] items = result.ToArray();
+        Assert.That(items.Any(c => c.Key == _trashed.Key), Is.True);
+        Assert.That(items.Any(c => c.Key == deepDescendant.Key), Is.True,
+            "GetRecycleBinAsync must include trashed descendants that aren't direct children of the bin");
+    }
+
+    [Test]
+    public async Task GetRecycleBinAsync_ExcludesNonTrashedItems()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IEnumerable<IContent> result = await repository.GetRecycleBinAsync(CancellationToken.None);
+        scope.Complete();
+
+        IContent[] items = result.ToArray();
+        Assert.That(items.Any(c => c.Key == _trashed.Key), Is.True);
+        Assert.That(items.Any(c => c.Key == _textpage.Key), Is.False);
+        Assert.That(items.Any(c => c.Key == _subpage.Key), Is.False);
+    }
+
+    [Test]
+    public async Task GetPagedRecycleBinAsync_ReturnsPagedTrashedItemsWithTotal()
+    {
+        // Trash two more items (in addition to the existing _trashed) so paging has something to page over.
+        _subpage.Trashed = true;
+        ContentService.Save(_subpage, -1);
+        _subpage2.Trashed = true;
+        ContentService.Save(_subpage2, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> firstPage = await repository.GetPagedRecycleBinAsync(
+            pageIndex: 0, pageSize: 2, ordering: null, CancellationToken.None);
+        PagedModel<IContent> secondPage = await repository.GetPagedRecycleBinAsync(
+            pageIndex: 1, pageSize: 2, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(firstPage.Total, Is.EqualTo(3));
+        Assert.That(firstPage.Items.Count(), Is.EqualTo(2));
+        Assert.That(secondPage.Total, Is.EqualTo(3));
+        Assert.That(secondPage.Items.Count(), Is.EqualTo(1), "page 2 of a 3-item set with pageSize=2 has exactly 1 remaining item");
+
+        Guid[] allKeys = firstPage.Items.Select(c => c.Key).Concat(secondPage.Items.Select(c => c.Key)).ToArray();
+        Assert.That(allKeys, Is.EquivalentTo(new[] { _trashed.Key, _subpage.Key, _subpage2.Key }),
+            "the two pages together must cover all 3 trashed items with no duplicates/omissions");
+    }
+
+    [Test]
+    public async Task GetPagedRecycleBinAsync_OrderedByInvariantName_SortsTrashedItems()
+    {
+        _subpage.Trashed = true;
+        _subpage.Name = "Zzz Last";
+        ContentService.Save(_subpage, -1);
+        _subpage2.Trashed = true;
+        _subpage2.Name = "Aaa First";
+        ContentService.Save(_subpage2, -1);
+        _trashed.Name = "Mmm Middle";
+        ContentService.Save(_trashed, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // No culture, so Ordering.IsInvariant is true and this exercises the plain node.Text ordering
+        // path (FetchDefaultOrdered), not the culture-variant name path.
+        PagedModel<IContent> result = await repository.GetPagedRecycleBinAsync(
+            pageIndex: 0, pageSize: 10, ordering: Ordering.By("name"), CancellationToken.None);
+        scope.Complete();
+
+        IContent[] items = result.Items.ToArray();
+        Assert.That(items, Has.Length.EqualTo(3));
+        Assert.That(items.Select(c => c.Name), Is.EqualTo(new[] { "Aaa First", "Mmm Middle", "Zzz Last" }));
+    }
+
+    [Test]
+    public async Task GetPagedRecycleBinAsync_OrderedByName_WithCulture_UsesCultureVariantName()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        // Invariant names sort in opposite order from culture names — this proves the CCV join is used,
+        // mirroring GetChildrenAsync_OrderedByName_WithCulture_UsesCultureVariantName.
+        var docA = new ContentBuilder().WithContentType(contentType).WithName("Z-First").WithParentId(_textpage.Id).Build();
+        docA.SetCultureName("Alpha", "en-US");
+        docA.Trashed = true;
+        ContentService.Save(docA, -1);
+
+        var docB = new ContentBuilder().WithContentType(contentType).WithName("A-Second").WithParentId(_textpage.Id).Build();
+        docB.SetCultureName("Zeta", "en-US");
+        docB.Trashed = true;
+        ContentService.Save(docB, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetPagedRecycleBinAsync(
+            pageIndex: 0, pageSize: 10, ordering: Ordering.By("name", culture: "en-US"), CancellationToken.None);
+        scope.Complete();
+
+        IContent first = result.Items.First(item => item.Key == docA.Key || item.Key == docB.Key);
+        Assert.That(first.GetCultureName("en-US"), Is.EqualTo("Alpha"),
+            "Culture name ordering must put 'Alpha' before 'Zeta', not fall back to invariant name order ('A-Second' before 'Z-First')");
+    }
+
+    [Test]
+    public async Task GetPagedRecycleBinAsync_OrderedByCustomIntProperty_OrdersByPropertyValue()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_textpage.Id).Build();
+        docHigh.SetValue("priority", 30);
+        docHigh.Trashed = true;
+        ContentService.Save(docHigh, -1);
+
+        var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
+        docLow.SetValue("priority", 5);
+        docLow.Trashed = true;
+        ContentService.Save(docLow, -1);
+
+        var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").WithParentId(_textpage.Id).Build();
+        docMid.SetValue("priority", 15);
+        docMid.Trashed = true;
+        ContentService.Save(docMid, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetPagedRecycleBinAsync(
+            pageIndex: 0, pageSize: 100, ordering: Ordering.By("priority", isCustomField: true), CancellationToken.None);
+        scope.Complete();
+
+        IContent[] custom = result.Items.Where(item => item.ContentType.Alias == contentType.Alias).ToArray();
+        Assert.That(custom.Select(c => c.Key), Is.EqualTo(new[] { docLow.Key, docMid.Key, docHigh.Key }),
+            "Ascending custom-field ordering should sort by the integer property value, low to high");
+    }
+
+    [Test]
+    public async Task RecycleBinSmellsAsync_WhenRecycleBinHasDirectChild_ReturnsTrue()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        bool smells = await repository.RecycleBinSmellsAsync(CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(smells, Is.True, "_trashed is a direct child of the recycle bin (-20) per SetUpData");
+    }
+
+    [Test]
+    public async Task RecycleBinSmellsAsync_IgnoresTrashedNodesThatAreNotDirectChildrenOfTheBin()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        using var scope = NewScopeProvider.CreateScope();
+
+        // Reparent the only trashed node away from being a direct child of the recycle bin (-20), while
+        // leaving it Trashed = true — simulating a trashed node RecycleBinSmells must NOT count, since
+        // NPoco's equivalent (CountChildren(RecycleBinId)) only checks direct children of the bin, unlike
+        // GetRecycleBinAsync's flat Trashed-only filter.
+        await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.Nodes.Where(node => node.NodeId == _trashed.Id)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(node => node.ParentId, _textpage.Id)));
+
+        var repository = CreateRepository();
+        bool smells = await repository.RecycleBinSmellsAsync(CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(smells, Is.False);
+    }
 }
