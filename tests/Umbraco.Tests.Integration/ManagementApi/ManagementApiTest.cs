@@ -62,7 +62,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     }
 
     protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin) =>
-        await AuthenticateClientAsync(client,
+        await AuthenticateClientAsync(
+            client,
             async userService =>
             {
                 IUser user;
@@ -148,7 +149,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
             var token = await userManager.GeneratePasswordResetTokenAsync(userCreationResult.User);
 
-            var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
+            var changePasswordAttempt = await userService.ChangePasswordAsync(
+                userKey,
                 new ChangeUserPasswordModel
                 {
                     NewPassword = password, ResetPasswordToken = token.Result.ToUrlBase64(), UserKey = userKey,
@@ -181,7 +183,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
         Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
 
-        var tokenResponse = await client.PostAsync("/umbraco/management/api/v1/security/back-office/token",
+        var tokenResponse = await client.PostAsync(
+            "/umbraco/management/api/v1/security/back-office/token",
             new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 ["grant_type"] = "authorization_code",

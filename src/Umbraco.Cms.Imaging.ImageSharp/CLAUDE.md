@@ -128,13 +128,13 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
 }
 ```
 
-### Security: Size Limits Without HMAC
+### Security: Max Dimension Limits
 
-When HMAC is not configured, `ConfigureImageSharpMiddlewareOptions.cs:46-83` enforces max dimensions:
+`ConfigureImageSharpMiddlewareOptions.cs` enforces max dimensions on every request, **regardless of whether HMAC is configured**:
 - Width/height requests exceeding `MaxWidth`/`MaxHeight` are **stripped** from the query
 - This prevents DoS via excessive image generation
 
-When HMAC **is** configured, size validation is skipped (trusted requests).
+HMAC and the size limits do two separate jobs: HMAC controls *who* may request processing, while `MaxWidth`/`MaxHeight` control *how large* the output may be. The dimension ceiling therefore still applies to validly-signed requests — for legitimate (server-generated) URLs it is a no-op, and it remains a useful backstop if the HMAC secret key ever leaks.
 
 ### Cache Busting
 

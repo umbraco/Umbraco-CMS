@@ -30,6 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Umbraco.Cms.Search.Core" Version="17.0.0" />
+    <PackageReference Include="Umbraco.Cms.Search.Provider.Examine" Version="17.0.0-beta.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!--
     Umbraco.Web.UI opts out of central package management, so the Microsoft.OpenApi transitive pin in
     Directory.Packages.props does not reach it. Reference it directly to force the patched version instead
