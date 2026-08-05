@@ -152,6 +152,23 @@ export class UmbPickerInputContext<
 	}
 
 	async openPicker(pickerData?: Partial<PickerModalConfigType>) {
+		await this.#openPicker(pickerData);
+	}
+
+	/**
+	 * Opens the picker modal and applies its selection to this context, like {@link openPicker}, but also
+	 * returns the submitted modal value. Use this when the picker modal returns more than a selection, so the
+	 * consumer can act on the rest of the value.
+	 * @param {Partial<PickerModalConfigType>} [pickerData] The modal data to merge on top of the stored modal data.
+	 * @returns {Promise<PickerModalValueType | undefined>} The submitted modal value, or undefined if the modal was rejected.
+	 * @memberof UmbPickerInputContext
+	 */
+	// TODO (V20): Fold into openPicker, whose return type cannot change before then.
+	async openPickerForValue(pickerData?: Partial<PickerModalConfigType>): Promise<PickerModalValueType | undefined> {
+		return this.#openPicker(pickerData);
+	}
+
+	async #openPicker(pickerData?: Partial<PickerModalConfigType>): Promise<PickerModalValueType | undefined> {
 		await this.#itemManager.init;
 
 		if (!this.modalAlias) {
@@ -164,6 +181,8 @@ export class UmbPickerInputContext<
 		}).catch(() => undefined);
 
 		this.#applyModalValue(modalValue);
+
+		return modalValue;
 	}
 
 	protected _combinePickableFilters<ItemType>(

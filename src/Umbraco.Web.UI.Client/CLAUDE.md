@@ -17,6 +17,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Package Development](./docs/package-development.md)** - Package & module structure, folder structure conventions, localization, organizational rules
 - **[Value Type](./docs/value-type.md)** - Compile-time type map (`UmbValueTypeMap`); declaring typed value type constants via declaration merging
 - **[Value Summary](./docs/value-summary.md)** - `valueSummary` extension type; rendering compact values in collection views, batch resolver pattern, coordinator
+- **[Clipboard](./docs/clipboard.md)** - Copy/paste between property editors; entry value types as interop formats, copy/paste value translators, where clipboard work belongs
 
 ### Development
 
@@ -57,6 +58,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 | Work with auth or security                    | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                           |
 | Scaffold a new package or module              | [docs/package-development.md](./docs/package-development.md)                                                                  |
 | Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards           |
+| Add clipboard copy/paste to a property editor | [docs/clipboard.md](./docs/clipboard.md) — then use the `general-add-clipboard-support` skill                                  |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.
 

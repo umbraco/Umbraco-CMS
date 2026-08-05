@@ -1,5 +1,7 @@
 import type { UmbMediaCardItemModel } from '../../types.js';
 import { UmbMediaPickerFolderFilter, UmbMediaPickerInputContext } from './input-media.context.js';
+import type { UmbMediaClipboardConfig } from '../../clipboard/types.js';
+import { UmbClipboardCopyRequestEvent, UmbClipboardPasteRequestEvent } from '@umbraco-cms/backoffice/clipboard';
 import {
 	css,
 	customElement,
@@ -120,6 +122,14 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	/**
+	 * The clipboard affordances to offer. Supplied by the hosting property editor, because it is the one that owns
+	 * the value on both sides — see the `clipboard-copy-request` and `clipboard-paste-request` events.
+	 * @type {UmbMediaClipboardConfig}
+	 */
+	@property({ type: Object, attribute: false })
+	clipboardConfig?: UmbMediaClipboardConfig;
+
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);
@@ -203,11 +213,12 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		);
 	}
 
-	#openPicker() {
-		this.#pickerInputContext.openPicker(
+	async #openPicker() {
+		const modalValue = await this.#pickerInputContext.openPickerForValue(
 			{
 				multiple: this.max > 1,
 				startNode: this.startNode,
+				clipboard: this.clipboardConfig?.paste,
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({
@@ -217,6 +228,19 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				includeTrashed: this.includeTrashed,
 				folderFilter: this.folderFilter,
 			},
+		);
+
+		const clipboardSelection = modalValue?.clipboard?.selection;
+		if (clipboardSelection?.length) {
+			// Requested, not resolved: only the hosting property editor can turn entries into its value.
+			this.dispatchEvent(new UmbClipboardPasteRequestEvent(clipboardSelection));
+		}
+	}
+
+	// Requested, not written: only the hosting property editor can produce the value for the item.
+	#requestClipboardCopy(item: UmbMediaCardItemModel) {
+		this.dispatchEvent(
+			new UmbClipboardCopyRequestEvent({ unique: item.unique, name: item.name, icon: item.mediaType.icon }),
 		);
 	}
 
@@ -280,8 +304,22 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				?disabled=${!this._editMediaPath}>
 				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
+				<uui-action-bar slot="actions">
+					${this.#renderCopyAction(item)} ${this.#renderRemoveAction(item)}
+				</uui-action-bar>
 			</uui-card-media>
+		`;
+	}
+
+	#renderCopyAction(item: UmbMediaCardItemModel) {
+		if (this.readonly || !this.clipboardConfig?.copy.enabled) return nothing;
+		return html`
+			<uui-button
+				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
+				look="secondary"
+				@click=${() => this.#requestClipboardCopy(item)}>
+				<uui-icon name="icon-clipboard-copy"></uui-icon>
+			</uui-button>
 		`;
 	}
 
