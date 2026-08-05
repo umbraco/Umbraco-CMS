@@ -382,7 +382,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
         var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ContentTypeId == elementType.Id);
         var filterQuery = ScopeProvider.CreateQuery<IElement>().Where(x => x.Name.Contains("Two"));
-        var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filterQuery, Ordering.By("Name")).ToArray();
+        var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: filterQuery, ordering: Ordering.By("Name")).ToArray();
 
         Assert.Multiple(() =>
         {
@@ -411,7 +411,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
         repository.Save(otherTypeElement);
 
         var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ContentTypeId == elementType.Id);
-        var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("Name", Direction.Descending)).ToArray();
+        var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, ordering: Ordering.By("Name", Direction.Descending)).ToArray();
 
         Assert.Multiple(() =>
         {
@@ -613,7 +613,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
         }
 
         var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ParentId == Constants.System.Root);
-        var result = repository.GetPage(query, 0, 20, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("UpdateDate")).ToArray();
+        var result = repository.GetPage(query, 0, 20, out var totalRecords, propertyAliases: null, filter: null, ordering: Ordering.By("UpdateDate")).ToArray();
 
         Assert.AreEqual(10, totalRecords);
         foreach (var r in result)
@@ -769,14 +769,14 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
         var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.Name.Contains("Element"));
 
-        var result = repository.GetPage(query, 0, 2, out var totalRecords, propertyAliases: null, filter: null, Ordering.By("title", isCustomField: true)).ToArray();
+        var result = repository.GetPage(query, 0, 2, out var totalRecords, propertyAliases: null, filter: null, ordering: Ordering.By("title", isCustomField: true)).ToArray();
 
         Assert.AreEqual(3, totalRecords);
         Assert.AreEqual(2, result.Length);
         Assert.AreEqual(element2.Id, result[0].Id); // "Alpha"
         Assert.AreEqual(element1.Id, result[1].Id); // "Bravo"
 
-        result = repository.GetPage(query, 1, 2, out totalRecords, propertyAliases: null, filter: null, Ordering.By("title", isCustomField: true)).ToArray();
+        result = repository.GetPage(query, 1, 2, out totalRecords, propertyAliases: null, filter: null, ordering: Ordering.By("title", isCustomField: true)).ToArray();
 
         Assert.AreEqual(1, result.Length);
         Assert.AreEqual(element3.Id, result[0].Id); // "Charlie"
