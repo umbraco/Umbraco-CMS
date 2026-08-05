@@ -238,20 +238,6 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Completes the login flow.
-	 * @deprecated No-op — the server sets the auth cookie directly, there is no code exchange. Always returns null. Scheduled for removal in Umbraco 21.
-	 * @returns {Promise<null>} Always null.
-	 */
-	async completeAuthorizationRequest(): Promise<null> {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.completeAuthorizationRequest()',
-			removeInVersion: '21.0.0',
-			solution: 'There is no authorization code exchange with cookie auth; remove the call.',
-		}).warn();
-		return null;
-	}
-
-	/**
 	 * Checks if the user is authorized. If Authorization is bypassed, the user is always authorized.
 	 * @returns {boolean} True if the user is authorized, otherwise false.
 	 */
@@ -368,58 +354,6 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Gets the latest token from the Management API.
-	 * With cookie auth, this returns '[redacted]' — the real token is in the httpOnly cookie.
-	 * @example <caption>Using the latest token</caption>
-	 * ```js
-	 *   const token = await authContext.getLatestToken();
-	 *   const result = await fetch('https://my-api.com', { headers: { Authorization: `Bearer ${token}` } });
-	 * ```
-	 * @see {@link configureClient} for automatic token handling with `@hey-api/openapi-ts` clients.
-	 * @see {@link getOpenApiConfiguration} for manual fetch calls with cookie-based auth.
-	 * @deprecated Use {@link configureClient}, {@link getOpenApiConfiguration}, or remove `"auth"` and set `"include": "credentials"` on fetch calls instead. Scheduled for removal in Umbraco 21.
-	 * @memberof UmbAuthContext
-	 * @returns {Promise<string>} The latest token from the Management API
-	 */
-	async getLatestToken(): Promise<string> {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.getLatestToken()',
-			removeInVersion: '21.0.0',
-			solution:
-				'Back-office auth is cookie-based and carries no client token. Use configureClient()/getOpenApiConfiguration(), or set credentials: "include" on fetch calls.',
-		}).warn();
-		return '[redacted]';
-	}
-
-	/**
-	 * @deprecated Cookie auth has no token to validate — returns {@link getIsAuthorized}. Use {@link keepAlive} to extend the session. Scheduled for removal in Umbraco 21.
-	 * @memberof UmbAuthContext
-	 * @returns {Promise<boolean>} Whether a session is currently established.
-	 */
-	async validateToken(): Promise<boolean> {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.validateToken()',
-			removeInVersion: '21.0.0',
-			solution: 'Use getIsAuthorized() or keepAlive() instead.',
-		}).warn();
-		return this.getIsAuthorized();
-	}
-
-	/**
-	 * Attempts to refresh the token using Web Locks to prevent concurrent refresh requests.
-	 * @deprecated Cookie auth has no refresh token — delegates to {@link keepAlive}, which extends the session by renewing the cookie. Scheduled for removal in Umbraco 21.
-	 * @returns {Promise<boolean>} True if the refresh was successful, otherwise false.
-	 */
-	async makeRefreshTokenRequest(): Promise<boolean> {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.makeRefreshTokenRequest()',
-			removeInVersion: '21.0.0',
-			solution: 'Use keepAlive() to extend the session.',
-		}).warn();
-		return this.keepAlive();
-	}
-
-	/**
 	 * Checks if the current session is still valid.
 	 * @deprecated Use {@link getIsAuthorized} or observe {@link session$} instead. Scheduled for removal in Umbraco 19.
 	 * @returns True if the session has not expired.
@@ -441,21 +375,6 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Clears the in-memory session state and broadcasts to other tabs.
-	 * @deprecated Cookie auth stores no client-side token, and clearing local state without the server sign-out leaves the auth cookie intact (the next request re-authenticates). Use {@link signOut} to log out. Scheduled for removal in Umbraco 21.
-	 * @memberof UmbAuthContext
-	 */
-	clearTokenStorage() {
-		new UmbDeprecation({
-			deprecated: 'UmbAuthContext.clearTokenStorage()',
-			removeInVersion: '21.0.0',
-			solution: 'Use signOut() to log out.',
-		}).warn();
-		this.#session.setValue(undefined);
-		this.#channel.postMessage({ type: 'sessionCleared' });
-	}
-
-	/**
 	 * Handles the case where the user has timed out, i.e. the token has expired.
 	 * This will clear the token storage and set the user as unauthorized.
 	 * @memberof UmbAuthContext
@@ -471,7 +390,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @memberof UmbAuthContext
 	 */
 	async signOut(): Promise<void> {
-		// Clear local state directly (not clearTokenStorage) to skip its deprecation warning; signedOut covers other tabs.
+		// signedOut covers other tabs.
 		this.#session.setValue(undefined);
 		this.#channel.postMessage({ type: 'signedOut' });
 
@@ -529,14 +448,15 @@ export class UmbAuthContext extends UmbContextBase {
 		return {
 			base: this.#serverUrl,
 			credentials: 'include',
-			// Deprecated (removal v21): cookie auth carries no client token, so this callback is a no-op.
+			// Kept, unlike the removed token accessors: returning undefined is harmless, because the
+			// hey-api SDK omits the Authorization header entirely rather than sending a bad one.
 			token: async () => {
 				new UmbDeprecation({
 					deprecated: 'UmbOpenApiConfiguration.token',
 					removeInVersion: '21.0.0',
 					solution: 'The auth cookie is sent automatically with credentials: "include"; remove the token() call.',
 				}).warn();
-				return '[redacted]';
+				return undefined;
 			},
 		};
 	}

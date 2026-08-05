@@ -50,14 +50,6 @@ describe('UmbAuthContext', () => {
 			expect(context).to.have.property('setInitialState').that.is.a('function');
 		});
 
-		it('has a getLatestToken method', () => {
-			expect(context).to.have.property('getLatestToken').that.is.a('function');
-		});
-
-		it('has a clearTokenStorage method', () => {
-			expect(context).to.have.property('clearTokenStorage').that.is.a('function');
-		});
-
 		it('has a signOut method', () => {
 			expect(context).to.have.property('signOut').that.is.a('function');
 		});
@@ -132,13 +124,6 @@ describe('UmbAuthContext', () => {
 			expect(receivedConfig.auth).to.be.undefined;
 			// The server's 302 to /login must not be followed; the interceptor handles the 401 instead.
 			expect(receivedConfig).to.have.property('redirect', 'manual');
-		});
-	});
-
-	describe('clearTokenStorage', () => {
-		it('clears the session and broadcasts', () => {
-			expect(() => context.clearTokenStorage()).to.not.throw();
-			expect(context.getIsAuthorized()).to.be.false;
 		});
 	});
 

@@ -4,8 +4,8 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { directAuthProvider } from './direct-auth-provider.function.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { directAuthProvider } from './direct-auth-provider.function.js';
 
 export class UmbAppAuthController extends UmbControllerBase {
 	readonly #retrievedContext: Promise<unknown>;

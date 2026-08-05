@@ -17,8 +17,9 @@ export interface UmbOpenApiConfiguration {
 	/**
 	 * The token to use for the Authorization header.
 	 * @deprecated Use `credentials: 'include'` instead, as the Management API uses cookie-based authentication. Scheduled for removal in Umbraco 21.
-	 * @remarks Kept required until its removal: it is always supplied, and making it optional would
-	 * force consumers to add undefined checks for a property that is only being deprecated.
+	 * @remarks Kept required until its removal, and resolves to undefined: the hey-api SDK omits the
+	 * Authorization header rather than sending a value, so nothing is misled into thinking a token
+	 * exists. The token accessors on UmbAuthContext were removed outright for that same reason.
 	 * @returns A resolver for the token to use for the Authorization header.
 	 */
 	readonly token: () => Promise<string | undefined>;

@@ -59,12 +59,12 @@ authContext.configureClient(myClient);
 // ✅ For manual fetch calls
 const config = authContext.getOpenApiConfiguration();
 
-// ❌ getLatestToken() / getOpenApiConfiguration().token() are deprecated shims (return '[redacted]') — removal v21
-const token = await authContext.getLatestToken();
+// ❌ There is no client-readable token. The token accessors were removed in v19 —
+// getOpenApiConfiguration().token() survives but resolves to undefined, so the SDK sends no header.
 ```
 
 **Do NOT probe the session per request**:
-The boot probe (`user/current/configuration`) runs once at boot and after `keepAlive()`, never per request — the cookie rides along automatically. (Historically the mistake was calling the now-removed `validateToken()` per request, which revoked the reference token and caused ID2019 errors.)
+The boot probe (`user/current/configuration`) runs once at boot and after `keepAlive()`, never per request — the cookie rides along automatically. (Historically the mistake was calling `validateToken()` per request, which revoked the reference token and caused ID2019 errors. That method no longer exists.)
 
 **Authorization Checks**:
 
