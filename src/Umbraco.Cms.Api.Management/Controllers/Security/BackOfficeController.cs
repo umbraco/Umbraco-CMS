@@ -531,7 +531,7 @@ public class BackOfficeController : SecurityControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public IActionResult ExternalLogin(string provider, string? returnUrl = null)
     {
-        if (string.IsNullOrWhiteSpace(provider))
+        if (provider.IsNullOrWhiteSpace())
         {
             return BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Missing provider")
@@ -550,7 +550,7 @@ public class BackOfficeController : SecurityControllerBase
         var callbackUrl = Url.Action(nameof(ExternalLoginCallback), this.GetControllerName());
         AuthenticationProperties properties =
             _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(provider, callbackUrl);
-        if (string.IsNullOrWhiteSpace(returnUrl) is false)
+        if (returnUrl.IsNullOrWhiteSpace() is false)
         {
             properties.Items[ExternalLoginReturnUrlKey] = returnUrl;
         }
@@ -747,7 +747,7 @@ public class BackOfficeController : SecurityControllerBase
         var url = ClientRedirectUrl(_securitySettings.Value.CallbackPathName.EnsureEndsWith('/') + "auth-callback");
 
         // The value round-trips through the external provider's state, so re-validate it as untrusted input.
-        if (string.IsNullOrWhiteSpace(returnUrl) is false && Url.IsLocalUrl(returnUrl))
+        if (returnUrl.IsNullOrWhiteSpace() is false && Url.IsLocalUrl(returnUrl))
         {
             url = url.AppendQueryStringToUrl($"{ExternalLoginReturnUrlKey}={Uri.EscapeDataString(returnUrl)}");
         }
