@@ -41,15 +41,25 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 		// Not authorized. Decide before opening the modal so a single provider doesn't flash it: this
 		// guard runs at router init, after public extensions have registered, so the provider list is
-		// available. Exactly one provider → initiate it directly (full-page); otherwise open the modal
-		// to pick. (Timeouts always open the modal — see the timeoutSignal observer.)
+		// available. Otherwise open the modal to pick.
+		// Only reached on a cold boot: a timeout goes through the timeoutSignal observer and always
+		// opens the modal, because auto-navigating away from a timed-out session would discard the
+		// unsaved work the modal exists to preserve.
 		// TODO: counts frontend manifests only; the follow-up auth-providers endpoint will reconcile
 		// against the server's actually-configured providers (and local-login-disabled state).
 		try {
-			const providers = await firstValueFrom(umbExtensionsRegistry.byType('authProvider'));
-			if (providers.length === 1) {
+			const providers = await firstValueFrom(
+				umbExtensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider'),
+			);
+
+			// Go straight to a provider when there is only one to choose, or when one asks to be gone
+			// to directly.
+			const directProvider =
+				providers.length === 1 ? providers[0] : providers.find((provider) => provider.meta?.behavior?.autoRedirect);
+
+			if (directProvider) {
 				// redirect: true → full-page navigate (cold boot, nothing to preserve), no modal flash.
-				this.#authContext.makeAuthorizationRequest(providers[0].forProviderName, true);
+				this.#authContext.makeAuthorizationRequest(directProvider.forProviderName, true);
 				return false;
 			}
 		} catch {
