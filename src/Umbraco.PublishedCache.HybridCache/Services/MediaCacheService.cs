@@ -150,10 +150,10 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         // stale-set guard GetNodeAsync applies per key, here applied once for the whole set.
         var generation = Interlocked.Read(ref _cacheGeneration);
 
-        return await TieredResolver.ResolveAsync<Guid, IPublishedContent>(keys, GetCachedTier, GetHybridCacheTier, GetDatabaseTier);
+        return await TieredResolver.ResolveAsync<Guid, IPublishedContent>(keys, ResolveCachedTier, ResolveHybridCacheTier, ResolveDatabaseTier);
 
         // L0 (converted) fast path (via the shared TryGetCached).
-        Task GetCachedTier(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
+        Task ResolveCachedTier(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
         {
             foreach (Guid key in batchKeys)
             {
@@ -168,7 +168,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss is
         // deferred to the single batched database read below.
-        async Task GetHybridCacheTier(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
+        async Task ResolveHybridCacheTier(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
         {
             foreach (Guid key in batchKeys)
             {
@@ -181,7 +181,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         }
 
         // The single batched database read for whatever L0 and L1/L2 missed.
-        async Task GetDatabaseTier(IReadOnlyCollection<Guid> missedKeys, IDictionary<Guid, IPublishedContent> results)
+        async Task ResolveDatabaseTier(IReadOnlyCollection<Guid> missedKeys, IDictionary<Guid, IPublishedContent> results)
         {
             IReadOnlyCollection<ContentCacheNode> coldNodes;
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())

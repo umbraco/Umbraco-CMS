@@ -14,7 +14,7 @@ public class TieredResolverTests
     public async Task ResolveAsync_AllCached_ReturnsAllInOrder_WithoutMaterialising()
     {
         var (keys, items) = BuildItems(10);
-        GetItemsAsyncDelegate<Guid, IPublishedContent> warmTier = WarmFromAsync(items);
+        ResolveItemsAsyncDelegate<Guid, IPublishedContent> warmTier = WarmFromAsync(items);
         var (materialiseTier, calls) = MaterialiserAsync(items);
 
         IReadOnlyList<IPublishedContent> result = await TieredResolver.ResolveAsync(keys, warmTier, materialiseTier);
@@ -122,7 +122,7 @@ public class TieredResolverTests
         return (keys, items);
     }
 
-    private static GetItemsAsyncDelegate<Guid, IPublishedContent> WarmFromAsync(Dictionary<Guid, IPublishedContent> warm)
+    private static ResolveItemsAsyncDelegate<Guid, IPublishedContent> WarmFromAsync(Dictionary<Guid, IPublishedContent> warm)
         => (keys, results) =>
         {
             foreach (Guid key in keys)
@@ -136,16 +136,16 @@ public class TieredResolverTests
             return Task.CompletedTask;
         };
 
-    private static GetItemsAsyncDelegate<Guid, IPublishedContent> AllMissAsync()
+    private static ResolveItemsAsyncDelegate<Guid, IPublishedContent> AllMissAsync()
         => (_, _) => Task.CompletedTask;
 
     // A batched materialising tier backed by the given store, recording the keys of each invocation so
     // tests can assert how much was materialised.
-    private static (GetItemsAsyncDelegate<Guid, IPublishedContent> Materialise, List<IReadOnlyList<Guid>> Calls) MaterialiserAsync(
+    private static (ResolveItemsAsyncDelegate<Guid, IPublishedContent> Materialise, List<IReadOnlyList<Guid>> Calls) MaterialiserAsync(
         Dictionary<Guid, IPublishedContent> store)
     {
         var calls = new List<IReadOnlyList<Guid>>();
-        GetItemsAsyncDelegate<Guid, IPublishedContent> materialise = (keys, results) =>
+        ResolveItemsAsyncDelegate<Guid, IPublishedContent> materialise = (keys, results) =>
         {
             calls.Add(keys.ToArray());
 

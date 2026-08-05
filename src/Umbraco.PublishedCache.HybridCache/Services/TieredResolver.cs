@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 /// </summary>
 /// <param name="keys">The candidate keys for this tier (already known to have missed every earlier tier).</param>
 /// <param name="results">The dictionary shared across every tier for this call; write resolved keys into it rather than returning a new dictionary.</param>
-internal delegate Task GetItemsAsyncDelegate<TKey, TItem>(IReadOnlyCollection<TKey> keys, IDictionary<TKey, TItem> results)
+internal delegate Task ResolveItemsAsyncDelegate<TKey, TItem>(IReadOnlyCollection<TKey> keys, IDictionary<TKey, TItem> results)
     where TKey : notnull;
 
 /// <summary>
@@ -40,25 +40,25 @@ internal static class TieredResolver
     /// <returns>The resolved items, in input order (including repeats), with missing items omitted.</returns>
     public static async Task<IReadOnlyList<TItem>> ResolveAsync<TKey, TItem>(
         IReadOnlyCollection<TKey> keys,
-        GetItemsAsyncDelegate<TKey, TItem> firstTier,
-        params GetItemsAsyncDelegate<TKey, TItem>[] additionalTiers)
+        ResolveItemsAsyncDelegate<TKey, TItem> firstTier,
+        params ResolveItemsAsyncDelegate<TKey, TItem>[] additionalTiers)
         where TKey : notnull
     {
-        GetItemsAsyncDelegate<TKey, TItem>[] tiers = additionalTiers.Length == 0
+        ResolveItemsAsyncDelegate<TKey, TItem>[] tiers = additionalTiers.Length == 0
             ? [firstTier]
             : [firstTier, .. additionalTiers];
 
         var resolvedByKey = new Dictionary<TKey, TItem>(keys.Count);
         IReadOnlyCollection<TKey> pending = [.. keys.Distinct()];
 
-        foreach (GetItemsAsyncDelegate<TKey, TItem> tryGetTier in tiers)
+        foreach (ResolveItemsAsyncDelegate<TKey, TItem> resolveTier in tiers)
         {
             if (pending.Count == 0)
             {
                 break;
             }
 
-            await tryGetTier(pending, resolvedByKey);
+            await resolveTier(pending, resolvedByKey);
 
             pending = pending.Where(key => !resolvedByKey.ContainsKey(key)).ToArray();
         }
