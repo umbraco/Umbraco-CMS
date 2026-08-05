@@ -1191,7 +1191,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #region Utilities
 
         protected virtual string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
-            => EnsureUniqueNodeName(parentId, nodeName, id, out _);
+        {
+            // Fetch only the siblings whose name can collide with nodeName (i.e. share its base
+            // text), instead of every sibling under the parent. This is critical for flat trees
+            // such as large media libraries, where "all siblings" could be the majority or all
+            // of the entire library and the full fetch scales O(total items) on every write.
+            // GetUniqueName still applies the authoritative uniqueness filter, so narrowing the
+            // fetch to a superset of the names it cares about preserves behaviour.
+            var prefix = GetSafeLikePrefix(SimilarNodeName.GetBaseText(nodeName));
+
+            Sql<ISqlContext> sql = Sql()
+                .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text!, "name"))
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId)
+                .Where<NodeDto>(x => x.Text!.StartsWith(prefix));
+
+            List<SimilarNodeName> siblings = Database.Fetch<SimilarNodeName>(sql);
+
+            return SimilarNodeName.GetUniqueName(siblings, id, nodeName);
+        }
+
+        // '[' opens a character-class in a SQL Server LIKE pattern, which could cause the prefix
+        // to match fewer rows than the case-insensitive StartsWith the caller expects. Truncating
+        // at the first '[' keeps the prefix a superset (a shorter prefix only broadens the match)
+        // and avoids needing an ESCAPE clause. '%' and '_' only ever broaden the match, so they
+        // are safe to leave in place.
+        private static string GetSafeLikePrefix(string baseText)
+        {
+            var index = baseText.IndexOf('[');
+            return index < 0 ? baseText : baseText[..index];
+        }
 
         private protected string? EnsureUniqueNodeName(int parentId, string? nodeName, int id, out List<SimilarNodeName> siblings)
         {

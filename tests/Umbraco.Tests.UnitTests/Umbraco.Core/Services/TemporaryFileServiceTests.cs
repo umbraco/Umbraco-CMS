@@ -46,6 +46,23 @@ public class TemporaryFileServiceTests
         Assert.AreEqual(TemporaryFileOperationStatus.Success, result.Status);
     }
 
+    // '/' is invalid in a file name on every platform, unlike ':' which is only invalid on Windows.
+    [TestCase("in/valid.png")]
+    [TestCase("/.png")]
+    public async Task Cannot_Create_Temporary_File_With_Invalid_File_Name(string fileName)
+    {
+        var contentSettings = new ContentSettings
+        {
+            AllowedUploadedFileExtensions = new HashSet<string> { "png" },
+        };
+        TemporaryFileService service = CreateService(contentSettings);
+
+        Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result =
+            await service.CreateAsync(new CreateTemporaryFileModel { Key = Guid.NewGuid(), FileName = fileName });
+
+        Assert.AreEqual(TemporaryFileOperationStatus.InvalidFileName, result.Status);
+    }
+
     private static TemporaryFileService CreateService(ContentSettings contentSettings)
     {
         var repository = new Mock<ITemporaryFileRepository>();

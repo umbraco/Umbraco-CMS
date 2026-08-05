@@ -26,14 +26,19 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
     private readonly TContentTypeService _typeService;
-    private readonly Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
 
+    // Concurrent because TryGetContentTypeKey lazily adds aliases resolved after the initial load,
+    // on live request threads; a non-concurrent map corrupts under parallel misses. See #23518.
+    private readonly Lazy<ConcurrentDictionary<string, Guid>> _contentTypeAliasToKeyMap;
+
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     ///     Bundles a navigation structure dictionary and its root keys into a single reference so that
     ///     <see cref="HandleRebuildAsync"/> can swap both atomically with one <see cref="Interlocked.Exchange{T}"/>
     ///     call and readers always observe a consistent pair. Also carries the per-snapshot
     ///     descendants cache populated by <see cref="TryGetDescendantsKeysFromStructure"/>.
     /// </summary>
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
     private sealed record NavigationSnapshot(
         ConcurrentDictionary<Guid, NavigationNode> Structure,
         HashSet<Guid> Roots)
@@ -109,7 +114,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         _coreScopeProvider = coreScopeProvider;
         _navigationRepository = navigationRepository;
         _typeService = typeService;
-        _contentTypeAliasToKeyMap = new Lazy<Dictionary<string, Guid>>(LoadContentTypes);
+        _contentTypeAliasToKeyMap = new Lazy<ConcurrentDictionary<string, Guid>>(LoadContentTypes);
     }
 
     /// <summary>
@@ -1037,7 +1042,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
     private bool TryGetContentTypeKey(string contentTypeAlias, out Guid? contentTypeKey)
     {
-        Dictionary<string, Guid> aliasToKeyMap = _contentTypeAliasToKeyMap.Value;
+        ConcurrentDictionary<string, Guid> aliasToKeyMap = _contentTypeAliasToKeyMap.Value;
 
         if (aliasToKeyMap.TryGetValue(contentTypeAlias, out Guid key))
         {
@@ -1090,6 +1095,6 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
     }
 
-    private Dictionary<string, Guid> LoadContentTypes()
-        => _typeService.GetAll().ToDictionary(ct => ct.Alias, ct => ct.Key);
+    private ConcurrentDictionary<string, Guid> LoadContentTypes()
+        => new(_typeService.GetAll().Select(ct => new KeyValuePair<string, Guid>(ct.Alias, ct.Key)));
 }

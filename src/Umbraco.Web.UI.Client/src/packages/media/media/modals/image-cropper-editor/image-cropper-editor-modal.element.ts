@@ -85,8 +85,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		this.#getSrc();
 	}
 
-	async #observeAcceptedFileTypes() {
-		await this.#config.initialized;
+	#observeAcceptedFileTypes() {
 		this.observe(
 			this.#config.part('imageFileTypes'),
 			(imageFileTypes) => (this.#imageFileTypes = imageFileTypes),

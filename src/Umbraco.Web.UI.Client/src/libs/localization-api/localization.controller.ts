@@ -412,8 +412,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	htmlString(text: string | undefined, ...args: unknown[]) {
 		// `escapeHTML` short-circuits on non-strings, so we stringify first to also escape values
 		// like `{ toString: () => '<script>...' }`. `undefined` is preserved so `string()` can
-		// keep the original placeholder unmatched (existing semantics).
-		const escapedArgs = args.map((a) => (typeof a === 'undefined' ? a : escapeHTML(String(a))));
+		// keep the original placeholder unmatched (existing semantics). A plain object with no
+		// custom `toString` safely degrades to the literal "[object Object]" here.
+		const escapedArgs = args.map((a) => (a === undefined ? a : escapeHTML(String(a))));
 		return unsafeHTML(this.string(text, ...escapedArgs));
 	}
 }

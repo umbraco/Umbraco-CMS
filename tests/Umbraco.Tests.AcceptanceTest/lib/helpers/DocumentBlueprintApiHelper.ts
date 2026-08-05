@@ -24,7 +24,7 @@ export class DocumentBlueprintApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint', documentBlueprint);
-    return response.headers().location.split("v1/document-blueprint/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -49,7 +49,7 @@ export class DocumentBlueprintApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/document-blueprint/children?parentId=${id}&skip=0&take=10000&foldersOnly=false`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async doesNameExist(name: string) {
@@ -96,7 +96,7 @@ export class DocumentBlueprintApiHelper {
     const rootDocumentBlueprints = await this.getAllAtRoot();
     const jsonDocumentBlueprints = await rootDocumentBlueprints.json();
 
-    for (const blueprint of jsonDocumentBlueprints.items) {
+    for (const blueprint of this.api.itemsOf(jsonDocumentBlueprints)) {
       if (blueprint.name === name) {
         return this.get(blueprint.id);
       } else if (blueprint.hasChildren) {
@@ -113,7 +113,7 @@ export class DocumentBlueprintApiHelper {
     const rootDocumentBlueprints = await this.getAllAtRoot();
     const jsonDocumentBlueprints = await rootDocumentBlueprints.json();
 
-    for (const blueprint of jsonDocumentBlueprints.items) {
+    for (const blueprint of this.api.itemsOf(jsonDocumentBlueprints)) {
       if (blueprint.name === name) {
         if (blueprint.hasChildren) {
           await this.recurseDeleteChildren(blueprint.id);
@@ -146,7 +146,7 @@ export class DocumentBlueprintApiHelper {
       }
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/from-document', documentBlueprintData);
-    return response.headers().location.split("v1/document-blueprint/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async createDocumentBlueprintWithTextBoxValue(documentBlueprintName: string, documentTypeId: string, dataTypeName: string, text: string) {
@@ -201,7 +201,7 @@ export class DocumentBlueprintApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(documentBlueprint);
   }
 

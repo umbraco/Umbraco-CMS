@@ -927,6 +927,7 @@ export type DocumentTypeTreeItemResponseModel = {
 export type DocumentUrlInfoModel = {
     message: null | string;
     provider: string;
+    isExternal: boolean;
     culture: null | string;
     url: null | string;
 };
@@ -1338,13 +1339,13 @@ export type InviteUserRequestModel = {
 };
 
 export type IPermissionPresentationModel = ({
-    $type?: 'DocumentPermissionPresentationModel';
+    $type: 'DocumentPermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPermissionPresentationModel) | ({
-    $type?: 'DocumentPropertyValuePermissionPresentationModel';
+    $type: 'DocumentPropertyValuePermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPropertyValuePermissionPresentationModel) | ({
-    $type?: 'ElementPermissionPresentationModel';
+    $type: 'ElementPermissionPresentationModel';
 } & IPermissionPresentationModelElementPermissionPresentationModel) | ({
-    $type?: 'UnknownTypePermissionPresentationModel';
+    $type: 'UnknownTypePermissionPresentationModel';
 } & IPermissionPresentationModelUnknownTypePermissionPresentationModel);
 
 export type IPermissionPresentationModelDocumentPermissionPresentationModel = {
@@ -1373,23 +1374,23 @@ export type IPermissionPresentationModelUnknownTypePermissionPresentationModel =
 };
 
 export type IReferenceResponseModel = ({
-    $type?: 'DefaultReferenceResponseModel';
+    $type: 'DefaultReferenceResponseModel';
 } & IReferenceResponseModelDefaultReferenceResponseModel) | ({
-    $type?: 'DocumentReferenceResponseModel';
+    $type: 'DocumentReferenceResponseModel';
 } & IReferenceResponseModelDocumentReferenceResponseModel) | ({
-    $type?: 'DocumentTypePropertyTypeReferenceResponseModel';
+    $type: 'DocumentTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelDocumentTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'ElementContainerReferenceResponseModel';
+    $type: 'ElementContainerReferenceResponseModel';
 } & IReferenceResponseModelElementContainerReferenceResponseModel) | ({
-    $type?: 'ElementReferenceResponseModel';
+    $type: 'ElementReferenceResponseModel';
 } & IReferenceResponseModelElementReferenceResponseModel) | ({
-    $type?: 'MediaReferenceResponseModel';
+    $type: 'MediaReferenceResponseModel';
 } & IReferenceResponseModelMediaReferenceResponseModel) | ({
-    $type?: 'MediaTypePropertyTypeReferenceResponseModel';
+    $type: 'MediaTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMediaTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'MemberReferenceResponseModel';
+    $type: 'MemberReferenceResponseModel';
 } & IReferenceResponseModelMemberReferenceResponseModel) | ({
-    $type?: 'MemberTypePropertyTypeReferenceResponseModel';
+    $type: 'MemberTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel);
 
 export type IReferenceResponseModelDefaultReferenceResponseModel = {
@@ -1462,9 +1463,7 @@ export type IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel 
     name?: null | string;
 };
 
-export type ISetupTwoFactorModel = {
-    $type?: 'NoopSetupTwoFactorModel';
-} & ISetupTwoFactorModelNoopSetupTwoFactorModel;
+export type ISetupTwoFactorModel = ISetupTwoFactorModelNoopSetupTwoFactorModel;
 
 export type ISetupTwoFactorModelNoopSetupTwoFactorModel = {
     $type: 'NoopSetupTwoFactorModel';
@@ -3541,7 +3540,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
-    httpStatusCode?: number | null;
+    httpStatusCode?: null | number;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;
@@ -4803,7 +4802,7 @@ export type GetTreeDictionaryRootResponses = {
 
 export type GetTreeDictionaryRootResponse = GetTreeDictionaryRootResponses[keyof GetTreeDictionaryRootResponses];
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
+export type PutDocumentByIdValidateData = {
     body: ValidateUpdateDocumentRequestModel;
     path: {
         id: string;
@@ -4812,7 +4811,7 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
     url: '/umbraco/management/api/v1.1/document/{id}/validate';
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
+export type PutDocumentByIdValidateErrors = {
     /**
      * Bad Request
      */
@@ -4831,9 +4830,9 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
     404: ProblemDetails;
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Error = PutUmbracoManagementApiV11DocumentByIdValidate11Errors[keyof PutUmbracoManagementApiV11DocumentByIdValidate11Errors];
+export type PutDocumentByIdValidateError = PutDocumentByIdValidateErrors[keyof PutDocumentByIdValidateErrors];
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Responses = {
+export type PutDocumentByIdValidateResponses = {
     /**
      * OK
      */

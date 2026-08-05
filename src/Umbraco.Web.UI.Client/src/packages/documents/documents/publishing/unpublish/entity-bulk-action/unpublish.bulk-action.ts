@@ -3,19 +3,17 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../constants.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import { UmbDocumentPublishEntityBulkAction } from '../../publish/entity-bulk-action/publish.bulk-action.js';
-import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
-import { UMB_CONTENT_UNPUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import {
+	UMB_CONTENT_UNPUBLISH_MODAL,
+	UmbBulkContentPublishingController,
+	UmbContentUnpublishEntityAction,
+} from '@umbraco-cms/backoffice/content';
 import { html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
@@ -45,21 +43,13 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 	}
 
 	async #unpublishMultipleSelections(entityType: string, unique: string | null): Promise<void> {
-		// Fetch document items and languages in parallel
-		const itemRepository = new UmbDocumentItemRepository(this._host);
-		const languageRepository = new UmbLanguageCollectionRepository(this._host);
-
-		const [{ data: documentItems }, { data: languageData }] = await Promise.all([
-			itemRepository.requestItems(this.selection),
-			languageRepository.requestAllItems(),
-		]);
-
-		if (!documentItems?.length) return;
-
-		const { allInvariant, options } = UmbDocumentPublishEntityBulkAction.buildVariantOptions(
-			documentItems,
-			languageData?.items ?? [],
+		const variantOptions = await UmbDocumentPublishEntityBulkAction.requestBulkVariantOptions(
+			this._host,
+			this.selection,
 		);
+		if (!variantOptions) return;
+
+		const { allInvariant, options } = variantOptions;
 
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and unpublish directly:
 		if (options.length === 1 || allInvariant) {
@@ -89,18 +79,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			? UmbVariantId.CreateInvariant()
 			: new UmbVariantId(options[0].language.unique, null);
 
-		const documentCnt = await this.#unpublishDocuments(this.selection, [variantId]);
-
-		const localize = new UmbLocalizationController(this);
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		notificationContext?.peek('positive', {
-			data: {
-				headline: localize.term('speechBubbles_contentUnpublished'),
-				message: localize.term('speechBubbles_editMultiContentUnpublishedText', documentCnt),
-			},
-		});
-
-		await this.#reloadChildren(entityType, unique);
+		await this.#bulkUnpublish([variantId], entityType, unique);
 	}
 
 	async #unpublishSelectedVariants(
@@ -122,22 +101,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		if (!variantIds.length) return;
 
-		const documentCnt = await this.#unpublishDocuments(this.selection, variantIds);
-
-		const localize = new UmbLocalizationController(this);
-		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		notificationContext?.peek('positive', {
-			data: {
-				headline: localize.term('speechBubbles_contentUnpublished'),
-				message: localize.term(
-					'speechBubbles_editMultiVariantUnpublishedText',
-					documentCnt,
-					localize.list(variantIds.map((v) => v.culture ?? '')),
-				),
-			},
-		});
-
-		await this.#reloadChildren(entityType, unique);
+		await this.#bulkUnpublish(variantIds, entityType, unique);
 	}
 
 	static #renderDocumentCountLabel(option: UmbEntityVariantOptionModel) {
@@ -149,21 +113,24 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			: nothing;
 	}
 
-	async #unpublishDocuments(uniques: Array<string>, variantIds: Array<UmbVariantId>): Promise<number> {
+	// Unpublishes the selection sequentially in a progress dialog, then reports the outcome and reloads.
+	async #bulkUnpublish(variantIds: Array<UmbVariantId>, entityType: string, unique: string | null): Promise<void> {
 		const repository = new UmbDocumentPublishingRepository(this._host);
-		let successCount = 0;
-		for (const unique of uniques) {
-			const { error } = await repository.unpublish(unique, variantIds);
-			if (!error) successCount++;
-		}
-		return successCount;
-	}
 
-	async #reloadChildren(entityType: string, unique: string | null): Promise<void> {
-		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) return;
-		const event = new UmbRequestReloadChildrenOfEntityEvent({ entityType, unique });
-		eventContext.dispatchEvent(event);
+		await new UmbBulkContentPublishingController(this).run({
+			selection: this.selection,
+			entityType,
+			unique,
+			headline: '#unpublish_inProgress',
+			variantIds,
+			labels: {
+				headline: 'speechBubbles_contentUnpublished',
+				multiVariant: 'speechBubbles_editMultiVariantUnpublishedText',
+				multiContent: 'speechBubbles_editMultiContentUnpublishedText',
+				partial: 'speechBubbles_editMultiContentUnpublishedPartialText',
+			},
+			process: (documentUnique) => repository.unpublish(documentUnique, variantIds),
+		});
 	}
 }
 

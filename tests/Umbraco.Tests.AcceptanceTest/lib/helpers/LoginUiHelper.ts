@@ -53,6 +53,13 @@ export class LoginUiHelper extends UiBaseLocators {
     await this.click(this.loginBtn);
   }
 
+  async clickLoginButtonAndWaitForBackOffice() {
+    // The login button triggers the OAuth token exchange and redirect; wait for the backoffice shell to
+    // mount before continuing, otherwise the next navigation races an unauthenticated (still-login) page.
+    await this.click(this.loginBtn);
+    await expect(this.backOfficeMain).toBeVisible({timeout: ConstantHelper.timeout.pageLoad});
+  }
+
   async loginWithCredentials(email: string, password: string) {
     await this.enterEmail(email);
     await this.enterPassword(password);
@@ -69,7 +76,12 @@ export class LoginUiHelper extends UiBaseLocators {
   }
 
   async clickLogoutButtonAndWaitForUserLogout() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.revoke, this.click(this.logoutBtn), ConstantHelper.statusCodes.ok);
+    // Register the listener before clicking: the revoke can complete before a post-click waiter attaches.
+    const revokeResponse = this.page.waitForResponse(
+      resp => resp.url().includes(ConstantHelper.apiEndpoints.revoke) && resp.status() === ConstantHelper.statusCodes.ok,
+    );
+    await this.click(this.logoutBtn);
+    return await revokeResponse;
   }
 
   async clickForgottenPasswordButton() {

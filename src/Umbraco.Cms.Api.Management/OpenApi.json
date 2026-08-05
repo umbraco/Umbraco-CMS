@@ -2940,7 +2940,7 @@
         ],
         "summary": "Validates updating a document.",
         "description": "Validates the request model for updating a document without actually updating it.",
-        "operationId": "PutUmbracoManagementApiV1.1DocumentByIdValidate1.1",
+        "operationId": "PutDocumentByIdValidate",
         "parameters": [
           {
             "name": "id",
@@ -44196,7 +44196,8 @@
           "message",
           "provider",
           "culture",
-          "url"
+          "url",
+          "isExternal"
         ],
         "type": "object",
         "properties": {
@@ -44208,6 +44209,9 @@
           },
           "provider": {
             "type": "string"
+          },
+          "isExternal": {
+            "type": "boolean"
           },
           "culture": {
             "type": [
@@ -54249,9 +54253,11 @@
             "type": "string"
           },
           "httpStatusCode": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "isSuccessStatusCode": {
             "type": "boolean"

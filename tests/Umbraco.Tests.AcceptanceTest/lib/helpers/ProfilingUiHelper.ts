@@ -26,7 +26,8 @@ export class ProfilingUiHelper extends UiBaseLocators {
     return await this.waitForResponseAfterExecutingPromise(
       ConstantHelper.apiEndpoints.profilingStatus,
       this.clickActivateProfilerByDefaultToggle(),
-      ConstantHelper.statusCodes.ok
+      ConstantHelper.statusCodes.ok,
+      ConstantHelper.httpMethods.put,
     );
   }
 
