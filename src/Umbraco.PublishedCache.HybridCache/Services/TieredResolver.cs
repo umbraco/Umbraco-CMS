@@ -2,11 +2,12 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
 /// <summary>
 /// Resolves as many of <paramref name="keys"/> as this tier can, batched into a single asynchronous
-/// call, keyed by the key each item was resolved from.
+/// call, writing each one it resolves into <paramref name="results"/> keyed by the key it was resolved
+/// from.
 /// </summary>
 /// <param name="keys">The candidate keys for this tier (already known to have missed every earlier tier).</param>
-/// <returns>The items this tier resolved, keyed by the key each one was resolved from.</returns>
-internal delegate Task<IReadOnlyDictionary<TKey, TItem>> GetItemsAsyncDelegate<TKey, TItem>(IReadOnlyCollection<TKey> keys)
+/// <param name="results">The dictionary shared across every tier for this call; write resolved keys into it rather than returning a new dictionary.</param>
+internal delegate Task GetItemsAsyncDelegate<TKey, TItem>(IReadOnlyCollection<TKey> keys, IDictionary<TKey, TItem> results)
     where TKey : notnull;
 
 /// <summary>
@@ -17,7 +18,7 @@ internal delegate Task<IReadOnlyDictionary<TKey, TItem>> GetItemsAsyncDelegate<T
 /// Used by <see cref="DocumentCacheService"/> and <see cref="MediaCacheService"/> for their
 /// <c>GetByKeysAsync</c> batch lookups — e.g. a synchronous L0 probe first, then a batched database
 /// read for whatever L0 missed. Deliberately not shared with <c>Umbraco.Core</c>'s sync
-/// <c>TieredResolver</c>: HybridCache and Core are versioned and released as separate NuGet packages
+/// <c>ChunkedTieredResolver</c>: HybridCache and Core are versioned and released as separate NuGet packages
 /// with a floating dependency range within a major version (e.g. <c>[17.5.3, 18.0.0)</c>), so an
 /// internal type exposed across that boundary via <c>InternalsVisibleTo</c> would carry no
 /// binary-compatibility guarantee — a Core patch could change an internal signature with nothing to
@@ -57,11 +58,7 @@ internal static class TieredResolver
                 break;
             }
 
-            IReadOnlyDictionary<TKey, TItem> found = await tryGetTier(pending);
-            foreach (KeyValuePair<TKey, TItem> pair in found)
-            {
-                resolvedByKey[pair.Key] = pair.Value;
-            }
+            await tryGetTier(pending, resolvedByKey);
 
             pending = pending.Where(key => !resolvedByKey.ContainsKey(key)).ToArray();
         }

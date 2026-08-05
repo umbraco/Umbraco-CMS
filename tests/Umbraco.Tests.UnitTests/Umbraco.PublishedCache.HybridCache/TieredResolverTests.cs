@@ -123,22 +123,21 @@ public class TieredResolverTests
     }
 
     private static GetItemsAsyncDelegate<Guid, IPublishedContent> WarmFromAsync(Dictionary<Guid, IPublishedContent> warm)
-        => keys =>
+        => (keys, results) =>
         {
-            var found = new Dictionary<Guid, IPublishedContent>();
             foreach (Guid key in keys)
             {
                 if (warm.TryGetValue(key, out IPublishedContent? cached))
                 {
-                    found[key] = cached;
+                    results[key] = cached;
                 }
             }
 
-            return Task.FromResult<IReadOnlyDictionary<Guid, IPublishedContent>>(found);
+            return Task.CompletedTask;
         };
 
     private static GetItemsAsyncDelegate<Guid, IPublishedContent> AllMissAsync()
-        => _ => Task.FromResult<IReadOnlyDictionary<Guid, IPublishedContent>>(new Dictionary<Guid, IPublishedContent>());
+        => (_, _) => Task.CompletedTask;
 
     // A batched materialising tier backed by the given store, recording the keys of each invocation so
     // tests can assert how much was materialised.
@@ -146,20 +145,19 @@ public class TieredResolverTests
         Dictionary<Guid, IPublishedContent> store)
     {
         var calls = new List<IReadOnlyList<Guid>>();
-        GetItemsAsyncDelegate<Guid, IPublishedContent> materialise = keys =>
+        GetItemsAsyncDelegate<Guid, IPublishedContent> materialise = (keys, results) =>
         {
             calls.Add(keys.ToArray());
 
-            var found = new Dictionary<Guid, IPublishedContent>();
             foreach (Guid key in keys)
             {
                 if (store.TryGetValue(key, out IPublishedContent? item))
                 {
-                    found[key] = item;
+                    results[key] = item;
                 }
             }
 
-            return Task.FromResult<IReadOnlyDictionary<Guid, IPublishedContent>>(found);
+            return Task.CompletedTask;
         };
 
         return (materialise, calls);
