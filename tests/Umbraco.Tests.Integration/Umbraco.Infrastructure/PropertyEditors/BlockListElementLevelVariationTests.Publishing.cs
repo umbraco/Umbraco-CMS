@@ -924,7 +924,7 @@ internal partial class BlockListElementLevelVariationTests
 
         var elementType = CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateSegmentVariantPropertiesContentType(blockListDataType);
+        var contentType = await CreateSegmentVariantPropertiesContentType(blockListDataType);
 
         var content = new ContentBuilder()
             .WithContentType(contentType)
@@ -995,7 +995,7 @@ internal partial class BlockListElementLevelVariationTests
         }
     }
 
-    private IContentType CreateSegmentVariantPropertiesContentType(IDataType blocksEditorDataType)
+    private async Task<IContentType> CreateSegmentVariantPropertiesContentType(IDataType blocksEditorDataType)
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias("myPage")
@@ -1016,7 +1016,7 @@ internal partial class BlockListElementLevelVariationTests
             .WithVariations(ContentVariation.Segment)
             .Done()
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         return contentType;
     }
 
