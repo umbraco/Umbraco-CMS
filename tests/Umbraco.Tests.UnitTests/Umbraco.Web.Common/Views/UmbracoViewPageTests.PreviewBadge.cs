@@ -22,12 +22,12 @@ using Umbraco.Cms.Web.Common.Views;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views;
 
 [TestFixture]
-public class UmbracoViewPagePreviewBadgeTests
+public partial class UmbracoViewPageTests
 {
     [Test]
     public void Preview_Badge_Contains_Nonce_When_Available()
     {
-        TestPage page = CreatePage("s0m3-n0nc3");
+        PreviewBadgeTestPage page = CreatePreviewBadgePage("s0m3-n0nc3");
         TagHelperOutput output = CreateBodyTagHelperOutput();
 
         page.WriteUmbracoContent(output);
@@ -38,7 +38,23 @@ public class UmbracoViewPagePreviewBadgeTests
     [Test]
     public void Preview_Badge_Omits_Nonce_When_Not_Available()
     {
-        TestPage page = CreatePage(null);
+        PreviewBadgeTestPage page = CreatePreviewBadgePage(null);
+        TagHelperOutput output = CreateBodyTagHelperOutput();
+
+        page.WriteUmbracoContent(output);
+
+        var content = output.Content.GetContent();
+        Assert.Multiple(() =>
+        {
+            Assert.That(content, Does.Contain(@"<script src="""));
+            Assert.That(content, Does.Not.Contain("nonce"));
+        });
+    }
+
+    [Test]
+    public void Preview_Badge_Omits_Nonce_When_Service_Is_Not_Registered()
+    {
+        PreviewBadgeTestPage page = CreatePreviewBadgePage(null, registerCspNonceService: false);
         TagHelperOutput output = CreateBodyTagHelperOutput();
 
         page.WriteUmbracoContent(output);
@@ -57,7 +73,7 @@ public class UmbracoViewPagePreviewBadgeTests
             new TagHelperAttributeList(),
             (_, _) => Task.FromResult<TagHelperContent>(new DefaultTagHelperContent()));
 
-    private static TestPage CreatePage(string? nonce)
+    private static PreviewBadgeTestPage CreatePreviewBadgePage(string? nonce, bool registerCspNonceService = true)
     {
         var umbracoContext = new Mock<IUmbracoContext>();
         umbracoContext.Setup(x => x.InPreviewMode).Returns(true);
@@ -70,8 +86,12 @@ public class UmbracoViewPagePreviewBadgeTests
         services.AddSingleton(umbracoContextAccessor.Object);
         services.AddSingleton(Options.Create(new ContentSettings()));
         services.AddSingleton(Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco"));
-        services.AddSingleton(Mock.Of<ICspNonceService>(x => x.GetNonce() == nonce));
         services.AddSingleton(new ContentModelBinder(Mock.Of<IEventAggregator>()));
+
+        if (registerCspNonceService)
+        {
+            services.AddSingleton(Mock.Of<ICspNonceService>(x => x.GetNonce() == nonce));
+        }
 
         var httpContext = new DefaultHttpContext { RequestServices = services.BuildServiceProvider() };
         httpContext.Request.Scheme = "https";
@@ -83,7 +103,7 @@ public class UmbracoViewPagePreviewBadgeTests
             new EmptyModelMetadataProvider(),
             new ModelStateDictionary());
 
-        return new TestPage
+        return new PreviewBadgeTestPage
         {
             ViewContext = new ViewContext
             {
@@ -93,7 +113,7 @@ public class UmbracoViewPagePreviewBadgeTests
         };
     }
 
-    private class TestPage : UmbracoViewPage<IPublishedContent>
+    private class PreviewBadgeTestPage : UmbracoViewPage<IPublishedContent>
     {
         public override Task ExecuteAsync() => throw new NotImplementedException();
     }
