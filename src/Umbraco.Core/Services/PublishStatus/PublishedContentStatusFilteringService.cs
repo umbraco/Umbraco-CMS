@@ -64,15 +64,24 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
                 _publishStatusQueryService.IsDocumentPublished(key, culture)
                 && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
 
-        GetItemsDelegate<Guid, IPublishedContent> getCachedItems = batchKeys => batchKeys
-            .Select(key => _documentCacheService.TryGetCached(key, preview, out IPublishedContent? content) ? (Key: key, Content: content) : default)
-            .Where(pair => pair != default)
-            .ToDictionary(pair => pair.Key, pair => pair.Content!);
+        ResolveItemsDelegate<Guid, IPublishedContent> resolveCachedItems = (batchKeys, results) =>
+        {
+            foreach (Guid key in batchKeys)
+            {
+                if (_documentCacheService.TryGetCached(key, preview, out IPublishedContent? content) && content is not null)
+                {
+                    results[key] = content;
+                }
+            }
+        };
 
-        GetItemsDelegate<Guid, IPublishedContent> getPersistedItems = missedKeys
-            => _documentCacheService.GetByKeysAsync(missedKeys, preview)
-                .GetAwaiter().GetResult()
-                .ToDictionary(x => x.Key);
+        ResolveItemsDelegate<Guid, IPublishedContent> resolvePersistedItems = (missedKeys, results) =>
+        {
+            foreach (IPublishedContent content in _documentCacheService.GetByKeysAsync(missedKeys, preview).GetAwaiter().GetResult())
+            {
+                results[content.Key] = content;
+            }
+        };
 
         // Materialise in growing chunks: an all-L0-hit chunk stays fully synchronous (no async, no
         // batch), while a cold set collapses its database access into batched reads. Returned lazily
@@ -80,8 +89,8 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         // buffer the result themselves (.ToList() / .ToArray()).
         return ChunkedTieredResolver.Resolve(
             keys,
-            getCachedItems,
-            getPersistedItems)
+            resolveCachedItems,
+            resolvePersistedItems)
             .Where(content => culture == Constants.System.InvariantCulture
                                || content.ContentType.VariesByCulture() is false
                                || content.Cultures.ContainsKey(culture));

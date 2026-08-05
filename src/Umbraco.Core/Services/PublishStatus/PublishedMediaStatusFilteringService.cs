@@ -38,20 +38,29 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
     /// </remarks>
     public IEnumerable<IPublishedContent> FilterAvailable(IEnumerable<Guid> candidateKeys, string? culture)
     {
-        GetItemsDelegate<Guid, IPublishedContent> getCachedItems = keys => keys
-            .Select(key => _mediaCacheService.TryGetCached(key, out IPublishedContent? content) ? (Key: key, Content: content) : default)
-            .Where(pair => pair != default)
-            .ToDictionary(pair => pair.Key, pair => pair.Content!);
+        ResolveItemsDelegate<Guid, IPublishedContent> resolveCachedItems = (batchKeys, results) =>
+        {
+            foreach (Guid key in batchKeys)
+            {
+                if (_mediaCacheService.TryGetCached(key, out IPublishedContent? content) && content is not null)
+                {
+                    results[key] = content;
+                }
+            }
+        };
 
-        GetItemsDelegate<Guid, IPublishedContent> getPersistedItems = keys
-            => _mediaCacheService.GetByKeysAsync(keys)
-                .GetAwaiter().GetResult()
-                .ToDictionary(x => x.Key);
+        ResolveItemsDelegate<Guid, IPublishedContent> resolvePersistedItems = (missedKeys, results) =>
+        {
+            foreach (IPublishedContent content in _mediaCacheService.GetByKeysAsync(missedKeys).GetAwaiter().GetResult())
+            {
+                results[content.Key] = content;
+            }
+        };
 
         return ChunkedTieredResolver.Resolve(
             candidateKeys,
-            getCachedItems,
-            getPersistedItems);
+            resolveCachedItems,
+            resolvePersistedItems);
     }
 
     /// <inheritdoc />

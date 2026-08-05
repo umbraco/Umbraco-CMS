@@ -1,12 +1,12 @@
 namespace Umbraco.Cms.Core.Collections;
 
 /// <summary>
-/// Resolves as many of <paramref name="keys"/> as this tier can, batched into a single call, keyed by
-/// the key each item was resolved from.
+/// Resolves as many of <paramref name="keys"/> as this tier can, batched into a single call, writing
+/// each one it resolves into <paramref name="results"/> keyed by the key it was resolved from.
 /// </summary>
 /// <param name="keys">The candidate keys for this tier (already known to have missed every earlier tier).</param>
-/// <returns>The items this tier resolved, keyed by the key each one was resolved from.</returns>
-internal delegate IReadOnlyDictionary<TKey, TItem> GetItemsDelegate<TKey, TItem>(IReadOnlyCollection<TKey> keys)
+/// <param name="results">The dictionary shared across every tier for this chunk; write resolved keys into it rather than returning a new dictionary.</param>
+internal delegate void ResolveItemsDelegate<TKey, TItem>(IReadOnlyCollection<TKey> keys, IDictionary<TKey, TItem> results)
     where TKey : notnull;
 
 /// <summary>
@@ -42,11 +42,11 @@ internal static class ChunkedTieredResolver
     /// <returns>The resolved items, in input order (including repeats), with missing items omitted. Apply any further filtering with <c>.Where()</c> on the result.</returns>
     public static IEnumerable<TItem> Resolve<TKey, TItem>(
         IEnumerable<TKey> keys,
-        GetItemsDelegate<TKey, TItem> firstTier,
-        params GetItemsDelegate<TKey, TItem>[] additionalTiers)
+        ResolveItemsDelegate<TKey, TItem> firstTier,
+        params ResolveItemsDelegate<TKey, TItem>[] additionalTiers)
         where TKey : notnull
     {
-        GetItemsDelegate<TKey, TItem>[] tiers = additionalTiers.Length == 0
+        ResolveItemsDelegate<TKey, TItem>[] tiers = additionalTiers.Length == 0
             ? [firstTier]
             : [firstTier, .. additionalTiers];
 
@@ -87,7 +87,7 @@ internal static class ChunkedTieredResolver
     }
 
     /// <summary>
-    /// Resolves one chunk to its items in chunk order, running <paramref name="tryGetItems"/> in turn
+    /// Resolves one chunk to its items in chunk order, running <paramref name="resolveItems"/> in turn
     /// against whatever the previous tier left unresolved. A tier is skipped once nothing remains
     /// unresolved, so a chunk fully resolved by an early tier never reaches a later one. A key repeated
     /// within the chunk is only ever asked about once per tier; the final walk over <paramref name="chunk"/>
@@ -95,23 +95,20 @@ internal static class ChunkedTieredResolver
     /// </summary>
     private static List<TItem> ResolveChunk<TKey, TItem>(
         List<TKey> chunk,
-        GetItemsDelegate<TKey, TItem>[] tryGetItems)
+        ResolveItemsDelegate<TKey, TItem>[] resolveItems)
         where TKey : notnull
     {
         var resolvedByKey = new Dictionary<TKey, TItem>(chunk.Count);
         IReadOnlyCollection<TKey> pending = chunk.Distinct().ToArray();
 
-        foreach (GetItemsDelegate<TKey, TItem> tryGetTier in tryGetItems)
+        foreach (ResolveItemsDelegate<TKey, TItem> resolveTier in resolveItems)
         {
             if (pending.Count == 0)
             {
                 break;
             }
 
-            foreach (KeyValuePair<TKey, TItem> pair in tryGetTier(pending))
-            {
-                resolvedByKey[pair.Key] = pair.Value;
-            }
+            resolveTier(pending, resolvedByKey);
 
             pending = pending.Where(key => !resolvedByKey.ContainsKey(key)).ToArray();
         }

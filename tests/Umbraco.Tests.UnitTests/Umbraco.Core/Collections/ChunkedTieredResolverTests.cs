@@ -17,7 +17,7 @@ public class ChunkedTieredResolverTests
     public void Resolve_AllCached_ReturnsAllInOrder_WithoutMaterialising()
     {
         var (keys, items) = BuildItems(10);
-        GetItemsDelegate<Guid, IPublishedContent> warmTier = WarmFrom(items); // everything in L0
+        ResolveItemsDelegate<Guid, IPublishedContent> warmTier = WarmFrom(items); // everything in L0
         var (materialiseTier, calls) = Materialiser(items);
 
         IPublishedContent[] result = ChunkedTieredResolver
@@ -206,44 +206,38 @@ public class ChunkedTieredResolverTests
     }
 
     // A sync L0 tier backed by the given "warm" set.
-    private static GetItemsDelegate<Guid, IPublishedContent> WarmFrom(Dictionary<Guid, IPublishedContent> warm)
-        => keys =>
+    private static ResolveItemsDelegate<Guid, IPublishedContent> WarmFrom(Dictionary<Guid, IPublishedContent> warm)
+        => (keys, results) =>
         {
-            var found = new Dictionary<Guid, IPublishedContent>();
             foreach (Guid key in keys)
             {
                 if (warm.TryGetValue(key, out IPublishedContent? cached))
                 {
-                    found[key] = cached;
+                    results[key] = cached;
                 }
             }
-
-            return found;
         };
 
-    private static GetItemsDelegate<Guid, IPublishedContent> AllMiss()
-        => _ => new Dictionary<Guid, IPublishedContent>();
+    private static ResolveItemsDelegate<Guid, IPublishedContent> AllMiss()
+        => (_, _) => { };
 
     // A batched materialising tier backed by the given store, recording the keys of each invocation so
     // tests can assert how much was materialised.
-    private static (GetItemsDelegate<Guid, IPublishedContent> Materialise, List<IReadOnlyList<Guid>> Calls) Materialiser(
+    private static (ResolveItemsDelegate<Guid, IPublishedContent> Materialise, List<IReadOnlyList<Guid>> Calls) Materialiser(
         Dictionary<Guid, IPublishedContent> store)
     {
         var calls = new List<IReadOnlyList<Guid>>();
-        GetItemsDelegate<Guid, IPublishedContent> materialise = keys =>
+        ResolveItemsDelegate<Guid, IPublishedContent> materialise = (keys, results) =>
         {
             calls.Add(keys.ToArray());
 
-            var found = new Dictionary<Guid, IPublishedContent>();
             foreach (Guid key in keys)
             {
                 if (store.TryGetValue(key, out IPublishedContent? item))
                 {
-                    found[key] = item;
+                    results[key] = item;
                 }
             }
-
-            return found;
         };
 
         return (materialise, calls);
