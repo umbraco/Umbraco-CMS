@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -47,7 +48,7 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
                 .GetAwaiter().GetResult()
                 .ToDictionary(x => x.Key);
 
-        return ChunkedTieredEnumerator.Enumerate(
+        return ChunkedTieredResolver.Resolve(
             candidateKeys,
             getCachedItems,
             getPersistedItems);

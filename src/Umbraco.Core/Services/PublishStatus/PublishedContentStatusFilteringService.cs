@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -77,7 +78,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         // batch), while a cold set collapses its database access into batched reads. Returned lazily
         // so short-circuiting consumers still exit early; callers that enumerate more than once should
         // buffer the result themselves (.ToList() / .ToArray()).
-        return ChunkedTieredEnumerator.Enumerate(
+        return ChunkedTieredResolver.Resolve(
             keys,
             getCachedItems,
             getPersistedItems)

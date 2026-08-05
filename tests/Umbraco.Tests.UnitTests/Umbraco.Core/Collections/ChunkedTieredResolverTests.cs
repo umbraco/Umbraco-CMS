@@ -1,12 +1,12 @@
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services.Navigation;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.PublishStatus;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Collections;
 
 [TestFixture]
-public class ChunkedTieredEnumeratorTests
+public class ChunkedTieredResolverTests
 {
     // Held as static readonly fields (rather than inline array literals) so the assertion calls do not
     // allocate a fresh array each time.
@@ -14,14 +14,14 @@ public class ChunkedTieredEnumeratorTests
     private static readonly int[] _firstFiveIds = [0, 1, 2, 3, 4];
 
     [Test]
-    public void Enumerate_AllCached_ReturnsAllInOrder_WithoutMaterialising()
+    public void Resolve_AllCached_ReturnsAllInOrder_WithoutMaterialising()
     {
         var (keys, items) = BuildItems(10);
         GetItemsDelegate<Guid, IPublishedContent> warmTier = WarmFrom(items); // everything in L0
         var (materialiseTier, calls) = Materialiser(items);
 
-        IPublishedContent[] result = ChunkedTieredEnumerator
-            .Enumerate(keys, warmTier, materialiseTier)
+        IPublishedContent[] result = ChunkedTieredResolver
+            .Resolve(keys, warmTier, materialiseTier)
             .ToArray();
 
         Assert.Multiple(() =>
@@ -35,13 +35,13 @@ public class ChunkedTieredEnumeratorTests
     }
 
     [Test]
-    public void Enumerate_NoneCached_MaterialisesAllInOrder_InAFewBatches()
+    public void Resolve_NoneCached_MaterialisesAllInOrder_InAFewBatches()
     {
         var (keys, items) = BuildItems(10);
         var (materialiseTier, calls) = Materialiser(items);
 
-        IPublishedContent[] result = ChunkedTieredEnumerator
-            .Enumerate(keys, AllMiss(), materialiseTier)
+        IPublishedContent[] result = ChunkedTieredResolver
+            .Resolve(keys, AllMiss(), materialiseTier)
             .ToArray();
 
         Assert.Multiple(() =>
@@ -60,13 +60,13 @@ public class ChunkedTieredEnumeratorTests
     }
 
     [Test]
-    public void Enumerate_FirstOnly_MaterialisesSingleItem()
+    public void Resolve_FirstOnly_MaterialisesSingleItem()
     {
         var (keys, items) = BuildItems(10);
         var (materialiseTier, calls) = Materialiser(items);
 
-        IPublishedContent? first = ChunkedTieredEnumerator
-            .Enumerate(keys, AllMiss(), materialiseTier)
+        IPublishedContent? first = ChunkedTieredResolver
+            .Resolve(keys, AllMiss(), materialiseTier)
             .FirstOrDefault();
 
         Assert.Multiple(() =>
@@ -78,13 +78,13 @@ public class ChunkedTieredEnumeratorTests
     }
 
     [Test]
-    public void Enumerate_Take_MaterialisesOnlyRequested()
+    public void Resolve_Take_MaterialisesOnlyRequested()
     {
         var (keys, items) = BuildItems(10);
         var (materialiseTier, calls) = Materialiser(items);
 
-        IPublishedContent[] taken = ChunkedTieredEnumerator
-            .Enumerate(keys, AllMiss(), materialiseTier)
+        IPublishedContent[] taken = ChunkedTieredResolver
+            .Resolve(keys, AllMiss(), materialiseTier)
             .Take(3)
             .ToArray();
 
@@ -98,14 +98,14 @@ public class ChunkedTieredEnumeratorTests
     }
 
     [Test]
-    public void Enumerate_FilteringIsLeftToTheCaller()
+    public void Resolve_FilteringIsLeftToTheCaller()
     {
         var (keys, items) = BuildItems(10);
         var (materialiseTier, _) = Materialiser(items);
 
-        // Enumerate itself applies no filtering — callers chain .Where() on the (lazy) result.
-        IPublishedContent[] result = ChunkedTieredEnumerator
-            .Enumerate(keys, WarmFrom(items), materialiseTier)
+        // Resolve itself applies no filtering — callers chain .Where() on the (lazy) result.
+        IPublishedContent[] result = ChunkedTieredResolver
+            .Resolve(keys, WarmFrom(items), materialiseTier)
             .Where(item => item.Id % 2 == 0)
             .ToArray();
 
@@ -113,7 +113,7 @@ public class ChunkedTieredEnumeratorTests
     }
 
     [Test]
-    public void Enumerate_MixedCacheHits_PreservesInputOrder()
+    public void Resolve_MixedCacheHits_PreservesInputOrder()
     {
         var (keys, items) = BuildItems(10);
 
@@ -121,8 +121,8 @@ public class ChunkedTieredEnumeratorTests
         var warm = items.Where(kvp => kvp.Value.Id % 2 == 0).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         var (materialiseTier, _) = Materialiser(items);
 
-        IPublishedContent[] result = ChunkedTieredEnumerator
-            .Enumerate(keys, WarmFrom(warm), materialiseTier)
+        IPublishedContent[] result = ChunkedTieredResolver
+            .Resolve(keys, WarmFrom(warm), materialiseTier)
             .ToArray();
 
         // Regardless of which tier served each item, the output stays in input order.
@@ -130,7 +130,7 @@ public class ChunkedTieredEnumeratorTests
     }
 
     [Test]
-    public void Enumerate_OmitsKeysThatResolveToNothing()
+    public void Resolve_OmitsKeysThatResolveToNothing()
     {
         var (keys, items) = BuildItems(10);
 
@@ -138,20 +138,47 @@ public class ChunkedTieredEnumeratorTests
         var backing = items.Where(kvp => kvp.Value.Id < 5).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         var (materialiseTier, _) = Materialiser(backing);
 
-        IPublishedContent[] result = ChunkedTieredEnumerator
-            .Enumerate(keys, AllMiss(), materialiseTier)
+        IPublishedContent[] result = ChunkedTieredResolver
+            .Resolve(keys, AllMiss(), materialiseTier)
             .ToArray();
 
         CollectionAssert.AreEqual(_firstFiveIds, result.Select(x => x.Id));
     }
 
     [Test]
-    public void Enumerate_EmptyInput_ReturnsEmpty()
+    public void Resolve_DuplicateKeyWithinAChunk_ResolvesToSameItemAtEveryOccurrence_WithoutDuplicateWork()
+    {
+        var (keys, items) = BuildItems(2);
+        Guid keyA = keys[0];
+        Guid keyB = keys[1];
+
+        // Chunk sizes grow 1, 2, 4, ... — so chunk 1 is [keyB] and chunk 2 is [keyA, keyA], the
+        // duplicate landing entirely within one chunk rather than split across the boundary.
+        Guid[] input = [keyB, keyA, keyA];
+        var (materialiseTier, calls) = Materialiser(items);
+
+        IPublishedContent[] result = ChunkedTieredResolver
+            .Resolve(input, AllMiss(), materialiseTier)
+            .ToArray();
+
+        Assert.Multiple(() =>
+        {
+            // The repeated key resolves to the same item at both occurrences.
+            CollectionAssert.AreEqual(new[] { 1, 0, 0 }, result.Select(x => x.Id));
+
+            // ...but the second chunk's tier call only asks about keyA once, not twice.
+            Assert.AreEqual(2, calls.Count);
+            CollectionAssert.AreEqual(new[] { keyA }, calls[1]);
+        });
+    }
+
+    [Test]
+    public void Resolve_EmptyInput_ReturnsEmpty()
     {
         var (materialiseTier, calls) = Materialiser(new Dictionary<Guid, IPublishedContent>());
 
-        IPublishedContent[] result = ChunkedTieredEnumerator
-            .Enumerate([], AllMiss(), materialiseTier)
+        IPublishedContent[] result = ChunkedTieredResolver
+            .Resolve([], AllMiss(), materialiseTier)
             .ToArray();
 
         Assert.Multiple(() =>
