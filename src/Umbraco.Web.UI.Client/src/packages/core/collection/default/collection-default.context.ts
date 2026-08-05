@@ -370,6 +370,8 @@ export class UmbDefaultCollectionContext<
 		return this._filter.getValue() as UmbCollectionMemorizedFilter;
 	}
 
+	// TODO: The filter, order and pagination memories below would ideally live in the managers owning that state, like
+	// the view manager does with its own. That requires a filter manager first, so we move them over time. [MR]
 	#observeInteractionMemory() {
 		this.observe(this.filter, () => this.#writeInteractionMemory(), 'umbCollectionInteractionMemoryWriteObserver');
 
