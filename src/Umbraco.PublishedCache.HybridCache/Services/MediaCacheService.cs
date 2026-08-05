@@ -173,14 +173,15 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             foreach (Guid key in batchKeys)
             {
                 (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(GetCacheKey(key), CancellationToken.None);
-                if (exists)
+                if (exists && node is not null)
                 {
-                    await AddMaterialisedAsync(key, node, generation, fromDatabase: false, results);
+                    ResolveNode(key, node, generation, results);
                 }
             }
         }
 
-        // The single batched database read for whatever L0 and L1/L2 missed.
+        // The single batched database read for whatever L0 and L1/L2 missed. Once resolved, a
+        // database-read node is promoted into L1 — an L1/L2 hit is already there.
         async Task ResolveDatabaseTier(IReadOnlyCollection<Guid> missedKeys, IDictionary<Guid, IPublishedContent> results)
         {
             IReadOnlyCollection<ContentCacheNode> coldNodes;
@@ -192,43 +193,33 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
             foreach (ContentCacheNode node in coldNodes)
             {
-                await AddMaterialisedAsync(node.Key, node, generation, fromDatabase: true, results);
+                if (ResolveNode(node.Key, node, generation, results) && IsCacheGenerationCurrent(generation))
+                {
+                    await _hybridCache.SetAsync(GetCacheKey(node.Key), node, GetEntryOptions(node.Key), GenerateTags(node));
+                }
             }
         }
     }
 
-    // Converts a resolved cache node to IPublishedContent and, when our snapshot is still current,
-    // populates L0 (and, for freshly database-read nodes, L1).
-    private async Task AddMaterialisedAsync(
-        Guid key,
-        ContentCacheNode? node,
-        long generation,
-        bool fromDatabase,
-        IDictionary<Guid, IPublishedContent> results)
+    // Converts a resolved cache node to IPublishedContent, writes it into results, and — when our
+    // snapshot is still current — populates L0. Returns whether conversion succeeded, so a caller that
+    // also needs L1 (only the database tier does) knows whether there's anything worth promoting.
+    private bool ResolveNode(Guid key, ContentCacheNode node, long generation, IDictionary<Guid, IPublishedContent> results)
     {
-        if (node is null)
-        {
-            return;
-        }
-
         IPublishedContent? content = _publishedContentFactory.ToIPublishedMedia(node).CreateModel(_publishedModelFactory);
         if (content is null)
         {
-            return;
+            return false;
         }
 
         results[key] = content;
 
         if (IsCacheGenerationCurrent(generation))
         {
-            // Only a node read from the database still needs writing to L1; an L1/L2 hit is already there.
-            if (fromDatabase)
-            {
-                await _hybridCache.SetAsync(GetCacheKey(key), node, GetEntryOptions(key), GenerateTags(node));
-            }
-
             _publishedContentCache.Set(key, content, ContentCacheNodeSizeEstimator.EstimateBytes(node));
         }
+
+        return true;
     }
 
     /// <inheritdoc />
