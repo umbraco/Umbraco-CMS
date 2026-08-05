@@ -15,7 +15,8 @@ test('can log out via the user menu', {tag: '@smoke'}, async ({umbracoUi, umbrac
   // Let the logout navigation settle before re-navigating, or the in-flight cookie-clear is
   // interrupted and the still-valid session silently re-authorises back into the backoffice.
   await umbracoUi.page.waitForURL(/\/umbraco\/logout/, {timeout: ConstantHelper.timeout.navigation});
-  await umbracoUi.page.waitForLoadState('networkidle');
+  // Deterministic settle: retry re-navigating until the login page renders, rather than a SPA-flaky
+  // networkidle wait (background polling can hold the network open indefinitely).
   await expect(async () => {
     await umbracoUi.goToBackOffice();
     await umbracoUi.login.isLoginPageVisible();
