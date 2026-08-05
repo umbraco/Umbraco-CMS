@@ -879,6 +879,7 @@ export default {
 		by: 'by',
 		cancel: 'Cancel',
 		cellMargin: 'Cell margin',
+		changeView: 'Change view',
 		choose: 'Choose',
 		clear: 'Clear',
 		close: 'Close',
