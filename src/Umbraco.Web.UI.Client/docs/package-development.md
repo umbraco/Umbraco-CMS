@@ -102,6 +102,16 @@ No hardcoded UI-facing strings. All user-visible text must go through the locali
 
 For step-by-step instructions on adding localization keys and using them in elements or controllers, use the `general-add-localization` skill.
 
+### Type-safe localization keys
+
+`this.localize.term()`, `termOrDefault()`, and the `<umb-localize key="…">` element are typed against the `en.ts` localization.
+
+After adding or renaming a key in `en.ts`, run:
+```bash
+npm run generate:localization-keys
+```
+The script also runs automatically as a `prebuild` hook, and as part of the test scripts.
+
 ### Active language
 
 The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`, not by `<html lang>`:
@@ -120,16 +130,6 @@ Two separate concepts — don't conflate them:
 - **Fallback culture** — `en` (`UMB_DEFAULT_LOCALIZATION_CULTURE`). The culture the canonical `en.ts` dictionary ships under (`Umb.Localization.EN`). Always loaded _alongside_ the active locale so any missing key falls back to English.
 
 A third-party language pack overriding canonical keys for a default install should declare `culture: 'en-US'` (matches active locale), not `culture: 'en'`. The keys come _from_ `en.ts`, but the override extension's `culture` must match the active locale, otherwise the registry filters it out.
-
-### Active language
-
-The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`, not by `<html lang>`:
-
-- Razor sets `lang` on the shell element from `GlobalSettings.DefaultUILanguage`. The shell reads its own `lang` on connect and calls `umbLocalizationRegistry.loadLanguage(this.lang)`.
-- After login, `current-user.context` calls `loadLanguage(user.languageIsoCode)` and the shell mirrors the new value back onto its own `lang` attribute via `umbLocalizationRegistry.currentLanguage`.
-- `<html lang>` is the static `"en"` for the noscript fallback text. Don't conflate it with the dynamic UI language.
-
-If you're adding a new shell-like element (rare — most code lives inside `<umb-app>`), give it a `lang` attribute and the same subscribe-and-mirror pattern. For everything else, just use `this.localize` and the inherited context resolves the rest.
 
 ---
 
