@@ -160,7 +160,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('general_scheduledPublishing')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('content_saveAndScheduleModalTitle')}>
 			${this.#renderOptions()}
 
 			<div slot="actions">
