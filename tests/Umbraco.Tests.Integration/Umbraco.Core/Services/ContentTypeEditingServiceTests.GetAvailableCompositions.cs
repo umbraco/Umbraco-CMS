@@ -300,7 +300,6 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == composition.Key && x.Allowed == false));
     }
 
-
     private ContentTypeCreateModel CreateBasicContentTypeModelWithSingleProperty(string contentTypeName, string propertyName, bool isElement)
     {
         var container = ContentTypePropertyContainerModel();

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.ContentTypeEditing;
 [TestFixture]
 public class ContentTypeEditingHelperTests
 {
-    private IShortStringHelper ShortStringHelper => new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
+    private static readonly IShortStringHelper ShortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
     [Test]
     public void GetAllDescendantPropertyAliases_Excludes_Sources_Own_Composition_Contribution()
@@ -83,7 +83,7 @@ public class ContentTypeEditingHelperTests
         CollectionAssert.AreEquivalent(new[] { "deep" }, descendantAliases);
     }
 
-    private void AddPropertyType(IContentType contentType, string alias)
+    private static void AddPropertyType(ContentType contentType, string alias)
     {
         var propertyTypeCollection = new PropertyTypeCollection(true)
         {
