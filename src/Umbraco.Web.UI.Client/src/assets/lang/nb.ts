@@ -227,6 +227,8 @@ export default {
 		routeError: 'Dette dokumentet er publisert, men URL-en kolliderer med innhold %0%',
 		routeErrorCannotRoute: 'Dette dokumentet er publisert, men URL-en kan ikke rutes',
 		saveModalTitle: 'Lagre',
+		saveAndPublishDescendantsModalTitle: 'Lagre og publiser med undersider',
+		saveAndScheduleModalTitle: 'Lagre og planlegg publisering',
 		schedulePublishHelp: 'Velg dato og tid for å publisere og/eller avpublisere innholdselementet.',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Hva betyr dette?</a>',

@@ -2,6 +2,7 @@ import { UmbUserRepository } from '../../repository/index.js';
 import type { UmbUserMfaProviderModel } from '../../types.js';
 import type { UmbUserMfaModalConfiguration } from './user-mfa-modal.token.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -142,7 +143,7 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
 		await umbConfirmModal(this, {
 			headline: '#actions_disable',
-			content: this.localize.term('user_2faDisableForUser', item.displayName),
+			content: this.localize.term('user_2faDisableForUser', escapeHTML(item.displayName)),
 			confirmLabel: '#actions_disable',
 			color: 'danger',
 		});
