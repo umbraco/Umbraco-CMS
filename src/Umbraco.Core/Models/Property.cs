@@ -183,7 +183,7 @@ public class Property : EntityBase, IProperty
     /// <remarks>
     ///     This method is for internal use and must be invoked by the content item.
     ///     It does not validate the value - the content item must validate first.
-    ///     The neutral value is published along with the value of every segment supported by the property type.
+    ///     The default value is published along with the value of every segment supported by the property type.
     /// </remarks>
     /// <exception cref="NotSupportedException">Thrown when attempting to publish merged culture values for culture variant properties.</exception>
     public void PublishPartialValues(IDataEditor dataEditor, string? culture)
