@@ -10,11 +10,12 @@ internal static class ContentTypeEditingHelper
     /// <summary>
     ///     Gets the combined, full effective property alias set (own properties plus everything each one gets from
     ///     its own compositions) of every content type descending from <paramref name="source"/>, across both the
-    ///     tree inheritance and composition axes.
+    ///     tree inheritance and composition axes - excluding whatever already flows into those descendants through
+    ///     <paramref name="source"/>'s own current state.
     /// </summary>
     /// <param name="source">The content type to find descendants of, or <c>null</c> when there are none (e.g. creating a new content type).</param>
     /// <param name="allContentTypes">All existing content type compositions, used to resolve the descendant tree.</param>
-    /// <returns>The lowercased property aliases already effective on every descendant of <paramref name="source"/>.</returns>
+    /// <returns>The lowercased property aliases already effective on every descendant of <paramref name="source"/>, excluding aliases <paramref name="source"/> itself already contributes.</returns>
     /// <remarks>
     ///     Inheritance children hold their parent in their own <see cref="IContentTypeComposition.ContentTypeComposition"/>,
     ///     so walking the composition graph downward captures inheritance and composition descendants alike.
@@ -58,6 +59,8 @@ internal static class ContentTypeEditingHelper
                 stack.Push(descendant.Id);
             }
         }
+
+        descendantPropertyAliases.ExceptWith(source.CompositionPropertyTypes.Select(pt => pt.Alias.ToLowerInvariant()));
 
         return descendantPropertyAliases;
     }

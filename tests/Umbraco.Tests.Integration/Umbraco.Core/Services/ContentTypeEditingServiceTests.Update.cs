@@ -1688,6 +1688,45 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsTrue(child.CompositionPropertyTypes.Any(p => p.Alias == "compProperty"));
     }
 
+    [Test]
+    public async Task Can_Reapply_Composition_With_Property_When_It_Has_An_Inheriting_Child()
+    {
+        var composition = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Composition C", "shared"), Constants.Security.SuperUserKey)).Result!;
+        var parent = (await ContentTypeEditingService.CreateAsync(
+                ContentTypeCreateModel(
+                    "Parent",
+                    compositions: [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }]),
+                Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key), Constants.Security.SuperUserKey);
+
+        var updateModel = ContentTypeUpdateModel(
+            "Parent",
+            alias: parent.Alias,
+            compositions: [new() { CompositionType = CompositionType.Composition, Key = composition.Key }]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success, result.Status.ToString());
+    }
+
+    [Test]
+    public async Task Can_Resave_Own_Property_When_Content_Type_Has_An_Inheriting_Child()
+    {
+        var parent = (await ContentTypeEditingService.CreateAsync(CompositionModelWithProperty("Parent", "own1"), Constants.Security.SuperUserKey)).Result!;
+        await ContentTypeEditingService.CreateAsync(ChildModelInheriting("Child", parent.Key), Constants.Security.SuperUserKey);
+
+        var container = ContentTypePropertyContainerModel();
+        var updateModel = ContentTypeUpdateModel(
+            "Parent Renamed",
+            alias: parent.Alias,
+            propertyTypes: [ContentTypePropertyTypeModel("own1", "own1", containerKey: container.Key)],
+            containers: [container]);
+
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success, result.Status.ToString());
+    }
+
     private ContentTypeCreateModel ChildModelInheriting(string name, Guid parentKey, string? ownPropertyAlias = null)
     {
         IEnumerable<ContentTypePropertyTypeModel> properties = Enumerable.Empty<ContentTypePropertyTypeModel>();
