@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Core.Services.Navigation;
+namespace Umbraco.Cms.Core.Collections;
 
 /// <summary>
 /// Resolves as many of <paramref name="keys"/> as this tier can, batched into a single call, keyed by
@@ -10,24 +10,15 @@ internal delegate IReadOnlyDictionary<TKey, TItem> GetItemsDelegate<TKey, TItem>
     where TKey : notnull;
 
 /// <summary>
-/// Lazily materialises a sequence of keys into items, pulling keys in growing chunks so that
-/// short-circuiting consumers stay cheap while a full enumeration of a cold set collapses its expensive
-/// work into a handful of batched calls.
+/// Resolves a sequence of keys into items by running a set of tiers in order, each one only asked
+/// about whatever the previous tiers could not resolve.
 /// </summary>
 /// <remarks>
-/// <para>
-/// Each chunk is run through the tiers given to <see cref="Enumerate{TKey,TItem}"/>, in order — e.g. a
-/// cheap synchronous L0 probe first, then a batched database read for whatever L0 missed. A tier is only
-/// invoked for the keys the previous tiers could not resolve, and a chunk fully resolved by an earlier
-/// tier skips the later ones entirely — identical to the per-key warm path when everything is cached.
-/// </para>
-/// <para>
-/// Chunk size starts at 1 and doubles up to <see cref="MaxChunkSize"/>. So a <c>FirstOrDefault()</c>
-/// materialises a single item, a full enumeration of N items uses O(log N + N / cap) chunks, and cold
-/// over-fetch on a predicate short-circuit is bounded to roughly twice what the consumer draws.
-/// </para>
+/// Tiers run in order — e.g. a cheap synchronous L0 probe first, then a batched database read for
+/// whatever L0 missed. A tier is only invoked for the keys the previous tiers could not resolve, and a
+/// chunk fully resolved by an earlier tier skips the later ones entirely.
 /// </remarks>
-internal static class ChunkedTieredEnumerator
+internal static class ChunkedTieredResolver
 {
     private const int MaxChunkSize = 256;
 
@@ -36,13 +27,20 @@ internal static class ChunkedTieredEnumerator
     /// running each chunk through <paramref name="firstTier"/> and then <paramref name="additionalTiers"/>,
     /// in order, until every key is resolved or every tier has been tried.
     /// </summary>
-    /// <typeparam name="TKey">The type of key used to look up and deduplicate items.</typeparam>
+    /// <remarks>
+    /// Chunk size starts at 1 and doubles up to <see cref="MaxChunkSize"/>. So a <c>FirstOrDefault()</c>
+    /// materialises a single item, a full enumeration of N items uses O(log N + N / cap) chunks, and cold
+    /// over-fetch on a predicate short-circuit is bounded to roughly twice what the consumer draws. A
+    /// chunk fully resolved by an earlier tier skips the later ones entirely — identical to the per-key
+    /// warm path when everything is cached.
+    /// </remarks>
+    /// <typeparam name="TKey">The type of key used to look up items.</typeparam>
     /// <typeparam name="TItem">The type of item being materialised.</typeparam>
-    /// <param name="keys">The keys to materialise, in the order they should be yielded. Duplicates are collapsed to a single result.</param>
+    /// <param name="keys">The keys to materialise, in the order they should be yielded. A key repeated in <paramref name="keys"/> resolves to the same item at every occurrence, without re-running the tiers for it more than once per chunk.</param>
     /// <param name="firstTier">The first tier to run for each chunk.</param>
     /// <param name="additionalTiers">Further tiers, in order, for whatever <paramref name="firstTier"/> and the ones before them left unresolved.</param>
-    /// <returns>The resolved items, in input order, with missing items omitted. Apply any further filtering with <c>.Where()</c> on the result.</returns>
-    public static IEnumerable<TItem> Enumerate<TKey, TItem>(
+    /// <returns>The resolved items, in input order (including repeats), with missing items omitted. Apply any further filtering with <c>.Where()</c> on the result.</returns>
+    public static IEnumerable<TItem> Resolve<TKey, TItem>(
         IEnumerable<TKey> keys,
         GetItemsDelegate<TKey, TItem> firstTier,
         params GetItemsDelegate<TKey, TItem>[] additionalTiers)
@@ -54,7 +52,7 @@ internal static class ChunkedTieredEnumerator
 
         var chunkSize = 1;
         var chunk = new List<TKey>(MaxChunkSize);
-        using IEnumerator<TKey> enumerator = keys.Distinct().GetEnumerator();
+        using IEnumerator<TKey> enumerator = keys.GetEnumerator();
 
         while (TryFillChunk(enumerator, chunk, chunkSize))
         {
@@ -89,10 +87,11 @@ internal static class ChunkedTieredEnumerator
     }
 
     /// <summary>
-    /// Resolves one chunk (already deduplicated by <see cref="Enumerate{TKey,TItem}"/>) to its items in
-    /// chunk order, running <paramref name="tryGetItems"/> in turn against whatever the previous tier left
-    /// unresolved. A tier is skipped once nothing remains unresolved, so a chunk fully resolved by an
-    /// early tier never reaches a later one.
+    /// Resolves one chunk to its items in chunk order, running <paramref name="tryGetItems"/> in turn
+    /// against whatever the previous tier left unresolved. A tier is skipped once nothing remains
+    /// unresolved, so a chunk fully resolved by an early tier never reaches a later one. A key repeated
+    /// within the chunk is only ever asked about once per tier; the final walk over <paramref name="chunk"/>
+    /// still emits one item per occurrence.
     /// </summary>
     private static List<TItem> ResolveChunk<TKey, TItem>(
         List<TKey> chunk,
@@ -100,7 +99,7 @@ internal static class ChunkedTieredEnumerator
         where TKey : notnull
     {
         var resolvedByKey = new Dictionary<TKey, TItem>(chunk.Count);
-        IReadOnlyCollection<TKey> pending = chunk;
+        IReadOnlyCollection<TKey> pending = chunk.Distinct().ToArray();
 
         foreach (GetItemsDelegate<TKey, TItem> tryGetTier in tryGetItems)
         {

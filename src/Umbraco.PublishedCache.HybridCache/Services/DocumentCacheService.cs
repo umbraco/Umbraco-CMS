@@ -167,57 +167,59 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         // same stale-set guard GetNodeAsync applies per key, here applied once for the whole set.
         var generation = Interlocked.Read(ref _cacheGeneration);
 
-        var resultsByKey = new Dictionary<Guid, IPublishedContent>(keys.Count);
-        var coldKeys = new List<Guid>();
+        return await TieredResolver.ResolveAsync(keys, GetCachedTier, GetHybridCacheTier, GetDatabaseTier);
 
-        foreach (Guid key in keys)
+        // L0 (converted) fast path — published only, mirroring GetNodeAsync (via the shared TryGetCached).
+        Task<IReadOnlyDictionary<Guid, IPublishedContent>> GetCachedTier(IReadOnlyCollection<Guid> batchKeys)
         {
-            var cacheKey = GetCacheKey(key, calculatedPreview);
-
-            // L0 (converted) fast path — published only, mirroring GetNodeAsync (via the shared TryGetCached).
-            if (TryGetCached(key, calculatedPreview, out IPublishedContent? cached) && cached is not null)
+            var found = new Dictionary<Guid, IPublishedContent>();
+            foreach (Guid key in batchKeys)
             {
-                resultsByKey[key] = cached;
-                continue;
+                if (TryGetCached(key, calculatedPreview, out IPublishedContent? cached) && cached is not null)
+                {
+                    found[key] = cached;
+                }
             }
 
-            // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss
-            // is deferred to the single batched database read below.
-            (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
-            if (exists is false)
-            {
-                coldKeys.Add(key);
-                continue;
-            }
-
-            await AddMaterialisedAsync(key, node, calculatedPreview, generation, fromDatabase: false, resultsByKey);
+            return Task.FromResult<IReadOnlyDictionary<Guid, IPublishedContent>>(found);
         }
 
-        if (coldKeys.Count > 0)
+        // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss is
+        // deferred to the single batched database read below.
+        async Task<IReadOnlyDictionary<Guid, IPublishedContent>> GetHybridCacheTier(IReadOnlyCollection<Guid> batchKeys)
         {
+            var found = new Dictionary<Guid, IPublishedContent>();
+            foreach (Guid key in batchKeys)
+            {
+                var cacheKey = GetCacheKey(key, calculatedPreview);
+                (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
+                if (exists)
+                {
+                    await AddMaterialisedAsync(key, node, calculatedPreview, generation, fromDatabase: false, found);
+                }
+            }
+
+            return found;
+        }
+
+        // The single batched database read for whatever L0 and L1/L2 missed.
+        async Task<IReadOnlyDictionary<Guid, IPublishedContent>> GetDatabaseTier(IReadOnlyCollection<Guid> missedKeys)
+        {
+            var found = new Dictionary<Guid, IPublishedContent>();
+
             IReadOnlyCollection<ContentCacheNode> coldNodes;
             using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
-                coldNodes = (await _databaseCacheRepository.GetContentSourcesAsync(coldKeys, calculatedPreview)).ToArray();
+                coldNodes = (await _databaseCacheRepository.GetContentSourcesAsync(missedKeys, calculatedPreview)).ToArray();
             }
 
             foreach (ContentCacheNode node in coldNodes)
             {
-                await AddMaterialisedAsync(node.Key, node, calculatedPreview, generation, fromDatabase: true, resultsByKey);
+                await AddMaterialisedAsync(node.Key, node, calculatedPreview, generation, fromDatabase: true, found);
             }
-        }
 
-        // Return in input order; keys that resolved to nothing (missing/unpublished) are omitted.
-        var ordered = new List<IPublishedContent>(resultsByKey.Count);
-        foreach (Guid key in keys)
-        {
-            if (resultsByKey.TryGetValue(key, out IPublishedContent? content))
-            {
-                ordered.Add(content);
-            }
+            return found;
         }
-
-        return ordered;
     }
 
     // Converts a resolved cache node to IPublishedContent and, when our snapshot is still current,
@@ -229,7 +231,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         bool preview,
         long generation,
         bool fromDatabase,
-        Dictionary<Guid, IPublishedContent> resultsByKey)
+        Dictionary<Guid, IPublishedContent> found)
     {
         if (node is null)
         {
@@ -247,7 +249,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             return;
         }
 
-        resultsByKey[key] = content;
+        found[key] = content;
 
         if (preview is false && IsCacheGenerationCurrent(generation))
         {
