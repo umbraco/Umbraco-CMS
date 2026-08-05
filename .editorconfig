@@ -128,6 +128,7 @@ dotnet_style_prefer_simplified_interpolation = true:warning
 file_header_template = Copyright (c) Umbraco.\nSee LICENSE for more details.
 dotnet_diagnostic.SA1633.severity = none # Suppressed until we decide to enforce it
 dotnet_diagnostic.SA1636.severity = none # Suppressed since we are using StyleCop
+dotnet_diagnostic.SA1101.severity = none # PrefixLocalCallsWithThis - stylecop appears to be ignoring dotnet_style_qualification_for_*
 
 # C# Code Style Settings
 # https://docs.microsoft.com/visualstudio/ide/editorconfig-language-conventions#c-code-style-settings
