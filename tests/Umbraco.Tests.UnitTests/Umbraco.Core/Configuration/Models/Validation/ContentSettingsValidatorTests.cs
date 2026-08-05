@@ -86,6 +86,35 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             });
         }
 
+        [Test]
+        public void Logs_Warning_Once_When_PreviewBadge_Is_Validated_Repeatedly()
+        {
+            var validator = CreateValidator();
+            ContentSettings options = BuildContentSettings();
+            options.PreviewBadge = @"<script src=""{0}/website/preview.js""></script>";
+
+            validator.Validate("settings", options);
+            validator.Validate("settings", options);
+            validator.Validate(Options.DefaultName, BuildContentSettings());
+
+            Assert.AreEqual(1, GetWarningLogCount());
+        }
+
+        [Test]
+        public void Logs_Warning_Again_When_PreviewBadge_Changes()
+        {
+            var validator = CreateValidator();
+            ContentSettings options = BuildContentSettings();
+
+            options.PreviewBadge = @"<script src=""{0}/website/preview.js""></script>";
+            validator.Validate("settings", options);
+
+            options.PreviewBadge = @"<script defer src=""{0}/website/preview.js""></script>";
+            validator.Validate("settings", options);
+
+            Assert.AreEqual(2, GetWarningLogCount());
+        }
+
         private ContentSettingsValidator CreateValidator() => new(_loggerMock.Object);
 
         private int GetWarningLogCount() =>

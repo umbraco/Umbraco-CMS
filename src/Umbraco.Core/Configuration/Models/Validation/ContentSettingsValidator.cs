@@ -15,6 +15,8 @@ public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOpt
 {
     private readonly ILogger<ContentSettingsValidator> _logger;
 
+    private string? _lastCheckedPreviewBadge;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentSettingsValidator" /> class.
     /// </summary>
@@ -65,6 +67,13 @@ public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOpt
 
     private void WarnOnPreviewBadgeWithoutNoncePlaceholder(ContentSettings options)
     {
+        // Validation runs once per options instance rather than once per process, and the scoped
+        // IOptionsSnapshot rebuilds per request, so only warn when the configured value changes.
+        if (Interlocked.Exchange(ref _lastCheckedPreviewBadge, options.PreviewBadge) == options.PreviewBadge)
+        {
+            return;
+        }
+
         // The default mark-up carries the placeholder, so a value without it has been customised; an empty
         // value disables the badge altogether. See https://github.com/umbraco/Umbraco-CMS/issues/23530.
         if (string.IsNullOrWhiteSpace(options.PreviewBadge)
