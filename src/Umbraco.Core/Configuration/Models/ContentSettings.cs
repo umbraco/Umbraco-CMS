@@ -22,6 +22,11 @@ public class ContentSettings
     internal const bool StaticSortChildrenByFieldFiresNotifications = false;
 
     /// <summary>
+    ///     The placeholder in <see cref="PreviewBadge" /> that renders as the CSP nonce attribute.
+    /// </summary>
+    internal const string PreviewBadgeNoncePlaceholder = "{3}";
+
+    /// <summary>
     ///     The default preview badge markup template.
     /// </summary>
     internal const string StaticDefaultPreviewBadge = @"
@@ -149,6 +154,14 @@ public class ContentSettings
     ///             </description>
     ///         </item>
     ///     </list>
+    ///     <para>
+    ///         The nonce rendered by <c>{3}</c> is the one provided by
+    ///         <see cref="Umbraco.Cms.Core.Security.ICspNonceService" />, so it only matches the policy when that
+    ///         same nonce reaches the <c>Content-Security-Policy</c> header — which is what
+    ///         <c>app.UseUmbracoCspNonceInjection()</c> does. A site whose own middleware generates a different
+    ///         nonce for the header needs to source its nonce from <c>ICspNonceService</c> as well, otherwise the
+    ///         values will not match and the badge stays blocked.
+    ///     </para>
     /// </remarks>
     [DefaultValue(StaticDefaultPreviewBadge)]
     public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
