@@ -232,11 +232,11 @@ async function main() {
 		if (previous === formatted) continue;
 		changed = true;
 		fs.writeFileSync(outputPath, formatted, 'utf-8');
-		console.log(`[generate-known-keys] Wrote ${entries.length} keys to ${path.relative(projectRoot, outputPath)}.`);
+		//console.log(`[generate-known-keys] Wrote ${entries.length} keys to ${path.relative(projectRoot, outputPath)}.`);
 	}
 
 	if (!changed) {
-		console.log(`[generate-known-keys] No changes (${entries.length} keys).`);
+		//console.log(`[generate-known-keys] No changes (${entries.length} keys).`);
 	}
 }
 
