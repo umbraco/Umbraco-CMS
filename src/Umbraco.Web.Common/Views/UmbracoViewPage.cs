@@ -107,7 +107,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
 
     private IHostingEnvironment HostingEnvironment => Context.RequestServices.GetRequiredService<IHostingEnvironment>();
 
-    private ICspNonceService CspNonceService => Context.RequestServices.GetRequiredService<ICspNonceService>();
+    private ICspNonceService? CspNonceService => Context.RequestServices.GetService<ICspNonceService>();
 
     /// <inheritdoc />
     public override void Write(object? value)
@@ -151,7 +151,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                                                                                                 // But just to be sure of prevention of an XSS vulnterablity we'll HTML encode here too.
                                                                                                 // An expected URL is untouched by this encoding.
                             UmbracoContext.PublishedRequest?.PublishedContent?.Key,
-                            CspNonceService.GetNonceAttribute());
+                            CspNonceService?.GetNonceAttribute() ?? string.Empty);
                 }
                 else
                 {
