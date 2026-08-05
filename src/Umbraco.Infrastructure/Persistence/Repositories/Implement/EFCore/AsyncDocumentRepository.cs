@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
@@ -34,6 +35,8 @@ internal sealed class AsyncDocumentRepository
 {
     private readonly ITemplateRepository _templateRepository;
     private readonly IIdKeyMap _idKeyMap;
+    private readonly ITagRepository _tagRepository;
+    private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AsyncDocumentRepository" /> class.
@@ -53,6 +56,8 @@ internal sealed class AsyncDocumentRepository
     /// <param name="contentTypeRepository">The content type repository.</param>
     /// <param name="templateRepository">The template repository, used to validate template IDs on load.</param>
     /// <param name="idKeyMap">The ID/key map, used to resolve data type configuration for sortable property values.</param>
+    /// <param name="tagRepository">The tag repository, used to persist tag values for tag-enabled properties on publish.</param>
+    /// <param name="jsonSerializer">The JSON serializer, used to parse legacy JSON-stored tag values.</param>
     internal AsyncDocumentRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
@@ -68,7 +73,9 @@ internal sealed class AsyncDocumentRepository
         ICacheSyncService cacheSyncService,
         IContentTypeRepository contentTypeRepository,
         ITemplateRepository templateRepository,
-        IIdKeyMap idKeyMap)
+        IIdKeyMap idKeyMap,
+        ITagRepository tagRepository,
+        IJsonSerializer jsonSerializer)
         : base(
             scopeAccessor,
             appCaches,
@@ -86,6 +93,8 @@ internal sealed class AsyncDocumentRepository
     {
         _templateRepository = templateRepository;
         _idKeyMap = idKeyMap;
+        _tagRepository = tagRepository;
+        _jsonSerializer = jsonSerializer;
     }
 
     /// <inheritdoc />
@@ -180,7 +189,7 @@ internal sealed class AsyncDocumentRepository
             // NPoco's PersistNewItem, and PersistUpdatedItemAsync's equivalent block below. Without this,
             // a caller inspecting the same IContent instance right after SaveAsync returns (rather than
             // re-fetching via GetAsync) would see stale Published/PublishDate/etc. values.
-            ApplyPostPublishFlagFlips(item);
+            await ApplyPostPublishFlagFlipsAsync(item);
 
             item.ResetDirtyProperties();
 
@@ -211,28 +220,33 @@ internal sealed class AsyncDocumentRepository
             item.UpdatingEntity();
 
             // Check if this entity is being moved as a descendant as part of a bulk moving operation.
-            // TODO (EF Core): fast path not implemented, see NPoco PersistUpdatedItem — this phase always
-            // takes the general path below regardless of isMoving.
+            // When moving, only Path + Level + UpdateDate are dirty, so we can skip version creation,
+            // property-data reconciliation, culture-variation reconciliation and tag updates entirely —
+            // we cannot roll a bulk move back anyway. Mirrors NPoco's
+            // PublishableContentRepositoryBase.PersistUpdatedItem fast path.
             var isMoving = item.IsMoving();
 
             var publishing = item.PublishedState == PublishedState.Publishing;
 
-            if (publishing && item.PublishedVersionId > 0)
+            if (!isMoving)
             {
-                // The published version is not published anymore — a new one is about to take its place.
-                await db.DocumentVersions.Where(documentVersion => documentVersion.Id == item.PublishedVersionId)
-                    .ExecuteUpdateAsync(setters => setters.SetProperty(documentVersion => documentVersion.Published, false));
-            }
+                if (publishing && item.PublishedVersionId > 0)
+                {
+                    // The published version is not published anymore — a new one is about to take its place.
+                    await db.DocumentVersions.Where(documentVersion => documentVersion.Id == item.PublishedVersionId)
+                        .ExecuteUpdateAsync(setters => setters.SetProperty(documentVersion => documentVersion.Published, false));
+                }
 
-            SanitizeNames(item);
-            item.SanitizeEntityPropertiesForXmlStorage();
+                SanitizeNames(item);
+                item.SanitizeEntityPropertiesForXmlStorage();
 
-            if (item.IsPropertyDirty(nameof(item.ParentId)))
-            {
-                NodeDto parent = await GetParentNodeDtoAsync(db, item.ParentId);
-                item.Path = string.Concat(parent.Path, ",", item.Id);
-                item.Level = parent.Level + 1;
-                item.SortOrder = await GetNewChildSortOrderAsync(db, item.ParentId, 0);
+                if (item.IsPropertyDirty(nameof(item.ParentId)))
+                {
+                    NodeDto parent = await GetParentNodeDtoAsync(db, item.ParentId);
+                    item.Path = string.Concat(parent.Path, ",", item.Id);
+                    item.Level = parent.Level + 1;
+                    item.SortOrder = await GetNewChildSortOrderAsync(db, item.ParentId, 0);
+                }
             }
 
             DocumentDto dto = BuildEntityDto(item);
@@ -247,6 +261,18 @@ internal sealed class AsyncDocumentRepository
                 .SetProperty(node => node.SortOrder, nodeDto.SortOrder)
                 .SetProperty(node => node.Trashed, nodeDto.Trashed)
                 .SetProperty(node => node.UserId, nodeDto.UserId));
+
+            if (isMoving)
+            {
+                // Skip version/property/culture-variation/tag handling entirely, and skip the post-publish
+                // flag flips below (a move never changes PublishedState) — mirrors NPoco, which wraps its
+                // equivalent blocks (including both SetEntityTags/ClearEntityTags call sites) in the same
+                // isMoving guard.
+                await OnUowRefreshedEntityAsync(item, CancellationToken.None);
+                item.ResetDirtyProperties();
+                IsolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IContent>(item.Key));
+                return true;
+            }
 
             await db.Content.Where(content => content.NodeId == item.Id).ExecuteUpdateAsync(setters => setters
                 .SetProperty(content => content.ContentTypeId, dto.ContentDto.ContentTypeId));
@@ -365,14 +391,19 @@ internal sealed class AsyncDocumentRepository
                 .SetProperty(document => document.Published, dto.Published)
                 .SetProperty(document => document.Edited, dto.Edited));
 
-            // TODO (EF Core): call SetEntityTags once an EF Core ITagRepository exists — see NPoco
-            // PublishableContentRepositoryBase.PersistUpdatedItem. No ITagRepository is injected anywhere
-            // in the EF Core repository chain yet, so tag-based content does not round-trip tag values
-            // through this repository.
+            // If entity is publishing, update tags; else leave tags there. This means that implicitly
+            // unpublished, or trashed, entities *still* have tags in the database. Mirrors NPoco's
+            // PublishableContentRepositoryBase.PersistUpdatedItem, which calls SetEntityTags here (before
+            // the refresh trigger) and again below (after the publish-state flip) — see
+            // ApplyPostPublishFlagFlipsAsync for the second call.
+            if (publishing)
+            {
+                await SetEntityTagsAsync(item);
+            }
 
             await OnUowRefreshedEntityAsync(item, CancellationToken.None);
 
-            ApplyPostPublishFlagFlips(item);
+            await ApplyPostPublishFlagFlipsAsync(item);
 
             item.ResetDirtyProperties();
 
@@ -1550,7 +1581,7 @@ internal sealed class AsyncDocumentRepository
 
     // Flips the entity's in-memory published state to match what was just persisted — shared by
     // PersistNewItemAsync and PersistUpdatedItemAsync. Mirrors NPoco's PersistNewItem/PersistUpdatedItem.
-    private static void ApplyPostPublishFlagFlips(IContent item)
+    private async Task ApplyPostPublishFlagFlipsAsync(IContent item)
     {
         if (item.PublishedState == PublishedState.Publishing)
         {
@@ -1560,10 +1591,7 @@ internal sealed class AsyncDocumentRepository
             item.PublishName = item.Name;
             item.PublishDate = item.UpdateDate;
 
-            // TODO (EF Core): call SetEntityTags once an EF Core ITagRepository exists — see
-            // NPoco PublishableContentRepositoryBase.PersistNewItem/PersistUpdatedItem. No ITagRepository
-            // is injected anywhere in the EF Core repository chain yet, so tag-based content does not
-            // round-trip tag values through this repository.
+            await SetEntityTagsAsync(item);
         }
         else if (item.PublishedState == PublishedState.Unpublishing)
         {
@@ -1573,10 +1601,79 @@ internal sealed class AsyncDocumentRepository
             item.PublishName = null;
             item.PublishDate = null;
 
-            // TODO (EF Core): call ClearEntityTags once an EF Core ITagRepository exists — see
-            // NPoco PublishableContentRepositoryBase.PersistNewItem/PersistUpdatedItem.
+            ClearEntityTags(item);
         }
     }
+
+    // Updates tags for an item. Ported from ContentRepositoryBase.SetEntityTags, with one behavioral
+    // fix: the culture-to-language-id lookup is properly awaited here instead of using
+    // GetAwaiter().GetResult() (safe in the NPoco base class only because callers there are synchronous).
+    private async Task SetEntityTagsAsync(IContent entity)
+    {
+        foreach (IProperty property in entity.Properties)
+        {
+            if (PropertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false)
+            {
+                continue;
+            }
+
+            if (editor.GetValueEditor() is not IDataValueTags tagsProvider)
+            {
+                // Support for legacy tag editors — everything from here down to the last continue can be
+                // removed when TagsPropertyEditorAttribute is removed.
+                TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService, _idKeyMap);
+                if (tagConfiguration == null)
+                {
+                    continue;
+                }
+
+                if (property.PropertyType.VariesByCulture())
+                {
+                    var tags = new List<ITag>();
+                    foreach (IPropertyValue pvalue in property.Values)
+                    {
+                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, _idKeyMap, _jsonSerializer, pvalue.Culture);
+                        int? languageId = await LanguageRepository.GetIdByIsoCodeAsync(pvalue.Culture);
+                        IEnumerable<Tag> cultureTags = tagsValue.Select(tagText => new Tag { Group = tagConfiguration.Group, Text = tagText, LanguageId = languageId });
+                        tags.AddRange(cultureTags);
+                    }
+
+                    _tagRepository.Assign(entity.Id, property.PropertyTypeId, tags);
+                }
+                else
+                {
+                    IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, _idKeyMap, _jsonSerializer);
+                    IEnumerable<Tag> tags = tagsValue.Select(tagText => new Tag { Group = tagConfiguration.Group, Text = tagText });
+                    _tagRepository.Assign(entity.Id, property.PropertyTypeId, tags);
+                }
+
+                continue;
+            }
+
+            object? configurationObject = property.PropertyType.GetDataType(DataTypeService, _idKeyMap)?.ConfigurationObject;
+
+            if (property.PropertyType.VariesByCulture())
+            {
+                var tags = new List<ITag>();
+                foreach (IPropertyValue pvalue in property.Values)
+                {
+                    int? languageId = await LanguageRepository.GetIdByIsoCodeAsync(pvalue.Culture);
+                    tags.AddRange(tagsProvider.GetTags(pvalue.EditedValue, configurationObject, languageId));
+                }
+
+                _tagRepository.Assign(entity.Id, property.PropertyTypeId, tags);
+            }
+            else
+            {
+                IEnumerable<ITag> tags = tagsProvider.GetTags(property.GetValue(), configurationObject, null);
+                _tagRepository.Assign(entity.Id, property.PropertyTypeId, tags);
+            }
+        }
+    }
+
+    // Clears tags for an item. Ported from ContentRepositoryBase.ClearEntityTags — a plain synchronous
+    // call, no scope/await concerns.
+    private void ClearEntityTags(IContent entity) => _tagRepository.RemoveAll(entity.Id);
 
     private static void AssignDefaultTemplateIfMissing(IContent entity)
     {

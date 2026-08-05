@@ -1,6 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
@@ -104,9 +101,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Mock.Of<ICacheSyncService>(),
         GetRequiredService<IContentTypeRepository>(),
         GetRequiredService<ITemplateRepository>(),
-        GetRequiredService<IIdKeyMap>());
-
-    // --- PerformGetAsync ---
+        GetRequiredService<IIdKeyMap>(),
+        GetRequiredService<ITagRepository>(),
+        GetRequiredService<IJsonSerializer>());
 
     [Test]
     public async Task GetAsync_WithExistingKey_ReturnsSingleDocument()
@@ -223,8 +220,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         scope.Complete();
     }
 
-    // --- PerformGetAllAsync ---
-
     [Test]
     public async Task GetAllAsync_ReturnsAllDocuments()
     {
@@ -261,8 +256,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(results.All(c => c.ContentType != null), Is.True);
         scope.Complete();
     }
-
-    // --- PerformGetManyAsync ---
 
     [Test]
     public async Task GetManyAsync_WithSubsetOfKeys_ReturnsOnlyRequestedDocuments()
@@ -322,8 +315,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         scope.Complete();
     }
 
-    // --- Parity with NPoco path ---
-
     [Test]
     public async Task GetAsync_MatchesContentServiceOnScalarFields()
     {
@@ -369,8 +360,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    // --- Published/draft property split ---
-
     [Test]
     public async Task GetAsync_EditedAfterPublish_HasBothDraftAndPublishedPropertyValues()
     {
@@ -390,8 +379,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.GetValue("title", published: true), Is.EqualTo("Welcome to our Home page"),
             "published value should remain unchanged");
     }
-
-    // --- Culture variations (ApplyVariationsAsync) ---
 
     // Helper: creates a French language and a culture-variant content type with a variant text property.
     // en-US is already installed as the default language by the migration runner.
@@ -509,8 +496,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.GetValue("variantTitle", "fr"), Is.EqualTo("Titre Français"));
     }
 
-    // --- Template IDs ---
-
     [Test]
     public async Task GetAsync_PublishedDocumentWithTemplate_PopulatesTemplateIds()
     {
@@ -533,8 +518,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.PublishTemplateId, Is.EqualTo(_template.Id),
             "PublishTemplateId should reflect the template that was active when the document was published");
     }
-
-    // --- Partial culture publication ---
 
     [Test]
     public async Task GetAsync_PartiallyPublishedVariantDocument_OnlyPublishedCultureHasPublishInfo()
@@ -560,8 +543,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.GetPublishName("en-US"), Is.EqualTo("English Name"));
         Assert.That(result.GetPublishName("fr"), Is.Null);
     }
-
-    // --- Group 8: GetVersionAsync ---
 
     [Test]
     public async Task GetVersionAsync_WithValidVersionKey_ReturnsVersion()
@@ -618,8 +599,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result!.Properties, Is.Not.Empty);
     }
 
-    // --- Group 9: GetAllVersionsAsync ---
-
     [Test]
     public async Task GetAllVersionsAsync_WithMultipleVersions_ReturnsAllInOrder()
     {
@@ -665,7 +644,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    // --- Group 10: EF Core / NPoco parity for version methods (temporary) ---
+    // EF Core / NPoco parity for version methods (temporary) ---
     // These tests exist to build confidence that the EF Core version methods
     // return the same data as the NPoco equivalents. Remove once parity is established.
 
@@ -782,8 +761,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             });
         }
     }
-
-    // --- Group 11: GetChildrenAsync ---
 
     [Test]
     public async Task GetChildrenAsync_WithChildren_ReturnsDirectChildrenOnly()
@@ -919,8 +896,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             "GetChildrenAsync must populate TemplateId for content with a template assigned");
     }
 
-    // --- Group 12: GetDescendantsAsync ---
-
     [Test]
     public async Task GetDescendantsAsync_WithDescendants_ReturnsAllDescendants()
     {
@@ -1025,7 +1000,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             "GetDescendantsAsync must populate TemplateId for content with a template assigned");
     }
 
-    // --- Variant published/draft property split ---
 
     [Test]
     public async Task GetAsync_VariantDocument_EditedAfterPublish_HasBothDraftAndPublishedPropertyValues()
@@ -1055,8 +1029,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.GetValue("variantTitle", "en-US", published: true), Is.EqualTo("published value"),
             "published property value should remain unchanged");
     }
-
-    // --- Culture-specific name ordering ---
 
     [Test]
     public async Task GetChildrenAsync_OrderedByName_WithCulture_UsesCultureVariantName()
@@ -1364,8 +1336,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             "SortableValue must be populated on write for a property whose editor implements IDataValueSortable");
     }
 
-    // --- Group 14: PersistNewItemAsync (write path, Phase 1) ---
-
     [Test]
     public async Task PersistNewItemAsync_InvariantUnpublishedWithProperties_PersistsAndReadsBack()
     {
@@ -1460,7 +1430,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             Mock.Of<ICacheSyncService>(),
             GetRequiredService<IContentTypeRepository>(),
             GetRequiredService<ITemplateRepository>(),
-            GetRequiredService<IIdKeyMap>());
+            GetRequiredService<IIdKeyMap>(),
+            GetRequiredService<ITagRepository>(),
+            GetRequiredService<IJsonSerializer>());
 
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Notify Page", _textpage.Id);
 
@@ -1488,8 +1460,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result!.TemplateId, Is.EqualTo(_template.Id),
             "the content type's default template should be assigned when no template was explicitly set");
     }
-
-    // --- Group 15: PersistUpdatedItemAsync (write path, Phase 2) ---
 
     [Test]
     public async Task PersistUpdatedItemAsync_NoDirtyProperties_ReturnsWithoutError()
@@ -1671,7 +1641,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             Mock.Of<ICacheSyncService>(),
             GetRequiredService<IContentTypeRepository>(),
             GetRequiredService<ITemplateRepository>(),
-            GetRequiredService<IIdKeyMap>());
+            GetRequiredService<IIdKeyMap>(),
+            GetRequiredService<ITagRepository>(),
+            GetRequiredService<IJsonSerializer>());
 
         content.Name = "Notify Update Page Renamed";
         await notifyingRepository.SaveAsync(content, CancellationToken.None);
@@ -1679,8 +1651,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         eventAggregatorMock.Verify(x => x.Publish(It.IsAny<ContentRefreshNotification>()), Times.Once);
     }
-
-    // --- Group 16: Culture variant persistence (write path, Phase 3) ---
 
     [Test]
     public async Task PersistNewItemAsync_CultureVariant_PersistsNamesPerCulture()
@@ -1777,8 +1747,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
                 "only en-US's DocumentCultureVariation row should remain for this node");
         });
     }
-
-    // --- Group 17: Save-and-publish double-insert dance (write path, Phase 4) ---
 
     [Test]
     public async Task PersistNewItemAsync_PublishOnCreate_WritesTwoVersionRowPairs()
@@ -1930,5 +1898,297 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             Assert.That(rowCountAfterUnpublish, Is.EqualTo(rowCountAfterPublish),
                 "unpublishing must not create a new ContentVersion/DocumentVersion row pair");
         });
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_PublishWithTags_PersistsTagRelationships()
+    {
+        var contentType = ContentTypeBuilder.CreateSimpleTagsContentType("umbTags", "Tags Page", defaultTemplateId: _template.Id);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged Page", _textpage.Id);
+        content.SetValue("tags", "[\"red\",\"blue\"]");
+        content.PublishedState = PublishedState.Publishing;
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+        int nodeId = content.Id;
+
+        List<string> tagTexts = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.TagRelationships.Where(tagRelationship => tagRelationship.NodeId == nodeId)
+                .Join(db.Tags, tagRelationship => tagRelationship.TagId, tag => tag.Id, (tagRelationship, tag) => tag.Text)
+                .ToListAsync());
+
+        scope.Complete();
+
+        Assert.That(tagTexts, Is.EquivalentTo(new[] { "red", "blue" }),
+            "publishing content with a tags property must persist tag relationships via SetEntityTags");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_PublishExistingDraftWithTags_PersistsTagRelationships()
+    {
+        var contentType = ContentTypeBuilder.CreateSimpleTagsContentType("umbTagsRepublish", "Tags Republish Page", defaultTemplateId: _template.Id);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged Draft Page", _textpage.Id);
+        content.SetValue("tags", "[\"yellow\",\"purple\"]");
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // First save: HasIdentity is false and PublishedState is still the default Unpublished, so this
+        // routes through PersistNewItemAsync, giving the entity an identity as a plain draft.
+        await repository.SaveAsync(content, CancellationToken.None);
+        int nodeId = content.Id;
+
+        // Second save: HasIdentity is now true, so this routes through PersistUpdatedItemAsync with
+        // publishing == true — the specific "publish an existing draft via update" path.
+        content.PublishedState = PublishedState.Publishing;
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        List<string> tagTexts = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.TagRelationships.Where(tagRelationship => tagRelationship.NodeId == nodeId)
+                .Join(db.Tags, tagRelationship => tagRelationship.TagId, tag => tag.Id, (tagRelationship, tag) => tag.Text)
+                .ToListAsync());
+
+        scope.Complete();
+
+        Assert.That(tagTexts, Is.EquivalentTo(new[] { "yellow", "purple" }),
+            "publishing an existing draft via PersistUpdatedItemAsync must persist tag relationships via SetEntityTags");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_PublishExistingDraftWithTags_TagsVisibleBeforeRefreshNotification()
+    {
+        var contentType = ContentTypeBuilder.CreateSimpleTagsContentType("umbTagsRepublishOrder", "Tags Republish Order Page", defaultTemplateId: _template.Id);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged Draft Order Page", _textpage.Id);
+        content.SetValue("tags", "[\"orange\"]");
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        await repository.SaveAsync(content, CancellationToken.None);
+        int nodeId = content.Id;
+
+        // Captures the tag relationships visible at the exact moment the refresh notification fires —
+        // distinguishes the mid-function SetEntityTags call (before the notification) from the later
+        // duplicate call in ApplyPostPublishFlagFlipsAsync (after it), which cache-populating
+        // notification handlers rely on seeing up-to-date tags synchronously.
+        List<string>? tagTextsAtRefreshTime = null;
+        var eventAggregatorMock = new Mock<IEventAggregator>();
+        eventAggregatorMock
+            .Setup(x => x.Publish(It.IsAny<ContentRefreshNotification>()))
+            .Callback(() =>
+            {
+                tagTextsAtRefreshTime = scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+                        db.TagRelationships.Where(tagRelationship => tagRelationship.NodeId == nodeId)
+                            .Join(db.Tags, tagRelationship => tagRelationship.TagId, tag => tag.Id, (tagRelationship, tag) => tag.Text)
+                            .ToListAsync())
+                    .GetAwaiter().GetResult();
+            });
+
+        var notifyingRepository = new AsyncDocumentRepository(
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
+            AppCaches.Disabled,
+            LoggerFactory,
+            GetRequiredService<ILanguageRepository>(),
+            GetRequiredService<IRelationRepository>(),
+            GetRequiredService<IRelationTypeRepository>(),
+            GetRequiredService<PropertyEditorCollection>(),
+            GetRequiredService<DataValueReferenceFactoryCollection>(),
+            GetRequiredService<IDataTypeService>(),
+            eventAggregatorMock.Object,
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>(),
+            GetRequiredService<IContentTypeRepository>(),
+            GetRequiredService<ITemplateRepository>(),
+            GetRequiredService<IIdKeyMap>(),
+            GetRequiredService<ITagRepository>(),
+            GetRequiredService<IJsonSerializer>());
+
+        content.PublishedState = PublishedState.Publishing;
+        await notifyingRepository.SaveAsync(content, CancellationToken.None);
+        scope.Complete();
+
+        eventAggregatorMock.Verify(x => x.Publish(It.IsAny<ContentRefreshNotification>()), Times.Once);
+        Assert.That(tagTextsAtRefreshTime, Is.EquivalentTo(new[] { "orange" }),
+            "tag relationships must already be persisted by the time the content refresh notification fires");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_UnpublishWithTags_ClearsTagRelationships()
+    {
+        var contentType = ContentTypeBuilder.CreateSimpleTagsContentType("umbTagsUnpublish", "Tags Unpublish Page", defaultTemplateId: _template.Id);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged Page For Unpublish", _textpage.Id);
+        content.SetValue("tags", "[\"green\"]");
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        content.PublishedState = PublishedState.Publishing;
+        await repository.SaveAsync(content, CancellationToken.None);
+        int nodeId = content.Id;
+
+        content.PublishedState = PublishedState.Unpublishing;
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        List<TagRelationshipDto> remaining = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.TagRelationships.Where(tagRelationship => tagRelationship.NodeId == nodeId).ToListAsync());
+
+        scope.Complete();
+
+        Assert.That(remaining, Is.Empty,
+            "unpublishing must clear tag relationships via ClearEntityTags");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_IsMoving_SkipsVersioningAndPropertyDataButUpdatesNodePathAndLevel()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        // A descendant several levels below the node actually being moved: only its Path, Level and
+        // (via UpdatingEntity) UpdateDate change during a bulk move — its ParentId is untouched, since
+        // its immediate parent didn't change, only some ancestor further up did. This is the exact
+        // dirty-property combination IsMoving() checks for.
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Bulk Move Descendant Page", _subpage.Id);
+        content.SetValue("title", "Original Value");
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+        int nodeId = content.Id;
+        int versionId = content.VersionId;
+        int originalParentId = content.ParentId;
+
+        ContentVersionDto originalContentVersion = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.FirstAsync(contentVersion => contentVersion.Id == versionId));
+
+        List<PropertyDataDto> originalPropertyData = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.PropertyData.Where(propertyData => propertyData.VersionId == versionId).OrderBy(propertyData => propertyData.Id).ToListAsync());
+
+        // Simulate the effect of ContentService.PerformMoveDescendantLocked on this descendant: Path and
+        // Level are set directly, ParentId is left alone.
+        content.Path = $"{_subpage2.Path},{_subpage.Id},{content.Id}";
+        content.Level = _subpage2.Level + 2;
+
+        await repository.SaveAsync(content, CancellationToken.None);
+        scope.Complete();
+
+        NodeDto node = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.Nodes.FirstAsync(n => n.NodeId == nodeId));
+
+        ContentVersionDto contentVersionAfterMove = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.FirstAsync(contentVersion => contentVersion.Id == versionId));
+
+        List<PropertyDataDto> propertyDataAfterMove = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.PropertyData.Where(propertyData => propertyData.VersionId == versionId).OrderBy(propertyData => propertyData.Id).ToListAsync());
+
+        int versionCountAfterMove = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.CountAsync(contentVersion => contentVersion.NodeId == nodeId));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(node.Path, Is.EqualTo(content.Path), "the Node row's Path must still be updated on the fast path");
+            Assert.That(node.Level, Is.EqualTo(content.Level), "the Node row's Level must still be updated on the fast path");
+            Assert.That(node.ParentId, Is.EqualTo(originalParentId), "ParentId must be untouched — a descendant's immediate parent doesn't change during a bulk move");
+
+            Assert.That(versionCountAfterMove, Is.EqualTo(1), "a move must not create a new ContentVersion/DocumentVersion row pair");
+            Assert.That(contentVersionAfterMove.VersionDate, Is.EqualTo(originalContentVersion.VersionDate),
+                "ContentVersion.VersionDate must be untouched on the fast path — proves the version-update block was skipped");
+            Assert.That(contentVersionAfterMove.Text, Is.EqualTo(originalContentVersion.Text));
+
+            Assert.That(propertyDataAfterMove, Has.Count.EqualTo(originalPropertyData.Count));
+            for (var i = 0; i < originalPropertyData.Count; i++)
+            {
+                Assert.That(propertyDataAfterMove[i].Id, Is.EqualTo(originalPropertyData[i].Id),
+                    "PropertyData rows must be untouched (same primary keys) on the fast path");
+                Assert.That(propertyDataAfterMove[i].VarcharValue, Is.EqualTo(originalPropertyData[i].VarcharValue));
+            }
+
+            Assert.That(content.IsDirty(), Is.False, "a successful save must reset dirty properties on the fast path too");
+        });
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_IsMoving_FiresContentRefreshNotification()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Bulk Move Notify Page", _subpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        var eventAggregatorMock = new Mock<IEventAggregator>();
+        var notifyingRepository = new AsyncDocumentRepository(
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
+            AppCaches.Disabled,
+            LoggerFactory,
+            GetRequiredService<ILanguageRepository>(),
+            GetRequiredService<IRelationRepository>(),
+            GetRequiredService<IRelationTypeRepository>(),
+            GetRequiredService<PropertyEditorCollection>(),
+            GetRequiredService<DataValueReferenceFactoryCollection>(),
+            GetRequiredService<IDataTypeService>(),
+            eventAggregatorMock.Object,
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>(),
+            GetRequiredService<IContentTypeRepository>(),
+            GetRequiredService<ITemplateRepository>(),
+            GetRequiredService<IIdKeyMap>(),
+            GetRequiredService<ITagRepository>(),
+            GetRequiredService<IJsonSerializer>());
+
+        content.Path = $"{_subpage2.Path},{_subpage.Id},{content.Id}";
+        content.Level = _subpage2.Level + 2;
+        await notifyingRepository.SaveAsync(content, CancellationToken.None);
+        scope.Complete();
+
+        eventAggregatorMock.Verify(x => x.Publish(It.IsAny<ContentRefreshNotification>()), Times.Once,
+            "OnUowRefreshedEntityAsync must still fire on the fast path");
+    }
+
+    [Test]
+    public async Task PersistUpdatedItemAsync_PathDirtyButLevelNotDirty_IsNotTreatedAsMoving_GeneralPathStillRuns()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Not Actually Moving Page", _subpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(content, CancellationToken.None);
+        int versionId = content.VersionId;
+
+        ContentVersionDto originalContentVersion = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.FirstAsync(contentVersion => contentVersion.Id == versionId));
+
+        // Only Path becomes dirty here — Level is left alone, so IsMoving() must be false and the
+        // general (non-fast) path must still run, even though a "move-like" property changed.
+        // ValidatePath only checks the last two segments against ParentId, so prefixing an extra
+        // (unvalidated) segment yields a Path that is both different (dirty) and still valid.
+        content.Path = $"0,{content.Path}";
+        content.Name = "Renamed While Not Moving";
+
+        await repository.SaveAsync(content, CancellationToken.None);
+
+        ContentVersionDto contentVersionAfterSave = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions.FirstAsync(contentVersion => contentVersion.Id == versionId));
+
+        scope.Complete();
+
+        Assert.That(contentVersionAfterSave.VersionDate, Is.GreaterThan(originalContentVersion.VersionDate),
+            "with Level not dirty, IsMoving() must be false and the general path (which updates VersionDate) must run");
+        Assert.That(contentVersionAfterSave.Text, Is.EqualTo("Renamed While Not Moving"));
     }
 }
