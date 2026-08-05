@@ -244,6 +244,132 @@ public partial class ContentEditingServiceTests
         }
     }
 
+    /// <summary>
+    /// A culture the editing user has no access to is restored from the existing content for every segment of
+    /// that culture, not only its segment-less value.
+    /// </summary>
+    [Test]
+    public async Task Can_Retain_Existing_Segment_Values_For_Culture_Without_Access()
+    {
+        // Arrange: prepare culture and segment variant content, and an editor with access to
+        // English only, so every segment of the Danish culture is off limits to them.
+        var content = await CreateCultureAndSegmentVariantContent(ContentVariation.Segment);
+        var editor = await CreateEnglishLanguageOnlyEditor();
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default English title", Culture = "en-US" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 English title", Culture = "en-US", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 English title", Culture = "en-US", Segment = "seg-2" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default Danish title", Culture = "da-DK" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 Danish title", Culture = "da-DK", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 Danish title", Culture = "da-DK", Segment = "seg-2" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other default title" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other seg-1 title", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other seg-2 title", Segment = "seg-2" },
+            ],
+            Variants =
+            [
+                new VariantModel { Name = "The Updated English Name", Culture = "en-US" },
+                new VariantModel { Name = "The Updated Danish Name", Culture = "da-DK" },
+            ],
+        };
+
+        // Act: update the content as the English only editor, attempting to change every culture and segment.
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, editor.Key);
+        Assert.IsTrue(result.Success);
+
+        // Assert: the English values are updated and every segment of the Danish culture keeps its
+        // initial value, both on the returned content and on a re-get.
+        VerifyUpdate(result.Result.Content);
+        VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
+
+        void VerifyUpdate(IContent? updatedContent)
+        {
+            Assert.IsNotNull(updatedContent);
+            Assert.Multiple(() =>
+            {
+                // The editor has access to English, so all of its segments are updated.
+                Assert.AreEqual("The updated default English title", updatedContent.GetValue<string>("variantTitle", culture: "en-US", segment: null));
+                Assert.AreEqual("The updated seg-1 English title", updatedContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-1"));
+                Assert.AreEqual("The updated seg-2 English title", updatedContent.GetValue<string>("variantTitle", culture: "en-US", segment: "seg-2"));
+
+                // The editor has no access to Danish, so every segment of it keeps its initial value.
+                Assert.AreEqual("The initial title in Danish", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
+                Assert.AreEqual("The initial seg-1 title in Danish", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
+                Assert.AreEqual("The initial seg-2 title in Danish", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+
+                // The editor has access to the default language, so the culture invariant property is updated.
+                Assert.AreEqual("The updated other default title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: null));
+                Assert.AreEqual("The updated other seg-1 title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: "seg-1"));
+                Assert.AreEqual("The updated other seg-2 title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: "seg-2"));
+            });
+        }
+    }
+
+    /// <summary>
+    /// A culture invariant property the editing user is not allowed to change is restored from the existing
+    /// content for every segment, not only its segment-less value.
+    /// </summary>
+    /// <remarks>
+    /// The editor is restricted to a non-default language, which is what withholds access to culture
+    /// invariant properties when the AllowEditInvariantFromNonDefault content setting is false.
+    /// </remarks>
+    [Test]
+    public async Task Can_Retain_Existing_Segment_Values_For_Invariant_Property_Without_Access()
+    {
+        // Arrange: prepare culture and segment variant content with a culture invariant, segment variant
+        // "otherTitle" property, and an editor with access to Danish only - not the default language.
+        var content = await CreateCultureAndSegmentVariantContent(ContentVariation.Segment);
+        var editor = await CreateSingleLanguageEditor("da-DK");
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties =
+            [
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated default Danish title", Culture = "da-DK" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-1 Danish title", Culture = "da-DK", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "variantTitle", Value = "The updated seg-2 Danish title", Culture = "da-DK", Segment = "seg-2" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other default title" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other seg-1 title", Segment = "seg-1" },
+                new PropertyValueModel { Alias = "otherTitle", Value = "The updated other seg-2 title", Segment = "seg-2" },
+            ],
+            Variants =
+            [
+                new VariantModel { Name = "The Updated Danish Name", Culture = "da-DK" },
+            ],
+        };
+
+        // Act: update the content as the Danish only editor, attempting to change the culture invariant property.
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, editor.Key);
+        Assert.IsTrue(result.Success);
+
+        // Assert: the Danish values are updated and every segment of the culture invariant property keeps
+        // its initial value, both on the returned content and on a re-get.
+        VerifyUpdate(result.Result.Content);
+        VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
+
+        void VerifyUpdate(IContent? updatedContent)
+        {
+            Assert.IsNotNull(updatedContent);
+            Assert.Multiple(() =>
+            {
+                // The editor has access to Danish, so all of its segments are updated.
+                Assert.AreEqual("The updated default Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: null));
+                Assert.AreEqual("The updated seg-1 Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-1"));
+                Assert.AreEqual("The updated seg-2 Danish title", updatedContent.GetValue<string>("variantTitle", culture: "da-DK", segment: "seg-2"));
+
+                // The editor has no access to the default language, so every segment of the culture
+                // invariant property keeps its initial value.
+                Assert.AreEqual("The initial other default title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: null));
+                Assert.AreEqual("The initial other seg-1 title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: "seg-1"));
+                Assert.AreEqual("The initial other seg-2 title", updatedContent.GetValue<string>("otherTitle", culture: null, segment: "seg-2"));
+            });
+        }
+    }
+
     [Test]
     public async Task Can_Update_Template()
     {

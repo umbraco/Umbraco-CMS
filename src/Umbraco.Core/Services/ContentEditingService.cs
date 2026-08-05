@@ -225,14 +225,13 @@ internal sealed class ContentEditingService
             }
         }
 
-        // if the property varies by culture, simply overwrite the edited property value with the current property value for every culture
+        // If the property varies by culture, simply overwrite the edited property value with the current property value
+        // for every culture.
         foreach (IProperty property in variantProperties)
         {
             foreach (var culture in disallowedCultures)
             {
-                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
-                        .GetValue(culture, null, false);
-                    property.SetValue(currentValue, culture, null);
+                RestoreExistingPropertyValues(property, existingContent, culture);
             }
         }
 
@@ -241,9 +240,7 @@ internal sealed class ContentEditingService
         {
             foreach (IProperty property in invariantProperties)
             {
-                var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
-                    .GetValue(null, null, false);
-                property.SetValue(currentValue, null, null);
+                RestoreExistingPropertyValues(property, existingContent, null);
             }
         }
 
@@ -267,6 +264,30 @@ internal sealed class ContentEditingService
         }
 
         return contentWithPotentialUnallowedChanges;
+    }
+
+    /// <summary>
+    /// Overwrites the edited values of a property for one culture with the values held by the existing content.
+    /// </summary>
+    /// <remarks>
+    /// The property may vary by segment, so every segment of the culture has to be restored, not only its
+    /// segment-less value - including any segment the edit added, which is restored to no value.
+    /// </remarks>
+    private static void RestoreExistingPropertyValues(IProperty property, IContent? existingContent, string? culture)
+    {
+        IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
+
+        IEnumerable<string?> segments = property.Values
+            .Concat(existingProperty?.Values ?? [])
+            .Where(value => culture.InvariantEquals(value.Culture))
+            .Select(value => value.Segment)
+            .Append(null)
+            .Distinct();
+
+        foreach (var segment in segments)
+        {
+            property.SetValue(existingProperty?.GetValue(culture, segment, false), culture, segment);
+        }
     }
 
     private async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
