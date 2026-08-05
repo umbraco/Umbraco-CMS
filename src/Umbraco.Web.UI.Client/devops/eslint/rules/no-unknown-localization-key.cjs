@@ -5,7 +5,7 @@ const path = require('node:path');
 
 /**
  * Flags string-literal arguments to `<x>.localize.term(...)` / `<x>.localize.termOrDefault(...)` that
- * aren't in the generated `UMB_KNOWN_LOCALIZATION_KEYS` list (sourced from `assets/lang/en.ts`).
+ * aren't in the generated `KNOWN_LOCALIZATION_KEYS` list (sourced from `assets/lang/en.ts`).
  *
  * Why a lint rule and not just type-checking: the TypeScript signature on `term()` keeps a
  * `(string & {})` escape hatch in the key parameter so dynamic keys (e.g. `` `login_greeting${day}` ``)
@@ -18,7 +18,7 @@ const path = require('node:path');
  * `// eslint-disable-next-line local-rules/no-unknown-localization-key`.
  */
 
-const GENERATED_KEYS_FILE = path.join(__dirname, '../../../src/libs/localization-api/known-keys.generated.ts');
+const GENERATED_KEYS_FILE = path.join(__dirname, '../../../src/libs/localization-api/known-keys.const.generated.ts');
 
 let cachedKeySet = null;
 
@@ -33,10 +33,10 @@ function loadKnownKeys() {
 		// CI's `npm run lint:errors` runs after the generator, so this branch only hits locally.
 		return new Set();
 	}
-	const arrayMatch = source.match(/UMB_KNOWN_LOCALIZATION_KEYS[^=]*=\s*\[([\s\S]*?)\];/);
+	const arrayMatch = source.match(/KNOWN_LOCALIZATION_KEYS[^=]*=\s*\[([\s\S]*?)\];/);
 	if (!arrayMatch) {
 		throw new Error(
-			`Could not locate UMB_KNOWN_LOCALIZATION_KEYS in ${GENERATED_KEYS_FILE}. Regenerate via \`npm run generate:localization-keys\`.`,
+			`Could not locate KNOWN_LOCALIZATION_KEYS in ${GENERATED_KEYS_FILE}. Regenerate via \`npm run generate:localization-keys\`.`,
 		);
 	}
 	const keys = new Set();
@@ -68,7 +68,7 @@ module.exports = {
 		type: 'problem',
 		docs: {
 			description:
-				'Disallow passing string literals to `localize.term()` / `localize.termOrDefault()` that are not in the generated `UMB_KNOWN_LOCALIZATION_KEYS` list.',
+				'Disallow passing string literals to `localize.term()` / `localize.termOrDefault()` that are not in the generated `KNOWN_LOCALIZATION_KEYS` list.',
 			category: 'Possible Errors',
 			recommended: true,
 		},

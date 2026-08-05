@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import en from '../../assets/lang/en.js';
-import { UMB_KNOWN_LOCALIZATION_KEYS } from './known-keys.generated.js';
+import { KNOWN_LOCALIZATION_KEYS } from './known-keys.const.generated.js';
 
 /**
  * Catches the "edited `en.ts` but forgot to regenerate" failure mode. The generated file is
@@ -24,12 +24,13 @@ describe('UmbKnownLocalizationSet generation', () => {
 			}
 		}
 
-		const actual = new Set<string>(UMB_KNOWN_LOCALIZATION_KEYS);
+		const actual = new Set<string>(KNOWN_LOCALIZATION_KEYS);
 
 		const missing = [...expected].filter((k) => !actual.has(k));
 		const extra = [...actual].filter((k) => !expected.has(k));
 
-		const regenHint = "Run 'npm run generate:localization-keys' to regenerate `known-keys.generated.ts`.";
+		const regenHint =
+			"Run 'npm run generate:localization-keys' to regenerate `known-keys.types.generated.ts` / `known-keys.const.generated.ts`.";
 
 		expect(
 			missing,

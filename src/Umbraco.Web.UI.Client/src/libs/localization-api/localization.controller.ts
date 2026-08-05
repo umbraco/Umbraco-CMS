@@ -15,7 +15,7 @@ import type { UmbLocalizationConsumer, UmbLocalizationSetBase, UmbLocalizationSe
 import { umbLocalizationManager } from './localization.manager.js';
 // Side-effect import: registers the global `UmbKnownLocalizationSet` / `UmbKnownLocalizationKey`
 // declarations so plugins can extend the interface via plain `declare global { … }` blocks.
-import './known-keys.generated.js';
+import './known-keys.types.generated.js';
 import { unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';

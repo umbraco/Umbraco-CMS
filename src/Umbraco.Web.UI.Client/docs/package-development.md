@@ -104,15 +104,13 @@ For step-by-step instructions on adding localization keys and using them in elem
 
 ### Type-safe localization keys
 
-`this.localize.term()`, `termOrDefault()`, and the `<umb-localize key="…">` element are typed against the canonical `en.ts` dictionary. After adding or renaming a key in `en.ts`, run:
+`this.localize.term()`, `termOrDefault()`, and the `<umb-localize key="…">` element are typed against the `en.ts` localization.
 
+After adding or renaming a key in `en.ts`, run:
 ```bash
 npm run generate:localization-keys
 ```
-
-This walks `en.ts`, flattens `group: { key: value }` into `group_key`, and rewrites `src/libs/localization-api/known-keys.generated.ts` with an `UmbKnownLocalizationSet` interface — string entries stay typed as `string`, function entries forward their parameter types (so `term('user_languageNotFound', culture, baseCulture)` is checked against the underlying signature). The script also runs automatically as a `prebuild` hook, so production builds always see fresh keys.
-
-The TypeScript signature on `term()` keeps a `(string & {})` escape hatch alongside `keyof UmbKnownLocalizationSet`. That means autocomplete shows the canonical keys and dynamic keys like `` localize.term(`login_greeting${day}`) `` still work without a cast. Typos in static string literals are caught by a local ESLint rule (`local-rules/no-unknown-localization-key`) that checks the literal against the generated runtime list — that runs in this repo only, so third-party plugins are unaffected.
+The script also runs automatically as a `prebuild` hook, and as part of the test scripts.
 
 #### Adding plugin-specific keys
 
