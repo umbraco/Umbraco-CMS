@@ -1106,8 +1106,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             "Culture name ordering must put 'Alpha' before 'Zeta', not fall back to invariant name order ('A-Second' before 'Z-First')");
     }
 
-    // --- Group 13: Custom property field ordering ---
-
     private async Task<IContentType> CreateIntPropertyContentTypeAsync()
     {
         var propertyCollection = new PropertyTypeCollection(true)
@@ -2198,8 +2196,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(contentVersionAfterSave.Text, Is.EqualTo("Renamed While Not Moving"));
     }
 
-    // --- Group 20: Recycle bin ---
-
     [Test]
     public async Task GetRecycleBinAsync_ReturnsAllTrashedItemsRegardlessOfDepth()
     {
@@ -2386,8 +2382,6 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         Assert.That(smells, Is.False);
     }
-
-    // --- Group 21: Permissions ---
 
     private async Task<UserGroup> CreateTestUserGroupAsync()
     {

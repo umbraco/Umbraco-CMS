@@ -88,8 +88,6 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// <summary>Gets the content type repository used to resolve content types by their integer ID.</summary>
     protected IContentTypeRepository ContentTypeRepository { get; }
 
-    // --- Entity ↔ DTO mapping (abstract: concrete repos provide the mapping logic) ---
-
     /// <summary>
     ///     Builds a domain entity from an EF Core <typeparamref name="TEntityDto" /> and its associated content type.
     /// </summary>
@@ -106,8 +104,6 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// <param name="entity">The domain entity to convert.</param>
     /// <returns>The DTO ready to be saved to the database.</returns>
     protected abstract TEntityDto BuildEntityDto(TEntity entity);
-
-    // --- AsyncContentRepositoryBase overrides ---
 
     /// <inheritdoc />
     protected override async Task PerformDeleteVersionAsync(int versionId, CancellationToken cancellationToken) =>
@@ -131,8 +127,6 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
             return true;
         });
-
-    // --- IAsyncPublishableContentRepository ---
 
     /// <inheritdoc />
     public virtual Task<ContentScheduleCollection> GetContentScheduleAsync(Guid contentKey, CancellationToken cancellationToken) =>

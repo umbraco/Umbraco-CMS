@@ -110,8 +110,6 @@ internal sealed class AsyncDocumentRepository
     /// <inheritdoc />
     protected override AsyncDocumentRepository This => this;
 
-    // --- AsyncEntityRepositoryBase abstract overrides ---
-
     /// <inheritdoc />
     protected override async Task<IContent?> PerformGetAsync(Guid key)
     {
@@ -418,8 +416,6 @@ internal sealed class AsyncDocumentRepository
 
             return true;
         });
-
-    // --- AsyncContentRepositoryBase abstract overrides ---
 
     /// <inheritdoc />
     protected override string RecycleBinCacheKey => CacheKeys.ContentRecycleBinCacheKey;
@@ -1225,8 +1221,6 @@ internal sealed class AsyncDocumentRepository
         return Task.CompletedTask;
     }
 
-    // --- AsyncPublishableContentRepositoryBase abstract overrides ---
-
     /// <inheritdoc />
     protected override IContent BuildEntity(DocumentDto entityDto, IContentType? contentType) =>
         ContentBaseFactory.BuildEntity(entityDto, contentType);
@@ -1234,8 +1228,6 @@ internal sealed class AsyncDocumentRepository
     /// <inheritdoc />
     protected override DocumentDto BuildEntityDto(IContent entity) =>
         ContentBaseFactory.BuildDocumentDto(entity, NodeObjectTypeKey, entity.PublishedState == PublishedState.Publishing);
-
-    // --- IAsyncDocumentRepository: permissions ---
 
     /// <inheritdoc />
     public Task ReplaceContentPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken) =>
@@ -1253,8 +1245,6 @@ internal sealed class AsyncDocumentRepository
     public Task AddOrUpdatePermissionsAsync(ContentPermissionSet permission, CancellationToken cancellationToken) =>
         _permissionRepository.AddOrUpdatePermissionsAsync(permission, cancellationToken);
 
-    // --- IAsyncDocumentRepository: document-specific ---
-
     /// <inheritdoc />
     // Checks for a direct child of the recycle bin folder node itself (Constants.System.RecycleBinContent),
     // not "any trashed node anywhere" — mirrors NPoco's PublishableContentRepositoryBase.RecycleBinSmells,
@@ -1267,8 +1257,6 @@ internal sealed class AsyncDocumentRepository
             db.Nodes.AnyAsync(
                 node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == Constants.System.RecycleBinContent,
                 cancellationToken));
-
-    // --- Private helpers ---
 
     // Projects a database row spanning Nodes/Documents/Content/ContentVersions/DocumentVersions
     // plus the optional published version (LEFT JOINed by NodeId) into a single typed record,
@@ -1856,8 +1844,6 @@ internal sealed class AsyncDocumentRepository
         return isoCode;
     }
 
-    // --- PersistNewItemAsync helpers ---
-
     // Flips the entity's in-memory published state to match what was just persisted — shared by
     // PersistNewItemAsync and PersistUpdatedItemAsync. Mirrors NPoco's PersistNewItem/PersistUpdatedItem.
     private async Task ApplyPostPublishFlagFlipsAsync(IContent item)
@@ -2143,8 +2129,6 @@ internal sealed class AsyncDocumentRepository
         }
     }
 
-    // --- PersistUpdatedItemAsync helpers ---
-
     // Diff-reconciles PropertyData rows for the given version against the freshly built values for the
     // entity's current properties: matches existing rows by (PropertyTypeId, VersionId, LanguageId,
     // Segment), updates matches in place, inserts new rows for unmatched values, and deletes rows that no
@@ -2245,8 +2229,6 @@ internal sealed class AsyncDocumentRepository
 
         return (edited, editedCultures);
     }
-
-    // --- Culture variation helpers (shared by PersistNewItemAsync/PersistUpdatedItemAsync) ---
 
     // Shared culture-variation computation for PersistNewItemAsync/PersistUpdatedItemAsync: determines which
     // cultures have an edited name, updates SetCultureEdited/AdjustDates on the entity, and builds the DTOs
