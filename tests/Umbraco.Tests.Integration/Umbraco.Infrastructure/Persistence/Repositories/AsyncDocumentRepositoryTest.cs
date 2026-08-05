@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -103,7 +104,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         GetRequiredService<ITemplateRepository>(),
         GetRequiredService<IIdKeyMap>(),
         GetRequiredService<ITagRepository>(),
-        GetRequiredService<IJsonSerializer>());
+        GetRequiredService<IJsonSerializer>(),
+        GetRequiredService<IUserGroupService>());
 
     [Test]
     public async Task GetAsync_WithExistingKey_ReturnsSingleDocument()
@@ -1432,7 +1434,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<ITemplateRepository>(),
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
-            GetRequiredService<IJsonSerializer>());
+            GetRequiredService<IJsonSerializer>(),
+            GetRequiredService<IUserGroupService>());
 
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Notify Page", _textpage.Id);
 
@@ -1643,7 +1646,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<ITemplateRepository>(),
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
-            GetRequiredService<IJsonSerializer>());
+            GetRequiredService<IJsonSerializer>(),
+            GetRequiredService<IUserGroupService>());
 
         content.Name = "Notify Update Page Renamed";
         await notifyingRepository.SaveAsync(content, CancellationToken.None);
@@ -2011,7 +2015,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<ITemplateRepository>(),
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
-            GetRequiredService<IJsonSerializer>());
+            GetRequiredService<IJsonSerializer>(),
+            GetRequiredService<IUserGroupService>());
 
         content.PublishedState = PublishedState.Publishing;
         await notifyingRepository.SaveAsync(content, CancellationToken.None);
@@ -2147,7 +2152,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<ITemplateRepository>(),
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
-            GetRequiredService<IJsonSerializer>());
+            GetRequiredService<IJsonSerializer>(),
+            GetRequiredService<IUserGroupService>());
 
         content.Path = $"{_subpage2.Path},{_subpage.Id},{content.Id}";
         content.Level = _subpage2.Level + 2;
@@ -2379,5 +2385,92 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         scope.Complete();
 
         Assert.That(smells, Is.False);
+    }
+
+    // --- Group 21: Permissions ---
+
+    private async Task<UserGroup> CreateTestUserGroupAsync()
+    {
+        UserGroup userGroup = UserGroupBuilder.CreateUserGroup();
+        await GetRequiredService<IUserGroupService>().CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        return userGroup;
+    }
+
+    [Test]
+    public async Task AssignEntityPermissionAsync_ThenGetPermissionsForEntityAsync_RoundTripsThePermission()
+    {
+        UserGroup userGroup = await CreateTestUserGroupAsync();
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.AssignEntityPermissionAsync(_textpage, "A", new[] { userGroup.Key }, CancellationToken.None);
+        EntityPermissionCollection permissions = await repository.GetPermissionsForEntityAsync(_textpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        EntityPermission permission = permissions.Single(p => p.UserGroupId == userGroup.Id);
+        Assert.That(permission.EntityId, Is.EqualTo(_textpage.Id));
+        Assert.That(permission.AssignedPermissions, Is.EquivalentTo(new[] { "A" }));
+    }
+
+    [Test]
+    public async Task ReplaceContentPermissionsAsync_ReplacesExistingPermissionsForTheEntity()
+    {
+        UserGroup userGroup = await CreateTestUserGroupAsync();
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.AssignEntityPermissionAsync(_textpage, "A", new[] { userGroup.Key }, CancellationToken.None);
+
+        var replacement = new EntityPermissionSet(
+            _textpage.Id,
+            new EntityPermissionCollection(new[]
+            {
+                new EntityPermission(userGroup.Id, _textpage.Id, new HashSet<string> { "B" }),
+            }));
+        await repository.ReplaceContentPermissionsAsync(replacement, CancellationToken.None);
+
+        EntityPermissionCollection permissions = await repository.GetPermissionsForEntityAsync(_textpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        EntityPermission permission = permissions.Single(p => p.UserGroupId == userGroup.Id);
+        Assert.That(permission.AssignedPermissions, Is.EquivalentTo(new[] { "B" }),
+            "ReplaceContentPermissionsAsync must replace the old permission set ('A'), not merge with it");
+    }
+
+    [Test]
+    public async Task AddOrUpdatePermissionsAsync_PersistsThePermissionSetForTheEntity()
+    {
+        UserGroup userGroup = await CreateTestUserGroupAsync();
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var permissionSet = new ContentPermissionSet(
+            _textpage,
+            new EntityPermissionCollection(new[]
+            {
+                new EntityPermission(userGroup.Id, _textpage.Id, new HashSet<string> { "C" }),
+            }));
+        await repository.AddOrUpdatePermissionsAsync(permissionSet, CancellationToken.None);
+
+        EntityPermissionCollection permissions = await repository.GetPermissionsForEntityAsync(_textpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        EntityPermission permission = permissions.Single(p => p.UserGroupId == userGroup.Id);
+        Assert.That(permission.AssignedPermissions, Is.EquivalentTo(new[] { "C" }));
+    }
+
+    [Test]
+    public async Task GetPermissionsForEntityAsync_WithUnknownKey_ReturnsEmptyCollection()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        EntityPermissionCollection permissions = await repository.GetPermissionsForEntityAsync(Guid.NewGuid(), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(permissions, Is.Empty);
     }
 }

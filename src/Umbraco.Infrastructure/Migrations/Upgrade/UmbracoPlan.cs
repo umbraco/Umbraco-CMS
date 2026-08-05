@@ -133,6 +133,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddRedirectUrlDto>("{72B8BF0F-28C1-4FE3-ABD7-122D5E962C1C}");
         To<V_18_0_0.AddContentTypeDtosBasic>("{9C4E7A1F-2B8D-4E6C-A3F5-1D8B6C9E0A72}");
         To<V_18_0_0.ReconcileEfCoreRepositoriesMerge>("{7B3E9A4C-1D6F-4A82-B5E3-2F8C0D9A6B41}");
+        To<V_19_0_0.AddUserGroup2GranularPermissionDto>("{DE5E1EC8-EB36-4980-A08A-66BC9561C263}");
     }
 
     /// <summary>

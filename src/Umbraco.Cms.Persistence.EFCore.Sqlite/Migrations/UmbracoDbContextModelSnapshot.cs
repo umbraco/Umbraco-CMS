@@ -2006,6 +2006,45 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.ToTable("umbracoUser", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserGroup2GranularPermissionDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Context")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("context")
+                        .UseCollation("NOCASE");
+
+                    b.Property<string>("Permission")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("permission")
+                        .UseCollation("NOCASE");
+
+                    b.Property<Guid?>("UniqueId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("uniqueId");
+
+                    b.Property<Guid>("UserGroupKey")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("userGroupKey");
+
+                    b.HasKey("Id")
+                        .HasName("PK_umbracoUserGroup2GranularPermissionDto");
+
+                    b.HasIndex("UniqueId")
+                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermission_UniqueId");
+
+                    b.HasIndex("UserGroupKey")
+                        .HasDatabaseName("IX_umbracoUserGroup2GranularPermission_UserGroupKey_UniqueId");
+
+                    b.ToTable("umbracoUserGroup2GranularPermission", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>
                 {
                     b.Property<int>("WebhookId")
@@ -2479,6 +2518,15 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserGroup2GranularPermissionDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
+                        .WithMany()
+                        .HasForeignKey("UniqueId")
+                        .HasPrincipalKey("UniqueId")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>

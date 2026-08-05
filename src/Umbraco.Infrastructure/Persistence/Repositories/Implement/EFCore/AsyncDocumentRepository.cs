@@ -37,6 +37,7 @@ internal sealed class AsyncDocumentRepository
     private readonly IIdKeyMap _idKeyMap;
     private readonly ITagRepository _tagRepository;
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly AsyncPermissionRepository<IContent> _permissionRepository;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AsyncDocumentRepository" /> class.
@@ -58,6 +59,7 @@ internal sealed class AsyncDocumentRepository
     /// <param name="idKeyMap">The ID/key map, used to resolve data type configuration for sortable property values.</param>
     /// <param name="tagRepository">The tag repository, used to persist tag values for tag-enabled properties on publish.</param>
     /// <param name="jsonSerializer">The JSON serializer, used to parse legacy JSON-stored tag values.</param>
+    /// <param name="userGroupService">The user group service, used to resolve user group keys to IDs for permission storage.</param>
     internal AsyncDocumentRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
@@ -75,7 +77,8 @@ internal sealed class AsyncDocumentRepository
         ITemplateRepository templateRepository,
         IIdKeyMap idKeyMap,
         ITagRepository tagRepository,
-        IJsonSerializer jsonSerializer)
+        IJsonSerializer jsonSerializer,
+        IUserGroupService userGroupService)
         : base(
             scopeAccessor,
             appCaches,
@@ -95,6 +98,7 @@ internal sealed class AsyncDocumentRepository
         _idKeyMap = idKeyMap;
         _tagRepository = tagRepository;
         _jsonSerializer = jsonSerializer;
+        _permissionRepository = new AsyncPermissionRepository<IContent>(scopeAccessor, appCaches, userGroupService);
     }
 
     /// <inheritdoc />
@@ -1235,19 +1239,19 @@ internal sealed class AsyncDocumentRepository
 
     /// <inheritdoc />
     public Task ReplaceContentPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+        _permissionRepository.ReplaceEntityPermissionsAsync(permissionSet, cancellationToken);
 
     /// <inheritdoc />
     public Task AssignEntityPermissionAsync(IContent entity, string permission, IEnumerable<Guid> groupKeys, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+        _permissionRepository.AssignEntityPermissionAsync(entity, permission, groupKeys, cancellationToken);
 
     /// <inheritdoc />
     public Task<EntityPermissionCollection> GetPermissionsForEntityAsync(Guid entityKey, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+        _permissionRepository.GetPermissionsForEntityAsync(entityKey, cancellationToken);
 
     /// <inheritdoc />
     public Task AddOrUpdatePermissionsAsync(ContentPermissionSet permission, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+        _permissionRepository.AddOrUpdatePermissionsAsync(permission, cancellationToken);
 
     // --- IAsyncDocumentRepository: document-specific ---
 

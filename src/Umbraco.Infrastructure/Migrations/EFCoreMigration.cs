@@ -30,4 +30,5 @@ public enum EFCoreMigration
     AddRedirectUrlDto = 22,
     AddContentTypeDtosBasic = 23,
     ReconcileEfCoreRepositoriesMerge = 24,
+    AddUserGroup2GranularPermissionDto = 25,
 }

@@ -38,5 +38,6 @@ public static class UmbracoBuilderExtensions
             .AddEFCoreModelCustomizer<SqlServerDocumentUrlDtoModelCustomizer>()
             .AddEFCoreModelCustomizer<SqlServerTagDtoModelCustomizer>()
             .AddEFCoreModelCustomizer<SqlServerTagRelationshipDtoModelCustomizer>()
-            .AddEFCoreModelCustomizer<SqlServerRedirectUrlDtoModelCustomizer>();
+            .AddEFCoreModelCustomizer<SqlServerRedirectUrlDtoModelCustomizer>()
+            .AddEFCoreModelCustomizer<SqlServerUserGroup2GranularPermissionDtoModelCustomizer>();
 }
