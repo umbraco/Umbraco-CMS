@@ -165,10 +165,16 @@ html`<p>${this.localize.htmlString('#defaultdialogs_confirmdelete', userControll
 html`<p>${unsafeHTML(this.localize.string('#defaultdialogs_confirmdelete', userControlledName))}</p>`;
 ```
 
-**Modal `content` field** (e.g. `umbConfirmModal`) renders strings via `unsafeHTML` internally. When passing a localized string with user-controlled args, wrap it in a template:
+**Modal `content` field** (e.g. `umbConfirmModal`) renders strings via `unsafeHTML` internally. When passing a localized string with user-controlled args, either pre-escape the args (preferred, `content` stays a plain string) or wrap an `htmlString()` call in a template for keys containing markup. Note `term()`/`string()` take a **bare** key — only `string()`/`htmlString()` resolve a leading `#`, so `term()` never uses one:
 
 ```typescript
-// ✅ Safe — htmlString escapes args, html`...` wraps the directive in a TemplateResult
+// ✅ Preferred — term() returns a plain string; escape user-controlled args at the call site
+umbConfirmModal(this, {
+	headline: '#actions_delete',
+	content: this.localize.term('defaultdialogs_confirmdelete', escapeHTML(item.name ?? '')),
+});
+
+// ✅ Also safe — htmlString escapes args, html`...` wraps the directive in a TemplateResult
 umbConfirmModal(this, {
 	headline: '#actions_delete',
 	content: html`${this.#localize.htmlString('#defaultdialogs_confirmdelete', item.name)}`,

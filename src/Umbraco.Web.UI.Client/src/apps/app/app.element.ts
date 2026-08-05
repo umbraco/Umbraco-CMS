@@ -25,7 +25,10 @@ import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import {
+	UMB_CURRENT_USER_CONTEXT,
+	UmbUserEntryPointExtensionInitializer,
+} from '@umbraco-cms/backoffice/current-user';
 import { UmbOutlineStyleController } from './outline-style.controller.js';
 
 const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
@@ -141,6 +144,9 @@ export class UmbAppElement extends UmbLitElement {
 	#serverConnection?: UmbServerConnection;
 	#authController = new UmbAppAuthController(this);
 	#bundleInitializer: UmbBundleExtensionInitializer;
+	// The initializer registers itself as a controller on this host; the reference only pins the instantiation to the app's lifetime.
+	// eslint-disable-next-line no-unused-private-class-members
+	#userEntryPointInitializer?: UmbUserEntryPointExtensionInitializer;
 
 	#currentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>>;
@@ -224,6 +230,8 @@ export class UmbAppElement extends UmbLitElement {
 		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 		const entryPointInitializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
+		this.#userEntryPointInitializer = new UmbUserEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {

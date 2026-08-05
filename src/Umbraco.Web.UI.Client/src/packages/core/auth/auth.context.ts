@@ -63,18 +63,25 @@ export class UmbAuthContext extends UmbContextBase {
 	#postLogoutRedirectUri;
 
 	/**
-	 * Observable that emits when the auth context is initialized.
-	 * @deprecated The auth context is initialized on creation and this emits immediately. Scheduled for removal in Umbraco 21.
+	 * Observable that emits once, without a value, when the auth context is initialized.
+	 * @internal This was only ever public so the core entry point could drive it. It gates nothing
+	 * for consumers: the boot sequence already awaits app entry points before the router evaluates
+	 * its guards, so by the time any extension code runs this has long since completed.
+	 * @deprecated Internal boot signal, never intended for public use. Scheduled for removal in Umbraco 19.
 	 * @remark It will only emit once and then complete itself.
 	 */
 	get isInitialized(): Observable<void> {
 		new UmbDeprecation({
 			deprecated: 'UmbAuthContext.isInitialized',
-			removeInVersion: '21.0.0',
-			solution: 'The auth context is ready once constructed; remove the dependency on this signal.',
+			solution:
+				'Remove the dependency on this signal. It is an internal boot detail — the app awaits app entry points before routing, so extension code always runs after initialization. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
 		}).warn();
-		return this.#isInitialized.asObservable();
+		return this.#isInitializedObservable;
 	}
+
+	/** Internal, non-warning view of {@link isInitialized} for use inside this class. */
+	readonly #isInitializedObservable = this.#isInitialized.asObservable();
 
 	/**
 	 * Observable that emits true if the user is authorized, otherwise false.
@@ -388,15 +395,21 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Checks if the current session is still valid.
-	 * @deprecated Cookie auth verifies the session with the server on boot and per request, so a local expiry check is redundant. Use {@link getIsAuthorized} or observe {@link session$}. Scheduled for removal in Umbraco 21.
-	 * @returns {boolean} True if the session has not expired.
+	 * @deprecated Use {@link getIsAuthorized} or observe {@link session$} instead. Scheduled for removal in Umbraco 19.
+	 * @returns True if the session has not expired.
 	 */
 	isSessionValid(): boolean {
 		new UmbDeprecation({
 			deprecated: 'UmbAuthContext.isSessionValid()',
-			removeInVersion: '21.0.0',
-			solution: 'Use getIsAuthorized() or observe session$ instead.',
+			solution:
+				'Use getIsAuthorized() for a synchronous check, or observe session$ to react to session changes. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
 		}).warn();
+		return this.#isSessionValid();
+	}
+
+	/** Internal, non-warning implementation of {@link isSessionValid}. */
+	#isSessionValid(): boolean {
 		const session = this.#session.getValue();
 		return !!session && session.expiresAt > Math.floor(Date.now() / 1000);
 	}
@@ -445,13 +458,28 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Get the server url to the Management API.
 	 * @deprecated Consume {@link UMB_SERVER_CONTEXT} and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 21.
 	 * @memberof UmbAuthContext
-	 * @returns {string} The server url to the Management API
+	 * @example <caption>Using the server url</caption>
+	 * ```js
+	 * 	const serverUrl = authContext.getServerUrl();
+	 * 	OpenAPI.BASE = serverUrl;
+	 * ```
+	 * @example <caption></caption>
+	 * ```js
+	 * 	const config = authContext.getOpenApiConfiguration();
+	 * 	const result = await fetch(`${config.base}/umbraco/management/api/v1/my-resource`, {
+	 * 		credentials: config.credentials,
+	 * 		headers: { Authorization: `Bearer ${await config.token()}` },
+	 * 	});
+	 * ```
+	 * @deprecated Consume {@link UMB_SERVER_CONTEXT} and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 19.
+	 * @returns The server url to the Management API
 	 */
-	getServerUrl(): string {
+	getServerUrl() {
 		new UmbDeprecation({
 			deprecated: 'UmbAuthContext.getServerUrl()',
-			removeInVersion: '21.0.0',
-			solution: 'Consume UMB_SERVER_CONTEXT and use its getServerUrl() instead.',
+			solution:
+				'Consume UMB_SERVER_CONTEXT from @umbraco-cms/backoffice/server and use its getServerUrl(), which is the canonical source. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
 		}).warn();
 		return this.#serverUrl;
 	}
@@ -532,29 +560,53 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
-	 * Sets the auth context as initialized.
-	 * @deprecated The auth context is ready once constructed and no longer gates provider discovery on this signal; it is now a no-op. Scheduled for removal in Umbraco 21.
+	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
+	 * @internal Only public because the core entry point calls it from outside this class. Nothing
+	 * outside Umbraco core should ever call this — doing so opens the provider-discovery gate early.
+	 * @deprecated Internal boot hook, never intended for public use. Scheduled for removal in Umbraco 19.
+	 * @remark The constructor already does this, so calling it again is a no-op on an
+	 * already-completed subject. It emits once, without a value.
 	 */
 	setInitialized() {
 		new UmbDeprecation({
 			deprecated: 'UmbAuthContext.setInitialized()',
-			removeInVersion: '21.0.0',
-			solution: 'Remove the call; the auth context is ready once constructed.',
+			solution:
+				'Do not call this. It is an internal boot hook owned by the core entry point. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
 		}).warn();
+		this.#setInitialized();
+	}
+
+	/** Internal, non-warning implementation of {@link setInitialized}. */
+	#setInitialized() {
+		this.#isInitialized.next();
+		this.#isInitialized.complete();
 	}
 
 	/**
 	 * Gets all registered auth providers.
-	 * @deprecated Query the extension registry directly: `extensionsRegistry.byType('authProvider')`. Scheduled for removal in Umbraco 21.
-	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extensions registry to get auth providers from.
-	 * @returns {Observable<ManifestAuthProvider[]>} An observable that emits the registered auth providers.
+	 * @deprecated Query the extension registry directly: `umbExtensionsRegistry.byType('authProvider')`. Scheduled for removal in Umbraco 19.
+	 * @remark The initialization gate this used to add is redundant — the app awaits app entry points
+	 * before the router evaluates its guards, so the provider list has already settled by then.
+	 * @param extensionsRegistry
 	 */
-	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry): Observable<ManifestAuthProvider[]> {
+	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
 		new UmbDeprecation({
 			deprecated: 'UmbAuthContext.getAuthProviders()',
-			removeInVersion: '21.0.0',
-			solution: "Query the extension registry directly with extensionsRegistry.byType('authProvider').",
+			solution:
+				"Query the extension registry directly with byType('authProvider'). The boot sequence already awaits app entry points before routing, so the provider list has settled. Scheduled for removal in Umbraco 19.",
+			removeInVersion: '19.0.0',
 		}).warn();
+		return this.#getAuthProviders(extensionsRegistry);
+	}
+
+	/**
+	 * Internal, non-warning implementation of {@link getAuthProviders}.
+	 * No initialization gate: the constructor completes #isInitialized, so piping through it only
+	 * added a micro-task delay. Ordering is guaranteed by the boot sequence awaiting app entry
+	 * points before the router evaluates its guards.
+	 */
+	#getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
 		return extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider');
 	}
 

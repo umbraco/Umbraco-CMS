@@ -1,5 +1,5 @@
 import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH } from '@umbraco-cms/backoffice/auth';
-import type { UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
+import type { ManifestAuthProvider, UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

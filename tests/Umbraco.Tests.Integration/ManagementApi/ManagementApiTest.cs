@@ -69,7 +69,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     }
 
     protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin) =>
-        await AuthenticateClientAsync(client,
+        await AuthenticateClientAsync(
+            client,
             async userService =>
             {
                 IUser user;
@@ -154,7 +155,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
             var token = await userManager.GeneratePasswordResetTokenAsync(userCreationResult.User);
 
-            var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
+            var changePasswordAttempt = await userService.ChangePasswordAsync(
+                userKey,
                 new ChangeUserPasswordModel
                 {
                     NewPassword = password, ResetPasswordToken = token.Result.ToUrlBase64(), UserKey = userKey,

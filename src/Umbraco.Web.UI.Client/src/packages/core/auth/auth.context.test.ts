@@ -1,5 +1,5 @@
 import { UmbAuthContext, type UmbAuthSession } from './auth.context.js';
-import { expect } from '@open-wc/testing';
+import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -26,6 +26,20 @@ describe('UmbAuthContext', () => {
 
 		it('has an isInitialized property', () => {
 			expect(context).to.have.property('isInitialized');
+		});
+
+		// setInitialized() used to be driven from the core entry point. It now runs in the constructor,
+		// so guard the property that makes that safe: #isInitialized is a ReplaySubject(1), meaning a
+		// subscriber attaching after construction still receives the emission rather than hanging.
+		// Reading the deprecated getter logs a deprecation warning here — expected, since the test
+		// runner's origin resolves to 'unknown' rather than 'core' so the warning isn't suppressed.
+		it('emits isInitialized to a subscriber that attaches after construction', async () => {
+			let emitted = false;
+			context.isInitialized.subscribe(() => {
+				emitted = true;
+			});
+			await aTimeout(0);
+			expect(emitted).to.be.true;
 		});
 
 		it('has a getIsAuthorized method', () => {
