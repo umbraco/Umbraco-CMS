@@ -75,6 +75,7 @@ declare global {
 		actions_chooseWhereToMove: string;
 		actions_clear: string;
 		actions_copy: string;
+		actions_copyInProgress: string;
 		actions_copyTo: string;
 		actions_create: string;
 		actions_createblueprint: string;
@@ -82,6 +83,7 @@ declare global {
 		actions_createGroup: string;
 		actions_createPackage: string;
 		actions_delete: string;
+		actions_deleteInProgress: string;
 		actions_disable: string;
 		actions_editContent: string;
 		actions_editSettings: string;
@@ -101,6 +103,7 @@ declare global {
 		actions_loadMore: string;
 		actions_logout: string;
 		actions_move: string;
+		actions_moveInProgress: string;
 		actions_notify: string;
 		actions_protect: string;
 		actions_publish: string;
@@ -263,7 +266,7 @@ declare global {
 		blockEditor_confirmDeleteBlockGroupNotice: string;
 		blockEditor_confirmDeleteBlockGroupTitle: string;
 		blockEditor_confirmDeleteBlockMessage: string;
-		blockEditor_confirmDeleteBlockTitle: string;
+		blockEditor_confirmDeleteBlockTitle: (name: string) => string;
 		blockEditor_confirmDeleteBlockTypeMessage: string;
 		blockEditor_confirmDeleteBlockTypeNotice: string;
 		blockEditor_confirmDeleteBlockTypeTitle: string;
@@ -413,6 +416,8 @@ declare global {
 		clipboard_confirmClearDescription: string;
 		clipboard_confirmDeleteDescription: string;
 		clipboard_confirmDeleteHeadline: string;
+		clipboard_confirmPasteHeadline: string;
+		clipboard_confirmPasteOverwriteMessage: (name: string) => string;
 		clipboard_copySuccessHeadline: string;
 		clipboard_labelForArrayOfItems: string;
 		clipboard_labelForArrayOfItemsFrom: string;
@@ -622,11 +627,17 @@ declare global {
 		contentTypeEditor_collections: string;
 		contentTypeEditor_collectionsDescription: string;
 		contentTypeEditor_compositionInUse: string;
+		contentTypeEditor_compositionInUseMediaType: string;
+		contentTypeEditor_compositionInUseMemberType: string;
 		contentTypeEditor_compositionRemoveWarning: string;
 		contentTypeEditor_compositions: string;
 		contentTypeEditor_compositionsDescription: string;
+		contentTypeEditor_compositionsDescriptionMediaType: string;
+		contentTypeEditor_compositionsDescriptionMemberType: string;
 		contentTypeEditor_compositionUsageHeading: string;
 		contentTypeEditor_compositionUsageSpecification: string;
+		contentTypeEditor_compositionUsageSpecificationMediaType: string;
+		contentTypeEditor_compositionUsageSpecificationMemberType: string;
 		contentTypeEditor_configuration: string;
 		contentTypeEditor_confirmDeleteGroupMessage: string;
 		contentTypeEditor_confirmDeleteGroupNotice: string;
@@ -672,6 +683,8 @@ declare global {
 		contentTypeEditor_memberCanEditDescription: string;
 		contentTypeEditor_movedUnderneath: string;
 		contentTypeEditor_noAvailableCompositions: string;
+		contentTypeEditor_noAvailableCompositionsMediaType: string;
+		contentTypeEditor_noAvailableCompositionsMemberType: string;
 		contentTypeEditor_noGroups: string;
 		contentTypeEditor_presentation: string;
 		contentTypeEditor_propertyHasChanges: string;
@@ -789,6 +802,7 @@ declare global {
 		defaultdialogs_confirmdisable: string;
 		defaultdialogs_confirmlogout: string;
 		defaultdialogs_confirmremove: string;
+		defaultdialogs_confirmRemoveItem: (name: string) => string;
 		defaultdialogs_confirmremoveusageof: string;
 		defaultdialogs_confirmSure: string;
 		defaultdialogs_confirmTrash: (name: string) => string;
@@ -1143,6 +1157,7 @@ declare global {
 		general_password: string;
 		general_path: string;
 		general_pixels: string;
+		general_placeholder: string;
 		general_pleasewait: string;
 		general_preview: string;
 		general_previous: string;
@@ -1215,9 +1230,11 @@ declare global {
 		general_videos: string;
 		general_view: string;
 		general_viewSourceCode: string;
+		general_weight: string;
 		general_welcome: string;
 		general_width: string;
 		general_yes: string;
+		globalSearch_documents: string;
 		globalSearch_navigateSearchProviders: string;
 		globalSearch_navigateSearchResults: string;
 		graphicheadline_backgroundcolor: string;
@@ -1421,6 +1438,7 @@ declare global {
 		login_greeting6: string;
 		login_hidePassword: string;
 		login_instruction: string;
+		login_invalidPasswordMessage: string;
 		login_localLoginDisabled: string;
 		login_login: string;
 		login_mfaCodeInput: string;
@@ -1754,6 +1772,7 @@ declare global {
 		propertyActions_tooltipForPropertyActionsMenu: string;
 		propertyActions_tooltipForPropertyActionsMenuClose: string;
 		propertyEditorPicker_openPropertyEditorPicker: string;
+		propertyEditorPicker_selectAction: string;
 		propertyEditorPicker_title: string;
 		propertyEditorUIGroups_advanced: string;
 		propertyEditorUIGroups_blocks: string;
@@ -1981,6 +2000,7 @@ declare global {
 		sort_sortOrder: string;
 		sort_sortPleaseWait: string;
 		speechBubbles_cannotCopyInformation: string;
+		speechBubbles_cannotCopyToClipboard: string;
 		speechBubbles_contentCultureUnpublished: string;
 		speechBubbles_contentCultureValidationError: string;
 		speechBubbles_contentMandatoryCultureUnpublished: string;
@@ -2013,9 +2033,11 @@ declare global {
 		speechBubbles_documentTypeExportedSuccess: string;
 		speechBubbles_editBlueprintSavedHeader: string;
 		speechBubbles_editBlueprintSavedText: string;
+		speechBubbles_editContentPublishedFailed: string;
 		speechBubbles_editContentPublishedFailedByParent: string;
 		speechBubbles_editContentPublishedFailedByValidation: string;
 		speechBubbles_editContentPublishedHeader: string;
+		speechBubbles_editContentPublishedReloadFailed: string;
 		speechBubbles_editContentPublishedText: string;
 		speechBubbles_editContentSavedHeader: string;
 		speechBubbles_editContentSavedText: string;
@@ -2027,12 +2049,16 @@ declare global {
 		speechBubbles_editContentUnpublishedText: string;
 		speechBubbles_editCulturesAndHostnamesError: string;
 		speechBubbles_editCulturesAndHostnamesSaved: string;
+		speechBubbles_editElementPublishedFailed: string;
 		speechBubbles_editElementPublishedHeader: string;
+		speechBubbles_editElementPublishedReloadFailed: string;
 		speechBubbles_editElementUnpublishedHeader: string;
 		speechBubbles_editMediaSaved: string;
 		speechBubbles_editMediaSavedText: string;
 		speechBubbles_editMemberSaved: string;
+		speechBubbles_editMultiContentPublishedPartialText: string;
 		speechBubbles_editMultiContentPublishedText: string;
+		speechBubbles_editMultiContentUnpublishedPartialText: string;
 		speechBubbles_editMultiContentUnpublishedText: string;
 		speechBubbles_editMultiElementPublishedText: string;
 		speechBubbles_editMultiElementUnpublishedText: string;
@@ -2217,8 +2243,10 @@ declare global {
 		templateEditor_usedIfAllEmpty: string;
 		templateEditor_usedIfEmpty: string;
 		templateEditor_withTime: string;
+		textbox_autocompleteLabel: string;
 		textbox_characters_exceed: string;
 		textbox_characters_left: string;
+		textbox_maxCharsLabel: string;
 		timeout_warningContinueAction: string;
 		timeout_warningHeadline: string;
 		timeout_warningLogoutAction: string;
@@ -2274,6 +2302,11 @@ declare global {
 		translation_translationOptions: string;
 		translation_translator: string;
 		translation_uploadTranslationXml: string;
+		tree_cardViewLabel: string;
+		tree_children: string;
+		tree_classicViewLabel: string;
+		tree_noItems: string;
+		tree_tableViewLabel: string;
 		treeHeaders_advancedGroup: string;
 		treeHeaders_cacheBrowser: string;
 		treeHeaders_content: string;
@@ -2370,6 +2403,7 @@ declare global {
 		uiCulture_zh: string;
 		'uiCulture_zh-cn': string;
 		'uiCulture_zh-tw': string;
+		unpublish_inProgress: string;
 		update_updateAvailable: string;
 		update_updateDownloadText: string;
 		update_updateNoServer: string;
@@ -2770,6 +2804,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'actions_chooseWhereToMove',
 	'actions_clear',
 	'actions_copy',
+	'actions_copyInProgress',
 	'actions_copyTo',
 	'actions_create',
 	'actions_createblueprint',
@@ -2777,6 +2812,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'actions_createGroup',
 	'actions_createPackage',
 	'actions_delete',
+	'actions_deleteInProgress',
 	'actions_disable',
 	'actions_editContent',
 	'actions_editSettings',
@@ -2796,6 +2832,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'actions_loadMore',
 	'actions_logout',
 	'actions_move',
+	'actions_moveInProgress',
 	'actions_notify',
 	'actions_protect',
 	'actions_publish',
@@ -3108,6 +3145,8 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'clipboard_confirmClearDescription',
 	'clipboard_confirmDeleteDescription',
 	'clipboard_confirmDeleteHeadline',
+	'clipboard_confirmPasteHeadline',
+	'clipboard_confirmPasteOverwriteMessage',
 	'clipboard_copySuccessHeadline',
 	'clipboard_labelForArrayOfItems',
 	'clipboard_labelForArrayOfItemsFrom',
@@ -3317,11 +3356,17 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'contentTypeEditor_collections',
 	'contentTypeEditor_collectionsDescription',
 	'contentTypeEditor_compositionInUse',
+	'contentTypeEditor_compositionInUseMediaType',
+	'contentTypeEditor_compositionInUseMemberType',
 	'contentTypeEditor_compositionRemoveWarning',
 	'contentTypeEditor_compositions',
 	'contentTypeEditor_compositionsDescription',
+	'contentTypeEditor_compositionsDescriptionMediaType',
+	'contentTypeEditor_compositionsDescriptionMemberType',
 	'contentTypeEditor_compositionUsageHeading',
 	'contentTypeEditor_compositionUsageSpecification',
+	'contentTypeEditor_compositionUsageSpecificationMediaType',
+	'contentTypeEditor_compositionUsageSpecificationMemberType',
 	'contentTypeEditor_configuration',
 	'contentTypeEditor_confirmDeleteGroupMessage',
 	'contentTypeEditor_confirmDeleteGroupNotice',
@@ -3367,6 +3412,8 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'contentTypeEditor_memberCanEditDescription',
 	'contentTypeEditor_movedUnderneath',
 	'contentTypeEditor_noAvailableCompositions',
+	'contentTypeEditor_noAvailableCompositionsMediaType',
+	'contentTypeEditor_noAvailableCompositionsMemberType',
 	'contentTypeEditor_noGroups',
 	'contentTypeEditor_presentation',
 	'contentTypeEditor_propertyHasChanges',
@@ -3484,6 +3531,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'defaultdialogs_confirmdisable',
 	'defaultdialogs_confirmlogout',
 	'defaultdialogs_confirmremove',
+	'defaultdialogs_confirmRemoveItem',
 	'defaultdialogs_confirmremoveusageof',
 	'defaultdialogs_confirmSure',
 	'defaultdialogs_confirmTrash',
@@ -3838,6 +3886,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'general_password',
 	'general_path',
 	'general_pixels',
+	'general_placeholder',
 	'general_pleasewait',
 	'general_preview',
 	'general_previous',
@@ -3910,9 +3959,11 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'general_videos',
 	'general_view',
 	'general_viewSourceCode',
+	'general_weight',
 	'general_welcome',
 	'general_width',
 	'general_yes',
+	'globalSearch_documents',
 	'globalSearch_navigateSearchProviders',
 	'globalSearch_navigateSearchResults',
 	'graphicheadline_backgroundcolor',
@@ -4116,6 +4167,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'login_greeting6',
 	'login_hidePassword',
 	'login_instruction',
+	'login_invalidPasswordMessage',
 	'login_localLoginDisabled',
 	'login_login',
 	'login_mfaCodeInput',
@@ -4449,6 +4501,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'propertyActions_tooltipForPropertyActionsMenu',
 	'propertyActions_tooltipForPropertyActionsMenuClose',
 	'propertyEditorPicker_openPropertyEditorPicker',
+	'propertyEditorPicker_selectAction',
 	'propertyEditorPicker_title',
 	'propertyEditorUIGroups_advanced',
 	'propertyEditorUIGroups_blocks',
@@ -4676,6 +4729,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'sort_sortOrder',
 	'sort_sortPleaseWait',
 	'speechBubbles_cannotCopyInformation',
+	'speechBubbles_cannotCopyToClipboard',
 	'speechBubbles_contentCultureUnpublished',
 	'speechBubbles_contentCultureValidationError',
 	'speechBubbles_contentMandatoryCultureUnpublished',
@@ -4708,9 +4762,11 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'speechBubbles_documentTypeExportedSuccess',
 	'speechBubbles_editBlueprintSavedHeader',
 	'speechBubbles_editBlueprintSavedText',
+	'speechBubbles_editContentPublishedFailed',
 	'speechBubbles_editContentPublishedFailedByParent',
 	'speechBubbles_editContentPublishedFailedByValidation',
 	'speechBubbles_editContentPublishedHeader',
+	'speechBubbles_editContentPublishedReloadFailed',
 	'speechBubbles_editContentPublishedText',
 	'speechBubbles_editContentSavedHeader',
 	'speechBubbles_editContentSavedText',
@@ -4722,12 +4778,16 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'speechBubbles_editContentUnpublishedText',
 	'speechBubbles_editCulturesAndHostnamesError',
 	'speechBubbles_editCulturesAndHostnamesSaved',
+	'speechBubbles_editElementPublishedFailed',
 	'speechBubbles_editElementPublishedHeader',
+	'speechBubbles_editElementPublishedReloadFailed',
 	'speechBubbles_editElementUnpublishedHeader',
 	'speechBubbles_editMediaSaved',
 	'speechBubbles_editMediaSavedText',
 	'speechBubbles_editMemberSaved',
+	'speechBubbles_editMultiContentPublishedPartialText',
 	'speechBubbles_editMultiContentPublishedText',
+	'speechBubbles_editMultiContentUnpublishedPartialText',
 	'speechBubbles_editMultiContentUnpublishedText',
 	'speechBubbles_editMultiElementPublishedText',
 	'speechBubbles_editMultiElementUnpublishedText',
@@ -4912,8 +4972,10 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'templateEditor_usedIfAllEmpty',
 	'templateEditor_usedIfEmpty',
 	'templateEditor_withTime',
+	'textbox_autocompleteLabel',
 	'textbox_characters_exceed',
 	'textbox_characters_left',
+	'textbox_maxCharsLabel',
 	'timeout_warningContinueAction',
 	'timeout_warningHeadline',
 	'timeout_warningLogoutAction',
@@ -4969,6 +5031,11 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'translation_translationOptions',
 	'translation_translator',
 	'translation_uploadTranslationXml',
+	'tree_cardViewLabel',
+	'tree_children',
+	'tree_classicViewLabel',
+	'tree_noItems',
+	'tree_tableViewLabel',
 	'treeHeaders_advancedGroup',
 	'treeHeaders_cacheBrowser',
 	'treeHeaders_content',
@@ -5065,6 +5132,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'uiCulture_zh',
 	'uiCulture_zh-cn',
 	'uiCulture_zh-tw',
+	'unpublish_inProgress',
 	'update_updateAvailable',
 	'update_updateDownloadText',
 	'update_updateNoServer',
