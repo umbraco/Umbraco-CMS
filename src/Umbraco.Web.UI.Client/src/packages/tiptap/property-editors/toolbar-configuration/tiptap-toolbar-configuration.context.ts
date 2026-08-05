@@ -230,11 +230,19 @@ export class UmbTiptapToolbarConfigurationContext extends UmbContextBase {
 		}
 
 		this.#extensionsInUse.clear();
-		value.forEach((row) => row.forEach((group) => group.forEach((alias) => this.#extensionsInUse.add(alias))));
 
+		// An extension can only be used once, so any repeat occurrence is dropped rather than carried along. (#23524)
 		const toolbar = value.map((row) => ({
 			unique: UmbId.new(),
-			data: row.map((group) => ({ unique: UmbId.new(), data: group })),
+			data: row.map((group) => {
+				const aliases: Array<string> = [];
+				for (const alias of group) {
+					if (this.#extensionsInUse.has(alias)) continue;
+					this.#extensionsInUse.add(alias);
+					aliases.push(alias);
+				}
+				return { unique: UmbId.new(), data: aliases };
+			}),
 		}));
 
 		this.#toolbar.setValue(toolbar);

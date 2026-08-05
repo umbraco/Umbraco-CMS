@@ -338,6 +338,8 @@ export default {
 		variantScheduleNotAllowed: 'Plannung ist nicht erlaubt',
 		variantUnpublishNotAllowed: 'Veröffentlichung zurücknehmen ist nicht erlaubt.',
 		saveModalTitle: 'Speichern',
+		saveAndPublishDescendantsModalTitle: 'Speichern und veröffentlichen mit Unterknoten',
+		saveAndScheduleModalTitle: 'Speichern und Veröffentlichung planen',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Erzeuge eine neue Inhaltsvorlage von <em>%0%</em>',

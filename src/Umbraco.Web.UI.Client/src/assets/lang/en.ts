@@ -303,9 +303,9 @@ export default {
 		publishedPendingChanges: 'Published (pending changes)',
 		publishStatus: 'Publication Status',
 		publishDescendantsHelp:
-			'Publish <strong>%0%</strong> and all items underneath and thereby making their content publicly available.',
+			'Save and publish <strong>%0%</strong> and publish all items underneath thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
-			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
+			'Save and publish variants and publish variants of same type underneath thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
@@ -383,6 +383,8 @@ export default {
 		selectAllVariants: 'Select all variants',
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
+		saveAndPublishDescendantsModalTitle: 'Save and publish with descendants',
+		saveAndScheduleModalTitle: 'Save and schedule publishing',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
 		sharedAcrossCultures: 'Shared across cultures',
@@ -581,6 +583,7 @@ export default {
 		confirmdeleteNumberOfItems: 'Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items',
 		confirmdisable: 'Are you sure you want to disable',
 		confirmremove: 'Are you sure you want to remove',
+		confirmRemoveItem: (name: string) => `Are you sure you want to remove${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
@@ -1502,7 +1505,7 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
-		selectAction: "Select Property Editor",
+		selectAction: 'Select Property Editor',
 	},
 	propertyEditorUIGroups: {
 		advanced: 'Advanced',
@@ -2753,6 +2756,9 @@ export default {
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
 		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
+		confirmPasteHeadline: 'Paste from clipboard',
+		confirmPasteOverwriteMessage: (name: string) =>
+			`The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Copied to clipboard',
 	},
 	propertyActions: {
