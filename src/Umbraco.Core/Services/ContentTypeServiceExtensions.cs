@@ -4,6 +4,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
 namespace Umbraco.Extensions;
 
@@ -53,16 +54,17 @@ public static class ContentTypeServiceExtensions
         };
 
     /// <summary>
-    ///     Returns the available composite content types for a given content type
+    ///     Gets the composite content types available to a given content type, indicating whether each one is
+    ///     actually allowed to be selected.
     /// </summary>
-    /// <param name="allContentTypes"></param>
+    /// <param name="ctService">The content type service.</param>
+    /// <param name="source">The content type to find available compositions for, or <c>null</c> when creating a new one.</param>
+    /// <param name="allContentTypes">All existing content types of the same kind (document, media or member type).</param>
     /// <param name="filterContentTypes">
     ///     This is normally an empty list but if additional content type aliases are passed in, any content types containing
     ///     those aliases will be filtered out
     ///     along with any content types that have matching property types that are included in the filtered content types
     /// </param>
-    /// <param name="ctService"></param>
-    /// <param name="source"></param>
     /// <param name="filterPropertyTypes">
     ///     This is normally an empty list but if additional property type aliases are passed in, any content types that have
     ///     these aliases will be filtered out.
@@ -71,7 +73,12 @@ public static class ContentTypeServiceExtensions
     ///     be looked up via the db, they need to be passed in.
     /// </param>
     /// <param name="isElement">Whether the composite content types should be applicable for an element type</param>
-    /// <returns></returns>
+    /// <returns>Every candidate composition (excluding <paramref name="source"/> itself), each flagged as allowed or not.</returns>
+    /// <remarks>
+    ///     A composition is marked not allowed when it is <paramref name="source"/>'s own ancestor, when it is filtered
+    ///     out via <paramref name="filterContentTypes"/> or <paramref name="filterPropertyTypes"/>, or when selecting it
+    ///     would push a property alias down onto one of <paramref name="source"/>'s descendants that already defines it.
+    /// </remarks>
     public static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(
         this IContentTypeService ctService,
         IContentTypeComposition? source,
@@ -80,23 +87,21 @@ public static class ContentTypeServiceExtensions
         string[]? filterPropertyTypes = null,
         bool isElement = false)
     {
-        filterContentTypes = filterContentTypes == null
-            ? Array.Empty<string>()
-            : filterContentTypes.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
+        filterContentTypes = filterContentTypes?.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? [];
+        filterPropertyTypes = filterPropertyTypes?.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? [];
 
-        filterPropertyTypes = filterPropertyTypes == null
-            ? Array.Empty<string>()
-            : filterPropertyTypes.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
-
-        // create the full list of property types to use as the filter
-        // this is the combination of all property type aliases found in the content types passed in for the filter
-        // as well as the specific property types passed in for the filter
-        filterPropertyTypes = allContentTypes
-            .Where(c => filterContentTypes.InvariantContains(c.Alias))
-            .SelectMany(c => c.PropertyTypes)
-            .Select(c => c.Alias)
-            .Union(filterPropertyTypes)
-            .ToArray();
+        // aliases to exclude candidates on: the ones passed in, the properties of any filtered content types, and
+        // every alias already effective on a descendant. Always reports the truth, even for already-selected
+        // compositions - callers that want to ignore unchanged state must filter that out themselves.
+        filterPropertyTypes =
+        [
+            .. filterPropertyTypes,
+            .. allContentTypes
+                .Where(c => filterContentTypes.InvariantContains(c.Alias))
+                .SelectMany(c => c.PropertyTypes)
+                .Select(c => c.Alias),
+            .. source.GetAllDescendantPropertyAliases(allContentTypes)
+        ];
 
         var sourceId = source?.Id ?? 0;
 
@@ -116,9 +121,10 @@ public static class ContentTypeServiceExtensions
 
         // if it is not used then composition is possible
         // hashset guarantees uniqueness on Id
-        var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
-            (x, y) => x?.Id == y?.Id,
-            x => x.Id));
+        var list = new HashSet<IContentTypeComposition>(
+            new DelegateEqualityComparer<IContentTypeComposition>(
+                (x, y) => x?.Id == y?.Id,
+                x => x.Id));
 
         // usable types are those that are top-level
         // do not allow element types to be composed by non-element types as this will break the model generation in ModelsBuilder
@@ -162,9 +168,7 @@ public static class ContentTypeServiceExtensions
 
         // now we can create our result based on what is still available and the ancestors
         var result = list
-
-            // not itself
-            .Where(x => x.Id != sourceId)
+            .Where(x => x.Id != sourceId) // not itself
             .OrderBy(x => x.Name)
             .Select(composition => filtered.Contains(composition)
                 ? new ContentTypeAvailableCompositionsResult(composition, ancestorIds.Contains(composition.Id) == false)

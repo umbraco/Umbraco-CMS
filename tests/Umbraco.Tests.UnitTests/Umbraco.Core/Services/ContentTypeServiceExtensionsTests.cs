@@ -319,4 +319,39 @@ public class ContentTypeServiceExtensionsTests
         Assert.AreEqual(ct3.Id, availableTypes.ElementAt(1).Id);
         Assert.AreEqual(ct4.Id, availableTypes.ElementAt(2).Id);
     }
+
+    // An already-selected composition carrying properties must not self-collide just because a descendant
+    // inherits those very properties through it.
+    [Test]
+    public void GetAvailableCompositeContentTypes_Already_Selected_Composition_With_Property_Remains_Allowed_When_Inherited_From()
+    {
+        var composition = ContentTypeBuilder.CreateBasicContentType("composition", "Composition");
+        composition.Id = 1;
+        var contentCollection = new PropertyTypeCollection(true)
+        {
+            new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
+            {
+                Alias = "shared",
+                Name = "shared",
+                DataTypeId = -88,
+            },
+        };
+        composition.PropertyGroups.Add(new PropertyGroup(contentCollection) { Alias = "shared", Name = "shared", SortOrder = 1 });
+
+        var parent = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
+        parent.Id = 2;
+        parent.AddContentType(composition);
+
+        var child = ContentTypeBuilder.CreateBasicContentType("child", "Child", parent); // child inherits parent
+        child.Id = 3;
+
+        var service = new Mock<IContentTypeService>();
+
+        var results = service.Object.GetAvailableCompositeContentTypes(
+            parent,
+            new IContentTypeComposition[] { composition, parent, child }).Results;
+
+        var compositionResult = results.Single(x => x.Composition.Id == composition.Id);
+        Assert.IsTrue(compositionResult.Allowed);
+    }
 }
