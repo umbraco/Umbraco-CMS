@@ -208,7 +208,7 @@
 		"generate:localization-keys": "node ./devops/localization/generate-known-keys.js",
 		"lint:errors": "npm run lint -- --quiet",
 		"lint:fix": "npm run lint -- --fix",
-		"lint": "eslint src",
+		"lint": "npm run prebuild && eslint src",
 		"prepack": "tsc-alias -f -p src/tsconfig.build.json && npm run generate:jsonschema:dist && npm run wc-analyze && npm run wc-analyze:vscode && node ./devops/publish/cleanse-pkg.js",
 		"preview": "vite preview --open",
 		"storybook:build": "npm run wc-analyze && storybook build",

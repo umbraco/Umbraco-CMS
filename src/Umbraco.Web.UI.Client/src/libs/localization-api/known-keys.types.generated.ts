@@ -266,7 +266,7 @@ declare global {
 		blockEditor_confirmDeleteBlockGroupNotice: string;
 		blockEditor_confirmDeleteBlockGroupTitle: string;
 		blockEditor_confirmDeleteBlockMessage: string;
-		blockEditor_confirmDeleteBlockTitle: (name: string) => string;
+		blockEditor_confirmDeleteBlockTitle: string;
 		blockEditor_confirmDeleteBlockTypeMessage: string;
 		blockEditor_confirmDeleteBlockTypeNotice: string;
 		blockEditor_confirmDeleteBlockTypeTitle: string;
@@ -1050,6 +1050,7 @@ declare global {
 		general_cellMargin: string;
 		general_change: string;
 		general_changePassword: string;
+		general_changeView: string;
 		general_choose: string;
 		general_clear: string;
 		general_clipboard: string;

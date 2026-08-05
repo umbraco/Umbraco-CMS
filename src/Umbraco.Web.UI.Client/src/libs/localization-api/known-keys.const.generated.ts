@@ -1023,6 +1023,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'general_cellMargin',
 	'general_change',
 	'general_changePassword',
+	'general_changeView',
 	'general_choose',
 	'general_clear',
 	'general_clipboard',
