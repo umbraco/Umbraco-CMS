@@ -449,37 +449,6 @@ public class BackOfficeApplicationManagerTests
         Assert.That(postLogoutUriStrings, Does.Contain("https://server1.local/umbraco/oauth_complete/logout"));
     }
 
-    /// <summary>
-    /// Tests that the obsolete <see cref="SecuritySettings.AuthorizeCallbackLogoutPathName"/> no longer overrides the
-    /// logout path: it is a client route, so it is always derived from CallbackPathName. Honouring an override could
-    /// produce a path the back office client cannot route.
-    /// </summary>
-    [Test]
-    public void BackofficeOpenIddictApplicationDescriptor_ObsoleteLogoutPathNameOverride_IsIgnored()
-    {
-#pragma warning disable CS0618 // Type or member is obsolete
-        var securitySettingsWithExplicitLogout = Options.Create(new SecuritySettings
-        {
-            CallbackPathName = "umbraco",
-            AuthorizeCallbackLogoutPathName = "umbraco/custom-logout",
-        });
-#pragma warning restore CS0618
-
-        var sut = new BackOfficeApplicationManager(
-            _mockApplicationManager.Object,
-            _mockWebHostEnvironment.Object,
-            securitySettingsWithExplicitLogout,
-            _mockRuntimeState.Object,
-            _mockLogger.Object);
-
-        OpenIddictApplicationDescriptor descriptor = sut.BackofficeOpenIddictApplicationDescriptor(new Uri("https://server1.local/"));
-
-        var postLogoutUriStrings = descriptor.PostLogoutRedirectUris.Select(u => u.ToString()).ToList();
-
-        Assert.That(postLogoutUriStrings, Does.Contain("https://server1.local/umbraco/logout"));
-        Assert.That(postLogoutUriStrings, Does.Not.Contain("https://server1.local/umbraco/custom-logout"));
-    }
-
     private BackOfficeApplicationManager CreateDefaultMockedBackofficeApplicationManager() =>
         new(
             _mockApplicationManager.Object,

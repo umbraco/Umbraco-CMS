@@ -277,61 +277,6 @@ public class SecuritySettings
     public string CallbackPathName { get; set; } = StaticCallbackPathName;
 
     /// <summary>
-    ///     Gets the path at which the back-office client is served.
-    /// </summary>
-    /// <remarks>
-    ///     Setting this has no effect. It used to be the OAuth callback path, a concept cookie
-    ///     authentication no longer has; honouring it would silently redefine where the back office is
-    ///     served. Reading it reflects <see cref="CallbackPathName" />.
-    /// </remarks>
-    [Obsolete("Setting this has no effect. Use CallbackPathName. Scheduled for removal in Umbraco 21.")]
-    [DefaultValue(StaticCallbackPathName)]
-    public string AuthorizeCallbackPathName
-    {
-        get => CallbackPathName;
-        set
-        {
-            // Intentionally inert - see the remarks above.
-        }
-    }
-
-    /// <summary>
-    ///     Gets the path at which the back-office client's logout route is served.
-    /// </summary>
-    /// <remarks>
-    ///     Setting this has no effect - see <see cref="AuthorizeCallbackPathName" />. Logout is a client
-    ///     route, so it has to stay in step with <see cref="CallbackPathName" />; pointing it elsewhere
-    ///     produced a path the client could not route. Reading it returns the derived value.
-    /// </remarks>
-    [Obsolete("Setting this has no effect; the logout path is derived from CallbackPathName. Scheduled for removal in Umbraco 21.")]
-    [DefaultValue(StaticAuthorizeCallbackLogoutPathName)]
-    public string AuthorizeCallbackLogoutPathName
-    {
-        get => GetEffectiveLogoutPathName();
-        set
-        {
-            // Intentionally inert - see the remarks above.
-        }
-    }
-
-    /// <summary>
-    ///     Gets the path at which the back-office client's error route is served.
-    /// </summary>
-    /// <remarks>
-    ///     Setting this has no effect - see <see cref="AuthorizeCallbackLogoutPathName" />.
-    /// </remarks>
-    [Obsolete("Setting this has no effect; the error path is derived from CallbackPathName. Scheduled for removal in Umbraco 21.")]
-    [DefaultValue(StaticAuthorizeCallbackErrorPathName)]
-    public string AuthorizeCallbackErrorPathName
-    {
-        get => GetEffectiveErrorPathName();
-        set
-        {
-            // Intentionally inert - see the remarks above.
-        }
-    }
-
-    /// <summary>
     ///     Gets or sets the expiry time for password reset emails.
     /// </summary>
     [DefaultValue(StaticPasswordResetEmailExpiry)]
