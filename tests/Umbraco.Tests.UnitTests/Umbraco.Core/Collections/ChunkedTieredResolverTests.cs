@@ -12,6 +12,7 @@ public class ChunkedTieredResolverTests
     // allocate a fresh array each time.
     private static readonly int[] _evenIds = [0, 2, 4, 6, 8];
     private static readonly int[] _firstFiveIds = [0, 1, 2, 3, 4];
+    private static readonly int[] _duplicateKeyResultIds = [1, 0, 0];
 
     [Test]
     public void Resolve_AllCached_ReturnsAllInOrder_WithoutMaterialising()
@@ -164,7 +165,7 @@ public class ChunkedTieredResolverTests
         Assert.Multiple(() =>
         {
             // The repeated key resolves to the same item at both occurrences.
-            CollectionAssert.AreEqual(new[] { 1, 0, 0 }, result.Select(x => x.Id));
+            CollectionAssert.AreEqual(_duplicateKeyResultIds, result.Select(x => x.Id));
 
             // ...but the second chunk's tier call only asks about keyA once, not twice.
             Assert.AreEqual(2, calls.Count);

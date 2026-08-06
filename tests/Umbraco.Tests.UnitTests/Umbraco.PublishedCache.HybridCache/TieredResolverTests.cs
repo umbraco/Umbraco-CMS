@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.HybridCache;
 public class TieredResolverTests
 {
     private static readonly int[] _firstFiveIds = [0, 1, 2, 3, 4];
+    private static readonly int[] _duplicateKeyResultIds = [0, 1, 1, 2];
 
     [Test]
     public async Task ResolveAsync_AllCached_ReturnsAllInOrder_WithoutMaterialising()
@@ -101,7 +102,7 @@ public class TieredResolverTests
         Assert.Multiple(() =>
         {
             Assert.AreEqual(4, result.Count);
-            CollectionAssert.AreEqual(new[] { 0, 1, 1, 2 }, result.Select(x => x.Id));
+            CollectionAssert.AreEqual(_duplicateKeyResultIds, result.Select(x => x.Id));
         });
     }
 

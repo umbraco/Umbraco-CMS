@@ -150,53 +150,57 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         // stale-set guard GetNodeAsync applies per key, here applied once for the whole set.
         var generation = Interlocked.Read(ref _cacheGeneration);
 
-        return await TieredResolver.ResolveAsync<Guid, IPublishedContent>(keys, ResolveCachedTier, ResolveHybridCacheTier, ResolveDatabaseTier);
+        return await TieredResolver.ResolveAsync<Guid, IPublishedContent>(
+            keys,
+            (batchKeys, results) => ResolveCachedTierAsync(batchKeys, results),
+            (batchKeys, results) => ResolveHybridCacheTierAsync(batchKeys, generation, results),
+            (missedKeys, results) => ResolveDatabaseTierAsync(missedKeys, generation, results));
+    }
 
-        // L0 (converted) fast path (via the shared TryGetCached).
-        Task ResolveCachedTier(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
+    // L0 (converted) fast path (via the shared TryGetCached).
+    private Task ResolveCachedTierAsync(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
+    {
+        foreach (Guid key in batchKeys)
         {
-            foreach (Guid key in batchKeys)
+            if (TryGetCached(key, out IPublishedContent? cached) && cached is not null)
             {
-                if (TryGetCached(key, out IPublishedContent? cached) && cached is not null)
-                {
-                    results[key] = cached;
-                }
-            }
-
-            return Task.CompletedTask;
-        }
-
-        // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss is
-        // deferred to the single batched database read below.
-        async Task ResolveHybridCacheTier(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
-        {
-            foreach (Guid key in batchKeys)
-            {
-                (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(GetCacheKey(key), CancellationToken.None);
-                if (exists && node is not null)
-                {
-                    ResolveNode(key, node, generation, results);
-                }
+                results[key] = cached;
             }
         }
 
-        // The single batched database read for whatever L0 and L1/L2 missed. Once resolved, a
-        // database-read node is promoted into L1 — an L1/L2 hit is already there.
-        async Task ResolveDatabaseTier(IReadOnlyCollection<Guid> missedKeys, IDictionary<Guid, IPublishedContent> results)
-        {
-            IReadOnlyCollection<ContentCacheNode> coldNodes;
-            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-            {
-                coldNodes = (await _databaseCacheRepository.GetMediaSourcesAsync(missedKeys)).ToArray();
-                scope.Complete();
-            }
+        return Task.CompletedTask;
+    }
 
-            foreach (ContentCacheNode node in coldNodes)
+    // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss is
+    // deferred to the single batched database read below.
+    private async Task ResolveHybridCacheTierAsync(IReadOnlyCollection<Guid> batchKeys, long generation, IDictionary<Guid, IPublishedContent> results)
+    {
+        foreach (Guid key in batchKeys)
+        {
+            (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(GetCacheKey(key), CancellationToken.None);
+            if (exists && node is not null)
             {
-                if (ResolveNode(node.Key, node, generation, results) && IsCacheGenerationCurrent(generation))
-                {
-                    await _hybridCache.SetAsync(GetCacheKey(node.Key), node, GetEntryOptions(node.Key), GenerateTags(node));
-                }
+                ResolveNode(key, node, generation, results);
+            }
+        }
+    }
+
+    // The single batched database read for whatever L0 and L1/L2 missed. Once resolved, a
+    // database-read node is promoted into L1 — an L1/L2 hit is already there.
+    private async Task ResolveDatabaseTierAsync(IReadOnlyCollection<Guid> missedKeys, long generation, IDictionary<Guid, IPublishedContent> results)
+    {
+        IReadOnlyCollection<ContentCacheNode> coldNodes;
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        {
+            coldNodes = (await _databaseCacheRepository.GetMediaSourcesAsync(missedKeys)).ToArray();
+            scope.Complete();
+        }
+
+        foreach (ContentCacheNode node in coldNodes)
+        {
+            if (ResolveNode(node.Key, node, generation, results) && IsCacheGenerationCurrent(generation))
+            {
+                await _hybridCache.SetAsync(GetCacheKey(node.Key), node, GetEntryOptions(node.Key), GenerateTags(node));
             }
         }
     }
