@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
@@ -111,6 +112,45 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
 
     /// <inheritdoc />
     public abstract Guid RecycleBinKey { get; }
+
+    /// <inheritdoc />
+    public virtual async Task UpdateSortOrderAsync(IReadOnlyList<Guid> orderedNodeKeys, CancellationToken cancellationToken)
+    {
+        if (orderedNodeKeys.Count == 0)
+        {
+            return;
+        }
+
+        await AmbientScope.ExecuteWithContextAsync<object>(async db =>
+        {
+            var nodesByKey = new Dictionary<Guid, NodeDto>();
+
+            foreach (IEnumerable<Guid> batch in orderedNodeKeys.Distinct().InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                List<Guid> batchKeys = batch.ToList();
+
+                List<NodeDto> batchNodes = await db.Nodes
+                    .AsTracking()
+                    .Where(node => batchKeys.Contains(node.UniqueId))
+                    .ToListAsync(cancellationToken);
+
+                foreach (NodeDto node in batchNodes)
+                {
+                    nodesByKey[node.UniqueId] = node;
+                }
+            }
+
+            for (var sortOrder = 0; sortOrder < orderedNodeKeys.Count; sortOrder++)
+            {
+                if (nodesByKey.TryGetValue(orderedNodeKeys[sortOrder], out NodeDto? node))
+                {
+                    node.SortOrder = sortOrder;
+                }
+            }
+
+            await db.SaveChangesAsync(cancellationToken);
+        });
+    }
 
     /// <inheritdoc />
     public abstract Task<IEnumerable<TEntity>> GetAllVersionsAsync(Guid nodeKey, CancellationToken cancellationToken);

@@ -16,6 +16,18 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Guid RecycleBinKey { get; }
 
     /// <summary>
+    ///     Updates the sort order of the specified nodes so that each node's sort order matches its
+    ///     position in the supplied (already ordered) collection, in a single batched operation.
+    /// </summary>
+    /// <param name="orderedNodeKeys">The Guid keys of the nodes, in their desired order.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <remarks>
+    ///     This persists the sort order directly and does not load the entities or fire any notifications;
+    ///     callers are responsible for any required cache refresh and auditing.
+    /// </remarks>
+    Task UpdateSortOrderAsync(IReadOnlyList<Guid> orderedNodeKeys, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets all versions of a content node.
     /// </summary>
     /// <param name="nodeKey">The Guid key of the content node.</param>

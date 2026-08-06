@@ -1414,6 +1414,85 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task UpdateSortOrderAsync_ReordersNodesToMatchGivenSequence()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var first = ContentBuilder.CreateSimpleContent(_contentType, "Reorder First", _textpage.Id);
+        await repository.SaveAsync(first, CancellationToken.None);
+
+        var second = ContentBuilder.CreateSimpleContent(_contentType, "Reorder Second", _textpage.Id);
+        await repository.SaveAsync(second, CancellationToken.None);
+
+        var third = ContentBuilder.CreateSimpleContent(_contentType, "Reorder Third", _textpage.Id);
+        await repository.SaveAsync(third, CancellationToken.None);
+
+        await repository.UpdateSortOrderAsync([third.Key, first.Key, second.Key], CancellationToken.None);
+
+        Dictionary<Guid, int> sortOrders = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.Nodes
+                .Where(n => n.UniqueId == third.Key || n.UniqueId == first.Key || n.UniqueId == second.Key)
+                .ToDictionaryAsync(n => n.UniqueId, n => n.SortOrder));
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sortOrders[third.Key], Is.EqualTo(0));
+            Assert.That(sortOrders[first.Key], Is.EqualTo(1));
+            Assert.That(sortOrders[second.Key], Is.EqualTo(2));
+        });
+    }
+
+    [Test]
+    public async Task UpdateSortOrderAsync_EmptyList_NoOp()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Assert.DoesNotThrowAsync(async () =>
+            await repository.UpdateSortOrderAsync([], CancellationToken.None));
+        scope.Complete();
+    }
+
+    [Test]
+    public async Task UpdateSortOrderAsync_UnknownKeyInList_SkipsItSilentlyAndStillReordersTheRest()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // Uses a fresh parent (not _textpage, which already has _subpage/_subpage2 at SortOrder 0/1) so
+        // first's and second's pre-call SortOrder values don't coincidentally match their expected
+        // post-call values — otherwise a broken implementation could still pass this assertion.
+        var parent = ContentBuilder.CreateSimpleContent(_contentType, "Reorder With Unknown Parent", -1);
+        await repository.SaveAsync(parent, CancellationToken.None);
+
+        var first = ContentBuilder.CreateSimpleContent(_contentType, "Reorder With Unknown First", parent.Id);
+        await repository.SaveAsync(first, CancellationToken.None);
+
+        var second = ContentBuilder.CreateSimpleContent(_contentType, "Reorder With Unknown Second", parent.Id);
+        await repository.SaveAsync(second, CancellationToken.None);
+
+        var unknownKey = Guid.NewGuid();
+
+        await repository.UpdateSortOrderAsync([second.Key, unknownKey, first.Key], CancellationToken.None);
+
+        Dictionary<Guid, int> sortOrders = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.Nodes
+                .Where(n => n.UniqueId == second.Key || n.UniqueId == first.Key)
+                .ToDictionaryAsync(n => n.UniqueId, n => n.SortOrder));
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sortOrders[second.Key], Is.EqualTo(0));
+            Assert.That(sortOrders[first.Key], Is.EqualTo(2));
+        });
+    }
+
+    [Test]
     public async Task PersistNewItemAsync_FiresContentRefreshNotification()
     {
         var eventAggregatorMock = new Mock<IEventAggregator>();
