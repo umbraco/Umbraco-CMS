@@ -2164,8 +2164,18 @@ internal sealed class AsyncDocumentRepository
     // entity's current properties: matches existing rows by (PropertyTypeId, VersionId, LanguageId,
     // Segment), updates matches in place, inserts new rows for unmatched values, and deletes rows that no
     // longer have a corresponding value. Mirrors NPoco's ContentRepositoryBase.ReplacePropertyValues,
-    // omitting only the row-level pessimistic lock (ForUpdate()) NPoco takes before the fetch — EF Core has
-    // no direct equivalent, and the ambient scope's own transaction already provides isolation.
+    // omitting NPoco's row-level pessimistic lock (ForUpdate()/UPDLOCK) on the fetch. This is safe because
+    // every caller reaches this method through ContentService/PublishableContentServiceBase, which always
+    // acquires the global Constants.Locks.ContentTree write lock before saving/publishing — a real
+    // cross-server database lock (see IDistributedLockingMechanism.WriteLock), not just an in-process one.
+    // EFCoreScope shares the ambient NPoco scope's physical connection/transaction
+    // (_shareUmbracoConnection = true), so that lock already serializes this read-then-write sequence
+    // across servers; a per-row UPDLOCK here would be redundant defense-in-depth, not a fix for a real race.
+    // Note that NPoco's own ForUpdate() was itself narrow, not a strong guarantee being weakened here: per
+    // its doc comment it "will not work for all queries, only simple ones" — it patches only the first
+    // FROM-prefixed SQL fragment in the query (SqlServerSyntaxProvider.InsertForUpdateHint) and silently
+    // no-ops if no such fragment is found, so it never handled joins, multiple FROMs, or aliased tables
+    // robustly either.
     private async Task<(bool Edited, HashSet<string>? EditedCultures)> PersistUpdatedPropertyDataAsync(
         UmbracoDbContext db, IContent item, int versionId, int publishedVersionId)
     {
