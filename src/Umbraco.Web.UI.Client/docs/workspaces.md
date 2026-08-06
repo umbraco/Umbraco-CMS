@@ -263,7 +263,8 @@ Workspace contexts can use kinds for shared patterns:
    - If `isNew` → `_create(data, parent)` → `repository.create(data, parentUnique)`
    - If existing → `_update(data)` → `repository.save(data)`
 6. Updates persisted + current data from response
-7. Dispatches events: `UmbRequestReloadChildrenOfEntityEvent` (create), `UmbRequestReloadStructureForEntityEvent`, `UmbEntityUpdatedEvent` (update)
+7. Dispatches events: `UmbRequestReloadChildrenOfEntityEvent` + `UmbEntityCreatedEvent` (create), `UmbRequestReloadStructureForEntityEvent`, `UmbEntityUpdatedEvent` (update)
+   - For content workspaces (varying by culture/segment), `UmbEntityCreatedEvent`/`UmbEntityUpdatedEvent` carry the affected variants via `getVariantIds()`. Invariant entities report an empty array.
 8. If opened in modal → resolves modal value and closes
 
 ### Built-in action classes
