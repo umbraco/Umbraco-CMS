@@ -150,90 +150,80 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         // stale-set guard GetNodeAsync applies per key, here applied once for the whole set.
         var generation = Interlocked.Read(ref _cacheGeneration);
 
-        var resultsByKey = new Dictionary<Guid, IPublishedContent>(keys.Count);
-        var coldKeys = new List<Guid>();
-
-        foreach (Guid key in keys)
-        {
-            // L0 (converted) fast path (via the shared TryGetCached).
-            if (TryGetCached(key, out IPublishedContent? cached) && cached is not null)
-            {
-                resultsByKey[key] = cached;
-                continue;
-            }
-
-            // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss
-            // is deferred to the single batched database read below.
-            (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(GetCacheKey(key), CancellationToken.None);
-            if (exists is false)
-            {
-                coldKeys.Add(key);
-                continue;
-            }
-
-            await AddMaterialisedAsync(key, node, generation, fromDatabase: false, resultsByKey);
-        }
-
-        if (coldKeys.Count > 0)
-        {
-            IReadOnlyCollection<ContentCacheNode> coldNodes;
-            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
-            {
-                coldNodes = (await _databaseCacheRepository.GetMediaSourcesAsync(coldKeys)).ToArray();
-                scope.Complete();
-            }
-
-            foreach (ContentCacheNode node in coldNodes)
-            {
-                await AddMaterialisedAsync(node.Key, node, generation, fromDatabase: true, resultsByKey);
-            }
-        }
-
-        // Return in input order; keys that resolved to nothing (missing) are omitted.
-        var ordered = new List<IPublishedContent>(resultsByKey.Count);
-        foreach (Guid key in keys)
-        {
-            if (resultsByKey.TryGetValue(key, out IPublishedContent? content))
-            {
-                ordered.Add(content);
-            }
-        }
-
-        return ordered;
+        return await TieredResolver.ResolveAsync<Guid, IPublishedContent>(
+            keys,
+            (batchKeys, results) => ResolveCachedTierAsync(batchKeys, results),
+            (batchKeys, results) => ResolveHybridCacheTierAsync(batchKeys, generation, results),
+            (missedKeys, results) => ResolveDatabaseTierAsync(missedKeys, generation, results));
     }
 
-    // Converts a resolved cache node to IPublishedContent and, when our snapshot is still current,
-    // populates L0 (and, for freshly database-read nodes, L1).
-    private async Task AddMaterialisedAsync(
-        Guid key,
-        ContentCacheNode? node,
-        long generation,
-        bool fromDatabase,
-        Dictionary<Guid, IPublishedContent> resultsByKey)
+    // L0 (converted) fast path (via the shared TryGetCached).
+    private Task ResolveCachedTierAsync(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
     {
-        if (node is null)
+        foreach (Guid key in batchKeys)
         {
-            return;
+            if (TryGetCached(key, out IPublishedContent? cached) && cached is not null)
+            {
+                results[key] = cached;
+            }
         }
 
+        return Task.CompletedTask;
+    }
+
+    // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss is
+    // deferred to the single batched database read below.
+    private async Task ResolveHybridCacheTierAsync(IReadOnlyCollection<Guid> batchKeys, long generation, IDictionary<Guid, IPublishedContent> results)
+    {
+        foreach (Guid key in batchKeys)
+        {
+            (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(GetCacheKey(key), CancellationToken.None);
+            if (exists && node is not null)
+            {
+                ResolveNode(key, node, generation, results);
+            }
+        }
+    }
+
+    // The single batched database read for whatever L0 and L1/L2 missed. Once resolved, a
+    // database-read node is promoted into L1 — an L1/L2 hit is already there.
+    private async Task ResolveDatabaseTierAsync(IReadOnlyCollection<Guid> missedKeys, long generation, IDictionary<Guid, IPublishedContent> results)
+    {
+        IReadOnlyCollection<ContentCacheNode> coldNodes;
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        {
+            coldNodes = (await _databaseCacheRepository.GetMediaSourcesAsync(missedKeys)).ToArray();
+            scope.Complete();
+        }
+
+        foreach (ContentCacheNode node in coldNodes)
+        {
+            if (ResolveNode(node.Key, node, generation, results) && IsCacheGenerationCurrent(generation))
+            {
+                await _hybridCache.SetAsync(GetCacheKey(node.Key), node, GetEntryOptions(node.Key), GenerateTags(node));
+            }
+        }
+    }
+
+    // Converts a resolved cache node to IPublishedContent, writes it into results, and — when our
+    // snapshot is still current — populates L0. Returns whether conversion succeeded, so a caller that
+    // also needs L1 (only the database tier does) knows whether there's anything worth promoting.
+    private bool ResolveNode(Guid key, ContentCacheNode node, long generation, IDictionary<Guid, IPublishedContent> results)
+    {
         IPublishedContent? content = _publishedContentFactory.ToIPublishedMedia(node).CreateModel(_publishedModelFactory);
         if (content is null)
         {
-            return;
+            return false;
         }
 
-        resultsByKey[key] = content;
+        results[key] = content;
 
         if (IsCacheGenerationCurrent(generation))
         {
-            // Only a node read from the database still needs writing to L1; an L1/L2 hit is already there.
-            if (fromDatabase)
-            {
-                await _hybridCache.SetAsync(GetCacheKey(key), node, GetEntryOptions(key), GenerateTags(node));
-            }
-
             _publishedContentCache.Set(key, content, ContentCacheNodeSizeEstimator.EstimateBytes(node));
         }
+
+        return true;
     }
 
     /// <inheritdoc />

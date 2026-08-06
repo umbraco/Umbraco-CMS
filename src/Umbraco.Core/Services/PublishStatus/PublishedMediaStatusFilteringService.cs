@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -36,11 +37,31 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
     /// that need to enumerate the result more than once should buffer it themselves (.ToList() / .ToArray()).
     /// </remarks>
     public IEnumerable<IPublishedContent> FilterAvailable(IEnumerable<Guid> candidateKeys, string? culture)
-        => ChunkedPublishedContentEnumerator.Enumerate(
+    {
+        ResolveItemsDelegate<Guid, IPublishedContent> resolveCachedItems = (batchKeys, results) =>
+        {
+            foreach (Guid key in batchKeys)
+            {
+                if (_mediaCacheService.TryGetCached(key, out IPublishedContent? content) && content is not null)
+                {
+                    results[key] = content;
+                }
+            }
+        };
+
+        ResolveItemsDelegate<Guid, IPublishedContent> resolvePersistedItems = (missedKeys, results) =>
+        {
+            foreach (IPublishedContent content in _mediaCacheService.GetByKeysAsync(missedKeys).GetAwaiter().GetResult())
+            {
+                results[content.Key] = content;
+            }
+        };
+
+        return ChunkedTieredResolver.Resolve(
             candidateKeys,
-            _mediaCacheService.TryGetCached,
-            misses => _mediaCacheService.GetByKeysAsync(misses).GetAwaiter().GetResult(),
-            predicate: null);
+            resolveCachedItems,
+            resolvePersistedItems);
+    }
 
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)

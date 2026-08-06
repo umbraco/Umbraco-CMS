@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -63,17 +64,36 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
                 _publishStatusQueryService.IsDocumentPublished(key, culture)
                 && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
 
+        ResolveItemsDelegate<Guid, IPublishedContent> resolveCachedItems = (batchKeys, results) =>
+        {
+            foreach (Guid key in batchKeys)
+            {
+                if (_documentCacheService.TryGetCached(key, preview, out IPublishedContent? content) && content is not null)
+                {
+                    results[key] = content;
+                }
+            }
+        };
+
+        ResolveItemsDelegate<Guid, IPublishedContent> resolvePersistedItems = (missedKeys, results) =>
+        {
+            foreach (IPublishedContent content in _documentCacheService.GetByKeysAsync(missedKeys, preview).GetAwaiter().GetResult())
+            {
+                results[content.Key] = content;
+            }
+        };
+
         // Materialise in growing chunks: an all-L0-hit chunk stays fully synchronous (no async, no
         // batch), while a cold set collapses its database access into batched reads. Returned lazily
         // so short-circuiting consumers still exit early; callers that enumerate more than once should
         // buffer the result themselves (.ToList() / .ToArray()).
-        return ChunkedPublishedContentEnumerator.Enumerate(
+        return ChunkedTieredResolver.Resolve(
             keys,
-            (Guid key, out IPublishedContent? content) => _documentCacheService.TryGetCached(key, preview, out content),
-            misses => _documentCacheService.GetByKeysAsync(misses, preview).GetAwaiter().GetResult(),
-            content => culture == Constants.System.InvariantCulture
-                       || content.ContentType.VariesByCulture() is false
-                       || content.Cultures.ContainsKey(culture));
+            resolveCachedItems,
+            resolvePersistedItems)
+            .Where(content => culture == Constants.System.InvariantCulture
+                               || content.ContentType.VariesByCulture() is false
+                               || content.Cultures.ContainsKey(culture));
     }
 
     /// <inheritdoc />
