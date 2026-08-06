@@ -471,7 +471,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     private sealed class TestMediaModelOne : PublishedContentWrapped
     {
         public TestMediaModelOne(IPublishedContent content)
-            : base(content)
+            : base(content, Mock.Of<IPublishedValueFallback>())
         {
         }
     }
@@ -479,7 +479,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
     private sealed class TestMediaModelTwo : PublishedContentWrapped
     {
         public TestMediaModelTwo(IPublishedContent content)
-            : base(content)
+            : base(content, Mock.Of<IPublishedValueFallback>())
         {
         }
     }
