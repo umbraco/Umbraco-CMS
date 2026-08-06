@@ -70,6 +70,7 @@ const treeItemMapper = (model: UmbMockDocumentModel): DocumentTreeItemResponseMo
 		documentType: {
 			icon: documentType.icon,
 			id: documentType.id,
+			collection: documentType.collection,
 		},
 		hasChildren: model.hasChildren,
 		id: model.id,

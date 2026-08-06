@@ -73,6 +73,21 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 		this.#orderByOptions.setValue(orderByOptions);
 		this.#activeOrderByOption.setValue(firstOption.unique);
+
+		// The ordering can be set without going through the options, ex. when it is restored from the interaction memory.
+		this.observe(
+			this.filter,
+			(filter) => {
+				const { orderBy, orderDirection } = filter as UmbUserCollectionFilterModel;
+				const option = this.#orderByOptions
+					.getValue()
+					.find((x) => x.config.orderBy === orderBy && x.config.orderDirection === orderDirection);
+				if (option) {
+					this.#activeOrderByOption.setValue(option.unique);
+				}
+			},
+			'umbUserCollectionActiveOrderByOptionObserver',
+		);
 	}
 
 	/**
