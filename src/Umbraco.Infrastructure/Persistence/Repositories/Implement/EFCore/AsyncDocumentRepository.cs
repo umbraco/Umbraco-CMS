@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 /// <summary>
 ///     Provides an EF Core backed async repository for <see cref="IContent" /> document entities.
 /// </summary>
-internal sealed class AsyncDocumentRepository
+internal class AsyncDocumentRepository
     : AsyncPublishableContentRepositoryBase<
         IContent,
         AsyncDocumentRepository,
