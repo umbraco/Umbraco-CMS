@@ -226,6 +226,6 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
                 return ConstructorInvoker.Create(ctor);
             });
 
-        return (MediaWithCrops) factory.Invoke(mediaItem, publishedValueFallback, localCrops);
+        return (MediaWithCrops)factory.Invoke(mediaItem, publishedValueFallback, localCrops);
     }
 }
