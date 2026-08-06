@@ -16,7 +16,7 @@ export class UmbCollectionWorkspaceViewInteractionMemoryController extends UmbCo
 	// Undefined rather than an empty array, as an array state emits [] on subscribe. The host forwards that to
 	// umb-collection, which takes an incoming snapshot as authoritative and would wipe what the collection has
 	// memorized on its own. Undefined means nothing to say yet, [] means clear.
-	#memories = new UmbBasicState<Array<UmbInteractionMemoryModel> | undefined>(undefined);
+	readonly #memories = new UmbBasicState<Array<UmbInteractionMemoryModel> | undefined>(undefined);
 	public readonly memories = this.#memories.asObservable();
 
 	#globalInteractionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
