@@ -85,6 +85,7 @@ export class UmbCodeBlockElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+				background-color: var(--uui-color-surface);
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 			}
