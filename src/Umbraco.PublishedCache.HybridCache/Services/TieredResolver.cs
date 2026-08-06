@@ -5,8 +5,11 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 /// call, writing each one it resolves into <paramref name="results"/> keyed by the key it was resolved
 /// from.
 /// </summary>
+/// <typeparam name="TKey">The type of key used to look up items.</typeparam>
+/// <typeparam name="TItem">The type of item being resolved.</typeparam>
 /// <param name="keys">The candidate keys for this tier (already known to have missed every earlier tier).</param>
 /// <param name="results">The dictionary shared across every tier for this call; write resolved keys into it rather than returning a new dictionary.</param>
+/// <returns>A task that completes once this tier has finished resolving whatever it can from <paramref name="keys"/>.</returns>
 internal delegate Task ResolveItemsAsyncDelegate<TKey, TItem>(IReadOnlyCollection<TKey> keys, IDictionary<TKey, TItem> results)
     where TKey : notnull;
 
@@ -49,11 +52,11 @@ internal static class TieredResolver
             : [firstTier, .. additionalTiers];
 
         var resolvedByKey = new Dictionary<TKey, TItem>(keys.Count);
-        IReadOnlyCollection<TKey> pending = [.. keys.Distinct()];
+        TKey[] pending = [.. keys.Distinct()];
 
         foreach (ResolveItemsAsyncDelegate<TKey, TItem> resolveTier in tiers)
         {
-            if (pending.Count == 0)
+            if (pending.Length == 0)
             {
                 break;
             }
