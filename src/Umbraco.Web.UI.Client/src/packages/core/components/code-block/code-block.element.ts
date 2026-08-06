@@ -63,7 +63,6 @@ export class UmbCodeBlockElement extends UmbLitElement {
 					this.copy,
 					() => html`
 						<uui-button
-							color=${this._copyState === 'idle' ? 'default' : 'positive'}
 							.label=${this._copyState === 'idle'
 								? this.localize.term('general_copy')
 								: this.localize.term('general_copied')}
