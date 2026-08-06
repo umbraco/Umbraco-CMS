@@ -1,14 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Buffers;
 using System.Collections.Concurrent;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-using Umbraco.Extensions;
 using Umbraco.Tests.Benchmarks.Config;
 
 namespace Umbraco.Tests.Benchmarks
