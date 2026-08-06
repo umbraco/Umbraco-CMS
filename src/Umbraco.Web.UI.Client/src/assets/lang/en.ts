@@ -288,9 +288,9 @@ export default {
 		publishedPendingChanges: 'Published (pending changes)',
 		publishStatus: 'Publication Status',
 		publishDescendantsHelp:
-			'Publish <strong>%0%</strong> and all items underneath and thereby making their content publicly available.',
+			'Save and publish <strong>%0%</strong> and publish all items underneath thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
-			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
+			'Save and publish variants and publish variants of same type underneath thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
@@ -368,6 +368,8 @@ export default {
 		selectAllVariants: 'Select all variants',
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
+		saveAndPublishDescendantsModalTitle: 'Save and publish with descendants',
+		saveAndScheduleModalTitle: 'Save and schedule publishing',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
 		sharedAcrossCultures: 'Shared across cultures',
