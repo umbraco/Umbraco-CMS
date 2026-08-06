@@ -1361,6 +1361,7 @@ export default {
 		userCreatedSuccessHelp:
 			'Se ha creado el nuevo usuario con éxito. Para acceder a Umbraco usa la contraseña siguiente.',
 		userManagement: 'Administración de usuario',
+		type: 'Tipo',
 		username: 'Nombre de usuario',
 		userPermissions: 'Permisos de usuarios',
 		usergroup: 'Grupo de usuario',

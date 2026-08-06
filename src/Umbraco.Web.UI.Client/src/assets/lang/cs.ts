@@ -1661,6 +1661,7 @@ export default {
 		stateLockedOut: 'Uzamčeno',
 		stateInvited: 'Pozváno',
 		stateInactive: 'Neaktivní',
+		type: 'Typ',
 		sortNameAscending: 'Jméno (A-Z)',
 		sortNameDescending: 'Jméno (Z-A)',
 		sortCreateDateAscending: 'Nejstarší',

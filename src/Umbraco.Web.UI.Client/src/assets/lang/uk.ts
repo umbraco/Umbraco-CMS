@@ -1421,6 +1421,7 @@ export default {
 		updateDate: 'Час останнього оновлення',
 		username: "Ім'я користувача",
 		usergroup: 'Група користувачів',
+		type: 'Тип',
 		userInvited: ' був запрошений',
 		userInvitedSuccessHelp:
 			'Новому користувачеві було надіслано запрошення, яке містить інструкції для входу в панель Umbraco.',
