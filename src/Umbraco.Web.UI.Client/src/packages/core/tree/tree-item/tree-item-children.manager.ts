@@ -63,7 +63,7 @@ export class UmbTreeItemChildrenManager<
 	#isLoadingNextChildren = new UmbBooleanState(false);
 	public readonly isLoadingNextChildren = this.#isLoadingNextChildren.asObservable();
 
-	#takeSize: number = 50;
+	#takeSize: number = 100;
 	#takeBeforeTarget?: number;
 	#takeAfterTarget?: number;
 
