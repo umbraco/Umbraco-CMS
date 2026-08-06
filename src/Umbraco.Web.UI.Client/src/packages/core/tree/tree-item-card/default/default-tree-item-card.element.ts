@@ -20,7 +20,6 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 			this.observe(value.hasChildren, (v) => (this._hasChildren = v), '_observeHasChildren');
 			this.observe(value.noAccess, (v) => (this._noAccess = v), '_observeNoAccess');
 			this.observe(value.path, (v) => (this._path = v), '_observePath');
-			this.observe(value.hasActions, (v) => (this._hasActions = v), '_observeHasActions');
 		}
 	}
 	public get api(): UmbTreeItemCardApi | undefined {
@@ -53,9 +52,6 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 
 	@state()
 	private _path = '';
-
-	@state()
-	private _hasActions = false;
 
 	#onSelected(e: CustomEvent) {
 		e.stopPropagation();
@@ -109,8 +105,9 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	}
 
 	#renderActions() {
-		if (!this._hasActions) return nothing;
-		return html`<umb-entity-actions-bundle slot="actions" .label=${this.localize.string(this.item?.name ?? '')}></umb-entity-actions-bundle>`;
+		return html`<umb-entity-actions-bundle
+			slot="actions"
+			.label=${this.localize.string(this.item?.name ?? '')}></umb-entity-actions-bundle>`;
 	}
 }
 

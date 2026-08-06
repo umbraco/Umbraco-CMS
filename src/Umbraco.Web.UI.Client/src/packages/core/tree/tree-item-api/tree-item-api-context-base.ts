@@ -1,13 +1,14 @@
 import type { UmbTreeItemModel } from '../types.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { UMB_TREE_ITEM_CONTEXT } from '../tree-item/tree-item.context.token.js';
-import { UmbTreeItemEntityActionManager } from '../tree-item/tree-item-entity-action.manager.js';
 import type { UmbTreeItemApi } from './tree-item-api.interface.js';
-import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { combineLatest, distinctUntilChanged, map } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
-import { debounce } from '@umbraco-cms/backoffice/utils';
+import { debounce, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityContext, UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -67,15 +68,39 @@ export abstract class UmbTreeItemApiContextBase<
 	#hasActiveDescendant = new UmbBooleanState(undefined);
 	readonly hasActiveDescendant = this.#hasActiveDescendant.asObservable();
 
-	#treeItemEntityActionManager = new UmbTreeItemEntityActionManager(this);
 	#hideTreeItemActions = new UmbBooleanState(false);
 
 	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
 
-	readonly hasActions = combineLatest([
-		this.#treeItemEntityActionManager.hasActions,
+	// Cold on purpose: nothing subscribes to the registry unless someone observes hasActions.
+	#hasActions = combineLatest([
+		this._treeItem.asObservablePart((item) => item?.entityType),
+		umbExtensionsRegistry.byType('entityAction'),
 		this.#hideTreeItemActions.asObservable(),
-	]).pipe(map(([has, hide]) => !hide && has));
+	]).pipe(
+		map(
+			([entityType, actions, hide]) =>
+				!hide && !!entityType && actions.some((action) => action.forEntityTypes.includes(entityType)),
+		),
+		distinctUntilChanged(),
+	);
+
+	/**
+	 * @returns {Observable<boolean>} True if any entity action is registered for this entity type
+	 * @deprecated Deprecated since v17. This only tells whether a manifest exists for the entity type, it does not
+	 * evaluate the conditions of the actions. Render `<umb-entity-actions-bundle>`, which resolves the actions
+	 * that are actually permitted for the item. Will be removed in v19.
+	 */
+	get hasActions(): Observable<boolean> {
+		new UmbDeprecation({
+			deprecated: 'UmbTreeItemApiContextBase.hasActions',
+			removeInVersion: '19.0.0',
+			solution:
+				'Render <umb-entity-actions-bundle>, which resolves the entity actions that are permitted for the item.',
+		}).warn();
+
+		return this.#hasActions;
+	}
 
 	protected readonly _selectOnly = new UmbBooleanState(false);
 	readonly selectOnly = this._selectOnly.asObservable();
@@ -115,7 +140,6 @@ export abstract class UmbTreeItemApiContextBase<
 			this._treeItem.setValue(undefined);
 			this.#entityContext.setEntityType(undefined);
 			this.#entityContext.setUnique(null);
-			this.#treeItemEntityActionManager.setTreeItem(undefined);
 			return;
 		}
 
@@ -136,8 +160,6 @@ export abstract class UmbTreeItemApiContextBase<
 			? { entityType: item.parent.entityType, unique: item.parent.unique }
 			: undefined;
 		this.#parentContext.setParent(parentEntity);
-
-		this.#treeItemEntityActionManager.setTreeItem(item);
 
 		this._observeIsSelected();
 		this._observeIsSelectable();
