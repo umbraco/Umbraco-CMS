@@ -2467,4 +2467,388 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         Assert.That(permissions, Is.Empty);
     }
+
+    [Test]
+    public async Task PersistContentScheduleAsync_ThenGetContentScheduleAsync_RoundTripsTheSchedule()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var schedule = new ContentScheduleCollection();
+        DateTime releaseDate = DateTime.UtcNow.AddDays(1);
+        schedule.Add(releaseDate, null);
+
+        await repository.PersistContentScheduleAsync(_textpage, schedule, CancellationToken.None);
+        ContentScheduleCollection result = await repository.GetContentScheduleAsync(_textpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        ContentSchedule entry = result.FullSchedule.Single();
+        Assert.That(entry.Action, Is.EqualTo(ContentScheduleAction.Release));
+        Assert.That(entry.Date, Is.EqualTo(releaseDate).Within(TimeSpan.FromSeconds(1)));
+        Assert.That(entry.Culture, Is.EqualTo(Constants.System.InvariantCulture));
+    }
+
+    [Test]
+    public async Task PersistContentScheduleAsync_CalledAgainWithDifferentSet_ReplacesStaleEntriesAndKeepsCarriedOverEntryStable()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        DateTime releaseDate = DateTime.UtcNow.AddDays(1);
+        var firstSchedule = new ContentScheduleCollection();
+        firstSchedule.Add(releaseDate, DateTime.UtcNow.AddDays(2));
+        await repository.PersistContentScheduleAsync(_textpage, firstSchedule, CancellationToken.None);
+
+        ContentScheduleCollection persisted = await repository.GetContentScheduleAsync(_textpage.Key, CancellationToken.None);
+        Guid releaseEntryId = persisted.FullSchedule.Single(s => s.Action == ContentScheduleAction.Release).Id;
+
+        // Re-persist keeping only the release entry (by its existing Id) and dropping the expire entry —
+        // mirrors the real update-schedule workflow of mutating a previously-read ContentScheduleCollection.
+        var secondSchedule = new ContentScheduleCollection();
+        secondSchedule.Add(new ContentSchedule(releaseEntryId, Constants.System.InvariantCulture, releaseDate, ContentScheduleAction.Release));
+        await repository.PersistContentScheduleAsync(_textpage, secondSchedule, CancellationToken.None);
+
+        ContentScheduleCollection final = await repository.GetContentScheduleAsync(_textpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        ContentSchedule[] entries = final.FullSchedule.ToArray();
+        Assert.That(entries, Has.Length.EqualTo(1), "the expire entry must be removed, not carried over");
+        Assert.That(entries[0].Id, Is.EqualTo(releaseEntryId), "the surviving entry must keep its stable Id, not be deleted and reinserted");
+    }
+
+    [Test]
+    public async Task ClearScheduleAsync_RemovesEntriesAtOrBeforeCutoff_LeavesFutureEntries()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var pastSchedule = new ContentScheduleCollection();
+        pastSchedule.Add(DateTime.UtcNow.AddDays(-1), null);
+        await repository.PersistContentScheduleAsync(_textpage, pastSchedule, CancellationToken.None);
+
+        var futureSchedule = new ContentScheduleCollection();
+        futureSchedule.Add(DateTime.UtcNow.AddDays(5), null);
+        await repository.PersistContentScheduleAsync(_subpage, futureSchedule, CancellationToken.None);
+
+        await repository.ClearScheduleAsync(DateTime.UtcNow, CancellationToken.None);
+
+        ContentScheduleCollection textpageSchedule = await repository.GetContentScheduleAsync(_textpage.Key, CancellationToken.None);
+        ContentScheduleCollection subpageSchedule = await repository.GetContentScheduleAsync(_subpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(textpageSchedule.FullSchedule, Is.Empty, "past-dated entry must be cleared");
+        Assert.That(subpageSchedule.FullSchedule, Has.Count.EqualTo(1), "future-dated entry must survive");
+    }
+
+    [Test]
+    public async Task ClearScheduleAsync_WithAction_OnlyClearsMatchingAction()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        DateTime pastDate = DateTime.UtcNow.AddDays(-1);
+        var schedule = new ContentScheduleCollection();
+        schedule.Add(pastDate, pastDate.AddHours(1));
+        await repository.PersistContentScheduleAsync(_textpage, schedule, CancellationToken.None);
+
+        await repository.ClearScheduleAsync(DateTime.UtcNow, ContentScheduleAction.Release, CancellationToken.None);
+
+        ContentScheduleCollection result = await repository.GetContentScheduleAsync(_textpage.Key, CancellationToken.None);
+        scope.Complete();
+
+        ContentSchedule remaining = result.FullSchedule.Single();
+        Assert.That(remaining.Action, Is.EqualTo(ContentScheduleAction.Expire));
+    }
+
+    [Test]
+    public async Task ClearScheduleAsync_DoesNotTouchScheduleRowsForOtherNodeObjectTypes()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        using var scope = NewScopeProvider.CreateScope();
+
+        var pastSchedule = new ContentScheduleCollection();
+        pastSchedule.Add(DateTime.UtcNow.AddDays(-1), null);
+        var repository = CreateRepository();
+        await repository.PersistContentScheduleAsync(_subpage, pastSchedule, CancellationToken.None);
+
+        // Reclassify _subpage's own node as a non-Document object type — simulating a schedule row that
+        // belongs to a different content type sharing the same umbracoContentSchedule table — to prove
+        // ClearScheduleAsync's NodeObjectType scoping actually isolates Document schedules. Mirrors how
+        // RecycleBinSmellsAsync's isolation test manipulates a node directly rather than standing up a
+        // second repository type; reusing _subpage's existing Node/Content rows avoids the FK violation
+        // that inserting a schedule row for an unrelated system node (e.g. the recycle bin folder, which
+        // has no umbracoContent row) would hit.
+        await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.Nodes.Where(n => n.NodeId == _subpage.Id)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(n => n.NodeObjectType, Constants.ObjectTypes.Media)));
+
+        await repository.ClearScheduleAsync(DateTime.UtcNow, CancellationToken.None);
+
+        bool stillExists = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentSchedules.AnyAsync(cs => cs.NodeId == _subpage.Id));
+        scope.Complete();
+
+        Assert.That(stillExists, Is.True, "ClearScheduleAsync must not touch schedule rows for non-Document nodes");
+    }
+
+    [Test]
+    public async Task HasContentForReleaseAsync_TrueWhenDueEntryExists_FalseForFutureDated()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        bool beforeAny = await repository.HasContentForReleaseAsync(DateTime.UtcNow, CancellationToken.None);
+
+        var futureSchedule = new ContentScheduleCollection();
+        futureSchedule.Add(DateTime.UtcNow.AddDays(10), null);
+        await repository.PersistContentScheduleAsync(_textpage, futureSchedule, CancellationToken.None);
+        bool withFutureOnly = await repository.HasContentForReleaseAsync(DateTime.UtcNow, CancellationToken.None);
+
+        var dueSchedule = new ContentScheduleCollection();
+        dueSchedule.Add(DateTime.UtcNow.AddDays(-1), null);
+        await repository.PersistContentScheduleAsync(_subpage, dueSchedule, CancellationToken.None);
+        bool withDueEntry = await repository.HasContentForReleaseAsync(DateTime.UtcNow, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(beforeAny, Is.False);
+        Assert.That(withFutureOnly, Is.False);
+        Assert.That(withDueEntry, Is.True);
+    }
+
+    [Test]
+    public async Task HasContentForExpirationAsync_TrueWhenDueEntryExists_FalseForFutureDated()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        bool beforeAny = await repository.HasContentForExpirationAsync(DateTime.UtcNow, CancellationToken.None);
+
+        var futureSchedule = new ContentScheduleCollection();
+        futureSchedule.Add(null, DateTime.UtcNow.AddDays(10));
+        await repository.PersistContentScheduleAsync(_textpage, futureSchedule, CancellationToken.None);
+        bool withFutureOnly = await repository.HasContentForExpirationAsync(DateTime.UtcNow, CancellationToken.None);
+
+        var dueSchedule = new ContentScheduleCollection();
+        dueSchedule.Add(null, DateTime.UtcNow.AddDays(-1));
+        await repository.PersistContentScheduleAsync(_subpage, dueSchedule, CancellationToken.None);
+        bool withDueEntry = await repository.HasContentForExpirationAsync(DateTime.UtcNow, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(beforeAny, Is.False);
+        Assert.That(withFutureOnly, Is.False);
+        Assert.That(withDueEntry, Is.True);
+    }
+
+    [Test]
+    public async Task GetContentForReleaseAsync_ReturnsDueEntities_RespectsActionFilter()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var releaseDue = new ContentScheduleCollection();
+        releaseDue.Add(DateTime.UtcNow.AddDays(-1), null);
+        await repository.PersistContentScheduleAsync(_textpage, releaseDue, CancellationToken.None);
+
+        var expireDue = new ContentScheduleCollection();
+        expireDue.Add(null, DateTime.UtcNow.AddDays(-1));
+        await repository.PersistContentScheduleAsync(_subpage, expireDue, CancellationToken.None);
+
+        IEnumerable<IContent> dueForRelease = await repository.GetContentForReleaseAsync(DateTime.UtcNow, CancellationToken.None);
+        scope.Complete();
+
+        IContent[] items = dueForRelease.ToArray();
+        Assert.That(items.Any(c => c.Key == _textpage.Key), Is.True);
+        Assert.That(items.Any(c => c.Key == _subpage.Key), Is.False, "an expire-due entry must not show up in GetContentForReleaseAsync");
+    }
+
+    [Test]
+    public async Task GetContentForExpirationAsync_ReturnsDueEntities_RespectsActionFilter()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var expireDue = new ContentScheduleCollection();
+        expireDue.Add(null, DateTime.UtcNow.AddDays(-1));
+        await repository.PersistContentScheduleAsync(_textpage, expireDue, CancellationToken.None);
+
+        var releaseDue = new ContentScheduleCollection();
+        releaseDue.Add(DateTime.UtcNow.AddDays(-1), null);
+        await repository.PersistContentScheduleAsync(_subpage, releaseDue, CancellationToken.None);
+
+        IEnumerable<IContent> dueForExpiration = await repository.GetContentForExpirationAsync(DateTime.UtcNow, CancellationToken.None);
+        scope.Complete();
+
+        IContent[] items = dueForExpiration.ToArray();
+        Assert.That(items.Any(c => c.Key == _textpage.Key), Is.True);
+        Assert.That(items.Any(c => c.Key == _subpage.Key), Is.False, "a release-due entry must not show up in GetContentForExpirationAsync");
+    }
+
+    [Test]
+    public async Task CountPublishedAsync_CountsOnlyPublishedNonTrashedDocuments()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        int count = await repository.CountPublishedAsync(null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(count, Is.EqualTo(1), "_publishedPage is the only published, non-trashed document in the fixture");
+    }
+
+    [Test]
+    public async Task CountPublishedAsync_WithContentTypeAliasFilter_NarrowsToMatchingType()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        int matching = await repository.CountPublishedAsync(_contentType.Alias, CancellationToken.None);
+        int nonMatching = await repository.CountPublishedAsync("someOtherAliasThatDoesNotExist", CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(matching, Is.EqualTo(1));
+        Assert.That(nonMatching, Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task CountPublishedAsync_IncreasesAfterPublishingAnotherItem()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+
+        // Publish a root-level item (_textpage), not a descendant — ContentService.Publish rejects
+        // publishing a node whose ancestor path isn't itself published (PublishResultType
+        // .FailedPublishPathNotPublished), so a descendant can't be used here without publishing its
+        // parent first too.
+        PublishResult publishResult = ContentService.Publish(_textpage, ["*"]);
+        var repository = CreateRepository();
+
+        int count = await repository.CountPublishedAsync(null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(publishResult.Success, Is.True, $"Publish failed: {publishResult.Result}");
+        Assert.That(count, Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task IsPathPublishedAsync_RootLevelPublishedPage_ReturnsTrue()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        bool result = await repository.IsPathPublishedAsync(_publishedPage, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public async Task IsPathPublishedAsync_RootLevelUnpublishedPage_ReturnsFalse()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        bool result = await repository.IsPathPublishedAsync(_textpage, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task IsPathPublishedAsync_DescendantWithUnpublishedAncestor_ReturnsFalse()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+
+        // ContentService.Publish rejects publishing a node whose ancestor path isn't itself published,
+        // so a "child published, parent not" state can't be reached by publishing the child directly —
+        // publish both, then unpublish just the parent. Unpublishing a parent does not cascade to
+        // children, so _subpage's own Published flag stays true even though the path is no longer
+        // fully published — exactly the state IsPathPublishedAsync exists to detect.
+        PublishResult publishParent = ContentService.Publish(_textpage, ["*"]);
+        PublishResult publishChild = ContentService.Publish(_subpage, ["*"]);
+        PublishResult unpublishParent = ContentService.Unpublish(_textpage);
+
+        var repository = CreateRepository();
+        bool result = await repository.IsPathPublishedAsync(_subpage, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(publishParent.Success, Is.True, $"Publish parent failed: {publishParent.Result}");
+        Assert.That(publishChild.Success, Is.True, $"Publish child failed: {publishChild.Result}");
+        Assert.That(unpublishParent.Success, Is.True, $"Unpublish parent failed: {unpublishParent.Result}");
+        Assert.That(result, Is.False, "a published node with an unpublished ancestor is not path-published");
+    }
+
+    [Test]
+    public async Task IsPathPublishedAsync_DescendantWithAllAncestorsPublished_ReturnsTrue()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+
+        ContentService.Publish(_textpage, ["*"]);
+        ContentService.Publish(_subpage, ["*"]);
+        var repository = CreateRepository();
+
+        bool result = await repository.IsPathPublishedAsync(_subpage, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public async Task IsPathPublishedAsync_TrashedNode_ReturnsFalse()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        bool result = await repository.IsPathPublishedAsync(_trashed, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task IsPathPublishedAsync_NullContent_ReturnsFalseWithoutThrowing()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        bool result = await repository.IsPathPublishedAsync(null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public async Task GetContentSchedulesByKeysAsync_ReturnsSchedulesForEachRequestedKey_OmitsUnknownKey()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        var textpageSchedule = new ContentScheduleCollection();
+        textpageSchedule.Add(DateTime.UtcNow.AddDays(1), null);
+        await repository.PersistContentScheduleAsync(_textpage, textpageSchedule, CancellationToken.None);
+
+        var subpageSchedule = new ContentScheduleCollection();
+        subpageSchedule.Add(null, DateTime.UtcNow.AddDays(2));
+        await repository.PersistContentScheduleAsync(_subpage, subpageSchedule, CancellationToken.None);
+
+        IDictionary<Guid, IEnumerable<ContentSchedule>> result = await repository.GetContentSchedulesByKeysAsync(
+            new[] { _textpage.Key, _subpage.Key, Guid.NewGuid() }, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.ContainsKey(_textpage.Key), Is.True);
+        Assert.That(result[_textpage.Key].Single().Action, Is.EqualTo(ContentScheduleAction.Release));
+        Assert.That(result.ContainsKey(_subpage.Key), Is.True);
+        Assert.That(result[_subpage.Key].Single().Action, Is.EqualTo(ContentScheduleAction.Expire));
+        Assert.That(result.Keys, Has.Count.EqualTo(2), "the unknown key must simply be absent, not throw or appear with an empty list");
+    }
+
+    [Test]
+    public async Task GetContentSchedulesByKeysAsync_WithEmptyArray_ReturnsEmptyDictionary()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IDictionary<Guid, IEnumerable<ContentSchedule>> result = await repository.GetContentSchedulesByKeysAsync(Array.Empty<Guid>(), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Empty);
+    }
 }

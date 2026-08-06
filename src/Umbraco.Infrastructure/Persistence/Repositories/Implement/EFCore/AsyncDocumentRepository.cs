@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
@@ -1244,6 +1245,36 @@ internal sealed class AsyncDocumentRepository
     /// <inheritdoc />
     public Task AddOrUpdatePermissionsAsync(ContentPermissionSet permission, CancellationToken cancellationToken) =>
         _permissionRepository.AddOrUpdatePermissionsAsync(permission, cancellationToken);
+
+    /// <inheritdoc />
+    // Ported from NPoco's DocumentRepository.IsPathPublished, with one deliberate fix: that version has a
+    // latent null-dereference for a null content parameter (the fast-fail/succeed-fast null-conditional
+    // checks both fall through without returning, then it crashes unguarded on content.Path.Split) — this
+    // version returns false for null up front instead of reproducing that bug.
+    public override Task<bool> IsPathPublishedAsync(IContent? content, CancellationToken cancellationToken)
+    {
+        if (content is null || content.Path.StartsWith($"{Constants.System.Root},{Constants.System.RecycleBinContent},", StringComparison.Ordinal))
+        {
+            return Task.FromResult(false);
+        }
+
+        if (content.ParentId == Constants.System.Root)
+        {
+            return Task.FromResult(content.Published);
+        }
+
+        List<int> ancestorIds = content.Path.Split(',').Skip(1)
+            .Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToList();
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int publishedAncestorCount = await PublishedNodes(db)
+                .Where(node => ancestorIds.Contains(node.NodeId))
+                .CountAsync(cancellationToken);
+
+            return publishedAncestorCount == content.Level;
+        });
+    }
 
     /// <inheritdoc />
     // Checks for a direct child of the recycle bin folder node itself (Constants.System.RecycleBinContent),
