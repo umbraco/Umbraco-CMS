@@ -126,6 +126,8 @@ export abstract class UmbTreeItemApiContextBase<
 		if (item.unique === undefined) throw new Error('Could not set tree item, unique is missing');
 		if (!item.entityType) throw new Error('Could not set tree item, entity type is missing');
 
+		if (item === this._treeItem.getValue()) return;
+
 		this._treeItem.setValue(item);
 		this.unique = item.unique;
 		this.entityType = item.entityType;

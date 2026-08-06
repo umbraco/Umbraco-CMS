@@ -83,6 +83,35 @@ describe('UmbTreeItemContextBase', () => {
 		});
 	});
 
+	describe('setTreeItem', () => {
+		const observerFor = (alias: string) =>
+			context.getUmbControllers((controller) => controller.controllerAlias === alias)[0];
+
+		it('rebuilds the item observers when a different tree item is set', async () => {
+			new UmbDefaultTreeContext(host);
+
+			context.setTreeItem(treeItem);
+			await aTimeout(0);
+			const observer = observerFor('_observeIsSelected');
+			expect(observer).to.not.be.undefined;
+
+			context.setTreeItem({ ...treeItem, name: 'Renamed Item' });
+			expect(observerFor('_observeIsSelected')).to.not.equal(observer);
+		});
+
+		it('does not rebuild the item observers when the same tree item is set again', async () => {
+			new UmbDefaultTreeContext(host);
+
+			context.setTreeItem(treeItem);
+			await aTimeout(0);
+			const observer = observerFor('_observeIsSelected');
+			expect(observer).to.not.be.undefined;
+
+			context.setTreeItem(treeItem);
+			expect(observerFor('_observeIsSelected')).to.equal(observer);
+		});
+	});
+
 	describe('Additional Request Args', () => {
 		it('forwards the tree context additional request args to the per-item children manager', async () => {
 			const treeContext = new UmbDefaultTreeContext(host);

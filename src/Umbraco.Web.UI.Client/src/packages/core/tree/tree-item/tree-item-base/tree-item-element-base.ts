@@ -21,6 +21,8 @@ export abstract class UmbTreeItemElementBase<
 > extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	set item(newVal: TreeItemModelType) {
+		if (newVal === this._item) return;
+
 		this._item = newVal;
 		this._extractFlags(newVal);
 
