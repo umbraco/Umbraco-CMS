@@ -62,7 +62,12 @@ export class UmbCodeBlockElement extends UmbLitElement {
 				${when(
 					this.copy,
 					() => html`
-						<uui-button color=${this._copyState === 'idle' ? 'default' : 'positive'} .label=${this._copyState === 'idle' ? this.localize.term('general_copy') : this.localize.term('general_copied')} @click=${this.copyCode}>
+						<uui-button
+							.label=${this._copyState === 'idle'
+								? this.localize.term('general_copy')
+								: this.localize.term('general_copied')}
+							@click=${this.copyCode}
+							compact>
 							${when(
 								this._copyState === 'idle',
 								() => html`<uui-icon name="copy"></uui-icon> <umb-localize key="general_copy">Copy</umb-localize>`,
@@ -81,7 +86,8 @@ export class UmbCodeBlockElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
-				border: 1px solid var(--uui-color-divider-emphasis);
+				background-color: var(--uui-color-surface);
+				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 			}
 
@@ -92,12 +98,11 @@ export class UmbCodeBlockElement extends UmbLitElement {
 
 			pre {
 				font-family: monospace;
-				background-color: var(--uui-color-surface-alt);
 				color: #303033;
 				display: block;
 				margin: 0;
 				overflow-x: auto;
-				padding: 9.5px;
+				padding: var(--uui-size-space-3);
 			}
 
 			pre,
@@ -111,30 +116,15 @@ export class UmbCodeBlockElement extends UmbLitElement {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				background-color: var(--uui-color-surface-alt);
-				border-bottom: 1px solid var(--uui-color-divider-emphasis);
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+
+			#header uui-button {
+				margin-right: var(--uui-size-space-1);
 			}
 
 			#lang {
-				margin-left: 16px;
-				font-weight: bold;
-			}
-
-			button {
-				font-family: inherit;
-				padding: 6px 16px;
-				background-color: transparent;
-				border: none;
-				border-left: 1px solid var(--uui-color-divider-emphasis);
-				border-radius: 0;
-				color: #000;
-				display: flex;
-				align-items: center;
-				gap: 8px;
-			}
-
-			button:hover {
-				background-color: var(--uui-color-surface-emphasis);
+				margin-left: var(--uui-size-space-3);
 			}
 		`,
 	];
