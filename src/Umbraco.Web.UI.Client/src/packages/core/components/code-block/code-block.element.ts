@@ -66,7 +66,8 @@ export class UmbCodeBlockElement extends UmbLitElement {
 							.label=${this._copyState === 'idle'
 								? this.localize.term('general_copy')
 								: this.localize.term('general_copied')}
-							@click=${this.copyCode}>
+							@click=${this.copyCode}
+							compact>
 							${when(
 								this._copyState === 'idle',
 								() => html`<uui-icon name="copy"></uui-icon> <umb-localize key="general_copy">Copy</umb-localize>`,
@@ -101,7 +102,7 @@ export class UmbCodeBlockElement extends UmbLitElement {
 				display: block;
 				margin: 0;
 				overflow-x: auto;
-				padding: 9.5px;
+				padding: var(--uui-size-space-3);
 			}
 
 			pre,
@@ -118,9 +119,12 @@ export class UmbCodeBlockElement extends UmbLitElement {
 				border-bottom: 1px solid var(--uui-color-border);
 			}
 
+			#header uui-button {
+				margin-right: var(--uui-size-space-1);
+			}
+
 			#lang {
-				margin-left: 16px;
-				font-weight: bold;
+				margin-left: var(--uui-size-space-3);
 			}
 		`,
 	];
