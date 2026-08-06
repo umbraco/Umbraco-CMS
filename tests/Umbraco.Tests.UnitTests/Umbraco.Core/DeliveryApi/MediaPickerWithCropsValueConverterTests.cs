@@ -2,6 +2,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -296,6 +297,66 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.IsEmpty(result);
     }
 
+    [Test]
+    public void MediaPickerWithCropsValueConverter_InSingleMode_ConvertsValueToStronglyTypedMediaWithCrops()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(false);
+
+        TestMediaModelOne? media = null;
+        var mediaKey = SetupMedia("My media", ".jpg", 200, 400, "My alt text", 800, asModel: inner => media = new TestMediaModelOne(inner));
+
+        var valueConverter = MediaPickerWithCropsValueConverter();
+        var inter = SerializeMediaWithCropsDtos(mediaKey);
+
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false);
+
+        Assert.AreEqual(typeof(MediaWithCrops<TestMediaModelOne>), result.GetType());
+        Assert.AreSame(media, ((MediaWithCrops<TestMediaModelOne>)result).Content);
+    }
+
+    [Test]
+    public void MediaPickerWithCropsValueConverter_InMultiMode_ConvertsEachValueToItsOwnStronglyTypedMediaWithCrops()
+    {
+        var publishedPropertyType = SetupMediaPropertyType(true);
+
+        TestMediaModelOne? firstMedia = null;
+        TestMediaModelTwo? secondMedia = null;
+        var firstMediaKey = SetupMedia("First media", ".jpg", 200, 400, "First alt text", 800, asModel: inner => firstMedia = new TestMediaModelOne(inner));
+        var secondMediaKey = SetupMedia("Second media", ".png", 300, 600, "Second alt text", 900, asModel: inner => secondMedia = new TestMediaModelTwo(inner));
+
+        var valueConverter = MediaPickerWithCropsValueConverter();
+        var inter = SerializeMediaWithCropsDtos(firstMediaKey, secondMediaKey);
+
+        // convert twice; the first pass populates the constructor cache, the second one exercises it
+        for (var iteration = 0; iteration < 2; iteration++)
+        {
+            var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<MediaWithCrops>;
+            Assert.NotNull(result);
+
+            var mediaWithCrops = result.ToArray();
+            Assert.AreEqual(2, mediaWithCrops.Length);
+
+            Assert.AreEqual(typeof(MediaWithCrops<TestMediaModelOne>), mediaWithCrops[0].GetType());
+            Assert.AreEqual(typeof(MediaWithCrops<TestMediaModelTwo>), mediaWithCrops[1].GetType());
+
+            Assert.AreSame(firstMedia, ((MediaWithCrops<TestMediaModelOne>)mediaWithCrops[0]).Content);
+            Assert.AreSame(secondMedia, ((MediaWithCrops<TestMediaModelTwo>)mediaWithCrops[1]).Content);
+        }
+    }
+
+    private string SerializeMediaWithCropsDtos(params Guid[] mediaKeys)
+    {
+        var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        return serializer.Serialize(mediaKeys.Select(mediaKey =>
+            new MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto
+            {
+                Key = Guid.NewGuid(),
+                MediaKey = mediaKey,
+                Crops = Array.Empty<ImageCropperValue.ImageCropperCrop>(),
+                FocalPoint = new ImageCropperValue.ImageCropperFocalPoint { Left = .2m, Top = .4m }
+            }).ToArray());
+    }
+
     private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect)
     {
         var publishedDataType = new PublishedDataType(123, "test", "test", new Lazy<object>(() => new MediaPicker3Configuration
@@ -316,7 +377,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         return publishedPropertyType.Object;
     }
 
-    private Guid SetupMedia(string name, string extension, int width, int height, string altText, int bytes, ImageCropperValue? imageCropperValue = null)
+    private Guid SetupMedia(string name, string extension, int width, int height, string altText, int bytes, ImageCropperValue? imageCropperValue = null, Func<IPublishedContent, IPublishedContent>? asModel = null)
     {
         var publishedMediaType = new Mock<IPublishedContentType>();
         publishedMediaType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Media);
@@ -344,15 +405,17 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         AddProperty(Constants.Conventions.Media.File, imageCropperValue);
         AddProperty("altText", altText);
 
+        IPublishedContent mediaItem = asModel is null ? media.Object : asModel(media.Object);
+
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(mediaKey))
-            .Returns(media.Object);
+            .Returns(mediaItem);
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(It.IsAny<bool>(), mediaKey))
-            .Returns(media.Object);
+            .Returns(mediaItem);
 
         PublishedUrlProviderMock
-            .Setup(p => p.GetMediaUrl(media.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
+            .Setup(p => p.GetMediaUrl(mediaItem, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
             .Returns(name.ToLowerInvariant().Replace(" ", "-"));
 
         return mediaKey;
@@ -401,5 +464,23 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         Assert.AreEqual(expectedX2, actual.Coordinates.X2);
         Assert.AreEqual(expectedY1, actual.Coordinates.Y1);
         Assert.AreEqual(expectedY2, actual.Coordinates.Y2);
+    }
+
+    // two distinct media model types, shaped like the models ModelsBuilder generates, so the converter
+    // has to close MediaWithCrops<> over a different type per media item
+    private sealed class TestMediaModelOne : PublishedContentWrapped
+    {
+        public TestMediaModelOne(IPublishedContent content)
+            : base(content)
+        {
+        }
+    }
+
+    private sealed class TestMediaModelTwo : PublishedContentWrapped
+    {
+        public TestMediaModelTwo(IPublishedContent content)
+            : base(content)
+        {
+        }
     }
 }
