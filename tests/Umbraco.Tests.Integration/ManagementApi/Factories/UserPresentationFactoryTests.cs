@@ -1,10 +1,11 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -46,6 +48,10 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         services.PostConfigure<SecuritySettings>(options => options.KeepUserLoggedIn = false);
 
         services.AddTransient<IUserPresentationFactory, UserPresentationFactory>();
+
+        // The integration host composes a subset of the app and does not run the Management API's
+        // AddUsers(), which is where this is registered in production.
+        services.AddSingleton<ISessionExpiryAccessor, HttpContextSessionExpiryAccessor>();
         services.AddTransient<IUserGroupPresentationFactory, UserGroupPresentationFactory>();
         services.AddSingleton<IAbsoluteUrlBuilder, DefaultAbsoluteUrlBuilder>();
         services.AddSingleton<IUrlAssembler, DefaultUrlAssembler>();

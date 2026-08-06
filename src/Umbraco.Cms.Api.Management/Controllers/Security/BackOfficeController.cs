@@ -598,6 +598,12 @@ public class BackOfficeController : SecurityControllerBase
         {
             { IsLockedOut: true } => ExternalLoginErrorRedirect("locked-out"),
             { IsNotAllowed: true } => ExternalLoginErrorRedirect("not-allowed"),
+
+            // The provider authenticated the user but Umbraco still wants a second factor, which is a
+            // pending sign-in rather than a failure. The two-factor cookie survives this redirect, so the
+            // client can complete the flow against verify-2fa - but it can only do that if it is told
+            // apart from a genuine failure.
+            { RequiresTwoFactor: true } => ExternalLoginErrorRedirect("two-factor-required"),
             _ => ExternalLoginErrorRedirect("failed"),
         };
     }

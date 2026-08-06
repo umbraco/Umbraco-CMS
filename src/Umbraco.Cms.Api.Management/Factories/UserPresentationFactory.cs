@@ -1,6 +1,4 @@
-using System.Globalization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
@@ -20,6 +18,7 @@ using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -43,7 +42,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly Dictionary<Type, IPermissionPresentationMapper> _permissionPresentationMappersByType;
     private readonly IContentPermissionService _contentPermissionService;
     private readonly IElementPermissionService _elementPermissionService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ISessionExpiryAccessor _sessionExpiryAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
@@ -61,7 +60,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     /// <param name="permissionPresentationMappers">Collection of mappers for permission presentation models.</param>
     /// <param name="contentPermissionService">Service for managing content permissions.</param>
     /// <param name="elementPermissionService">Service for managing element permissions.</param>
-    /// <param name="httpContextAccessor">Accessor for the current HTTP context, used to read the authentication ticket expiry.</param>
+    /// <param name="sessionExpiryAccessor">Accessor for the current session expiry.</param>
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
@@ -76,7 +75,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers,
         IContentPermissionService contentPermissionService,
         IElementPermissionService elementPermissionService,
-        IHttpContextAccessor httpContextAccessor)
+        ISessionExpiryAccessor sessionExpiryAccessor)
     {
         _entityService = entityService;
         _appCaches = appCaches;
@@ -91,7 +90,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         _permissionPresentationMappersByType = permissionPresentationMappers.ToDictionary(x => x.PresentationModelToHandle);
         _contentPermissionService = contentPermissionService;
         _elementPermissionService = elementPermissionService;
-        _httpContextAccessor = httpContextAccessor;
+        _sessionExpiryAccessor = sessionExpiryAccessor;
     }
 
     /// <summary>
@@ -139,7 +138,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             permissionPresentationMappers,
             contentPermissionService,
             elementPermissionService,
-            StaticServiceProvider.Instance.GetRequiredService<IHttpContextAccessor>())
+            StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
     {
     }
 
@@ -186,7 +185,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             permissionPresentationMappers,
             contentPermissionService,
             StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IHttpContextAccessor>())
+            StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
     {
     }
 
@@ -231,7 +230,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             permissionPresentationMappers,
             StaticServiceProvider.Instance.GetRequiredService<IContentPermissionService>(),
             StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IHttpContextAccessor>())
+            StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
     {
     }
 
@@ -328,17 +327,10 @@ public class UserPresentationFactory : IUserPresentationFactory
         // Surface the absolute session timeout, so the client can drive its countdown/timeout UX (or explicit keep
         // the session alive when KeepUserLoggedIn is enabled). The value comes from the authentication ticket-expiry
         // claim written during back-office cookie validation.
-        DateTimeOffset? timeoutUtc = null;
-        var ticketExpires = _httpContextAccessor.HttpContext?.User.FindFirst(Constants.Security.TicketExpiresClaimType)?.Value;
-        if (DateTimeOffset.TryParse(ticketExpires, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTimeOffset parsedExpiry))
-        {
-            timeoutUtc = parsedExpiry;
-        }
-
         var model = new CurrentUserConfigurationResponseModel
         {
             KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
-            TimeoutUtc = timeoutUtc,
+            TimeoutUtc = _sessionExpiryAccessor.GetSessionExpiry(),
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
 
             // You should not be able to change any password or set 2fa if any providers has deny local login set.

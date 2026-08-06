@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -90,7 +90,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         // SameSite=None (requires HTTPS) lets the cookie ride cross-site requests when the back office
         // is served from a different origin than the server (dev server). An unparseable value is a
         // configuration mistake rather than something to paper over, so it fails the boot.
-        options.Cookie.SameSite = Enum.TryParse(_securitySettings.AuthCookieSameSite, ignoreCase: true, out SameSiteMode result)
+        options.Cookie.SameSite = TryParseAuthCookieSameSite(_securitySettings.AuthCookieSameSite, out SameSiteMode result)
             ? result
             : throw new ConfigurationException("The provided AuthCookieSameSite value from SecuritySettings could not be parsed into as SameSiteMode value.");
 
@@ -286,6 +286,25 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 return Task.CompletedTask;
             },
         };
+    }
+
+    /// <summary>
+    ///     Resolves the configured <see cref="SecuritySettings.AuthCookieSameSite" /> value.
+    /// </summary>
+    /// <remarks>
+    ///     Enum.TryParse on its own accepts any integer, so an out-of-range value would yield an undefined
+    ///     mode - which makes the samesite attribute be omitted altogether, silently weakening the cookie.
+    ///     Enum.IsDefined rejects those, while still allowing a defined member to be configured numerically.
+    /// </remarks>
+    internal static bool TryParseAuthCookieSameSite(string value, out SameSiteMode mode)
+    {
+        if (Enum.TryParse(value, ignoreCase: true, out mode) && Enum.IsDefined(mode))
+        {
+            return true;
+        }
+
+        mode = SameSiteMode.Unspecified;
+        return false;
     }
 
     private static bool IsManagementApiRequest(HttpRequest request)

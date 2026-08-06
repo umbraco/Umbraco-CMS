@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -78,6 +78,9 @@ public static partial class UmbracoBuilderExtensions
 
         // Register a notification handler to interrogate the registered external login providers at startup.
         builder.AddNotificationHandler<UmbracoApplicationStartingNotification, ExternalLoginProviderStartupHandler>();
+
+        // Register a notification handler to report problematic back-office auth configuration at startup.
+        builder.AddNotificationHandler<UmbracoApplicationStartingNotification, BackOfficeAuthConfigurationStartupHandler>();
 
         return builder;
     }

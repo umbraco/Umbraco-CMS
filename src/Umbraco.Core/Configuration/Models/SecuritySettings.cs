@@ -100,16 +100,6 @@ public class SecuritySettings
     internal const string StaticCallbackPathName = "/umbraco";
 
     /// <summary>
-    ///     The default path for the authorization callback logout.
-    /// </summary>
-    internal const string StaticAuthorizeCallbackLogoutPathName = "/umbraco/logout";
-
-    /// <summary>
-    ///     The default path for the authorization callback error.
-    /// </summary>
-    internal const string StaticAuthorizeCallbackErrorPathName = "/umbraco/error";
-
-    /// <summary>
     ///     The default expiry time for password reset emails.
     /// </summary>
     internal const string StaticPasswordResetEmailExpiry = "01:00:00";
@@ -152,13 +142,18 @@ public class SecuritySettings
     ///     Gets or sets the SameSite mode for the back-office authentication cookie.
     /// </summary>
     /// <remarks>
-    ///     Only set "None" (which also requires HTTPS) when the back
-    ///     office is served from a different origin than the server, such as a local front-end dev
-    ///     server or a containerised setup, so the cookie is sent on cross-site requests. A normal
-    ///     deployment serves both from the same origin and does not need it.
+    ///     Valid values are "Strict" (default), "Lax", "None" and "Unspecified".
     ///     <para>
-    ///     Keep the default in production: "Lax" is what stops a cross-site request from carrying the
-    ///     authentication cookie, and the Management API has no antiforgery tokens of its own.
+    ///     Keep the default in production. SameSite is what stops a cross-site request from carrying
+    ///     the authentication cookie, and the Management API has no antiforgery tokens of its own.
+    ///     </para>
+    ///     <para>
+    ///     Only set "None" when the back office is served from a different origin than the server,
+    ///     such as a local front-end dev server or a containerised setup, so the cookie is sent on
+    ///     cross-site requests. "None" additionally requires the cookie to be marked Secure, so
+    ///     <see cref="GlobalSettings.UseHttps" /> must be enabled - browsers reject a "None" cookie
+    ///     that is not Secure, and sign-in then fails with no server-side error. A normal deployment
+    ///     serves both from the same origin and does not need it.
     ///     </para>
     /// </remarks>
     [DefaultValue(StaticAuthCookieSameSite)]
