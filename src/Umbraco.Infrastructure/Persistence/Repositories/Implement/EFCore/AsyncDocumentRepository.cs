@@ -13,11 +13,13 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
@@ -39,6 +41,7 @@ internal sealed class AsyncDocumentRepository
     private readonly ITagRepository _tagRepository;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly AsyncPermissionRepository<IContent> _permissionRepository;
+    private readonly IShortStringHelper _shortStringHelper;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AsyncDocumentRepository" /> class.
@@ -61,6 +64,7 @@ internal sealed class AsyncDocumentRepository
     /// <param name="tagRepository">The tag repository, used to persist tag values for tag-enabled properties on publish.</param>
     /// <param name="jsonSerializer">The JSON serializer, used to parse legacy JSON-stored tag values.</param>
     /// <param name="userGroupService">The user group service, used to resolve user group keys to IDs for permission storage.</param>
+    /// <param name="shortStringHelper">The short string helper, used to detect URL segment collisions between sibling names.</param>
     internal AsyncDocumentRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
@@ -79,7 +83,8 @@ internal sealed class AsyncDocumentRepository
         IIdKeyMap idKeyMap,
         ITagRepository tagRepository,
         IJsonSerializer jsonSerializer,
-        IUserGroupService userGroupService)
+        IUserGroupService userGroupService,
+        IShortStringHelper shortStringHelper)
         : base(
             scopeAccessor,
             appCaches,
@@ -100,6 +105,7 @@ internal sealed class AsyncDocumentRepository
         _tagRepository = tagRepository;
         _jsonSerializer = jsonSerializer;
         _permissionRepository = new AsyncPermissionRepository<IContent>(scopeAccessor, appCaches, userGroupService);
+        _shortStringHelper = shortStringHelper;
     }
 
     /// <inheritdoc />
@@ -136,9 +142,7 @@ internal sealed class AsyncDocumentRepository
 
             AssignDefaultTemplateIfMissing(item);
 
-            // TODO (EF Core): port sibling name-uniqueness (SimilarNodeName.GetUniqueName) and variant name
-            // handling, see NPoco PublishableContentRepositoryBase.SanitizeNames.
-            SanitizeNames(item);
+            await SanitizeNamesAsync(db, item, publishing);
 
             item.SanitizeEntityPropertiesForXmlStorage();
 
@@ -240,7 +244,7 @@ internal sealed class AsyncDocumentRepository
                         .ExecuteUpdateAsync(setters => setters.SetProperty(documentVersion => documentVersion.Published, false));
                 }
 
-                SanitizeNames(item);
+                await SanitizeNamesAsync(db, item, publishing);
                 item.SanitizeEntityPropertiesForXmlStorage();
 
                 if (item.IsPropertyDirty(nameof(item.ParentId)))
@@ -1979,13 +1983,83 @@ internal sealed class AsyncDocumentRepository
         }
     }
 
-    // Scoped-down stand-in for NPoco's PublishableContentRepositoryBase.SanitizeNames: this phase is
-    // invariant-only, so only the "must have a name at all" check applies here.
-    private static void SanitizeNames(IContent entity)
+    /// <inheritdoc />
+    // Adds URL segment collision detection on top of the base's literal-duplicate-name check — resolves
+    // https://github.com/umbraco/Umbraco-CMS/issues/22070 for the EF Core path too.
+    protected override async Task<string?> EnsureUniqueNodeNameAsync(UmbracoDbContext db, int parentId, string? nodeName, int id)
     {
-        if (string.IsNullOrWhiteSpace(entity.Name))
+        if (!EnsureUniqueNaming)
         {
-            throw new InvalidOperationException("Cannot save content with an empty name.");
+            return nodeName;
+        }
+
+        (string? uniqueName, List<SimilarNodeName> siblings) = await GetUniqueNodeNameAndSiblingsAsync(db, parentId, nodeName, id);
+        return EnsureUniqueUrlSegment(uniqueName, id, siblings, _shortStringHelper);
+    }
+
+    /// <inheritdoc />
+    protected override Task<string?> EnsureUniqueVariantNameAsync(string? nodeName, int nodeId, List<SimilarNodeName> siblings, string culture) =>
+        Task.FromResult(EnsureUniqueUrlSegment(nodeName, nodeId, siblings, _shortStringHelper, culture));
+
+    /// <summary>
+    /// Ensures the proposed name produces a URL segment that is unique among sibling URL segments.
+    /// If a collision is detected (e.g. "Title" and "Title." both produce segment "title"),
+    /// a numeric suffix is appended to the name until uniqueness is achieved.
+    /// </summary>
+    /// <remarks>
+    /// Ported directly from NPoco's <c>DocumentRepository.EnsureUniqueUrlSegment</c> rather than
+    /// referencing it — <c>DocumentRepository</c> is slated for removal once the EF Core migration
+    /// completes, so this repository must not depend on it.
+    /// </remarks>
+    private static string? EnsureUniqueUrlSegment(
+        string? nodeName,
+        int nodeId,
+        IEnumerable<SimilarNodeName> siblings,
+        IShortStringHelper shortStringHelper,
+        string? culture = null)
+    {
+        if (string.IsNullOrWhiteSpace(nodeName))
+        {
+            return nodeName;
+        }
+
+        var proposedSegment = shortStringHelper.CleanStringForUrlSegment(nodeName, culture);
+        if (string.IsNullOrEmpty(proposedSegment))
+        {
+            return nodeName;
+        }
+
+        // Build a set of URL segments from siblings, excluding the current node.
+        var siblingSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (SimilarNodeName sibling in siblings)
+        {
+            if (sibling.Id == nodeId || string.IsNullOrWhiteSpace(sibling.Name))
+            {
+                continue;
+            }
+
+            var segment = shortStringHelper.CleanStringForUrlSegment(sibling.Name, culture);
+            if (string.IsNullOrEmpty(segment) is false)
+            {
+                siblingSegments.Add(segment);
+            }
+        }
+
+        // If the proposed segment doesn't collide, return the name as-is.
+        if (siblingSegments.Contains(proposedSegment) is false)
+        {
+            return nodeName;
+        }
+
+        // Increment a (N) suffix on the name until the resulting URL segment is unique.
+        for (var i = 1; ; i++)
+        {
+            var candidateName = $"{nodeName} ({i})";
+            var candidateSegment = shortStringHelper.CleanStringForUrlSegment(candidateName, culture);
+            if (string.IsNullOrEmpty(candidateSegment) || siblingSegments.Contains(candidateSegment) is false)
+            {
+                return candidateName;
+            }
         }
     }
 

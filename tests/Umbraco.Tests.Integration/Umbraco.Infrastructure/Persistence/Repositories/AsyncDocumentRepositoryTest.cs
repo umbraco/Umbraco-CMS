@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
@@ -105,7 +106,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         GetRequiredService<IIdKeyMap>(),
         GetRequiredService<ITagRepository>(),
         GetRequiredService<IJsonSerializer>(),
-        GetRequiredService<IUserGroupService>());
+        GetRequiredService<IUserGroupService>(),
+        GetRequiredService<IShortStringHelper>());
 
     [Test]
     public async Task GetAsync_WithExistingKey_ReturnsSingleDocument()
@@ -1433,7 +1435,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
             GetRequiredService<IJsonSerializer>(),
-            GetRequiredService<IUserGroupService>());
+            GetRequiredService<IUserGroupService>(),
+            GetRequiredService<IShortStringHelper>());
 
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Notify Page", _textpage.Id);
 
@@ -1645,13 +1648,97 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
             GetRequiredService<IJsonSerializer>(),
-            GetRequiredService<IUserGroupService>());
+            GetRequiredService<IUserGroupService>(),
+            GetRequiredService<IShortStringHelper>());
 
         content.Name = "Notify Update Page Renamed";
         await notifyingRepository.SaveAsync(content, CancellationToken.None);
         scope.Complete();
 
         eventAggregatorMock.Verify(x => x.Publish(It.IsAny<ContentRefreshNotification>()), Times.Once);
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_DuplicateSiblingName_AppendsNumericSuffix()
+    {
+        var sibling1 = ContentBuilder.CreateSimpleContent(_contentType, "Duplicate Name", _textpage.Id);
+        var sibling2 = ContentBuilder.CreateSimpleContent(_contentType, "Duplicate Name", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(sibling1, CancellationToken.None);
+        await repository.SaveAsync(sibling2, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(sibling2.Name, Is.EqualTo("Duplicate Name (1)"));
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_MultipleDuplicateSiblingNames_IncrementsSuffix()
+    {
+        var sibling1 = ContentBuilder.CreateSimpleContent(_contentType, "Triplicate Name", _textpage.Id);
+        var sibling2 = ContentBuilder.CreateSimpleContent(_contentType, "Triplicate Name", _textpage.Id);
+        var sibling3 = ContentBuilder.CreateSimpleContent(_contentType, "Triplicate Name", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(sibling1, CancellationToken.None);
+        await repository.SaveAsync(sibling2, CancellationToken.None);
+        await repository.SaveAsync(sibling3, CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sibling2.Name, Is.EqualTo("Triplicate Name (1)"));
+            Assert.That(sibling3.Name, Is.EqualTo("Triplicate Name (2)"));
+        });
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_UrlSegmentCollisionWithoutLiteralNameCollision_AppendsNumericSuffix()
+    {
+        // "!" and "?" are both stripped by CleanStringForUrlSegment, so these two literally-distinct
+        // names still collide on URL segment ("page-one") — proving the check goes beyond literal
+        // name comparison (resolves umbraco/Umbraco-CMS#22070 for the EF Core path).
+        var sibling1 = ContentBuilder.CreateSimpleContent(_contentType, "Page One!", _textpage.Id);
+        var sibling2 = ContentBuilder.CreateSimpleContent(_contentType, "Page One?", _textpage.Id);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(sibling1, CancellationToken.None);
+        await repository.SaveAsync(sibling2, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(sibling2.Name, Is.EqualTo("Page One? (1)"));
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_EmptyInvariantName_ThrowsInvalidOperationException()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Placeholder", _textpage.Id);
+        content.Name = string.Empty;
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await repository.SaveAsync(content, CancellationToken.None));
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_VariantContentTypeWithNoCultureNames_ThrowsInvalidOperationException()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+        IContent content = ContentBuilder.CreateBasicContent(contentType);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await repository.SaveAsync(content, CancellationToken.None));
     }
 
     [Test]
@@ -1747,6 +1834,35 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
                 "only en-US's ContentVersionCultureVariation row should remain for this version");
             Assert.That(entityVariations, Has.Count.EqualTo(1),
                 "only en-US's DocumentCultureVariation row should remain for this node");
+        });
+    }
+
+    [Test]
+    public async Task PersistNewItemAsync_CultureVariant_DuplicateSiblingNameForCulture_DisambiguatesIndependentlyPerCulture()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        IContent sibling1 = ContentBuilder.CreateBasicContent(contentType);
+        sibling1.SetCultureName("Shared Name", "en-US");
+        sibling1.SetCultureName("Nom Partagé", "fr");
+
+        IContent sibling2 = ContentBuilder.CreateBasicContent(contentType);
+        sibling2.SetCultureName("Shared Name", "en-US");
+        sibling2.SetCultureName("Nom Différent", "fr");
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        await repository.SaveAsync(sibling1, CancellationToken.None);
+        await repository.SaveAsync(sibling2, CancellationToken.None);
+        scope.Complete();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sibling2.GetCultureName("en-US"), Is.EqualTo("Shared Name (1)"),
+                "en-US literally collided with sibling1's en-US name, so it must be disambiguated");
+            Assert.That(sibling2.GetCultureName("fr"), Is.EqualTo("Nom Différent"),
+                "fr did not collide with any sibling's fr name, so it must be left unchanged");
         });
     }
 
@@ -2014,7 +2130,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
             GetRequiredService<IJsonSerializer>(),
-            GetRequiredService<IUserGroupService>());
+            GetRequiredService<IUserGroupService>(),
+            GetRequiredService<IShortStringHelper>());
 
         content.PublishedState = PublishedState.Publishing;
         await notifyingRepository.SaveAsync(content, CancellationToken.None);
@@ -2151,7 +2268,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
             GetRequiredService<IJsonSerializer>(),
-            GetRequiredService<IUserGroupService>());
+            GetRequiredService<IUserGroupService>(),
+            GetRequiredService<IShortStringHelper>());
 
         content.Path = $"{_subpage2.Path},{_subpage.Id},{content.Id}";
         content.Level = _subpage2.Level + 2;

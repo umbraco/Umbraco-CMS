@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
@@ -348,4 +349,165 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             await LanguageRepository.GetIsoCodeByIdAsync(dto.LanguageId) ?? Constants.System.InvariantCulture,
             dto.Date,
             dto.Action == ContentScheduleAction.Release.ToString() ? ContentScheduleAction.Release : ContentScheduleAction.Expire);
+
+    /// <summary>
+    ///     Gets a value indicating whether saving must keep names unique among siblings. Mirrors NPoco's
+    ///     <c>PublishableContentRepositoryBase.EnsureUniqueNaming</c>.
+    /// </summary>
+    protected virtual bool EnsureUniqueNaming => true;
+
+    /// <summary>
+    ///     Ensures the entity has a valid, sibling-unique invariant name and, for variant content, sibling-unique
+    ///     names per culture. Ported from NPoco's <c>PublishableContentRepositoryBase.SanitizeNames</c>.
+    /// </summary>
+    protected async Task SanitizeNamesAsync(UmbracoDbContext db, TEntity content, bool publishing)
+    {
+        await EnsureInvariantNameExistsAsync(content);
+        await EnsureInvariantNameIsUniqueAsync(db, content);
+        await EnsureVariantNamesAreUniqueAsync(db, content, publishing);
+    }
+
+    private async Task EnsureInvariantNameExistsAsync(TEntity content)
+    {
+        if (content.ContentType.VariesByCulture())
+        {
+            // content varies by culture
+            // then it must have at least a variant name, else it makes no sense
+            if (content.CultureInfos?.Count == 0)
+            {
+                throw new InvalidOperationException("Cannot save content with an empty name.");
+            }
+
+            // and then, we need to set the invariant name implicitly,
+            // using the default culture if it has a name, otherwise anything we can
+            var defaultCulture = await LanguageRepository.GetDefaultIsoCodeAsync();
+            content.Name = defaultCulture != null &&
+                           (content.CultureInfos?.TryGetValue(defaultCulture, out ContentCultureInfos? cultureName) ??
+                            false)
+                ? cultureName!.Name
+                : content.CultureInfos![0].Name;
+        }
+        else
+        {
+            // content is invariant, and invariant content must have an explicit invariant name
+            if (string.IsNullOrWhiteSpace(content.Name))
+            {
+                throw new InvalidOperationException("Cannot save content with an empty name.");
+            }
+        }
+    }
+
+    private async Task EnsureInvariantNameIsUniqueAsync(UmbracoDbContext db, TEntity content) =>
+        content.Name = await EnsureUniqueNodeNameAsync(db, content.ParentId, content.Name, content.Id);
+
+    /// <summary>
+    ///     Resolves a sibling-unique name for <paramref name="nodeName" /> among the other nodes sharing
+    ///     <paramref name="parentId" />. The default implementation only resolves literal duplicate names
+    ///     (via <see cref="SimilarNodeName.GetUniqueName(IEnumerable{SimilarNodeName},int,string)" />) — override
+    ///     to add further uniqueness checks (e.g. URL segment collisions), as <c>AsyncDocumentRepository</c> does.
+    /// </summary>
+    protected virtual async Task<string?> EnsureUniqueNodeNameAsync(UmbracoDbContext db, int parentId, string? nodeName, int id)
+    {
+        if (!EnsureUniqueNaming)
+        {
+            return nodeName;
+        }
+
+        (string? uniqueName, List<SimilarNodeName> _) = await GetUniqueNodeNameAndSiblingsAsync(db, parentId, nodeName, id);
+        return uniqueName;
+    }
+
+    /// <summary>
+    ///     Fetches every sibling under <paramref name="parentId" /> (of this repository's <see cref="NodeObjectTypeKey" />)
+    ///     and resolves a sibling-unique name for <paramref name="nodeName" />, returning both so overrides of
+    ///     <see cref="EnsureUniqueNodeNameAsync" /> can run further checks against the same sibling list without
+    ///     re-querying. Deliberately unfiltered (no name-prefix narrowing) — unlike NPoco's generic
+    ///     Media/DataType-oriented sibling fetch, a URL-segment collision check (see <c>AsyncDocumentRepository</c>)
+    ///     needs the full sibling list, since two names with different literal prefixes can still collide on
+    ///     URL segment.
+    /// </summary>
+    protected async Task<(string? UniqueName, List<SimilarNodeName> Siblings)> GetUniqueNodeNameAndSiblingsAsync(
+        UmbracoDbContext db, int parentId, string? nodeName, int id)
+    {
+        List<SimilarNodeName> siblings = await db.Nodes
+            .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentId)
+            .Select(node => new SimilarNodeName { Id = node.NodeId, Name = node.Text })
+            .ToListAsync();
+
+        return (SimilarNodeName.GetUniqueName(siblings, id, nodeName), siblings);
+    }
+
+    private async Task EnsureVariantNamesAreUniqueAsync(UmbracoDbContext db, TEntity content, bool publishing)
+    {
+        if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos?.Count == 0)
+        {
+            return;
+        }
+
+        // get names per culture, at same level (ie all siblings)
+        var names = await db.ContentVersionCultureVariations
+            .Join(db.ContentVersions.Where(cv => cv.Current), ccv => ccv.VersionId, cv => cv.Id, (ccv, cv) => new { ccv, cv })
+            .Join(
+                db.Nodes.Where(n => n.NodeObjectType == NodeObjectTypeKey && n.ParentId == content.ParentId && n.NodeId != content.Id),
+                joined => joined.cv.NodeId,
+                node => node.NodeId,
+                (joined, node) => new { joined.ccv.Id, joined.ccv.Name, joined.ccv.LanguageId })
+            .ToListAsync();
+
+        if (names.Count == 0)
+        {
+            return;
+        }
+
+        // note: the code below means we are going to unique-ify every culture names, regardless
+        // of whether the name has changed (ie the culture has been updated) - some saving culture
+        // fr-FR could cause culture en-UK name to change - not sure that is clean
+        ILookup<int, (int Id, string? Name, int LanguageId)> namesByLanguage = names
+            .Select(n => (n.Id, n.Name, n.LanguageId))
+            .ToLookup(n => n.LanguageId);
+
+        if (content.CultureInfos is null)
+        {
+            return;
+        }
+
+        foreach (ContentCultureInfos cultureInfo in content.CultureInfos)
+        {
+            int? langId = await LanguageRepository.GetIdByIsoCodeAsync(cultureInfo.Culture);
+            if (!langId.HasValue)
+            {
+                continue;
+            }
+
+            IEnumerable<(int Id, string? Name, int LanguageId)> cultureNames = namesByLanguage[langId.Value];
+            if (!cultureNames.Any())
+            {
+                continue;
+            }
+
+            // get a unique name (literal duplicates first, then subclass-specific checks)
+            List<SimilarNodeName> otherNames = cultureNames.Select(n => new SimilarNodeName { Id = n.Id, Name = n.Name }).ToList();
+            var uniqueName = SimilarNodeName.GetUniqueName(otherNames, content.Id, cultureInfo.Name);
+            uniqueName = await EnsureUniqueVariantNameAsync(uniqueName, content.Id, otherNames, cultureInfo.Culture);
+
+            if (uniqueName == content.GetCultureName(cultureInfo.Culture))
+            {
+                continue;
+            }
+
+            // update the name, and the publish name if published
+            content.SetCultureName(uniqueName, cultureInfo.Culture);
+            if (publishing && (content.PublishCultureInfos?.ContainsKey(cultureInfo.Culture) ?? false))
+            {
+                content.SetPublishInfo(cultureInfo.Culture, uniqueName, DateTime.UtcNow);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Called during variant name uniqueness to allow subclasses to apply additional uniqueness checks
+    ///     (e.g. URL segment collision detection). The default implementation returns the name unchanged.
+    /// </summary>
+    protected virtual Task<string?> EnsureUniqueVariantNameAsync(string? nodeName, int nodeId, List<SimilarNodeName> siblings, string culture) =>
+        Task.FromResult(nodeName);
 }
