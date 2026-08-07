@@ -27,10 +27,21 @@ public class GetElementPermissionsCurrentUserController : CurrentUserControllerB
     /// Initializes a new instance of the <see cref="GetElementPermissionsCurrentUserController"/> class, which handles requests related to retrieving element permissions for the current user.
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security information for the current user.</param>
+    /// <param name="userService">Service for managing and retrieving user information. Unused; retained for backward compatibility.</param>
     /// <param name="mapper">The Umbraco object mapper used for mapping between models.</param>
     /// <param name="elementPermissionService">Service for managing element permissions.</param>
+    /// <remarks>
+    /// The unused IUserService parameter is kept so this constructor stays a strict superset of the obsolete
+    /// one below. The DI container activates controllers by selecting the widest resolvable constructor and
+    /// throws when no single constructor dominates, so both are needed until the obsolete one is removed.
+    /// </remarks>
+    // TODO (V19): Remove the IUserService parameter when the obsolete constructor is removed.
+    [ActivatorUtilitiesConstructor]
     public GetElementPermissionsCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+#pragma warning disable IDE0060 // Remove unused parameter
+        IUserService userService,
+#pragma warning restore IDE0060 // Remove unused parameter
         IUmbracoMapper mapper,
         IElementPermissionService elementPermissionService)
     {
@@ -42,34 +53,17 @@ public class GetElementPermissionsCurrentUserController : CurrentUserControllerB
     /// <summary>
     /// Initializes a new instance of the <see cref="GetElementPermissionsCurrentUserController"/> class.
     /// </summary>
-    /// <remarks>
-    /// This constructor exists only to give the dependency injection container an unambiguous (greediest) constructor
-    /// to select while the obsolete <see cref="IUserService"/> constructor remains. Use the constructor without
-    /// <see cref="IUserService"/>.
-    /// </remarks>
-    [Obsolete("This constructor exists only to satisfy dependency injection. Please use the constructor without IUserService. Scheduled for removal in Umbraco 20.")]
-    public GetElementPermissionsCurrentUserController(
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUserService userService,
-        IUmbracoMapper mapper,
-        IElementPermissionService elementPermissionService)
-        : this(backOfficeSecurityAccessor, mapper, elementPermissionService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetElementPermissionsCurrentUserController"/> class.
-    /// </summary>
     /// <param name="backOfficeSecurityAccessor">Provides access to back office security information for the current user.</param>
     /// <param name="userService">Service for managing and retrieving user information.</param>
     /// <param name="mapper">The Umbraco object mapper used for mapping between models.</param>
-    [Obsolete("Please use the constructor without IUserService. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public GetElementPermissionsCurrentUserController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserService userService,
         IUmbracoMapper mapper)
         : this(
             backOfficeSecurityAccessor,
+            userService,
             mapper,
             StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>())
     {

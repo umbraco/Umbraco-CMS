@@ -78,7 +78,8 @@
 
   public static readonly dropdownSettings = {
     0: ['Enable multiple choice', ''],
-    1: ['Add options', '']
+    1: ['Add options', ''],
+    2: ['Placeholder', '']
   }
 
   public static readonly imageCropperSettings = {
@@ -137,7 +138,8 @@
 
   public static readonly textareaSettings = {
     0: ['Maximum allowed characters', 'If empty - no character limit'],
-    1: ['Number of rows', 'If empty or zero, the textarea is set to auto-height']
+    1: ['Number of rows', 'If empty or zero, the textarea is set to auto-height'],
+    2: ['Placeholder', 'Placeholder text shown inside the textarea when empty']
   }
 
   public static readonly textstringSettings = {
@@ -288,7 +290,17 @@
     forbidden: 403
   }
 
+  public static readonly httpMethods = {
+    get: 'GET',
+    post: 'POST',
+    put: 'PUT',
+    delete: 'DELETE'
+  }
+
+  // Matched against response URLs via url().includes(), so entries are either full paths
+  // (e.g. '/umbraco/management/api/v1/document') or path fragments.
   public static readonly apiEndpoints = {
+    profilingStatus: '/umbraco/management/api/v1/profiling/status',
     document: '/umbraco/management/api/v1/document',
     documentType: '/umbraco/management/api/v1/document-type',
     documentTypeFolder: '/umbraco/management/api/v1/document-type/folder',
@@ -321,7 +333,10 @@
     domains: '/domains',
     notifications: '/notifications',
     currentUser: '/umbraco/management/api/v1/user/current',
-    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    currentUserConfiguration: '/umbraco/management/api/v1/user/current/configuration',
+    backOfficeLogin: '/umbraco/management/api/v1/security/back-office/login',
+    backOfficeSignOut: '/umbraco/management/api/v1/security/back-office/signout',
+    backOfficeKeepAlive: '/umbraco/management/api/v1/security/back-office/keep-alive',
     documentSearch: '/umbraco/management/api/v1/item/document/search',
     mediaSearch: '/umbraco/management/api/v1/item/media/search',
     memberSearch: '/umbraco/management/api/v1/item/member/search',

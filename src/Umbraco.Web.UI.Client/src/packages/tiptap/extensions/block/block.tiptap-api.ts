@@ -44,17 +44,20 @@ export default class UmbTiptapBlockElementApi extends UmbTiptapExtensionApiBase 
 	 * Observes both layouts (structure) and allContents (data availability) so that
 	 * library element blocks are inserted once their external content has been fetched.
 	 * Skips layout entries whose content type is not yet resolved (deferred until allContents re-emits).
+	 * Walks `editor.state.doc` rather than `editor.view.dom`, as `view` is unavailable
+	 * if editor construction aborts (#23563).
 	 * @param {Array<UmbBlockRteLayoutModel>} layouts - Current layout entries.
 	 */
 	#updateBlocks(layouts: Array<UmbBlockRteLayoutModel>) {
 		const editor = this._editor;
 		if (!editor) return;
 
-		const existingLayoutKeys = new Set(
-			Array.from(editor.view.dom.querySelectorAll('umb-rte-block, umb-rte-block-inline')).map((x) =>
-				x.getAttribute(UMB_BLOCK_RTE_DATA_LAYOUT_KEY),
-			),
-		);
+		const existingLayoutKeys = new Set<string>();
+		editor.state.doc.descendants((node) => {
+			const layoutKey = node.attrs[UMB_BLOCK_RTE_DATA_LAYOUT_KEY];
+			if (layoutKey) existingLayoutKeys.add(layoutKey);
+			return true;
+		});
 
 		const newLayouts = layouts.filter((x) => !existingLayoutKeys.has(x.key));
 

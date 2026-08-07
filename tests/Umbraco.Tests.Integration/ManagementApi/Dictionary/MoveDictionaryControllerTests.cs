@@ -19,7 +19,7 @@ public class MoveDictionaryControllerTests : ManagementApiUserGroupTestBase<Move
     private Guid _targetId;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         var originalDictionaryItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());
         var targetDictionaryItem = new DictionaryItem(Constants.System.RootKey, Guid.NewGuid().ToString());

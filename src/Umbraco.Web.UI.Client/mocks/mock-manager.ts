@@ -38,6 +38,11 @@ class UmbMockManager {
 			loader: () => import('./data/sets/documents/index.js') as Promise<UmbMockDataSet>,
 			visible: true,
 		},
+		blocksReusableContent: {
+			label: 'Blocks: Reusable Content',
+			loader: () => import('./data/sets/blocks-reusable-content/index.js') as Promise<UmbMockDataSet>,
+			visible: true,
+		},
 	};
 
 	/**

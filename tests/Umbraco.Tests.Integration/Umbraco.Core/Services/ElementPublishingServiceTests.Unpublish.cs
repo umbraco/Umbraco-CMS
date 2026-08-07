@@ -151,6 +151,34 @@ public partial class ElementPublishingServiceTests
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferencedTrue))]
+    public async Task Cannot_Unpublish_When_Element_Is_Referenced_By_External_Block_Content_And_Configured_To_Disable_When_Referenced()
+    {
+        var elementType = await SetupInvariantElementTypeAsync();
+        var referencingElement = await CreateInvariantContentAsync(elementType);
+        var referencedElement = await CreateInvariantContentAsync(elementType);
+
+        await ElementPublishingService.PublishAsync(
+            referencedElement.Key,
+            [new() { Culture = Constants.System.InvariantCulture }],
+            Constants.Security.SuperUserKey);
+
+        // Embedding an element as external block content records this relation, which must protect it from unpublish.
+        RelationService.Relate(referencingElement.Id, referencedElement.Id, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias);
+
+        var unpublishAttempt = await ElementPublishingService.UnpublishAsync(
+            referencedElement.Key,
+            null,
+            Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(unpublishAttempt.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.CannotUnpublishWhenReferenced, unpublishAttempt.Result);
+
+        var publishedElement = await ElementCacheService.GetByKeyAsync(referencedElement.Key, false);
+        Assert.IsNotNull(publishedElement);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferencedTrue))]
     public async Task Can_Unpublish_Referencing_Element_When_Configured_To_Disable_When_Referenced()
     {
         var elementType = await SetupInvariantElementTypeAsync();

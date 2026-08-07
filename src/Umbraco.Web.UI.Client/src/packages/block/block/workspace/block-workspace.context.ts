@@ -288,6 +288,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 						}
 
 						await this.content.structure.whenLoaded();
+						// Have we been destroyed while awaiting the structure? then back out, otherwise reading from
+						// the now-destroyed content type structure or element states throws:
+						if (!this.#blockManager) return;
 						this.#gotLabel(blockType?.label ?? this.content.structure.getOwnerContentTypeName());
 					},
 					'observeBlockType',

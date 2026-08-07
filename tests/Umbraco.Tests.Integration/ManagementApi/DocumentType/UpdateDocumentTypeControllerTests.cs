@@ -17,7 +17,7 @@ public class UpdateDocumentTypeControllerTests : ManagementApiUserGroupTestBase<
     private Guid _key;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _key = Guid.NewGuid();
         await ContentTypeEditingService.CreateAsync(new ContentTypeCreateModel { Key = _key, Name = "Test", Alias = "test",  Icon = "icon-document" }, Constants.Security.SuperUserKey);
