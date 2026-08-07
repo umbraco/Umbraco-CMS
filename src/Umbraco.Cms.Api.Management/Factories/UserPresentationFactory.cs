@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -41,6 +42,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly Dictionary<Type, IPermissionPresentationMapper> _permissionPresentationMappersByType;
     private readonly IContentPermissionService _contentPermissionService;
     private readonly IElementPermissionService _elementPermissionService;
+    private readonly ISessionExpiryAccessor _sessionExpiryAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
@@ -58,6 +60,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     /// <param name="permissionPresentationMappers">Collection of mappers for permission presentation models.</param>
     /// <param name="contentPermissionService">Service for managing content permissions.</param>
     /// <param name="elementPermissionService">Service for managing element permissions.</param>
+    /// <param name="sessionExpiryAccessor">Accessor for the current session expiry.</param>
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
@@ -71,7 +74,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         IBackOfficeExternalLoginProviders externalLoginProviders,
         IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers,
         IContentPermissionService contentPermissionService,
-        IElementPermissionService elementPermissionService)
+        IElementPermissionService elementPermissionService,
+        ISessionExpiryAccessor sessionExpiryAccessor)
     {
         _entityService = entityService;
         _appCaches = appCaches;
@@ -86,6 +90,56 @@ public class UserPresentationFactory : IUserPresentationFactory
         _permissionPresentationMappersByType = permissionPresentationMappers.ToDictionary(x => x.PresentationModelToHandle);
         _contentPermissionService = contentPermissionService;
         _elementPermissionService = elementPermissionService;
+        _sessionExpiryAccessor = sessionExpiryAccessor;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserPresentationFactory"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for accessing and managing entities.</param>
+    /// <param name="appCaches">Provides application-level caching functionality.</param>
+    /// <param name="mediaFileManager">Manages media file storage and retrieval.</param>
+    /// <param name="imageUrlGenerator">Generates URLs for images.</param>
+    /// <param name="userGroupPresentationFactory">Factory for creating user group presentation models.</param>
+    /// <param name="absoluteUrlBuilder">Builds absolute URLs for resources.</param>
+    /// <param name="emailSender">Handles sending emails.</param>
+    /// <param name="passwordConfigurationPresentationFactory">Factory for password configuration presentation models.</param>
+    /// <param name="securitySettings">Provides access to security-related configuration settings.</param>
+    /// <param name="externalLoginProviders">Manages back office external login providers.</param>
+    /// <param name="permissionPresentationMappers">Collection of mappers for permission presentation models.</param>
+    /// <param name="contentPermissionService">Service for managing content permissions.</param>
+    /// <param name="elementPermissionService">Service for managing element permissions.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
+    public UserPresentationFactory(
+        IEntityService entityService,
+        AppCaches appCaches,
+        MediaFileManager mediaFileManager,
+        IImageUrlGenerator imageUrlGenerator,
+        IUserGroupPresentationFactory userGroupPresentationFactory,
+        IAbsoluteUrlBuilder absoluteUrlBuilder,
+        IEmailSender emailSender,
+        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
+        IOptionsSnapshot<SecuritySettings> securitySettings,
+        IBackOfficeExternalLoginProviders externalLoginProviders,
+        IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers,
+        IContentPermissionService contentPermissionService,
+        IElementPermissionService elementPermissionService)
+        : this(
+            entityService,
+            appCaches,
+            mediaFileManager,
+            imageUrlGenerator,
+            userGroupPresentationFactory,
+            absoluteUrlBuilder,
+            emailSender,
+            passwordConfigurationPresentationFactory,
+            securitySettings,
+            externalLoginProviders,
+            permissionPresentationMappers,
+            contentPermissionService,
+            elementPermissionService,
+            StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
+    {
     }
 
     /// <summary>
@@ -130,7 +184,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             externalLoginProviders,
             permissionPresentationMappers,
             contentPermissionService,
-            StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>())
+            StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
     {
     }
 
@@ -174,7 +229,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             externalLoginProviders,
             permissionPresentationMappers,
             StaticServiceProvider.Instance.GetRequiredService<IContentPermissionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>())
+            StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
     {
     }
 
@@ -268,9 +324,13 @@ public class UserPresentationFactory : IUserPresentationFactory
     /// <inheritdoc/>
     public Task<CurrentUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
     {
+        // Surface the absolute session timeout, so the client can drive its countdown/timeout UX (or explicit keep
+        // the session alive when KeepUserLoggedIn is enabled). The value comes from the authentication ticket-expiry
+        // claim written during back-office cookie validation.
         var model = new CurrentUserConfigurationResponseModel
         {
             KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
+            TimeoutUtc = _sessionExpiryAccessor.GetSessionExpiry(),
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
 
             // You should not be able to change any password or set 2fa if any providers has deny local login set.

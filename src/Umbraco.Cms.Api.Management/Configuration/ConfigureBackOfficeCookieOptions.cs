@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -6,13 +6,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using OpenIddict.Abstractions;
+using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Umbraco.Cms.Api.Management.Configuration;
 
@@ -21,6 +25,9 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// </summary>
 public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
 {
+    private static readonly PathString ManagementApiBasePath
+        = new($"/{Constants.System.UmbracoPathSegment}{Constants.Web.ManagementApiPath.TrimEnd('/')}");
+
     private readonly IDataProtectionProvider _dataProtection;
     private readonly GlobalSettings _globalSettings;
     private readonly IIpResolver _ipResolver;
@@ -80,6 +87,13 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             _globalSettings.UseHttps ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
         options.Cookie.Path = "/";
 
+        // SameSite=None (requires HTTPS) lets the cookie ride cross-site requests when the back office
+        // is served from a different origin than the server (dev server). An unparseable value is a
+        // configuration mistake rather than something to paper over, so it fails the boot.
+        options.Cookie.SameSite = TryParseAuthCookieSameSite(_securitySettings.AuthCookieSameSite, out SameSiteMode result)
+            ? result
+            : throw new ConfigurationException("The provided AuthCookieSameSite value from SecuritySettings could not be parsed into as SameSiteMode value.");
+
         // NOTE: matches route in BackOfficeLoginController
         const string backOfficeLoginPath = "/umbraco/login";
         options.LoginPath = backOfficeLoginPath;
@@ -129,7 +143,22 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
 
                 EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
 
+                // An explicit keep-alive request renews the ticket for an actively-working user,
+                // regardless of KeepUserLoggedIn. This is what lets the session-timeout warning offer
+                // a working "Stay logged in" action even when the session has a fixed expiry.
+                // Scoped strictly to this one endpoint so we never set ShouldRenew unconditionally
+                // (see the note below the SecurityStampValidator call — that would break the
+                // validation-interval behaviour and AllowConcurrentLogins enforcement).
+                if (ctx.Request.Path.StartsWithSegments(Paths.BackOfficeApi.KeepAliveEndpoint, StringComparison.OrdinalIgnoreCase))
+                {
+                    ctx.ShouldRenew = true;
+                }
+
                 // add or update a claim to track when the cookie expires, we use this to track time remaining
+                // NOTE: this runs before the ExpiresUtc reset below, so on a renewing request the claim
+                // still carries the pre-renewal expiry and only catches up on the next request. That is
+                // why the client re-reads the expiry from user/current/configuration after a keep-alive
+                // rather than trusting the claim on the keep-alive response itself.
                 backOfficeIdentity?.AddOrUpdateClaim(new Claim(
                     Constants.Security.TicketExpiresClaimType,
                     ctx.Properties.ExpiresUtc!.Value.ToString("o"),
@@ -230,7 +259,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             // See this for more: https://github.com/dotnet/aspnetcore/issues/63093#issuecomment-3201530217
             OnRedirectToLogin = context =>
             {
-                if (IsXhr(context.Request))
+                if (ShouldBeTreatedAsXhr(context.Request))
                 {
                     context.Response.Headers.Location = context.RedirectUri;
                     context.Response.StatusCode = 401;
@@ -244,7 +273,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             },
             OnRedirectToAccessDenied = context =>
             {
-                if (IsXhr(context.Request))
+                if (ShouldBeTreatedAsXhr(context.Request))
                 {
                     context.Response.Headers.Location = context.RedirectUri;
                     context.Response.StatusCode = 403;
@@ -259,9 +288,44 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         };
     }
 
-    private bool IsXhr(HttpRequest request) =>
+    /// <summary>
+    ///     Resolves the configured <see cref="SecuritySettings.AuthCookieSameSite" /> value.
+    /// </summary>
+    /// <remarks>
+    ///     Enum.TryParse on its own accepts any integer, so an out-of-range value would yield an undefined
+    ///     mode - which makes the samesite attribute be omitted altogether, silently weakening the cookie.
+    ///     Enum.IsDefined rejects those, while still allowing a defined member to be configured numerically.
+    /// </remarks>
+    internal static bool TryParseAuthCookieSameSite(string value, out SameSiteMode mode)
+    {
+        if (Enum.TryParse(value, ignoreCase: true, out mode) && Enum.IsDefined(mode))
+        {
+            return true;
+        }
+
+        mode = SameSiteMode.Unspecified;
+        return false;
+    }
+
+    private static bool IsManagementApiRequest(HttpRequest request)
+        => request.Path.StartsWithSegments(ManagementApiBasePath, StringComparison.OrdinalIgnoreCase);
+
+    private static bool HasClientId(HttpRequest request)
+        => request.Query.ContainsKey(OpenIddictConstants.Parameters.ClientId);
+
+    private static bool IsXhr(HttpRequest request) =>
         string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
         string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
+
+    // Management API requests are always JSON, so an unauthenticated one must get a 401/403 — never a
+    // 302 to the HTML login page, which a fetch/JSON client can't follow meaningfully (it lands on
+    // login HTML and blows up downstream). The dual-scheme back-office policies now include this
+    // cookie scheme, so its challenge fires for API requests too; force the status-code branch for
+    // anything under the Management API path, regardless of the X-Requested-With header.
+    // The one exception is when an explicit client ID has been supplied in the request. This is the case
+    // when authorizing clients like Postman or Swagger UI.
+    private static bool ShouldBeTreatedAsXhr(HttpRequest request)
+        => IsXhr(request) || (IsManagementApiRequest(request) && HasClientId(request) is false);
 
     /// <summary>
     ///     Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn" /> is set to true

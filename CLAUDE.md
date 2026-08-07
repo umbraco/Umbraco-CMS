@@ -402,20 +402,23 @@ The repository contains BOTH (actively supported):
 
 **Note**: The codebase is actively migrating to EF Core, but NPoco remains the primary persistence layer and is not deprecated. Both are fully supported.
 
-### Authentication: OpenIddict
+### Authentication
 
-All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
-- Reference tokens (not JWT) for better security
-- **Secure cookie-based token storage** (v17+) - tokens stored in HTTP-only cookies with `__Host-` prefix
-- Tokens are redacted from client-side responses and passed via secure cookies only (`[redacted]` placeholder)
-- ASP.NET Core Data Protection for token encryption
-- Configured in `Umbraco.Cms.Api.Common`
-- API requests must include credentials (`credentials: include` for fetch)
+**Back office (v19+)**: a single HTTP-only authentication cookie — no client-side tokens and no
+OpenIddict flow. The back-office authorization policies accept both the cookie scheme
+(`Constants.Security.BackOfficeAuthenticationType`) and the OpenIddict validation scheme; see
+`BackOfficeAuthPolicyBuilderExtensions`. Cookie behaviour (expiry, renewal, SameSite,
+401-instead-of-302 for API requests) is configured in `ConfigureBackOfficeCookieOptions`.
+
+**API users / external clients**: **OpenIddict** (OAuth 2.0/OpenID Connect) with reference tokens
+(not JWT), configured in `Umbraco.Cms.Api.Common`.
+
+- ASP.NET Core Data Protection protects both the auth cookie and OpenIddict tokens
+- Back-office requests must include credentials (`credentials: include` for fetch)
 
 **Load Balancing Requirement**: All servers must share the same Data Protection key ring.
 
 **Frontend auth pitfalls** — see `src/Umbraco.Web.UI.Client/docs/edge-cases.md` (Auth & Cross-tab section) and `docs/security.md`. Key points:
-- Never call `validateToken()` per API request — it revokes the previous reference token (ID2019 errors)
 - `window.opener` is set for ANY `window.open()` target, not only OAuth popups — scope guards to the pathname too
 - BroadcastChannel does not deliver messages to the sender's own tab
 

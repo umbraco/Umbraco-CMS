@@ -75,16 +75,12 @@ Conversely, if you are working on front-end only, you want to build the back-end
 
 ```json
 "BackOfficeHost": "http://localhost:5173",
-"AuthorizeCallbackPathName": "/oauth_complete",
-"AuthorizeCallbackLogoutPathName": "/logout",
-"AuthorizeCallbackErrorPathName": "/error",
-"BackOfficeTokenCookie": {
-  "SameSite": "None"
-}
+"CallbackPathName": "/",
+"AuthCookieSameSite": "None"
 ```
 
 > [!NOTE]
-> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `Umbraco:Cms:Security:BackOfficeTokenCookie:SameSite` setting is set to `None`.
+> If you get stuck in a login loop, try clearing your browser cookies for localhost, and make sure that the `Umbraco:Cms:Security:AuthCookieSameSite` setting is set to `None`.
 
 Then run Umbraco from the command line.
 
