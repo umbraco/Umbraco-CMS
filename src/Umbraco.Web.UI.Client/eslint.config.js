@@ -56,6 +56,8 @@ export default [
 			'local-rules/enforce-manifest-alias': 'warn',
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/no-unsafe-localize': 'error',
+			// TODO: change to 'error' when the ~130 current violations are cleaned up. [NL]
+			'local-rules/enforce-null-observe-alias-in-constructor': 'warn',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{
