@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Asp.Versioning;
 using Examine;
 using Examine.Lucene.Search;
@@ -71,6 +72,22 @@ public class QuerySearcherController : SearcherControllerBase
 
         ISearchResults results;
 
+        // The Lucene-specific LuceneQueryOptions constructor overload used here is not guaranteed to be binary
+        // compatible across major versions of Examine.Lucene (e.g. it changed shape between 3.x and 4.x). The JIT
+        // resolves every member a method references before running any of that method's code, so the call to the
+        // (possibly unresolvable) constructor must live in its own non-inlinable method - only then does a failure
+        // to resolve it surface as a catchable MissingMethodException at this call site, rather than crashing here
+        // directly the same way it would if the constructor call were inlined into this method's own try block.
+        QueryOptions queryOptions;
+        try
+        {
+            queryOptions = BuildLuceneQueryOptions(skip, take);
+        }
+        catch (MissingMethodException)
+        {
+            queryOptions = new QueryOptions(skip, take);
+        }
+
         // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
         // Due to examine changes we need to supply the skipTakeMaxResults, see https://github.com/umbraco/Umbraco-CMS/issues/17920 for more info
         try
@@ -78,7 +95,7 @@ public class QuerySearcherController : SearcherControllerBase
             results = searcher
                 .CreateQuery()
                 .NativeQuery(term)
-                .Execute(new LuceneQueryOptions(skip, take, skipTakeMaxResults: skip + take));
+                .Execute(queryOptions);
         }
         catch (ParseException)
         {
@@ -104,4 +121,10 @@ public class QuerySearcherController : SearcherControllerBase
             }),
         });
     }
+
+    // Must contain nothing but the constructor call, and must not be inlined into the caller - see the comment
+    // at the call site in Query() above for why.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static QueryOptions BuildLuceneQueryOptions(int skip, int take)
+        => new LuceneQueryOptions(skip, take, skipTakeMaxResults: skip + take);
 }
