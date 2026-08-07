@@ -9,6 +9,7 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { clamp } from '@umbraco-cms/backoffice/utils';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 
 /**
  * Custom element for a split panel with adjustable divider.
@@ -48,6 +49,8 @@ export class UmbSplitPanelElement extends UmbLitElement {
 	 */
 	@property({ type: String, reflect: true }) position = 'var(--umb-split-panel-initial-position)';
 	//TODO: Add support for negative values (relative to end of container) similar to snap points.
+
+	@property({ type: Boolean, reflect: true, attribute: 'sidebar-open' }) sidebarOpen = false;
 
 	/** Width of the locked panel when in "start" or "end" lock mode */
 	#lockedPanelWidth: number = 0;
@@ -117,11 +120,14 @@ export class UmbSplitPanelElement extends UmbLitElement {
 			maxEndWidth = this.#lockedPanelWidth + 'px';
 		}
 
-		this.mainElement.style.gridTemplateColumns = `
-      minmax(var(--umb-split-panel-start-min-width), ${maxStartWidth})
-      0px
-      minmax(var(--umb-split-panel-end-min-width), ${maxEndWidth})
-    `;
+		this.style.setProperty(
+			'--_columns',
+			`
+    minmax(var(--umb-split-panel-start-min-width), ${maxStartWidth})
+    0px
+    minmax(var(--umb-split-panel-end-min-width), ${maxEndWidth})
+  `,
+		);
 	}
 
 	#onDragStart = (event: PointerEvent | TouchEvent) => {
@@ -180,16 +186,17 @@ export class UmbSplitPanelElement extends UmbLitElement {
 	#disconnect() {
 		this.dividerTouchAreaElement.removeEventListener('pointerdown', this.#onDragStart);
 		this.dividerTouchAreaElement.removeEventListener('touchstart', this.#onDragStart);
+		this.removeAttribute('connected');
+		this.style.removeProperty('--_columns');
 		this.dividerElement.style.display = 'none';
-		this.mainElement.style.display = 'flex';
 		this.#hasInitialized = false;
 	}
 
 	async #connect() {
 		this.#hasInitialized = true;
 
-		this.mainElement.style.display = 'grid';
-		this.mainElement.style.gridTemplateColumns = `${this.position} 0px 1fr`;
+		this.toggleAttribute('connected', true);
+		this.style.setProperty('--_columns', `${this.position} 0px 1fr`);
 		this.dividerElement.style.display = 'unset';
 
 		this.dividerTouchAreaElement.addEventListener('pointerdown', this.#onDragStart);
@@ -253,14 +260,11 @@ export class UmbSplitPanelElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div id="main">
-				<slot
-					name="start"
-					@slotchange=${this.#onSlotChanged}
-					style="width: ${this._hasStartPanel ? '100%' : '0'}"></slot>
+				<slot name="start" @slotchange=${this.#onSlotChanged}></slot>
 				<div id="divider">
 					<div id="divider-touch-area" tabindex="0" @keydown=${this.#onKeydown}></div>
 				</div>
-				<slot name="end" @slotchange=${this.#onSlotChanged} style="width: ${this._hasEndPanel ? '100%' : '0'}"></slot>
+				<slot name="end" @slotchange=${this.#onSlotChanged}></slot>
 			</div>
 		`;
 	}
@@ -313,6 +317,41 @@ export class UmbSplitPanelElement extends UmbLitElement {
 			transform: round(translateX(-50%));
 			background-color: var(--umb-split-panel-divider-color);
 			z-index: -1;
+		}
+
+		:host([connected]) #main {
+			display: grid;
+			grid-template-columns: var(--_columns);
+		}
+
+		slot[name='end'] {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
+			:host([connected]) #main {
+				display: flex;
+				position: relative;
+			}
+			:host([connected]) slot[name='start'] {
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 100;
+				display: none;
+			}
+			:host([connected][sidebar-open]) slot[name='start'] {
+				display: block;
+			}
+			:host([connected]) slot[name='end'] {
+				flex: 1 1 auto;
+				min-width: 0;
+			}
+			:host([connected]) #divider {
+				display: none;
+			}
 		}
 	`;
 }
