@@ -43,7 +43,7 @@ export abstract class UmbTreeItemContextBase<
 	constructor(host: UmbControllerHost) {
 		super(host);
 		// TODO: Get take size from Tree context
-		this._treeItemChildrenManager.setTakeSize(50);
+		this._treeItemChildrenManager.setTakeSize(100);
 	}
 
 	/**

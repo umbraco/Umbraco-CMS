@@ -94,7 +94,7 @@ export class UmbDefaultTreeContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_CONTEXT);
-		this.#treeItemChildrenManager.setTakeSize(50);
+		this.#treeItemChildrenManager.setTakeSize(100);
 
 		// Auto-enable selectOnly when a selection exists and it was not explicitly set.
 		this.observe(this.selection.selection, (selection) => {
