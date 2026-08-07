@@ -65,7 +65,7 @@ internal class AsyncDocumentRepository
     /// <param name="jsonSerializer">The JSON serializer, used to parse legacy JSON-stored tag values.</param>
     /// <param name="userGroupService">The user group service, used to resolve user group keys to IDs for permission storage.</param>
     /// <param name="shortStringHelper">The short string helper, used to detect URL segment collisions between sibling names.</param>
-    internal AsyncDocumentRepository(
+    public AsyncDocumentRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
         ILoggerFactory loggerFactory,

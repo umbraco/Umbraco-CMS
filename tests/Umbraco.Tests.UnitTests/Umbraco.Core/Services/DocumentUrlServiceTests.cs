@@ -218,7 +218,7 @@ public class DocumentUrlServiceTests
     {
         var loggerMock = Mock.Of<ILogger<DocumentUrlService>>();
         var documentUrlRepositoryMock = new Mock<IDocumentUrlRepository>();
-        var documentRepositoryMock = Mock.Of<IDocumentRepository>();
+        var documentRepositoryMock = Mock.Of<IAsyncDocumentRepository>();
         var globalSettingsMock = Options.Create(new GlobalSettings());
         var webRoutingSettingsMock = Options.Create(new WebRoutingSettings());
         var contentServiceMock = Mock.Of<IContentService>();
@@ -660,7 +660,7 @@ public class DocumentUrlServiceTests
         var documentUrlRepositoryMock = new Mock<IDocumentUrlRepository>();
         documentUrlRepositoryMock.Setup(x => x.GetAll()).Returns(segments);
 
-        var documentRepositoryMock = Mock.Of<IDocumentRepository>();
+        var documentRepositoryMock = Mock.Of<IAsyncDocumentRepository>();
         var globalSettingsMock = Options.Create(new GlobalSettings());
         var webRoutingSettingsMock = Options.Create(new WebRoutingSettings());
         var contentServiceMock = Mock.Of<IContentService>();

@@ -30,7 +30,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
 
     private readonly ILogger<DocumentUrlService> _logger;
     private readonly IDocumentUrlRepository _documentUrlRepository;
-    private readonly IDocumentRepository _documentRepository;
+    private readonly IAsyncDocumentRepository _documentRepository;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly GlobalSettings _globalSettings;
     private readonly WebRoutingSettings _webRoutingSettings;
@@ -166,7 +166,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
-        IDocumentRepository documentRepository,
+        IAsyncDocumentRepository documentRepository,
         ICoreScopeProvider coreScopeProvider,
         IOptions<GlobalSettings> globalSettings,
         IOptions<WebRoutingSettings> webRoutingSettings,
@@ -215,7 +215,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         if (SkipDatabaseWrites() is false && await ShouldRebuildUrls())
         {
             _logger.LogInformation("Rebuilding all document URLs.");
-            await RebuildAllUrlsAsync();
+            await RebuildAllUrlsAsync(cancellationToken);
         }
 
         _logger.LogInformation("Caching document URLs.");
@@ -267,7 +267,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     private string GetCurrentRebuildValue() => string.Join("|", _urlSegmentProviderCollection.Select(x => x.GetType().Name));
 
     /// <inheritdoc/>
-    public async Task RebuildAllUrlsAsync()
+    public async Task RebuildAllUrlsAsync(CancellationToken cancellationToken)
     {
         if (SkipDatabaseWrites())
         {
@@ -278,7 +278,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        IEnumerable<IContent> documents = _documentRepository.GetMany(Array.Empty<int>());
+        IEnumerable<IContent> documents = await _documentRepository.GetAllAsync(cancellationToken);
 
         await CreateOrUpdateUrlSegmentsAsync(documents);
 

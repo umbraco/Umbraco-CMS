@@ -985,7 +985,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
-        Assert.DoesNotThrowAsync(() => DocumentUrlService.RebuildAllUrlsAsync());
+        Assert.DoesNotThrowAsync(() => DocumentUrlService.RebuildAllUrlsAsync(CancellationToken.None));
         Assert.That(
             DocumentUrlService.GetUrlSegment(Textpage.Key, isoCode, false),
             Is.Not.Null,
