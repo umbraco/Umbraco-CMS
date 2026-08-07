@@ -210,7 +210,8 @@ export class UmbArrayState<T, U = unknown, D extends T[] | undefined = T[]> exte
 	 * myState.append({ key: 1, value: 'replaced-foo'});
 	 */
 	appendOne(entry: T) {
-		const next = this.getValue() ? [...this.getValue()!] : [];
+		const value = this.getValue();
+		const next = value ? [...value] : [];
 		if (this.getUniqueMethod) {
 			pushToUniqueArray(next, entry, this.getUniqueMethod);
 		} else {
