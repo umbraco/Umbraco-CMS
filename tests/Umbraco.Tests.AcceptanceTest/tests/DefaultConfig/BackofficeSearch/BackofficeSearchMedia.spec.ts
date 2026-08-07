@@ -12,7 +12,8 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('can find a media item by name', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.media.createDefaultMediaFile(mediaName);
+  const mediaId = await umbracoApi.media.createDefaultMediaFile(mediaName);
+  await umbracoApi.media.waitUntilIndexed(mediaName, mediaId);
 
   // Act
   await umbracoUi.backofficeSearch.clickSearchHeaderButton();

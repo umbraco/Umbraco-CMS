@@ -24,11 +24,21 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     this.navigationTips = this.searchModal.locator('#navigation-tips');
   }
 
+  async goToSection(sectionName: string, checkSections = true, skipReload = false) {
+    await super.goToSection(sectionName, checkSections, skipReload);
+    await this.waitForVisible(this.activeSectionLink.getByText(sectionName));
+  }
+
   async clickSearchHeaderButton() {
     await this.waitForPageLoad();
-    await this.click(this.searchHeaderBtn);
-    await this.waitForLoadState();
-    await this.waitForVisible(this.searchModal, ConstantHelper.timeout.long);
+    await expect(async () => {
+      if (!(await this.searchModal.isVisible())) {
+        await this.click(this.searchHeaderBtn);
+      }
+      await expect(this.searchModal).toBeVisible({
+        timeout: ConstantHelper.timeout.short,
+      });
+    }).toPass({timeout: ConstantHelper.timeout.long});
   }
 
   async clickOutsideToCloseModal() {

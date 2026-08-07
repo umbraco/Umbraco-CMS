@@ -164,13 +164,38 @@ html`<p>${this.localize.htmlString('#defaultdialogs_confirmdelete', userControll
 html`<p>${unsafeHTML(this.localize.string('#defaultdialogs_confirmdelete', userControlledName))}</p>`;
 ```
 
-**Modal `content` field** (e.g. `umbConfirmModal`) renders strings via `unsafeHTML` internally. When passing a localized string with user-controlled args, wrap it in a template:
+**Modal `content` field** (e.g. `umbConfirmModal`) renders strings via `unsafeHTML` internally. When passing a localized string with user-controlled args, either pre-escape the args (preferred, `content` stays a plain string) or wrap an `htmlString()` call in a template for keys containing markup. Note `term()`/`string()` take a **bare** key — only `string()`/`htmlString()` resolve a leading `#`, so `term()` never uses one:
 
 ```typescript
-// ✅ Safe — htmlString escapes args, html`...` wraps the directive in a TemplateResult
+// ✅ Preferred — term() returns a plain string; escape user-controlled args at the call site
+umbConfirmModal(this, {
+	headline: '#actions_delete',
+	content: this.localize.term('defaultdialogs_confirmdelete', escapeHTML(item.name ?? '')),
+});
+
+// ✅ Also safe — htmlString escapes args, html`...` wraps the directive in a TemplateResult
 umbConfirmModal(this, {
 	headline: '#actions_delete',
 	content: html`${this.#localize.htmlString('#defaultdialogs_confirmdelete', item.name)}`,
+});
+```
+
+**Notification `htmlMessage` field**: notification `data.message` (`peek()`, `stay()`, `umbPeekError`) is always rendered as plain text. To render HTML in a toast, set `data.htmlMessage` instead — it takes precedence over `message`. A string value is sanitized with `sanitizeHTML` before rendering (scripts and event handlers are stripped); a `TemplateResult` renders as-is since Lit escapes its bindings. Sanitization does not prevent markup injection (links, images), so never interpolate user-controlled content into an `htmlMessage` string — use a `TemplateResult` (or `localize.htmlString()`) so the interpolated values are escaped:
+
+```typescript
+// ✅ Safe — static HTML string, sanitized at render
+notificationContext.peek('positive', {
+	data: { message: 'Import finished', htmlMessage: 'Import finished — <a href="/report">view the report</a>' },
+});
+
+// ✅ Safe — TemplateResult: Lit escapes item.name
+notificationContext.peek('positive', {
+	data: { message: `${item.name} published`, htmlMessage: html`<strong>${item.name}</strong> published` },
+});
+
+// ❌ Unsafe — user-controlled content in an HTML string survives sanitization as markup (e.g. links)
+notificationContext.peek('positive', {
+	data: { message: 'Published', htmlMessage: `<strong>${item.name}</strong> published` },
 });
 ```
 

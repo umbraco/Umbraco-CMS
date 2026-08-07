@@ -13,6 +13,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	UmbLitElement,
 ) {
 	@property({ type: String })
+	name?: string;
+
+	@property({ type: String })
 	label: string = '';
 
 	@property({ type: String })
@@ -35,6 +38,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 
 	@property({ type: String, attribute: 'alias-pattern' })
 	aliasPattern: string = DEFAULT_ALIAS_PATTERN;
+
+	@property({ type: String, attribute: 'autocomplete' })
+	autocomplete?: string;
 
 	@state()
 	private _aliasLocked = true;
@@ -128,7 +134,9 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 		return html`
 			<uui-input
 				id="name"
+				name=${ifDefined(this.name)}
 				placeholder=${ifDefined(this.placeholder)}
+				.autocomplete=${this.autocomplete}
 				label=${nameLabel}
 				.value=${this.value ?? ''}
 				@input=${this.#onNameChange}
@@ -137,11 +145,12 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 				${!this.readonly
 					? html`
 							<uui-input-lock
-								name="alias"
+								name=${ifDefined(this.name ? `${this.name}-alias` : undefined)}
 								slot="append"
 								label=${aliasLabel}
 								placeholder=${aliasLabel}
 								.value=${this.alias}
+								.autocomplete=${this.autocomplete}
 								?auto-width=${!!this.value}
 								?locked=${this._aliasLocked && !this.aliasReadonly}
 								?readonly=${this._aliasLocked || this.aliasReadonly}

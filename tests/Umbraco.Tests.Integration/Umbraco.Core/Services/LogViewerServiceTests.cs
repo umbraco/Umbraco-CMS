@@ -42,7 +42,7 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
     private string _corruptLogfilePath;
 
     [OneTimeSetUp]
-    public void Setup()
+    public new void Setup()
     {
         var testRoot = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
         var ioHelper = TestHelper.IOHelper;
@@ -66,7 +66,7 @@ internal sealed class LogViewerServiceTests : UmbracoIntegrationTest
     }
 
     [OneTimeTearDown]
-    public void TearDown()
+    public new void TearDown()
     {
         if (File.Exists(_sampleLogfilePath))
         {

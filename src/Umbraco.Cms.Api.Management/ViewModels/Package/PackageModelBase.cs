@@ -31,6 +31,12 @@ public class PackageModelBase
     public bool MediaLoadChildNodes { get; set; }
 
     /// <summary>
+    ///     Gets or sets the list of keys for the selected elements.
+    /// </summary>
+    // TODO (V20): make non-nullable
+    public IList<Guid>? ElementIds { get; set; } = new List<Guid>();
+
+    /// <summary>
     ///     Gets or sets the list of ids for the selected document types.
     /// </summary>
     public IList<string> DocumentTypes { get; set; } = new List<string>();

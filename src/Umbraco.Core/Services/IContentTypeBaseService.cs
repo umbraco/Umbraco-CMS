@@ -278,6 +278,16 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(int skip, int take);
 
     /// <summary>
+    /// Returns all the content types allowed in the library.
+    /// </summary>
+    /// <param name="parentKey">The parent container key, or <c>null</c> at the library root.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The number of items to take.</param>
+    // TODO (V20): Remove default implementation.
+    Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(Guid? parentKey, int skip, int take)
+        => GetAllAllowedInLibraryAsync(skip, take);
+
+    /// <summary>
     /// Returns all content types allowed as children for a given content type key.
     /// </summary>
     /// <param name="key">The content type key.</param>

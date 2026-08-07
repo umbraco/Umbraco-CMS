@@ -30,7 +30,11 @@ import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import {
+	UMB_CURRENT_USER_CONTEXT,
+	UmbUserEntryPointExtensionInitializer,
+} from '@umbraco-cms/backoffice/current-user';
+import { UmbOutlineStyleController } from './outline-style.controller.js';
 
 const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
 	import('../../packages/block/umbraco-package.js'),
@@ -185,6 +189,9 @@ export class UmbAppElement extends UmbLitElement {
 	#serverConnection?: UmbServerConnection;
 	#authController = new UmbAppAuthController(this);
 	#bundleInitializer: UmbBundleExtensionInitializer;
+	// The initializer registers itself as a controller on this host; the reference only pins the instantiation to the app's lifetime.
+	// eslint-disable-next-line no-unused-private-class-members
+	#userEntryPointInitializer?: UmbUserEntryPointExtensionInitializer;
 
 	#currentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>>;
@@ -201,6 +208,8 @@ export class UmbAppElement extends UmbLitElement {
 		new UmbNetworkConnectionStatusManager(this);
 
 		new UmbViewContext(this, null);
+
+		new UmbOutlineStyleController(this);
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (userContext) => {
 			this.#currentUser = userContext;
@@ -243,6 +252,9 @@ export class UmbAppElement extends UmbLitElement {
 					// TODO: Remove dependency on current user context from the app element in future [MR]
 					this.#loadCurrentUser();
 				} else {
+					// Authorization was lost (e.g. session timeout). Invalidate the loaded current user,
+					// as a subsequent sign-in may be for a different user.
+					this.#currentUser?.invalidate();
 					// TODO: Unregistering all extensions from v.18 [NL]
 					//void this.#unregisterExtensions();
 				}
@@ -263,6 +275,8 @@ export class UmbAppElement extends UmbLitElement {
 		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
 		const entryPointInitializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
+		this.#userEntryPointInitializer = new UmbUserEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
@@ -338,7 +352,7 @@ export class UmbAppElement extends UmbLitElement {
 		umbExtensionsRegistry.registerMany((await this.#packageModules).flatMap((modules) => modules.extensions));
 	}
 
-	// TODO (V18): Unregister extensions on sign-out. [NL]
+	// TODO: Unregister extensions on sign-out for v.19. [NL]
 	/*
 		async #unregisterExtensions() {
 			if (!this.#packageModules) return;

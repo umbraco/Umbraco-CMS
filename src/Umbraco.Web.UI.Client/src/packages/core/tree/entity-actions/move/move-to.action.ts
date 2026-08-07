@@ -14,6 +14,11 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		return (treeItem) => treeItem.unique !== unique;
 	}
 
+	#searchConfig() {
+		const alias = this.args.meta.searchProviderAlias;
+		return alias ? { providerAlias: alias } : undefined;
+	}
+
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
@@ -23,15 +28,23 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 			this._getPickableFilter(this.args.unique),
 		]);
 
+		const treeExpansion = ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined;
+
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
+				headline: '#actions_move',
+				confirmLabel: '#general_move',
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
-				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
+				treeExpansion,
 				pickableFilter,
+				search: this.#searchConfig(),
 			},
-		});
+		}).catch(() => undefined);
+
+		// The modal was cancelled.
+		if (!value) return;
 
 		const destinationUnique = value.selection[0];
 		if (destinationUnique === undefined) throw new Error('Destination Unique is not available');

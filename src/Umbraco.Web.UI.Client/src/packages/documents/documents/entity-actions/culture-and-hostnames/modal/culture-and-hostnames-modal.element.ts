@@ -311,14 +311,14 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 					popovertarget="more-options">
 					<uui-icon name="icon-navigation-down"></uui-icon>
 				</uui-button>
-				<uui-popover-container id="more-options" placement="bottom-end">
-					<umb-popover-layout>
-						<uui-button
-							label=${this.localize.term('assignDomain_addCurrent')}
-							@click=${() => this.#onAddDomain(true)}></uui-button>
-					</umb-popover-layout>
-				</uui-popover-container>
 			</uui-button-group>
+			<uui-popover-container id="more-options" placement="bottom-end">
+				<umb-popover-layout>
+					<uui-button
+						label=${this.localize.term('assignDomain_addCurrent')}
+						@click=${() => this.#onAddDomain(true)}></uui-button>
+				</umb-popover-layout>
+			</uui-popover-container>
 		`;
 	}
 

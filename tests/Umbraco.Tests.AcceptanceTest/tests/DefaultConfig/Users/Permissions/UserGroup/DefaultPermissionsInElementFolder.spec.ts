@@ -134,7 +134,7 @@ test('can rename an element folder with update permission enabled', async ({umbr
   // Act
   await umbracoUi.library.clickActionsMenuForElement(folderName);
   await umbracoUi.library.clickRenameActionMenuOption();
-  await umbracoUi.library.enterFolderName(newFolderName);
+  await umbracoUi.library.enterRenameFolderName(newFolderName);
   await umbracoUi.library.clickConfirmRenameFolderButtonAndWaitForElementFolderToBeRenamed();
 
   // Assert
@@ -315,10 +315,8 @@ test.skip('cannot see an element inside a folder when read folder permission is 
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
   await umbracoUi.library.goToWorkspacePath(`/workspace/element-folder/edit/${folderId}`);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
   await umbracoUi.library.goToWorkspacePath(`/workspace/element/edit/${innerElementId}`);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
   await umbracoUi.library.isElementReadOnly();
 });
 

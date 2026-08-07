@@ -30,6 +30,20 @@ describe('UmbAuthContext', () => {
 			expect(context).to.have.property('isInitialized');
 		});
 
+		// setInitialized() used to be driven from the core entry point. It now runs in the constructor,
+		// so guard the property that makes that safe: #isInitialized is a ReplaySubject(1), meaning a
+		// subscriber attaching after construction still receives the emission rather than hanging.
+		// Reading the deprecated getter logs a deprecation warning here — expected, since the test
+		// runner's origin resolves to 'unknown' rather than 'core' so the warning isn't suppressed.
+		it('emits isInitialized to a subscriber that attaches after construction', async () => {
+			let emitted = false;
+			context.isInitialized.subscribe(() => {
+				emitted = true;
+			});
+			await aTimeout(0);
+			expect(emitted).to.be.true;
+		});
+
 		it('has a getIsAuthorized method', () => {
 			expect(context).to.have.property('getIsAuthorized').that.is.a('function');
 		});
@@ -205,6 +219,12 @@ describe('UmbAuthContext', () => {
 
 		it('times the user out on a definitive invalid_grant failure', async () => {
 			fetchResponder = invalidGrantResponse;
+
+			// A peer tab establishes the session that is about to be rejected
+			const now = Math.floor(Date.now() / 1000);
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await aTimeout(50);
+
 			let timeOutCalls = 0;
 			context.timeOut = () => {
 				timeOutCalls++;
@@ -213,6 +233,19 @@ describe('UmbAuthContext', () => {
 			await context.validateToken();
 
 			expect(timeOutCalls).to.equal(1);
+		});
+
+		it('does not time the user out when there was no session to lose', async () => {
+			fetchResponder = invalidGrantResponse;
+			let timeOutCalls = 0;
+			context.timeOut = () => {
+				timeOutCalls++;
+			};
+
+			await context.setInitialState();
+
+			expect(timeOutCalls).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.false;
 		});
 
 		it('retries /token after a transient network failure', async () => {

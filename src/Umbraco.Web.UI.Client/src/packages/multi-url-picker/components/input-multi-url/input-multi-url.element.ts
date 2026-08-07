@@ -69,7 +69,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -87,7 +87,7 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */

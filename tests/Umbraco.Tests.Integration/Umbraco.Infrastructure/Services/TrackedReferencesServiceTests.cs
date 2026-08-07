@@ -38,7 +38,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     }
 
     [SetUp]
-    public async Task Setup() => await CreateTestData();
+    public new async Task Setup() => await CreateTestData();
 
     protected virtual async Task CreateTestData()
     {

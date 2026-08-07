@@ -34,6 +34,7 @@ public sealed class SystemTextConfigurationEditorJsonSerializer : SystemTextJson
                 new JsonUdiConverter(),
                 new JsonUdiRangeConverter(),
                 new JsonBooleanConverter(),
+                new JsonTolerantNumberConverterFactory(),
             },
 
             // Properties of data type configuration objects are annotated with [ConfigurationField] attributes

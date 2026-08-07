@@ -3,11 +3,42 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 public partial class ElementEditingServiceTests
 {
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowElementInFolders))]
+    public async Task Cannot_Move_Element_Into_A_Folder_Disallowed_By_Content_Type_Filter()
+    {
+        var containerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey);
+
+        var element = await CreateInvariantElement();
+
+        var moveResult = await ElementEditingService.MoveAsync(element.Key, containerKey, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(moveResult.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, moveResult.Result);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowElementAtRoot))]
+    public async Task Cannot_Move_Element_To_Root_Disallowed_By_Content_Type_Filter()
+    {
+        var containerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey);
+
+        var element = await CreateInvariantElement(containerKey);
+
+        var moveResult = await ElementEditingService.MoveAsync(element.Key, null, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(moveResult.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, moveResult.Result);
+    }
+
     [Test]
     public async Task Can_Move_Element_From_Root_To_A_Folder()
     {

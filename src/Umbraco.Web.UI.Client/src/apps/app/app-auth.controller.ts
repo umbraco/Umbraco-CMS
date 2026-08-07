@@ -1,5 +1,5 @@
 import { UMB_AUTH_CONTEXT, UMB_MODAL_APP_AUTH } from '@umbraco-cms/backoffice/auth';
-import type { UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
+import type { ManifestAuthProvider, UmbUserLoginState } from '@umbraco-cms/backoffice/auth';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
@@ -67,8 +67,12 @@ export class UmbAppAuthController extends UmbControllerBase {
 		}
 		setStoredPath(currentUrl);
 
-		// Figure out which providers are available
-		const availableProviders = await firstValueFrom(this.#authContext.getAuthProviders(umbExtensionsRegistry));
+		// Figure out which providers are available. Queried straight from the registry: app.element.ts
+		// awaits app entry points before routing, so any providers they register (or unregister) have
+		// already settled by the time this runs.
+		const availableProviders = await firstValueFrom(
+			umbExtensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider'),
+		);
 
 		if (availableProviders.length === 0) {
 			throw new Error('[Fatal] No auth providers available');

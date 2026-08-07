@@ -142,10 +142,10 @@ public sealed partial class HtmlLocalLinkParser
         {
             return _linkPattern.Replace(text, match =>
             {
-                if (match.Groups["culture"].Value.Equals(culture, StringComparison.OrdinalIgnoreCase)
+                if (match.Groups["culture"].ValueSpan.Equals(culture, StringComparison.OrdinalIgnoreCase)
                     && match.Groups["href"].Value == tagHref)
                 {
-                    return match.Groups[1].Value + newLink + match.Groups["closequote"].Value;
+                    return $"{match.Groups[1].ValueSpan}{newLink}{match.Groups["closequote"].ValueSpan}";
                 }
                 return match.Value;
             });
@@ -165,7 +165,7 @@ public sealed partial class HtmlLocalLinkParser
         MatchCollection localLinkTagMatches = _localLinkTagPattern.Matches(text);
         foreach (Match linkTag in localLinkTagMatches)
         {
-            if (Guid.TryParse(linkTag.Groups["guid"].Value, out Guid guid) is false)
+            if (Guid.TryParse(linkTag.Groups["guid"].ValueSpan, out Guid guid) is false)
             {
                 continue;
             }

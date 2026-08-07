@@ -1,6 +1,5 @@
-import type { UmbWebhookDeliveryCollectionFilterModel } from '../types.js';
+import type { UmbWebhookDeliveryCollectionFilterModel, UmbWebhookDeliveryCollectionItemModel } from '../types.js';
 import { UMB_WEBHOOK_DELIVERY_ENTITY_TYPE } from '../../../entity.js';
-import type { UmbWebhookDeliveryDetailModel } from '../../types.js';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -43,14 +42,15 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 		}
 
 		const items = data.items.map((item) => {
-			const model: UmbWebhookDeliveryDetailModel = {
+			const model: UmbWebhookDeliveryCollectionItemModel = {
 				entityType: UMB_WEBHOOK_DELIVERY_ENTITY_TYPE,
 				unique: item.key,
+				name: item.eventAlias,
+				icon: 'icon-box-alt',
 				date: item.date,
 				url: item.url,
-				eventAlias: item.eventAlias,
 				retryCount: item.retryCount,
-				statusCode: item.statusCode,
+				statusCode: { label: item.statusCode, code: item.httpStatusCode ?? null },
 			};
 
 			return model;

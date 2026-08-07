@@ -7,6 +7,7 @@ import { customElement, state, css, html } from '@umbraco-cms/backoffice/externa
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
+// TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
 @customElement('umb-media-workspace-editor')
 export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	//
@@ -14,6 +15,8 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	private _splitViewElement = new UmbMediaWorkspaceSplitViewElement();
 
 	#workspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
+
+	#workspaceRoute?: string;
 	#variants?: Array<Pick<UmbMediaVariantOptionModel, 'culture' | 'segment' | 'unique'>>;
 
 	@state()
@@ -70,41 +73,51 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
-		// Split view routes:
-		this.#variants?.forEach((variantA) => {
-			this.#variants?.forEach((variantB) => {
-				routes.push({
-					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
-					path: variantA.unique + '_&_' + variantB.unique,
-					component: this._splitViewElement,
-					setup: (_component, info) => {
-						// Set split view/active info..
-						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
-					},
-				});
-			});
+		routes.push({
+			path: '/:variantPath/',
+			preserveQuery: true,
+			component: this._splitViewElement,
+			setup: async (_component, info) => {
+				const variants = this.#variants;
+				if (!variants) {
+					throw new Error('Variants are not available when resolving the route.');
+				}
+				if (!this.#workspaceContext) {
+					throw new Error('Workspace context is not available when resolving the route.');
+				}
+
+				const consumed = info.match.fragments.consumed;
+
+				this.#workspaceContext?.splitView.setVariantParts(consumed);
+			},
 		});
 
-		// Single view:
-		this.#variants?.forEach((variant) => {
-			routes.push({
-				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
-				path: variant.unique,
-				component: this._splitViewElement,
-				setup: (_component, info) => {
-					// cause we might come from a split-view, we need to reset index 1.
-					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
-				},
-			});
-		});
-
-		if (routes.length !== 0 && this.#variants?.length) {
-			// Using first single view as the default route for now (hence the math below):
+		if (routes.length !== 0) {
+			// Find a decent variant to use as the default route:
 			routes.push({
 				path: '',
+				preserveQuery: true,
 				pathMatch: 'full',
-				redirectTo: routes[this.#variants.length * this.#variants.length]?.path,
+				resolve: async () => {
+					if (!this.#workspaceContext) {
+						throw new Error('Workspace context is not available when resolving the default route.');
+					}
+
+					// get current get variables from url, and check if openCollection is set:
+					const urlSearchParams = new URLSearchParams(window.location.search);
+					const openCollection = urlSearchParams.has('openCollection');
+					const view = openCollection ? `/view/collection` : '';
+
+					// Is there a path matching the current culture?
+					let variant = this.#variants?.find((v) => !v.culture);
+
+					if (!variant) {
+						// If none then just use the first variant as a fallback.
+						variant = this.#variants?.[0];
+					}
+
+					history.replaceState({}, '', `${this.#workspaceRoute}/${variant?.unique}${view}`);
+				},
 			});
 		}
 
@@ -126,7 +139,8 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
-		this.#workspaceContext?.splitView.setWorkspaceRoute(e.target.absoluteRouterPath);
+		this.#workspaceRoute = e.target.absoluteRouterPath;
+		this.#workspaceContext?.splitView.setWorkspaceRoute(this.#workspaceRoute);
 	};
 
 	override render() {

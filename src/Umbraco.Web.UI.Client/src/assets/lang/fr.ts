@@ -298,6 +298,8 @@ export default {
 		createEmpty: 'Créer nouveau',
 		createFromClipboard: 'Copier du clipboard',
 		saveModalTitle: 'Sauver',
+		saveAndPublishDescendantsModalTitle: 'Sauver et publier avec les descendants',
+		saveAndScheduleModalTitle: 'Sauver et planifier la publication',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Créer un nouveau Modèle de Contenu à partir de <em>%0%</em>',

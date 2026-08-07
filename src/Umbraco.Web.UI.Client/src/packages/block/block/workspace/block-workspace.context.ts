@@ -13,6 +13,7 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	type ManifestWorkspace,
 	UmbWorkspaceIsNewRedirectControllerAlias,
+	umbWorkspaceWillNavigateAway,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbBooleanState,
@@ -267,6 +268,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 						}
 
 						await this.content.structure.whenLoaded();
+						// Have we been destroyed while awaiting the structure? then back out, otherwise reading from
+						// the now-destroyed content type structure or element states throws:
+						if (!this.#blockManager) return;
 						this.#gotLabel(blockType?.label ?? this.content.structure.getOwnerContentTypeName());
 					},
 					'observeBlockType',
@@ -351,10 +355,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	 * @memberof UmbEntityWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
-		if (newUrl instanceof URL) {
-			newUrl = newUrl.href;
-		}
-		return !newUrl.includes(this.routes.getActiveLocalPath());
+		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);
 	}
 
 	setEditorSize(editorSize: UUIModalSidebarSize) {

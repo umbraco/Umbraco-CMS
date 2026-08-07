@@ -7,7 +7,11 @@ import type {
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type {
+	ObserverCallback,
+	UmbObserverValueType,
+	UmbObserverController,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbClassGetContextOptions extends UmbContextConsumerAsPromiseOptionsType {
@@ -27,18 +31,13 @@ export interface UmbClassInterface extends UmbControllerHost {
 	observe<
 		ObservableType extends Observable<T> | undefined,
 		T,
-		SpecificT = ObservableType extends Observable<infer U>
-			? ObservableType extends undefined
-				? U | undefined
-				: U
-			: undefined,
+		SpecificT = UmbObserverValueType<ObservableType>,
 		SpecificR = ObservableType extends undefined
 			? UmbObserverController<SpecificT> | undefined
 			: UmbObserverController<SpecificT>,
 	>(
-		// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
 		source: ObservableType,
-		callback?: ObserverCallback<SpecificT>,
+		callback?: ObserverCallback<UmbObserverValueType<ObservableType>>,
 		controllerAlias?: UmbControllerAlias | null,
 	): SpecificR;
 

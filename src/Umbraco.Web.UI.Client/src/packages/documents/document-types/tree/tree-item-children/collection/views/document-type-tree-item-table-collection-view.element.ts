@@ -136,6 +136,6 @@ export { UmbDocumentTypeTreeItemTableCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbDocumentTypeTreeItemTableCollectionViewElement;
+		'umb-document-type-tree-item-table-collection-view': UmbDocumentTypeTreeItemTableCollectionViewElement;
 	}
 }

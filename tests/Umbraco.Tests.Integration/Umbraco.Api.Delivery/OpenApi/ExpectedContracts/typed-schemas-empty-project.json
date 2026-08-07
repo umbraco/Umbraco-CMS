@@ -1516,6 +1516,12 @@
             "type": "string",
             "format": "uuid"
           },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "properties": {
             "type": [
               "null",
