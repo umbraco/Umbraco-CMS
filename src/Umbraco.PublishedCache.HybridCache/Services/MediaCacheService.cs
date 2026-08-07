@@ -174,7 +174,9 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
         // The node carries both identifiers, so the id/key map can be warmed without a lookup of its own.
         // Unlike the content itself the mapping is permanent, so this is done regardless of snapshotIsCurrent.
+        // Deliberately outside the read-through branch above, so that backing store hits populate the map too.
         _idKeyMap.PopulateCache(contentCacheNode.Id, contentCacheNode.Key, UmbracoObjectTypes.Media);
+
 
         IPublishedContent? result = _publishedContentFactory.ToIPublishedMedia(contentCacheNode).CreateModel(_publishedModelFactory);
 
@@ -282,7 +284,13 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
             scope.Complete();
 
-            _logger.LogDebug("Media nodes to cache {NodeCount}", cacheNodes.Count);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Media nodes to cache {NodeCount}", cacheNodes.Count);
+            }
+
+            // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
+            var idKeyPairs = new List<(int Id, Guid Key)>(cacheNodes.Count);
 
             foreach (ContentCacheNode cacheNode in cacheNodes)
             {
@@ -292,12 +300,11 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
                     GetSeedEntryOptions(),
                     GenerateTags(cacheNode),
                     cancellationToken: cancellationToken);
+
+                idKeyPairs.Add((cacheNode.Id, cacheNode.Key));
             }
 
-            // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
-            _idKeyMap.PopulateCache(
-                cacheNodes.Select(x => (x.Id, x.Key)).ToList(),
-                UmbracoObjectTypes.Media);
+            _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Media);
         }
 
 #if DEBUG
@@ -307,9 +314,6 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         _logger.LogInformation("Media cache seeding completed with {SeedCount} seed keys.", SeedKeys.Count);
 #endif
     }
-
-    // Internal for test purposes.
-    internal void ResetSeedKeys() => _seedKeys = null;
 
     public async Task RefreshMemoryCacheAsync(Guid key)
     {
@@ -394,6 +398,14 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             .Select(x => _publishedContentFactory.ToIPublishedContent(x, x.IsDraft).CreateModel(_publishedModelFactory))
             .WhereNotNull();
     }
+
+    /// <summary>
+    ///     Discards the memoized seed keys so that they are recalculated on the next seeding run.
+    /// </summary>
+    /// <remarks>
+    ///     Internal for test purposes, so that media created after the keys were first resolved is seeded.
+    /// </remarks>
+    internal void ResetSeedKeys() => _seedKeys = null;
 
     private HybridCacheEntryOptions GetEntryOptions(Guid key)
     {

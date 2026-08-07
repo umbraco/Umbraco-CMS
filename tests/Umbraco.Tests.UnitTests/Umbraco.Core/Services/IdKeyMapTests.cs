@@ -13,10 +13,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 [TestFixture]
 public class IdKeyMapTests
 {
-    private IdKeyMap GetIdKeyMap()
+    private static IdKeyMap GetIdKeyMap()
         => new IdKeyMap(Mock.Of<ICoreScopeProvider>(), Mock.Of<IIdKeyMapRepository>());
 
-    private IdKeyMap GetIdKeyMap(out Mock<IIdKeyMapRepository> repository)
+    private static IdKeyMap GetIdKeyMap(out Mock<IIdKeyMapRepository> repository)
     {
         repository = new Mock<IIdKeyMapRepository>();
 

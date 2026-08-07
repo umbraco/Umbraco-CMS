@@ -192,9 +192,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         // The node carries both identifiers, so the id/key map can be warmed without a lookup of its own.
         // Unlike the content itself the mapping is permanent, so this is done regardless of snapshotIsCurrent.
-        // The L0 fast path above returns before reaching here, which only matters for a key that was mapped
-        // by an earlier pass - and the map is only ever evicted per entity, alongside that entity's L0 entry.
+        // Deliberately outside the read-through branch above, so that backing store hits populate the map too.
         _idKeyMap.PopulateCache(contentCacheNode.Id, contentCacheNode.Key, UmbracoObjectTypes.Document);
+
 
         IPublishedContent? result = _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
 
@@ -354,7 +354,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
             scope.Complete();
 
-            _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count);
+            }
+
+            // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
+            var idKeyPairs = new List<(int Id, Guid Key)>(cacheNodes.Count);
 
             foreach (ContentCacheNode cacheNode in cacheNodes)
             {
@@ -365,12 +371,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
                     GetSeedEntryOptions(),
                     GenerateTags(cacheNode),
                     cancellationToken: cancellationToken);
+
+                idKeyPairs.Add((cacheNode.Id, cacheNode.Key));
             }
 
-            // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
-            _idKeyMap.PopulateCache(
-                cacheNodes.Select(x => (x.Id, x.Key)).ToList(),
-                UmbracoObjectTypes.Document);
+            _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Document);
         }
 
 #if DEBUG

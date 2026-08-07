@@ -41,8 +41,6 @@ internal sealed class MediaHybridCacheIdKeyMapTests : UmbracoIntegrationTestWith
 
     private IMediaCacheService MediaCacheService => GetRequiredService<IMediaCacheService>();
 
-    private IIdKeyMap IdKeyMap => GetRequiredService<IIdKeyMap>();
-
     private CountingIdKeyMapRepository IdKeyMapRepository
         => (CountingIdKeyMapRepository)GetRequiredService<IIdKeyMapRepository>();
 
@@ -78,6 +76,26 @@ internal sealed class MediaHybridCacheIdKeyMapTests : UmbracoIntegrationTestWith
         IdKeyMapRepository.Reset();
 
         // Act - fetch by key, so resolving the media item itself never consults the map.
+        Assert.IsNotNull(await PublishedMediaHybridCache.GetByIdAsync(key));
+
+        // Assert
+        AssertResolvesWithoutQuerying(RootFolderId, key);
+    }
+
+    [Test]
+    public async Task Loading_Media_From_The_Backing_Store_Populates_The_Id_Key_Map()
+    {
+        Guid key = RootFolder.Key!.Value;
+
+        // Arrange - warm the hybrid cache, then drop only the converted content cache. The read below is
+        // therefore served from the backing store rather than the database, which is the common case and
+        // the reason the map is populated outside the branch that reads through to the repository.
+        Assert.IsNotNull(await PublishedMediaHybridCache.GetByIdAsync(key));
+        MediaCacheService.ClearConvertedContentCache();
+        IdKeyMap.ClearCache();
+        IdKeyMapRepository.Reset();
+
+        // Act
         Assert.IsNotNull(await PublishedMediaHybridCache.GetByIdAsync(key));
 
         // Assert

@@ -42,8 +42,6 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
 
     private IDocumentCacheService DocumentCacheService => GetRequiredService<IDocumentCacheService>();
 
-    private IIdKeyMap IdKeyMap => GetRequiredService<IIdKeyMap>();
-
     private CountingIdKeyMapRepository IdKeyMapRepository
         => (CountingIdKeyMapRepository)GetRequiredService<IIdKeyMapRepository>();
 
@@ -85,19 +83,22 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
     }
 
     [Test]
-    public async Task Loading_A_Document_Keeps_The_Id_Key_Map_Populated_Across_Repeated_Reads()
+    public async Task Loading_A_Document_From_The_Backing_Store_Populates_The_Id_Key_Map()
     {
         Guid key = PublishedTextPage.Key!.Value;
 
-        await DocumentCacheService.RemoveFromMemoryCacheAsync(key);
+        // Arrange - warm the hybrid cache, then drop only the converted content cache. The read below is
+        // therefore served from the backing store rather than the database, which is the common case and
+        // the reason the map is populated outside the branch that reads through to the repository.
+        Assert.IsNotNull(await PublishedContentHybridCache.GetByIdAsync(key));
+        DocumentCacheService.ClearConvertedContentCache();
         IdKeyMap.ClearCache();
         IdKeyMapRepository.Reset();
 
-        // The first read is a cache miss and warms the map; subsequent reads are served from the converted
-        // content cache and return before the map is consulted, which is why the map has to stay warm.
-        Assert.IsNotNull(await PublishedContentHybridCache.GetByIdAsync(key));
+        // Act
         Assert.IsNotNull(await PublishedContentHybridCache.GetByIdAsync(key));
 
+        // Assert
         AssertResolvesWithoutQuerying(PublishedTextPageId, key);
     }
 
