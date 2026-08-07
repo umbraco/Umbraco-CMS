@@ -77,6 +77,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private NavigationSnapshot _navigation = new(new(), []);
     private NavigationSnapshot _recycleBinNavigation = new(new(), []);
 
+    private Lock _lockNavigation = new();
+    private Lock _lockRecycleBinNavigation = new();
+
     /// <summary>
     ///     Gets the approximate number of nodes currently held in memory across the active navigation
     ///     structure and the recycle bin structure, for diagnostics. Each snapshot reference is read once,
@@ -483,7 +486,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
         else
         {
-            _navigation.Roots.Add(key);
+            lock (_lockNavigation)
+            {
+                _navigation.Roots.Add(key);
+            }
         }
 
         // Note: sortOrder can't be automatically determined for items at root level, so it needs to be passed in
@@ -523,7 +529,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false; // Cannot move a node to itself
         }
 
-        _navigation.Roots.Remove(key); // Just in case
+        lock (_lockNavigation)
+        {
+            _navigation.Roots.Remove(key); // Just in case
+        }
 
         NavigationNode? targetParentNode = null;
         if (targetParentKey.HasValue)
@@ -535,7 +544,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
         else
         {
-            _navigation.Roots.Add(key);
+            lock(_lockNavigation)
+            {
+                _navigation.Roots.Add(key);
+            }
         }
 
         // Remove the node from its current parent's children list
@@ -598,7 +610,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false; // Node doesn't exist
         }
 
-        _recycleBinNavigation.Roots.Remove(key);
+        lock (_lockRecycleBinNavigation)
+        {
+            _recycleBinNavigation.Roots.Remove(key);
+        }
 
         RemoveDescendantsRecursively(nodeToRemove);
 
@@ -928,8 +943,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
     private void AddDescendantsToRecycleBinRecursively(NavigationNode node)
     {
-        _recycleBinNavigation.Roots.Add(node.Key);
-        _navigation.Roots.Remove(node.Key);
+        lock (_lockRecycleBinNavigation)
+        {
+            _recycleBinNavigation.Roots.Add(node.Key);
+        }
+        lock (_lockNavigation)
+        {
+            _navigation.Roots.Remove(node.Key);
+        }
         IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _navigation.Structure);
 
         foreach (Guid childKey in childrenKeys)
@@ -970,10 +991,16 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     {
         if (node.Parent is null)
         {
-            _navigation.Roots.Add(node.Key);
+            lock(_lockNavigation)
+            {
+                _navigation.Roots.Add(node.Key);
+            }
         }
 
-        _recycleBinNavigation.Roots.Remove(node.Key);
+        lock(_lockRecycleBinNavigation)
+        {
+            _recycleBinNavigation.Roots.Remove(node.Key);
+        }
         IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _recycleBinNavigation.Structure);
 
         foreach (Guid childKey in childrenKeys)
