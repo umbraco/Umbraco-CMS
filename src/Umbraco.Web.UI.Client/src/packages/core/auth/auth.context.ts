@@ -13,21 +13,18 @@ import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-c
 import { isReturnableRoute } from './returnable-route.function.js';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
-/**
- * Session lifetime assumed when the server reports no expiry, which happens with
- * `keepUserLoggedIn`. It never drives the countdown — the timeout controller does not schedule a
- * warning in that mode — it is only carried in the session broadcast to peer tabs.
- */
-const ASSUMED_SESSION_LIFETIME_IN_SECONDS = 60 * 60;
-
 export interface UmbAuthSession {
 	/**
 	 * @deprecated Cookie auth has a single, server-owned expiry, so this is now identical to
 	 * {@link expiresAt}. Use `expiresAt`. Scheduled for removal in Umbraco 21.
 	 */
-	accessTokenExpiresAt: number;
-	/** When the session (auth cookie) expires. Used for the timeout UI. */
-	expiresAt: number;
+	accessTokenExpiresAt?: number;
+	/**
+	 * When the session (auth cookie) expires. Used for the timeout UI.
+	 * Undefined when the server reported no expiry, which means "unknown", not "never": the
+	 * countdown is not scheduled at all rather than run against a guess.
+	 */
+	expiresAt?: number;
 }
 
 export class UmbAuthContext extends UmbContextBase {
@@ -314,9 +311,12 @@ export class UmbAuthContext extends UmbContextBase {
 
 			const data = await response.json();
 			const issuedAt = Math.floor(Date.now() / 1000);
+			// No expiry reported means the server did not tell us when the session ends, not that it
+			// never does. Guessing a lifetime schedules the warning at the wrong time in whichever
+			// direction the guess is wrong, so carry the session without one instead.
 			const expiresIn = data.timeoutUtc
 				? Math.max(0, Math.floor(new Date(data.timeoutUtc).getTime() / 1000) - issuedAt)
-				: ASSUMED_SESSION_LIFETIME_IN_SECONDS;
+				: undefined;
 
 			this.#setSessionLocally(expiresIn, issuedAt);
 
@@ -347,7 +347,9 @@ export class UmbAuthContext extends UmbContextBase {
 	/** Internal, non-warning implementation of {@link isSessionValid}. */
 	#isSessionValid(): boolean {
 		const session = this.#session.getValue();
-		return !!session && session.expiresAt > Math.floor(Date.now() / 1000);
+		if (!session) return false;
+		// An unknown expiry cannot be checked, so do not treat it as expired.
+		return session.expiresAt === undefined || session.expiresAt > Math.floor(Date.now() / 1000);
 	}
 
 	/**
@@ -606,14 +608,15 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Sets the in-memory session state (does not broadcast — callers that establish a session on
 	 * behalf of other tabs, e.g. {@link #establishSessionFromServer}, broadcast separately).
-	 * @param {number} expiresIn The number of seconds until the session expires.
+	 * @param {number | undefined} expiresIn The number of seconds until the session expires, or
+	 * undefined when the server reported no expiry.
 	 * @param {number} issuedAt The timestamp when the session was issued.
 	 */
-	#setSessionLocally(expiresIn: number, issuedAt: number) {
+	#setSessionLocally(expiresIn: number | undefined, issuedAt: number) {
 		// Cookie auth: the session has a single, server-owned expiry (the auth cookie's), so both
 		// timestamps are the same — the historical access-vs-refresh token split (and its ×4
 		// multiplier) no longer applies. TODO (V21): drop the deprecated accessTokenExpiresAt.
-		const expiresAt = issuedAt + expiresIn;
+		const expiresAt = expiresIn === undefined ? undefined : issuedAt + expiresIn;
 		this.#session.setValue({ accessTokenExpiresAt: expiresAt, expiresAt });
 	}
 

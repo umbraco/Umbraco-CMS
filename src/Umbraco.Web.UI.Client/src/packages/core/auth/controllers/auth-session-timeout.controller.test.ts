@@ -108,6 +108,18 @@ describe('UmbAuthSessionTimeoutController', () => {
 		expect(timeOutCalls).to.equal(1);
 	});
 
+	// A missing expiry means the server did not say when the session ends. Scheduling a warning
+	// against a guessed lifetime fires at the wrong time in whichever direction the guess is wrong,
+	// and an over-long guess is the dangerous one: no warning until well after the cookie died.
+	it('does not schedule a countdown when the session has no known expiry', async () => {
+		const now = Math.floor(Date.now() / 1000);
+		channel.postMessage({ type: 'authorized', expiresIn: undefined, issuedAt: now });
+		await aTimeout(50);
+
+		expect(openedModals).to.have.lengthOf(0);
+		expect(timeOutCalls).to.equal(0);
+	});
+
 	it('times out instead of opening the modal when the warning timer fires after the session expired (e.g. after system sleep)', async function () {
 		this.timeout(5000);
 

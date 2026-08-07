@@ -35,8 +35,13 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 					// logged back in and broadcast the fresh session).
 					this.#closeTimeoutModal();
 
-					// Schedule the warning against the session expiry
-					this.#scheduleCheck(session.expiresAt);
+					// Schedule the warning against the session expiry. An unknown expiry gets no
+					// countdown: warning against a guessed lifetime is worse than not warning, because
+					// the guess is as likely to fire long after the session died as before it. The
+					// interceptor's 401 handling remains the backstop.
+					if (session.expiresAt !== undefined) {
+						this.#scheduleCheck(session.expiresAt);
+					}
 				}
 			},
 			'_sessionState',

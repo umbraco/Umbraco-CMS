@@ -216,6 +216,20 @@ describe('UmbAuthContext', () => {
 				expect(session!.expiresAt).to.be.greaterThan(Math.floor(Date.now() / 1000));
 			});
 
+			// `timeoutUtc` is nullable on the server. Authorized-with-unknown-expiry is a real state,
+			// and it must not be turned into a guessed lifetime — see the timeout controller, which
+			// schedules no countdown for it.
+			it('authorizes without an expiry when the server reports no timeout', async () => {
+				stubFetch(() => new Response(JSON.stringify({}), { status: 200 }));
+
+				await context.setInitialState();
+
+				expect(context.getIsAuthorized()).to.be.true;
+				const session = getLatestSession();
+				expect(session).to.not.be.undefined;
+				expect(session!.expiresAt).to.be.undefined;
+			});
+
 			it('stays unauthorized and clears the session on a non-ok response', async () => {
 				stubFetch(() => new Response(null, { status: 401 }));
 
