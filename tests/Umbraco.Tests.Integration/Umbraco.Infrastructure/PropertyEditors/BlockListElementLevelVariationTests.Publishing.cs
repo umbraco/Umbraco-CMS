@@ -908,6 +908,118 @@ internal partial class BlockListElementLevelVariationTests
         }
     }
 
+    /// <summary>
+    /// A segment variant, culture invariant block property on a culture variant content type opts into
+    /// partial property publishing, which publishes every segment of the property, not just the default one.
+    /// </summary>
+    /// <remarks>
+    /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/23553.
+    /// </remarks>
+    [Test]
+    public async Task Can_Publish_Segment_Variant_Blocks_On_Culture_Variant_Content_Type()
+    {
+        // Arrange: prepare a culture variant content type with a segment variant block property,
+        // and create content with values for the default segment and one other segment.
+        const string Segment1 = "s1";
+
+        var elementType = CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateSegmentVariantPropertiesContentType(blockListDataType);
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Home (en)")
+            .WithCultureName("da-DK", "Home (da)")
+            .Build();
+
+        content.SetValue("title", "The default segment title");
+        content.SetValue("title", "The segment 1 title", null, Segment1);
+        content.SetValue("blocks", BlockListPropertyValueJson("The default segment block value"));
+        content.SetValue("blocks", BlockListPropertyValueJson("The segment 1 block value"), null, Segment1);
+
+        // Act: save and publish the content.
+        ContentService.Save(content);
+        PublishContent(content, contentType);
+
+        // Assert: retrieve the published content and assert that all segments of the block property
+        // are published, and the published cache has the same values.
+        var publishedContent = ContentService.GetById(content.Key);
+        Assert.IsNotNull(publishedContent);
+
+        Assert.Multiple(() =>
+        {
+            // A non-block property with the same variation publishes all its segments...
+            Assert.AreEqual("The default segment title", publishedContent.GetValue<string>("title", published: true));
+            Assert.AreEqual("The segment 1 title", publishedContent.GetValue<string>("title", segment: Segment1, published: true));
+
+            // ...and so should the block property.
+            Assert.AreEqual("The default segment block value", PublishedBlockValue(publishedContent, null));
+            Assert.AreEqual("The segment 1 block value", PublishedBlockValue(publishedContent, Segment1));
+        });
+
+        AssertPublishedCacheBlockValue(null, "The default segment block value");
+        AssertPublishedCacheBlockValue(Segment1, "The segment 1 block value");
+
+        string BlockListPropertyValueJson(string invariantTextValue)
+        {
+            var blockListValue = BlockListPropertyValue(
+                elementType,
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                new BlockProperty(
+                    [new() { Alias = "invariantText", Value = invariantTextValue }],
+                    [],
+                    null,
+                    null));
+            return JsonSerializer.Serialize(blockListValue);
+        }
+
+        string? PublishedBlockValue(IContent target, string? segment)
+        {
+            var value = target.GetValue<string>("blocks", segment: segment, published: true);
+            return value is null
+                ? null
+                : JsonSerializer.Deserialize<BlockListValue>(value)?.ContentData.FirstOrDefault()?.Values
+                    .FirstOrDefault(propertyValue => propertyValue.Alias == "invariantText")?.Value as string;
+        }
+
+        void AssertPublishedCacheBlockValue(string? segment, string expectedInvariantContentValue)
+        {
+            SetVariationContext("en-US", segment);
+            var cachedContent = GetPublishedContent(content.Key);
+
+            var value = cachedContent.Value<BlockListModel>("blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+            Assert.AreEqual(expectedInvariantContentValue, value.First().Content.Value<string>("invariantText"));
+        }
+    }
+
+    private async Task<IContentType> CreateSegmentVariantPropertiesContentType(IDataType blocksEditorDataType)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("myPage")
+            .WithName("My Page")
+            .WithContentVariation(ContentVariation.CultureAndSegment)
+            .AddPropertyType()
+            .WithAlias("title")
+            .WithName("Title")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Segment)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("blocks")
+            .WithName("Blocks")
+            .WithDataTypeId(blocksEditorDataType.Id)
+            .WithVariations(ContentVariation.Segment)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType;
+    }
+
     [Test]
     public async Task Can_Publish_With_Blocks_Removed()
     {
