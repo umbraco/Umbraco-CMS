@@ -77,8 +77,8 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private NavigationSnapshot _navigation = new(new(), []);
     private NavigationSnapshot _recycleBinNavigation = new(new(), []);
 
-    private Lock _lockNavigation = new();
-    private Lock _lockRecycleBinNavigation = new();
+    private readonly Lock _lockNavigation = new();
+    private readonly Lock _lockRecycleBinNavigation = new();
 
     /// <summary>
     ///     Gets the approximate number of nodes currently held in memory across the active navigation
