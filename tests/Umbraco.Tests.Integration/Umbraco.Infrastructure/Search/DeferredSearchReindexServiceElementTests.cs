@@ -45,9 +45,9 @@ internal sealed class DeferredSearchReindexServiceElementTests : BlockEditorWith
         var content = CreateDocumentEmbeddingElement(contentType, elementKey);
 
         var elementId = await ElementId(elementKey);
-        var documentIds = Service.FindDocumentIdsReferencingElements([elementId]);
+        var documentIds = Service.FindDocumentKeysReferencingElements([elementId]);
 
-        Assert.Contains(content.Id, documentIds.ToArray());
+        Assert.Contains(content.Key, documentIds.ToArray());
     }
 
     [Test]
@@ -72,8 +72,8 @@ internal sealed class DeferredSearchReindexServiceElementTests : BlockEditorWith
         Assert.AreEqual(1, pickerRelations.Length, "The element picker should create a umbElement relation to the element.");
 
         // ...but a picker reference does not index the element's content, so the document must not be reindexed.
-        var documentIds = Service.FindDocumentIdsReferencingElements([elementId]);
-        Assert.IsFalse(documentIds.Contains(document.Id), "Documents referencing an element only via the element picker must not be reindexed.");
+        var documentIds = Service.FindDocumentKeysReferencingElements([elementId]);
+        Assert.IsFalse(documentIds.Contains(document.Key), "Documents referencing an element only via the element picker must not be reindexed.");
     }
 
     private async Task<IDataType> CreateElementPickerDataType()
@@ -112,9 +112,9 @@ internal sealed class DeferredSearchReindexServiceElementTests : BlockEditorWith
         var document = CreateDocumentEmbeddingElement(contentType, outerElementKey);
 
         var innerElementId = await ElementId(innerElementKey);
-        var documentIds = Service.FindDocumentIdsReferencingElements([innerElementId]);
+        var documentIds = Service.FindDocumentKeysReferencingElements([innerElementId]);
 
-        Assert.Contains(document.Id, documentIds.ToArray(), "Editing the inner element must reindex the document that transitively embeds it.");
+        Assert.Contains(document.Key, documentIds.ToArray(), "Editing the inner element must reindex the document that transitively embeds it.");
     }
 
     private async Task<IContentType> CreateElementTypeWithBlocks(IDataType blocksEditorDataType, string alias, string name)

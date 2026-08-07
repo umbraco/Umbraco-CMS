@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Search;
 internal sealed class DeferredSearchReindexService : IDeferredSearchReindexService, IDisposable
 {
     private readonly IDocumentRepository _documentRepository;
+    private readonly IAsyncDocumentRepository _asyncDocumentRepository;
     private readonly IMediaRepository _mediaRepository;
     private readonly IMemberRepository _memberRepository;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
@@ -47,6 +48,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     ///     Initializes a new instance of the <see cref="DeferredSearchReindexService" /> class.
     /// </summary>
     /// <param name="documentRepository">Repository used to page through content items without acquiring distributed locks.</param>
+    /// <param name="asyncDocumentRepository">Repository used to fetch documents referencing changed elements by key.</param>
     /// <param name="mediaRepository">Repository used to page through media items without acquiring distributed locks.</param>
     /// <param name="memberRepository">Repository used to page through member items without acquiring distributed locks.</param>
     /// <param name="umbracoIndexingHandler">The handler responsible for writing entries to Examine indexes.</param>
@@ -58,6 +60,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     /// <param name="relationService">The relation service, used to traverse element-to-document relations.</param>
     public DeferredSearchReindexService(
         IDocumentRepository documentRepository,
+        IAsyncDocumentRepository asyncDocumentRepository,
         IMediaRepository mediaRepository,
         IMemberRepository memberRepository,
         IUmbracoIndexingHandler umbracoIndexingHandler,
@@ -69,6 +72,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         IRelationService relationService)
     {
         _documentRepository = documentRepository;
+        _asyncDocumentRepository = asyncDocumentRepository;
         _mediaRepository = mediaRepository;
         _memberRepository = memberRepository;
         _umbracoIndexingHandler = umbracoIndexingHandler;
@@ -186,7 +190,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                     if (elementIds.Length > 0)
                     {
                         _logger.LogInformation("Deferred reindex starting for documents referencing element IDs: {ElementIds}", elementIds);
-                        ReindexDocumentsReferencingElements(elementIds);
+                        await ReindexDocumentsReferencingElementsAsync(elementIds, cancellationToken);
                         _logger.LogInformation("Deferred reindex completed for documents referencing element IDs: {ElementIds}", elementIds);
                     }
 
@@ -291,7 +295,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
             c => _umbracoIndexingHandler.ReIndexForMember(c));
     }
 
-    private void ReindexDocumentsReferencingElements(int[] elementIds)
+    private async Task ReindexDocumentsReferencingElementsAsync(int[] elementIds, CancellationToken cancellationToken)
     {
         // External block element content only participates in the index when the feature is enabled; with it off there
         // is nothing to refresh, so skip the traversal and reindex entirely.
@@ -300,20 +304,20 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
             return;
         }
 
-        IReadOnlyCollection<int> documentIds = FindDocumentIdsReferencingElements(elementIds);
-        if (documentIds.Count == 0)
+        IReadOnlyCollection<Guid> documentKeys = FindDocumentKeysReferencingElements(elementIds);
+        if (documentKeys.Count == 0)
         {
             return;
         }
 
         var publishChecked = new Dictionary<int, bool>();
-        foreach (IEnumerable<int> batch in documentIds.InGroupsOf(_indexingSettings.CurrentValue.BatchSize))
+        foreach (IEnumerable<Guid> batch in documentKeys.InGroupsOf(_indexingSettings.CurrentValue.BatchSize))
         {
-            var batchIds = batch.ToArray();
-            IContent[] documents;
+            var batchKeys = batch.ToArray();
+            IEnumerable<IContent> documents;
             using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
-                documents = _documentRepository.GetMany(batchIds).ToArray();
+                documents = await _asyncDocumentRepository.GetManyAsync(batchKeys, cancellationToken);
             }
 
             foreach (IContent document in documents)
@@ -343,9 +347,9 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         }
     }
 
-    internal IReadOnlyCollection<int> FindDocumentIdsReferencingElements(IEnumerable<int> elementIds)
+    internal IReadOnlyCollection<Guid> FindDocumentKeysReferencingElements(IEnumerable<int> elementIds)
     {
-        var documentIds = new HashSet<int>();
+        var documentKeys = new HashSet<Guid>();
         var visitedElementIds = new HashSet<int>(elementIds);
         var currentLevel = new HashSet<int>(visitedElementIds);
 
@@ -358,7 +362,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
             // This could be improved in the future to support a single multi-type query.
             foreach (IUmbracoEntity document in GetParentEntities(childIds, UmbracoObjectTypes.Document))
             {
-                documentIds.Add(document.Id);
+                documentKeys.Add(document.Key);
             }
 
             var nextLevel = new HashSet<int>();
@@ -375,7 +379,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
             currentLevel = nextLevel;
         }
 
-        return documentIds;
+        return documentKeys;
     }
 
     private IEnumerable<IUmbracoEntity> GetParentEntities(int[] childIds, UmbracoObjectTypes entityType)

@@ -26,6 +26,7 @@ public class DeferredSearchReindexServiceTests
     private static readonly TimeSpan _testTimeout = TimeSpan.FromSeconds(5);
 
     private Mock<IDocumentRepository> _documentRepository = null!;
+    private Mock<IAsyncDocumentRepository> _asyncDocumentRepository = null!;
     private Mock<IMediaRepository> _mediaRepository = null!;
     private Mock<IMemberRepository> _memberRepository = null!;
     private Mock<IUmbracoIndexingHandler> _umbracoIndexingHandler = null!;
@@ -38,6 +39,7 @@ public class DeferredSearchReindexServiceTests
     public void SetUp()
     {
         _documentRepository = new Mock<IDocumentRepository>();
+        _asyncDocumentRepository = new Mock<IAsyncDocumentRepository>();
         _mediaRepository = new Mock<IMediaRepository>();
         _memberRepository = new Mock<IMemberRepository>();
         _umbracoIndexingHandler = new Mock<IUmbracoIndexingHandler>();
@@ -79,6 +81,7 @@ public class DeferredSearchReindexServiceTests
 
         return new DeferredSearchReindexService(
             _documentRepository.Object,
+            _asyncDocumentRepository.Object,
             _mediaRepository.Object,
             _memberRepository.Object,
             _umbracoIndexingHandler.Object,
@@ -452,9 +455,9 @@ public class DeferredSearchReindexServiceTests
             { 1, [(100, Constants.ObjectTypes.Document)] },
         });
 
-        var documentIds = _service.FindDocumentIdsReferencingElements([2]);
+        var documentIds = _service.FindDocumentKeysReferencingElements([2]);
 
-        CollectionAssert.AreEquivalent(new[] { 100 }, documentIds);
+        CollectionAssert.AreEquivalent(new[] { KeyForId(100) }, documentIds);
     }
 
     /// <summary>
@@ -470,9 +473,9 @@ public class DeferredSearchReindexServiceTests
             { 1, [(100, Constants.ObjectTypes.Document), (2, Constants.ObjectTypes.Element)] },
         });
 
-        var documentIds = _service.FindDocumentIdsReferencingElements([2]);
+        var documentIds = _service.FindDocumentKeysReferencingElements([2]);
 
-        CollectionAssert.AreEquivalent(new[] { 100 }, documentIds);
+        CollectionAssert.AreEquivalent(new[] { KeyForId(100) }, documentIds);
     }
 
     /// <summary>
@@ -529,8 +532,15 @@ public class DeferredSearchReindexServiceTests
 
     private static IEntitySlim CreateEntity(int id, Guid nodeObjectType)
         => nodeObjectType == Constants.ObjectTypes.Element
-            ? Mock.Of<IPublishableContentEntitySlim>(e => e.Id == id && e.NodeObjectType == nodeObjectType && e.Published)
-            : Mock.Of<IEntitySlim>(e => e.Id == id && e.NodeObjectType == nodeObjectType);
+            ? Mock.Of<IPublishableContentEntitySlim>(e => e.Id == id && e.Key == KeyForId(id) && e.NodeObjectType == nodeObjectType && e.Published)
+            : Mock.Of<IEntitySlim>(e => e.Id == id && e.Key == KeyForId(id) && e.NodeObjectType == nodeObjectType);
+
+    /// <summary>
+    ///     Derives a stable, deterministic Guid from an int id, purely so BFS tests can assert on the document keys
+    ///     <see cref="DeferredSearchReindexService.FindDocumentKeysReferencingElements" /> returns without needing a
+    ///     real ID/key map.
+    /// </summary>
+    private static Guid KeyForId(int id) => new(id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     private static IContent CreateContent(int id, bool published)
     {
