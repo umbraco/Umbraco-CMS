@@ -1105,6 +1105,15 @@ export default {
 		sortHelp:
 			'Перетаскивайте элементы на нужное место вверх или вниз для определения необходимого Вам порядка сортировки. Также можно использовать заголовки столбцов, чтобы отсортировать все элементы сразу.',
 		sortPleaseWait: 'Пожалуйста, подождите... Страницы сортируются, это может занять некоторое время.',
+		sortByFieldHeadline: 'Сортировать по полю',
+		sortByFieldSentence: 'Сортировать все дочерние элементы по',
+		sortByFieldDirectionLabel: 'Направление',
+		sortByFieldAscending: 'По возрастанию',
+		sortByFieldDescending: 'По убыванию',
+		sortByFieldNameOption: 'Имя',
+		sortByFieldCreateDateOption: 'Создано',
+		sortByFieldUpdateDateOption: 'Последнее изменение',
+		sortIndividuallyHeadline: 'Сортировать по отдельности',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Процесс публикации был отменен установленным пакетом дополнений.',

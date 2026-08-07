@@ -1,13 +1,15 @@
 import type { UmbSortChildrenOfRepository, UmbTreeItemModel } from '../../../types.js';
+import type { UmbSortChildrenByFieldOption } from '../types.js';
 import type { UmbTreeRepository } from '../../../data/index.js';
 import type { UmbSortChildrenOfModalData, UmbSortChildrenOfModalValue } from './sort-children-of-modal.token.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDirection, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonState, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -16,6 +18,9 @@ import type {
 	UmbTableOrderedEvent,
 	UmbTableSortedEvent,
 } from '@umbraco-cms/backoffice/components';
+
+const UMB_SORT_TAB_INDIVIDUALLY = 'individually';
+const UMB_SORT_TAB_BY_FIELD = 'byField';
 
 @customElement('umb-sort-children-of-modal')
 export class UmbSortChildrenOfModalElement<
@@ -50,9 +55,26 @@ export class UmbSortChildrenOfModalElement<
 	@state()
 	private _submitButtonState?: UUIButtonState;
 
+	@state()
+	private _activeTab: string = UMB_SORT_TAB_INDIVIDUALLY;
+
+	@state()
+	private _supportsSortByField = false;
+
+	@state()
+	private _sortByFieldOptions: Array<UmbSortChildrenByFieldOption> = [];
+
+	@state()
+	private _selectedField?: string;
+
+	@state()
+	private _selectedDirection: UmbDirectionType = UmbDirection.ASCENDING as UmbDirectionType;
+
 	protected _sortedUniques = new Set<string>();
 
 	#pagination = new UmbPaginationManager();
+
+	#sortChildrenOfRepository?: UmbSortChildrenOfRepository;
 
 	constructor() {
 		super();
@@ -78,12 +100,58 @@ export class UmbSortChildrenOfModalElement<
 		];
 	}
 
+	/**
+	 * The fields offered by the "Sort by field" view. Returns an empty array by default, which hides the view.
+	 * Override in an entity-specific subclass to enable server-side sorting by field.
+	 * @returns {Array<UmbSortChildrenByFieldOption>} the available fields
+	 */
+	protected _getSortByFieldOptions(): Array<UmbSortChildrenByFieldOption> {
+		return [];
+	}
+
+	/**
+	 * The culture to sort by when sorting by field. Undefined for invariant sorting.
+	 * @returns {string | undefined} the culture
+	 */
+	protected _getSortCulture(): string | undefined {
+		return undefined;
+	}
+
 	protected override async firstUpdated(
 		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
 	): Promise<void> {
 		super.firstUpdated(_changedProperties);
 		await this.#requestChildren();
 		this._setTableColumns();
+		await this.#initSortByField();
+	}
+
+	async #initSortByField() {
+		this._sortByFieldOptions = this._getSortByFieldOptions();
+		this._selectedField = this._sortByFieldOptions[0]?.value;
+
+		if (this._sortByFieldOptions.length === 0) {
+			this._supportsSortByField = false;
+			return;
+		}
+
+		try {
+			const repository = await this.#getSortChildrenOfRepository();
+			this._supportsSortByField = typeof repository.sortChildrenOfByField === 'function';
+		} catch {
+			this._supportsSortByField = false;
+		}
+	}
+
+	async #getSortChildrenOfRepository(): Promise<UmbSortChildrenOfRepository> {
+		if (!this.#sortChildrenOfRepository) {
+			if (!this.data?.sortChildrenOfRepositoryAlias) throw new Error('sortChildrenOfRepositoryAlias is required');
+			this.#sortChildrenOfRepository = await createExtensionApiByAlias<UmbSortChildrenOfRepository>(
+				this,
+				this.data.sortChildrenOfRepositoryAlias,
+			);
+		}
+		return this.#sortChildrenOfRepository;
 	}
 
 	async #requestChildren() {
@@ -147,20 +215,18 @@ export class UmbSortChildrenOfModalElement<
 	async #onSubmit(event: PointerEvent) {
 		if (this._submitButtonState === 'waiting') return;
 		event?.stopPropagation();
-		if (!this.data?.sortChildrenOfRepositoryAlias) throw new Error('sortChildrenOfRepositoryAlias is required');
 
 		this._submitButtonState = 'waiting';
 
 		try {
-			const sortChildrenOfRepository = await createExtensionApiByAlias<UmbSortChildrenOfRepository>(
-				this,
-				this.data.sortChildrenOfRepositoryAlias,
-			);
-
-			const { error } = await sortChildrenOfRepository.sortChildrenOf({
-				unique: this.data.unique,
-				sorting: this.#getSortOrderOfSortedItems(),
-			});
+			const repository = await this.#getSortChildrenOfRepository();
+			const { error } =
+				this._supportsSortByField && this._activeTab === UMB_SORT_TAB_BY_FIELD
+					? await this.#sortByField(repository)
+					: await repository.sortChildrenOf({
+							unique: this.data!.unique,
+							sorting: this.#getSortOrderOfSortedItems(),
+						});
 
 			if (!error) {
 				this._submitButtonState = 'success';
@@ -172,6 +238,16 @@ export class UmbSortChildrenOfModalElement<
 			this._submitButtonState = 'failed';
 			throw error;
 		}
+	}
+
+	#sortByField(repository: UmbSortChildrenOfRepository) {
+		if (!repository.sortChildrenOfByField) throw new Error('sortChildrenOfByField is not supported');
+		return repository.sortChildrenOfByField({
+			unique: this.data!.unique,
+			field: this._selectedField!,
+			direction: this._selectedDirection,
+			culture: this._getSortCulture(),
+		});
 	}
 
 	#getSortOrderOfSortedItems() {
@@ -229,10 +305,20 @@ export class UmbSortChildrenOfModalElement<
 		return 0;
 	}
 
+	#onFieldChange(event: UUISelectEvent) {
+		this._selectedField = event.target.value as string;
+	}
+
+	#onDirectionChange(event: UUISelectEvent) {
+		this._selectedDirection = event.target.value as UmbDirectionType;
+	}
+
 	override render() {
+		const hasChildren = this._children.length > 0;
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_sort')}>
-				${this._children.length === 0 ? this.#renderEmptyState() : this.#renderTable()}
+				${hasChildren && this._supportsSortByField ? this.#renderTabs() : nothing}
+				${hasChildren ? this.#renderActiveView() : this.#renderEmptyState()}
 				<uui-button
 					slot="actions"
 					label=${this.localize.term('general_cancel')}
@@ -248,13 +334,80 @@ export class UmbSortChildrenOfModalElement<
 		`;
 	}
 
+	#renderTabs() {
+		return html`
+			<uui-tab-group slot="navigation">
+				<uui-tab
+					label=${this.localize.term('sort_sortIndividuallyHeadline')}
+					data-mark="sort-children-of-modal:tab-individually"
+					?active=${this._activeTab === UMB_SORT_TAB_INDIVIDUALLY}
+					@click=${() => (this._activeTab = UMB_SORT_TAB_INDIVIDUALLY)}>
+					<umb-icon slot="icon" name="icon-grip"></umb-icon>
+					${this.localize.term('sort_sortIndividuallyHeadline')}
+				</uui-tab>
+				<uui-tab
+					label=${this.localize.term('sort_sortByFieldHeadline')}
+					data-mark="sort-children-of-modal:tab-by-field"
+					?active=${this._activeTab === UMB_SORT_TAB_BY_FIELD}
+					@click=${() => (this._activeTab = UMB_SORT_TAB_BY_FIELD)}>
+					<umb-icon slot="icon" name="icon-ordered-list"></umb-icon>
+					${this.localize.term('sort_sortByFieldHeadline')}
+				</uui-tab>
+			</uui-tab-group>
+		`;
+	}
+
+	#renderActiveView() {
+		if (this._supportsSortByField && this._activeTab === UMB_SORT_TAB_BY_FIELD) {
+			return this.#renderSortByFieldView();
+		}
+		return this.#renderIndividuallyView();
+	}
+
 	#renderEmptyState() {
 		return html`
 			<uui-label><umb-localize key="sort_sortEmptyState">This node has no child nodes to sort</umb-localize></uui-label>
 		`;
 	}
 
-	#renderTable() {
+	#renderSortByFieldView() {
+		const fieldOptions = this._sortByFieldOptions.map((option) => ({
+			name: option.label,
+			value: option.value,
+			selected: option.value === this._selectedField,
+		}));
+
+		const directionOptions = [
+			{
+				name: this.localize.term('sort_sortByFieldAscending'),
+				value: UmbDirection.ASCENDING,
+				selected: this._selectedDirection === UmbDirection.ASCENDING,
+			},
+			{
+				name: this.localize.term('sort_sortByFieldDescending'),
+				value: UmbDirection.DESCENDING,
+				selected: this._selectedDirection === UmbDirection.DESCENDING,
+			},
+		];
+
+		return html`
+			<uui-box>
+				<div id="sort-by-field">
+					<span><umb-localize key="sort_sortByFieldSentence">Sort all children by</umb-localize></span>
+					<uui-select
+						label=${this.localize.term('sort_sortByFieldHeadline')}
+						.options=${fieldOptions}
+						@change=${this.#onFieldChange}></uui-select>
+					<uui-select
+						label=${this.localize.term('sort_sortByFieldDirectionLabel')}
+						.options=${directionOptions}
+						@change=${this.#onDirectionChange}></uui-select>
+				</div>
+			</uui-box>
+		`;
+	}
+
+	#renderIndividuallyView() {
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
@@ -281,6 +434,19 @@ export class UmbSortChildrenOfModalElement<
 
 	static override styles = [
 		css`
+			uui-tab-group {
+				--uui-tab-divider: var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
+			}
+
+			#sort-by-field {
+				display: flex;
+				gap: var(--uui-size-space-3);
+				align-items: center;
+				flex-wrap: wrap;
+			}
+
 			#loadMoreButton {
 				width: 100%;
 				margin-top: var(--uui-size-space-3);
