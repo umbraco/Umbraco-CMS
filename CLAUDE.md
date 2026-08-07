@@ -360,6 +360,15 @@ public interface IMyService
   ```
 - Update ALL internal callers to use the new API - no internal code should use obsolete members
 
+### 5.5 Public Enums — Append New Members
+
+Enum members get implicit, sequential underlying values (0, 1, 2, …). Inserting a new member in the middle — or before a trailing value like `NotImplemented`/`Unknown` — silently shifts the numeric value of every later member. For a `public` enum this is a **breaking change**: consumers may persist the integer value (database, distributed cache, serialized payloads, API contracts) and would then read back the wrong member.
+
+**Rules**:
+- Add new members at the **end** of a public enum so existing values stay stable. Don't reorder existing members.
+- If a meaningful grouping requires a particular declaration order, assign **explicit numeric values** instead, so future additions can't shift them.
+- This applies to all public enums, including the `*OperationStatus` enums in `Umbraco.Core/Services/OperationStatus`.
+
 ---
 
 ## 6. Project-Specific Notes
