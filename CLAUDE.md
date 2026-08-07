@@ -382,6 +382,18 @@ public interface IMyService
 - `.editorconfig` - Code style rules
 - `.globalconfig` - Roslyn analyzer rules
 
+### SBOM Generation & License Policy (Azure Pipelines)
+
+`build/azure-pipelines.yml` generates a CycloneDX SBOM per project (Backend/NuGet, Login UI, Backoffice, E2E) via **`umbraco-sbom`** (the `Umbraco.Internal.Sbom` .NET 10 global tool), not plain `dotnet CycloneDX` / `@cyclonedx/cyclonedx-npm`. It adds license-policy enforcement over CycloneDX. Repo (private): https://github.com/umbraco/Umbraco.Internal.Sbom — README has the full flag/exit-code/policy reference.
+
+When editing those steps:
+
+- **Output filenames** (`bom-dotnet.xml`, `bom-login.xml`, `bom-backoffice.xml`, `bom-e2e.xml`) are mapped by `build/templates/dependency-track.yml` — don't rename.
+- **Usage**: `umbraco-sbom <path> --output-file <full-path> [policy flags]`. Only `--output-file` plus policy flags (`--allow-package`, `--allow-commercial`, `--allow-copyleft`, `--fail-on-unknown`, `--policy-allow-file`) exist.
+- **Commercial packages** need `--allow-package`, else **exit 50**. Backend uses `nuget:SixLabors.*` (covers both `SixLabors.ImageSharp` and `.ImageSharp.Web`).
+- **Exit 10** = success-with-warnings (unresolved licenses; SBOM still written). Each step tolerates it: `if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 10) { exit $LASTEXITCODE }; exit 0`.
+- **Frontend jobs** need a `UseDotNet@2` (`useGlobalJson: true`) step before the tool install (the .NET 10 tool needs the SDK; those jobs are otherwise Node-only).
+
 ### Persistence Layer - NPoco and EF Core
 
 The repository contains BOTH (actively supported):
