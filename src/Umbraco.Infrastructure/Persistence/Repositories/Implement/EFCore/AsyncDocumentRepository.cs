@@ -1213,6 +1213,216 @@ internal class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
+    public Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            // Content types are themselves nodes (their own umbracoNode row), so their Guid key lives on
+            // NodeDto, not on ContentTypeDto — resolve keys to the underlying node IDs that ContentDto.ContentTypeId
+            // actually stores, in one batched query rather than per-key IIdKeyMap round-trips.
+            List<Guid> contentTypeKeysList = contentTypeKeys.ToList();
+            List<int> contentTypeIdsList = await db.Nodes
+                .Where(node => node.NodeObjectType == Constants.ObjectTypes.DocumentType && contentTypeKeysList.Contains(node.UniqueId))
+                .Select(node => node.NodeId)
+                .ToListAsync(cancellationToken);
+
+            int total = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey)
+                .Join(
+                    db.Content,
+                    node => node.NodeId,
+                    content => content.NodeId,
+                    (node, content) => content)
+                .Where(content => contentTypeIdsList.Contains(content.ContentTypeId))
+                .CountAsync(cancellationToken);
+
+            if (total == 0)
+            {
+                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+            }
+
+            var publishedSubquery = db.ContentVersions
+                .Join(
+                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
+                    contentVersion => contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
+
+            // The ContentTypes JOIN is always included so contentTypeAlias is available for ordering,
+            // mirroring GetChildrenCoreAsync/GetDescendantsCoreAsync/GetPagedRecycleBinAsync — the content-type
+            // filter is inserted right after the Content join, since ContentTypeId only becomes available
+            // there (unlike those three, whose leading predicate is a plain NodeDto property).
+            var baseQuery = db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey)
+                .Join(
+                    db.Documents,
+                    node => node.NodeId,
+                    document => document.NodeId,
+                    (node, document) => new { node, document })
+                .Join(
+                    db.Content,
+                    joined => joined.node.NodeId,
+                    content => content.NodeId,
+                    (joined, content) => new { joined.node, joined.document, content })
+                .Where(joined => contentTypeIdsList.Contains(joined.content.ContentTypeId))
+                .Join(
+                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
+                    joined => joined.node.NodeId,
+                    contentVersion => contentVersion.NodeId,
+                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
+                .Join(
+                    db.DocumentVersions,
+                    joined => joined.contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
+                .Join(
+                    db.ContentTypes,
+                    joined => joined.content.ContentTypeId,
+                    contentType => contentType.NodeId,
+                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
+                .GroupJoin(
+                    publishedSubquery,
+                    joined => joined.node.NodeId,
+                    pub => pub.contentVersion.NodeId,
+                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
+                .SelectMany(
+                    joined => joined.pubGroup.DefaultIfEmpty(),
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
+
+            bool isCustomFieldOrdering = ordering?.IsCustomField == true;
+            bool isCultureNameOrdering =
+                !isCustomFieldOrdering
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
+                && ordering?.IsInvariant == false;
+
+            IReadOnlyList<DocumentRow> rows = isCustomFieldOrdering
+                ? await FetchCustomFieldOrdered()
+                : isCultureNameOrdering
+                    ? await FetchCultureNameOrdered()
+                    : await FetchDefaultOrdered();
+
+            if (rows.Count == 0)
+            {
+                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+            }
+
+            List<IContent> items = await AssembleEntitiesAsync(rows, db);
+
+            async Task<IReadOnlyList<DocumentRow>> FetchCustomFieldOrdered()
+            {
+                List<int> candidateNodeIds = await db.Nodes
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey)
+                    .Join(
+                        db.Content,
+                        node => node.NodeId,
+                        content => content.NodeId,
+                        (node, content) => new { node, content })
+                    .Where(joined => contentTypeIdsList.Contains(joined.content.ContentTypeId))
+                    .Select(joined => joined.node.NodeId)
+                    .ToListAsync(cancellationToken);
+
+                return await FetchCustomFieldOrderedPageAsync(
+                    db,
+                    candidateNodeIds,
+                    ordering!,
+                    skip,
+                    take,
+                    pageNodeIds => baseQuery
+                        .Where(joined => pageNodeIds.Contains(joined.node.NodeId))
+                        .Select(joined => new DocumentRow(
+                            joined.node,
+                            joined.document,
+                            joined.content,
+                            joined.contentVersion,
+                            joined.documentVersion,
+                            joined.pub!.contentVersion,
+                            joined.pub!.documentVersion))
+                        .ToListAsync(cancellationToken),
+                    cancellationToken);
+            }
+
+            async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
+            {
+                // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
+                // An unknown culture yields languageId = 0, which matches no CCV rows, so
+                // variantName falls back to node.Text for every row (graceful degradation).
+                int languageId = await db.Language
+                    .Where(lang => lang.IsoCode == ordering!.Culture)
+                    .Select(lang => lang.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                var withVariantName = baseQuery
+                    .GroupJoin(
+                        db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
+                        joined => joined.contentVersion.Id,
+                        ccv => ccv.VersionId,
+                        (joined, ccvGroup) => new
+                        {
+                            joined.node, joined.document, joined.content,
+                            joined.contentVersion, joined.documentVersion,
+                            joined.contentType, joined.pub, ccvGroup
+                        })
+                    .SelectMany(
+                        joined => joined.ccvGroup.DefaultIfEmpty(),
+                        (joined, ccv) => new
+                        {
+                            joined.node, joined.document, joined.content,
+                            joined.contentVersion, joined.documentVersion,
+                            joined.contentType, joined.pub,
+                            variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
+                        });
+
+                bool descending = ordering!.Direction == Direction.Descending;
+
+                var ordered = descending
+                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
+                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
+
+                return await ordered
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(joined => new DocumentRow(
+                        joined.node,
+                        joined.document,
+                        joined.content,
+                        joined.contentVersion,
+                        joined.documentVersion,
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion))
+                    .ToListAsync(cancellationToken);
+            }
+
+            async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
+            {
+                var orderedQuery = ApplyDocumentOrdering(
+                    baseQuery,
+                    ordering,
+                    sortOrderSelector: joined => joined.node.SortOrder,
+                    textSelector: joined => joined.node.Text,
+                    createDateSelector: joined => joined.node.CreateDate,
+                    versionDateSelector: joined => joined.contentVersion.VersionDate,
+                    idSelector: joined => joined.node.NodeId,
+                    ownerSelector: joined => joined.node.UserId,
+                    publishedSelector: joined => joined.documentVersion.Published,
+                    contentTypeAliasSelector: joined => joined.contentType.Alias,
+                    pathSelector: joined => joined.node.Path);
+
+                return await orderedQuery
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(joined => new DocumentRow(
+                        joined.node,
+                        joined.document,
+                        joined.content,
+                        joined.contentVersion,
+                        joined.documentVersion,
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion))
+                    .ToListAsync(cancellationToken);
+            }
+            return new PagedModel<IContent> { Total = total, Items = items };
+        });
+
+    /// <inheritdoc />
     protected override Task OnUowRefreshedEntityAsync(IContent entity, CancellationToken cancellationToken)
     {
         // ContentRefreshNotification is [Obsolete] ("use saved notifications instead") but is still the ONLY
@@ -1328,7 +1538,8 @@ internal class AsyncDocumentRepository
         Expression<Func<T, int>> idSelector,
         Expression<Func<T, int?>> ownerSelector,
         Expression<Func<T, bool>> publishedSelector,
-        Expression<Func<T, string?>> contentTypeAliasSelector)
+        Expression<Func<T, string?>> contentTypeAliasSelector,
+        Expression<Func<T, string?>>? pathSelector = null)
     {
         bool descending = ordering?.Direction == Direction.Descending;
         string? orderBy = ordering?.OrderBy?.ToLowerInvariant();
@@ -1357,6 +1568,12 @@ internal class AsyncDocumentRepository
             "contenttypealias" => descending
                 ? source.OrderByDescending(contentTypeAliasSelector)
                 : source.OrderBy(contentTypeAliasSelector),
+            // Only reachable when the caller passes a pathSelector (currently just GetPagedOfContentTypesAsync) —
+            // a missing pathSelector falls through to the default arm below, exactly like every other caller
+            // that doesn't support "path" ordering today.
+            "path" when pathSelector is not null => descending
+                ? source.OrderByDescending(pathSelector)
+                : source.OrderBy(pathSelector),
             // Custom-field ordering (ordering.IsCustomField) is intercepted by callers before reaching
             // this method — see ResolveCustomFieldOrderedNodeIdsAsync.
             _ => descending

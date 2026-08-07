@@ -15,7 +15,8 @@ internal sealed class AsyncDocumentRepositoryOrderingTests
         DateTime VersionDate,
         int? OwnerId,
         bool Published,
-        string? ContentTypeAlias);
+        string? ContentTypeAlias,
+        string? Path);
 
     // Deliberately gives the row with the HIGHER NodeId the earlier position in the source sequence,
     // decoupling "sequence order" from "NodeId order". A real SQLite integration test can't construct
@@ -24,14 +25,26 @@ internal sealed class AsyncDocumentRepositoryOrderingTests
     // goes undetected. Here, in-memory sequence order is fully under the test's control.
     private static List<OrderingTestRow> CreateTiedRows() =>
     [
-        new(NodeId: 200, SortOrder: 0, Text: "Same", CreateDate: DateTime.MinValue, VersionDate: DateTime.MinValue, OwnerId: -1, Published: false, ContentTypeAlias: "alias"),
-        new(NodeId: 100, SortOrder: 0, Text: "Same", CreateDate: DateTime.MinValue, VersionDate: DateTime.MinValue, OwnerId: -1, Published: false, ContentTypeAlias: "alias"),
+        new(NodeId: 200, SortOrder: 0, Text: "Same", CreateDate: DateTime.MinValue, VersionDate: DateTime.MinValue, OwnerId: -1, Published: false, ContentTypeAlias: "alias", Path: "-1,999"),
+        new(NodeId: 100, SortOrder: 0, Text: "Same", CreateDate: DateTime.MinValue, VersionDate: DateTime.MinValue, OwnerId: -1, Published: false, ContentTypeAlias: "alias", Path: "-1,999"),
     ];
 
-    private static List<int> ApplyOrderingAndGetNodeIds(Ordering? ordering)
+    // Same Path for both rows (the thing being tied), but DIFFERENT SortOrder — unlike CreateTiedRows().
+    // If the "path" switch case were missing and silently fell through to the sortOrderSelector default,
+    // NodeId 200 (SortOrder 1) would sort before NodeId 100 (SortOrder 2), producing {200, 100} — visibly
+    // different from the correct path-tiebreak result of {100, 200}. Reusing CreateTiedRows() here would
+    // NOT be discriminating: both rows also share SortOrder there, so the fallback default ordering would
+    // coincidentally tiebreak to the same {100, 200} the correct implementation produces.
+    private static List<OrderingTestRow> CreatePathTiedRowsWithDistinctSortOrder() =>
+    [
+        new(NodeId: 200, SortOrder: 1, Text: "Same", CreateDate: DateTime.MinValue, VersionDate: DateTime.MinValue, OwnerId: -1, Published: false, ContentTypeAlias: "alias", Path: "-1,999"),
+        new(NodeId: 100, SortOrder: 2, Text: "Same", CreateDate: DateTime.MinValue, VersionDate: DateTime.MinValue, OwnerId: -1, Published: false, ContentTypeAlias: "alias", Path: "-1,999"),
+    ];
+
+    private static List<int> ApplyOrderingAndGetNodeIds(Ordering? ordering, List<OrderingTestRow>? rows = null)
     {
         IOrderedQueryable<OrderingTestRow> ordered = AsyncDocumentRepository.ApplyDocumentOrdering(
-            CreateTiedRows().AsQueryable(),
+            (rows ?? CreateTiedRows()).AsQueryable(),
             ordering,
             sortOrderSelector: row => row.SortOrder,
             textSelector: row => row.Text,
@@ -40,7 +53,8 @@ internal sealed class AsyncDocumentRepositoryOrderingTests
             idSelector: row => row.NodeId,
             ownerSelector: row => row.OwnerId,
             publishedSelector: row => row.Published,
-            contentTypeAliasSelector: row => row.ContentTypeAlias);
+            contentTypeAliasSelector: row => row.ContentTypeAlias,
+            pathSelector: row => row.Path);
 
         return ordered.Select(row => row.NodeId).ToList();
     }
@@ -73,5 +87,17 @@ internal sealed class AsyncDocumentRepositoryOrderingTests
         List<int> nodeIds = ApplyOrderingAndGetNodeIds(Ordering.By("id"));
 
         Assert.That(nodeIds, Is.EqualTo(new[] { 100, 200 }));
+    }
+
+    [Test]
+    public void ApplyDocumentOrdering_PathOrderingTied_BreaksTieByAscendingNodeId()
+    {
+        // A real node's Path always includes its own NodeId, so two real rows can never share a Path —
+        // this tie is only constructible here, against a synthetic in-memory sequence.
+        List<int> nodeIds = ApplyOrderingAndGetNodeIds(Ordering.By("path"), CreatePathTiedRowsWithDistinctSortOrder());
+
+        Assert.That(nodeIds, Is.EqualTo(new[] { 100, 200 }),
+            "tied Path must break the tie by ascending NodeId — a missing \"path\" case would instead fall " +
+            "through to the SortOrder default and produce {200, 100}");
     }
 }

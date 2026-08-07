@@ -44,6 +44,20 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Gets a paged list of documents whose content type is one of the specified content type keys.
+    /// </summary>
+    /// <remarks>
+    ///     Trashed documents are included — callers that need to exclude them must filter the result.
+    /// </remarks>
+    /// <param name="contentTypeKeys">The Guid keys of the content types to filter by.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching documents.</returns>
+    Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Bulk-replaces all permissions for a content item with the provided permission set.
     /// </summary>
     /// <param name="permissionSet">The new set of permissions to apply, replacing any existing permissions.</param>

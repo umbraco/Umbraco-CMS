@@ -3048,4 +3048,228 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         Assert.That(result, Is.Empty);
     }
+
+    [Test]
+    public async Task GetPagedOfContentTypesAsync_SingleContentTypeId_ReturnsOnlyMatchingItems()
+    {
+        IContentType secondContentType = await CreateIntPropertyContentTypeAsync();
+        var secondTypeDoc = new ContentBuilder().WithContentType(secondContentType).WithName("Second Type Doc").Build();
+        ContentService.Save(secondTypeDoc, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
+            new[] { secondContentType.Key }, skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(1));
+        IContent[] items = result.Items.ToArray();
+        Assert.That(items, Has.Length.EqualTo(1));
+        Assert.That(items[0].Key, Is.EqualTo(secondTypeDoc.Key));
+    }
+
+    [Test]
+    public async Task GetPagedOfContentTypesAsync_MultipleContentTypeIds_ReturnsUnionOfBoth()
+    {
+        IContentType secondContentType = await CreateIntPropertyContentTypeAsync();
+        var secondTypeDoc = new ContentBuilder().WithContentType(secondContentType).WithName("Second Type Doc").Build();
+        ContentService.Save(secondTypeDoc, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
+            new[] { _contentType.Key, secondContentType.Key }, skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        // 5 fixture items of _contentType (textpage, subpage, subpage2, trashed, publishedPage) + the 1 new one.
+        Assert.That(result.Total, Is.EqualTo(6));
+        Assert.That(result.Items.Any(c => c.Key == secondTypeDoc.Key), Is.True);
+        Assert.That(result.Items.Any(c => c.Key == _textpage.Key), Is.True);
+    }
+
+    [Test]
+    public async Task GetPagedOfContentTypesAsync_NoMatchingContentTypeId_ReturnsEmptyWithZeroTotal()
+    {
+        IContentType unusedContentType = await CreateIntPropertyContentTypeAsync();
+        // No content created of this type — this is the "valid ID, zero matches" case, distinct from an empty
+        // input array (both return nothing, but exercise different behavior: a real Contains() miss vs. a
+        // vacuously-false empty-list Contains()).
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
+            new[] { unusedContentType.Key }, skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetPagedOfContentTypesAsync_EmptyContentTypeIdArray_ReturnsEmptyWithZeroTotal()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
+            Array.Empty<Guid>(), skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetPagedOfContentTypesAsync_MixedContentTypes_TotalReflectsOnlyFilteredCount()
+    {
+        // Baseline fixture already has 5 items of _contentType. Add 2 items of a second, different type.
+        IContentType secondContentType = await CreateIntPropertyContentTypeAsync();
+        var doc1 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 1").Build();
+        ContentService.Save(doc1, -1);
+        var doc2 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 2").Build();
+        ContentService.Save(doc2, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // take: 1, deliberately smaller than the filtered set, so Total can't be inferred from Items.Count() —
+        // this is the query most at risk of a forgotten filter, since it's a structurally different,
+        // independently-built count query rather than a copy of the main paged query.
+        PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
+            new[] { secondContentType.Key }, skip: 0, take: 1, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(2),
+            "Total must reflect only the 2 items of the filtered content type, not all 7 documents in the install");
+        Assert.That(result.Items.Count(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task GetPagedOfContentTypesAsync_Paging_ReturnsCorrectPagesAndTotal()
+    {
+        IContentType secondContentType = await CreateIntPropertyContentTypeAsync();
+        var doc1 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 1").Build();
+        ContentService.Save(doc1, -1);
+        var doc2 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 2").Build();
+        ContentService.Save(doc2, -1);
+        var doc3 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 3").Build();
+        ContentService.Save(doc3, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> firstPage = await repository.GetPagedOfContentTypesAsync(
+            new[] { secondContentType.Key }, skip: 0, take: 2, ordering: null, CancellationToken.None);
+        PagedModel<IContent> secondPage = await repository.GetPagedOfContentTypesAsync(
+            new[] { secondContentType.Key }, skip: 2, take: 2, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(firstPage.Total, Is.EqualTo(3));
+        Assert.That(firstPage.Items.Count(), Is.EqualTo(2));
+        Assert.That(secondPage.Total, Is.EqualTo(3));
+        Assert.That(secondPage.Items.Count(), Is.EqualTo(1), "page 2 of a 3-item set with pageSize=2 has exactly 1 remaining item");
+
+        Guid[] allKeys = firstPage.Items.Select(c => c.Key).Concat(secondPage.Items.Select(c => c.Key)).ToArray();
+        Assert.That(allKeys, Is.EquivalentTo(new[] { doc1.Key, doc2.Key, doc3.Key }),
+            "the two pages together must cover all 3 items with no duplicates/omissions");
+    }
+
+    [Test]
+    public async Task GetPagedOfContentTypesAsync_OrderedByCustomIntProperty_CombinesFilterWithCustomFieldOrdering()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").Build();
+        docHigh.SetValue("priority", 30);
+        ContentService.Save(docHigh, -1);
+
+        var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").Build();
+        docLow.SetValue("priority", 5);
+        ContentService.Save(docLow, -1);
+
+        var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").Build();
+        docMid.SetValue("priority", 15);
+        ContentService.Save(docMid, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // One item per page deliberately: if the FetchCustomFieldOrdered candidate-node prefetch forgot the
+        // content-type filter, unrelated baseline (_contentType) nodes would pollute the candidate set and
+        // occupy page slots, shifting or dropping the real filtered items from their expected positions.
+        PagedModel<IContent> page1 = await repository.GetPagedOfContentTypesAsync(
+            new[] { contentType.Key }, skip: 0, take: 1, ordering: Ordering.By("priority", isCustomField: true), CancellationToken.None);
+        PagedModel<IContent> page2 = await repository.GetPagedOfContentTypesAsync(
+            new[] { contentType.Key }, skip: 1, take: 1, ordering: Ordering.By("priority", isCustomField: true), CancellationToken.None);
+        PagedModel<IContent> page3 = await repository.GetPagedOfContentTypesAsync(
+            new[] { contentType.Key }, skip: 2, take: 1, ordering: Ordering.By("priority", isCustomField: true), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(page1.Total, Is.EqualTo(3), "Total must reflect only the 3 items of the filtered content type");
+        Assert.That(page1.Items.Single().Key, Is.EqualTo(docLow.Key));
+        Assert.That(page2.Items.Single().Key, Is.EqualTo(docMid.Key));
+        Assert.That(page3.Items.Single().Key, Is.EqualTo(docHigh.Key));
+    }
+
+    [Test]
+    public async Task GetPagedOfContentTypesAsync_OrderedByName_WithCulture_CombinesFilterWithCultureVariantName()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        // Invariant names sort in opposite order from culture names — this proves the CCV join is used,
+        // mirroring GetPagedRecycleBinAsync_OrderedByName_WithCulture_UsesCultureVariantName.
+        var docA = new ContentBuilder().WithContentType(contentType).WithName("Z-First").Build();
+        docA.SetCultureName("Alpha", "en-US");
+        ContentService.Save(docA, -1);
+
+        var docB = new ContentBuilder().WithContentType(contentType).WithName("A-Second").Build();
+        docB.SetCultureName("Zeta", "en-US");
+        ContentService.Save(docB, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
+            new[] { contentType.Key }, skip: 0, take: 10, ordering: Ordering.By("name", culture: "en-US"), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(2), "Total must reflect only the 2 items of the filtered content type");
+        IContent first = result.Items.First(item => item.Key == docA.Key || item.Key == docB.Key);
+        Assert.That(first.GetCultureName("en-US"), Is.EqualTo("Alpha"),
+            "Culture name ordering must put 'Alpha' before 'Zeta', not fall back to invariant name order ('A-Second' before 'Z-First')");
+    }
+
+    [Test]
+    public async Task GetPagedOfContentTypesAsync_OrderedByPath_SortsByNodePath()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        var root1 = new ContentBuilder().WithContentType(contentType).WithName("Root 1").Build();
+        ContentService.Save(root1, -1);
+
+        var childOfTextpage = new ContentBuilder().WithContentType(contentType).WithName("Child").WithParentId(_textpage.Id).Build();
+        ContentService.Save(childOfTextpage, -1);
+
+        var root2 = new ContentBuilder().WithContentType(contentType).WithName("Root 2").Build();
+        ContentService.Save(root2, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // First fetch unordered to learn the real (unpredictable) Path values the database assigns, then
+        // independently compute the expected Path-ascending order in C# — avoids hardcoding node IDs, which
+        // depend on however many system-seeded rows already exist ahead of this test's own content.
+        PagedModel<IContent> unordered = await repository.GetPagedOfContentTypesAsync(
+            new[] { contentType.Key }, skip: 0, take: 100, ordering: null, CancellationToken.None);
+        Guid[] expectedOrder = unordered.Items.OrderBy(c => c.Path, StringComparer.Ordinal).Select(c => c.Key).ToArray();
+
+        PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
+            new[] { contentType.Key }, skip: 0, take: 100, ordering: Ordering.By("path"), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Items.Select(c => c.Key), Is.EqualTo(expectedOrder));
+    }
 }
