@@ -64,13 +64,21 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	#copyPassword() {
+	async #copyPassword() {
 		const passwordInput = this.shadowRoot?.querySelector('#password') as UUIInputPasswordElement;
 		if (!passwordInput || typeof passwordInput.value !== 'string') return;
 
-		navigator.clipboard.writeText(passwordInput.value);
-		const data: UmbNotificationDefaultData = { message: this.localize.term('user_passwordCopied') };
-		this.#notificationContext?.peek('positive', { data });
+		try {
+			// navigator.clipboard only exists in secure contexts (https or localhost) and the
+			// write can also be denied by permissions policy, so failures must be surfaced.
+			await navigator.clipboard.writeText(passwordInput.value);
+			const data: UmbNotificationDefaultData = { message: this.localize.term('user_passwordCopied') };
+			this.#notificationContext?.peek('positive', { data });
+		} catch {
+			this.#notificationContext?.peek('danger', {
+				data: { message: this.localize.term('speechBubbles_cannotCopyToClipboard') },
+			});
+		}
 	}
 
 	#onCloseModal = (event: Event) => {

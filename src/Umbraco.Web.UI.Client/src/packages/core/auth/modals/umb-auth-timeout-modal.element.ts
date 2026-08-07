@@ -25,12 +25,22 @@ export class UmbAuthTimeoutModalElement extends UmbModalBaseElement<UmbModalAuth
 	}
 
 	#startCountdown() {
+		// Guard against a leaked interval if the element is reconnected
+		if (this.#interval) {
+			clearInterval(this.#interval);
+		}
 		this._remainingTimeInSeconds = this.data?.remainingTimeInSeconds ?? 60;
+		// Count down against an absolute deadline rather than the number of ticks — interval
+		// timers are paused/throttled during system sleep and in background tabs, which would
+		// otherwise leave the countdown showing time that has already passed.
+		const deadline = Date.now() + this._remainingTimeInSeconds * 1000;
 		this.#interval = setInterval(() => {
-			if (this._remainingTimeInSeconds > 0) {
-				this._remainingTimeInSeconds--;
+			const secondsLeft = Math.ceil((deadline - Date.now()) / 1000);
+			if (secondsLeft > 0) {
+				this._remainingTimeInSeconds = secondsLeft;
 			} else {
 				clearInterval(this.#interval);
+				this._remainingTimeInSeconds = 0;
 				// Timer expired — notify the controller so it can call timeOut() and
 				// open the re-auth popup. Submit (not reject) so the catch block is
 				// not triggered.

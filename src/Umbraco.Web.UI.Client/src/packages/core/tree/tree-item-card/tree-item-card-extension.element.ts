@@ -1,6 +1,6 @@
 import type { UmbTreeItemModel } from '../types.js';
 import type { ManifestTreeItemCard } from './tree-item-card.extension.js';
-import type { UmbTreeItemCardElement } from './types.js';
+import type { UmbTreeItemCardApi, UmbTreeItemCardElement } from './types.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -11,6 +11,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 export class UmbTreeItemCardExtensionElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementAndApiInitializer<ManifestBase, string, ManifestTreeItemCard>;
 	#item?: UmbTreeItemModel;
+	#api?: UmbTreeItemCardApi;
 
 	@state()
 	protected _component?: UmbTreeItemCardElement;
@@ -25,6 +26,7 @@ export class UmbTreeItemCardExtensionElement extends UmbLitElement {
 
 		if (this._component && value.entityType === oldValue?.entityType) {
 			this._component.item = value;
+			this.#api?.setTreeItem(value);
 			return;
 		}
 
@@ -58,6 +60,7 @@ export class UmbTreeItemCardExtensionElement extends UmbLitElement {
 				component.api = api;
 				api.setTreeItem(this.#item);
 
+				this.#api = api;
 				this._component = component;
 				this.requestUpdate('_component');
 			},

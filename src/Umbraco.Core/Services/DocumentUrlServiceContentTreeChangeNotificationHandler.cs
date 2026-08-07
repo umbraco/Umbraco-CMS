@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services.Changes;
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services;
 /// is delivered to other servers, ensuring URL data is in the database before any server processes the instruction.
 /// </summary>
 public class DocumentUrlServiceContentTreeChangeNotificationHandler
-    : INotificationAsyncHandler<ContentTreeChangeNotification>
+    : IDistributedCacheAsyncNotificationHandler<ContentTreeChangeNotification>
 {
     private readonly IDocumentUrlService _documentUrlService;
     private readonly IDocumentUrlAliasService _documentUrlAliasService;

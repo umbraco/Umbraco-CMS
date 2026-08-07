@@ -40,6 +40,7 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(1, result!.Count());
         var element = result.First();
         Assert.AreEqual(PublishedElement.Key, element.Id);
+        Assert.AreEqual(PublishedElement.Name, element.Name);
         Assert.AreEqual("TheElementType", element.ContentType);
         Assert.IsEmpty(element.Properties);
     }
@@ -86,6 +87,7 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(1, result!.Count());
         var element = result.First();
         Assert.AreEqual(key, element.Id);
+        Assert.AreEqual("The element", element.Name);
         Assert.AreEqual("theElementType", element.ContentType);
         Assert.AreEqual(2, element.Properties.Count);
         Assert.AreEqual("Delivery API value", element.Properties[DeliveryApiPropertyType.Alias]);

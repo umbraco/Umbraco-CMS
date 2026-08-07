@@ -58,7 +58,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		// When it is a collection, we show a list icon instead of the expand arrow. Activating the caret then
 		// enters the Collection instead of expanding its children (see `UmbDocumentTreeItemContext`).
 		// `this._forceShowExpand` is equivalent to hasCollection for this element.
-		if (!this._forceShowExpand) return undefined;
+		// Exception: a "no access" collection is an ancestor of the user's start node, so it must stay
+		// expandable in the tree (render the normal caret) to let the user browse down to it.
+		if (!this._forceShowExpand || this._noAccess) return undefined;
 		return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 	};
 

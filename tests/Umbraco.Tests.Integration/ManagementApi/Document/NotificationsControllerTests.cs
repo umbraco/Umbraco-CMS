@@ -24,7 +24,7 @@ public class NotificationsControllerTests : ManagementApiUserGroupTestBase<Notif
     private Guid _contentKey;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         // Template
         var template = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());

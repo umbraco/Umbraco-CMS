@@ -31,8 +31,8 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 	@state()
 	private _startNode?: UmbTreeStartNode;
 
-	protected override _observeContext() {
-		super._observeContext();
+	protected override _gotTreeContext() {
+		super._gotTreeContext();
 		this.observe(this._treeContext?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
 		this.observe(
 			this._treeContext?.isLoadingPrevChildren,

@@ -5,8 +5,7 @@ import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-a
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
-import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbArrayState, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbTreeCreateOption } from './types.js';
 
 type ManifestType = ManifestEntityCreateOptionAction;
@@ -14,9 +13,7 @@ type ManifestType = ManifestEntityCreateOptionAction;
 export class UmbTreeCreateActionApi extends UmbTreeActionBase {
 	#options = new UmbArrayState<UmbTreeCreateOption>([], (x) => x.alias);
 	public readonly options = this.#options.asObservable();
-
-	#multipleOptions = new UmbBooleanState(false);
-	public readonly multipleOptions = this.#multipleOptions.asObservable();
+	public readonly multipleOptions = this.#options.asObservablePart((options) => options.length > 1);
 
 	#controllers = new Map<string, UmbExtensionApiInitializer<ManifestType>>();
 	#extensionsInitializer?: UmbExtensionsApiInitializer<ManifestType>;
@@ -28,11 +25,10 @@ export class UmbTreeCreateActionApi extends UmbTreeActionBase {
 			if (!context) return;
 
 			this.observe(
-				combineLatest([context.entityType, context.unique]),
+				observeMultiple([context.entityType, context.unique]),
 				([entityType, unique]) => {
 					if (!entityType || unique === undefined) {
 						this.#options.setValue([]);
-						this.#multipleOptions.setValue(false);
 						return;
 					}
 
@@ -62,7 +58,6 @@ export class UmbTreeCreateActionApi extends UmbTreeActionBase {
 							}
 
 							this.#options.setValue(options);
-							this.#multipleOptions.setValue(options.length > 1);
 						},
 					) as unknown as UmbExtensionsApiInitializer<ManifestType>;
 				},

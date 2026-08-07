@@ -59,7 +59,7 @@ test('can render published element extension methods on an invariant element', a
   const currentUser = await umbracoApi.user.getCurrentUser();
   const templateId = await umbracoApi.template.createTemplateWithDisplayingElementPickerExtensionMethods(templateName, propertyName, elementTypeAlias, pageDocumentTypeAlias);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, elementPickerDataTypeId, propertyName, templateId);
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoApi.element.publish(elementId);
   const contentId = await umbracoApi.document.createDocumentWithElementPickers(contentName, documentTypeId, propertyName, [elementId]);
@@ -76,7 +76,7 @@ test('can render published element extension methods on an invariant element', a
   await umbracoUi.contentRender.doesContentRenderValueContainText('IsDocumentType: True');
   await umbracoUi.contentRender.doesContentRenderValueContainText('NotDocumentType: False');
   await umbracoUi.contentRender.doesContentRenderValueContainText('CultureDate: ' + currentYear);
-  await umbracoUi.contentRender.doesContentRenderValueContainText('CreatorName: ' + currentUser.name, true);
+  await umbracoUi.contentRender.doesContentRenderValueContainText('CreatorName: ' + currentUser.name);
   await umbracoUi.contentRender.doesContentRenderValueContainText('WriterName: ' + currentUser.name);
   await umbracoUi.contentRender.doesContentRenderValueContainText('PageName: ' + contentName);
   await umbracoUi.contentRender.doesContentRenderValueContainText('PageIsDocumentType: True');
@@ -164,7 +164,7 @@ test('can compare elements using IsEqual and IsNotEqual', async ({umbracoApi, um
   // Arrange
   const templateId = await umbracoApi.template.createTemplateWithDisplayingElementPickerVarianceAndIdentityMethods(templateName, propertyName, elementTypeAlias, pageDocumentTypeAlias);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, elementPickerDataTypeId, propertyName, templateId);
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const firstElementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   const secondElementId = await umbracoApi.element.createDefaultElement(secondElementName, elementTypeId);
   await umbracoApi.element.publish(firstElementId);
@@ -188,15 +188,16 @@ test('can render published content extensions on a variant element', async ({umb
   await umbracoApi.language.createDanishLanguage();
   const templateId = await umbracoApi.template.createTemplateWithDisplayingElementPickerVarianceAndIdentityMethods(templateName, propertyName, elementTypeAlias, pageDocumentTypeAlias);
   const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditorAndAllowedTemplate(documentTypeName, propertyName, elementPickerDataTypeId, templateId);
-  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  const elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoApi.element.publish(elementId);
   const contentId = await umbracoApi.document.createDocumentWithMultipleVariantsWithSharedProperty(contentName, documentTypeId, elementPickerPropertyAlias, 'Umbraco.ElementPicker', [{isoCode: 'en-US', name: contentName}, {isoCode: 'da', name: danishContentName}], [elementId]);
   await umbracoApi.document.publish(contentId, {publishSchedules: [{culture: 'en-US'}, {culture: 'da'}]});
-  const contentUrl = await umbracoApi.document.getDocumentUrl(contentId);
+  // Variant content needs culture domains to route on the front-end; without them the URL falls back to root → login.
+  await umbracoApi.document.updateDomainsForVariantDocument(contentId, [{domainName: '/en', isoCode: 'en-US'}, {domainName: '/da', isoCode: 'da'}]);
 
   // Act
-  await umbracoUi.contentRender.navigateToRenderedContentPage(contentUrl);
+  await umbracoUi.contentRender.navigateToRenderedContentPage('/en');
 
   // Assert
   await umbracoUi.contentRender.doesContentRenderValueContainText('PageHasCultureEn: True');

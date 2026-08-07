@@ -4,9 +4,11 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -36,6 +38,8 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         base.CustomTestSetup(builder);
         builder
             .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentUnpublishedNotification, ContentRelationsUpdate>()
             .AddNotificationHandler<RelationSavedNotification, RelationSavedTracker>()
             .AddNotificationHandler<RelationDeletedNotification, RelationDeletedTracker>();
     }
@@ -236,6 +240,123 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(0, RelationDeletedTracker.DeletedRelations.Count);
         Assert.IsNull(RelationSavedTracker.LastIsAutomatic);
         Assert.IsNull(RelationDeletedTracker.LastIsAutomatic);
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Remove_Stale_Published_Relation_When_Saving_Draft_After_Unpublish()
+    {
+        (IContent source, IContent targetA, IContent targetB) = await CreatePublishedContentPickerScenario();
+
+        // The published document references target A via the content picker.
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id }));
+
+        // Unpublish. The document no longer has a live published version, but the property's PublishedValue still holds target A.
+        Assert.IsTrue(ContentService.Unpublish(source).Success);
+
+        // Save a draft that re-points the picker to target B.
+        IContent draft = ContentService.GetById(source.Id)!;
+        draft.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetB.Key).ToString());
+        ContentService.Save(draft);
+
+        // The stale relation to target A (from the previously-published snapshot) must be gone; only the draft reference to B remains.
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Remove_Stale_Published_Relation_When_Unpublishing()
+    {
+        (IContent source, IContent targetA, IContent targetB) = await CreatePublishedContentPickerScenario();
+
+        // Save a draft that re-points the picker to target B, without publishing. The document remains published, so both the
+        // live (published A) and draft (edited B) references are legitimately tracked.
+        IContent draft = ContentService.GetById(source.Id)!;
+        draft.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetB.Key).ToString());
+        ContentService.Save(draft);
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id, targetB.Id }));
+
+        // Unpublish. There is no longer a live published version, so the stale published reference to A must be removed,
+        // leaving only the draft reference to B.
+        Assert.IsTrue(ContentService.Unpublish(draft).Success);
+
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
+    }
+
+    [Test]
+    [LongRunning]
+    public async Task Can_Delete_Content_Type_Of_Published_Content_With_Relation()
+    {
+        // The relation target uses a different, unrelated content type so that it survives the deletion below -
+        // this is what allows ContentRelationsUpdate to still resolve the (now-deleted) target's node ID when
+        // it re-runs for the source's ContentUnpublishedNotification, and therefore attempt the FK-violating INSERT.
+        var targetType = new ContentTypeBuilder().WithAlias("target").WithName("Target Type").Build();
+        await ContentTypeService.CreateAsync(targetType, Constants.Security.SuperUserKey);
+
+        var sourceType = new ContentTypeBuilder()
+            .WithAlias("source")
+            .WithName("Source Type")
+            .AddPropertyType()
+                .WithAlias("contentPicker")
+                .WithName("Content Picker")
+                .WithDataTypeId(1046)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(sourceType, Constants.Security.SuperUserKey);
+
+        var target = new ContentBuilder().WithContentType(targetType).WithName("Target").Build();
+        ContentService.Save(target);
+
+        var source = new ContentBuilder().WithContentType(sourceType).WithName("Source").Build();
+        source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, target.Key).ToString());
+        ContentService.Save(source);
+        PublishResult publishResult = ContentService.Publish(source, ["*"]);
+        Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
+
+        // The automatic relation exists for the published content before its content type (and the content
+        // itself) is deleted.
+        Assert.That(RelationService.GetByParentId(source.Id).Select(x => x.ChildId), Is.EquivalentTo(new[] { target.Id }));
+
+        // Deleting the content type cascades to permanently deleting the published content within the same scope
+        // that later raises ContentUnpublishedNotification for it. Before the fix, ContentRelationsUpdate would
+        // try to re-persist the relation for the now-deleted node and throw a foreign key violation.
+        ContentTypeOperationStatus status = await ContentTypeService.DeleteAsync(sourceType.Key, Constants.Security.SuperUserKey);
+        Assert.AreEqual(ContentTypeOperationStatus.Success, status);
+
+        Assert.IsNull(ContentService.GetById(source.Id));
+        Assert.IsEmpty(RelationService.GetByChildId(target.Id));
+    }
+
+    private async Task<(IContent Source, IContent TargetA, IContent TargetB)> CreatePublishedContentPickerScenario()
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithName("Page")
+            .AddPropertyType()
+                .WithAlias("contentPicker")
+                .WithName("Content Picker")
+                .WithDataTypeId(1046)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.ContentPicker)
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var targetA = new ContentBuilder().WithContentType(contentType).WithName("Target A").Build();
+        ContentService.Save(targetA);
+        var targetB = new ContentBuilder().WithContentType(contentType).WithName("Target B").Build();
+        ContentService.Save(targetB);
+
+        // Publish the source document with the picker pointing at target A. Both the edited and published property
+        // snapshots now reference target A.
+        var source = new ContentBuilder().WithContentType(contentType).WithName("Source").Build();
+        source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetA.Key).ToString());
+        ContentService.Save(source);
+        PublishResult publishResult = ContentService.Publish(source, ["*"]);
+        Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
+
+        return (source, targetA, targetB);
     }
 
     private sealed class RelationSavedTracker : INotificationHandler<RelationSavedNotification>

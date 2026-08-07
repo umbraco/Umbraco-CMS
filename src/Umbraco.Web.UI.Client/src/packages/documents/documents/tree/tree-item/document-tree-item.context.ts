@@ -36,13 +36,21 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	readonly ancestors = this._treeItem.asObservablePart((item) => item?.ancestors ?? []);
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
 
+	// A collection is only browsed via its Collection view when the user can actually access it.
+	// When the node is a "no access" ancestor of the user's start node, it must remain expandable
+	// in the tree so the user can browse down to their start node.
+	readonly #collapsibleCollection = mergeObservables(
+		[this.hasCollection, this.noAccess],
+		([hasCollection, noAccess]) => hasCollection && !noAccess,
+	);
+
 	override setIsMenu(isMenu: boolean) {
 		super.setIsMenu(isMenu);
 		if (isMenu) {
 			this.observe(
-				this.hasCollection,
-				(hasCollection) => {
-					if (hasCollection) {
+				this.#collapsibleCollection,
+				(collapsibleCollection) => {
+					if (collapsibleCollection) {
 						this._treeItemChildrenManager.setTargetTakeSize(1, 1);
 
 						this.observe(
@@ -54,6 +62,8 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 							},
 							'observeCollectionHasActiveDescendant',
 						);
+					} else {
+						this.removeUmbControllerByAlias('observeCollectionHasActiveDescendant');
 					}
 				},
 				'_whenMenuObserveHasCollection',
@@ -88,7 +98,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override showChildren() {
-		if (this.#item.getHasCollection()) {
+		if (this.#getCollapsibleCollection()) {
 			this.#activateCollection();
 			return;
 		}
@@ -96,7 +106,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override hideChildren() {
-		if (this.#item.getHasCollection()) {
+		if (this.#getCollapsibleCollection()) {
 			this.#activateCollection();
 			return;
 		}
@@ -111,6 +121,10 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		} else {
 			this.open();
 		}
+	}
+
+	#getCollapsibleCollection(): boolean {
+		return this.#item.getHasCollection() && this.getTreeItem()?.noAccess !== true;
 	}
 
 	#openCollection() {

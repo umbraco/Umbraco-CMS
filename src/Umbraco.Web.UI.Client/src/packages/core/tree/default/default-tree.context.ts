@@ -52,7 +52,7 @@ export class UmbDefaultTreeContext<
 
 	#selectOnlyConfig?: boolean;
 
-	#isMenu = new UmbBooleanState(false);
+	#isMenu = new UmbBooleanState(undefined);
 	public readonly isMenu = this.#isMenu.asObservable();
 
 	#expandTreeRoot = new UmbBooleanState(undefined);
@@ -67,7 +67,7 @@ export class UmbDefaultTreeContext<
 	public readonly startNode = this.#treeItemChildrenManager.startNode;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
-	public readonly isLoadingChildren = this.#treeItemChildrenManager.isLoading;
+	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
 	public readonly isLoadingPrevChildren = this.#treeItemChildrenManager.isLoadingPrevChildren;
 	public readonly isLoadingNextChildren = this.#treeItemChildrenManager.isLoadingNextChildren;
 
@@ -264,7 +264,7 @@ export class UmbDefaultTreeContext<
 	}
 
 	getIsMenu(): boolean {
-		return this.#isMenu.getValue();
+		return this.#isMenu.getValue() ?? false;
 	}
 
 	/**

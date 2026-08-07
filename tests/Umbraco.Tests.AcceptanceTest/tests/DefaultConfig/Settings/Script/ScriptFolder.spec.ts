@@ -107,6 +107,26 @@ test('can create a folder in a folder in a folder', {tag: '@smoke'}, async ({umb
   await umbracoUi.script.isScriptRootTreeItemVisible(childOfChildFolderName, true, false);
 });
 
+test('can find a script in a sibling nested folder', async ({umbracoApi}) => {
+  // Arrange
+  const firstChildFolderName = 'AAFirstChildFolder';
+  const nestedFolderName = 'NestedFolder';
+  const secondChildFolderName = 'ZZSecondChildFolder';
+  const targetScriptName = 'TargetScript.js';
+  await umbracoApi.script.createFolder(scriptFolderName);
+  const firstChildFolderPath = await umbracoApi.script.createFolder(firstChildFolderName, scriptFolderName);
+  await umbracoApi.script.createFolder(nestedFolderName, firstChildFolderPath);
+  const secondChildFolderPath = await umbracoApi.script.createFolder(secondChildFolderName, scriptFolderName);
+  const targetScriptPath = await umbracoApi.script.create(targetScriptName, 'const test = true;', secondChildFolderPath);
+
+  // Act
+  const scriptData = await umbracoApi.script.getByName(targetScriptName);
+
+  // Assert
+  expect(scriptData).toBeTruthy();
+  expect(scriptData.path).toBe(targetScriptPath);
+});
+
 test('can create a script in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childFolderName = 'ChildFolderName';

@@ -1,3 +1,8 @@
+import {
+	UMB_ELEMENT_OR_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_READ,
+} from '../../../user-permissions/constants.js';
+import { UMB_USER_PERMISSION_ELEMENT_FOLDER_READ } from '../../../folder/user-permissions/constants.js';
 import { UMB_ELEMENT_RECYCLE_BIN_COLLECTION_ALIAS } from '../../collection/constants.js';
 import { UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_ELEMENT_RECYCLE_BIN_ROOT_WORKSPACE_ALIAS } from './constants.js';
@@ -31,6 +36,11 @@ const workspaceView: ManifestWorkspaceViewCollectionKind = {
 		{
 			alias: UMB_WORKSPACE_CONDITION_ALIAS,
 			match: UMB_ELEMENT_RECYCLE_BIN_ROOT_WORKSPACE_ALIAS,
+		},
+		{
+			alias: UMB_ELEMENT_OR_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+			element: { allOf: [UMB_USER_PERMISSION_ELEMENT_READ] },
+			folder: { allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_READ] },
 		},
 	],
 };

@@ -194,7 +194,7 @@ public static partial class StringExtensions
         for (var i = 0; i < queryStrings.Length; i++)
         {
             queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand)
-                .TrimEnd(Constants.CharArrays.Ampersand);
+                .TrimEnd('&');
         }
 
         var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
@@ -623,22 +623,36 @@ public static partial class StringExtensions
     /// <exception cref="ArgumentNullException">Thrown when text or chars is null.</exception>
     public static string ReplaceMany(this string text, char[] chars, char replacement)
     {
-        if (text == null)
+        ArgumentNullException.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(chars);
+
+        if (chars.Length == 0 || text.Length == 0)
         {
-            throw new ArgumentNullException(nameof(text));
+            return text;
         }
 
-        if (chars == null)
+        // If the text does not contain any of the characters to replace, we can just return the original text.
+        int startingIndex = text.AsSpan().IndexOfAny(chars);
+        if (startingIndex == -1)
         {
-            throw new ArgumentNullException(nameof(chars));
+            return text;
         }
 
-        for (var i = 0; i < chars.Length; i++)
+        return string.Create(text.Length, (text, startingIndex, chars, replacement), static (span, state) =>
         {
-            text = text.Replace(chars[i], replacement);
-        }
+            (string? source, int startingIndex, char[]? set, char replacement) = state;
+            source.AsSpan().CopyTo(span);
 
-        return text;
+            span[startingIndex] = replacement;
+
+            Span<char> remaining = span[(startingIndex + 1)..];
+            int idx;
+            while ((idx = remaining.IndexOfAny(set)) >= 0)
+            {
+                remaining[idx] = replacement;
+                remaining = remaining[(idx + 1)..];
+            }
+        });
     }
 
     /// <summary>

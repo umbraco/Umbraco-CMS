@@ -54,7 +54,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	private _treeExpansion: UmbEntityExpansionModel = [];
 
 	@state()
-	private _treeInteractionMemories: Array<UmbInteractionMemoryModel> = [];
+	private _treeInteractionMemories?: Array<UmbInteractionMemoryModel>;
 
 	@state()
 	private _currentLocation?: UmbTreeStartNode;
@@ -62,6 +62,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _breadcrumb: Array<UmbTreeBreadcrumbItem> = [];
 
+	#treeAlias?: string;
 	private _initialStartNode?: UmbTreeStartNode;
 	private _repository?: UmbTreeRepository;
 	private _breadcrumbLoaded = false;
@@ -112,7 +113,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				multiple,
 			};
 
-			if (this.data?.treeAlias) {
+			if (this.data?.treeAlias && this.data.treeAlias !== this.#treeAlias) {
+				this.#treeAlias = this.data.treeAlias;
 				this._initialStartNode = this.data.startNode;
 				this._currentLocation = this.data.startNode;
 				this._breadcrumb = [];
@@ -301,7 +303,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.observe(
 			this._pickerContext.interactionMemory.memory(TREE_MEMORY_UNIQUE),
 			(memory) => {
-				this._treeInteractionMemories = memory?.memories ?? [];
+				this._treeInteractionMemories = memory?.memories;
 			},
 			'umbTreePickerInteractionMemoriesObserver',
 		);
@@ -376,7 +378,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('general_choose')}>
+			<umb-body-layout headline=${this.localize.string(this.data?.headline ?? '#general_choose')}>
 				${this.#renderSearch()} ${this.#renderTree()} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
@@ -402,7 +404,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			<umb-tree
 				alias=${ifDefined(this.data?.treeAlias)}
 				.props=${{
-					hideToolbar: false,
+					showToolbar: true,
 					hideTreeItemActions: true,
 					hideTreeRoot: this.data?.hideTreeRoot,
 					expandTreeRoot: this.data?.expandTreeRoot,
@@ -454,7 +456,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 							href=${this._createPath}></uui-button>`
 					: nothing}
 				<uui-button
-					label=${this.localize.term('general_choose')}
+					label=${this.localize.string(this.data?.confirmLabel ?? '#general_choose')}
 					look="primary"
 					color="positive"
 					@click=${this._submitModal}

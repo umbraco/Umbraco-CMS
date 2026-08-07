@@ -38,33 +38,33 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			// Derive emptiness from the loaded children, not `hasChildren`: the latter is also written by the
 			// concurrent tree-root load (with the root's own child count), which can clobber the start node's value
 			// and intermittently hide the empty state.
-			this.observe(
-				value.rootItems,
-				(items) => (this._hasItems = (items?.length ?? 0) > 0),
-				'umbTreeRootItemsObserver',
-			);
+			this.observe(value.rootItems, (items) => (this._hasItems = (items?.length ?? 0) > 0), 'umbTreeRootItemsObserver');
 			// Track loading so the empty state isn't shown before the children have loaded, or while reloading.
 			this.observe(
-				value.isLoadingChildren,
-				(isLoadingChildren) => {
-					this._isLoadingChildren = isLoadingChildren ?? false;
-					if (isLoadingChildren) {
+				value.isLoading,
+				(isLoading) => {
+					this._isLoading = isLoading ?? false;
+					if (isLoading) {
 						this.#hasBeenLoading = true;
 					} else if (this.#hasBeenLoading) {
 						this._initialLoadDone = true;
 					}
 				},
-				'umbTreeIsLoadingChildrenObserver',
+				'umbTreeIsLoadingObserver',
 			);
 		}
 		if (value?.view) {
-			this.observe(value.view.currentView, async (manifest) => {
-				const element = manifest ? await createExtensionElement(manifest) : null;
-				if (element && 'manifest' in element) {
-					(element as HTMLElement & { manifest: unknown }).manifest = manifest;
-				}
-				this._viewElement = element;
-			});
+			this.observe(
+				value.view.currentView,
+				async (manifest) => {
+					const element = manifest ? await createExtensionElement(manifest) : null;
+					if (element && 'manifest' in element) {
+						(element as HTMLElement & { manifest: unknown }).manifest = manifest;
+					}
+					this._viewElement = element;
+				},
+				'umbTreeCurrentViewObserver',
+			);
 		}
 		if (value?.interactionMemory) {
 			// Snapshot before forwarding so the first observer emission is not treated as a change.
@@ -113,21 +113,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ attribute: false })
 	expansion: UmbTreeExpansionModel = [];
 
-	/**
-	 * When true the view-switcher toolbar is hidden.
-	 * Defaults to true for backwards compatibility — existing trees stay toolbar-less
-	 * until a consumer explicitly opts in with hide-toolbar="false".
-	 * Note: hideTreeRoot and hideTreeItemActions default to false; this is the intentional exception.
-	 */
-	@property({ type: Boolean, attribute: 'hide-toolbar' })
-	hideToolbar: boolean = true;
+	@property({ type: Boolean, attribute: 'show-toolbar' })
+	showToolbar: boolean = false;
 
-	/**
-	 * When true the tree actions are hidden.
-	 * Defaults to true — tree actions are not shown unless explicitly opted in with hide-tree-actions="false".
-	 */
-	@property({ type: Boolean, attribute: 'hide-tree-actions' })
-	hideTreeActions: boolean = true;
+	@property({ type: Boolean, attribute: 'show-tree-actions' })
+	showTreeActions: boolean = false;
 
 	@property({ attribute: false })
 	interactionMemories?: Array<UmbInteractionMemoryModel>;
@@ -141,7 +131,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	private _hasItems = false;
 
 	@state()
-	private _isLoadingChildren = false;
+	private _isLoading = false;
 
 	@state()
 	private _initialLoadDone = false;
@@ -218,8 +208,8 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			${!this.hideToolbar
-				? html`<umb-tree-toolbar .hideTreeActions=${this.hideTreeActions}></umb-tree-toolbar>`
+			${this.showToolbar
+				? html`<umb-tree-toolbar .showTreeActions=${this.showTreeActions}></umb-tree-toolbar>`
 				: nothing}
 			${this._viewElement ?? nothing} ${this.#renderEmptyState()}
 		`;
@@ -230,7 +220,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		// the collection pattern. It is only relevant when the children are shown on their own (root hidden or drilled
 		// into a start node) and never in the sidebar menu.
 		if (this.isMenu || !(this.hideTreeRoot || this.startNode)) return nothing;
-		if (!this._initialLoadDone || this._isLoadingChildren || this._hasItems) return nothing;
+		if (!this._initialLoadDone) {
+			return html`<umb-view-loader></umb-view-loader>`;
+		}
+		if (this._isLoading || this._hasItems) return nothing;
 		return html`<div id="empty-state" class="uui-text"><h4>${this.localize.term('tree_noItems')}</h4></div>`;
 	}
 

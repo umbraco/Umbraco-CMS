@@ -12,6 +12,9 @@ import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localiza
 
 export default {
 	actions: {
+		copyInProgress: 'Kopierer - vent venligst...',
+		deleteInProgress: 'Sletter - vent venligst...',
+		moveInProgress: 'Flytter - vent venligst...',
 		assigndomain: 'Tilføj domæne',
 		auditTrail: 'Revisionsspor',
 		browse: 'Gennemse elementer',
@@ -353,6 +356,8 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 		saveModalTitle: 'Gem',
 		saveAndPublishModalTitle: 'Gem og udgiv',
+		saveAndPublishDescendantsModalTitle: 'Gem og udgiv med undersider',
+		saveAndScheduleModalTitle: 'Gem og planlæg udgivelse',
 		publishModalTitle: 'Udgiv',
 		selectAllVariants: 'Vælg alle varianter',
 		scheduledPendingChanges: 'Denne tidsplan har ændringer, der træder i kraft, når du klikker på "%0%".',
@@ -832,6 +837,7 @@ export default {
 		by: 'af',
 		cancel: 'Fortryd',
 		cellMargin: 'Celle margen',
+		changeView: 'Skift visning',
 		choose: 'Vælg',
 		clear: 'Ryd',
 		close: 'Luk',
@@ -962,6 +968,7 @@ export default {
 		username: 'Brugernavn',
 		value: 'Værdi',
 		view: 'Vis',
+		weight: 'Vægt',
 		welcome: 'Velkommen...',
 		width: 'Bredde',
 		yes: 'Ja',
@@ -1340,6 +1347,9 @@ export default {
 		paMembers: 'Adgang til enkelte medlemmer',
 		paMembersHelp: 'Hvis du ønsker at give adgang til enkelte medlemmer',
 	},
+	unpublish: {
+		inProgress: 'Afpublicerer - vent venligst...',
+	},
 	publish: {
 		invalidPublishBranchPermissions: 'Utilstrækkelige bruger adgang til a udgive alle under dokumenter',
 		contentPublishedFailedAwaitingRelease: 'Udgivelsen kunne ikke udgives da publiceringsdato er sat',
@@ -1514,6 +1524,8 @@ export default {
 		sortEmptyState: 'Denne node har ingen under noder at sortere',
 	},
 	speechBubbles: {
+		editMultiContentPublishedPartialText: '%0% af %1% dokumenter udgivet.',
+		editMultiContentUnpublishedPartialText: '%0% af %1% dokumenter afpubliceret.',
 		validationFailedHeader: 'Validering',
 		validationFailedMessage: 'Valideringsfejl skal rettes før elementet kan gemmes',
 		operationFailedHeader: 'Fejlet',
@@ -1798,9 +1810,19 @@ export default {
 		chooseChildNode: 'Vælg child node',
 		compositionsDescription:
 			'Nedarv faner og egenskaber fra en anden dokumenttype. Nye faner vil blive\n      tilføjet den nuværende dokumenttype eller sammenflettet hvis fanenavnene er ens.\n    ',
+		compositionsDescriptionMediaType:
+			'Nedarv faner og egenskaber fra en anden medietype. Nye faner vil blive\n      tilføjet den nuværende medietype eller sammenflettet hvis fanenavnene er ens.\n    ',
+		compositionsDescriptionMemberType:
+			'Nedarv faner og egenskaber fra en anden medlemstype. Nye faner vil blive\n      tilføjet den nuværende medlemstype eller sammenflettet hvis fanenavnene er ens.\n    ',
 		compositionInUse:
 			'Indholdstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
+		compositionInUseMediaType:
+			'Medietypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
+		compositionInUseMemberType:
+			'Medlemstypen bliver brugt i en komposition og kan derfor ikke blive anvendt som\n      komposition\n    ',
 		noAvailableCompositions: 'Der er ingen indholdstyper tilgængelige at bruge som komposition',
+		noAvailableCompositionsMediaType: 'Der er ingen medietyper tilgængelige at bruge som komposition',
+		noAvailableCompositionsMemberType: 'Der er ingen medlemstyper tilgængelige at bruge som komposition',
 		compositionRemoveWarning:
 			'Når du fjerner en komposition vil alle associerede indholdsdata blive slettet.\n      Når først dokumenttypen er gemt, er der ingen vej tilbage.\n    ',
 		availableEditors: 'Opret ny indstilling',
@@ -1838,6 +1860,9 @@ export default {
 		tabHasNoSortOrder: 'fane har ingen sorteringsrækkefølge',
 		compositionUsageHeading: 'Hvor er denne komposition brugt?',
 		compositionUsageSpecification: 'Denne komposition brugt i kompositionen af de følgende indholdstyper:\n    ',
+		compositionUsageSpecificationMediaType: 'Denne komposition brugt i kompositionen af de følgende medietyper:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Denne komposition brugt i kompositionen af de følgende medlemstyper:\n    ',
 		variantsHeading: 'Tillad variationer',
 		cultureVariantHeading: 'Tillad sprogvariation',
 		segmentVariantHeading: 'Tillad segmentering',
@@ -2059,6 +2084,7 @@ export default {
 		cardViewLabel: 'Kort',
 		tableViewLabel: 'Tabel',
 		children: 'Underelementer',
+		noItems: 'Ingen elementer',
 	},
 	update: {
 		updateAvailable: 'Ny opdatering er klar',
@@ -2556,7 +2582,7 @@ export default {
 		labelEditorSize: 'Rederings lagets størrelse',
 		addCustomView: 'Tilføj speciel visning',
 		addSettingsElementType: 'Tilføj indstillinger',
-		confirmDeleteBlockTitle: 'Slet %0',
+		confirmDeleteBlockTitle: 'Slet %0%?',
 		confirmDeleteBlockMessage: 'Er du sikker på at du vil slette indholdet <strong>%0%</strong>?',
 		confirmDeleteBlockTypeTitle: 'Slet konfiguration for blokken?',
 		confirmDeleteBlockTypeMessage: 'Er du sikker på at du vil slette konfigurationen <strong>%0%</strong>?',

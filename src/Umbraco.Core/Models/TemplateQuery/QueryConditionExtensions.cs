@@ -39,7 +39,14 @@ public static class QueryConditionExtensions
         }
 
         ParameterExpression parameterExpression = Expression.Parameter(typeof(T), parameterAlias);
-        MemberExpression propertyExpression = Expression.Property(parameterExpression, condition.Property.Alias);
+
+        // GetPublicProperties resolves properties inherited from base interfaces (e.g. IPublishedContent
+        // exposing Name/Id via IPublishedElement), which Expression.Property(expression, string) cannot.
+        PropertyInfo propertyInfo = typeof(T).GetPublicProperties().FirstOrDefault(p => p.Name == condition.Property.Alias)
+            ?? throw new ArgumentException(
+                $"Instance property '{condition.Property.Alias}' is not defined for type '{typeof(T)}'",
+                nameof(condition));
+        MemberExpression propertyExpression = Expression.Property(parameterExpression, propertyInfo);
 
         ConstantExpression valueExpression = Expression.Constant(constraintValue);
         Expression bodyExpression;

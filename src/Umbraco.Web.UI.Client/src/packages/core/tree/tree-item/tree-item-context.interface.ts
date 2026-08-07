@@ -1,4 +1,4 @@
-import type { UmbTreeItemApi } from './tree-item-base/tree-item-api-base.js';
+import type { UmbTreeItemApi } from '../tree-item-api/tree-item-api.interface.js';
 import type { UmbTreeItemModel } from '../types.js';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';

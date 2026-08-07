@@ -44,7 +44,7 @@ export class UserUiHelper extends UiBaseLocators {
     this.openUserGroupsBtn = page.locator('[label="Groups"]').getByLabel('open', {exact: true});
     this.chooseUserGroupsBtn = page.locator('umb-user-group-input').getByLabel('Choose');
     this.updatedNameOfTheUserTxt = page.locator('umb-workspace-header-name-editable').locator('input');
-    this.changePasswordBtn = page.getByLabel('Change your password');
+    this.changePasswordBtn = page.getByLabel('Change password');
     this.searchInUserSectionTxt = page.locator('umb-collection-filter-field #input');
     this.userSectionCard = page.locator('uui-card-user');
     this.statusBtn = page.locator('uui-button', {hasText: 'Status'});
@@ -108,7 +108,7 @@ export class UserUiHelper extends UiBaseLocators {
   }
 
   async clickChangePasswordButton() {
-    await this.click(this.changePasswordBtn);
+    await this.click(this.changePasswordBtn, {timeout: ConstantHelper.timeout.long});
   }
 
   async updatePassword(newPassword: string) {
@@ -249,7 +249,7 @@ export class UserUiHelper extends UiBaseLocators {
     await this.clickUserWithName(name);
     await this.hasValue(this.nameOfUserInput, name);
   }
-  
+
   async clickUserButton() {
     await this.click(this.userBtn);
   }
@@ -279,7 +279,9 @@ export class UserUiHelper extends UiBaseLocators {
   }
 
   async doesUserGroupPickerHaveDetails(userGroupName: string, details: string) {
-    const userGroupRefLocator = this.page.locator('umb-user-group-ref', {hasText: userGroupName});
+    // Filter by an exact-text match so a longer leftover name (e.g. 'TestUserGroupNameDescription')
+    // does not also match 'TestUserGroupName' and trip strict-mode multi-match.
+    const userGroupRefLocator = this.page.locator('umb-user-group-ref').filter({has: this.page.getByText(userGroupName, {exact: true})});
     const detailsLocator = userGroupRefLocator.locator('#details');
     return await this.containsText(detailsLocator, details);
   }

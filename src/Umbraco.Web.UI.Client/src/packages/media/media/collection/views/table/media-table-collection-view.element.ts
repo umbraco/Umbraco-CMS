@@ -161,7 +161,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			case 'contentTypeAlias':
 				return item.contentTypeAlias;
 			case 'createDate':
-				return item.createDate.toLocaleString();
+				return item.createDate.toLocaleString(this.localize.lang());
 			case 'name':
 				return item.name;
 			case 'creator':
@@ -170,7 +170,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			case 'sortOrder':
 				return item.sortOrder;
 			case 'updateDate':
-				return item.updateDate.toLocaleString();
+				return item.updateDate.toLocaleString(this.localize.lang());
 			case 'updater':
 				return item.updater;
 			default:

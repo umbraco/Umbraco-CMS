@@ -98,4 +98,27 @@ public interface IElementPermissionService
     /// <param name="elementKeys">The identifiers of the element items to get permissions for.</param>
     /// <returns>A task resolving into the effective permissions for each element item.</returns>
     Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> elementKeys);
+
+    /// <summary>
+    ///     Filters the fallback permissions for a user. Fallback permissions are the user group default permissions
+    ///     used by the UI when no granular per-element permissions are assigned.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to filter permissions for.</param>
+    /// <param name="fallbackPermissions">The fallback permissions aggregated from the user's groups.</param>
+    /// <returns>A task resolving into the filtered set of fallback permissions.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         Only removals are honoured. The returned set is intersected with the supplied one, so a verb added by an
+    ///         implementation is discarded. Every permission service is given its own copy of the same unfiltered set,
+    ///         which also means no implementation can reinstate a verb that another has removed.
+    ///     </para>
+    ///     <para>
+    ///         The supplied set holds every fallback verb assigned to the user, not only those relating to elements, and
+    ///         permission verbs carry nothing that identifies the entity type they belong to. An implementation should
+    ///         therefore only remove verbs it owns.
+    ///     </para>
+    /// </remarks>
+    // TODO (V20): Remove the default implementation.
+    Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
+        => Task.FromResult(fallbackPermissions);
 }

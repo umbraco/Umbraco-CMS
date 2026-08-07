@@ -157,7 +157,7 @@ export class UmbCodeEditorController extends UmbControllerBase {
 		const hasMinimap = Object.prototype.hasOwnProperty.call(options, 'minimap');
 		const hasLightbulb = Object.prototype.hasOwnProperty.call(options, 'lightbulb');
 
-		return {
+		const mapped: monaco.editor.IStandaloneEditorConstructionOptions = {
 			...options,
 			lineNumbers: hasLineNumbers ? (options.lineNumbers ? 'on' : 'off') : undefined,
 			minimap: hasMinimap ? (options.minimap ? { enabled: true } : { enabled: false }) : undefined,
@@ -167,6 +167,14 @@ export class UmbCodeEditorController extends UmbControllerBase {
 					: { enabled: monaco.editor.ShowLightbulbIconMode.Off }
 				: undefined,
 		};
+
+		if (options.autoHeight) {
+			mapped.scrollbar = { vertical: 'hidden', horizontal: 'hidden', handleMouseWheel: false };
+			mapped.overviewRulerLanes = 0;
+		}
+
+		delete (mapped as Record<string, unknown>).autoHeight;
+		return mapped;
 	}
 	/**
 	 * Updates the options of the editor. This is useful for updating the options after the editor has been created.

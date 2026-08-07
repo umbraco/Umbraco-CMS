@@ -143,10 +143,10 @@ internal sealed class LogViewerQueryRepository : EntityRepositoryBase<int, ILogV
     internal sealed class LogViewerQueryModelFactory
     {
         /// <summary>
-        /// Creates an <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.LogViewerQueryRepository.ILogViewerQuery" /> instance from the specified <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.LogViewerQueryRepository.LogViewerQueryDto" />.
+        /// Creates an <see cref="ILogViewerQuery" /> instance from the specified <see cref="LogViewerQueryDto" />.
         /// </summary>
         /// <param name="dto">The DTO containing the log viewer query information.</param>
-        /// <returns>A new <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.LogViewerQueryRepository.ILogViewerQuery" /> instance.</returns>
+        /// <returns>A new <see cref="ILogViewerQuery" /> instance.</returns>
         public ILogViewerQuery BuildEntity(LogViewerQueryDto dto)
         {
             var logViewerQuery = new LogViewerQuery(dto.Name, dto.Query) { Id = dto.Id };

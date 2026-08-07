@@ -1,5 +1,5 @@
 import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
-import type { UmbDocumentTreeItemModel } from '../types.js';
+import type { UmbDocumentTreeItemModel, UmbDocumentTreeRootModel } from '../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbDefaultTreeContext, UmbTreeItemOpenEvent } from '@umbraco-cms/backoffice/tree';
 import { aTimeout, expect, oneEvent } from '@open-wc/testing';
@@ -9,7 +9,10 @@ import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 @customElement('umb-test-document-tree-item-host')
 class UmbTestDocumentTreeItemHostElement extends UmbElementMixin(HTMLElement) {}
 
-function createTreeItem(hasCollection: boolean): UmbDocumentTreeItemModel {
+function createTreeItem(
+	hasCollection: boolean,
+	overrides?: Partial<UmbDocumentTreeItemModel>,
+): UmbDocumentTreeItemModel {
 	return {
 		unique: 'document-unique-id',
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
@@ -32,12 +35,13 @@ function createTreeItem(hasCollection: boolean): UmbDocumentTreeItemModel {
 		createDate: '2024-01-01T00:00:00Z',
 		variants: [],
 		flags: [],
+		...overrides,
 	};
 }
 
 describe('UmbDocumentTreeItemContext', () => {
 	let host: UmbTestDocumentTreeItemHostElement;
-	let treeContext: UmbDefaultTreeContext<UmbDocumentTreeItemModel>;
+	let treeContext: UmbDefaultTreeContext<UmbDocumentTreeItemModel, UmbDocumentTreeRootModel>;
 	let context: UmbDocumentTreeItemContext;
 
 	// Stubs/spies (no sinon in this project).
@@ -114,7 +118,7 @@ describe('UmbDocumentTreeItemContext', () => {
 
 			context.showChildren();
 
-			const event = (await listener) as UmbTreeItemOpenEvent;
+			const event = (await listener) as unknown as UmbTreeItemOpenEvent;
 			expect(event.unique).to.equal('document-unique-id');
 			expect(event.entityType).to.equal(UMB_DOCUMENT_ENTITY_TYPE);
 			expect(expandCalls).to.equal(0);
@@ -126,7 +130,7 @@ describe('UmbDocumentTreeItemContext', () => {
 
 			context.hideChildren();
 
-			const event = (await listener) as UmbTreeItemOpenEvent;
+			const event = (await listener) as unknown as UmbTreeItemOpenEvent;
 			expect(event.unique).to.equal('document-unique-id');
 			expect(event.entityType).to.equal(UMB_DOCUMENT_ENTITY_TYPE);
 			expect(collapseCalls).to.equal(0);
@@ -151,6 +155,47 @@ describe('UmbDocumentTreeItemContext', () => {
 			context.hideChildren();
 
 			expect(collapseCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+	});
+
+	describe('no-access collection item', () => {
+		// A "no access" collection node is an ancestor of the user's start node and must remain
+		// expandable so the user can browse down to their start node. (#22353)
+		it('expands its children in a menu instead of navigating to the Collection view', async () => {
+			context.setIsMenu(true);
+			context.setTreeItem(createTreeItem(true, { noAccess: true }));
+			await aTimeout(0);
+
+			context.showChildren();
+
+			expect(expandCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+
+		it('collapses its children in a menu instead of navigating to the Collection view', async () => {
+			context.setIsMenu(true);
+			context.setTreeItem(createTreeItem(true, { noAccess: true }));
+			await aTimeout(0);
+
+			context.hideChildren();
+
+			expect(collapseCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+
+		it('expands its children in a picker instead of emitting the open event', async () => {
+			context.setTreeItem(createTreeItem(true, { noAccess: true }));
+			await aTimeout(0);
+
+			let openEvents = 0;
+			host.addEventListener(UmbTreeItemOpenEvent.TYPE, () => openEvents++);
+
+			context.showChildren();
+			await aTimeout(0);
+
+			expect(expandCalls).to.equal(1);
+			expect(openEvents).to.equal(0);
 			expect(pushStateCalls.length).to.equal(0);
 		});
 	});

@@ -286,7 +286,7 @@ public class CoreScope : ICoreScope
     ///     Called when a child scope has completed, to update the parent's completion status.
     /// </summary>
     /// <param name="completed">A value indicating whether the child completed successfully.</param>
-    protected void ChildCompleted(bool? completed)
+    protected virtual void ChildCompleted(bool? completed)
     {
         // if child did not complete we cannot complete
         if (completed.HasValue == false || completed.Value == false)

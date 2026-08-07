@@ -1,6 +1,7 @@
 ﻿import {expect} from "@playwright/test";
 import {AliasHelper} from "./AliasHelper";
 import {ApiHelpers} from "./ApiHelpers";
+import {ConstantHelper} from "./ConstantHelper";
 import {DocumentBuilder, DocumentDomainBuilder} from "../builders";
 
 export class DocumentApiHelper {
@@ -15,6 +16,10 @@ export class DocumentApiHelper {
     return await response.json();
   }
 
+  async waitUntilIndexed(query: string, id: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.documentSearch, query, id);
+  }
+
   async doesExist(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id);
     return response.status() === 200;
@@ -25,7 +30,7 @@ export class DocumentApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document', document);
-    return response.headers().location.split("v1/document/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -61,7 +66,7 @@ export class DocumentApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/document/children?parentId=${id}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getChildrenAmount(id: string) {
@@ -117,10 +122,15 @@ export class DocumentApiHelper {
     const rootDocuments = await this.getAllAtRoot();
     const jsonDocuments = await rootDocuments.json();
 
-    for (const document of jsonDocuments.items) {
+    for (const document of this.api.itemsOf(jsonDocuments)) {
       for (const variant of document.variants) {
         if (variant.name === name) {
-          return this.get(document.id);
+          const found = await this.get(document.id);
+          // A trashed document can still be returned by the tree endpoint; it only "exists" in the
+          // recycle bin (checked via doesItemExistInRecycleBin), so don't report it as present.
+          if (!found.isTrashed) {
+            return found;
+          }
         }
       }
       if (document.hasChildren) {
@@ -137,7 +147,7 @@ export class DocumentApiHelper {
     const rootDocuments = await this.getAllAtRoot();
     const jsonDocuments = await rootDocuments.json();
 
-    for (const document of jsonDocuments.items) {
+    for (const document of this.api.itemsOf(jsonDocuments)) {
       for (const variant of document.variants) {
         if (variant.name === name) {
           if (document.hasChildren) {
@@ -549,6 +559,24 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createDocumentWithMultipleVariantsAndNoValues(documentName: string, documentTypeId: string, cultureVariants: {isoCode: string, name: string}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null,
+      });
+    }
+
+    return await this.create(document);
+  }
+
   async createDocumentWithMultipleVariantsWithSharedProperty(documentName: string, documentTypeId: string, dataTypeAlias: string, dataTypeEditorAlias: string, cultureVariants: {isoCode: string, name: string}[], value) {
     await this.ensureNameNotExists(documentName);
 
@@ -625,6 +653,14 @@ export class DocumentApiHelper {
   async isDocumentPublished(id: string) {
     const document = await this.get(id);
     return document.variants[0].state === 'Published';
+  }
+
+  async waitUntilDocumentIsPublished(id: string) {
+    await expect.poll(() => this.isDocumentPublished(id), {timeout: ConstantHelper.timeout.veryLong}).toBeTruthy();
+  }
+
+  async waitUntilImageMediaPickerDoesNotContainImage(id: string, propertyAlias: string, mediaKey: string) {
+    await expect.poll(() => this.doesImageMediaPickerContainImage(id, propertyAlias, mediaKey), {timeout: ConstantHelper.timeout.veryLong}).toBeFalsy();
   }
 
   async createPublishedDocumentWithImageCropper(documentName: string, cropValue: any, dataTypeId: string, templateId: string, propertyName: string = 'Test Property Name', documentTypeName: string = 'Test Document Type', focalPoint: {left: number, top: number} = {left: 0.5, top: 0.5}) {
@@ -1508,14 +1544,14 @@ export class DocumentApiHelper {
 
     const documentBuilder = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId);
-    
+
     for (const culture of cultures) {
       documentBuilder.addVariant()
         .withName(documentName)
         .withCulture(culture)
         .done();
     }
-    
+
     const alias = AliasHelper.toAlias(dataTypeName);
     for (const value of values) {
       const valueBuilder = documentBuilder.addValue()
@@ -1523,7 +1559,7 @@ export class DocumentApiHelper {
         .withValue(value.value)
         .withCulture(value.culture)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();
@@ -1548,7 +1584,7 @@ export class DocumentApiHelper {
         .withAlias(alias)
         .withValue(value.value)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();
@@ -1636,7 +1672,7 @@ export class DocumentApiHelper {
   async doesItemExistInRecycleBin(documentItemName: string) {
     const recycleBin = await this.getRecycleBinItems();
     const jsonRecycleBin = await recycleBin.json();
-    for (const document of jsonRecycleBin.items) {
+    for (const document of this.api.itemsOf(jsonRecycleBin)) {
       if (document.variants[0].name === documentItemName) {
         return true;
       }
@@ -1879,6 +1915,7 @@ export class DocumentApiHelper {
   }
 
   async createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(originalName: string, updatedName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
+    await this.ensureNameNotExists(updatedName);
     const dataTypeData = await this.api.dataType.getByName(dataTypeName);
     const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     const documentId = await this.createDocumentWithTextContent(originalName, documentTypeId, originalText, dataTypeName);
