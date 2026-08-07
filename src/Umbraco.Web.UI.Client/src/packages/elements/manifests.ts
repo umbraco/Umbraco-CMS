@@ -19,11 +19,17 @@ import { manifests as searchManifests } from './search/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as userPermissionsManifests } from './user-permissions/manifests.js';
+import * as entryPointModule from './entry-point.js';
 
-// Ensure global components are registered (if needed, this could be moved to a `backofficeEntryPoint` [LK])
-import './global-components/index.js';
+const backofficeEntryPoint: UmbExtensionManifest = {
+	type: 'backofficeEntryPoint',
+	name: 'Element Backoffice Entry Point',
+	alias: 'Umb.BackofficeEntryPoint.Element',
+	js: entryPointModule,
+};
 
 export const manifests: Array<UmbExtensionManifest> = [
+	backofficeEntryPoint,
 	...auditLogManifests,
 	...collectionManifests,
 	...configurationManifests,
