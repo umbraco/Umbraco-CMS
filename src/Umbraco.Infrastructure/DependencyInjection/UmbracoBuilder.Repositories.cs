@@ -7,6 +7,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
@@ -33,6 +34,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDocumentBlueprintContainerRepository, DocumentBlueprintContainerRepository>();
         builder.Services.AddUnique<IDocumentBlueprintRepository, DocumentBlueprintRepository>();
         builder.Services.AddUnique<IDocumentRepository, DocumentRepository>();
+        builder.Services.AddUnique<IAsyncDocumentBlueprintRepository, AsyncDocumentBlueprintRepository>();
+        builder.Services.AddUnique<IAsyncDocumentRepository, AsyncDocumentRepository>();
         builder.Services.AddUnique<IDocumentVersionRepository, DocumentVersionRepository>();
         builder.Services.AddUnique<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
         builder.Services.AddUnique<IDocumentUrlRepository, DocumentUrlRepository>();
