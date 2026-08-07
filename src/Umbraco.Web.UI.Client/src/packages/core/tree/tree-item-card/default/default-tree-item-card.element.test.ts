@@ -44,6 +44,10 @@ class UmbTestTreeItemCardApi {
 	setHasChildren(value: boolean) {
 		this.#hasChildren.setValue(value);
 	}
+
+	open() {}
+	select() {}
+	deselect() {}
 }
 
 const item: UmbTreeItemModel = {
