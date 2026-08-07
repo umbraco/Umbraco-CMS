@@ -20,7 +20,15 @@ export class UmbAppAuthController extends UmbControllerBase {
 
 			// If the session times out mid-use, open the auth modal over the current content instead
 			// of navigating away, so any unsaved work is preserved.
-			this.observe(context?.timeoutSignal, () => this.#openAuthModal('timedOut'), '_authState');
+			// Observing an undefined source still invokes the callback, so only act when there is a
+			// context to act on — otherwise tearing the context down would throw from in here.
+			this.observe(
+				context?.timeoutSignal,
+				() => {
+					if (this.#authContext) this.#openAuthModal('timedOut');
+				},
+				'_authState',
+			);
 		}).asPromise({ preventTimeout: true });
 	}
 
@@ -97,11 +105,31 @@ export class UmbAppAuthController extends UmbControllerBase {
 					userLoginState,
 				},
 			});
-			await modal?.onSubmit();
+			const result = await modal?.onSubmit();
+
+			if (result?.success) {
+				this.#renderRouteIfNoneWasRendered(userLoginState);
+			}
 		} catch {
 			// Modal was force-closed — a subsequent timeout/guard check reopens it if still unauthorized.
 		} finally {
 			this.#authModalOpen = false;
 		}
+	}
+
+	/**
+	 * On a cold boot the route guard already resolved `false`, so no route was rendered and the
+	 * router slot is showing its loading fallback. The root slot only navigates on a history change,
+	 * and a session arriving from a peer tab produces none — so the tab would sit on the spinner
+	 * forever. Replacing the state re-runs the guard, the same way `#redirect()` starts the router.
+	 *
+	 * Deliberately not done for `timedOut`: there the route is already rendered behind the modal and
+	 * may hold unsaved work, and re-running the guard risks re-rendering it. That state needs no
+	 * nudge anyway — closing the modal reveals the view that was there all along.
+	 * @param {UmbUserLoginState} userLoginState The state the modal was opened in.
+	 */
+	#renderRouteIfNoneWasRendered(userLoginState: UmbUserLoginState) {
+		if (userLoginState === 'timedOut') return;
+		history.replaceState(null, '', location.href);
 	}
 }
