@@ -258,8 +258,8 @@ public class ConfigureBackOfficeCookieOptionsTests
     // than a 302 to the HTML login page. The exception is an explicit client_id, which is how Postman
     // and Swagger UI start an authorization code flow and do need the redirect.
     [TestCase("/umbraco/management/api/v1/document", null, 401)]
-    [TestCase("/umbraco/management/api/v1/document", "umbraco-back-office", 302)]
-    [TestCase("/umbraco/login", null, 302)]
+    [TestCase("/umbraco/management/api/v1/document", "any-client-id", 302)]
+    [TestCase("/umbraco/not-management-api", null, 302)]
     public void Can_Answer_Unauthorized_Request_With_Expected_Status(string path, string? clientId, int expectedStatusCode)
     {
         RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext(path, clientId);
@@ -270,8 +270,8 @@ public class ConfigureBackOfficeCookieOptionsTests
     }
 
     [TestCase("/umbraco/management/api/v1/document", null, 403)]
-    [TestCase("/umbraco/management/api/v1/document", "umbraco-back-office", 302)]
-    [TestCase("/umbraco/login", null, 302)]
+    [TestCase("/umbraco/management/api/v1/document", "any-client-id", 302)]
+    [TestCase("/umbraco/not-management-api", null, 302)]
     public void Can_Answer_Forbidden_Request_With_Expected_Status(string path, string? clientId, int expectedStatusCode)
     {
         RedirectContext<CookieAuthenticationOptions> context = CreateRedirectContext(path, clientId);
