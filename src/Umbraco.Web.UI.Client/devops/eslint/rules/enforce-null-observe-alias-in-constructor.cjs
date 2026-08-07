@@ -50,9 +50,11 @@ module.exports = {
 		fixable: 'code',
 		schema: [],
 		messages: {
-			missingNullAlias: 'Pass `null` as the third argument to `this.observe()` when calling it directly in a constructor.',
-			nonNullAlias: 'Observations in the constructor must have `null` as the third argument, unless you explicitly need to remove the controller manually on a later stage.',
-		},
+			messages: {
+				missingNullAlias: 'Pass `null` as the third argument to `this.observe()` when calling it directly in a constructor.',
+				nonNullAlias:
+					'Observations in the constructor must have `null` as the third argument. If you truly need a stable alias for manual removal, disable this rule for that line and document why.',
+			},
 	},
 	create(context) {
 		return {
