@@ -152,7 +152,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         //
         // Verified by: DocumentNavigationServiceTests.Concurrent_Rebuild_And_Queries_Never_Transiently_Lose_Content
         NavigationSnapshot snapshot = _navigation;
-        return TryGetRootKeysFromStructure(snapshot.Roots, snapshot.Structure, out rootKeys);
+        Guid[] roots;
+        lock (_lockNavigation)
+        {
+            roots = snapshot.Roots.ToArray();
+        }
+        return TryGetRootKeysFromStructure(roots, snapshot.Structure, out rootKeys);
     }
 
     /// <summary>
@@ -172,7 +177,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         {
             // See TryGetRootKeys for why we snapshot into a local.
             NavigationSnapshot snapshot = _navigation;
-            return TryGetRootKeysFromStructure(snapshot.Roots, snapshot.Structure, out rootKeys, contentTypeKey);
+            Guid[] roots;
+            lock (_lockNavigation)
+            {
+                roots = snapshot.Roots.ToArray();
+            }
+            return TryGetRootKeysFromStructure(roots, snapshot.Structure, out rootKeys, contentTypeKey);
         }
 
         // Content type alias doesn't exist
@@ -722,12 +732,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     }
 
     private static bool TryGetRootKeysFromStructure(
-        HashSet<Guid> input,
+        Guid[] input,
         ConcurrentDictionary<Guid, NavigationNode> structure,
         out IEnumerable<Guid> rootKeys,
         Guid? contentTypeKey = null)
     {
-        var keysWithSortOrder = new List<(Guid Key, int SortOrder)>(input.Count);
+        var keysWithSortOrder = new List<(Guid Key, int SortOrder)>(input.Length);
         foreach (Guid key in input)
         {
             if (structure.TryGetValue(key, out NavigationNode? navigationNode) is false)
