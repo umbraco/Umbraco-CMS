@@ -23,6 +23,8 @@ export interface UmbTableItem {
 	data: Array<UmbTableItemData>;
 	selectable?: boolean;
 	active?: boolean;
+	/** Overrides the table-wide select-only behaviour for this row. Set to `false` to keep the row content interactive while a selection is in progress. */
+	selectOnly?: boolean;
 	/** When set, the row shows a children indicator. The nested options control what activating it does. */
 	childrenIndicator?: {
 		/** When set, the indicator becomes an anchor linking to this href. */
@@ -424,12 +426,14 @@ export class UmbTableElement extends UmbLitElement {
 
 	private _renderRow = (item: UmbTableItem) => {
 		const isItemSelectable = this.#isSelectableItem(item);
+		const selectionMode = this._selectionMode || this.config.selectOnly === true;
 		return html`
 			<uui-table-row
 				${ref(this.#getRowRenderedCallback(item))}
 				data-sortable-id=${item.id}
 				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
-				?select-only=${this._selectionMode || this.config.selectOnly}
+				?selection-mode=${selectionMode}
+				?select-only=${item.selectOnly ?? selectionMode}
 				?selected=${this._isSelected(item.id)}
 				?active=${item.active ?? false}
 				@selected=${() => this._selectRow(item)}
@@ -588,14 +592,14 @@ export class UmbTableElement extends UmbLitElement {
 			uui-table-row[selectable]:focus umb-icon,
 			uui-table-row[selectable]:focus-within umb-icon,
 			uui-table-row[selectable]:hover umb-icon,
-			uui-table-row[select-only] umb-icon {
+			uui-table-row[selection-mode] umb-icon {
 				display: none;
 			}
 
 			uui-table-row[selectable]:focus uui-checkbox,
 			uui-table-row[selectable]:focus-within uui-checkbox,
 			uui-table-row[selectable]:hover uui-checkbox,
-			uui-table-row[select-only] uui-checkbox {
+			uui-table-row[selection-mode] uui-checkbox {
 				display: inline-block;
 			}
 
