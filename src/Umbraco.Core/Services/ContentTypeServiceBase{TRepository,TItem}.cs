@@ -1489,7 +1489,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             TItem[] allowedChildren = GetMany(sortedKeys).ToArray();
             result = new PagedModel<TItem>
             {
-                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Take(take).Skip(skip),
+                Items = allowedChildren.OrderBy(x => sortedKeys.IndexOf(x.Key)).Skip(skip).Take(take),
                 Total = allowedChildren.Length,
             };
         }
