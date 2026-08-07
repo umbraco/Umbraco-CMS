@@ -82,6 +82,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     private NavigationSnapshot _navigation = new(new(), []);
     private NavigationSnapshot _recycleBinNavigation = new(new(), []);
 
+    private readonly Lock _lockNavigation = new();
+    private readonly Lock _lockRecycleBinNavigation = new();
+
     /// <summary>
     ///     Gets the approximate number of nodes currently held in memory across the active navigation
     ///     structure and the recycle bin structure, for diagnostics. Each snapshot reference is read once,
@@ -154,7 +157,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         //
         // Verified by: DocumentNavigationServiceTests.Concurrent_Rebuild_And_Queries_Never_Transiently_Lose_Content
         NavigationSnapshot snapshot = _navigation;
-        return TryGetRootKeysFromStructure(snapshot.Roots, snapshot.Structure, out rootKeys);
+        Guid[] roots;
+        lock (_lockNavigation)
+        {
+            roots = snapshot.Roots.ToArray();
+        }
+        return TryGetRootKeysFromStructure(roots, snapshot.Structure, out rootKeys);
     }
 
     /// <summary>
@@ -174,7 +182,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         {
             // See TryGetRootKeys for why we snapshot into a local.
             NavigationSnapshot snapshot = _navigation;
-            return TryGetRootKeysFromStructure(snapshot.Roots, snapshot.Structure, out rootKeys, contentTypeKey);
+            Guid[] roots;
+            lock (_lockNavigation)
+            {
+                roots = snapshot.Roots.ToArray();
+            }
+            return TryGetRootKeysFromStructure(roots, snapshot.Structure, out rootKeys, contentTypeKey);
         }
 
         // Content type alias doesn't exist
@@ -488,7 +501,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
         else
         {
-            _navigation.Roots.Add(key);
+            lock (_lockNavigation)
+            {
+                _navigation.Roots.Add(key);
+            }
         }
 
         // Note: sortOrder can't be automatically determined for items at root level, so it needs to be passed in
@@ -528,7 +544,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false; // Cannot move a node to itself
         }
 
-        _navigation.Roots.Remove(key); // Just in case
+        lock (_lockNavigation)
+        {
+            _navigation.Roots.Remove(key); // Just in case
+        }
 
         NavigationNode? targetParentNode = null;
         if (targetParentKey.HasValue)
@@ -540,7 +559,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         }
         else
         {
-            _navigation.Roots.Add(key);
+            lock(_lockNavigation)
+            {
+                _navigation.Roots.Add(key);
+            }
         }
 
         // Remove the node from its current parent's children list
@@ -603,7 +625,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false; // Node doesn't exist
         }
 
-        _recycleBinNavigation.Roots.Remove(key);
+        lock (_lockRecycleBinNavigation)
+        {
+            _recycleBinNavigation.Roots.Remove(key);
+        }
 
         RemoveDescendantsRecursively(nodeToRemove);
 
@@ -712,12 +737,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     }
 
     private static bool TryGetRootKeysFromStructure(
-        HashSet<Guid> input,
+        Guid[] input,
         ConcurrentDictionary<Guid, NavigationNode> structure,
         out IEnumerable<Guid> rootKeys,
         Guid? contentTypeKey = null)
     {
-        var keysWithSortOrder = new List<(Guid Key, int SortOrder)>(input.Count);
+        var keysWithSortOrder = new List<(Guid Key, int SortOrder)>(input.Length);
         foreach (Guid key in input)
         {
             if (structure.TryGetValue(key, out NavigationNode? navigationNode) is false)
@@ -933,8 +958,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
     private void AddDescendantsToRecycleBinRecursively(NavigationNode node)
     {
-        _recycleBinNavigation.Roots.Add(node.Key);
-        _navigation.Roots.Remove(node.Key);
+        lock (_lockRecycleBinNavigation)
+        {
+            _recycleBinNavigation.Roots.Add(node.Key);
+        }
+        lock (_lockNavigation)
+        {
+            _navigation.Roots.Remove(node.Key);
+        }
         IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _navigation.Structure);
 
         foreach (Guid childKey in childrenKeys)
@@ -975,10 +1006,16 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     {
         if (node.Parent is null)
         {
-            _navigation.Roots.Add(node.Key);
+            lock(_lockNavigation)
+            {
+                _navigation.Roots.Add(node.Key);
+            }
         }
 
-        _recycleBinNavigation.Roots.Remove(node.Key);
+        lock(_lockRecycleBinNavigation)
+        {
+            _recycleBinNavigation.Roots.Remove(node.Key);
+        }
         IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _recycleBinNavigation.Structure);
 
         foreach (Guid childKey in childrenKeys)
