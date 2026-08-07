@@ -25,7 +25,6 @@ public class DeferredSearchReindexServiceTests
 {
     private static readonly TimeSpan _testTimeout = TimeSpan.FromSeconds(5);
 
-    private Mock<IDocumentRepository> _documentRepository = null!;
     private Mock<IAsyncDocumentRepository> _asyncDocumentRepository = null!;
     private Mock<IMediaRepository> _mediaRepository = null!;
     private Mock<IMemberRepository> _memberRepository = null!;
@@ -33,12 +32,12 @@ public class DeferredSearchReindexServiceTests
     private Mock<IPublishStatusQueryService> _publishStatusQueryService = null!;
     private Mock<ICoreScopeProvider> _scopeProvider = null!;
     private Mock<IRelationService> _relationService = null!;
+    private Mock<IIdKeyMap> _idKeyMap = null!;
     private DeferredSearchReindexService _service = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _documentRepository = new Mock<IDocumentRepository>();
         _asyncDocumentRepository = new Mock<IAsyncDocumentRepository>();
         _mediaRepository = new Mock<IMediaRepository>();
         _memberRepository = new Mock<IMemberRepository>();
@@ -46,6 +45,10 @@ public class DeferredSearchReindexServiceTests
         _publishStatusQueryService = new Mock<IPublishStatusQueryService>();
         _scopeProvider = new Mock<ICoreScopeProvider>();
         _relationService = new Mock<IRelationService>();
+        _idKeyMap = new Mock<IIdKeyMap>();
+        _idKeyMap
+            .Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), UmbracoObjectTypes.DocumentType))
+            .ReturnsAsync((int id, UmbracoObjectTypes _) => Attempt.Succeed(KeyForId(id)));
         _scopeProvider
             .Setup(x => x.CreateCoreScope(
                 It.IsAny<System.Data.IsolationLevel>(),
@@ -80,7 +83,6 @@ public class DeferredSearchReindexServiceTests
         indexingSettings.Setup(x => x.CurrentValue).Returns(new IndexingSettings { BatchSize = 100, IndexExternalBlockElements = indexExternalBlockElements });
 
         return new DeferredSearchReindexService(
-            _documentRepository.Object,
             _asyncDocumentRepository.Object,
             _mediaRepository.Object,
             _memberRepository.Object,
@@ -90,7 +92,8 @@ public class DeferredSearchReindexServiceTests
             _scopeProvider.Object,
             Mock.Of<ILogger<DeferredSearchReindexService>>(),
             lifetime.Object,
-            _relationService.Object);
+            _relationService.Object,
+            _idKeyMap.Object);
     }
 
     /// <summary>
@@ -102,17 +105,14 @@ public class DeferredSearchReindexServiceTests
     {
         // Arrange
         var content = CreateContent(1, published: true);
-        var total = 1L;
-        _documentRepository
-            .Setup(x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository
+            .Setup(x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out total,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()))
-            .Returns([content]);
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PagedModel<IContent> { Total = 1, Items = [content] });
         _publishStatusQueryService
             .Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
             .Returns(true);
@@ -195,17 +195,14 @@ public class DeferredSearchReindexServiceTests
     public async Task QueueContentTypeReindex_Deduplicates_Ids()
     {
         // Arrange
-        var total = 0L;
-        _documentRepository
-            .Setup(x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository
+            .Setup(x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out total,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()))
-            .Returns(Enumerable.Empty<IContent>());
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() });
 
         // Act — queue the same ID twice
         _service.QueueContentTypeReindex([1]);
@@ -213,15 +210,13 @@ public class DeferredSearchReindexServiceTests
         await WaitForProcessingAsync();
 
         // Assert — repository should be called at least once with the ID
-        _documentRepository.Verify(
-            x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository.Verify(
+            x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out total,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()),
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()),
             Times.AtLeastOnce);
     }
 
@@ -233,17 +228,14 @@ public class DeferredSearchReindexServiceTests
     public async Task Content_Media_And_Member_Types_Processed_Independently()
     {
         // Arrange
-        var contentTotal = 0L;
-        _documentRepository
-            .Setup(x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository
+            .Setup(x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out contentTotal,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()))
-            .Returns(Enumerable.Empty<IContent>());
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() });
 
         var mediaTotal = 0L;
         _mediaRepository
@@ -276,15 +268,13 @@ public class DeferredSearchReindexServiceTests
         await WaitForProcessingAsync();
 
         // Assert — each repository was called
-        _documentRepository.Verify(
-            x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository.Verify(
+            x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out contentTotal,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()),
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()),
             Times.AtLeastOnce);
         _mediaRepository.Verify(
             x => x.GetPage(
@@ -316,16 +306,13 @@ public class DeferredSearchReindexServiceTests
     {
         // Arrange — repository throws once then succeeds.
         var callCount = 0;
-        var total = 0L;
-        _documentRepository
-            .Setup(x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository
+            .Setup(x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out total,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()))
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()))
             .Returns(() =>
             {
                 if (Interlocked.Increment(ref callCount) == 1)
@@ -333,7 +320,7 @@ public class DeferredSearchReindexServiceTests
                     throw new InvalidOperationException("Transient DB error");
                 }
 
-                return Enumerable.Empty<IContent>();
+                return Task.FromResult(new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() });
             });
 
         // Act
@@ -341,15 +328,13 @@ public class DeferredSearchReindexServiceTests
         await WaitForProcessingAsync();
 
         // Assert — called twice (first failed, second succeeded)
-        _documentRepository.Verify(
-            x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository.Verify(
+            x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out total,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()),
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()),
             Times.Exactly(2));
     }
 
@@ -361,17 +346,14 @@ public class DeferredSearchReindexServiceTests
     public async Task Persistent_Failure_Gives_Up_After_Max_Retries()
     {
         // Arrange — repository always throws.
-        var total = 0L;
-        _documentRepository
-            .Setup(x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository
+            .Setup(x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out total,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()))
-            .Throws(new InvalidOperationException("Persistent DB error"));
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Persistent DB error"));
 
         // Act
         _service.QueueContentTypeReindex([1]);
@@ -380,15 +362,13 @@ public class DeferredSearchReindexServiceTests
         await _service.WaitForWorkerIdleAsync(cts.Token);
 
         // Assert — called 3 times (max consecutive failures)
-        _documentRepository.Verify(
-            x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository.Verify(
+            x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out total,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()),
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()),
             Times.Exactly(3));
     }
 
@@ -404,21 +384,19 @@ public class DeferredSearchReindexServiceTests
         using var service = CreateService(shutdownCts.Token);
 
         var reindexStarted = new TaskCompletionSource();
-        var total = 0L;
-        _documentRepository
-            .Setup(x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository
+            .Setup(x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out total,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()))
-            .Callback(() =>
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(() =>
             {
                 reindexStarted.SetResult();
                 shutdownCts.Cancel();
                 shutdownCts.Token.ThrowIfCancellationRequested();
+                return Task.FromResult(new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() });
             });
 
         // Act
@@ -429,15 +407,13 @@ public class DeferredSearchReindexServiceTests
 
         // Assert
         await reindexStarted.Task;
-        _documentRepository.Verify(
-            x => x.GetPage(
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<long>(),
+        _asyncDocumentRepository.Verify(
+            x => x.GetPagedOfContentTypesAsync(
+                It.IsAny<Guid[]>(),
                 It.IsAny<int>(),
-                out total,
-                It.IsAny<string[]?>(),
-                It.IsAny<IQuery<IContent>?>(),
-                It.IsAny<Ordering?>()),
+                It.IsAny<int>(),
+                It.IsAny<Ordering?>(),
+                It.IsAny<CancellationToken>()),
             Times.Once);
     }
 

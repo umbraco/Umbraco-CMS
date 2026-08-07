@@ -27,7 +27,6 @@ namespace Umbraco.Cms.Infrastructure.Search;
 /// </remarks>
 internal sealed class DeferredSearchReindexService : IDeferredSearchReindexService, IDisposable
 {
-    private readonly IDocumentRepository _documentRepository;
     private readonly IAsyncDocumentRepository _asyncDocumentRepository;
     private readonly IMediaRepository _mediaRepository;
     private readonly IMemberRepository _memberRepository;
@@ -38,6 +37,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     private readonly ILogger<DeferredSearchReindexService> _logger;
     private readonly CancellationTokenSource _shutdownCts;
     private readonly IRelationService _relationService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly ConcurrentDictionary<int, byte> _pendingContentTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMediaTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMemberTypeIds = new();
@@ -47,8 +47,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     /// <summary>
     ///     Initializes a new instance of the <see cref="DeferredSearchReindexService" /> class.
     /// </summary>
-    /// <param name="documentRepository">Repository used to page through content items without acquiring distributed locks.</param>
-    /// <param name="asyncDocumentRepository">Repository used to fetch documents referencing changed elements by key.</param>
+    /// <param name="asyncDocumentRepository">Repository used to page/fetch documents without acquiring distributed locks.</param>
     /// <param name="mediaRepository">Repository used to page through media items without acquiring distributed locks.</param>
     /// <param name="memberRepository">Repository used to page through member items without acquiring distributed locks.</param>
     /// <param name="umbracoIndexingHandler">The handler responsible for writing entries to Examine indexes.</param>
@@ -58,8 +57,8 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
     /// <param name="logger">The logger.</param>
     /// <param name="hostApplicationLifetime">The application lifetime, used to cancel in-flight reindexing on shutdown.</param>
     /// <param name="relationService">The relation service, used to traverse element-to-document relations.</param>
+    /// <param name="idKeyMap">The ID/key map, used to resolve queued content type IDs to their Guid keys.</param>
     public DeferredSearchReindexService(
-        IDocumentRepository documentRepository,
         IAsyncDocumentRepository asyncDocumentRepository,
         IMediaRepository mediaRepository,
         IMemberRepository memberRepository,
@@ -69,9 +68,9 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         ICoreScopeProvider scopeProvider,
         ILogger<DeferredSearchReindexService> logger,
         IHostApplicationLifetime hostApplicationLifetime,
-        IRelationService relationService)
+        IRelationService relationService,
+        IIdKeyMap idKeyMap)
     {
-        _documentRepository = documentRepository;
         _asyncDocumentRepository = asyncDocumentRepository;
         _mediaRepository = mediaRepository;
         _memberRepository = memberRepository;
@@ -82,6 +81,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         _logger = logger;
         _shutdownCts = CancellationTokenSource.CreateLinkedTokenSource(hostApplicationLifetime.ApplicationStopping);
         _relationService = relationService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -169,7 +169,7 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                     if (contentTypeIds.Length > 0)
                     {
                         _logger.LogInformation("Deferred reindex starting for content type IDs: {ContentTypeIds}", contentTypeIds);
-                        ReindexContentOfContentTypes(contentTypeIds);
+                        await ReindexContentOfContentTypesAsync(contentTypeIds, cancellationToken);
                         _logger.LogInformation("Deferred reindex completed for content type IDs: {ContentTypeIds}", contentTypeIds);
                     }
 
@@ -245,15 +245,18 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
         }
     }
 
-    private void ReindexContentOfContentTypes(int[] contentTypeIds)
+    private async Task ReindexContentOfContentTypesAsync(int[] contentTypeIds, CancellationToken cancellationToken)
     {
-        List<int> contentTypeIdsAsList = [.. contentTypeIds];
+        Guid[] contentTypeKeys = await ResolveKeysAsync(contentTypeIds, UmbracoObjectTypes.DocumentType);
+        if (contentTypeKeys.Length == 0)
+        {
+            return;
+        }
+
         var publishChecked = new Dictionary<int, bool>();
 
-        PageAndReindex(
-            _documentRepository,
-            () => _scopeProvider.CreateQuery<IContent>()
-                .Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)),
+        await AsyncPageAndReindex(
+            (skip, take, ordering, ct) => _asyncDocumentRepository.GetPagedOfContentTypesAsync(contentTypeKeys, skip, take, ordering, ct),
             Ordering.By("Path"),
             c =>
             {
@@ -268,7 +271,33 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
                 }
 
                 _umbracoIndexingHandler.ReIndexForContent(c, isPublished);
-            });
+            },
+            cancellationToken);
+    }
+
+    /// <summary>
+    ///     Resolves a batch of integer IDs to their Guid keys via <see cref="IIdKeyMap" />, silently omitting any ID
+    ///     that no longer resolves — the entity was deleted between the notification firing and this background job
+    ///     running, so there is nothing left to reindex for it.
+    /// </summary>
+    /// <remarks>
+    ///     TODO: Remove this bridge once the cache-refresher notifications feeding QueueContentTypeReindex (and any
+    ///     future async reindex queue) carry Guid keys directly instead of sync int IDs — at that point the queued
+    ///     payload itself is already what AsyncPageAndReindex's callers need, and this resolution step disappears.
+    /// </remarks>
+    private async Task<Guid[]> ResolveKeysAsync(IEnumerable<int> ids, UmbracoObjectTypes objectType)
+    {
+        var keys = new List<Guid>();
+        foreach (var id in ids)
+        {
+            Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(id, objectType);
+            if (keyAttempt.Success)
+            {
+                keys.Add(keyAttempt.Result);
+            }
+        }
+
+        return keys.ToArray();
     }
 
     private void ReindexMediaOfMediaTypes(int[] mediaTypeIds)
@@ -419,6 +448,45 @@ internal sealed class DeferredSearchReindexService : IDeferredSearchReindexServi
             }
 
             foreach (TEntity item in items)
+            {
+                reindex(item);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Async counterpart of <see cref="PageAndReindex{TEntity}" />, for repositories exposing a purpose-built
+    ///     async paged query instead of NPoco's arbitrary <see cref="IQuery{T}" />-based <c>GetPage</c> — currently
+    ///     only <see cref="IAsyncDocumentRepository.GetPagedOfContentTypesAsync" />, but written against a fetch
+    ///     delegate rather than a repository interface directly so media/member reindexing can adopt it too once
+    ///     they have their own async, purpose-built paged repository methods.
+    /// </summary>
+    /// <remarks>
+    ///     Same lock-avoidance rationale as <see cref="PageAndReindex{TEntity}" />: reads the repository directly
+    ///     instead of going through a service method that would acquire a distributed ReadLock.
+    /// </remarks>
+    private async Task AsyncPageAndReindex<TEntity>(
+        Func<int, int, Ordering?, CancellationToken, Task<PagedModel<TEntity>>> fetchPage,
+        Ordering ordering,
+        Action<TEntity> reindex,
+        CancellationToken cancellationToken)
+        where TEntity : class, IContentBase
+    {
+        var pageSize = _indexingSettings.CurrentValue.BatchSize;
+        var page = 0;
+        var total = long.MaxValue;
+        while (page * pageSize < total)
+        {
+            PagedModel<TEntity> pagedResult;
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                pagedResult = await fetchPage(page * pageSize, pageSize, ordering, cancellationToken);
+                page++;
+            }
+
+            total = pagedResult.Total;
+
+            foreach (TEntity item in pagedResult.Items)
             {
                 reindex(item);
             }
