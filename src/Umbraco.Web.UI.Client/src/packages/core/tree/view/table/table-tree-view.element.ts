@@ -209,6 +209,9 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			entityType: item.entityType,
 			childrenIndicator: item.hasChildren ? { href, onOpen } : undefined,
 			selectable: !noAccess && this._isSelectableItem(item as UmbTreeItemModel),
+			// select-only disables all row interaction, which would leave no way to drill into an item with
+			// children while a selection is in progress.
+			selectOnly: item.hasChildren ? false : undefined,
 			active: isActive,
 			data: [
 				{
