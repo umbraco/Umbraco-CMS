@@ -119,7 +119,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 			${this.#renderLoadPrevButton()}
 			${repeat(
 				this._rootItems,
-				(item, index) => item.name + '___' + index,
+				(item) => item.entityType + item.unique,
 				(item) => html`
 					<umb-tree-item
 						.entityType=${item.entityType}

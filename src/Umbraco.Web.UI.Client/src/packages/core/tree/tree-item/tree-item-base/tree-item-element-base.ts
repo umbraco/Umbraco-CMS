@@ -315,7 +315,7 @@ export abstract class UmbTreeItemElementBase<
 			${this._childItems
 				? repeat(
 						this._childItems,
-						(item, index) => item.name + '___' + index,
+						(item) => item.entityType + item.unique,
 						(item) => html`
 							<umb-tree-item
 								.entityType=${item.entityType}
