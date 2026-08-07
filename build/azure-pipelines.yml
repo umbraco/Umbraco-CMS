@@ -902,7 +902,7 @@ stages:
             displayName: 'Copy C# Docs to blob storage'
             inputs:
               SourcePath: '$(Build.ArtifactStagingDirectory)/csharp-docs/*'
-              azureSubscription: umbraco-storage
+              azureSubscription: umbraco-storage-wif
               Destination: AzureBlob
               storage: umbracoapidocs
               ContainerName: '$web'
@@ -924,7 +924,7 @@ stages:
             displayName: 'Copy UI Docs to blob storage'
             inputs:
               SourcePath: '$(Build.ArtifactStagingDirectory)/ui-docs/*'
-              azureSubscription: umbraco-storage
+              azureSubscription: umbraco-storage-wif
               Destination: AzureBlob
               storage: umbracoapidocs
               ContainerName: '$web'
