@@ -64,52 +64,65 @@ public abstract class OpenIdDictApplicationManagerBase
 
     private async Task<bool> MatchesAsync(object client, OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
     {
-        // Descriptor state that is not compared below is treated as a change, so a derived manager
-        // setting it never has its write silently skipped. Secrets are stored hashed and can never
-        // be compared at all.
-        if (clientDescriptor.ClientSecret is not null
-            || clientDescriptor.ConsentType is not null
-            || clientDescriptor.ApplicationType is not null
-            || clientDescriptor.JsonWebKeySet is not null
-            || clientDescriptor.Requirements.Count > 0
-            || clientDescriptor.DisplayNames.Count > 0
-            || clientDescriptor.Properties.Count > 0)
+        if (HasStateThatCannotBeCompared(clientDescriptor))
         {
             return false;
         }
 
-        if (string.Equals(
-                await ApplicationManager.GetDisplayNameAsync(client, cancellationToken),
-                clientDescriptor.DisplayName,
-                StringComparison.Ordinal) is false)
-        {
-            return false;
-        }
+        return await MatchesRegistrationAsync(client, clientDescriptor, cancellationToken)
+               && await MatchesRedirectUrisAsync(client, clientDescriptor, cancellationToken)
+               && await MatchesSettingsAsync(client, clientDescriptor, cancellationToken);
+    }
 
-        if (string.Equals(
-                await ApplicationManager.GetClientTypeAsync(client, cancellationToken),
-                clientDescriptor.ClientType,
-                StringComparison.OrdinalIgnoreCase) is false)
-        {
-            return false;
-        }
+    /// <summary>
+    /// Descriptor state that is not compared is treated as a change, so a derived manager setting it
+    /// never has its write silently skipped. Secrets are stored hashed and can never be compared.
+    /// </summary>
+    private static bool HasStateThatCannotBeCompared(OpenIddictApplicationDescriptor clientDescriptor)
+    {
+        object?[] uncomparableValues =
+        [
+            clientDescriptor.ClientSecret,
+            clientDescriptor.ConsentType,
+            clientDescriptor.ApplicationType,
+            clientDescriptor.JsonWebKeySet,
+        ];
 
-        if (SetEquals(await ApplicationManager.GetPermissionsAsync(client, cancellationToken), clientDescriptor.Permissions) is false)
-        {
-            return false;
-        }
+        int[] uncomparableCounts =
+        [
+            clientDescriptor.Requirements.Count,
+            clientDescriptor.DisplayNames.Count,
+            clientDescriptor.Properties.Count,
+        ];
 
-        if (UriSetEquals(await ApplicationManager.GetRedirectUrisAsync(client, cancellationToken), clientDescriptor.RedirectUris) is false)
-        {
-            return false;
-        }
+        return uncomparableValues.Any(value => value is not null)
+               || uncomparableCounts.Any(count => count > 0);
+    }
 
-        if (UriSetEquals(await ApplicationManager.GetPostLogoutRedirectUrisAsync(client, cancellationToken), clientDescriptor.PostLogoutRedirectUris) is false)
-        {
-            return false;
-        }
+    private async Task<bool> MatchesRegistrationAsync(object client, OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
+    {
+        var displayName = await ApplicationManager.GetDisplayNameAsync(client, cancellationToken);
+        var clientType = await ApplicationManager.GetClientTypeAsync(client, cancellationToken);
+        ImmutableArray<string> permissions = await ApplicationManager.GetPermissionsAsync(client, cancellationToken);
 
+        return string.Equals(displayName, clientDescriptor.DisplayName, StringComparison.Ordinal)
+               && string.Equals(clientType, clientDescriptor.ClientType, StringComparison.OrdinalIgnoreCase)
+               && SetEquals(permissions, clientDescriptor.Permissions);
+    }
+
+    private async Task<bool> MatchesRedirectUrisAsync(object client, OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
+    {
+        ImmutableArray<string> redirectUris = await ApplicationManager.GetRedirectUrisAsync(client, cancellationToken);
+        ImmutableArray<string> postLogoutRedirectUris = await ApplicationManager.GetPostLogoutRedirectUrisAsync(client, cancellationToken);
+
+        return UriSetEquals(redirectUris, clientDescriptor.RedirectUris)
+               && UriSetEquals(postLogoutRedirectUris, clientDescriptor.PostLogoutRedirectUris);
+    }
+
+    private async Task<bool> MatchesSettingsAsync(object client, OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
+    {
         ImmutableDictionary<string, string> settings = await ApplicationManager.GetSettingsAsync(client, cancellationToken);
+
         return settings.Count == clientDescriptor.Settings.Count
                && settings.All(setting =>
                    clientDescriptor.Settings.TryGetValue(setting.Key, out var value)
