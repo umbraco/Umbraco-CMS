@@ -45,7 +45,7 @@ test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'min', minimumValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationLimit', minimumValue)).toBeTruthy();
 });
 
 test('can update maximum value', async ({umbracoApi, umbracoUi}) => {
@@ -59,7 +59,7 @@ test('can update maximum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'max', maximumValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationLimit', undefined, maximumValue)).toBeTruthy();
 });
 
 test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
@@ -76,8 +76,5 @@ test('the default configuration is correct', async ({umbracoApi, umbracoUi}) => 
   const dataTypeData = await umbracoApi.dataType.getByName(customDataTypeName);
   expect(dataTypeData.editorAlias).toBe(editorAlias);
   expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
-  expect(dataTypeData.values).toEqual([
-    {alias: 'min', value: 0},
-    {alias: 'max', value: 0},
-  ]);
+  expect(dataTypeData.values).toEqual([]);
 });

@@ -45,7 +45,7 @@ test('can update minimum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'minVal', minimumValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationRange', minimumValue)).toBeTruthy();
 });
 
 test('can update maximum value', async ({umbracoApi, umbracoUi}) => {
@@ -59,7 +59,7 @@ test('can update maximum value', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxVal', maximumValue)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesDataTypeHaveRangeValue(customDataTypeName, 'validationRange', undefined, maximumValue)).toBeTruthy();
 });
 
 test('can update step size value', async ({umbracoApi, umbracoUi}) => {

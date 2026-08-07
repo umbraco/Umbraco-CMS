@@ -10,7 +10,8 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
  * @param value
  */
 function getNumberOrUndefined(value: string) {
-	const num = parseInt(value, 10);
+	if (value.trim() === '') return undefined;
+	const num = Number(value);
 	return isNaN(num) ? undefined : num;
 }
 
@@ -38,6 +39,13 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 	required = false;
 	@property({ type: String })
 	requiredMessage = UMB_VALIDATION_EMPTY_LOCALIZATION_KEY;
+
+	/**
+	 * The step size accepted by the inputs. Defaults to 1 (integers only); set a fractional value
+	 * (e.g. 0.000001) to allow decimals.
+	 */
+	@property({ type: Number })
+	step?: number;
 
 	@state()
 	private _maxValue?: number;
@@ -70,7 +78,9 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 
 	#updateValue() {
 		const newValue =
-			this._minValue || this._maxValue ? (this._minValue ?? '') + ',' + (this._maxValue ?? '') : undefined;
+			this._minValue != null || this._maxValue != null
+				? (this._minValue ?? '') + ',' + (this._maxValue ?? '')
+				: undefined;
 		if (super.value !== newValue) {
 			super.value = newValue;
 		}
@@ -89,7 +99,9 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 		}
 	}
 	public override get value(): string | undefined {
-		return this.minValue || this.maxValue ? (this.minValue || '') + ',' + (this.maxValue || '') : undefined;
+		return this.minValue != null || this.maxValue != null
+			? (this.minValue ?? '') + ',' + (this.maxValue ?? '')
+			: undefined;
 	}
 
 	constructor() {
@@ -139,6 +151,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.minLabel}
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
+				step=${ifDefined(this.step)}
 				placeholder=${this._minPlaceholder}
 				?required=${this.required}
 				.value=${this._minValue?.toString() ?? ''}
@@ -149,6 +162,7 @@ export class UmbInputNumberRangeElement extends UmbFormControlMixin(UmbLitElemen
 				label=${this.maxLabel}
 				min=${ifDefined(this.validationRange?.min)}
 				max=${ifDefined(this.validationRange?.max)}
+				step=${ifDefined(this.step)}
 				placeholder=${this._maxPlaceholder}
 				?required=${this.required}
 				.value=${this._maxValue?.toString() ?? ''}

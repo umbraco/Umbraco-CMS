@@ -25,11 +25,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly aliasTxt: Locator;
   private readonly widthTxt: Locator;
   private readonly heightTxt: Locator;
-  private readonly minimumTxt: Locator;
-  private readonly maximumTxt: Locator;
+  private readonly rangeLowValueTxt: Locator;
+  private readonly rangeHighValueTxt: Locator;
   private readonly stepSizeTxt: Locator;
-  private readonly sliderMinimumTxt: Locator;
-  private readonly sliderMaximumTxt: Locator;
   private readonly optionTxt: Locator;
   private readonly addOptionBtn: Locator;
   private readonly maximumAllowedCharsTxt: Locator;
@@ -38,8 +36,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly maxHeightTxt: Locator;
   private readonly acceptedFileExtensionsTxt: Locator;
   private readonly addAcceptedFileExtensionsBtn: Locator;
-  private readonly minimumNumberOfItemsTxt: Locator;
-  private readonly maximumNumberOfItemsTxt: Locator;
   private readonly ignoreUserStartNodesToggle: Locator;
   private readonly overlaySizeDropDownBox: Locator;
   private readonly hideAnchorQueryStringInputToggle: Locator;
@@ -197,15 +193,14 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.createCropBtn = this.propertyCrops.getByRole('button', {name: 'Create'});
     this.editCropBtn = this.propertyCrops.getByRole('button', {name: 'Edit'});
 
+    // Range control - the single min/max control shared by Numeric, Decimal, Slider,
+    // Multiple Text String and Multi URL Picker. Defined once so the label lookup lives in one place.
+    this.rangeLowValueTxt = page.getByLabel('Low value');
+    this.rangeHighValueTxt = page.getByLabel('High value');
+
     // Numeric
-    this.minimumTxt = page.getByTestId('property:min').locator('#input');
-    this.maximumTxt = page.getByTestId('property:max').locator('#input');
     this.stepSizeTxt = page.getByTestId('property:step').locator('#input');
     this.allowDecimalsToggle = page.locator('umb-property[label="Allow decimals"] #toggle');
-
-    // Slider (uses minVal/maxVal aliases rather than the Numeric min/max)
-    this.sliderMinimumTxt = page.getByTestId('property:minVal').locator('#input');
-    this.sliderMaximumTxt = page.getByTestId('property:maxVal').locator('#input');
 
     // Radiobox
     this.optionTxt = page.getByTestId('property:items').locator('#input');
@@ -222,8 +217,6 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.addAcceptedFileExtensionsBtn = page.getByTestId('property:fileExtensions').getByLabel('Add', {exact: true});
 
     // Multi URL Picker
-    this.minimumNumberOfItemsTxt = page.getByTestId('property:minNumber').locator('#input');
-    this.maximumNumberOfItemsTxt = page.getByTestId('property:maxNumber').locator('#input');
     this.overlaySizeDropDownBox = page.getByTestId('property:overlaySize').locator('select');
     this.hideAnchorQueryStringInputToggle = page.getByTestId('property:hideAnchor').locator('#toggle');
 
@@ -596,11 +589,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   // Numeric
   async enterMinimumValue(value: string) {
-    await this.enterText(this.minimumTxt, value);
+    await this.enterText(this.rangeLowValueTxt, value);
   }
 
   async enterMaximumValue(value: string) {
-    await this.enterText(this.maximumTxt, value);
+    await this.enterText(this.rangeHighValueTxt, value);
   }
 
   async enterStepSizeValue(value: string) {
@@ -608,11 +601,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async enterSliderMinimumValue(value: string) {
-    await this.enterText(this.sliderMinimumTxt, value);
+    await this.enterText(this.rangeLowValueTxt, value);
   }
 
   async enterSliderMaximumValue(value: string) {
-    await this.enterText(this.sliderMaximumTxt, value);
+    await this.enterText(this.rangeHighValueTxt, value);
   }
 
   async clickAllowDecimalsToggle() {
@@ -666,11 +659,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   // Multi URL Picker
   async enterMinimumNumberOfItemsValue(value: string) {
-    await this.enterText(this.minimumNumberOfItemsTxt, value);
+    await this.enterText(this.rangeLowValueTxt, value);
   }
 
   async enterMaximumNumberOfItemsValue(value: string) {
-    await this.enterText(this.maximumNumberOfItemsTxt, value);
+    await this.enterText(this.rangeHighValueTxt, value);
   }
 
   async clickIgnoreUserStartNodesToggle() {

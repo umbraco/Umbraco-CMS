@@ -15,16 +15,32 @@ public class MultiNodePickerConfiguration : IIgnoreUserStartNodesConfig
     public MultiNodePickerConfigurationTreeSource? TreeSource { get; set; }
 
     /// <summary>
+    /// Gets or sets the validation limits for the number of items that can be selected.
+    /// </summary>
+    [ConfigurationField("validationLimit", Type = typeof(RangeConfigurationField))]
+    public NumberRange ValidationLimit { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets the minimum number of items that must be selected.
     /// </summary>
-    [ConfigurationField("minNumber")]
-    public int MinNumber { get; set; }
+    [Obsolete("Use ValidationLimit instead. Scheduled for removal in Umbraco 21.")]
+    [JsonIgnore]
+    public int MinNumber
+    {
+        get => ValidationLimit.Min ?? 0;
+        set => ValidationLimit.Min = value == 0 ? null : value;
+    }
 
     /// <summary>
     /// Gets or sets the maximum number of items that can be selected.
     /// </summary>
-    [ConfigurationField("maxNumber")]
-    public int MaxNumber { get; set; }
+    [Obsolete("Use ValidationLimit instead. Scheduled for removal in Umbraco 21.")]
+    [JsonIgnore]
+    public int MaxNumber
+    {
+        get => ValidationLimit.Max ?? 0;
+        set => ValidationLimit.Max = value == 0 ? null : value;
+    }
 
     /// <summary>
     /// Gets or sets the content type filter for allowed selections.
