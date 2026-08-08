@@ -29,9 +29,13 @@ internal static class SingleBlockMigrationEditorAliasOverride
     /// Resolves block property values of the specified data types with the single block property editor until the
     /// returned <see cref="IDisposable" /> is disposed.
     /// </summary>
-    /// <param name="dataTypeKeys">The keys of the data types being converted to the single block property editor.</param>
+    /// <param name="dataTypeKeys">
+    /// The keys of the data types being converted to the single block property editor. Held by reference for the
+    /// lifetime of the returned scope - which is opened once per converted property value - so it must not be
+    /// mutated while in use.
+    /// </param>
     /// <returns>A disposable that restores the previous override when disposed.</returns>
-    public static IDisposable For(IEnumerable<Guid> dataTypeKeys) => new OverrideScope(dataTypeKeys);
+    public static IDisposable For(IReadOnlySet<Guid> dataTypeKeys) => new OverrideScope(dataTypeKeys);
 
     /// <summary>
     /// Gets the property editor alias to resolve the value editor of a block property value with.
@@ -55,10 +59,10 @@ internal static class SingleBlockMigrationEditorAliasOverride
     {
         private readonly IReadOnlySet<Guid>? _previous;
 
-        public OverrideScope(IEnumerable<Guid> dataTypeKeys)
+        public OverrideScope(IReadOnlySet<Guid> dataTypeKeys)
         {
             _previous = _dataTypeKeys.Value;
-            _dataTypeKeys.Value = dataTypeKeys.ToHashSet();
+            _dataTypeKeys.Value = dataTypeKeys;
         }
 
         public void Dispose() => _dataTypeKeys.Value = _previous;

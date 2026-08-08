@@ -209,6 +209,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     ?? throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(editedItems));
 
                 // Lookup the property editor.
+                // TODO (V22): Remove the override once the single block list migration it exists for is removed.
                 IDataEditor? propertyEditor = _propertyEditors[
                     SingleBlockMigrationEditorAliasOverride.Resolve(
                         propertyType.DataTypeKey,

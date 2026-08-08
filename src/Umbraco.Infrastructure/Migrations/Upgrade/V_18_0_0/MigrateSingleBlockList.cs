@@ -235,7 +235,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         }
 
         IDataType[] singleBlockListDataTypes = _blockListConfigurationCache.CachedDataTypes.ToArray();
-        var singleBlockListDataTypeKeys = singleBlockListDataTypes.Select(dataType => dataType.Key).ToArray();
+        var singleBlockListDataTypeKeys = singleBlockListDataTypes.Select(dataType => dataType.Key).ToHashSet();
 
         // Save the converted property values first, and only switch the data types over below.
         //
@@ -335,7 +335,7 @@ WHERE nodeId IN (@0)";
 
     private async Task<bool> SavePropertyTypes(
         IDictionary<IPropertyType, List<UpdateItem>> propertyTypes,
-        Guid[] singleBlockListDataTypeKeys)
+        IReadOnlySet<Guid> singleBlockListDataTypeKeys)
     {
         var success = true;
 
@@ -369,7 +369,7 @@ WHERE nodeId IN (@0)";
                     var completed = Interlocked.Increment(ref progress);
                     if (completed % 100 == 0)
                     {
-                        _logger.LogInformation("  - finíshed {progress} of {total} properties", completed, updateBatch.Count);
+                        _logger.LogInformation("  - finished {progress} of {total} properties", completed, updateBatch.Count);
                     }
 
                     if (FinalizeUpdateItem(propertyTypes[propertyType].First(item => Equals(item.PropertyDataDto, update.Poco)), updatedValueEditor) is false)
