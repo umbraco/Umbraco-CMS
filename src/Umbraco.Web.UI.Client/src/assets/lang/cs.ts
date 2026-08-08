@@ -1918,11 +1918,4 @@ export default {
 		formsDescription:
 			'Vytvářejte formuláře pomocí intuitivního rozhraní drag and drop. Od jednoduchých kontaktních formulářů, které odesílají e-maily, až po pokročilé dotazníky, které se integrují do systémů CRM. Vaši klienti to budou milovat!',
 	},
-	picker: {
-		selectedCount: (count: number) => {
-			if (count === 1) return 'Vybrána 1 položka';
-			if (count >= 2 && count <= 4) return `Vybrány ${count} položky`;
-			return `Vybráno ${count} položek`;
-		},
-	},
 } as UmbLocalizationDictionary;

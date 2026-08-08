@@ -2467,12 +2467,4 @@ export default {
 		wordWrapConfigLabel: 'تغليف الكلمات',
 		wordWrapConfigDescription: 'تفعيل تغليف الكلمات في محرر الأكواد.',
 	},
-	picker: {
-		selectedCount: (count: number) => {
-			if (count === 1) return 'تم تحديد عنصر واحد';
-			if (count === 2) return 'تم تحديد عنصرين';
-			if (count % 100 >= 3 && count % 100 <= 10) return `تم تحديد ${count} عناصر`;
-			return `تم تحديد ${count} عنصرًا`;
-		},
-	},
 } as UmbLocalizationDictionary;

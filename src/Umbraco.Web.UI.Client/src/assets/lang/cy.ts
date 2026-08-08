@@ -2502,7 +2502,4 @@ export default {
 		basicLevelDescription: "Byddwn yn anfon ID safle dienw, fersiwn Umbraco, a phecynnau wedi'u gosod",
 		detailedLevelDescription: '\n          Byddwn yn anfon:\n          ',
 	},
-	picker: {
-		selectedCount: (count: number) => (count === 1 ? "1 eitem wedi'i dewis" : `${count} o eitemau wedi'u dewis`),
-	},
 } as UmbLocalizationDictionary;

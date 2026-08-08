@@ -797,7 +797,4 @@ export default {
 		selectAllLogLevelFilters: 'בחר הכל',
 		deselectAllLogLevelFilters: 'הסר סימון מהכל',
 	},
-	picker: {
-		selectedCount: (count: number) => (count === 1 ? 'נבחר פריט אחד' : `נבחרו ${count} פריטים`),
-	},
 } as UmbLocalizationDictionary;
