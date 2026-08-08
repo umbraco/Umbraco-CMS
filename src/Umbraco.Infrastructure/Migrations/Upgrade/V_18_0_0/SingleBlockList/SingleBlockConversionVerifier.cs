@@ -90,6 +90,8 @@ internal static class SingleBlockConversionVerifier
                 count++;
             }
 
+            // A counted layout is still descended into, which cannot double-count it: its children are arrays of
+            // layout items, and a layout item never carries a "layout" key of its own.
             count += CountSingleBlockLayouts(property.Value);
         }
 
