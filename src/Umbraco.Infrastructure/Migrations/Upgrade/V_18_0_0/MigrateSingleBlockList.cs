@@ -330,104 +330,123 @@ WHERE nodeId IN (@0)";
 
         foreach (IPropertyType propertyType in propertyTypes.Keys)
         {
-            // The dataType and valueEditor should be constructed as we have done this before, but we hate null values.
-            IDataType dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey)
-                                 ?? throw new InvalidOperationException("The data type could not be fetched.");
-            IDataValueEditor updatedValueEditor = dataType.Editor?.GetValueEditor()
-                                           ?? throw new InvalidOperationException(
-                                               "The data type value editor could not be obtained.");
-
-            // batch by datatype
-            var propertyDataDtos = propertyTypes[propertyType].Select(item => item.PropertyDataDto).ToList();
-
-            var updateBatch = propertyDataDtos.Select(propertyDataDto =>
-                UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto))).ToList();
-
-            var updatesToSkip = new ConcurrentBag<UpdateBatch<PropertyDataDto>>();
-
-            var progress = 0;
-
-            void HandleUpdateBatch(UpdateBatch<PropertyDataDto> update)
-            {
-                using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
-
-                // The override has to be applied here rather than around the whole loop: the parallelized path below
-                // deliberately does not flow the execution context, which is what an ambient AsyncLocal rides on.
-                using (SingleBlockMigrationEditorAliasOverride.For(singleBlockListDataTypeKeys))
-                {
-                    var completed = Interlocked.Increment(ref progress);
-                    if (completed % 100 == 0)
-                    {
-                        _logger.LogInformation("  - finished {progress} of {total} properties", completed, updateBatch.Count);
-                    }
-
-                    if (FinalizeUpdateItem(propertyTypes[propertyType].First(item => Equals(item.PropertyDataDto, update.Poco)), updatedValueEditor) is false)
-                    {
-                        updatesToSkip.Add(update);
-                    }
-                }
-            }
-
-            if (DatabaseType == DatabaseType.SQLite)
-            {
-                // SQLite locks up if we run the migration in parallel, so... let's not.
-                foreach (UpdateBatch<PropertyDataDto> update in updateBatch)
-                {
-                    HandleUpdateBatch(update);
-                }
-            }
-            else
-            {
-                Parallel.ForEachAsync(updateBatch, async (update, token) =>
-                {
-                    //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
-                    Task task;
-                    using (ExecutionContext.SuppressFlow())
-                    {
-                        task = Task.Run(
-                            () =>
-                            {
-                                using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-                                scope.Complete();
-                                HandleUpdateBatch(update);
-                            },
-                            token);
-                    }
-
-                    await task;
-                }).GetAwaiter().GetResult();
-            }
-
-            if (updatesToSkip.IsEmpty is false)
-            {
-                success = false;
-                updateBatch.RemoveAll(updatesToSkip.Contains);
-            }
-
-            if (updateBatch.Any() is false)
-            {
-                _logger.LogDebug("  - no properties to convert, continuing");
-                continue;
-            }
-
-            _logger.LogInformation("  - {totalConverted} properties converted, saving...", updateBatch.Count);
-            var result = Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
-            if (result != updateBatch.Count)
-            {
-                throw new InvalidOperationException(
-                    $"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
-            }
-
-            _logger.LogDebug(
-                "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
-                propertyType.Name,
-                propertyType.Id,
-                propertyType.Alias,
-                propertyType.PropertyEditorAlias,
-                result);
+            success &= await SavePropertyType(propertyType, propertyTypes[propertyType], singleBlockListDataTypeKeys);
         }
 
         return success;
+    }
+
+    private async Task<bool> SavePropertyType(
+        IPropertyType propertyType,
+        List<UpdateItem> updateItems,
+        IReadOnlySet<Guid> singleBlockListDataTypeKeys)
+    {
+        // The dataType and valueEditor should be constructed as we have done this before, but we hate null values.
+        IDataType dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey)
+                             ?? throw new InvalidOperationException("The data type could not be fetched.");
+        IDataValueEditor updatedValueEditor = dataType.Editor?.GetValueEditor()
+                                       ?? throw new InvalidOperationException(
+                                           "The data type value editor could not be obtained.");
+
+        // batch by datatype
+        var propertyDataDtos = updateItems.Select(item => item.PropertyDataDto).ToList();
+
+        var updateBatch = propertyDataDtos.Select(propertyDataDto =>
+            UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto))).ToList();
+
+        var updatesToSkip = new ConcurrentBag<UpdateBatch<PropertyDataDto>>();
+
+        var total = updateBatch.Count;
+        var progress = 0;
+
+        void HandleUpdateBatch(UpdateBatch<PropertyDataDto> update)
+        {
+            using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
+
+            // The override has to be applied here rather than around the whole loop: the parallelized path below
+            // deliberately does not flow the execution context, which is what an ambient AsyncLocal rides on.
+            using (SingleBlockMigrationEditorAliasOverride.For(singleBlockListDataTypeKeys))
+            {
+                var completed = Interlocked.Increment(ref progress);
+                if (completed % 100 == 0)
+                {
+                    _logger.LogInformation("  - finished {Progress} of {Total} properties", completed, total);
+                }
+
+                if (FinalizeUpdateItem(updateItems.First(item => Equals(item.PropertyDataDto, update.Poco)), updatedValueEditor) is false)
+                {
+                    updatesToSkip.Add(update);
+                }
+            }
+        }
+
+        RunUpdateBatch(updateBatch, HandleUpdateBatch);
+
+        var success = true;
+        if (updatesToSkip.IsEmpty is false)
+        {
+            success = false;
+            updateBatch.RemoveAll(updatesToSkip.Contains);
+        }
+
+        if (updateBatch.Any() is false)
+        {
+            _logger.LogDebug("  - no properties to convert, continuing");
+            return success;
+        }
+
+        _logger.LogInformation("  - {totalConverted} properties converted, saving...", updateBatch.Count);
+        var result = Database.UpdateBatch(updateBatch, new BatchOptions { BatchSize = 100 });
+        if (result != updateBatch.Count)
+        {
+            throw new InvalidOperationException(
+                $"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
+        }
+
+        _logger.LogDebug(
+            "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
+            propertyType.Name,
+            propertyType.Id,
+            propertyType.Alias,
+            propertyType.PropertyEditorAlias,
+            result);
+
+        return success;
+    }
+
+    private void RunUpdateBatch(
+        List<UpdateBatch<PropertyDataDto>> updateBatch,
+        Action<UpdateBatch<PropertyDataDto>> handleUpdateBatch)
+    {
+        if (DatabaseType == DatabaseType.SQLite)
+        {
+            // SQLite locks up if we run the migration in parallel, so... let's not.
+            foreach (UpdateBatch<PropertyDataDto> update in updateBatch)
+            {
+                handleUpdateBatch(update);
+            }
+
+            return;
+        }
+
+        Parallel.ForEachAsync(updateBatch, async (update, token) =>
+        {
+            //Foreach here, but we need to suppress the flow before each task, but not the actuall await of the task
+            Task task;
+            using (ExecutionContext.SuppressFlow())
+            {
+                task = Task.Run(
+                    () =>
+                    {
+                        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+                        scope.Complete();
+                        handleUpdateBatch(update);
+                    },
+                    token);
+            }
+
+            await task;
+        }).GetAwaiter().GetResult();
     }
 
     private bool ProcessPropertyDataDto(
