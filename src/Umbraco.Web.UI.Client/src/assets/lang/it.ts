@@ -2303,4 +2303,7 @@ export default {
 		searchResult: 'oggetto trovato',
 		searchResults: 'oggetti trovati',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento selezionato' : 'elementi selezionati'}`,
+	},
 } as UmbLocalizationDictionary;

@@ -1316,4 +1316,13 @@ export default {
 		selectAllLogLevelFilters: 'Zaznacz wszystko',
 		deselectAllLogLevelFilters: 'Odznacz wszystkie',
 	},
+	picker: {
+		selectedCount: (count: number) => {
+			const mod10 = count % 10;
+			const mod100 = count % 100;
+			if (count === 1) return 'Wybrano 1 element';
+			if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `Wybrano ${count} elementy`;
+			return `Wybrano ${count} elementów`;
+		},
+	},
 } as UmbLocalizationDictionary;
