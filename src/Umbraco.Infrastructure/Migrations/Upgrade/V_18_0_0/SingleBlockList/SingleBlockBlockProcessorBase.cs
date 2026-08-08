@@ -35,8 +35,12 @@ internal abstract class SingleBlockBlockProcessorBase
                     blockPropertyValue.PropertyType!.DataTypeKey)
                 && blockPropertyValue.Value is BlockListValue blockListValue)
             {
-                blockPropertyValue.Value = processOuterValue.Invoke(blockListValue);
-                hasChanged = true;
+                var convertedValue = processOuterValue.Invoke(blockListValue);
+                if (ReferenceEquals(convertedValue, blockListValue) is false)
+                {
+                    blockPropertyValue.Value = convertedValue;
+                    hasChanged = true;
+                }
             }
         }
 
