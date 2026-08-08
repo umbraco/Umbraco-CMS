@@ -160,8 +160,8 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 					</div>
 					<div class="action-wrapper">
 						${this.editCropAlias
-							? html`<uui-button @click=${this.#onEditCancel}>Cancel</uui-button>
-									<uui-button look="secondary" type="submit" label=${this.localize.term('general_edit')}></uui-button>`
+							? html`<uui-button @click=${this.#onEditCancel} label=${this.localize.term('general_cancel')}></uui-button>
+									<uui-button look="secondary" type="submit" label=${this.localize.term('general_update')}></uui-button>`
 							: html`<uui-button
 									look="secondary"
 									type="submit"
