@@ -160,9 +160,9 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 					</div>
 					<div class="action-wrapper">
 						${this.editCropAlias
-							? html`<uui-button @click=${this.#onEditCancel}>Cancel</uui-button>
-									<uui-button look="secondary" type="submit" label=${this.localize.term('general_edit')}></uui-button>`
-							: html`<uui-button
+				? html`<uui-button @click=${this.#onEditCancel}>Cancel</uui-button>
+									<uui-button look="secondary" type="submit" label=${this.localize.term('general_update')}></uui-button>`
+				: html`<uui-button
 									look="secondary"
 									type="submit"
 									label=${this.localize.term('general_create')}></uui-button>`}
@@ -190,12 +190,12 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 		return html`
 			<uui-ref-list class="crops">
 				${repeat(
-					this.value,
-					(item) => item.alias,
-					(item) => html`
+			this.value,
+			(item) => item.alias,
+			(item) => html`
 						${this.editCropAlias === item.alias
-							? html`<div class="crop-form">${this.#renderForm(item)}</div>`
-							: html`
+					? html`<div class="crop-form">${this.#renderForm(item)}</div>`
+					: html`
 									<uui-ref-node
 										class="crop"
 										data-alias="${item.alias}"
@@ -215,7 +215,7 @@ export class UmbPropertyEditorUIImageCropsElement extends UmbLitElement implemen
 									</uui-ref-node>
 								`}
 					`,
-				)}
+		)}
 			</uui-ref-list>
 			${!this._isCreating && !this.editCropAlias
 				? html`<uui-button
