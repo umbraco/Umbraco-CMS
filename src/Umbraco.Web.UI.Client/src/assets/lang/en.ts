@@ -2093,6 +2093,9 @@ export default {
 		children: 'Children',
 		noItems: 'No items',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} selected`,
+	},
 	update: {
 		updateAvailable: 'New update ready',
 		updateDownloadText: '%0% is ready, click here for download',
