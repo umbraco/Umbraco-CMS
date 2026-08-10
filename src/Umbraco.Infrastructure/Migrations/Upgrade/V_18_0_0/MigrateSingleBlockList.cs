@@ -341,10 +341,11 @@ WHERE nodeId IN (@0)";
         List<UpdateItem> updateItems,
         IReadOnlySet<Guid> singleBlockListDataTypeKeys)
     {
-        // The dataType and valueEditor should be constructed as we have done this before, but we hate null values.
+        // Both lookups already succeeded for this property type in ProcessPropertyTypesAsync, so neither can
+        // realistically fail here - the throws are only because the APIs are nullable.
         IDataType dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey)
                              ?? throw new InvalidOperationException("The data type could not be fetched.");
-        IDataValueEditor updatedValueEditor = dataType.Editor?.GetValueEditor()
+        IDataValueEditor valueEditor = dataType.Editor?.GetValueEditor()
                                        ?? throw new InvalidOperationException(
                                            "The data type value editor could not be obtained.");
 
@@ -373,7 +374,7 @@ WHERE nodeId IN (@0)";
                     _logger.LogInformation("  - finished {Progress} of {Total} properties", completed, total);
                 }
 
-                if (FinalizeUpdateItem(updateItems.First(item => Equals(item.PropertyDataDto, update.Poco)), updatedValueEditor) is false)
+                if (FinalizeUpdateItem(updateItems.First(item => Equals(item.PropertyDataDto, update.Poco)), valueEditor) is false)
                 {
                     updatesToSkip.Add(update);
                 }
@@ -494,10 +495,9 @@ WHERE nodeId IN (@0)";
     }
 
     /// <summary>
-    /// Takes the updated value that was instanced from the db value by the old ValueEditors
-    /// And runs it through the updated ValueEditors and sets it on the PropertyDataDto
+    /// Serializes the converted value back to its database representation and sets it on the PropertyDataDto.
     /// </summary>
-    private bool FinalizeUpdateItem(UpdateItem updateItem, IDataValueEditor updatedValueEditor)
+    private bool FinalizeUpdateItem(UpdateItem updateItem, IDataValueEditor valueEditor)
     {
         var editorValue = _jsonSerializer.Serialize(updateItem.UpdatedValue);
 
@@ -510,7 +510,7 @@ WHERE nodeId IN (@0)";
         {
             dbValue = updateItem.UpdatedValue is SingleBlockValue
                 ? _dummySingleBlockValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null)
-                : updatedValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+                : valueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
         }
 #pragma warning restore CS0618 // Type or member is obsolete
 
