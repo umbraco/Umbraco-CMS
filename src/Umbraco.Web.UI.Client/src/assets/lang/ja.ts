@@ -413,6 +413,7 @@ export default {
 		install: 'インストール',
 		invalid: '無効',
 		justify: '位置揃え',
+		label: 'ラベル',
 		language: '言語',
 		layout: 'レイアウト',
 		links: 'リンク',
@@ -422,6 +423,7 @@ export default {
 		logoff: 'ログオフ',
 		logout: 'ログアウト',
 		macro: 'マクロ',
+		mandatory: '必須',
 		move: '移動',
 		name: '名前',
 		new: '新規',
@@ -440,6 +442,7 @@ export default {
 		reciept: 'フォームからEmailを受信',
 		recycleBin: 'ごみ箱',
 		remaining: '残り',
+		remove: '削除',
 		rename: '名前の変更',
 		renew: '更新',
 		required: 'この項目は必須です',
@@ -701,6 +704,7 @@ export default {
 		noColors: '設定済みの色はありません。',
 	},
 	propertyEditorPicker: {
+		title: 'プロパティエディターの選択',
 		selectAction: 'プロパティエディターの選択',
 	},
 	relatedlinks: {
@@ -1085,6 +1089,13 @@ export default {
 		invalidFalse: 'このフィールドはオンにする必要があります',
 		invalidPattern: '値が無効です。正しいパターンと一致しません',
 		customValidation: 'カスタム検証',
+	},
+	recycleBin: {
+		restoreItemTo: (from: string, to: string) => `<strong>${from}</strong> を<strong>${to}</strong> に復元します`,
+		itemCannotBeRestored: 'この項目は自動的に復元できません',
+		itemCannotBeRestoredHelpText:
+			'この項目を自動的に復元できる場所がありません。以下のツリーを使用して手動で移動できます。',
+		restoreToTitle: '復元先',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'すべて選択',

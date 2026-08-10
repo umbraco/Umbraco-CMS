@@ -2448,11 +2448,13 @@ export default {
 		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
+		restoreItemTo: (from: string, to: string) => `Restore <strong>${from}</strong> to <strong>${to}</strong>`,
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
 		mediaTrashed: 'Trashed media with Id: {0} related to original parent media item with Id: {1}',
 		itemCannotBeRestored: 'Cannot automatically restore this item',
 		itemCannotBeRestoredHelpText:
 			'There is no location where this item can be automatically restored. You can move the item manually using the tree below.',
+		restoreToTitle: 'Restore to',
 		wasRestored: 'was restored under',
 	},
 	relationType: {
