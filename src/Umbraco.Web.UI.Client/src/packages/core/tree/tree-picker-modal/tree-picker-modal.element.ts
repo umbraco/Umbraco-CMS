@@ -443,6 +443,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#renderSearch() {
+		if (!this._isSearchable) return nothing;
+
 		const selectableFilter =
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
