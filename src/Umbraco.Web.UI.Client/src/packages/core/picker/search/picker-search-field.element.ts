@@ -1,7 +1,7 @@
 import type { UmbPickerContext } from '../picker.context.js';
 import { UMB_PICKER_CONTEXT } from '../picker.context.token.js';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { html, customElement, state, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, state, nothing, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -15,6 +15,9 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 
 	@state()
 	private _isSearchable: boolean = false;
+
+	@query('uui-input')
+	private _input?: UUIInputElement;
 
 	#pickerContext?: UmbPickerContext;
 
@@ -30,6 +33,10 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 			this.observe(this.#pickerContext?.search.searching, (searching) => (this._searching = searching ?? false));
 			this.observe(this.#pickerContext?.search.query, (query) => (this._query = query?.query || ''));
 		});
+	}
+
+	override focus() {
+		this._input?.focus();
 	}
 
 	#onInput(event: UUIInputEvent) {
