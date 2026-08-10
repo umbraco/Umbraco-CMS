@@ -42,3 +42,7 @@ export interface UmbTreeAncestorsOfRequestArgs {
 		entityType: string;
 	};
 }
+
+export interface UmbTreeItemsRequestArgs {
+	uniques: Array<string>;
+}

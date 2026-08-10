@@ -2,6 +2,7 @@ import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
@@ -56,6 +57,13 @@ export interface UmbTreeRepository<
 	 * @memberof UmbTreeRepository
 	 */
 	requestTreeItemAncestors: (args: TreeAncestorsOfRequestArgsType) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
+
+	/**
+	 * Requests the tree items with the given uniques.
+	 * @param {UmbTreeItemsRequestArgs} args
+	 * @memberof UmbTreeRepository
+	 */
+	requestTreeItems?: (args: UmbTreeItemsRequestArgs) => Promise<UmbRepositoryResponse<TreeItemType[]>>;
 
 	/**
 	 * Returns an observable of the root items of the tree.

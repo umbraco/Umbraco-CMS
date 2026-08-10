@@ -11,6 +11,7 @@ import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeRepository } from '../data/index.js';
 import type { UmbTreeRootItemsRequestArgs } from '../data/types.js';
+import { umbResolveTreeStartNodes } from '../utils/index.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDeprecation, UmbSelectionManager, debounce } from '@umbraco-cms/backoffice/utils';
@@ -65,6 +66,7 @@ export class UmbDefaultTreeContext<
 	public readonly pagination = this.#treeItemChildrenManager.offsetPagination;
 	public readonly targetPagination = this.#treeItemChildrenManager.targetPagination;
 	public readonly startNode = this.#treeItemChildrenManager.startNode;
+	public readonly startNodes = this.#treeItemChildrenManager.startNodes;
 	public readonly foldersOnly = this.#treeItemChildrenManager.foldersOnly;
 	public readonly additionalRequestArgs = this.#treeItemChildrenManager.additionalRequestArgs;
 	public readonly isLoading = this.#treeItemChildrenManager.isLoading;
@@ -198,7 +200,7 @@ export class UmbDefaultTreeContext<
 	async #debouncedLoadTree(reload = false) {
 		await this.#init;
 
-		const hasStartNode = this.getStartNode();
+		const hasStartNode = this.getStartNode() !== undefined || this.getStartNodes().length > 0;
 		const hideTreeRoot = this.getHideTreeRoot();
 
 		// Always load the tree root entity, even when the root node is hidden or we are drilled
@@ -311,6 +313,27 @@ export class UmbDefaultTreeContext<
 	 */
 	getStartNode(): UmbTreeStartNode | undefined {
 		return this.#treeItemChildrenManager.getStartNode();
+	}
+
+	/**
+	 * Sets the startNodes config. A single node is handled as a start node, so only two or more nodes make the
+	 * tree present the nodes themselves as its top level.
+	 * @param {Array<UmbTreeStartNode> | undefined} startNodes - The start nodes
+	 * @memberof UmbDefaultTreeContext
+	 */
+	setStartNodes(startNodes: Array<UmbTreeStartNode> | undefined) {
+		const resolved = umbResolveTreeStartNodes(undefined, startNodes);
+		this.#treeItemChildrenManager.setStartNodes(resolved.startNodes);
+		this.setStartNode(resolved.startNode);
+	}
+
+	/**
+	 * Gets the startNodes config
+	 * @returns {Array<UmbTreeStartNode>} - The start nodes
+	 * @memberof UmbDefaultTreeContext
+	 */
+	getStartNodes(): Array<UmbTreeStartNode> {
+		return this.#treeItemChildrenManager.getStartNodes();
 	}
 
 	/**

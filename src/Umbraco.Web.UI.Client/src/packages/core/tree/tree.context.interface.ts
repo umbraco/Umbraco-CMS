@@ -44,6 +44,7 @@ export interface UmbTreeContext<
 	readonly pagination: UmbPaginationManager;
 	readonly targetPagination: UmbTargetPaginationManager;
 	readonly startNode: Observable<UmbTreeStartNode | undefined>;
+	readonly startNodes?: Observable<Array<UmbTreeStartNode>>;
 	readonly foldersOnly: Observable<boolean>;
 	readonly additionalRequestArgs: Observable<Partial<RequestArgsType> | object>;
 	readonly isLoading?: Observable<boolean>;
@@ -75,6 +76,9 @@ export interface UmbTreeContext<
 
 	setStartNode(startNode: UmbTreeStartNode | undefined): void;
 	getStartNode(): UmbTreeStartNode | undefined;
+
+	setStartNodes?(startNodes: Array<UmbTreeStartNode> | undefined): void;
+	getStartNodes?(): Array<UmbTreeStartNode>;
 
 	setFoldersOnly(foldersOnly: boolean): void;
 	getFoldersOnly(): boolean;

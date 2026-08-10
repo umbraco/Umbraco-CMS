@@ -5,6 +5,7 @@ import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-dat
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
 import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
@@ -163,6 +164,32 @@ export abstract class UmbTreeRepositoryBase<
 		const { data, error } = await this._treeSource.getAncestorsOf(args);
 
 		// TODO: implement observable for ancestor items in the store
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any };
+	}
+
+	/**
+	 * Requests the tree items with the given uniques
+	 * @param {UmbTreeItemsRequestArgs} args
+	 * @returns {*}
+	 * @memberof UmbTreeRepositoryBase
+	 */
+	async requestTreeItems(args: UmbTreeItemsRequestArgs): Promise<UmbRepositoryResponse<TreeItemType[]>> {
+		await this._init;
+
+		if (!this._treeSource.getItems) {
+			return {
+				data: undefined,
+				error: new Error('The tree data source does not support requesting items by unique.'),
+			};
+		}
+
+		const { data, error } = await this._treeSource.getItems(args);
+
+		if (data) {
+			this._treeStore?.appendItems(data);
+		}
+
 		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
 		return { data, error: error as any };
 	}

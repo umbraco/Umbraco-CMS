@@ -8,7 +8,7 @@ import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
-import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
+import { umbResolveTreeStartNodes, type UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
@@ -88,6 +88,12 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
+
+	/**
+	 * Multiple nodes to start the picker tree from. Takes precedence over `startNode`.
+	 */
+	@property({ type: Array, attribute: false })
+	startNodes?: Array<UmbTreeStartNode>;
 
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
@@ -189,7 +195,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 		this.#pickerInputContext.openPicker(
 			{
 				hideTreeRoot: true,
-				startNode: this.startNode,
+				...umbResolveTreeStartNodes(this.startNode, this.startNodes),
 			},
 			{
 				allowedContentTypes: this.allowedContentTypeIds?.map((id) => ({

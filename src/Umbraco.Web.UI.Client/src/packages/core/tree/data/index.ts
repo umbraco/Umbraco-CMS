@@ -9,6 +9,7 @@ export type {
 	UmbTreeRootItemsRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeItemsRequestArgs,
 } from './types.js';
 
 export { UmbUniqueTreeStore } from './unique-tree-store.js';
