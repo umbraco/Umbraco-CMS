@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Navigation;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -41,7 +42,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 #pragma warning restore CS0419 // Ambiguous reference in cref attribute
     private sealed record NavigationSnapshot(
         ConcurrentDictionary<Guid, NavigationNode> Structure,
-        HashSet<Guid> Roots)
+        ConcurrentHashSet<Guid> Roots)
     {
         private long _generation;
 
@@ -680,7 +681,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         // readers never observe a transiently empty navigation state or a mismatched pair
         // of Structure and Roots.
         var newStructure = new ConcurrentDictionary<Guid, NavigationNode>();
-        var newRoots = new HashSet<Guid>();
+        var newRoots = new ConcurrentHashSet<Guid>();
 
         if (trashed)
         {
@@ -712,7 +713,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     }
 
     private static bool TryGetRootKeysFromStructure(
-        HashSet<Guid> input,
+        ConcurrentHashSet<Guid> input,
         ConcurrentDictionary<Guid, NavigationNode> structure,
         out IEnumerable<Guid> rootKeys,
         Guid? contentTypeKey = null)
@@ -1063,7 +1064,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, HashSet<Guid> roots, IEnumerable<INavigationModel> entities)
+    private static void BuildNavigationDictionary(ConcurrentDictionary<Guid, NavigationNode> nodesStructure, ConcurrentHashSet<Guid> roots, IEnumerable<INavigationModel> entities)
     {
         var entityList = entities.ToList();
         var idToKeyMap = entityList.ToDictionary(x => x.Id, x => x.Key);
