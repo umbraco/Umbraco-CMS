@@ -394,6 +394,15 @@ public static partial class StringExtensions
     /// <summary>
     /// Strips all HTML tags from a string.
     /// </summary>
+    /// <remarks>
+    /// Not suitable for XSS prevention, <see cref="CleanForXss"/> is preferred instead.
+    /// This method strips only <i>valid</i> HTML tags, which means the following potential
+    /// XSS payload will be mitigated:
+    /// <code>&lt;script&gt;alert(1)&lt;/script&gt;</code>
+    /// But a payload containing a malformed tag that can still be rendered by a browser will not be
+    /// stripped:
+    /// <code>&lt;img src=x onerror=alert(1)</code>
+    /// </remarks>
     /// <param name="text">The text to strip HTML from.</param>
     /// <returns>The string with all HTML tags removed.</returns>
     public static string StripHtml(this string text)
