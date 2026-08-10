@@ -60,16 +60,6 @@
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!--
-    Umbraco.Web.UI opts out of central package management, so the SQLitePCLRaw.lib.e_sqlite3 transitive pin in
-    Directory.Packages.props does not reach it. Reference it directly to force the patched version instead
-    of the vulnerable 2.1.11 that Microsoft.Data.Sqlite / Microsoft.EntityFrameworkCore.Sqlite otherwise
-    resolve (GHSA-2m69-gcr7-jv3q).
-    -->
-    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
-  </ItemGroup>
-
   <PropertyGroup>
     <!--
       Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms.
