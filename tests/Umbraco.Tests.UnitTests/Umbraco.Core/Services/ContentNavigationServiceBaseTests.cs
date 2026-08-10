@@ -1547,6 +1547,18 @@ public class ContentNavigationServiceBaseTests
 
         // Assert
         Assert.IsFalse(result);
+
+        // The rejected key keeps the place it already had. No parent was passed above, so the add asked
+        // for the node at root level, yet the roots set is left as it was and the node stays under Root.
+        _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        var nodeExists = _navigationService.TryGetParentKey(Child1, out Guid? existingParentKey);
+
+        Assert.Multiple(() =>
+        {
+            CollectionAssert.AreEquivalent(new[] { Root }, rootKeys);
+            Assert.IsTrue(nodeExists);
+            Assert.AreEqual(Root, existingParentKey);
+        });
     }
 
     [Test]

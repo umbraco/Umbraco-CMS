@@ -487,16 +487,20 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
                 return false; // Parent node doesn't exist
             }
         }
-        else
-        {
-            _navigation.Roots.Add(key);
-        }
 
         // Note: sortOrder can't be automatically determined for items at root level, so it needs to be passed in
         var newNode = new NavigationNode(key, contentTypeKey, sortOrder ?? 0);
         if (_navigation.Structure.TryAdd(key, newNode) is false)
         {
             return false; // Node with this key already exists
+        }
+
+        // Registered as a root only once the key is known to be new. A key rejected above is already in
+        // the structure, so registering it here would report the existing node as a root regardless of
+        // the parent it actually has.
+        if (parentKey.HasValue is false)
+        {
+            _navigation.Roots.Add(key);
         }
 
         // If sortOrder supplied → caller is asserting the position, preserve it; otherwise append last.
