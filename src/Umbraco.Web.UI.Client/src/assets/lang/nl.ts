@@ -2187,4 +2187,7 @@ export default {
 		manageDescription:
 			'U kunt Inhoudssjablonen bewerken en verwijderen vanuit de boomstructuur\n      "inhoudssjablonen" in de sectie Instellingen. Vouw het documenttype uit waarop de Inhoudssjabloon is gebaseerd en\n      klik erop om het te bewerken of te verwijderen.\n    ',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
+	},
 } as UmbLocalizationDictionary;
