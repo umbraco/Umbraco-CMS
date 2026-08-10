@@ -2211,6 +2211,24 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
+  async createContentPickerSourceDataTypeWithDynamicRootAndQueryStep(name: string, originAlias: string, queryStepAlias: string, docTypeKeys: string[]) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
+      .withName(name)
+      .addStartNode()
+        .withType('content')
+        .withOriginAlias(originAlias)
+        .addQueryStep()
+          .withAlias(queryStepAlias)
+          .withDocTypeKeys(docTypeKeys)
+          .done()
+        .done()
+      .build();
+
+    return await this.save(dataType);
+  }
+
   async doesContentPickerHaveDynamicRoot(dataTypeName: string, originAlias: string) {
     const dataType = await this.getByName(dataTypeName);
     const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
