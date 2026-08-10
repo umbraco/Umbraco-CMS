@@ -58,7 +58,7 @@ internal sealed class AsyncDocumentBlueprintRepositoryTest : UmbracoIntegrationT
         GetRequiredService<IIdKeyMap>(),
         GetRequiredService<ITagRepository>(),
         GetRequiredService<IJsonSerializer>(),
-        GetRequiredService<IUserGroupService>(),
+        new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
         GetRequiredService<IShortStringHelper>());
 
     private AsyncDocumentRepository CreateDocumentRepository() => new(
@@ -79,7 +79,7 @@ internal sealed class AsyncDocumentBlueprintRepositoryTest : UmbracoIntegrationT
         GetRequiredService<IIdKeyMap>(),
         GetRequiredService<ITagRepository>(),
         GetRequiredService<IJsonSerializer>(),
-        GetRequiredService<IUserGroupService>(),
+        new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
         GetRequiredService<IShortStringHelper>());
 
     [Test]

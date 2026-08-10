@@ -22,18 +22,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
     where TEntity : class, IEntity
 {
-    private readonly IUserGroupService _userGroupService;
+    private readonly Lazy<IUserGroupService> _userGroupService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AsyncPermissionRepository{TEntity}" /> class.
     /// </summary>
     /// <param name="scopeAccessor">The EF Core scope accessor.</param>
     /// <param name="appCaches">The application caches.</param>
-    /// <param name="userGroupService">The user group service, used to resolve user group keys to/from IDs.</param>
+    /// <param name="userGroupService">
+    ///     The user group service, used to resolve user group keys to/from IDs. Resolved lazily: <see cref="IUserGroupService" />
+    ///     depends (transitively, via <see cref="IUserGroupPermissionService" />) on <see cref="IContentService" />, which owns
+    ///     the document repository this class is a sub-repository of — resolving it eagerly at construction time closes a
+    ///     circular dependency.
+    /// </param>
     public AsyncPermissionRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
-        IUserGroupService userGroupService)
+        Lazy<IUserGroupService> userGroupService)
         : base(scopeAccessor, appCaches) =>
         _userGroupService = userGroupService;
 
@@ -62,7 +67,7 @@ internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
             }
 
             List<Guid> groupKeys = rows.Select(row => row.UserGroupKey).Distinct().ToList();
-            Dictionary<Guid, int> keyToId = (await _userGroupService.GetAsync(groupKeys))
+            Dictionary<Guid, int> keyToId = (await _userGroupService.Value.GetAsync(groupKeys))
                 .ToDictionary(userGroup => userGroup.Key, userGroup => userGroup.Id);
 
             var collection = new EntityPermissionCollection();
@@ -136,7 +141,7 @@ internal sealed class AsyncPermissionRepository<TEntity> : AsyncRepositoryBase
         await db.UserGroup2GranularPermissions.Where(p => p.UniqueId == entityKey).ExecuteDeleteAsync(cancellationToken);
 
         List<int> groupIds = permissionSet.PermissionsSet.Select(p => p.UserGroupId).Distinct().ToList();
-        Dictionary<int, Guid> idToKey = (await _userGroupService.GetAsync(groupIds.ToArray()))
+        Dictionary<int, Guid> idToKey = (await _userGroupService.Value.GetAsync(groupIds.ToArray()))
             .ToDictionary(userGroup => userGroup.Id, userGroup => userGroup.Key);
 
         db.UserGroup2GranularPermissions.AddRange(permissionSet.PermissionsSet.SelectMany(p =>

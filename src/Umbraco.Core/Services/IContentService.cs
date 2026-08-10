@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the ContentService, which is an easy access to operations involving <see cref="IContent" />
 /// </summary>
-public interface IContentService : IPublishableContentService<IContent>
+public interface IContentService : IPublishableContentService<IContent>, IAsyncPublishableContentService<IContent>
 {
     #region Blueprints
 

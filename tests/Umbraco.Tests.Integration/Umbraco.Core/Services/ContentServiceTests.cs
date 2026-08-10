@@ -84,6 +84,23 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>();
 
+    [Test]
+    public async Task GetByIdAsync_ExistingContent_ReturnsContent()
+    {
+        IContent? content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
+
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content!.Id, Is.EqualTo(Textpage.Id));
+    }
+
+    [Test]
+    public async Task GetByIdAsync_UnknownKey_ReturnsNull()
+    {
+        IContent? content = await ContentService.GetByIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(content, Is.Null);
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     public void Sort_Preserves_Template_And_Property_Data_When_Items_Loaded_Without_Them(bool useSortChildren)

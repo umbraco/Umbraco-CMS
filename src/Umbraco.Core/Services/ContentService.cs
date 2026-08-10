@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Implements the content service.
 /// </summary>
-public class ContentService : PublishableContentServiceBase<IContent>, IContentService
+public class ContentService : AsyncPublishableContentServiceBase<IContent>, IContentService
 {
     private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
     private readonly IDocumentRepository _documentRepository;
@@ -64,6 +64,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
+    /// <param name="asyncDocumentRepository">The async (EF Core) document repository.</param>
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -81,7 +82,8 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        IAsyncDocumentRepository asyncDocumentRepository)
         : base(
             provider,
             loggerFactory,
@@ -89,6 +91,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             auditService,
             contentTypeRepository,
             documentRepository,
+            asyncDocumentRepository,
             languageRepository,
             propertyValidationService,
             cultureImpactFactory,
@@ -113,128 +116,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         });
         _relationService = relationService;
         _logger = loggerFactory.CreateLogger<ContentService>();
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentService"/> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="documentRepository">The document repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    /// <param name="contentTypeRepository">The content type repository.</param>
-    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
-    /// <param name="languageRepository">The language repository.</param>
-    /// <param name="propertyValidationService">The property validation service.</param>
-    /// <param name="shortStringHelper">The short string helper.</param>
-    /// <param name="cultureImpactFactory">The culture impact factory.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="propertyEditorCollection">The property editor collection.</param>
-    /// <param name="idKeyMap">The ID key map.</param>
-    /// <param name="optionsMonitor">The content settings options monitor.</param>
-    /// <param name="relationService">The relation service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory,
-        IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap,
-        IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            documentRepository,
-            entityRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            contentTypeRepository,
-            documentBlueprintRepository,
-            languageRepository,
-            propertyValidationService,
-            shortStringHelper,
-            cultureImpactFactory,
-            userIdKeyResolver,
-            propertyEditorCollection,
-            idKeyMap,
-            optionsMonitor,
-            relationService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentService"/> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="documentRepository">The document repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    /// <param name="auditService">The audit service.</param>
-    /// <param name="contentTypeRepository">The content type repository.</param>
-    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
-    /// <param name="languageRepository">The language repository.</param>
-    /// <param name="propertyValidationService">The property validation service.</param>
-    /// <param name="shortStringHelper">The short string helper.</param>
-    /// <param name="cultureImpactFactory">The culture impact factory.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="propertyEditorCollection">The property editor collection.</param>
-    /// <param name="idKeyMap">The ID key map.</param>
-    /// <param name="optionsMonitor">The content settings options monitor.</param>
-    /// <param name="relationService">The relation service.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDocumentRepository documentRepository,
-        IEntityRepository entityRepository,
-        IAuditRepository auditRepository,
-        IAuditService auditService,
-        IContentTypeRepository contentTypeRepository,
-        IDocumentBlueprintRepository documentBlueprintRepository,
-        ILanguageRepository languageRepository,
-        Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper,
-        ICultureImpactFactory cultureImpactFactory,
-        IUserIdKeyResolver userIdKeyResolver,
-        PropertyEditorCollection propertyEditorCollection,
-        IIdKeyMap idKeyMap,
-        IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            documentRepository,
-            entityRepository,
-            auditService,
-            contentTypeRepository,
-            documentBlueprintRepository,
-            languageRepository,
-            propertyValidationService,
-            shortStringHelper,
-            cultureImpactFactory,
-            userIdKeyResolver,
-            propertyEditorCollection,
-            idKeyMap,
-            optionsMonitor,
-            relationService)
-    {
     }
 
     #endregion

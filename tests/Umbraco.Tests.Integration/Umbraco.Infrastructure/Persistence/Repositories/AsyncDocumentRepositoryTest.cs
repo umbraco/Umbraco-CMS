@@ -106,7 +106,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         GetRequiredService<IIdKeyMap>(),
         GetRequiredService<ITagRepository>(),
         GetRequiredService<IJsonSerializer>(),
-        GetRequiredService<IUserGroupService>(),
+        new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
         GetRequiredService<IShortStringHelper>());
 
     [Test]
@@ -1514,7 +1514,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
             GetRequiredService<IJsonSerializer>(),
-            GetRequiredService<IUserGroupService>(),
+            new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
             GetRequiredService<IShortStringHelper>());
 
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Notify Page", _textpage.Id);
@@ -1727,7 +1727,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
             GetRequiredService<IJsonSerializer>(),
-            GetRequiredService<IUserGroupService>(),
+            new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
             GetRequiredService<IShortStringHelper>());
 
         content.Name = "Notify Update Page Renamed";
@@ -2209,7 +2209,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
             GetRequiredService<IJsonSerializer>(),
-            GetRequiredService<IUserGroupService>(),
+            new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
             GetRequiredService<IShortStringHelper>());
 
         content.PublishedState = PublishedState.Publishing;
@@ -2347,7 +2347,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             GetRequiredService<IIdKeyMap>(),
             GetRequiredService<ITagRepository>(),
             GetRequiredService<IJsonSerializer>(),
-            GetRequiredService<IUserGroupService>(),
+            new Lazy<IUserGroupService>(GetRequiredService<IUserGroupService>),
             GetRequiredService<IShortStringHelper>());
 
         content.Path = $"{_subpage2.Path},{_subpage.Id},{content.Id}";
