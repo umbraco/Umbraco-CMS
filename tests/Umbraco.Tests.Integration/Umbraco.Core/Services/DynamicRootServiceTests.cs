@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
@@ -379,6 +379,48 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(1, result.Count());
             CollectionAssert.Contains(result, contentNewActs.Key);
         });
+    }
+
+    /// <summary>
+    ///     Verifies that DescendantOrSelf steps return all matches at the resolved level, ordered as they appear
+    ///     in the backoffice tree rather than in an arbitrary database order (#23600).
+    /// </summary>
+    [TestCase(DynamicRootStepAlias.NearestDescendantOrSelf)]
+    [TestCase(DynamicRootStepAlias.FurthestDescendantOrSelf)]
+    public async Task GetDynamicRootsAsync_DescendantOrSelfWithMultipleMatches_ReturnsRootsInTreeOrder(
+        DynamicRootStepAlias dynamicRootAlias)
+    {
+        // Arrange
+        (Content origin, ContentType matchedContentType, Content[] expected) =
+            dynamicRootAlias == DynamicRootStepAlias.NearestDescendantOrSelf
+                ? (ContentYears, ContentTypeYear,
+                    new[] { ContentYear2024, ContentYear2023, ContentYear2022 })
+                : (ContentStages2022, ContentTypeStage,
+                    new[] { ContentStage2022Blue, ContentStage2022Red });
+
+        // Sort the matches so that the tree order and the creation (identifier) order disagree
+        ContentService.SortChildren(origin.Id, expected.Select(x => x.Id).ToArray());
+
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.ByKey.ToString(),
+            OriginKey = origin.Key,
+            Context = new DynamicRootContext() { CurrentKey = origin.Key, ParentKey = origin.Key },
+            QuerySteps =
+            [
+                new DynamicRootQueryStep()
+                {
+                    Alias = dynamicRootAlias.ToString(),
+                    AnyOfDocTypeKeys = [matchedContentType.Key],
+                },
+            ],
+        };
+
+        // Act
+        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
+
+        // Assert
+        CollectionAssert.AreEqual(expected.Select(x => x.Key), result);
     }
 
     /// <summary>

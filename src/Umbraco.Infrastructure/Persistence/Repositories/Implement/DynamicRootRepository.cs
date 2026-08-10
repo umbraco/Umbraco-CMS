@@ -12,6 +12,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 public class DynamicRootRepository : IDynamicRootRepository
 {
+    // The descendant queries can match nodes under several parents, so order per parent to follow the
+    // backoffice tree order within each sibling group; the identifier only breaks remaining ties. Without
+    // this the order of multiple resolved roots is undefined (https://github.com/umbraco/Umbraco-CMS/issues/23600).
+    private const string TreeOrderBy =
+        $"ORDER BY n.{NodeDto.ParentIdColumnName}, n.{NodeDto.SortOrderColumnName}, n.{NodeDto.IdColumnName}";
+
     private readonly IScopeAccessor _scopeAccessor;
 
     /// <summary>
@@ -107,7 +113,8 @@ public class DynamicRootRepository : IDynamicRootRepository
             Database.SqlContext.Sql()
                 .Select<NodeDto>("n", n => n.UniqueId)
                 .DescendantOrSelfBaseQuery(origins, filter)
-                .Where<NodeDto>(n => n.Level == level, "n");
+                .Where<NodeDto>(n => n.Level == level, "n")
+                .Append(TreeOrderBy);
 
         return await Database.FetchAsync<Guid>(query);
     }
@@ -129,7 +136,8 @@ public class DynamicRootRepository : IDynamicRootRepository
             Database.SqlContext.Sql()
                 .Select<NodeDto>("n", n => n.UniqueId)
                 .DescendantOrSelfBaseQuery(origins, filter)
-                .Where<NodeDto>(n => n.Level == level, "n");
+                .Where<NodeDto>(n => n.Level == level, "n")
+                .Append(TreeOrderBy);
 
         return await Database.FetchAsync<Guid>(query);
     }
