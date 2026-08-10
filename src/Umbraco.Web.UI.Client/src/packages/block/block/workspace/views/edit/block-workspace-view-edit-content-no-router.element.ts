@@ -55,10 +55,14 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 		this.#tabsStructureHelper.setIsRoot(true);
 		this.#tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this.#tabsStructureHelper.childContainers, (tabs) => {
-			this._tabs = tabs;
-			this.#setupViewContexts();
-		});
+		this.observe(
+			this.#tabsStructureHelper.childContainers,
+			(tabs) => {
+				this._tabs = tabs;
+				this.#setupViewContexts();
+			},
+			null,
+		);
 
 		this.observe(
 			this.#tabsStructureHelper.hasProperties,
@@ -66,10 +70,11 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				this._hasRootProperties = hasRootProperties;
 				this.#setupViewContexts();
 			},
-			'observeRootProperties',
+			null,
 		);
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
+			this._activeTabKey = undefined;
 			this.#blockWorkspace = context;
 			this.#blockManager = context?.content;
 			// block manager does not need to be setup this in file as that it being done by the implementation of this element.
@@ -92,7 +97,24 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	}
 
 	#setupViewContexts() {
-		if (!this._tabs || !this.#blockManager) return;
+		if (
+			!this._tabs ||
+			!this.#blockManager ||
+			!this.#blockWorkspace ||
+			this._hasRootGroups === undefined ||
+			this._hasRootProperties === undefined
+		) {
+			return;
+		}
+
+		// remove any view contexts that are no longer needed
+		this.#tabViewContexts = this.#tabViewContexts.filter((context) => {
+			if (context.viewAlias === null) {
+				return this._hasRootGroups || this._hasRootProperties;
+			} else {
+				return this._tabs?.some((tab) => getViewAliasForTab(tab) === context.viewAlias);
+			}
+		});
 
 		// Create view contexts for root groups/properties
 		if (this._hasRootGroups || this._hasRootProperties) {
