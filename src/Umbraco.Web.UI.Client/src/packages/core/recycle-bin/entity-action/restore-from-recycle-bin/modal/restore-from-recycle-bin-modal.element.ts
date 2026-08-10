@@ -170,14 +170,11 @@ export class UmbRestoreFromRecycleBinModalElement extends UmbModalBaseElement<
 			${this._destinationItem && this._destinationItemName
 				? html`<uui-ref-node name=${this._destinationItemName}>
 						<uui-action-bar slot="actions">
-							<uui-button @click=${() => (this._destinationItem = undefined)} label=${this.localize.term('general_remove')}
-								></uui-button
-							>
+							<uui-button @click=${() => (this._destinationItem = undefined)} label=${this.localize.term('general_remove')}></uui-button>
 						</uui-action-bar>
 					</uui-ref-node>`
-				: html` <uui-button id="placeholder" look="placeholder" label=${this.localize.term('general_choose')} @click=${this.#onSelectCustomDestination}
-						></uui-button
-					>`}
+				: html` <uui-button id="placeholder" look="placeholder" label=${this.localize.term('general_choose')} @click=${this.#onSelectCustomDestination}></uui-button>`
+			}
 		`;
 	}
 
