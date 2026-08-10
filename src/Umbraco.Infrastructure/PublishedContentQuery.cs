@@ -300,8 +300,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = Constants.IndexAliases.PublishedContent,
-        ISet<string>? loadedFields = null)
+        string indexName = Constants.IndexAliases.PublishedContent)
         => throw new NotSupportedException(
             "Content search requires Umbraco Search. The search enabled implementation replaces this one when Umbraco Search is composed (see Umbraco.Cms.Search.Core).");
 

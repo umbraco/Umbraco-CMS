@@ -123,10 +123,6 @@ public interface IPublishedContentQuery
     ///     The name of the index to search (defaults to
     ///     <see cref="Constants.IndexAliases.PublishedContent" />).
     /// </param>
-    /// <param name="loadedFields">
-    ///     This parameter is no longer used, because the results are loaded from the published snapshot
-    ///     using the single item ID field.
-    /// </param>
     /// <returns>
     ///     The search results.
     /// </returns>
@@ -138,6 +134,10 @@ public interface IPublishedContentQuery
     ///         invariant fields for all documents.
     ///     </para>
     ///     <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
+    ///     <para>
+    ///         This method only supports simple term searches. For filtering, faceting, or sorting, use
+    ///         <c>ISearcher</c> (resolved via <c>ISearcherResolver</c>) from Umbraco.Cms.Search.Core directly.
+    ///     </para>
     /// </remarks>
     IEnumerable<PublishedSearchResult> Search(
         string term,
@@ -145,8 +145,7 @@ public interface IPublishedContentQuery
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = Constants.IndexAliases.PublishedContent,
-        ISet<string>? loadedFields = null);
+        string indexName = Constants.IndexAliases.PublishedContent);
 
     /// <summary>
     ///     Searches content.

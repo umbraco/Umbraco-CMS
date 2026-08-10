@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.Fr
 
 /// <summary>
 /// Tests the Umbraco Search based template search APIs: the reimplemented
-/// <see cref="IPublishedContentQuery.Search(string, int, int, out long, string, string, ISet{string}?)"/>
+/// <see cref="IPublishedContentQuery.Search(string, int, int, out long, string, string)"/>
 /// and the <c>SearchChildren</c>/<c>SearchDescendants</c> extensions.
 /// </summary>
 public class PublishedContentQueryTests : TestBase
