@@ -1,6 +1,6 @@
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
