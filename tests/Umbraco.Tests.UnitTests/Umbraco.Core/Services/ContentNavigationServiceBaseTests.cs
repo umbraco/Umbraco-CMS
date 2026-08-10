@@ -1634,10 +1634,11 @@ public class ContentNavigationServiceBaseTests
     }
 
     [Test]
-    public void Cannot_Move_Node_When_Target_Parent_Does_Not_Exist()
+    [TestCase("E48DD82A-7059-418E-9B82-CDD5205796CF")] // Root
+    [TestCase("C6173927-0C59-4778-825D-D7B9F45D8DDE")] // Child 1
+    public void Cannot_Move_Node_When_Target_Parent_Does_Not_Exist(Guid nodeToMove)
     {
         // Arrange
-        Guid nodeToMove = Child1;
         var nonExistentTargetParentKey = Guid.NewGuid();
 
         // Act
@@ -1645,6 +1646,11 @@ public class ContentNavigationServiceBaseTests
 
         // Assert
         Assert.IsFalse(result);
+
+        // A node that fails to move keeps the place it already had, so a root asked to move under a
+        // parent that turns out not to exist is still a root afterwards.
+        _navigationService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
+        CollectionAssert.AreEquivalent(new[] { Root }, rootKeys);
     }
 
     [Test]

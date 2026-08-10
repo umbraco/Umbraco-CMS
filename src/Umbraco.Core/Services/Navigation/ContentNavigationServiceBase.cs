@@ -533,8 +533,6 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false; // Cannot move a node to itself
         }
 
-        _navigation.Roots.Remove(key); // Just in case
-
         NavigationNode? targetParentNode = null;
         if (targetParentKey.HasValue)
         {
@@ -543,9 +541,17 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
                 return false; // Target parent doesn't exist
             }
         }
-        else
+
+        // Updated only once the move is known to go ahead, so a node that fails the checks above keeps
+        // the place it already had. One operation per destination: a node moving to root is added, and
+        // one that is already a root stays a root throughout rather than being briefly removed first.
+        if (targetParentNode is null)
         {
             _navigation.Roots.Add(key);
+        }
+        else
+        {
+            _navigation.Roots.Remove(key);
         }
 
         // Remove the node from its current parent's children list
