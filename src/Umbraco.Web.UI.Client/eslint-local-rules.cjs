@@ -9,6 +9,7 @@ const preferStaticStylesLastRule = require('./devops/eslint/rules/prefer-static-
 const noRelativeImportToImportMapModule = require('./devops/eslint/rules/no-relative-import-to-import-map-module.cjs');
 const noUnsafeLocalize = require('./devops/eslint/rules/no-unsafe-localize.cjs');
 const enforceManifestAliasRule = require('./devops/eslint/rules/enforce-manifest-alias.cjs');
+const enforceNullObserveAliasInConstructorRule = require('./devops/eslint/rules/enforce-null-observe-alias-in-constructor.cjs');
 
 module.exports = {
 	'enforce-element-suffix-on-element-class-name': enforceElementSuffixOnElementClassNameRule,
@@ -20,4 +21,5 @@ module.exports = {
 	'no-relative-import-to-import-map-module': noRelativeImportToImportMapModule,
 	'no-unsafe-localize': noUnsafeLocalize,
 	'enforce-manifest-alias': enforceManifestAliasRule,
+	'enforce-null-observe-alias-in-constructor': enforceNullObserveAliasInConstructorRule,
 };

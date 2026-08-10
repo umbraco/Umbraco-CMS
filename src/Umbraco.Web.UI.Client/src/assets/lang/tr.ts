@@ -1986,4 +1986,7 @@ export default {
 		manageDescription:
 			'Ayarlar bölümündeki "İçerik Şablonları" ağacından İçerik Şablonlarını düzenleyebilir ve silebilirsiniz. İçerik Şablonunun dayandığı Belge Türünü genişletin ve düzenlemek veya silmek için tıklayın.',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} öğe seçildi`,
+	},
 } as UmbLocalizationDictionary;

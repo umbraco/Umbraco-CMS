@@ -1473,4 +1473,7 @@ export default {
 		selectAllLogLevelFilters: 'Seleccionar todo',
 		deselectAllLogLevelFilters: 'Deseleccionar todo',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento seleccionado' : 'elementos seleccionados'}`,
+	},
 } as UmbLocalizationDictionary;
