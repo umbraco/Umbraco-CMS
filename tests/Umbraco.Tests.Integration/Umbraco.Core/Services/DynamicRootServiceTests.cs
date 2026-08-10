@@ -424,6 +424,60 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
     }
 
     /// <summary>
+    ///     Verifies that DescendantOrSelf steps resolve the matching level for each origin in turn, so an origin whose
+    ///     matches sit deeper than another's still contributes its own (#23600).
+    /// </summary>
+    [TestCase(DynamicRootStepAlias.NearestDescendantOrSelf)]
+    [TestCase(DynamicRootStepAlias.FurthestDescendantOrSelf)]
+    public async Task GetDynamicRootsAsync_DescendantOrSelfWithMultipleOrigins_ResolvesTheLevelPerOrigin(
+        DynamicRootStepAlias dynamicRootAlias)
+    {
+        // Arrange - allow stages to nest, so 2023 can hold a stage one level deeper than the stages of 2022
+        ContentTypeStages.AllowedContentTypes =
+            ContentTypeStages.AllowedContentTypes!.Union([CreateContentTypeSort(ContentTypeStages, 1)]);
+        await ContentTypeService.UpdateAsync(ContentTypeStages, Constants.Security.SuperUserKey);
+
+        var stages2023 = ContentBuilder.CreateSimpleContent(ContentTypeStages, "Stages", ContentYear2023.Id);
+        ContentService.Save(stages2023, -1);
+
+        var nestedStages2023 = ContentBuilder.CreateSimpleContent(ContentTypeStages, "Nested Stages", stages2023.Id);
+        ContentService.Save(nestedStages2023, -1);
+
+        var deepStage2023 = ContentBuilder.CreateSimpleContent(ContentTypeStage, "Deep", nestedStages2023.Id);
+        ContentService.Save(deepStage2023, -1);
+
+        // The first step resolves all three years, so the second step runs with multiple origins: the stages of
+        // 2022 are at level 4, the stage of 2023 is at level 5, and 2024 has none at all.
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.ByKey.ToString(),
+            OriginKey = ContentYears.Key,
+            Context = new DynamicRootContext() { CurrentKey = ContentYears.Key, ParentKey = ContentYears.Key },
+            QuerySteps =
+            [
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeYear.Key],
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = dynamicRootAlias.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeStage.Key],
+                },
+            ],
+        };
+
+        // Act
+        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
+
+        // Assert
+        CollectionAssert.AreEquivalent(
+            new[] { ContentStage2022Red.Key, ContentStage2022Blue.Key, deepStage2023.Key },
+            result);
+    }
+
+    /// <summary>
     ///     Verifies that chaining multiple query steps (ancestor then descendant) correctly navigates the tree to find the expected node.
     /// </summary>
     [Test]

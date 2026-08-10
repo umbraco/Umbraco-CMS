@@ -1,6 +1,8 @@
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -103,21 +105,8 @@ public class DynamicRootRepository : IDynamicRootRepository
     /// <returns>
     /// A task that represents the asynchronous operation. The task result contains a collection of unique IDs for the nearest matching descendant or self node for each origin.
     /// </returns>
-    public async Task<ICollection<Guid>> NearestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
-    {
-        var level = Database.Single<int>(Database.SqlContext.Sql()
-            .Select("COALESCE(MIN(n.level), 0)")
-            .DescendantOrSelfBaseQuery(origins, filter));
-
-        Sql<ISqlContext> query =
-            Database.SqlContext.Sql()
-                .Select<NodeDto>("n", n => n.UniqueId)
-                .DescendantOrSelfBaseQuery(origins, filter)
-                .Where<NodeDto>(n => n.Level == level, "n")
-                .Append(TreeOrderBy);
-
-        return await Database.FetchAsync<Guid>(query);
-    }
+    public Task<ICollection<Guid>> NearestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
+        => DescendantOrSelfAsync(origins, filter, "MIN");
 
     /// <summary>
     /// Asynchronously finds, for each origin node, the unique identifiers of the deepest (furthest) descendant nodes or the origin node itself,
@@ -126,20 +115,68 @@ public class DynamicRootRepository : IDynamicRootRepository
     /// <param name="origins">A collection of unique identifiers representing the origin nodes from which to start the search.</param>
     /// <param name="filter">The dynamic root query step used to constrain or filter the descendant search.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a collection of unique identifiers for the furthest descendant or self nodes found for each origin.</returns>
-    public async Task<ICollection<Guid>> FurthestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
+    public Task<ICollection<Guid>> FurthestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
+        => DescendantOrSelfAsync(origins, filter, "MAX");
+
+    /// <summary>
+    /// Finds, for each origin, the matching descendants (or the origin itself) at its own shallowest or deepest
+    /// matching level, and returns the union of those.
+    /// </summary>
+    /// <remarks>
+    /// The matching level is resolved per origin, relative to that origin, rather than once across all of them:
+    /// otherwise an origin whose nearest match sits deeper than another's would contribute nothing at all
+    /// (https://github.com/umbraco/Umbraco-CMS/issues/23600). Because the origins are independent of each other,
+    /// they can also safely be queried in batches.
+    /// </remarks>
+    private async Task<ICollection<Guid>> DescendantOrSelfAsync(
+        ICollection<Guid> origins,
+        DynamicRootQueryStep filter,
+        string levelAggregate)
     {
-        var level = Database.Single<int>(Database.SqlContext.Sql()
-            .Select("COALESCE(MAX(n.level), 0)")
-            .DescendantOrSelfBaseQuery(origins, filter));
+        var docTypeKeys = filter.AnyOfDocTypeKeys.ToArray();
 
-        Sql<ISqlContext> query =
-            Database.SqlContext.Sql()
+        // The document type keys are bound once for the outer query and once for the correlated sub query.
+        var originsPerBatch = Constants.Sql.MaxParameterCount - (docTypeKeys.Length * 2);
+
+        var keys = new List<Guid>();
+
+        foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(originsPerBatch))
+        {
+            Sql<ISqlContext> query = Database.SqlContext.Sql()
                 .Select<NodeDto>("n", n => n.UniqueId)
-                .DescendantOrSelfBaseQuery(origins, filter)
-                .Where<NodeDto>(n => n.Level == level, "n")
-                .Append(TreeOrderBy);
+                .DescendantOrSelfBaseQuery(originBatch, filter);
 
-        return await Database.FetchAsync<Guid>(query);
+            query = AppendMatchingLevelForOrigin(query, levelAggregate, docTypeKeys).Append(TreeOrderBy);
+
+            keys.AddRange(await Database.FetchAsync<Guid>(query));
+        }
+
+        // A node descending from more than one origin can match under each of them.
+        return keys.Distinct().ToArray();
+    }
+
+    private Sql<ISqlContext> AppendMatchingLevelForOrigin(Sql<ISqlContext> sql, string levelAggregate, Guid[] docTypeKeys)
+    {
+        ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
+        var nodeTable = syntax.GetQuotedTableName(NodeDto.TableName);
+        var contentTable = syntax.GetQuotedTableName(ContentDto.TableName);
+        var contentTypeTable = syntax.GetQuotedTableName(ContentTypeDto.TableName);
+
+        var docTypeFilter = docTypeKeys.Length > 0 ? $"AND ctn2.{NodeDto.KeyColumnName} IN (@0)" : string.Empty;
+
+        // Correlated on the outer origin, so the aggregate is over that origin's own matching descendants.
+        var matchingLevel = $"""
+            AND n.{NodeDto.LevelColumnName} = (
+                SELECT {levelAggregate}(n2.{NodeDto.LevelColumnName})
+                FROM {nodeTable} n2
+                INNER JOIN {contentTable} c2 ON c2.{ContentDto.PrimaryKeyColumnName} = n2.{NodeDto.IdColumnName}
+                INNER JOIN {contentTypeTable} ct2 ON ct2.{ContentTypeDto.NodeIdColumnName} = c2.{ContentDto.ContentTypeIdColumnName}
+                INNER JOIN {nodeTable} ctn2 ON ctn2.{NodeDto.IdColumnName} = ct2.{ContentTypeDto.NodeIdColumnName}
+                WHERE {syntax.Substring}(n2.{NodeDto.PathColumnName}, 1, {syntax.Length}(norigin.{NodeDto.PathColumnName})) = norigin.{NodeDto.PathColumnName}
+                {docTypeFilter})
+            """;
+
+        return docTypeKeys.Length > 0 ? sql.Append(matchingLevel, docTypeKeys) : sql.Append(matchingLevel);
     }
 }
 
