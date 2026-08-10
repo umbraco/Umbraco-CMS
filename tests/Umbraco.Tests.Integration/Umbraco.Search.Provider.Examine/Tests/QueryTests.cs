@@ -2,10 +2,12 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Search.Core.Models.Searching;
 using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Tests.Common.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 // tests specifically related to free text querying
+[LongRunning]
 public class QueryTests : SearcherTestBase
 {
     [TestCase(null)]

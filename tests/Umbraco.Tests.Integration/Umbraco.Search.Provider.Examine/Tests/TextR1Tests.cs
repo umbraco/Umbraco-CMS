@@ -1,11 +1,13 @@
 using NUnit.Framework;
 using Umbraco.Cms.Search.Core.Models.Searching;
 using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
+using Umbraco.Cms.Tests.Common.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 // tests specifically related to the IndexValue.TextsR1 collection
 // - note that these tests are not exhaustive - see more test cases for IndexValue.Texts
+[LongRunning]
 public class TextR1Tests : SearcherTestBase
 {
     [Test]

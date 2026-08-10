@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Search.DeliveryApi.DependencyInjection;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
@@ -15,6 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.De
 /// (<c>DeliveryApiContentQueryProvider</c>), which replaces the Examine based core implementation
 /// when Delivery API querying is flipped to Umbraco Search.
 /// </summary>
+[LongRunning]
 public class DeliveryApiContentQueryProviderTests : TestBase
 {
     private static readonly Guid RootAlphaKey = Guid.Parse("11111111-1111-1111-1111-111111111111");

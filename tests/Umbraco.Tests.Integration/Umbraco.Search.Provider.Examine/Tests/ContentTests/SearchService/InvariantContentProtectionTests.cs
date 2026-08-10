@@ -4,12 +4,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Search.Core.Models.Searching;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.SearchService;
 
+[LongRunning]
 public class InvariantContentProtectionTests : SearcherTestBase
 {
     public IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();

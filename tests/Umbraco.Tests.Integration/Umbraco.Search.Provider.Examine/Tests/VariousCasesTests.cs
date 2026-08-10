@@ -5,10 +5,12 @@ using Umbraco.Cms.Search.Core.Models.Searching;
 using Umbraco.Cms.Search.Core.Models.Searching.Faceting;
 using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
 using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Tests.Common.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 // various tests unrelated to specific IndexValue collections or spanning multiple IndexValue collections
+[LongRunning]
 public class VariousCasesTests : SearcherTestBase
 {
     [Test]

@@ -15,6 +15,7 @@ using Umbraco.Cms.Search.Provider.Examine.Configuration;
 using Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
 using Umbraco.Cms.Search.Provider.Examine.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 using ISearcher = Umbraco.Cms.Search.Core.Services.ISearcher;
 using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
@@ -26,6 +27,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 /// using a custom <see cref="Indexer"/> and <see cref="Searcher"/> implementation.
 /// </summary>
 [TestFixture]
+[LongRunning]
 public class CustomSearchProviderTests
 {
     private ServiceProvider _serviceProvider = null!;

@@ -6,9 +6,11 @@ using Umbraco.Cms.Search.Core.Models.Searching.Faceting;
 using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
 using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.WithoutZeroDowntime;
 
+[LongRunning]
 public class SearchTests : SearcherTestBase
 {
     [Test]

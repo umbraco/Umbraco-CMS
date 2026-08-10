@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Search.Core.Extensions;
 using Umbraco.Cms.Search.Provider.Examine.Helpers;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Search.Provider.Examine.Constants;
@@ -15,6 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.Co
 /// Previously: a new document was indexed for every segment and every culture.
 /// Now: every culture will have every segment property on a single document.
 /// </summary>
+[LongRunning]
 public class ExplicitSegmentIndexTests : IndexTestBase
 {
     private static readonly Guid DocumentWithAllSegmentsKey = Guid.NewGuid();

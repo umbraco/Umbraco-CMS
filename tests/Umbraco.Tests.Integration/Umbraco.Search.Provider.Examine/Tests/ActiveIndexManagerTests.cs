@@ -3,12 +3,14 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Search.Core;
 using Umbraco.Cms.Search.Provider.Examine.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Extensions;
 using Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 [TestFixture]
+[LongRunning]
 public class ActiveIndexManagerTests
 {
     private ServiceProvider _serviceProvider;

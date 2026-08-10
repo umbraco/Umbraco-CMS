@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Search.Core.Cache.ContentType;
 using Umbraco.Cms.Search.Core.Models.Searching;
 using Umbraco.Cms.Search.Core.NotificationHandlers;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -17,6 +18,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.Co
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+[LongRunning]
 public class DocumentTypeTests : SearcherTestBase
 {
     private IContentTypeEditingService ContentTypeEditingService => GetRequiredService<IContentTypeEditingService>();

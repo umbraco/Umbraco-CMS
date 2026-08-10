@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -12,6 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.Co
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
+[LongRunning]
 public class InMemoryIndexTests : UmbracoIntegrationTest
 {
     private IExamineManager ExamineManager => GetRequiredService<IExamineManager>();

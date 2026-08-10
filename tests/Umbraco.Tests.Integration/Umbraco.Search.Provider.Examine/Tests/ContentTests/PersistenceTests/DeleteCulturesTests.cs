@@ -9,12 +9,14 @@ using Umbraco.Cms.Search.Core.Models.Indexing;
 using Umbraco.Cms.Search.Core.Models.Persistence;
 using Umbraco.Cms.Search.Core.Persistence;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.PersistenceTests;
 
 [TestFixture]
+[LongRunning]
 public class DeleteCulturesTests : TestBase
 {
     private IIndexDocumentRepository IndexDocumentRepository => GetRequiredService<IIndexDocumentRepository>();

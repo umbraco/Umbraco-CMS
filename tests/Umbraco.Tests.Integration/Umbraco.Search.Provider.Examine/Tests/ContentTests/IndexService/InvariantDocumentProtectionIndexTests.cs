@@ -5,12 +5,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Search.Core.Extensions;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Constants = Umbraco.Cms.Search.Provider.Examine.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.ContentTests.IndexService;
 
+[LongRunning]
 public class InvariantDocumentProtectionIndexTests : IndexTestBase
 {
     private IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();

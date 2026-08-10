@@ -2,10 +2,12 @@ using NUnit.Framework;
 using Umbraco.Cms.Search.Core;
 using Umbraco.Cms.Search.Core.Models.Indexing;
 using Umbraco.Cms.Search.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 [TestFixture]
+[LongRunning]
 public class HealthStatusTests : SearcherTestBase
 {
     private const string IndexAlias = global::Umbraco.Cms.Core.Constants.IndexAliases.PublishedContent;

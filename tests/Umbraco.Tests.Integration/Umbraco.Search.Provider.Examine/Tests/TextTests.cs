@@ -3,10 +3,12 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Search.Core.Models.Searching;
 using Umbraco.Cms.Search.Core.Models.Searching.Filtering;
 using Umbraco.Cms.Search.Core.Models.Searching.Sorting;
+using Umbraco.Cms.Tests.Common.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests;
 
 // tests specifically related to the IndexValue.Texts collection
+[LongRunning]
 public class TextTests : SearcherTestBase
 {
     [Test]

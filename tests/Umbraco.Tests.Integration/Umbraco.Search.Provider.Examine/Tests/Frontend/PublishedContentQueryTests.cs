@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Extensions;
@@ -14,6 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Provider.Examine.Tests.Fr
 /// <see cref="IPublishedContentQuery.Search(string, int, int, out long, string, string)"/>
 /// and the <c>SearchChildren</c>/<c>SearchDescendants</c> extensions.
 /// </summary>
+[LongRunning]
 public class PublishedContentQueryTests : TestBase
 {
     private static readonly Guid RootAlphaKey = Guid.Parse("11111111-1111-1111-1111-111111111111");
