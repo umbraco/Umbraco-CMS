@@ -86,6 +86,7 @@ public static partial class UmbracoBuilderExtensions
         builder.PackageMigrationPlans().Add(builder.TypeLoader.GetPackageMigrationPlans());
 
         builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
+        builder.Services.AddSingleton<IContentRoutingReadiness, ContentRoutingReadiness>();
         builder.Services.AddSingleton<IRuntime, CoreRuntime>();
         builder.Services.AddSingleton<PendingPackageMigrations>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();

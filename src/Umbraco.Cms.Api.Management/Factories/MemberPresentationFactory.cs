@@ -114,12 +114,14 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
             LastLockoutDate = member.LastLockoutDate.HasValue ? new DateTimeOffset(member.LastLockoutDate.Value, TimeSpan.Zero) : null,
             LastPasswordChangeDate = null,
             Kind = MemberKind.ExternalOnly,
-            Variants = [new MemberVariantResponseModel
-            {
-                Name = member.Name ?? string.Empty,
-                CreateDate = new DateTimeOffset(member.CreateDate, TimeSpan.Zero),
-                UpdateDate = new DateTimeOffset(member.UpdateDate, TimeSpan.Zero),
-            }],
+            Variants = [
+                new MemberVariantResponseModel
+                {
+                    Name = member.Name ?? string.Empty,
+                    CreateDate = new DateTimeOffset(member.CreateDate, TimeSpan.Zero),
+                    UpdateDate = new DateTimeOffset(member.UpdateDate, TimeSpan.Zero),
+                }
+            ],
             Values = Enumerable.Empty<MemberValueResponseModel>(),
             MemberType = new MemberTypeReferenceResponseModel(),
             Groups = groupKeys,

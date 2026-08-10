@@ -320,6 +320,8 @@ export default {
 		createFromClipboard: 'Zalijepi iz međuspremnika',
 		nodeIsInTrash: 'Ova stavka je u košu za smeće',
 		saveModalTitle: 'Spremi',
+		saveAndPublishDescendantsModalTitle: 'Spremi i objavi sa potomcima',
+		saveAndScheduleModalTitle: 'Spremi i zakaži objavu',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Kreirajte novi predložak sadržaja iz <em>%0%</em>',

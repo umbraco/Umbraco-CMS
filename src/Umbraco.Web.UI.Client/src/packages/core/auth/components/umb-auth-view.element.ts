@@ -160,27 +160,18 @@ export class UmbAuthViewElement extends UmbLitElement {
 		return provider.forProviderName.toLowerCase() !== 'umbraco';
 	};
 
-	#onSubmit = async (providerOrManifest: string | ManifestAuthProvider, loginHint?: string) => {
+	#onSubmit = async (manifest: ManifestAuthProvider) => {
 		try {
 			const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 			if (!authContext) {
 				throw new Error('Auth context not available');
 			}
-
-			const manifest = typeof providerOrManifest === 'string' ? undefined : providerOrManifest;
-			const providerName =
-				typeof providerOrManifest === 'string' ? providerOrManifest : providerOrManifest.forProviderName;
-
-			// If the user is timed out, we do not want to lose the state, so avoid redirecting to the provider
-			// and instead just make the authorization request. In all other cases, we want to redirect to the provider.
-			const isTimedOut = this.userLoginState === 'timedOut';
-
-			await authContext.makeAuthorizationRequest(providerName, isTimedOut ? false : true, loginHint, manifest);
-
-			const isAuthed = authContext.getIsAuthorized();
-			if (isAuthed) {
-				this.onSuccess?.();
-			}
+			// Only a timed-out session has unsaved work behind the modal, so that is the one flow that
+			// needs the popup. A cold-boot login has nothing to preserve and takes the full-page round
+			// trip instead — the same path local login already uses when it is the only provider, and it
+			// avoids depending on the popup's cross-tab broadcast reaching this window.
+			const redirect = this.userLoginState !== 'timedOut';
+			await authContext.makeAuthorizationRequest(manifest.forProviderName, redirect, undefined, manifest);
 		} catch (error) {
 			console.error('[AuthView] Error submitting auth request', error);
 			this._error = error instanceof Error ? error.message : 'Unknown error (see console)';

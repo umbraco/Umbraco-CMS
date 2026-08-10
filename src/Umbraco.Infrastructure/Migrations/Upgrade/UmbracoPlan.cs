@@ -62,6 +62,11 @@ public partial class UmbracoPlan : MigrationPlan
         //   .With()
         //     .To<ChangeB>("state-b")
         //   .As("state-2");
+        //
+        // Merging a migration UP into an already-released version line: it lands here in namespace order,
+        // BEFORE that line's own migrations, so sites already on that line skip it (they only walk forward).
+        // Re-apply it at the END of the plan as an empty subclass of the original, in the new version's
+        // namespace. See V_18_1_0.AddContentTypeIdIndexForContent and the Migration Edge Cases in CLAUDE.md.
 
         From(InitialState);
 
@@ -107,6 +112,11 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
         To<V_18_0_0.AddElementSectionForAdmins>("{6FE4656E-8B8D-452F-AE2A-438A615B61BC}");
 
+        // To 18.1.0
+        // Re-run of the 17.6 index migration: it sits earlier in the chain than the final 18.0 state,
+        // so sites already on 18.0.x skipped it. Idempotent, so other upgrade paths are unaffected.
+        To<V_18_1_0.AddContentTypeIdIndexForContent>("{AE533AF6-4611-4E25-AA4D-89AEFA468E79}");
+
         // To 19.0.0
         To<V_19_0_0.AddIndexDocumentTable>("{8A5C1B2E-4F6D-4E1A-9C3B-D2E7F0A16C54}");
         To<V_19_0_0.AddExternalBlockElementRelationType>("{2D8F1B6E-4C3A-4E7D-9A1B-5F0C7E2D8A93}");
@@ -142,9 +152,9 @@ public partial class UmbracoPlan : MigrationPlan
             if (match.Success)
             {
                 trackedVersion = new SemVersion(
-                    int.Parse(match.Groups[1].Value),
-                    int.Parse(match.Groups[2].Value),
-                    int.Parse(match.Groups[3].Value));
+                    int.Parse(match.Groups[1].ValueSpan),
+                    int.Parse(match.Groups[2].ValueSpan),
+                    int.Parse(match.Groups[3].ValueSpan));
             }
 
             if (string.Equals(transition.TargetState, state, StringComparison.OrdinalIgnoreCase))

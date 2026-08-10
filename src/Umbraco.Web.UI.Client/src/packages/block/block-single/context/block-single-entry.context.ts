@@ -17,7 +17,10 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_SINGLE_ENTRIES_CONTEXT.TYPE
 > {
 	#inlineEditingMode = new UmbBooleanState(undefined);
-	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
+	readonly inlineEditingMode = mergeObservables(
+		[this.#inlineEditingMode.asObservable(), this.isExternalContent],
+		([inlineEditingMode, isExternalContent]) => inlineEditingMode === true && !isExternalContent,
+	);
 	readonly forceHideContentEditorInOverlay = this._blockType.asObservablePart((x) =>
 		x ? (x.forceHideContentEditorInOverlay ?? false) : undefined,
 	);
@@ -31,6 +34,12 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_SINGLE_MANAGER_CONTEXT, UMB_BLOCK_SINGLE_ENTRIES_CONTEXT);
+	}
+
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block Single entry element owns the canonical `<umb-ufm-render>` (via its child
+		// views) and pushes resolved text via `setName()`. No hidden virtual renderer needed.
+		return false;
 	}
 
 	protected override _gotManager() {

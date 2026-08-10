@@ -351,6 +351,8 @@ export default {
 		selectAllVariants: 'Selecionar todas as variantes',
 		saveModalTitle: 'Guardar',
 		saveAndPublishModalTitle: 'Guardar e publicar',
+		saveAndPublishDescendantsModalTitle: 'Guardar e publicar com descendentes',
+		saveAndScheduleModalTitle: 'Guardar e agendar publicação',
 		publishModalTitle: 'Publicar',
 	},
 	blueprints: {

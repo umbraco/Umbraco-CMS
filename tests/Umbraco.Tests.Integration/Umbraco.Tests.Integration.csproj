@@ -102,10 +102,19 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Validate.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Restore.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.MoveToRecycleBin.cs">
       <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.SortByField.cs">
+      <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.Validate.cs">
+      <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\MediaEditingServiceTests.Restore.cs">
       <DependentUpon>MediaEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Publish.cs">
@@ -145,6 +154,9 @@
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.Update.cs">
+      <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.Variance.cs">
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.Create.cs">
@@ -381,6 +393,12 @@
     <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.Restore.cs">
       <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.CreateAndPublish.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ElementEditingServiceTests.UpdateAndPublish.cs">
+      <DependentUpon>ElementEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ElementContainerServiceTests.Restore.cs">
       <DependentUpon>ElementContainerServiceTests.cs</DependentUpon>
     </Compile>
@@ -404,6 +422,9 @@
     </Compile>
     <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.ChangeTypes.cs">
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\UserServiceTests.SetAvatar.cs">
+      <DependentUpon>UserServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.CreateAndPublish.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>

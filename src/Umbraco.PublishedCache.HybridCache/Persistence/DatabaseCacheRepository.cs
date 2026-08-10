@@ -1779,13 +1779,18 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         foreach (ContentNuDto dto in items)
         {
-            Database.Execute($@"
-                INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
+            Database.Execute(
+                $@"INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
                 SELECT @0, @1, @2, @3, @4
                 WHERE NOT EXISTS (
                     SELECT 1 FROM [{tableName}]
                     WHERE {nodeId} = @0 AND {published} = @1
-                )", dto.NodeId, dto.Published, (object?)dto.Data ?? DBNull.Value, (object?)dto.RawData ?? DBNull.Value, dto.Rv);
+                )",
+                dto.NodeId,
+                dto.Published,
+                (object?)dto.Data ?? DBNull.Value,
+                (object?)dto.RawData ?? DBNull.Value,
+                dto.Rv);
         }
     }
 

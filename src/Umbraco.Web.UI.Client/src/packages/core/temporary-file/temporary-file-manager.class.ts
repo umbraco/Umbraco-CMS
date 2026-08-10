@@ -38,7 +38,6 @@ export class UmbTemporaryFileManager<
 	 * @returns {Promise<UmbTemporaryFileConfigRepository>} The temporary file configuration.
 	 */
 	async getConfiguration(): Promise<UmbTemporaryFileConfigRepository> {
-		await this.#temporaryFileConfigRepository.initialized;
 		return this.#temporaryFileConfigRepository;
 	}
 

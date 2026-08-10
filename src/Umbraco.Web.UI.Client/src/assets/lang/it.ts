@@ -332,6 +332,8 @@ export default {
 		createFromClipboard: 'Incolla dagli appunti',
 		nodeIsInTrash: 'Questo articolo è nel cestino',
 		saveModalTitle: 'Salva',
+		saveAndPublishDescendantsModalTitle: 'Salva e pubblica con discendenti',
+		saveAndScheduleModalTitle: 'Salva e pianifica la pubblicazione',
 	},
 	blueprints: {
 		createBlueprintFrom: "Crea un nuovo modello di contenuto da '%0%'",

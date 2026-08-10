@@ -617,7 +617,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 					0 2px 2px -2px rgba(34, 47, 62, 0.1),
 					0 8px 8px -4px rgba(34, 47, 62, 0.07);
 
-				background-color: var(--uui-color-surface-alt);
+				background-color: var(--uui-color-surface);
 				color: var(--color-text);
 
 				position: sticky;

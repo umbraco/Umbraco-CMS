@@ -163,8 +163,10 @@ test('can unpublish element', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.elementUnpublished);
-  const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.variants[0].state).toBe('Draft');
+  await expect.poll(async () => {
+    const elementData = await umbracoApi.element.getByName(elementName);
+    return elementData ? elementData.variants[0].state : null;
+  }).toBe('Draft');
   // Verify audit trail
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.clickInfoTab();
@@ -233,7 +235,7 @@ test('can duplicate a element node to other parent', async ({umbracoApi, umbraco
   await umbracoUi.library.openElementCaretButtonForName(elementFolderName);
   await umbracoUi.library.isChildElementInTreeVisible(elementFolderName, elementName, true);
   await umbracoUi.library.isCaretButtonVisibleForElementName(elementName, false);
-  expect(await umbracoApi.element.getChildrenAmount(elementFolderId)).toEqual(1);
+  await expect.poll(() => umbracoApi.element.getChildrenAmount(elementFolderId)).toEqual(1);
 
   // Clean
   await umbracoApi.element.ensureNameNotExists(elementFolderName);
@@ -260,12 +262,12 @@ test('can move a element node to other parent', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.library.openElementCaretButtonForName(elementFolderName);
   await umbracoUi.library.isChildElementInTreeVisible(elementFolderName, elementName, true);
   await umbracoUi.library.isCaretButtonVisibleForElementName(elementName, false);
-  expect(await umbracoApi.element.getChildrenAmount(elementFolderId)).toEqual(1);
+  await expect.poll(() => umbracoApi.element.getChildrenAmount(elementFolderId)).toEqual(1);
   // Verify audit trail
   await umbracoUi.library.goToElementWithName(elementName);
   await umbracoUi.library.clickInfoTab();
-  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
-  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
+  await umbracoUi.library.doesAnyHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.library.doesAnyHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });

@@ -354,6 +354,8 @@ export default {
 		selectAllVariants: 'Chọn tất cả các biến thể',
 		saveModalTitle: 'Lưu',
 		saveAndPublishModalTitle: 'Lưu và xuất bản',
+		saveAndPublishDescendantsModalTitle: 'Lưu và xuất bản cùng với các phần tử con',
+		saveAndScheduleModalTitle: 'Lưu và lên lịch xuất bản',
 		publishModalTitle: 'Xuất bản',
 	},
 	blueprints: {

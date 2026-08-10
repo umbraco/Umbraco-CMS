@@ -406,20 +406,23 @@ The repository contains BOTH (actively supported):
 
 **Note**: The codebase is actively migrating to EF Core, but NPoco remains the primary persistence layer and is not deprecated. Both are fully supported.
 
-### Authentication: OpenIddict
+### Authentication
 
-All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
-- Reference tokens (not JWT) for better security
-- **Secure cookie-based token storage** (v17+) - tokens stored in HTTP-only cookies with `__Host-` prefix
-- Tokens are redacted from client-side responses and passed via secure cookies only (`[redacted]` placeholder)
-- ASP.NET Core Data Protection for token encryption
-- Configured in `Umbraco.Cms.Api.Common`
-- API requests must include credentials (`credentials: include` for fetch)
+**Back office (v19+)**: a single HTTP-only authentication cookie — no client-side tokens and no
+OpenIddict flow. The back-office authorization policies accept both the cookie scheme
+(`Constants.Security.BackOfficeAuthenticationType`) and the OpenIddict validation scheme; see
+`BackOfficeAuthPolicyBuilderExtensions`. Cookie behaviour (expiry, renewal, SameSite,
+401-instead-of-302 for API requests) is configured in `ConfigureBackOfficeCookieOptions`.
+
+**API users / external clients**: **OpenIddict** (OAuth 2.0/OpenID Connect) with reference tokens
+(not JWT), configured in `Umbraco.Cms.Api.Common`.
+
+- ASP.NET Core Data Protection protects both the auth cookie and OpenIddict tokens
+- Back-office requests must include credentials (`credentials: include` for fetch)
 
 **Load Balancing Requirement**: All servers must share the same Data Protection key ring.
 
 **Frontend auth pitfalls** — see `src/Umbraco.Web.UI.Client/docs/edge-cases.md` (Auth & Cross-tab section) and `docs/security.md`. Key points:
-- Never call `validateToken()` per API request — it revokes the previous reference token (ID2019 errors)
 - `window.opener` is set for ANY `window.open()` target, not only OAuth popups — scope guards to the pathname too
 - BroadcastChannel does not deliver messages to the sender's own tab
 
@@ -440,13 +443,22 @@ APIs use `Asp.Versioning.Mvc`:
 
 ### Updating `OpenApi.json` (Management API)
 
-When a PR changes Management API controllers or models, the `OpenApi.json` file in the Management API project must be updated:
+When a PR changes Management API controllers or models, the `OpenApi.json` file in the Management API project must be updated, along with the generated backoffice client that is derived from it.
 
-1. Run the Umbraco instance locally
-2. Open Swagger UI and navigate to the swagger.json link (e.g. `https://localhost:44339/umbraco/swagger/management/swagger.json`)
-3. Copy the full JSON content and paste it into `src/Umbraco.Cms.Api.Management/OpenApi.json`
+With the Umbraco instance running locally (in a non-Production environment — Swagger isn't mapped in Production):
 
-**Important**: Commit only the substantive changes — not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone.
+```bash
+npm --prefix src/Umbraco.Web.UI.Client run generate:openapi
+npm --prefix src/Umbraco.Web.UI.Client run generate:server-api
+```
+
+The first fetches the document from `/umbraco/swagger/management/swagger.json` byte-for-byte into `src/Umbraco.Cms.Api.Management/OpenApi.json`; the second regenerates the hey-api client from that committed file. Both results must be committed together.
+
+They are two separate commands on purpose. The client generator only ever reads the committed schema — never a running site — so the schema and the client it produced always land in the same commit.
+
+The `/umb-update-openapi` skill wraps this: it starts and stops a backend for you if one isn't already running, and explains the diff. Reach for it when you want the whole round trip handled.
+
+**Important**: The fetch is byte-for-byte on purpose, so the endpoint stays the source of truth. Don't reformat the result — commit only the substantive changes, not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone.
 
 ### Backoffice npm Package
 
@@ -532,23 +544,11 @@ Labels are only added, never removed. Claude applies only labels it is confident
 
 ## 8. Code Comment Policy
 
-**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Well-named identifiers and small functions are the primary form of self-documentation; comments are a fallback for the rare cases where the code itself cannot carry the meaning.
+**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Well-named identifiers and small functions carry the meaning; a comment is a fallback for what the code genuinely cannot say — a non-obvious *why*, a subtle invariant the types don't enforce, or a surprising edge case the code handles deliberately. Add XML doc / JSDoc on public members, but keep it concise.
 
-### When NOT to comment
+Linking a tracked issue (`(#21996)`, `https://...`) to explain a non-obvious *why* is welcome — for example, on a section of code or to explain why a regression test exists. Such a link stays useful even after the issue is closed, since it documents why the code is the way it is.
 
-- **Don't restate what the code does.** A line calling `resetState()` does not need `// Reset state`. A method named `validateInput` does not need `// Validate input`.
-- **Don't narrate a sequence of calls.** If three lines run in order, the order is in the code — don't paraphrase it above.
-- **Don't reference the current task, fix, callers, or PR.** No `// Fix for X`, `// Used by Y`, `// Added for the Z flow`, `// See PR #1234`. That belongs in commit messages and PR descriptions; in source it rots as the codebase evolves.
-
-### When a comment IS justified
-
-Write a comment only when **removing it would leave a future reader confused**. Concretely:
-
-- **A non-obvious WHY.** A hidden constraint, business rule, or ordering requirement that is not visible from the code.
-- **A workaround for a specific bug or platform quirk.** Link the issue (`(#21996)`, `https://...`) so the comment can be deleted once the upstream fix lands.
-- **A subtle invariant** that the type system or method names do not enforce.
-- **An edge case the code intentionally handles** that would surprise a reader (e.g. "must run before X because Y").
-- **API documentation** — XML doc comments on C# members, JSDoc on exported TypeScript symbols. Required for the public contract; still keep them concise.
+**Don't leave provenance noise.** No `// Fix for X`, `// Used by Y`, `// Added for the Z flow`, `// See PR #1234`. The transient task or PR that produced a change belongs in commit messages and PR descriptions; in source it rots as the codebase evolves.
 
 ### TODOs
 
@@ -563,6 +563,13 @@ Allowed, but cheap to write and cheaper to leave behind. Keep them short and tra
 Verify any test you add for a bug fix actually catches the bug: either write the failing test first (TDD), or temporarily revert the production change and confirm the test fails before re-applying. A test that passes both ways proves nothing. Watch for coincidental passes — default seed/sort orders can make a buggy path produce the right answer for the test's specific inputs; construct inputs so the broken and fixed behaviours give visibly different results.
 
 For integration tests that exercise caching or cache refreshers, see `tests/Umbraco.Tests.Integration/CLAUDE.md` — the harness disables caching by default, which can produce false greens.
+
+---
+
+## 10. Verification Discipline
+
+- **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
+- **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
 
 ---
 

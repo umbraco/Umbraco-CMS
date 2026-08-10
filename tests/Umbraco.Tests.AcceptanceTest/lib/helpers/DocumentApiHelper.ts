@@ -16,6 +16,10 @@ export class DocumentApiHelper {
     return await response.json();
   }
 
+  async waitUntilIndexed(query: string, id: string) {
+    await this.api.waitUntilItemIsIndexed(ConstantHelper.apiEndpoints.documentSearch, query, id);
+  }
+
   async doesExist(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id);
     return response.status() === 200;
@@ -26,7 +30,7 @@ export class DocumentApiHelper {
       return;
     }
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document', document);
-    return response.headers().location.split("v1/document/").pop();
+    return this.api.getIdFromLocation(response);
   }
 
   async delete(id: string) {
@@ -62,7 +66,7 @@ export class DocumentApiHelper {
   async getChildren(id: string) {
     const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/document/children?parentId=${id}&skip=0&take=10000`);
     const items = await response.json();
-    return items.items;
+    return this.api.itemsOf(items);
   }
 
   async getChildrenAmount(id: string) {
@@ -118,10 +122,15 @@ export class DocumentApiHelper {
     const rootDocuments = await this.getAllAtRoot();
     const jsonDocuments = await rootDocuments.json();
 
-    for (const document of jsonDocuments.items) {
+    for (const document of this.api.itemsOf(jsonDocuments)) {
       for (const variant of document.variants) {
         if (variant.name === name) {
-          return this.get(document.id);
+          const found = await this.get(document.id);
+          // A trashed document can still be returned by the tree endpoint; it only "exists" in the
+          // recycle bin (checked via doesItemExistInRecycleBin), so don't report it as present.
+          if (!found.isTrashed) {
+            return found;
+          }
         }
       }
       if (document.hasChildren) {
@@ -138,7 +147,7 @@ export class DocumentApiHelper {
     const rootDocuments = await this.getAllAtRoot();
     const jsonDocuments = await rootDocuments.json();
 
-    for (const document of jsonDocuments.items) {
+    for (const document of this.api.itemsOf(jsonDocuments)) {
       for (const variant of document.variants) {
         if (variant.name === name) {
           if (document.hasChildren) {
@@ -544,6 +553,24 @@ export class DocumentApiHelper {
         segment: null,
         editorAlias: 'Umbraco.TextBox',
         entityType: 'document-property-value'
+      });
+    }
+
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleVariantsAndNoValues(documentName: string, documentTypeId: string, cultureVariants: {isoCode: string, name: string}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null,
       });
     }
 
@@ -1532,7 +1559,7 @@ export class DocumentApiHelper {
         .withValue(value.value)
         .withCulture(value.culture)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();
@@ -1557,7 +1584,7 @@ export class DocumentApiHelper {
         .withAlias(alias)
         .withValue(value.value)
         .withEditorAlias(editorAlias);
-      if (value.segment) {
+      if (value.segment !== null) {
         valueBuilder.withSegment(value.segment);
       }
       valueBuilder.done();
@@ -1645,7 +1672,7 @@ export class DocumentApiHelper {
   async doesItemExistInRecycleBin(documentItemName: string) {
     const recycleBin = await this.getRecycleBinItems();
     const jsonRecycleBin = await recycleBin.json();
-    for (const document of jsonRecycleBin.items) {
+    for (const document of this.api.itemsOf(jsonRecycleBin)) {
       if (document.variants[0].name === documentItemName) {
         return true;
       }

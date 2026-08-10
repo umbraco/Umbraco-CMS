@@ -22,9 +22,22 @@ export class UmbAuthContext extends UmbContextBase {
 	#authRepository = new UmbAuthRepository(this);
 
 	#returnPath = '';
+	#backOfficeHost = '';
 
 	set returnPath(value: string) {
 		this.#returnPath = value;
+	}
+
+	/**
+	 * Sets the trusted back-office host origin. When the back office runs on a different origin than
+	 * the login page (a dev server or Umbraco Cloud), the return path resolves against this origin
+	 * instead of the login page's own origin.
+	 */
+	set backOfficeHost(value: string) {
+		this.#backOfficeHost = value;
+	}
+	get backOfficeHost(): string {
+		return this.#backOfficeHost;
 	}
 
 	/**
@@ -36,17 +49,20 @@ export class UmbAuthContext extends UmbContextBase {
 	 */
 	get returnPath(): string {
 		const params = new URLSearchParams(window.location.search);
-		let returnPath = params.get('ReturnUrl') ?? params.get('returnPath') ?? this.#returnPath;
+		const returnPath = params.get('ReturnUrl') ?? params.get('returnPath') ?? this.#returnPath;
 
 		// If return path is empty, return an empty string.
 		if (!returnPath) {
 			return '';
 		}
 
-		// Safely check that the return path is valid and doesn't link to an external site.
-		const url = new URL(returnPath, window.location.origin);
+		// Resolve against the configured back-office host when set (the client may be served from a
+		// different origin, e.g. a dev server or Umbraco Cloud), otherwise the current origin. The
+		// origin check still rejects off-site return paths (e.g. protocol-relative "//evil.com").
+		const base = this.#backOfficeHost || window.location.origin;
+		const url = new URL(returnPath, base);
 
-		if (url.origin !== window.location.origin) {
+		if (url.origin !== new URL(base).origin) {
 			return '';
 		}
 
