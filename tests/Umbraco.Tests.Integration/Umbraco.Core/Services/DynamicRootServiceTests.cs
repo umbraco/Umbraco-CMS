@@ -36,6 +36,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
     public enum DynamicRootStepAlias
     {
         NearestAncestorOrSelf,
+        FurthestAncestorOrSelf,
         NearestDescendantOrSelf,
         FurthestDescendantOrSelf,
     }
@@ -421,6 +422,44 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
         // Assert
         CollectionAssert.AreEqual(expected.Select(x => x.Key), result);
+    }
+
+    /// <summary>
+    ///     Verifies that AncestorOrSelf steps resolve an ancestor for each origin in turn, rather than a single one
+    ///     for the whole set of origins (#23600).
+    /// </summary>
+    [TestCase(DynamicRootStepAlias.NearestAncestorOrSelf)]
+    [TestCase(DynamicRootStepAlias.FurthestAncestorOrSelf)]
+    public async Task GetDynamicRootsAsync_AncestorOrSelfWithMultipleOrigins_ResolvesAnAncestorPerOrigin(
+        DynamicRootStepAlias dynamicRootAlias)
+    {
+        // Arrange
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.ByKey.ToString(),
+            OriginKey = ContentYears.Key,
+            Context = new DynamicRootContext() { CurrentKey = ContentYears.Key, ParentKey = ContentYears.Key },
+            QuerySteps =
+            [
+                // Resolves Ran-D, Red and Blue, so the ancestor step below runs with origins in two branches
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.FurthestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeAct.Key, ContentTypeStage.Key],
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = dynamicRootAlias.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeActs.Key, ContentTypeStages.Key],
+                },
+            ],
+        };
+
+        // Act
+        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
+
+        // Assert - Ran-D resolves to Acts and the two stages to Stages, where previously a single one was picked
+        CollectionAssert.AreEquivalent(new[] { ContentActs2022.Key, ContentStages2022.Key }, result);
     }
 
     /// <summary>

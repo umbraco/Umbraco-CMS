@@ -1,10 +1,11 @@
-using Umbraco.Cms.Core.Scoping;
+﻿using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 
 /// <summary>
 ///     A query step that finds the nearest (closest) descendants or self matching the specified document type criteria.
-///     This step traverses down the content tree from the origin and returns all matching nodes at the shallowest depth.
+///     This step traverses down the content tree from each origin and returns all matching nodes at the shallowest
+///     depth below each of them.
 /// </summary>
 public class NearestDescendantOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
 {
