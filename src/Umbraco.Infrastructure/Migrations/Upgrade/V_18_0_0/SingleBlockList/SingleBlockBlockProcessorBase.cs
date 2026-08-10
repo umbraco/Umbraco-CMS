@@ -35,6 +35,8 @@ internal abstract class SingleBlockBlockProcessorBase
                     blockPropertyValue.PropertyType!.DataTypeKey)
                 && blockPropertyValue.Value is BlockListValue blockListValue)
             {
+                // A value holding no block is returned unconverted, and must not be flagged as changed: that would
+                // have the migration rewrite the row and run the value through a value editor round trip for nothing.
                 var convertedValue = processOuterValue.Invoke(blockListValue);
                 if (ReferenceEquals(convertedValue, blockListValue) is false)
                 {
