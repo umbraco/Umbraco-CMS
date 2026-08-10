@@ -23,7 +23,11 @@ export interface UmbTableItem {
 	data: Array<UmbTableItemData>;
 	selectable?: boolean;
 	active?: boolean;
-	/** Overrides the table-wide select-only behaviour for this row. Set to `false` to keep the row content interactive while a selection is in progress. */
+	/**
+	 * Overrides the table-wide select-only behaviour for this row.
+	 * `true` always makes the row select-only, `false` always keeps its content interactive.
+	 * When left `undefined`, the row follows the table: select-only while a selection is in progress, or when the table is configured as select-only.
+	 */
 	selectOnly?: boolean;
 	/** When set, the row shows a children indicator. The nested options control what activating it does. */
 	childrenIndicator?: {
