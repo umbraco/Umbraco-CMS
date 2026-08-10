@@ -185,7 +185,7 @@ public partial class ElementContainerServiceTests
         // the container node, so that the element can be restored to its original location later.
         var trashResult = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(trashResult.Success);
-        Assert.IsNotEmpty(RelationService.GetByParentOrChildId(container.Id));
+        Assert.IsNotEmpty(await RelationService.GetByParentOrChildIdAsync(container.Id));
 
         // Deleting the now-empty container must clean up that relation, otherwise the FK on umbracoRelation is violated.
         var result = await ElementContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
@@ -196,7 +196,7 @@ public partial class ElementContainerServiceTests
         });
 
         Assert.IsNull(await ElementContainerService.GetAsync(container.Key));
-        Assert.IsEmpty(RelationService.GetByParentOrChildId(container.Id));
+        Assert.IsEmpty(await RelationService.GetByParentOrChildIdAsync(container.Id));
 
         // The trashed element is untouched and, having lost its original-parent relation, is restorable to the root.
         IElement? trashedElement = await ElementEditingService.GetAsync(element.Key);
