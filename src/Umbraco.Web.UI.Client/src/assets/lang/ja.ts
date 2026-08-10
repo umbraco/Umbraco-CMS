@@ -1094,8 +1094,9 @@ export default {
 		restoreItemTo: (from: string, to: string) => `<strong>${from}</strong> を<strong>${to}</strong> に復元します`,
 		itemCannotBeRestored: 'この項目は自動的に復元できません',
 		itemCannotBeRestoredHelpText:
-			'この項目を自動的に復元できる場所がありません。以下のツリーを使用して手動で移動できます。',
+			'この項目を自動的に復元できる場所がありません。以下から新しい場所を選択できます。',
 		restoreToTitle: '復元先',
+		selectRestoreLocation: '場所を選択',
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'すべて選択',
