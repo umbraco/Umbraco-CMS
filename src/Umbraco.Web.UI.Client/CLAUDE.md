@@ -46,17 +46,18 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 **Before performing any of these actions, you MUST read the linked doc first:**
 
-| Before you...                                 | Read                                                                                                                          |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Deprecate or remove a public API              | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
-| Create a new element or component             | [docs/style-guide.md](./docs/style-guide.md)                                                                                  |
-| Build, style, or write copy for any UI        | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy                     |
-| Create a repository or data source            | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md)                                     |
-| Add error handling or debugging               | [docs/error-handling.md](./docs/error-handling.md)                                                                            |
-| Write or modify tests                         | [docs/testing.md](./docs/testing.md)                                                                                          |
-| Work with auth or security                    | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                           |
-| Scaffold a new package or module              | [docs/package-development.md](./docs/package-development.md)                                                                  |
-| Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards           |
+| Before you...                                           | Read                                                                                                                           |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Deprecate or remove a public API                        | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning  |
+| Create a new element or component                       | [docs/style-guide.md](./docs/style-guide.md)                                                                                   |
+| Build, style, or write copy for any UI                  | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy                      |
+| Create a repository or data source                      | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md)                                      |
+| Add error handling or debugging                         | [docs/error-handling.md](./docs/error-handling.md)                                                                             |
+| Write or modify tests                                   | [docs/testing.md](./docs/testing.md)                                                                                           |
+| Work with auth or security                              | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md)                                            |
+| Scaffold a new package or module                        | [docs/package-development.md](./docs/package-development.md)                                                                   |
+| Write or change observers / `Umb*State` usage           | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards            |
+| Add, rename, or remove a key in `src/assets/lang/en.ts` | [docs/package-development.md](./docs/package-development.md#type-safe-localization-keys)                                       |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.
 
@@ -124,11 +125,11 @@ Uses the `semver` package (npm's own semver library) for robust parsing:
 **Pre-release packages (0.x.y)**
 
 ```
-Input:  ^0.85.0    or    0.85.0
-Output: >=0.85.0 <1.0.0
+Input:  ^0.99.0    or    0.99.0
+Output: >=0.99.0 <1.0.0
 
-Why: Pre-release caret (^0.85.0) only allows patch updates (0.85.x).
-     Explicit range allows plugins to use 0.91.1 without conflicts.
+Why: Pre-release caret (^0.99.0) only allows patch updates (0.99.x).
+     Explicit range allows plugins to use 0.99.5 without conflicts.
 ```
 
 **Stable packages with caret (major ≥ 1)**
@@ -159,7 +160,7 @@ Why: Normalizes to conventional semver format
 		"@umbraco-ui/uui": "^2.0.0",
 		"monaco-editor": "^0.55.1",
 		"@tiptap/core": "^3.16.0",
-		"@hey-api/openapi-ts": ">=0.85.0 <1.0.0"
+		"@hey-api/openapi-ts": ">=0.99.0 <1.0.0"
 	}
 }
 ```
@@ -169,7 +170,7 @@ Why: Normalizes to conventional semver format
 When using `@umbraco-cms/backoffice`:
 
 - **Declare dependencies explicitly** in your `package.json` (don't rely on transitive deps from backoffice)
-- **Version ranges are flexible**: `>=0.85.0 <1.0.0` means you can use `0.85.0`, `0.91.1`, or `0.99.99`
+- **Version ranges are flexible**: `>=0.99.0 <1.0.0` means you can use `0.99.0`, `0.99.5`, or `0.99.99`
 - **Types come from npm**: TypeScript gets types from your declared versions
 - **Runtime comes from importmap**: The actual code at runtime is managed by the backoffice (importmap)
 - **Future compatibility**: When `@hey-api` hits `1.0.0`, the published range will automatically become `^1.0.0`

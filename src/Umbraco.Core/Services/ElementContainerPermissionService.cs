@@ -90,6 +90,10 @@ internal sealed class ElementContainerPermissionService : IElementContainerPermi
             : ElementAuthorizationStatus.UnauthorizedMissingPermissionAccess);
     }
 
+    /// <inheritdoc/>
+    public Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
+        => Task.FromResult(fallbackPermissions);
+
     /// <summary>
     ///     Check the implicit/inherited permissions of a user for given element container items.
     /// </summary>

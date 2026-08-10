@@ -147,6 +147,13 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
     {
         plan.Validate();
 
+        // This class is registered as a singleton and a single boot can execute several plans - the Umbraco plan
+        // followed by one plan per package with pending migrations - so the flags are reset here to keep them scoped
+        // to the plan being executed. Without this, one plan asking for a rebuild makes every plan that follows it
+        // rebuild too (https://github.com/umbraco/Umbraco-CMS/discussions/23531).
+        _rebuildCache = false;
+        _invalidateBackofficeUserAccess = false;
+
         ExecutedMigrationPlan result = await RunMigrationPlanAsync(plan, fromState).ConfigureAwait(false);
 
         // If any completed migration requires us to rebuild cache we'll do that.

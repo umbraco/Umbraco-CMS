@@ -119,11 +119,11 @@ export class ApiHelpers {
     this.element = new ElementApiHelper(this);
   }
 
-  async getHeaders() {
-    // Playwright auto-sends cookies from the browser context — no explicit Cookie header needed.
-    return {
-      'Authorization': 'Bearer [redacted]',
-    }
+  // Back-office auth is cookie-only: Playwright auto-sends the authentication cookie from the
+  // browser context, so no Authorization header is set. Sending one would only make the request
+  // attempt bearer-token validation, which back-office sessions have no token for.
+  async getHeaders(): Promise<{ [key: string]: string; }> {
+    return {};
   }
 
   async get(url: string, params?: { [key: string]: string | number | boolean; }, extraHeaders?: { [key: string]: string; }) {
@@ -134,7 +134,13 @@ export class ApiHelpers {
       params: params,
       ignoreHTTPSErrors: true
     }
-    return await this.page.request.get(url, options);
+    const response = await this.page.request.get(url, options);
+    // GETs aren't asserted (they can legitimately 404/403), but a 5xx here silently yields e.g. false from
+    // doesNameExist and masks the real error - surface it as a warning to aid debugging.
+    if (response.status() >= 500) {
+      console.warn(`GET ${url} returned server error ${response.status()}`);
+    }
+    return response;
   }
 
   async post(url: string, data?: object) {
@@ -167,7 +173,8 @@ export class ApiHelpers {
     expect(response.ok(), `Expected a successful response but got ${response.status()} for ${response.url()}`).toBeTruthy();
     const location = response.headers()['location'];
     expect(location, `Expected Location header to be present for ${response.url()}`).toBeTruthy();
-    return location.split('/').pop()!;
+    // Trim any trailing slash so a "/document/{id}/" Location still yields the id, not an empty segment.
+    return location.replace(/\/+$/, '').split('/').pop()!;
   }
 
   // Examine indexes asynchronously after create; await this before a UI search so the item is findable.
@@ -219,83 +226,68 @@ export class ApiHelpers {
     return response;
   }
 
+  // Ensures the shared admin session is present and belongs to the admin. Runs before every test
+  // via the umbracoApi fixture, so it must stay cheap: with Security:KeepUserLoggedIn enabled the
+  // cookie slides on every request and the common path is a single probe with no sign-in at all.
   async isLoginStateValid() {
     await this.refreshLoginState(umbracoConfig.user.login, umbracoConfig.user.password);
-    // A refresh only proves some session is valid, not that it's the admin's (a prior user-switching
-    // test can leave a non-admin session). Only re-login on a positively-read different user - a
-    // speculative re-login runs password verification and degrades the full run.
+    // A live session only proves some session is valid, not that it's the admin's (a prior
+    // user-switching test can leave a non-admin session). Only re-login on a positively-read
+    // different user - a speculative re-login runs password verification and degrades the full run.
     const response = await this.get(this.baseUrl + ConstantHelper.apiEndpoints.currentUser);
-    if (response.status() === 200) {
+    if (response.status() === ConstantHelper.statusCodes.ok) {
       const currentUser = await response.json();
       const currentEmail = currentUser.email?.toLowerCase();
       if (currentEmail && currentEmail !== umbracoConfig.user.login.toLowerCase()) {
-        await this.updateTokenAndCookie(umbracoConfig.user.login, umbracoConfig.user.password);
+        await this.signIn(umbracoConfig.user.login, umbracoConfig.user.password);
       }
     }
   }
 
+  // Renews the session cookie, falling back to a full sign-in when there is no session to renew.
   async refreshLoginState(userEmail: string, userPassword: string) {
-    const response = await this.page.request.post(this.baseUrl + '/umbraco/management/api/v1/security/back-office/token', {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Origin: this.baseUrl
-      },
-      form:
-        {
-          grant_type: 'refresh_token',
-          client_id: 'umbraco-back-office',
-          redirect_uri: this.baseUrl + '/umbraco/oauth_complete',
-          refresh_token: '[redacted]'
-        },
-      ignoreHTTPSErrors: true
-    });
-
-    if (response.status() === 200) {
+    if (await this.login.keepAlive()) {
       return;
     }
-    console.log('Error refreshing access token, performing full re-login.');
-    await this.updateTokenAndCookie(userEmail, userPassword);
-    console.log('Successfully retrieved new authentication tokens.');
+    await this.signIn(userEmail, userPassword);
   }
 
-  async updateTokenAndCookie(userEmail: string, userPassword: string) {
+  /**
+   * Signs the given user in. The server sets the httpOnly authentication cookie on the browser
+   * context, which is the sole credential for every subsequent request.
+   */
+  async signIn(userEmail: string, userPassword: string) {
     await this.login.login(userEmail, userPassword);
   }
 
+  /**
+   * @deprecated Cookie auth issues no tokens. Use {@link signIn} instead.
+   */
+  async updateTokenAndCookie(userEmail: string, userPassword: string) {
+    await this.signIn(userEmail, userPassword);
+  }
+
+  /**
+   * Ends the current back-office session by clearing the authentication cookie server-side.
+   */
+  async signOut() {
+    await this.login.signOut();
+  }
+
+  /**
+   * @deprecated Cookie auth has no tokens to revoke. Use {@link signOut} instead.
+   */
   async revokeTokens() {
-    await this.page.request.post(this.baseUrl + '/umbraco/management/api/v1/security/back-office/revoke', {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Origin: this.baseUrl
-      },
-      form: {
-        token: '[redacted]',
-        token_type_hint: 'access_token',
-        client_id: 'umbraco-back-office'
-      },
-      ignoreHTTPSErrors: true
-    });
-    await this.page.request.post(this.baseUrl + '/umbraco/management/api/v1/security/back-office/revoke', {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Origin: this.baseUrl
-      },
-      form: {
-        token: '[redacted]',
-        token_type_hint: 'refresh_token',
-        client_id: 'umbraco-back-office'
-      },
-      ignoreHTTPSErrors: true
-    });
+    await this.signOut();
   }
 
   async loginToAdminUser() {
-    await this.revokeTokens();
-    await this.updateTokenAndCookie(umbracoConfig.user.login, umbracoConfig.user.password);
+    // Signing in replaces the single authentication cookie, so there is nothing to sign out of first.
+    await this.signIn(umbracoConfig.user.login, umbracoConfig.user.password);
   }
 
   async resetAuthState() {
-    await this.revokeTokens();
+    await this.signOut();
     await this.page.context().clearCookies();
   }
 

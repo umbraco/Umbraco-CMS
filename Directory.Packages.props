@@ -48,8 +48,8 @@
   </ItemGroup>
   <!-- Third-party packages -->
   <ItemGroup>
-    <PackageVersion Include="Asp.Versioning.Mvc" Version="10.0.0" />
-    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc" Version="10.2.1" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.2.1" />
     <PackageVersion Include="BitFaster.Caching" Version="2.6.0" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
     <PackageVersion Include="Examine" Version="3.9.0" />

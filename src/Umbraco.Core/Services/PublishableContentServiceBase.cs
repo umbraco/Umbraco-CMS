@@ -953,7 +953,16 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
         }
 
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        PublishResult result = CommitContentChangesInternal(
+            scope,
+            content,
+            evtMsgs,
+            allLangs,
+            savingNotification.State,
+            userId,
+            branchOne: false,
+            branchRoot: false,
+            raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1004,7 +1013,16 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
         content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
 
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        PublishResult result = CommitContentChangesInternal(
+            scope,
+            content,
+            evtMsgs,
+            allLangs,
+            savingNotification.State,
+            userId,
+            branchOne: false,
+            branchRoot: false,
+            raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1362,6 +1380,36 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         int userId,
         bool branchOne = false,
         bool branchRoot = false)
+        => CommitContentChangesInternal(
+            scope,
+            content,
+            eventMessages,
+            allLangs,
+            notificationState,
+            userId,
+            branchOne,
+            branchRoot,
+            raiseSavedNotification: false);
+
+    /// <inheritdoc cref="CommitContentChangesInternal(ICoreScope, TContent, EventMessages, IReadOnlyCollection{ILanguage}, IDictionary{string, object}, int, bool, bool)" />
+    /// <param name="raiseSavedNotification">
+    ///     Whether to raise the "saved" notification once the content is persisted. Enabled by the save-and-publish entry
+    ///     points, which combine a save and a publish, so the paired "saved" notification still fires.
+    /// </param>
+    /// <remarks>
+    ///     A separate overload rather than an optional parameter on the one above, because adding a parameter to a
+    ///     protected member of a public class is a binary breaking change.
+    /// </remarks>
+    protected PublishResult CommitContentChangesInternal(
+        ICoreScope scope,
+        TContent content,
+        EventMessages eventMessages,
+        IReadOnlyCollection<ILanguage> allLangs,
+        IDictionary<string, object?>? notificationState,
+        int userId,
+        bool branchOne,
+        bool branchRoot,
+        bool raiseSavedNotification)
     {
         if (scope == null)
         {
@@ -1401,6 +1449,22 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         IReadOnlyList<string>? culturesChanging = variesByCulture
             ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
             : null;
+
+        // For a save-and-publish, capture the saved cultures the same way (and at the same point) as the standalone
+        // Save path - before persistence resets change tracking - so the "saved" notification honours the same
+        // SavedCultures contract: the changed cultures for variant content, or the "*" marker for changed invariant content.
+        IReadOnlyCollection<string>? savedCultures = null;
+        if (raiseSavedNotification)
+        {
+            if (variesByCulture)
+            {
+                savedCultures = culturesChanging;
+            }
+            else
+            {
+                savedCultures = content.IsDirty() ? ["*"] : [];
+            }
+        }
 
         var isNew = !content.HasIdentity;
         TreeChangeTypes changeType = isNew || SupportsBranchPublishing is false ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
@@ -1541,6 +1605,19 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
         // Persist the content
         SaveContent(content);
+
+        // A save-and-publish is also a save, so raise the paired "saved" notification (https://github.com/umbraco/Umbraco-CMS/issues/23523).
+        // Positioned here, after the content is actually persisted, so it does not fire on the cancelled-publishing or
+        // concurrency-violation paths above, which return before reaching this point.
+        if (raiseSavedNotification)
+        {
+            scope.Notifications.Publish(
+                SavedNotification(
+                    content,
+                    eventMessages,
+                    BuildCultureMap(content, savedCultures))
+                .WithState(notificationState));
+        }
 
         // we have tried to unpublish - won't happen in a branch
         if (unpublishing)

@@ -14,6 +14,7 @@ internal sealed class ServerEventRouter : IServerEventRouter
     private readonly IUserConnectionManager _connectionManager;
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<ServerEventRouter> _logger;
+    private readonly IServerEventAccessService _accessService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ServerEventRouter"/> class.
@@ -22,16 +23,19 @@ internal sealed class ServerEventRouter : IServerEventRouter
     /// <param name="connectionManager">Manages user connections for server events.</param>
     /// <param name="runtimeState">Provides information about the current runtime state of the application.</param>
     /// <param name="logger">The logger used for logging events and errors related to the server event router.</param>
+    /// <param name="accessService">Resolves the recipients of an event for sources that are filtered per recipient.</param>
     public ServerEventRouter(
         IHubContext<ServerEventHub, IServerEventHub> eventHub,
         IUserConnectionManager connectionManager,
         IRuntimeState runtimeState,
-        ILogger<ServerEventRouter> logger)
+        ILogger<ServerEventRouter> logger,
+        IServerEventAccessService accessService)
     {
         _eventHub = eventHub;
         _connectionManager = connectionManager;
         _runtimeState = runtimeState;
         _logger = logger;
+        _accessService = accessService;
     }
 
     /// <inheritdoc/>
@@ -45,6 +49,41 @@ internal sealed class ServerEventRouter : IServerEventRouter
         try
         {
             await _eventHub.Clients.Group(serverEvent.EventSource).notify(serverEvent);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to route server event {EventType} for {EventSource}", serverEvent.EventType, serverEvent.EventSource);
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task RouteEventAsync(ServerEvent serverEvent, ServerEventRoutingContext context)
+    {
+        if (_runtimeState.Level != RuntimeLevel.Run)
+        {
+            return;
+        }
+
+        // Sources with no registered access filter are broadcast to the whole source group.
+        if (_accessService.AppliesTo(serverEvent.EventSource) is false)
+        {
+            await RouteEventAsync(serverEvent);
+            return;
+        }
+
+        // Entity-scoped sources are delivered only to the connections the access service authorizes.
+        // The registered filters are responsible for deciding what to gate on.
+        try
+        {
+            IReadOnlyList<string> connections =
+                await _accessService.GetAuthorizedConnectionsAsync(serverEvent.EventSource, context);
+
+            if (connections.Count == 0)
+            {
+                return;
+            }
+
+            await _eventHub.Clients.Clients(connections).notify(serverEvent);
         }
         catch (Exception ex)
         {

@@ -73,6 +73,7 @@ export class UiBaseLocators extends BasePage {
   public readonly openedModal: Locator;
   public readonly container: Locator;
   public readonly containerChooseBtn: Locator;
+  public readonly backofficeModalContainer: Locator;
   public readonly containerSaveAndPublishBtn: Locator;
   public readonly createModalBtn: Locator;
   public readonly copyModalBtn: Locator;
@@ -247,7 +248,6 @@ export class UiBaseLocators extends BasePage {
 
   // Block
   public readonly blockTypeCard: Locator;
-  public readonly backofficeModalContainer: Locator;
 
   // User & User Group
   public readonly allowAccessToAllElementsBtn: Locator;
@@ -941,8 +941,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
-  async isSuccessButtonWithTextVisible(text: string) {
-    return await this.isVisible(this.successState.filter({ hasText: text }));
+  // timeout is overridable because the success state can follow a slow server operation (e.g. rebuilding the
+  // database cache) that exceeds the default timeout under load; most callers can use the default.
+  async isSuccessButtonWithTextVisible(text: string, timeout?: number) {
+    return await this.isVisible(this.successState.filter({ hasText: text }), true, timeout);
   }
 
   async isSuccessStateIconVisible() {
@@ -1149,6 +1151,9 @@ export class UiBaseLocators extends BasePage {
       name: name,
       exact: isExact,
     });
+    // In scrollable pickers (e.g. the user-group modal) the target button can render below the fold,
+    // where a force click fails with "element is outside of the viewport". Scroll it in first.
+    await this.scrollIntoView(exactButtonWithNameLocator);
     await this.click(exactButtonWithNameLocator, { force: true });
   }
 
