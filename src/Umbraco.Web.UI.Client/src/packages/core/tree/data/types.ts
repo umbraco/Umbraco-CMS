@@ -43,6 +43,13 @@ export interface UmbTreeAncestorsOfRequestArgs {
 	};
 }
 
+/**
+ * Arguments for requesting specific tree items.
+ * @interface UmbTreeItemsRequestArgs
+ */
 export interface UmbTreeItemsRequestArgs {
+	/**
+	 * The uniques of the tree items to request.
+	 */
 	uniques: Array<string>;
 }

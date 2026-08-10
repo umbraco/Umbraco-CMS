@@ -2,6 +2,7 @@ import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
+import { UmbTreeItemsNotSupportedError } from './tree-items-not-supported.error.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
@@ -178,10 +179,7 @@ export abstract class UmbTreeRepositoryBase<
 		await this._init;
 
 		if (!this._treeSource.getItems) {
-			return {
-				data: undefined,
-				error: new Error('The tree data source does not support requesting items by unique.'),
-			};
+			return { data: undefined, error: new UmbTreeItemsNotSupportedError() };
 		}
 
 		const { data, error } = await this._treeSource.getItems(args);

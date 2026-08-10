@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -14,9 +14,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 public class DynamicRootRepository : IDynamicRootRepository
 {
-    // The descendant queries can match nodes under several parents, so order per parent to follow the
-    // backoffice tree order within each sibling group; the identifier only breaks remaining ties. Without
-    // this the order of multiple resolved roots is undefined (https://github.com/umbraco/Umbraco-CMS/issues/23600).
+    // The queries can match nodes under several parents, so order per parent to follow the backoffice tree order
+    // within each sibling group; the identifier only breaks remaining ties. Without this the order of multiple
+    // resolved roots is undefined (https://github.com/umbraco/Umbraco-CMS/issues/23600).
     private const string TreeOrderBy =
         $"ORDER BY n.{NodeDto.ParentIdColumnName}, n.{NodeDto.SortOrderColumnName}, n.{NodeDto.IdColumnName}";
 
@@ -43,27 +43,48 @@ public class DynamicRootRepository : IDynamicRootRepository
 
     /// <inheritdoc/>
     [Obsolete("Use NearestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 19.")]
-    public async Task<Guid?> NearestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep filter)
+    public async Task<Guid?> NearestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
     {
-        ICollection<Guid> keys = await NearestAncestorsOrSelfAsync(origins.ToArray(), filter);
+        ICollection<Guid> keys = await NearestAncestorsOrSelfAsync(origins.ToArray(), queryStep);
         return keys.Count > 0 ? keys.First() : null;
     }
 
     /// <inheritdoc/>
     [Obsolete("Use FurthestAncestorsOrSelfAsync instead, which resolves an ancestor for each origin. Scheduled for removal in Umbraco 19.")]
-    public async Task<Guid?> FurthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep filter)
+    public async Task<Guid?> FurthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
     {
-        ICollection<Guid> keys = await FurthestAncestorsOrSelfAsync(origins.ToArray(), filter);
+        ICollection<Guid> keys = await FurthestAncestorsOrSelfAsync(origins.ToArray(), queryStep);
         return keys.Count > 0 ? keys.First() : null;
     }
 
     /// <inheritdoc/>
-    public Task<ICollection<Guid>> NearestAncestorsOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
-        => AncestorOrSelfAsync(origins, filter, "MAX");
+    public Task<ICollection<Guid>> NearestAncestorsOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep queryStep)
+        => AncestorOrSelfAsync(origins, queryStep, "MAX");
 
     /// <inheritdoc/>
-    public Task<ICollection<Guid>> FurthestAncestorsOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
-        => AncestorOrSelfAsync(origins, filter, "MIN");
+    public Task<ICollection<Guid>> FurthestAncestorsOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep queryStep)
+        => AncestorOrSelfAsync(origins, queryStep, "MIN");
+
+    /// <summary>
+    /// Asynchronously finds, for each origin node, the nearest descendant (including the origin itself) that matches the specified filter, and returns their unique IDs.
+    /// </summary>
+    /// <param name="origins">A collection of unique IDs representing the origin nodes from which to start the search.</param>
+    /// <param name="queryStep">The filter criteria used to determine matching descendant or self nodes.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a collection of unique IDs for the nearest matching descendant or self node for each origin.
+    /// </returns>
+    public Task<ICollection<Guid>> NearestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep queryStep)
+        => DescendantOrSelfAsync(origins, queryStep, "MIN");
+
+    /// <summary>
+    /// Asynchronously finds, for each origin node, the unique identifiers of the deepest (furthest) descendant nodes or the origin node itself,
+    /// according to the specified dynamic root query filter.
+    /// </summary>
+    /// <param name="origins">A collection of unique identifiers representing the origin nodes from which to start the search.</param>
+    /// <param name="queryStep">The dynamic root query step used to constrain or filter the descendant search.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of unique identifiers for the furthest descendant or self nodes found for each origin.</returns>
+    public Task<ICollection<Guid>> FurthestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep queryStep)
+        => DescendantOrSelfAsync(origins, queryStep, "MAX");
 
     /// <summary>
     /// Finds, for each origin, the matching ancestor (or the origin itself) nearest to or furthest from that origin,
@@ -77,21 +98,19 @@ public class DynamicRootRepository : IDynamicRootRepository
     /// </remarks>
     private async Task<ICollection<Guid>> AncestorOrSelfAsync(
         ICollection<Guid> origins,
-        DynamicRootQueryStep filter,
+        DynamicRootQueryStep queryStep,
         string levelAggregate)
     {
-        var docTypeKeys = filter.AnyOfDocTypeKeys.ToArray();
-        var originsPerBatch = Constants.Sql.MaxParameterCount - (docTypeKeys.Length * 2);
-
+        var docTypeKeys = queryStep.AnyOfDocTypeKeys.ToArray();
         var keys = new List<Guid>();
 
-        foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(originsPerBatch))
+        foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(OriginsPerBatch(docTypeKeys)))
         {
             ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
             var correlation =
                 $"{syntax.Substring}(norigin.{NodeDto.PathColumnName}, 1, {syntax.Length}(n2.{NodeDto.PathColumnName})) = n2.{NodeDto.PathColumnName}";
 
-            Sql<ISqlContext> query = GetAncestorOrSelfBaseQuery(originBatch, filter);
+            Sql<ISqlContext> query = GetAncestorOrSelfBaseQuery(originBatch, queryStep);
             query = AppendMatchingLevelForOrigin(query, levelAggregate, docTypeKeys, correlation).Append(TreeOrderBy);
 
             keys.AddRange(await Database.FetchAsync<Guid>(query));
@@ -101,7 +120,51 @@ public class DynamicRootRepository : IDynamicRootRepository
         return keys.Distinct().ToArray();
     }
 
-    private Sql<ISqlContext> GetAncestorOrSelfBaseQuery(IEnumerable<Guid> origins, DynamicRootQueryStep filter)
+    /// <summary>
+    /// Finds, for each origin, the matching descendants (or the origin itself) at its own shallowest or deepest
+    /// matching level, and returns the union of those.
+    /// </summary>
+    /// <remarks>
+    /// The matching level is resolved per origin, relative to that origin, rather than once across all of them:
+    /// otherwise an origin whose nearest match sits deeper than another's would contribute nothing at all
+    /// (https://github.com/umbraco/Umbraco-CMS/issues/23600). Because the origins are independent of each other,
+    /// they can also safely be queried in batches.
+    /// </remarks>
+    private async Task<ICollection<Guid>> DescendantOrSelfAsync(
+        ICollection<Guid> origins,
+        DynamicRootQueryStep queryStep,
+        string levelAggregate)
+    {
+        var docTypeKeys = queryStep.AnyOfDocTypeKeys.ToArray();
+        var keys = new List<Guid>();
+
+        foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(OriginsPerBatch(docTypeKeys)))
+        {
+            Sql<ISqlContext> query = Database.SqlContext.Sql()
+                .Select<NodeDto>("n", n => n.UniqueId)
+                .DescendantOrSelfBaseQuery(originBatch, queryStep);
+
+            ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
+            var correlation =
+                $"{syntax.Substring}(n2.{NodeDto.PathColumnName}, 1, {syntax.Length}(norigin.{NodeDto.PathColumnName})) = norigin.{NodeDto.PathColumnName}";
+
+            query = AppendMatchingLevelForOrigin(query, levelAggregate, docTypeKeys, correlation).Append(TreeOrderBy);
+
+            keys.AddRange(await Database.FetchAsync<Guid>(query));
+        }
+
+        // A node descending from more than one origin can match under each of them.
+        return keys.Distinct().ToArray();
+    }
+
+    /// <summary>
+    /// How many origins can be bound to one query, given that the document type keys are bound twice: once for the
+    /// outer query and once for the correlated sub query. A batch holds at least one origin however many there are.
+    /// </summary>
+    private static int OriginsPerBatch(Guid[] docTypeKeys)
+        => Math.Max(1, Constants.Sql.MaxParameterCount - (docTypeKeys.Length * 2));
+
+    private Sql<ISqlContext> GetAncestorOrSelfBaseQuery(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep)
     {
         Sql<ISqlContext> query = Database.SqlContext.Sql()
             .Select<NodeDto>("n", n => n.UniqueId)
@@ -116,75 +179,12 @@ public class DynamicRootRepository : IDynamicRootRepository
             .On<ContentTypeDto, NodeDto>((ct, ctn) => ct.NodeId == ctn.NodeId, "ct", "ctn")
             .Where<NodeDto>(norigin => origins.Contains(norigin.UniqueId), "norigin");
 
-        if (filter.AnyOfDocTypeKeys.Any())
+        if (queryStep.AnyOfDocTypeKeys.Any())
         {
-            query = query.Where<NodeDto>(ctn => filter.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn");
+            query = query.Where<NodeDto>(ctn => queryStep.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn");
         }
 
         return query;
-    }
-
-
-    /// <summary>
-    /// Asynchronously finds, for each origin node, the nearest descendant (including the origin itself) that matches the specified filter, and returns their unique IDs.
-    /// </summary>
-    /// <param name="origins">A collection of unique IDs representing the origin nodes from which to start the search.</param>
-    /// <param name="filter">The filter criteria used to determine matching descendant or self nodes.</param>
-    /// <returns>
-    /// A task that represents the asynchronous operation. The task result contains a collection of unique IDs for the nearest matching descendant or self node for each origin.
-    /// </returns>
-    public Task<ICollection<Guid>> NearestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
-        => DescendantOrSelfAsync(origins, filter, "MIN");
-
-    /// <summary>
-    /// Asynchronously finds, for each origin node, the unique identifiers of the deepest (furthest) descendant nodes or the origin node itself,
-    /// according to the specified dynamic root query filter.
-    /// </summary>
-    /// <param name="origins">A collection of unique identifiers representing the origin nodes from which to start the search.</param>
-    /// <param name="filter">The dynamic root query step used to constrain or filter the descendant search.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of unique identifiers for the furthest descendant or self nodes found for each origin.</returns>
-    public Task<ICollection<Guid>> FurthestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
-        => DescendantOrSelfAsync(origins, filter, "MAX");
-
-    /// <summary>
-    /// Finds, for each origin, the matching descendants (or the origin itself) at its own shallowest or deepest
-    /// matching level, and returns the union of those.
-    /// </summary>
-    /// <remarks>
-    /// The matching level is resolved per origin, relative to that origin, rather than once across all of them:
-    /// otherwise an origin whose nearest match sits deeper than another's would contribute nothing at all
-    /// (https://github.com/umbraco/Umbraco-CMS/issues/23600). Because the origins are independent of each other,
-    /// they can also safely be queried in batches.
-    /// </remarks>
-    private async Task<ICollection<Guid>> DescendantOrSelfAsync(
-        ICollection<Guid> origins,
-        DynamicRootQueryStep filter,
-        string levelAggregate)
-    {
-        var docTypeKeys = filter.AnyOfDocTypeKeys.ToArray();
-
-        // The document type keys are bound once for the outer query and once for the correlated sub query.
-        var originsPerBatch = Constants.Sql.MaxParameterCount - (docTypeKeys.Length * 2);
-
-        var keys = new List<Guid>();
-
-        foreach (IEnumerable<Guid> originBatch in origins.InGroupsOf(originsPerBatch))
-        {
-            Sql<ISqlContext> query = Database.SqlContext.Sql()
-                .Select<NodeDto>("n", n => n.UniqueId)
-                .DescendantOrSelfBaseQuery(originBatch, filter);
-
-            ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
-            var correlation =
-                $"{syntax.Substring}(n2.{NodeDto.PathColumnName}, 1, {syntax.Length}(norigin.{NodeDto.PathColumnName})) = norigin.{NodeDto.PathColumnName}";
-
-            query = AppendMatchingLevelForOrigin(query, levelAggregate, docTypeKeys, correlation).Append(TreeOrderBy);
-
-            keys.AddRange(await Database.FetchAsync<Guid>(query));
-        }
-
-        // A node descending from more than one origin can match under each of them.
-        return keys.Distinct().ToArray();
     }
 
     /// <summary>

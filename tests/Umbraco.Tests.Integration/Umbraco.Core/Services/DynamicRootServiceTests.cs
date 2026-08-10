@@ -439,9 +439,10 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             OriginAlias = DynamicRootOrigin.ByKey.ToString(),
             OriginKey = ContentYears.Key,
             Context = new DynamicRootContext() { CurrentKey = ContentYears.Key, ParentKey = ContentYears.Key },
+
+            // The first step resolves Ran-D, Red and Blue, so the ancestor step runs with origins in two branches
             QuerySteps =
             [
-                // Resolves Ran-D, Red and Blue, so the ancestor step below runs with origins in two branches
                 new DynamicRootQueryStep()
                 {
                     Alias = DynamicRootStepAlias.FurthestDescendantOrSelf.ToString(),

@@ -12,4 +12,6 @@ export type {
 	UmbTreeItemsRequestArgs,
 } from './types.js';
 
+export { UmbTreeItemsNotSupportedError } from './tree-items-not-supported.error.js';
+
 export { UmbUniqueTreeStore } from './unique-tree-store.js';

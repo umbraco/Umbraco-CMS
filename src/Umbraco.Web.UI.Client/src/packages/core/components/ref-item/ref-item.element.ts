@@ -50,6 +50,8 @@ export class UmbRefItemElement extends UmbElementMixin(UUIRefNodeElement) {
 				padding-bottom: var(--uui-size-3);
 			}
 
+			/* #detail is the id UUIRefNodeElement gives the detail element in its own shadow root, so this
+			   override breaks silently if UUI ever renames it. */
 			:host([max-detail-lines]) #detail {
 				display: -webkit-box;
 				-webkit-line-clamp: var(--umb-ref-item-max-detail-lines, 1);

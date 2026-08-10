@@ -1,5 +1,6 @@
 import type { UmbTreeRootItemsRequestArgs } from '../data/index.js';
 import type { UmbTreeItemModel, UmbTreeRootModel, UmbTreeStartNode } from '../types.js';
+import { UmbTreeItemsNotSupportedError } from '../data/tree-items-not-supported.error.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { UmbRequestReloadTreeItemChildrenEvent } from '../entity-actions/reload-tree-item-children/index.js';
 import { UMB_TREE_ITEM_EXPANDABLE_CONTEXT } from './tree-item.context.token.js';
@@ -75,6 +76,7 @@ export class UmbTreeItemChildrenManager<
 	#treeContext?: typeof UMB_TREE_CONTEXT.TYPE;
 	#parentTreeItemContext?: typeof UMB_TREE_ITEM_EXPANDABLE_CONTEXT.TYPE;
 	#requestMaxRetries = 2;
+	#startNodeItemsNotSupported = false;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -248,16 +250,17 @@ export class UmbTreeItemChildrenManager<
 
 	/**
 	 * Whether the start nodes themselves should be loaded as the children of this manager. Only ever true for the
-	 * manager owned by the tree, never for the one owned by a tree item, and only when the tree repository can
-	 * resolve items by unique.
+	 * manager owned by the tree, never for the one owned by a tree item, and only while the tree repository can
+	 * resolve items by unique — a repository can only report that it cannot once it has been asked.
 	 */
 	#loadsStartNodesAsChildren(): boolean {
+		if (this.#startNodeItemsNotSupported) return false;
 		if (this.getStartNodes().length < 2) return false;
 		return this.#treeContext?.getRepository()?.requestTreeItems !== undefined;
 	}
 
 	#loadChildrenRetries = 0;
-	async #loadChildren(reload = false) {
+	async #loadChildren(reload = false): Promise<void> {
 		if (this.#loadsStartNodesAsChildren()) {
 			return this.#loadStartNodesAsChildren(reload);
 		}
@@ -383,7 +386,7 @@ export class UmbTreeItemChildrenManager<
 	 * Loads the start nodes as the children of this manager. The start nodes are already known, so they are
 	 * paginated client side and only the current window is resolved into items.
 	 */
-	async #loadStartNodesAsChildren(reload = false) {
+	async #loadStartNodesAsChildren(reload = false): Promise<void> {
 		const repository = this.#treeContext?.getRepository();
 		if (!repository?.requestTreeItems) throw new Error('Could not request start nodes, repository is missing');
 
@@ -395,7 +398,19 @@ export class UmbTreeItemChildrenManager<
 			? this.offsetPagination.getCurrentPageNumber() * this.offsetPagination.getPageSize()
 			: this.offsetPagination.getPageSize();
 
-		const { data } = await repository.requestTreeItems({ uniques: uniques.slice(skip, skip + take) });
+		const { data, error } = await repository.requestTreeItems({ uniques: uniques.slice(skip, skip + take) });
+
+		if (UmbTreeItemsNotSupportedError.isUmbTreeItemsNotSupportedError(error)) {
+			// The repository cannot resolve the start nodes as items, so fall back to the children of the first of
+			// them — the behaviour of a tree that only understands a single start node.
+			this.#startNodeItemsNotSupported = true;
+			return this.#loadChildren(reload);
+		}
+
+		if (error) {
+			this.#isLoading.setValue(false);
+			return this.#peekLoadingFailedNotification();
+		}
 
 		if (data) {
 			const items = data as Array<TreeItemType>;
@@ -424,9 +439,15 @@ export class UmbTreeItemChildrenManager<
 		const uniques = this.getStartNodes().map((startNode) => startNode.unique);
 		const skip = this.#children.getValue().length;
 
-		const { data } = await repository.requestTreeItems({
+		const { data, error } = await repository.requestTreeItems({
 			uniques: uniques.slice(skip, skip + this.offsetPagination.getPageSize()),
 		});
+
+		if (error) {
+			this.#isLoading.setValue(false);
+			this.#isLoadingNextChildren.setValue(false);
+			return this.#peekLoadingFailedNotification();
+		}
 
 		if (data) {
 			const items = data as Array<TreeItemType>;
@@ -708,6 +729,11 @@ export class UmbTreeItemChildrenManager<
 		// This is the terminal fallback, no further recovery
 
 		this.#isLoading.setValue(false);
+	}
+
+	async #peekLoadingFailedNotification(): Promise<void> {
+		const notificationManager = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+		notificationManager?.peek('danger', { data: { message: 'Menu loading failed.' } });
 	}
 
 	async #resetChildren(reason: ResetReason = 'error'): Promise<void> {

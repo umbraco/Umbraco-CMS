@@ -12,7 +12,12 @@ export function umbResolveTreeStartNodes(
 	startNode: UmbTreeStartNode | undefined,
 	startNodes: Array<UmbTreeStartNode> | undefined,
 ): { startNode?: UmbTreeStartNode; startNodes?: Array<UmbTreeStartNode> } {
-	const resolved = startNodes?.length ? startNodes : startNode ? [startNode] : [];
+	let resolved: Array<UmbTreeStartNode> = [];
+	if (startNodes?.length) {
+		resolved = startNodes;
+	} else if (startNode) {
+		resolved = [startNode];
+	}
 
 	if (resolved.length === 1) {
 		return { startNode: resolved[0], startNodes: undefined };
