@@ -1,0 +1,141 @@
+import { UMB_ENTITY_REFERENCES_MODAL } from '../reference/modal/constants.js';
+import type { UmbEntityReferenceRepository } from '../reference/types.js';
+import type { UmbConfirmActionModalEntityReferencesConfig } from './confirm-action-modal-entity-references.element.js';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+
+/**
+ * Publish/unpublish awareness: a neutral count of the items referencing the entity in `config`, with a link to the
+ * full, paged overview. Renders nothing when there are no references. Same `config` shape, getters, and
+ * `UmbChangeEvent` contract as `umb-confirm-action-modal-entity-references`, so it can be used as a drop-in
+ * replacement wherever that component's reference-aware gating (e.g. `disableUnpublishWhenReferenced`) is relied on.
+ * @element umb-entity-references-summary
+ */
+@customElement('umb-entity-references-summary')
+export class UmbEntityReferencesSummaryElement extends UmbLitElement {
+	@property({ type: Object, attribute: false })
+	config?: UmbConfirmActionModalEntityReferencesConfig;
+
+	@state()
+	private _totalReferencedByItems = 0;
+
+	@state()
+	private _totalDescendantsWithReferences = 0;
+
+	#referenceRepository?: UmbEntityReferenceRepository;
+
+	getTotalReferencedBy() {
+		return this._totalReferencedByItems;
+	}
+
+	getTotalDescendantsWithReferences() {
+		return this._totalDescendantsWithReferences;
+	}
+
+	protected override firstUpdated(_changedProperties: PropertyValues): void {
+		super.firstUpdated(_changedProperties);
+		this.#initData();
+	}
+
+	async #initData() {
+		if (!this.config) {
+			this.#referenceRepository?.destroy();
+			return;
+		}
+
+		if (!this.config.referenceRepositoryAlias) {
+			throw new Error('Missing referenceRepositoryAlias in config.');
+		}
+
+		this.#referenceRepository = await createExtensionApiByAlias<UmbEntityReferenceRepository>(
+			this,
+			this.config.referenceRepositoryAlias,
+		);
+
+		await Promise.all([this.#loadReferencedByTotal(), this.#loadDescendantsWithReferencesTotal()]);
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	async #loadReferencedByTotal() {
+		if (!this.#referenceRepository) {
+			throw new Error('Failed to create reference repository.');
+		}
+
+		if (!this.config?.unique) {
+			throw new Error('Missing unique in config.');
+		}
+
+		// take: 1 — only the total is needed here, the overview modal fetches the actual items.
+		const { data } = await this.#referenceRepository.requestReferencedBy(this.config.unique, 0, 1);
+		this._totalReferencedByItems = data?.total ?? 0;
+	}
+
+	async #loadDescendantsWithReferencesTotal() {
+		if (!this.#referenceRepository) {
+			throw new Error('Failed to create reference repository.');
+		}
+
+		// If the repository does not have the method, we don't need to load the referenced descendants.
+		if (!this.#referenceRepository.requestDescendantsWithReferences) return;
+
+		if (!this.config?.unique) {
+			throw new Error('Missing unique in config.');
+		}
+
+		const { data } = await this.#referenceRepository.requestDescendantsWithReferences(this.config.unique, 0, 1);
+		this._totalDescendantsWithReferences = data?.total ?? 0;
+	}
+
+	#onClickViewAll(event: Event) {
+		event.preventDefault();
+		if (!this.config) return;
+
+		umbOpenModal(this, UMB_ENTITY_REFERENCES_MODAL, {
+			data: {
+				unique: this.config.unique,
+				referenceRepositoryAlias: this.config.referenceRepositoryAlias,
+				itemRepositoryAlias: this.config.itemRepositoryAlias,
+			},
+		}).catch(() => undefined);
+	}
+
+	override render() {
+		const total = this._totalReferencedByItems + this._totalDescendantsWithReferences;
+		if (total === 0) return nothing;
+
+		return html`
+			<p class="reference-summary">
+				<uui-button
+					label=${this.localize.term('references_labelUsedByCount', total)}
+					look="outline"
+					@click=${this.#onClickViewAll}>
+					<umb-localize key="references_labelUsedByCount" .args=${[total]}>Used by ${total} item(s)</umb-localize>
+				</uui-button>
+			</p>
+		`;
+	}
+
+	static override styles = [
+		css`
+			.reference-summary {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: var(--uui-size-space-2);
+				color: var(--uui-color-text-alt);
+			}
+		`,
+	];
+}
+
+export default UmbEntityReferencesSummaryElement;
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-entity-references-summary': UmbEntityReferencesSummaryElement;
+	}
+}

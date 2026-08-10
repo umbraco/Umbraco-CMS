@@ -5,15 +5,15 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type {
 	UmbConfirmActionModalEntityReferencesConfig,
-	UmbConfirmActionModalEntityReferencesElement,
+	UmbEntityReferencesSummaryElement,
 } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 import '../../../variant-picker/content-variant-language-picker.element.js';
+import '@umbraco-cms/backoffice/relations';
 
 /**
  * @function isPublished
@@ -140,7 +140,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 
 	async #onReferencesChange(event: UmbChangeEvent) {
 		event.stopPropagation();
-		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
+		const target = event.target as UmbEntityReferencesSummaryElement;
 		const total = target.getTotalReferencedBy() + target.getTotalDescendantsWithReferences();
 
 		if (total === 0) {
@@ -173,9 +173,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<uui-dialog-layout headline=${this.localize.term('content_unpublish')}>
-				<p>
-					<umb-localize key="prompt_confirmUnpublish"></umb-localize>
-				</p>
+				<p><umb-localize key="prompt_confirmUnpublish"></umb-localize></p>
 				${when(
 					!this._isInvariant,
 					() => html`
@@ -191,10 +189,8 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 				${when(
 					this._referencesConfig,
 					() => html`
-						<umb-confirm-action-modal-entity-references
-							.config=${this._referencesConfig}
-							@change=${this.#onReferencesChange}>
-						</umb-confirm-action-modal-entity-references>
+						<umb-entity-references-summary .config=${this._referencesConfig} @change=${this.#onReferencesChange}>
+						</umb-entity-references-summary>
 					`,
 				)}
 				<div slot="actions">
@@ -213,7 +209,6 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;
