@@ -5,10 +5,11 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbConfirmActionModalEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 import '../../../variant-picker/content-variant-language-picker.element.js';
+import '@umbraco-cms/backoffice/relations';
 
 @customElement('umb-content-publish-modal')
 export class UmbContentPublishModalElement extends UmbModalBaseElement<
@@ -26,6 +27,9 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	@state()
 	private _isInvariant = false;
 
+	@state()
+	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+
 	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbPublishableVariantState.NOT_CREATED) {
 			return false;
@@ -34,6 +38,8 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	};
 
 	override firstUpdated() {
+		this.#configureReferences();
+
 		// If invariant, don't display the variant selection component.
 		if (this.data?.options.length === 1 && this.data.options[0].culture === null) {
 			this._isInvariant = true;
@@ -41,6 +47,16 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		}
 
 		this.#configureSelectionManager();
+	}
+
+	#configureReferences() {
+		if (!this.data?.unique || !this.data.itemRepositoryAlias || !this.data.referenceRepositoryAlias) return;
+
+		this._referencesConfig = {
+			unique: this.data.unique,
+			itemRepositoryAlias: this.data.itemRepositoryAlias,
+			referenceRepositoryAlias: this.data.referenceRepositoryAlias,
+		};
 	}
 
 	async #configureSelectionManager() {
@@ -100,6 +116,10 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 							.requiredFilter=${isNotPublishedMandatory}
 							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>`,
 				)}
+				${when(
+					this._referencesConfig,
+					() => html`<umb-entity-references-summary .config=${this._referencesConfig}></umb-entity-references-summary>`,
+				)}
 
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
@@ -118,7 +138,6 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;

@@ -2688,6 +2688,8 @@ export default {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
 		},
+		labelUsedByCount: (count: number) => `Referenced by ${count} ${count === 1 ? 'item' : 'items'}`,
+		labelViewAll: 'View all',
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',

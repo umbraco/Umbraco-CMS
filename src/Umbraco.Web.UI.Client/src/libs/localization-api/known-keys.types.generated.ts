@@ -1864,6 +1864,7 @@ declare global {
 		references_labelDependentDescendants: string;
 		references_labelDependsOnThis: string;
 		references_labelMoreReferences: (count: number) => string;
+		references_labelUsedByCount: (count: number) => string;
 		references_labelUsedByDocuments: string;
 		references_labelUsedByDocumentTypes: string;
 		references_labelUsedByItems: string;
@@ -1873,6 +1874,7 @@ declare global {
 		references_labelUsedByMemberTypes: string;
 		references_labelUsedDescendants: string;
 		references_labelUsedItems: string;
+		references_labelViewAll: string;
 		references_listViewDialogWarning: string;
 		references_tabName: string;
 		references_unpublishWarning: string;
