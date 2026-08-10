@@ -49,7 +49,7 @@ public class ProtectRecycleBinMediaMiddleware : IMiddleware
             return;
         }
 
-        AuthenticateResult authenticateResult = await context.AuthenticateAsync(Core.Constants.Security.BackOfficeExposedAuthenticationType);
+        AuthenticateResult authenticateResult = await context.AuthenticateAsync(Core.Constants.Security.BackOfficeAuthenticationType);
         if (authenticateResult.Succeeded is false)
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
