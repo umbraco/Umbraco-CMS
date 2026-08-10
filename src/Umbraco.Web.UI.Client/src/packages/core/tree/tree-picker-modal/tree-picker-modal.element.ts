@@ -5,10 +5,19 @@ import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { ManifestTree } from '../extensions/types.js';
 import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
-import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	query,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
@@ -67,6 +76,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	@state()
 	private _breadcrumb: Array<UmbTreeBreadcrumbItem> = [];
+
+	@query('umb-picker-search-field')
+	private _searchField?: UmbPickerSearchFieldElement;
 
 	#treeAlias?: string;
 	private _initialStartNode?: UmbTreeStartNode;
@@ -389,7 +401,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		if (tab === 'search') {
 			await this.updateComplete;
-			this.shadowRoot?.querySelector('umb-picker-search-field')?.focus();
+			this._searchField?.focus();
 		}
 	}
 

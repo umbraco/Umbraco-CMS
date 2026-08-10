@@ -2,8 +2,9 @@ import type { UmbCollectionLayoutConfiguration, UmbCollectionSelectionConfigurat
 import { UmbCollectionItemPickerContext } from './collection-item-picker-modal.context.js';
 import type { UmbCollectionItemPickerModalData, UmbCollectionItemPickerModalValue } from './types.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, customElement, state, nothing, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, ifDefined, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-collection-item-picker-modal')
@@ -30,6 +31,9 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _activeTab: 'browse' | 'search' = 'browse';
+
+	@query('umb-picker-search-field')
+	private _searchField?: UmbPickerSearchFieldElement;
 
 	#pickerContext = new UmbCollectionItemPickerContext(this);
 
@@ -114,7 +118,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 
 		if (tab === 'search') {
 			await this.updateComplete;
-			this.shadowRoot?.querySelector('umb-picker-search-field')?.focus();
+			this._searchField?.focus();
 		}
 	}
 
