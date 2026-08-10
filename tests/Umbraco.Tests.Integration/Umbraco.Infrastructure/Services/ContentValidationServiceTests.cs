@@ -528,7 +528,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
     }
 
     [Test]
-    public async Task Can_Validate_Mandatory_Segment()
+    public async Task Can_Validate_Mandatory_Property_For_Default_Segment()
     {
         var contentType = await SetupSegmentTest(ContentVariation.Segment, titleIsMandatory: true);
 
