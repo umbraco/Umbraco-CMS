@@ -442,22 +442,30 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </returns>
     public bool MoveToBin(Guid key)
     {
-        if (TryRemoveNodeFromParentInStructure(_navigation.Structure, key, out NavigationNode? nodeToRemove) is false || nodeToRemove is null)
+        // Snapshot references are read once here and passed down, so every step of the move — including
+        // the recursive descendant walk — acts on one coherent pair of structures. If a rebuild swaps a
+        // field mid-operation, the work lands on the snapshot being replaced and is discarded with it,
+        // which is what we want: the rebuild has already read the same state from the database. The
+        // mutators below follow the same convention; see TryGetRootKeys for the reader side.
+        NavigationSnapshot navigation = _navigation;
+        NavigationSnapshot recycleBinNavigation = _recycleBinNavigation;
+
+        if (TryRemoveNodeFromParentInStructure(navigation.Structure, key, out NavigationNode? nodeToRemove) is false || nodeToRemove is null)
         {
             return false; // Node doesn't exist
         }
 
         // Recursively remove all descendants and add them to recycle bin
-        AddDescendantsToRecycleBinRecursively(nodeToRemove);
+        AddDescendantsToRecycleBinRecursively(navigation, recycleBinNavigation, nodeToRemove);
 
         // Reset the SortOrder based on its new position in the bin
-        nodeToRemove.UpdateSortOrder(_recycleBinNavigation.Structure.Count);
-        var moved = _recycleBinNavigation.Structure.TryAdd(nodeToRemove.Key, nodeToRemove) &&
-                    _navigation.Structure.TryRemove(key, out _);
+        nodeToRemove.UpdateSortOrder(recycleBinNavigation.Structure.Count);
+        var moved = recycleBinNavigation.Structure.TryAdd(nodeToRemove.Key, nodeToRemove) &&
+                    navigation.Structure.TryRemove(key, out _);
 
         // Both snapshots' descendant lists are now potentially stale.
-        _navigation.Invalidate();
-        _recycleBinNavigation.Invalidate();
+        navigation.Invalidate();
+        recycleBinNavigation.Invalidate();
 
         return moved;
     }
@@ -479,10 +487,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </returns>
     public bool Add(Guid key, Guid contentTypeKey, Guid? parentKey = null, int? sortOrder = null)
     {
+        NavigationSnapshot navigation = _navigation;
+
         NavigationNode? parentNode = null;
         if (parentKey.HasValue)
         {
-            if (_navigation.Structure.TryGetValue(parentKey.Value, out parentNode) is false)
+            if (navigation.Structure.TryGetValue(parentKey.Value, out parentNode) is false)
             {
                 return false; // Parent node doesn't exist
             }
@@ -490,7 +500,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         // Note: sortOrder can't be automatically determined for items at root level, so it needs to be passed in
         var newNode = new NavigationNode(key, contentTypeKey, sortOrder ?? 0);
-        if (_navigation.Structure.TryAdd(key, newNode) is false)
+        if (navigation.Structure.TryAdd(key, newNode) is false)
         {
             return false; // Node with this key already exists
         }
@@ -500,13 +510,13 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         // the parent it actually has.
         if (parentKey.HasValue is false)
         {
-            _navigation.Roots.Add(key);
+            navigation.Roots.Add(key);
         }
 
         // If sortOrder supplied → caller is asserting the position, preserve it; otherwise append last.
-        parentNode?.AddChild(_navigation.Structure, key, appendAsLastItem: sortOrder is null);
+        parentNode?.AddChild(navigation.Structure, key, appendAsLastItem: sortOrder is null);
 
-        _navigation.Invalidate();
+        navigation.Invalidate();
         return true;
     }
 
@@ -523,7 +533,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </returns>
     public bool Move(Guid key, Guid? targetParentKey = null)
     {
-        if (_navigation.Structure.TryGetValue(key, out NavigationNode? nodeToMove) is false)
+        NavigationSnapshot navigation = _navigation;
+
+        if (navigation.Structure.TryGetValue(key, out NavigationNode? nodeToMove) is false)
         {
             return false; // Node doesn't exist
         }
@@ -536,7 +548,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         NavigationNode? targetParentNode = null;
         if (targetParentKey.HasValue)
         {
-            if (_navigation.Structure.TryGetValue(targetParentKey.Value, out targetParentNode) is false)
+            if (navigation.Structure.TryGetValue(targetParentKey.Value, out targetParentNode) is false)
             {
                 return false; // Target parent doesn't exist
             }
@@ -547,23 +559,23 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         // one that is already a root stays a root throughout rather than being briefly removed first.
         if (targetParentNode is null)
         {
-            _navigation.Roots.Add(key);
+            navigation.Roots.Add(key);
         }
         else
         {
-            _navigation.Roots.Remove(key);
+            navigation.Roots.Remove(key);
         }
 
         // Remove the node from its current parent's children list
-        if (nodeToMove.Parent is not null && _navigation.Structure.TryGetValue(nodeToMove.Parent.Value, out NavigationNode? currentParentNode))
+        if (nodeToMove.Parent is not null && navigation.Structure.TryGetValue(nodeToMove.Parent.Value, out NavigationNode? currentParentNode))
         {
-            currentParentNode.RemoveChild(_navigation.Structure, key);
+            currentParentNode.RemoveChild(navigation.Structure, key);
         }
 
         // Set the new parent for the node (if parent node is null - the node is moved to root)
-        targetParentNode?.AddChild(_navigation.Structure, key);
+        targetParentNode?.AddChild(navigation.Structure, key);
 
-        _navigation.Invalidate();
+        navigation.Invalidate();
         return true;
     }
 
@@ -577,7 +589,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </returns>
     public bool UpdateSortOrder(Guid key, int newSortOrder)
     {
-        if (_navigation.Structure.TryGetValue(key, out NavigationNode? node) is false)
+        NavigationSnapshot navigation = _navigation;
+
+        if (navigation.Structure.TryGetValue(key, out NavigationNode? node) is false)
         {
             return false; // Node doesn't exist
         }
@@ -587,14 +601,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         // The parent's cached ordered-children snapshot sorts by child SortOrder and is now
         // stale — invalidate so the next read rebuilds against the new value.
         if (node.Parent is not null
-            && _navigation.Structure.TryGetValue(node.Parent.Value, out NavigationNode? parentNode))
+            && navigation.Structure.TryGetValue(node.Parent.Value, out NavigationNode? parentNode))
         {
             parentNode.InvalidateOrderedChildren();
         }
 
         // Descendants lists are sort-order-presorted (depth-first using each parent's
         // ordered children), so re-ordering a child re-orders any cached ancestor descendants.
-        _navigation.Invalidate();
+        navigation.Invalidate();
 
         return true;
     }
@@ -609,17 +623,19 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </returns>
     public bool RemoveFromBin(Guid key)
     {
-        if (TryRemoveNodeFromParentInStructure(_recycleBinNavigation.Structure, key, out NavigationNode? nodeToRemove) is false || nodeToRemove is null)
+        NavigationSnapshot recycleBinNavigation = _recycleBinNavigation;
+
+        if (TryRemoveNodeFromParentInStructure(recycleBinNavigation.Structure, key, out NavigationNode? nodeToRemove) is false || nodeToRemove is null)
         {
             return false; // Node doesn't exist
         }
 
-        _recycleBinNavigation.Roots.Remove(key);
+        recycleBinNavigation.Roots.Remove(key);
 
-        RemoveDescendantsRecursively(nodeToRemove);
+        RemoveDescendantsRecursively(recycleBinNavigation, nodeToRemove);
 
-        var removed = _recycleBinNavigation.Structure.TryRemove(key, out _);
-        _recycleBinNavigation.Invalidate();
+        var removed = recycleBinNavigation.Structure.TryRemove(key, out _);
+        recycleBinNavigation.Invalidate();
         return removed;
     }
 
@@ -637,30 +653,33 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </returns>
     public bool RestoreFromBin(Guid key, Guid? targetParentKey = null)
     {
-        if (_recycleBinNavigation.Structure.TryGetValue(key, out NavigationNode? nodeToRestore) is false)
+        NavigationSnapshot navigation = _navigation;
+        NavigationSnapshot recycleBinNavigation = _recycleBinNavigation;
+
+        if (recycleBinNavigation.Structure.TryGetValue(key, out NavigationNode? nodeToRestore) is false)
         {
             return false; // Node doesn't exist
         }
 
         // If a target parent is specified, try to find it in the main structure
         NavigationNode? targetParentNode = null;
-        if (targetParentKey.HasValue && _navigation.Structure.TryGetValue(targetParentKey.Value, out targetParentNode) is false)
+        if (targetParentKey.HasValue && navigation.Structure.TryGetValue(targetParentKey.Value, out targetParentNode) is false)
         {
             return false; // Target parent doesn't exist
         }
 
         // Set the new parent for the node (if parent node is null - the node is moved to root)
-        targetParentNode?.AddChild(_recycleBinNavigation.Structure, key);
+        targetParentNode?.AddChild(recycleBinNavigation.Structure, key);
 
         // Restore the node and its descendants from the recycle bin to the main structure
-        RestoreNodeAndDescendantsRecursively(nodeToRestore);
+        RestoreNodeAndDescendantsRecursively(navigation, recycleBinNavigation, nodeToRestore);
 
-        var restored = _navigation.Structure.TryAdd(nodeToRestore.Key, nodeToRestore) &&
-                       _recycleBinNavigation.Structure.TryRemove(key, out _);
+        var restored = navigation.Structure.TryAdd(nodeToRestore.Key, nodeToRestore) &&
+                       recycleBinNavigation.Structure.TryRemove(key, out _);
 
         // Both snapshots' descendant lists are now potentially stale.
-        _navigation.Invalidate();
-        _recycleBinNavigation.Invalidate();
+        navigation.Invalidate();
+        recycleBinNavigation.Invalidate();
 
         return restored;
     }
@@ -942,69 +961,75 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         return true;
     }
 
-    private void AddDescendantsToRecycleBinRecursively(NavigationNode node)
+    private static void AddDescendantsToRecycleBinRecursively(
+        NavigationSnapshot navigation,
+        NavigationSnapshot recycleBinNavigation,
+        NavigationNode node)
     {
-        _recycleBinNavigation.Roots.Add(node.Key);
-        _navigation.Roots.Remove(node.Key);
-        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _navigation.Structure);
+        recycleBinNavigation.Roots.Add(node.Key);
+        navigation.Roots.Remove(node.Key);
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, navigation.Structure);
 
         foreach (Guid childKey in childrenKeys)
         {
-            if (_navigation.Structure.TryGetValue(childKey, out NavigationNode? childNode) is false)
+            if (navigation.Structure.TryGetValue(childKey, out NavigationNode? childNode) is false)
             {
                 continue;
             }
 
             // Reset the SortOrder based on its new position in the bin
-            childNode.UpdateSortOrder(_recycleBinNavigation.Structure.Count);
-            AddDescendantsToRecycleBinRecursively(childNode);
+            childNode.UpdateSortOrder(recycleBinNavigation.Structure.Count);
+            AddDescendantsToRecycleBinRecursively(navigation, recycleBinNavigation, childNode);
 
             // Only remove the child from the main structure if it was successfully added to the recycle bin
-            if (_recycleBinNavigation.Structure.TryAdd(childKey, childNode))
+            if (recycleBinNavigation.Structure.TryAdd(childKey, childNode))
             {
-                _navigation.Structure.TryRemove(childKey, out _);
+                navigation.Structure.TryRemove(childKey, out _);
             }
         }
     }
 
-    private void RemoveDescendantsRecursively(NavigationNode node)
+    private static void RemoveDescendantsRecursively(NavigationSnapshot recycleBinNavigation, NavigationNode node)
     {
-        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _recycleBinNavigation.Structure);
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, recycleBinNavigation.Structure);
         foreach (Guid childKey in childrenKeys)
         {
-            if (_recycleBinNavigation.Structure.TryGetValue(childKey, out NavigationNode? childNode) is false)
+            if (recycleBinNavigation.Structure.TryGetValue(childKey, out NavigationNode? childNode) is false)
             {
                 continue;
             }
 
-            RemoveDescendantsRecursively(childNode);
-            _recycleBinNavigation.Structure.TryRemove(childKey, out _);
+            RemoveDescendantsRecursively(recycleBinNavigation, childNode);
+            recycleBinNavigation.Structure.TryRemove(childKey, out _);
         }
     }
 
-    private void RestoreNodeAndDescendantsRecursively(NavigationNode node)
+    private static void RestoreNodeAndDescendantsRecursively(
+        NavigationSnapshot navigation,
+        NavigationSnapshot recycleBinNavigation,
+        NavigationNode node)
     {
         if (node.Parent is null)
         {
-            _navigation.Roots.Add(node.Key);
+            navigation.Roots.Add(node.Key);
         }
 
-        _recycleBinNavigation.Roots.Remove(node.Key);
-        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, _recycleBinNavigation.Structure);
+        recycleBinNavigation.Roots.Remove(node.Key);
+        IReadOnlyList<Guid> childrenKeys = GetOrderedChildren(node, recycleBinNavigation.Structure);
 
         foreach (Guid childKey in childrenKeys)
         {
-            if (_recycleBinNavigation.Structure.TryGetValue(childKey, out NavigationNode? childNode) is false)
+            if (recycleBinNavigation.Structure.TryGetValue(childKey, out NavigationNode? childNode) is false)
             {
                 continue;
             }
 
-            RestoreNodeAndDescendantsRecursively(childNode);
+            RestoreNodeAndDescendantsRecursively(navigation, recycleBinNavigation, childNode);
 
             // Only remove the child from the recycle bin structure if it was successfully added to the main one
-            if (_navigation.Structure.TryAdd(childKey, childNode))
+            if (navigation.Structure.TryAdd(childKey, childNode))
             {
-                _recycleBinNavigation.Structure.TryRemove(childKey, out _);
+                recycleBinNavigation.Structure.TryRemove(childKey, out _);
             }
         }
     }
