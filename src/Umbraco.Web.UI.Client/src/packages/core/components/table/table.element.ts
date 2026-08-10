@@ -432,7 +432,7 @@ export class UmbTableElement extends UmbLitElement {
 				${ref(this.#getRowRenderedCallback(item))}
 				data-sortable-id=${item.id}
 				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
-				?selection-mode=${selectionMode}
+				?data-selection-mode=${selectionMode}
 				?select-only=${item.selectOnly ?? selectionMode}
 				?selected=${this._isSelected(item.id)}
 				?active=${item.active ?? false}
@@ -592,14 +592,14 @@ export class UmbTableElement extends UmbLitElement {
 			uui-table-row[selectable]:focus umb-icon,
 			uui-table-row[selectable]:focus-within umb-icon,
 			uui-table-row[selectable]:hover umb-icon,
-			uui-table-row[selection-mode] umb-icon {
+			uui-table-row[data-selection-mode] umb-icon {
 				display: none;
 			}
 
 			uui-table-row[selectable]:focus uui-checkbox,
 			uui-table-row[selectable]:focus-within uui-checkbox,
 			uui-table-row[selectable]:hover uui-checkbox,
-			uui-table-row[selection-mode] uui-checkbox {
+			uui-table-row[data-selection-mode] uui-checkbox {
 				display: inline-block;
 			}
 

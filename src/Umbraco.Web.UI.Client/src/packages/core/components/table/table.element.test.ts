@@ -124,7 +124,7 @@ describe('UmbTableElement', () => {
 
 			expect(getRow('2').hasAttribute('select-only')).to.be.false;
 			// The row is still part of selection mode, so it presents its checkbox.
-			expect(getRow('2').hasAttribute('selection-mode')).to.be.true;
+			expect(getRow('2').hasAttribute('data-selection-mode')).to.be.true;
 		});
 
 		it('keeps a row interactive when it opts out of a select-only configuration', async () => {
