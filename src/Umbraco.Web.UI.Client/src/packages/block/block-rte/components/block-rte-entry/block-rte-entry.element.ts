@@ -4,7 +4,6 @@ import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { css, customElement, html, nothing, property, when, state } from '@umbraco-cms/backoffice/external/lit';
 import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
@@ -85,11 +84,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	@state()
 	private _exposed?: boolean;
 
-	private _localExpose?: boolean;
-
-	@state()
-	private _externalContentVariantState: string | null | undefined;
-
 	@state()
 	private _showActions?: boolean;
 
@@ -128,16 +122,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	@property({ type: Boolean, attribute: 'settings-invalid', reflect: true })
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	_settingsInvalid?: boolean;
-
-	#updateExposedState() {
-		// External content blocks use the element's variant state; local blocks use the expose entry
-		const isExposed = this._isExternalContent
-			? this._externalContentVariantState === UmbElementVariantState.PUBLISHED ||
-				this._externalContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
-			: this._localExpose;
-		this.#updateBlockViewProps({ unpublished: !isExposed });
-		this._exposed = isExposed;
-	}
 
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel>>) {
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
@@ -253,26 +237,17 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			null,
 		);
 		this.observe(
-			this.#context.hasExpose,
-			(exposed) => {
-				this._localExpose = exposed;
-				this.#updateExposedState();
+			this.#context.isExposed,
+			(isExposed) => {
+				this.#updateBlockViewProps({ unpublished: !isExposed });
+				this._exposed = isExposed;
 			},
 			null,
 		);
 		this.observe(
 			this.#context.isExternalContent,
 			(isExternalContent) => {
-				this._isExternalContent = isExternalContent ?? false;
-				this.#updateExposedState();
-			},
-			null,
-		);
-		this.observe(
-			this.#context.externalContentVariantState,
-			(state) => {
-				this._externalContentVariantState = state;
-				this.#updateExposedState();
+				this._isExternalContent = isExternalContent;
 			},
 			null,
 		);
