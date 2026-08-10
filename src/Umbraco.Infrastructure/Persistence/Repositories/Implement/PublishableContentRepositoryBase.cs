@@ -1077,6 +1077,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         {
             entity.PublishedVersionId = entity.VersionId;
             contentVersionDto.Id = 0;
+            contentVersionDto.Key = Guid.NewGuid(); // reused DTO from the first insert above; needs a fresh key too, not just a fresh id
             contentVersionDto.Current = true;
             contentVersionDto.Text = entity.Name;
             Database.Insert(contentVersionDto);
