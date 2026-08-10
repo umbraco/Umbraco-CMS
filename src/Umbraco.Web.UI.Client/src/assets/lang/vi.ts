@@ -2827,4 +2827,7 @@ export default {
 		resetUrlMessage: 'Bạn có chắc chắn muốn đặt lại URL này không?',
 		resetUrlLabel: 'Đặt lại',
 	},
+	picker: {
+		selectedCount: (count: number) => `Đã chọn ${count} mục`,
+	},
 } as UmbLocalizationDictionary;

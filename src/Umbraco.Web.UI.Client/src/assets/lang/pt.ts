@@ -2860,4 +2860,7 @@ export default {
 		emptyTimeZone: 'Por favor, selecione um fuso horário',
 		invalidTimeZone: 'O fuso horário selecionado não é válido',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
+	},
 } as UmbLocalizationDictionary;
