@@ -51,7 +51,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	private _createLabel?: string;
 
 	@state()
-	private _searchQuery?: string;
+	private _isSearchable: boolean = false;
+
+	@state()
+	private _activeTab: 'browse' | 'search' = 'browse';
 
 	@state()
 	private _treeExpansion: UmbEntityExpansionModel = [];
@@ -285,11 +288,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#observeSearch() {
 		this.observe(
-			this._pickerContext.search.query,
-			(query) => {
-				this._searchQuery = query?.query;
+			this._pickerContext.search.searchable,
+			(isSearchable) => {
+				this._isSearchable = isSearchable ?? false;
 			},
-			'umbPickerSearchQueryObserver',
+			'umbPickerSearchableObserver',
 		);
 	}
 
@@ -380,12 +383,51 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#searchSelectableFilter = () => true;
 
+	async #setActiveTab(tab: 'browse' | 'search') {
+		if (this._activeTab === tab) return;
+		this._activeTab = tab;
+
+		if (tab === 'search') {
+			await this.updateComplete;
+			this.shadowRoot?.querySelector('umb-picker-search-field')?.focus();
+		}
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.string(this.data?.headline ?? '#general_choose')}>
-				${this.#renderSearch()} ${this.#renderTree()} ${this.#renderSelectionCount()} ${this.#renderActions()}
+				${this.#renderTabs()}
+				<div id="browse" ?hidden=${this._activeTab !== 'browse'}>${this.#renderTree()}</div>
+				<div id="search" ?hidden=${this._activeTab !== 'search'}>${this.#renderSearch()}</div>
+				${this.#renderSelectionCount()} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
+	}
+
+	#renderTabs() {
+		if (!this._isSearchable) return nothing;
+
+		return html`
+			<uui-tab-group slot="navigation">
+				${this.#renderTab('browse', 'picker_browseTab', 'icon-list')}
+				${this.#renderTab('search', 'picker_searchTab', 'icon-search')}
+			</uui-tab-group>
+		`;
+	}
+
+	// The label is passed as both property and child text: `uui-tab` renders its `label` in the default
+	// slot, which the whitespace of a multi-line template would otherwise occupy.
+	#renderTab(tab: 'browse' | 'search', labelKey: string, icon: string) {
+		const label = this.localize.term(labelKey);
+
+		return html`<uui-tab
+			label=${label}
+			?active=${this._activeTab === tab}
+			@click=${() => this.#setActiveTab(tab)}
+			data-mark="picker:tab:${tab}">
+			<umb-icon slot="icon" name=${icon}></umb-icon>
+			${label}
+		</uui-tab>`;
 	}
 
 	#renderSearch() {
@@ -399,10 +441,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#renderTree() {
-		if (this._searchQuery) {
-			return nothing;
-		}
-
 		return html`
 			${this.#renderBreadcrumb()}
 			<umb-tree
@@ -478,6 +516,12 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	static override styles = css`
+		uui-tab-group {
+			--uui-tab-divider: var(--uui-color-border);
+			border-left: 1px solid var(--uui-color-border);
+			border-right: 1px solid var(--uui-color-border);
+		}
+
 		#breadcrumb {
 			margin-bottom: var(--uui-size-space-4);
 		}
