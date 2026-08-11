@@ -1,4 +1,12 @@
 import '@umbraco-ui/uui';
+import {
+	UUIActiveMixinInterface,
+	UUILabelMixinInterface,
+	UUIPopoverTargetMixinInterface,
+	UUISelectableMixinInterface,
+	UUISelectOnlyMixinInterface,
+	UUITimer,
+} from '@umbraco-ui/uui';
 export * from '@umbraco-ui/uui';
 
 // UUI 2.0 removed the global ambient `Option` interface (its replacement is the exported
@@ -39,3 +47,17 @@ export const demandCustomElement = (
 		);
 	}
 };
+
+/** @deprecated Use UUITimer instead */
+export const Timer = UUITimer;
+
+/** @deprecated Use UUIActiveMixinInterface instead */
+export type ActiveMixinInterface = UUIActiveMixinInterface;
+/** @deprecated Use UUILabelMixinInterface instead */
+export type LabelMixinInterface = UUILabelMixinInterface;
+/** @deprecated Use UUIPopoverTargetMixinInterface instead */
+export type PopoverTargetMixinInterface = UUIPopoverTargetMixinInterface;
+/** @deprecated Use UUISelectOnlyMixinInterface instead */
+export type SelectOnlyMixinInterface = UUISelectOnlyMixinInterface;
+/** @deprecated Use UUISelectableMixinInterface instead */
+export type SelectableMixinInterface = UUISelectableMixinInterface;
