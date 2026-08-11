@@ -275,9 +275,12 @@ declare global {
 		blockEditor_createThisFor: (name: string, variantName: string) => string;
 		blockEditor_defaultLayoutStylesheet: string;
 		blockEditor_deleteArea: string;
+		blockEditor_disconnectFromElementLibrary: string;
+		blockEditor_disconnectFromElementLibraryConfirm: string;
 		blockEditor_elementTypeDoesNotExist: string;
 		blockEditor_elementTypeDoesNotExistDescription: string;
 		blockEditor_elementTypeDoesNotExistHeadline: string;
+		blockEditor_elementUsedByCount: (count: number) => string;
 		blockEditor_focusParentBlock: string;
 		blockEditor_forceHideContentEditor: string;
 		blockEditor_forceHideContentEditorHelp: string;
@@ -332,7 +335,9 @@ declare global {
 		blockEditor_tabBlockTypeSettings: string;
 		blockEditor_tabClipboard: string;
 		blockEditor_tabCreateEmpty: string;
+		blockEditor_tabLibrary: string;
 		blockEditor_thumbnail: string;
+		blockEditor_transferToElementLibrary: string;
 		blockEditor_unsupportedBlockDescription: string;
 		blockEditor_unsupportedBlockName: string;
 		blueprints_blankBlueprint: string;
@@ -542,7 +547,9 @@ declare global {
 		content_resetFocalPoint: string;
 		content_routeError: string;
 		content_routeErrorCannotRoute: string;
+		content_saveAndPublishDescendantsModalTitle: string;
 		content_saveAndPublishModalTitle: string;
+		content_saveAndScheduleModalTitle: string;
 		content_saveModalTitle: string;
 		content_scheduledPendingChanges: string;
 		content_scheduledPublishDocumentation: string;
