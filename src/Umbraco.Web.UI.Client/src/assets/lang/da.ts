@@ -2470,7 +2470,7 @@ export default {
 		labelUsedByDocumentTypes: 'Refereret af følgende dokumenttyper',
 		labelUsedByItems: 'Refereret af',
 		labelDependsOnThis: 'Følgende elementer er afhængige af dette',
-		labelUsedItems: 'Følgende elementer refereres',
+		labelUsedItems: 'Elementer i brug',
 		labelUsedDescendants: 'The following descendant items have dependencies',
 		labelDependentDescendants: 'The following descending items have dependencies',
 		deleteWarning:
