@@ -36,20 +36,21 @@ export class UUICaretElement extends LitElement {
 
 	static override styles = [
 		css`
-      :host {
-        display: inline-block;
-        width: 12px;
-        vertical-align: middle;
-      }
+			:host {
+				display: inline-block;
+				width: 12px;
+				vertical-align: middle;
+			}
 
-      svg {
-        transform-origin: 50% 50%;
-        transition: transform 100ms cubic-bezier(0.1, 0, 0.9, 1);
+			svg {
+				transform-origin: 50% 50%;
+				transition: transform 100ms cubic-bezier(0.1, 0, 0.9, 1);
+			}
 
-      :host([open]) svg {
-        transform: rotate(180deg);
-      }
-    `,
+			:host([open]) svg {
+				transform: rotate(180deg);
+			}
+		`,
 	];
 }
 
