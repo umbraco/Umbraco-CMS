@@ -111,6 +111,18 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
                 .WithTitle("The folder has referenced descendants")
                 .WithDetail("The folder cannot be moved to the recycle bin because it contains items that are referenced by other content.")
                 .Build()),
+            EntityContainerOperationStatus.InvalidParent => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("Invalid parent folder")
+                .WithDetail("The folder cannot be moved to itself or to one of its own descendants.")
+                .Build()),
+            EntityContainerOperationStatus.InTrash => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("The folder is in the recycle bin")
+                .WithDetail("The operation is not allowed on a folder that is in the recycle bin.")
+                .Build()),
+            EntityContainerOperationStatus.NotInTrash => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("The folder is not in the recycle bin")
+                .WithDetail("The operation is only allowed on a folder that is in the recycle bin.")
+                .Build()),
             _ => new ObjectResult(problemDetailsBuilder
                 .WithTitle("Unknown folder operation status.")
                 .Build()) { StatusCode = StatusCodes.Status500InternalServerError },
