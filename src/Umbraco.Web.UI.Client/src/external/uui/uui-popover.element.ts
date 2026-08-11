@@ -89,7 +89,7 @@ export class UUIPopoverElement extends LitElement {
 	get open() {
 		return this._open;
 	}
-	set open(newValue) {
+	set open(newValue: boolean) {
 		const oldValue = this._open;
 		this._open = newValue;
 		if (newValue) {
