@@ -2535,7 +2535,7 @@ export default {
 			'Hvis du har brug for at se logfilerne, indsnævr dit datoområde eller prøv at åbne dem manuelt.',
 		timePeriod: 'Tidsperiode',
 		numberOfErrors: 'Antal fejl',
-		showErrorLogs: 'Vis fejl logs',
+		showErrorLogs: 'Vis fejllogs',
 		allLogs: 'Alle logs',
 		commonLogMessages: 'Almindelige logbeskeder',
 		totalUniqueMessageTypes: 'Samlet antal unikke beskedtyper: %0%',
@@ -2634,7 +2634,7 @@ export default {
 		allowedBlockColumns: 'Tilgængelige kolonne-størrelser',
 		allowedBlockColumnsHelp:
 			'Vælg de forskellige antal kolonner denne blok må optage i layoutet. Dette forhindre ikke blokken i at optræde i et mindre område.',
-		allowedBlockRows: 'TIlgængelige række-størrelser',
+		allowedBlockRows: 'Tilgængelige række-størrelser',
 		allowedBlockRowsHelp: 'Vælg hvor mange rækker denne blok på optage i layoutet.',
 		allowBlockInRoot: 'Tillad på rodniveau',
 		allowBlockInRootHelp:
@@ -2741,7 +2741,6 @@ export default {
 		title: 'Vælg Property Editor',
 		openPropertyEditorPicker: 'Vælg Property Editor',
 	},
-
 	propertyEditorUIGroups: {
 		advanced: 'Advanceret',
 		blocks: 'Bloks',
