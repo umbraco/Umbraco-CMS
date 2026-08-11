@@ -104,7 +104,7 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 	 * @param {UmbExternalLoginProviderOption} item The provider to render
 	 * @returns {TemplateResult} The rendered provider
 	 */
-	#renderProvider(item: UmbExternalLoginProviderOption) {
+	#renderProvider(item: UmbExternalLoginProviderOption): TemplateResult {
 		return html`
 			<uui-box>
 				<div class="header" slot="header">

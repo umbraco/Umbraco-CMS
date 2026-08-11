@@ -126,7 +126,7 @@ export class UmbCurrentUserMfaModalElement extends UmbLitElement {
 	 * @param {UmbMfaLoginProviderOption} item The provider to render
 	 * @returns {TemplateResult} The rendered provider
 	 */
-	#renderProvider(item: UmbMfaLoginProviderOption) {
+	#renderProvider(item: UmbMfaLoginProviderOption): TemplateResult {
 		return html`
 			<uui-box headline=${item.displayName}>
 				${when(
