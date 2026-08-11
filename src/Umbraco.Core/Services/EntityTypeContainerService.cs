@@ -422,6 +422,16 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
             return Attempt.Fail(validateMoveResult);
         }
 
+        // The container repository throws when the new parent already has a container with this name, so check
+        // up-front to report it as an operation status instead. This deliberately sits after the check for the
+        // container already being at the requested parent, as the container would otherwise match itself.
+        // Moves to the recycle bin are not checked: a name collision there should not stop a container being
+        // trashed.
+        if (trash is false && _entityContainerRepository.HasDuplicateName(parentId, container.Name!))
+        {
+            return Attempt.Fail(EntityContainerOperationStatus.DuplicateName);
+        }
+
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         // Fire the moving notification and handle cancellation.
