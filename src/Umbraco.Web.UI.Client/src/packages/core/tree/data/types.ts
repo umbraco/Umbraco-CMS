@@ -18,3 +18,7 @@ export interface UmbTreeAncestorsOfRequestArgs {
 		entityType: string;
 	};
 }
+
+export interface UmbCreateTreeItemDataResolverArgs {
+	entityType: string;
+}
