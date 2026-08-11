@@ -17,7 +17,7 @@ export class UmbModalToken<
 	 * Get the data type of the token's data.
 	 * @public
 	 * @type      {ModalDataType}
-	 * @memberOf  UmbModalToken
+	 * @memberof UmbModalToken
 	 * @example   `typeof MyModal.TYPE`
 	 * @returns   undefined
 	 */
@@ -27,7 +27,7 @@ export class UmbModalToken<
 	 * Get the value type of the token
 	 * @public
 	 * @type      {ModalValueType}
-	 * @memberOf  UmbModalToken
+	 * @memberof UmbModalToken
 	 * @example   `typeof MyModal.VALUE`
 	 * @returns   undefined
 	 */

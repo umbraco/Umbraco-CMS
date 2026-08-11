@@ -22,7 +22,6 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 
 /**
  * Clipboard context for managing clipboard entries for property values
- * @export
  * @class UmbClipboardPropertyContext
  * @augments {UmbContextBase}
  */

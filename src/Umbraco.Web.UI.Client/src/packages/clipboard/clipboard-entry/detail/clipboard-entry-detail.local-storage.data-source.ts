@@ -12,7 +12,6 @@ import { UmbError } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Manage clipboard entries in local storage
- * @export
  * @class UmbClipboardEntryDetailLocalStorageDataSource
  * @implements {UmbDetailDataSource<UmbClipboardEntryDetailModel>}
  */

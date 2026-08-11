@@ -44,7 +44,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 
 		/**
 		 * Retrieve controllers matching a filter of this element.
-		 * @param {Function} filterMethod - filter method
+		 * @param {(ctrl: UmbController) => boolean} filterMethod - filter method
 		 * @returns {Array<UmbController>} - currently assigned controllers passing the filter method.
 		 */
 		getUmbControllers(filterMethod: (ctrl: UmbController) => boolean): Array<UmbController> {

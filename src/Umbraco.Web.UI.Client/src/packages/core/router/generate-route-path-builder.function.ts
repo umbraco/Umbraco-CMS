@@ -4,7 +4,7 @@ import { umbUrlPatternToString, type UmbUrlParametersRecord } from '@umbraco-cms
 /**
  * Creates a function that builds an absolute route path from the given path pattern.
  * @param {string} path - The path pattern to build from.
- * @returns {Function} A function that generates the path from a set of params.
+ * @returns {(params: UmbUrlParametersRecord | null) => string} A function that generates the path from a set of params.
  */
 export function umbGenerateRoutePathBuilder(path: string) {
 	return (params: UmbUrlParametersRecord | null) => {

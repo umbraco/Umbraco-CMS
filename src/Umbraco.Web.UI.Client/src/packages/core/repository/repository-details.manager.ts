@@ -16,7 +16,6 @@ interface UmbRepositoryRequestStatus {
 }
 
 /**
- * @export
  * @class UmbRepositoryDetailsManager
  * @augments {UmbControllerBase}
  * @template DetailType

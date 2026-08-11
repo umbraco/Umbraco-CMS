@@ -4,7 +4,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Export Member Server Data Source
- * @export
  * @class UmbExportMemberTypeServerDataSource
  */
 export class UmbExportMemberTypeServerDataSource {

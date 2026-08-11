@@ -228,8 +228,8 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	/**
-	 * @internal
 	 * Notify that a view context has been activated.
+	 * @internal
 	 * @returns {boolean} true if the view is (or becomes) active.
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -269,8 +269,8 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	/**
-	 * @internal
 	 * Notify that a view context has been activated.
+	 * @internal
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_activate() {
@@ -283,9 +283,9 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	/**
-	 * @internal
 	 * Deactivate the view context.
 	 * We cannot conclude that this means the parent should be activated, it can be because of a child being activated.
+	 * @internal
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_deactivate() {

@@ -17,10 +17,7 @@ export interface MetaTreeView {
 
 	/**
 	 * An icon to represent the tree view
-	 * @examples [
-	 *   "icon-list",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-list", "icon-grid"]
 	 */
 	icon: string;
 }

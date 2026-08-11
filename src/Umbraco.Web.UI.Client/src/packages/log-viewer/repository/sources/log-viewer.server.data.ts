@@ -29,7 +29,7 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 
 	/**
 	 * Grabs all the log viewer saved searches from the server
-	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
+	 * @param {{ skip?: number; take?: number }} query - Pagination options.
 	 * @returns {*} The saved searches.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
@@ -38,7 +38,7 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	}
 	/**
 	 * Get a log viewer saved search by name from the server
-	 * @param {{ name: string }} { name }
+	 * @param {{ name: string }} path - The name of the saved search.
 	 * @returns {*} The saved search.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
@@ -48,7 +48,7 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 
 	/**
 	 *	Post a new log viewer saved search to the server
-	 * @param {{ body?: SavedLogSearch }} { body }
+	 * @param {SavedLogSearchResponseModel} request - The saved search to create.
 	 * @returns {*} The created saved search.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
@@ -57,7 +57,7 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	}
 	/**
 	 * Remove a log viewer saved search by name from the server
-	 * @param {{ name: string }} { name }
+	 * @param {{ name: string }} path - The name of the saved search to remove.
 	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
@@ -84,7 +84,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 
 	/**
 	 * Grabs all the loggers from the server
-	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
+	 * @param {{ skip?: number; take?: number }} query - Pagination options.
 	 * @returns {*} The loggers.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
@@ -94,7 +94,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 
 	/**
 	 * Grabs all the number of different log messages from the server
-	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
+	 * @param {{ startDate?: string; endDate?: string }} query - The date range to count log messages for.
 	 * @returns {*} The log level counts.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
@@ -148,15 +148,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	 * 		logLevel?: Array<LogLevelModel>;
 	 * 		startDate?: string;
 	 * 		endDate?: string;
-	 * 	}} {
-	 * 		skip = 0,
-	 * 		take = 100,
-	 * 		orderDirection,
-	 * 		filterExpression,
-	 * 		logLevel,
-	 * 		startDate,
-	 * 		endDate,
-	 * 	}
+	 * 	}} query - Filtering and pagination options.
 	 * @returns {*} The log messages.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
@@ -199,12 +191,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	 * 		take?: number;
 	 * 		startDate?: string;
 	 * 		endDate?: string;
-	 * 	}} {
-	 * 		skip,
-	 * 		take = 100,
-	 * 		startDate,
-	 * 		endDate,
-	 * 	}
+	 * 	}} query - Filtering and pagination options.
 	 * @returns {*} The log message templates.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */

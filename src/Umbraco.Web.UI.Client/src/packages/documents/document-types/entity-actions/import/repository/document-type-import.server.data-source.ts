@@ -4,7 +4,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Document Type Import Server Data Source
- * @Import
  * @class UmbDocumentTypeImportServerDataSource
  */
 export class UmbDocumentTypeImportServerDataSource {

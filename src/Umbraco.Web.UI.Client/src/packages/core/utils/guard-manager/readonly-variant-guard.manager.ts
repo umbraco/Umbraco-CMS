@@ -19,7 +19,6 @@ function findRule(rule: UmbVariantGuardRule, variantId: UmbVariantId) {
 
 /**
  * Read only guard manager for variant rules.
- * @export
  * @class UmbReadOnlyVariantGuardManager
  * @augments {UmbReadOnlyGuardManager<UmbVariantGuardRule>}
  */

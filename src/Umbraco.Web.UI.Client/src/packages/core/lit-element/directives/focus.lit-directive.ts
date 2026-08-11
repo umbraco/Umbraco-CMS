@@ -79,7 +79,7 @@ class UmbFocusDirective extends AsyncDirective {
 /**
  * @description
  * A Lit directive, which sets focus on the element of scope once its connected to the DOM.
- * @example:
+ * @example
  * ```js
  * html`<input ${umbFocus()}>`;
  * ```

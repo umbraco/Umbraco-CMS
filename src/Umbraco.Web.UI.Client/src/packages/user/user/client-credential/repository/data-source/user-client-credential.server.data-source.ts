@@ -10,7 +10,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Server data source for user client credentials
- * @export
  * @class UmbUserClientCredentialServerDataSource
  * @implements {UmbUserClientCredentialDataSource}
  */

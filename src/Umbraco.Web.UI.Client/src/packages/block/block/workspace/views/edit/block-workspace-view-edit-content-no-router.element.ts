@@ -13,8 +13,8 @@ import { UmbViewController } from '@umbraco-cms/backoffice/view';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 
 /**
- * @internal
  * Gets the view alias for a given tab. This is used to create a unique view context for each tab in the block workspace.
+ * @internal
  * @param {UmbPropertyTypeContainerMergedModel} tab - The tab to get the view alias for.
  * @returns {string} The view alias for the tab.
  */

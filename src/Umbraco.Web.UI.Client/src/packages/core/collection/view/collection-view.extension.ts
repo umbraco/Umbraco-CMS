@@ -14,10 +14,7 @@ export interface MetaCollectionView {
 
 	/**
 	 * An icon to represent the collection view
-	 * @examples [
-	 *   "icon-box",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-box", "icon-grid"]
 	 */
 	icon: string;
 

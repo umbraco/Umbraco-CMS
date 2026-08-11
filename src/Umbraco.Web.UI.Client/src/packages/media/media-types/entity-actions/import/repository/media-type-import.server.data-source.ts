@@ -4,7 +4,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Media Type Import Server Data Source
- * @Import
  * @class UmbMediaTypeImportServerDataSource
  */
 export class UmbMediaTypeImportServerDataSource {

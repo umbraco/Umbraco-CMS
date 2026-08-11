@@ -19,7 +19,7 @@ export class UmbPathPattern<
 	 * Get the params type of the path pattern
 	 * @public
 	 * @type      {T}
-	 * @memberOf  UmbPathPattern
+	 * @memberof UmbPathPattern
 	 * @example   `typeof MyPathPattern.PARAMS`
 	 */
 	readonly PARAMS!: LocalParamsType;
@@ -28,7 +28,7 @@ export class UmbPathPattern<
 	 * Get absolute params type of the path pattern
 	 * @public
 	 * @type      {T}
-	 * @memberOf  UmbPathPattern
+	 * @memberof UmbPathPattern
 	 * @example   `typeof MyPathPattern.ABSOLUTE_PARAMS`
 	 */
 	readonly ABSOLUTE_PARAMS!: LocalParamsType & BaseParamsType;

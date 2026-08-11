@@ -2,7 +2,7 @@
  * @function replaceInUniqueArray
  * @param {T[]} data - An array of objects.
  * @param {T} entry - The object to replace with.
- * @param {getUniqueMethod: (entry: T) => unknown} [getUniqueMethod] - Method to get the unique value of an entry.
+ * @param {(entry: T) => unknown} [getUniqueMethod] - Method to get the unique value of an entry.
  * @returns {T[]} - Returns a new array with the updated entry.
  * @description - Replaces an item of an Array.
  * @example <caption>Example replace an entry of an Array. Where the key is unique and the item will only be replaced if matched with existing.</caption>
