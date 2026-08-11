@@ -2,7 +2,7 @@
 
 import js from '@eslint/js';
 import globals from 'globals';
-import importPlugin from 'eslint-plugin-import';
+import importPlugin from 'eslint-plugin-import-x';
 import localRules from 'eslint-plugin-local-rules';
 import storybook from 'eslint-plugin-storybook';
 import wcPlugin from 'eslint-plugin-wc';
@@ -48,11 +48,16 @@ export default [
 			semi: ['warn', 'always'],
 			'prettier/prettier': ['warn', { endOfLine: 'auto' }],
 			'no-var': 'error',
-			'import/namespace': 'off',
-			'import/no-unresolved': 'off',
-			'import/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
-			'import/no-self-import': 'error',
-			'import/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
+			'import-x/namespace': 'off',
+			'import-x/no-unresolved': 'off',
+			// Off: false-positives on barrel files that reach the same underlying binding via two `export *`
+			// paths (e.g. an index.ts re-exporting both a submodule barrel and that submodule's constants
+			// directly) — harmless per the ES module spec, but the rule doesn't resolve to the original
+			// declaration before comparing names.
+			'import-x/export': 'off',
+			'import-x/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
+			'import-x/no-self-import': 'error',
+			'import-x/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
 			'local-rules/enforce-manifest-alias': 'warn',
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/no-unsafe-localize': 'error',
@@ -89,6 +94,11 @@ export default [
 		},
 		...importPlugin.flatConfigs.typescript,
 		rules: {
+			// import-x/named is off in the plugin's own typescript preset (spread above), but that preset's
+			// `rules` is a sibling key here and gets overwritten by this literal — restate it explicitly.
+			// TS type-checking already covers "does this import exist"; the rule's own resolution is prone
+			// to false negatives on deep/cyclic re-export barrels, which this codebase has plenty of.
+			'import-x/named': 'off',
 			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
 			'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 			'@typescript-eslint/no-non-null-assertion': 'off',
