@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Locking;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -159,6 +160,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
+                scope.WriteLock(DataTypeLocks.WriteLockIds);
+
                 EntityContainer? container = null;
                 var parentId = Constants.System.Root;
                 if (containerKey.HasValue && containerKey.Value != Guid.Empty)
@@ -257,6 +260,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(DataTypeLocks.WriteLockIds);
 
             IDataType? dataType = _dataTypeRepository.Get(id);
             if (dataType == null)
@@ -478,6 +482,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             dataType.CreatorId = currentUserId;
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(DataTypeLocks.WriteLockIds);
 
             DataTypeOperationStatus status = operationValidation();
             if (status != DataTypeOperationStatus.Success)

@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Locking;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -51,10 +52,8 @@ internal sealed class DataTypeContainerService : EntityTypeContainerService<IDat
     protected override UmbracoObjectTypes ContainerObjectType => UmbracoObjectTypes.DataTypeContainer;
 
     /// <inheritdoc />
-    /// <remarks>Data types do not have read/write locks (yet).</remarks>
-    protected override int[] ReadLockIds => [];
+    protected override int[] ReadLockIds => DataTypeLocks.ReadLockIds;
 
     /// <inheritdoc />
-    /// <remarks>Data types do not have read/write locks (yet).</remarks>
-    protected override int[] WriteLockIds => [];
+    protected override int[] WriteLockIds => DataTypeLocks.WriteLockIds;
 }
