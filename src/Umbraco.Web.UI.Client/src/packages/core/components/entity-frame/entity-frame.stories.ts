@@ -154,7 +154,7 @@ export const Nested: Story = {
 export const WithCustomColor: Story = {
 	render: () => html`
 		<div
-			style="position: relative; width: 240px; height: 120px; padding: 16px; border: 1px dashed rgba(0,0,0,0.2); border-radius: var(--uui-border-radius); --umb-entity-frame-color: #7532c8;">
+			style="position: relative; width: 240px; height: 120px; padding: 16px; border: 1px dashed rgba(0,0,0,0.2); border-radius: var(--uui-border-radius); --umb-entity-frame-color: #9117fd;">
 			<p style="margin: 0;">Themed via <code>--umb-entity-frame-color</code>.</p>
 			<umb-entity-frame label="Custom"></umb-entity-frame>
 		</div>
