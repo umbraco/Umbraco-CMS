@@ -56,8 +56,8 @@ export class UUIPopoverElement extends LitElement {
 	/**
 	 * Set the distance between popover-modal and trigger.
 	 * @type {number}
-	 * @attr disabled
-	 * @default false
+	 * @attr margin
+	 * @default 0
 	 */
 	@property({ type: Number })
 	margin = 0;
