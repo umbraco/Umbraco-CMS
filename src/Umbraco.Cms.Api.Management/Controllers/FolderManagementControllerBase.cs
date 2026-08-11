@@ -123,6 +123,10 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
                 .WithTitle("The folder is not in the recycle bin")
                 .WithDetail("The operation is only allowed on a folder that is in the recycle bin.")
                 .Build()),
+            EntityContainerOperationStatus.ParentChangeNotAllowed => new BadRequestObjectResult(problemDetailsBuilder
+                .WithTitle("The folder parent cannot be changed")
+                .WithDetail("The parent of a folder cannot be changed by this operation. Move the folder instead.")
+                .Build()),
             _ => new ObjectResult(problemDetailsBuilder
                 .WithTitle("Unknown folder operation status.")
                 .Build()) { StatusCode = StatusCodes.Status500InternalServerError },

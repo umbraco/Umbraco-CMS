@@ -227,7 +227,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
                 {
                     LoggerFactory.CreateLogger(GetType()).LogWarning(
                         $"Cannot use {nameof(UpdateAsync)} to change the container parent. Move the container instead.");
-                    return EntityContainerOperationStatus.ParentNotFound;
+                    return EntityContainerOperationStatus.ParentChangeNotAllowed;
                 }
 
                 return EntityContainerOperationStatus.Success;

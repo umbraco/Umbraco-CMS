@@ -71,6 +71,11 @@ public enum EntityContainerOperationStatus
     HasReferencedDescendants,
 
     /// <summary>
+    ///     The parent of the container cannot be changed by the attempted operation. The container must be moved instead.
+    /// </summary>
+    ParentChangeNotAllowed,
+
+    /// <summary>
     ///     Failure for an an unknown reason.
     /// </summary>
     Unknown,
