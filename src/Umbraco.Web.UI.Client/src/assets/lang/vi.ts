@@ -354,6 +354,8 @@ export default {
 		selectAllVariants: 'Chọn tất cả các biến thể',
 		saveModalTitle: 'Lưu',
 		saveAndPublishModalTitle: 'Lưu và xuất bản',
+		saveAndPublishDescendantsModalTitle: 'Lưu và xuất bản cùng với các phần tử con',
+		saveAndScheduleModalTitle: 'Lưu và lên lịch xuất bản',
 		publishModalTitle: 'Xuất bản',
 	},
 	blueprints: {
@@ -2824,5 +2826,8 @@ export default {
 		resetUrlHeadline: 'Đặt lại URL?',
 		resetUrlMessage: 'Bạn có chắc chắn muốn đặt lại URL này không?',
 		resetUrlLabel: 'Đặt lại',
+	},
+	picker: {
+		selectedCount: (count: number) => `Đã chọn ${count} mục`,
 	},
 } as UmbLocalizationDictionary;

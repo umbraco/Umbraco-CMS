@@ -356,6 +356,8 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 		saveModalTitle: 'Gem',
 		saveAndPublishModalTitle: 'Gem og udgiv',
+		saveAndPublishDescendantsModalTitle: 'Gem og udgiv med undersider',
+		saveAndScheduleModalTitle: 'Gem og planlæg udgivelse',
 		publishModalTitle: 'Udgiv',
 		selectAllVariants: 'Vælg alle varianter',
 		scheduledPendingChanges: 'Denne tidsplan har ændringer, der træder i kraft, når du klikker på "%0%".',
@@ -2924,5 +2926,8 @@ export default {
 		selectLanguageDefault: 'Auto (besøgendes sprog)',
 		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
 		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
+	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
 	},
 } as UmbLocalizationDictionary;

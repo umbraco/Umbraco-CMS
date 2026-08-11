@@ -351,6 +351,8 @@ export default {
 		selectAllVariants: 'Selecionar todas as variantes',
 		saveModalTitle: 'Guardar',
 		saveAndPublishModalTitle: 'Guardar e publicar',
+		saveAndPublishDescendantsModalTitle: 'Guardar e publicar com descendentes',
+		saveAndScheduleModalTitle: 'Guardar e agendar publicação',
 		publishModalTitle: 'Publicar',
 	},
 	blueprints: {
@@ -2857,5 +2859,8 @@ export default {
 		emptyDate: 'Por favor, selecione uma data',
 		emptyTimeZone: 'Por favor, selecione um fuso horário',
 		invalidTimeZone: 'O fuso horário selecionado não é válido',
+	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
 	},
 } as UmbLocalizationDictionary;

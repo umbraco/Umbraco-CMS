@@ -11,7 +11,6 @@ import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observa
 import {
 	ReplaySubject,
 	Subject,
-	switchMap,
 	distinctUntilChanged,
 	throttleTime,
 	auditTime,
@@ -91,10 +90,25 @@ export class UmbAuthContext extends UmbContextBase {
 	#postLogoutRedirectUri;
 
 	/**
-	 * Observable that emits true when the auth context is initialized.
+	 * Observable that emits once, without a value, when the auth context is initialized.
+	 * @internal This was only ever public so the core entry point could drive it. It gates nothing
+	 * for consumers: the boot sequence already awaits app entry points before the router evaluates
+	 * its guards, so by the time any extension code runs this has long since completed.
+	 * @deprecated Internal boot signal, never intended for public use. Scheduled for removal in Umbraco 19.
 	 * @remark It will only emit once and then complete itself.
 	 */
-	readonly isInitialized = this.#isInitialized.asObservable();
+	get isInitialized(): Observable<void> {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.isInitialized',
+			solution:
+				'Remove the dependency on this signal. It is an internal boot detail — the app awaits app entry points before routing, so extension code always runs after initialization. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
+		}).warn();
+		return this.#isInitializedObservable;
+	}
+
+	/** Internal, non-warning view of {@link isInitialized} for use inside this class. */
+	readonly #isInitializedObservable = this.#isInitialized.asObservable();
 
 	/**
 	 * Observable that emits true if the user is authorized, otherwise false.
@@ -171,57 +185,18 @@ export class UmbAuthContext extends UmbContextBase {
 
 		// Set up cross-tab coordination via BroadcastChannel
 		this.#channel = new BroadcastChannel('umb:auth');
-		this.#channel.onmessage = (evt: MessageEvent) => {
-			switch (evt.data?.type) {
-				case 'authorized': {
-					// Apply locally — do NOT call #updateSession which would re-broadcast.
-					this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
-					this.#authorizationSignal.next();
-					break;
-				}
-				case 'sessionUpdate':
-					// Peer broadcast already-computed timestamps, so set the session
-					// directly. We still go through the `#inSessionUpdateCallback` guard
-					// so observers triggered re-entrantly skip a redundant /token call.
-					this.#sessionDead = false;
-					this.#inSessionUpdateCallback = true;
-					try {
-						this.#session.setValue({
-							accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
-							expiresAt: evt.data.expiresAt,
-						});
-						this.#isAuthorized.setValue(true);
-					} finally {
-						this.#inSessionUpdateCallback = false;
-					}
-					break;
-				case 'sessionCleared':
-					this.#session.setValue(undefined);
-					this.#isAuthorized.setValue(false);
-					break;
-				case 'signedOut':
-					this.#session.setValue(undefined);
-					this.#isAuthorized.setValue(false);
-					// Redirect to logout page — cookies already cleared by the tab that initiated sign-out
-					location.href = this.#postLogoutRedirectUri;
-					break;
-				case 'sessionRequest': {
-					// Another tab is asking for the current session state (e.g. new tab opening).
-					// Only share the session if it is still valid — an expired session would cause
-					// the recipient (e.g. a popup) to believe it is already authorized and skip
-					// the authorization code exchange.
-					if (this.isSessionValid()) {
-						this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
-					}
-					break;
-				}
-			}
-		};
+		this.#channel.onmessage = (evt: MessageEvent) => this.#handleChannelMessage(evt);
 
 		if (!isTestEnvironment()) {
 			// Start the session timeout controller
 			new UmbAuthSessionTimeoutController(this);
 		}
+
+		// The context is usable as soon as it is constructed. This used to be driven from the core
+		// entry point via setInitialized(), but the gate is redundant: app.element.ts awaits app entry
+		// points before the router evaluates its guards, so provider discovery has already settled by
+		// the time anything consumes this.
+		this.#setInitialized();
 
 		// When an HTTP interceptor is active it registers an UmbAuthSignalerContext on the host.
 		// Consume it to keep authorization state in sync and to react to timeout requests.
@@ -546,9 +521,21 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Checks if the current session is still valid.
+	 * @deprecated Use {@link getIsAuthorized} or observe {@link session$} instead. Scheduled for removal in Umbraco 19.
 	 * @returns True if the session has not expired.
 	 */
 	isSessionValid(): boolean {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.isSessionValid()',
+			solution:
+				'Use getIsAuthorized() for a synchronous check, or observe session$ to react to session changes. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
+		}).warn();
+		return this.#isSessionValid();
+	}
+
+	/** Internal, non-warning implementation of {@link isSessionValid}. */
+	#isSessionValid(): boolean {
 		const session = this.#session.getValue();
 		return !!session && session.expiresAt > Math.floor(Date.now() / 1000);
 	}
@@ -645,9 +632,16 @@ export class UmbAuthContext extends UmbContextBase {
 	 * 		headers: { Authorization: `Bearer ${await config.token()}` },
 	 * 	});
 	 * ```
+	 * @deprecated Consume {@link UMB_SERVER_CONTEXT} and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 19.
 	 * @returns The server url to the Management API
 	 */
 	getServerUrl() {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.getServerUrl()',
+			solution:
+				'Consume UMB_SERVER_CONTEXT from @umbraco-cms/backoffice/server and use its getServerUrl(), which is the canonical source. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
+		}).warn();
 		return this.#serverUrl;
 	}
 
@@ -717,21 +711,53 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
-	 * @remark This is used to let the app context know that the core module is ready, which means that the core auth providers are available.
+	 * @internal Only public because the core entry point calls it from outside this class. Nothing
+	 * outside Umbraco core should ever call this — doing so opens the provider-discovery gate early.
+	 * @deprecated Internal boot hook, never intended for public use. Scheduled for removal in Umbraco 19.
+	 * @remark The constructor already does this, so calling it again is a no-op on an
+	 * already-completed subject. It emits once, without a value.
 	 */
 	setInitialized() {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.setInitialized()',
+			solution:
+				'Do not call this. It is an internal boot hook owned by the core entry point. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
+		}).warn();
+		this.#setInitialized();
+	}
+
+	/** Internal, non-warning implementation of {@link setInitialized}. */
+	#setInitialized() {
 		this.#isInitialized.next();
 		this.#isInitialized.complete();
 	}
 
 	/**
 	 * Gets all registered auth providers.
+	 * @deprecated Query the extension registry directly: `umbExtensionsRegistry.byType('authProvider')`. Scheduled for removal in Umbraco 19.
+	 * @remark The initialization gate this used to add is redundant — the app awaits app entry points
+	 * before the router evaluates its guards, so the provider list has already settled by then.
 	 * @param extensionsRegistry
 	 */
 	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
-		return this.#isInitialized.pipe(
-			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
-		);
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.getAuthProviders()',
+			solution:
+				"Query the extension registry directly with byType('authProvider'). The boot sequence already awaits app entry points before routing, so the provider list has settled. Scheduled for removal in Umbraco 19.",
+			removeInVersion: '19.0.0',
+		}).warn();
+		return this.#getAuthProviders(extensionsRegistry);
+	}
+
+	/**
+	 * Internal, non-warning implementation of {@link getAuthProviders}.
+	 * No initialization gate: the constructor completes #isInitialized, so piping through it only
+	 * added a micro-task delay. Ordering is guaranteed by the boot sequence awaiting app entry
+	 * points before the router evaluates its guards.
+	 */
+	#getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
+		return extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider');
 	}
 
 	/**
@@ -802,6 +828,56 @@ export class UmbAuthContext extends UmbContextBase {
 		await this.signOut();
 
 		return true;
+	}
+
+	/**
+	 * Handles a cross-tab message from the `umb:auth` BroadcastChannel.
+	 */
+	#handleChannelMessage(evt: MessageEvent) {
+		switch (evt.data?.type) {
+			case 'authorized': {
+				// Apply locally — do NOT call #updateSession which would re-broadcast.
+				this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
+				this.#authorizationSignal.next();
+				break;
+			}
+			case 'sessionUpdate':
+				// Peer broadcast already-computed timestamps, so set the session
+				// directly. We still go through the `#inSessionUpdateCallback` guard
+				// so observers triggered re-entrantly skip a redundant /token call.
+				this.#sessionDead = false;
+				this.#inSessionUpdateCallback = true;
+				try {
+					this.#session.setValue({
+						accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
+						expiresAt: evt.data.expiresAt,
+					});
+					this.#isAuthorized.setValue(true);
+				} finally {
+					this.#inSessionUpdateCallback = false;
+				}
+				break;
+			case 'sessionCleared':
+				this.#session.setValue(undefined);
+				this.#isAuthorized.setValue(false);
+				break;
+			case 'signedOut':
+				this.#session.setValue(undefined);
+				this.#isAuthorized.setValue(false);
+				// Redirect to logout page — cookies already cleared by the tab that initiated sign-out
+				location.href = this.#postLogoutRedirectUri;
+				break;
+			case 'sessionRequest': {
+				// Another tab is asking for the current session state (e.g. new tab opening).
+				// Only share the session if it is still valid — an expired session would cause
+				// the recipient (e.g. a popup) to believe it is already authorized and skip
+				// the authorization code exchange.
+				if (this.#isSessionValid()) {
+					this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
+				}
+				break;
+			}
+		}
 	}
 
 	/**

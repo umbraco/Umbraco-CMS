@@ -1,11 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using NUnit.Framework;
@@ -320,10 +317,51 @@ public class StringExtensionsTests
 
     [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
     [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
+    [TestCase("val$id!ate|this|str'ing", "95", '*', "val$id!ate|this|str'ing")]
+    [TestCase("$value", "$", '-', "-value")]
+    [TestCase("value$", "$", '-', "value-")]
+    [TestCase("$", "$", '-', "-")]
+    [TestCase("a$$b", "$", '-', "a--b")]
+    [TestCase("a$!b", "$!", '-', "a--b")]
+    [TestCase("$!$", "$!", '-', "---")]
+    [TestCase("", "$", '-', "")]
+    [TestCase("value$", "", '-', "value$")]
+    [TestCase("a$b$c", "$$$", '-', "a-b-c")]
+    [TestCase("a$b-c", "$-", '-', "a-b-c")]
+    [TestCase("a$b-c", "$", '-', "a-b-c")]
+    [TestCase("télévisiön", "éö", '-', "t-l-visi-n")]
+    [TestCase("a1b2c3d4e5f6g7h", "1234567", '-', "a-b-c-d-e-f-g-h")]
+    [TestCase("ab", "$!'&#%^*()", '-', "ab")]
+    [TestCase("a😀b$", "$", '-', "a😀b-")]
     public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
     {
         var output = input.ReplaceMany(toReplace.ToArray(), replacement);
         Assert.AreEqual(expected, output);
+    }
+
+    [TestCase("nothing to replace", "$")]
+    [TestCase("nothing to replace", "")]
+    [TestCase("", "$")]
+    public void Can_Replace_Many_By_One_Char_Returning_Original_Instance_When_Nothing_Matches(string input, string toReplace)
+    {
+        var output = input.ReplaceMany(toReplace.ToArray(), '-');
+        Assert.AreSame(input, output);
+    }
+
+    [Test]
+    public void Cannot_Replace_Many_By_One_Char_With_Null_Text()
+    {
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => ((string)null!).ReplaceMany(['$'], '-'));
+        Assert.AreEqual("text", exception?.ParamName);
+    }
+
+    [Test]
+    public void Cannot_Replace_Many_By_One_Char_With_Null_Chars()
+    {
+        ArgumentNullException? exception =
+            Assert.Throws<ArgumentNullException>(() => "value$".ReplaceMany(null!, '-'));
+        Assert.AreEqual("chars", exception?.ParamName);
     }
 
     [TestCase("test to test", "test", "release", "release to test")]

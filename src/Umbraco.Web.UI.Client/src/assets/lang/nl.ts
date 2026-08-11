@@ -320,6 +320,8 @@ export default {
 		createFromClipboard: 'Plakken vanaf het klembord',
 		nodeIsInTrash: 'Dit item is in de prullenbak',
 		saveModalTitle: 'Opslaan',
+		saveAndPublishDescendantsModalTitle: 'Opslaan en publiceren met onderliggende nodes',
+		saveAndScheduleModalTitle: 'Opslaan en publicatie plannen',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Nieuw Inhoudssjabloon aanmaken voor <em>%0%</em>',
@@ -2184,5 +2186,8 @@ export default {
 		manageHeadline: 'Hoe beheer ik Inhoudssjablonen?',
 		manageDescription:
 			'U kunt Inhoudssjablonen bewerken en verwijderen vanuit de boomstructuur\n      "inhoudssjablonen" in de sectie Instellingen. Vouw het documenttype uit waarop de Inhoudssjabloon is gebaseerd en\n      klik erop om het te bewerken of te verwijderen.\n    ',
+	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
 	},
 } as UmbLocalizationDictionary;

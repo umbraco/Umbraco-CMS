@@ -2,28 +2,35 @@ import type { UmbBlockDataValueModel, UmbBlockExposeModel, UmbBlockValueDataProp
 import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 import type { UmbPropertyValueResolver } from '@umbraco-cms/backoffice/property';
 
+export type UmbBlockValuesCallback = (
+	values: Array<UmbBlockDataValueModel>,
+	groupIdentifier?: string,
+) => Promise<Array<UmbBlockDataValueModel> | undefined>;
+
 export abstract class UmbBlockValueResolver<ValueType>
 	implements UmbPropertyValueResolver<UmbElementValueModel<ValueType>, UmbBlockDataValueModel, UmbBlockExposeModel>
 {
 	abstract processValues(
 		property: UmbElementValueModel<ValueType>,
-		valuesCallback: (values: Array<UmbBlockDataValueModel>) => Promise<Array<UmbBlockDataValueModel> | undefined>,
+		valuesCallback: UmbBlockValuesCallback,
 	): Promise<UmbElementValueModel<ValueType>>;
 
 	protected async _processValueBlockData<ValueType extends UmbBlockValueDataPropertiesBaseType>(
 		value: ValueType,
-		valuesCallback: (values: Array<UmbBlockDataValueModel>) => Promise<Array<UmbBlockDataValueModel> | undefined>,
+		valuesCallback: UmbBlockValuesCallback,
 	) {
+		// The group identifier ties each call back to its specific block, so consumers can pair
+		// two block values up by block instead of by the order the callback happens to fire in.
 		const contentData = await Promise.all(
 			(value.contentData ?? []).map(async (entry) => ({
 				...entry,
-				values: (await valuesCallback(entry.values)) ?? [],
+				values: (await valuesCallback(entry.values, `contentData:${entry.key}`)) ?? [],
 			})),
 		);
 		const settingsData = await Promise.all(
 			(value.settingsData ?? []).map(async (entry) => ({
 				...entry,
-				values: (await valuesCallback(entry.values)) ?? [],
+				values: (await valuesCallback(entry.values, `settingsData:${entry.key}`)) ?? [],
 			})),
 		);
 		return { ...value, contentData, settingsData };

@@ -338,6 +338,8 @@ export default {
 		variantScheduleNotAllowed: 'Plannung ist nicht erlaubt',
 		variantUnpublishNotAllowed: 'Veröffentlichung zurücknehmen ist nicht erlaubt.',
 		saveModalTitle: 'Speichern',
+		saveAndPublishDescendantsModalTitle: 'Speichern und veröffentlichen mit Unterknoten',
+		saveAndScheduleModalTitle: 'Speichern und Veröffentlichung planen',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Erzeuge eine neue Inhaltsvorlage von <em>%0%</em>',
@@ -2076,5 +2078,8 @@ export default {
 		routeForbiddenTitle: 'Zugriff verweigert',
 		routeForbiddenDescription:
 			'Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte wenden Sie sich an Ihren Administrator, um Unterstützung zu erhalten.',
+	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'Element' : 'Elemente'} ausgewählt`,
 	},
 } as UmbLocalizationDictionary;
