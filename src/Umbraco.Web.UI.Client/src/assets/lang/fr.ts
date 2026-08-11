@@ -1959,4 +1959,7 @@ export default {
 		searchResult: 'élément retrouvé',
 		searchResults: 'éléments retrouvés',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count > 1 ? 'éléments sélectionnés' : 'élément sélectionné'}`,
+	},
 } as UmbLocalizationDictionary;

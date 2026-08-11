@@ -42,6 +42,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	private _hasSelection: boolean = false;
 
 	@state()
+	private _selectionCount: number = 0;
+
+	@state()
 	private _createPath?: string;
 
 	@state()
@@ -272,6 +275,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.observe(
 			this._pickerContext.selection.selection,
 			(selection) => {
+				this._selectionCount = selection.length;
 				this.updateValue({ selection });
 				this.requestUpdate();
 			},
@@ -379,7 +383,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.string(this.data?.headline ?? '#general_choose')}>
-				${this.#renderSearch()} ${this.#renderTree()} ${this.#renderActions()}
+				${this.#renderSearch()} ${this.#renderTree()} ${this.#renderSelectionCount()} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
@@ -445,6 +449,14 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		`;
 	}
 
+	#renderSelectionCount() {
+		if (!this._selectionConfiguration.multiple || !this._hasSelection) return nothing;
+
+		return html`
+			<div id="selection-info" slot="footer">${this.localize.term('picker_selectedCount', this._selectionCount)}</div>
+		`;
+	}
+
 	#renderActions() {
 		return html`
 			<div slot="actions">
@@ -477,6 +489,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		uui-breadcrumb-item:not([last-item]) {
 			cursor: pointer;
+		}
+
+		#selection-info {
+			display: flex;
+			align-items: center;
+			box-sizing: border-box;
+			width: 100%;
+			padding: var(--uui-size-space-4) var(--uui-size-space-6);
+			background-color: var(--uui-color-selected);
+			color: var(--uui-color-selected-contrast);
 		}
 	`;
 }
