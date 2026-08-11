@@ -789,4 +789,7 @@ export default {
 		selectAllLogLevelFilters: '모두 선택',
 		deselectAllLogLevelFilters: '모두 선택 해제',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count}개 선택됨`,
+	},
 } as UmbLocalizationDictionary;

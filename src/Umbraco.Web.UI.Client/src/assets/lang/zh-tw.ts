@@ -1057,4 +1057,7 @@ export default {
 		selectAllLogLevelFilters: '全選',
 		deselectAllLogLevelFilters: '取消全選',
 	},
+	picker: {
+		selectedCount: (count: number) => `已選取 ${count} 個項目`,
+	},
 } as UmbLocalizationDictionary;

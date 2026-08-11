@@ -542,7 +542,9 @@ declare global {
 		content_resetFocalPoint: string;
 		content_routeError: string;
 		content_routeErrorCannotRoute: string;
+		content_saveAndPublishDescendantsModalTitle: string;
 		content_saveAndPublishModalTitle: string;
+		content_saveAndScheduleModalTitle: string;
 		content_saveModalTitle: string;
 		content_scheduledPendingChanges: string;
 		content_scheduledPublishDocumentation: string;
@@ -1712,6 +1714,7 @@ declare global {
 		permissions_FileWritingForPackages: string;
 		permissions_FolderCreation: string;
 		permissions_MediaFolderCreation: string;
+		picker_selectedCount: (count: number) => string;
 		placeholders_a11yCreateItem: string;
 		placeholders_a11yEdit: string;
 		placeholders_a11yName: string;
@@ -1826,6 +1829,9 @@ declare global {
 		recycleBin_itemCannotBeRestored: string;
 		recycleBin_itemCannotBeRestoredHelpText: string;
 		recycleBin_mediaTrashed: string;
+		recycleBin_restoreItemTo: (from: string, to: string) => string;
+		recycleBin_restoreToTitle: string;
+		recycleBin_selectRestoreLocation: string;
 		recycleBin_wasRestored: string;
 		redirectUrls_confirmDisable: string;
 		redirectUrls_culture: string;
