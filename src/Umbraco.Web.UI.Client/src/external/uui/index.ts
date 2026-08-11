@@ -17,9 +17,9 @@ declare global {
 
 /**
  * For v.17 we need to keep this function around for backwards compatibility with the legacy UUI 1.x custom elements.
- * TODO: Remove this in v.18.
+ * TODO: To be removed in v.18.
  * Fire a warning if the custom element with the provided name isn't available.
- * @func defineElement
+ * @func demandCustomElement
  * @param {HTMLElement} requester - Reference to the element requiring this custom element..
  * @param {string} elementName - Tag name of the required custom element.
  * @param {string} message - Optional message describing the consequences of it not begin available.
