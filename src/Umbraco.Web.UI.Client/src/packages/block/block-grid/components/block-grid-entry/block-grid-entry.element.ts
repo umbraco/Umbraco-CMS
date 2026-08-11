@@ -808,6 +808,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			}
 
 			.umb-block-grid__block {
+				--umb-block-scale-handler-opacity: 0;
 				--umb-entity-frame-opacity: 0;
 				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
 
@@ -816,6 +817,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				&:hover,
 				&:focus-within {
 					--umb-entity-frame-opacity: 1;
+					--umb-block-scale-handler-opacity: 1;
 				}
 			}
 		`,
