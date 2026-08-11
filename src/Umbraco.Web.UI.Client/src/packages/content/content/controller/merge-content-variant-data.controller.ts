@@ -140,30 +140,28 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		let newValue = draftValue;
 
 		if (api.processValues) {
-			// A property value resolver may resolve more than one group of inner values (a block editor
-			// emits one group per block). Gather the persisted groups keyed by the identifier the resolver
-			// supplies, so a draft group is paired with the persisted group belonging to the *same* block.
-			// Pairing on call order breaks as soon as the two arrays stop lining up, which shifts inner
-			// values onto neighbouring blocks and drops those falling off the end (#23525).
+			// Gather the persisted values by the optionally returned identifier
+			// the identifier is used for value matching when processing the draft values.
+			// A set of values identifier is provided by the resolver, the resolver knowns what makes a set of values unique.
 			const persistedValuesHolder = new Map<string, Array<UmbPotentialContentValueModel>>();
-			let persistedIndex = 0;
+			let persistedFallbackIndex = 0;
 
 			if (persistedValue) {
-				await api.processValues(persistedValue, async (values, groupIdentifier) => {
+				await api.processValues(persistedValue, async (values, identifier) => {
 					persistedValuesHolder.set(
-						groupIdentifier ?? `index:${persistedIndex++}`,
+						identifier ?? (persistedFallbackIndex++).toString(),
 						values as unknown as Array<UmbPotentialContentValueModel>,
 					);
 					return undefined;
 				});
 			}
 
-			let valuesIndex = 0;
+			let valuesFallbackIndex = 0;
 			newValue =
-				(await api.processValues(newValue, async (values, groupIdentifier) => {
+				(await api.processValues(newValue, async (values, identifier) => {
 					// Resolvers that do not supply an identifier only ever emit a single group, so falling
 					// back to call order keeps them working unchanged.
-					const persistedValues = persistedValuesHolder.get(groupIdentifier ?? `index:${valuesIndex++}`);
+					const persistedValues = persistedValuesHolder.get(identifier ?? (valuesFallbackIndex++).toString());
 
 					return await this.#processValues(persistedValues, values, variantsToStore);
 				})) ?? newValue;
