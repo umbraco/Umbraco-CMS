@@ -3,6 +3,7 @@ import type {
 	UmbCreateTreeItemDataResolverArgs,
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeItemDataResolver,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -12,7 +13,6 @@ import type {
 	UmbTargetPagedModel,
 } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 
 /**
  * Interface for a tree repository.
@@ -39,13 +39,13 @@ export interface UmbTreeRepository<
 	 * read directly off the tree item, such as variant aware document names.
 	 * @param {UmbControllerHost} host - The controller host of the consumer.
 	 * @param {UmbCreateTreeItemDataResolverArgs} [args] - Optional arguments for selecting the resolver.
-	 * @returns {UmbItemDataResolver | undefined} A resolver for the item, if one is available.
+	 * @returns {UmbTreeItemDataResolver | undefined} A resolver for the item, if one is available.
 	 * @memberof UmbTreeRepository
 	 */
 	createTreeItemDataResolver?: (
 		host: UmbControllerHost,
 		args?: UmbCreateTreeItemDataResolverArgs,
-	) => UmbItemDataResolver<TreeItemType> | undefined;
+	) => UmbTreeItemDataResolver<TreeItemType> | undefined;
 
 	/**
 	 * Requests the root items of the tree.

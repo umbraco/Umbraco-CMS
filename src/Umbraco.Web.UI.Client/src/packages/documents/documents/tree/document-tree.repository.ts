@@ -3,7 +3,11 @@ import { UmbDocumentItemDataResolver } from '../item/index.js';
 import { UmbDocumentTreeServerDataSource } from './server-data-source/document-tree.server.data-source.js';
 import type { UmbDocumentTreeItemModel, UmbDocumentTreeRootModel } from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
-import type { UmbCreateTreeItemDataResolverArgs, UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbCreateTreeItemDataResolverArgs,
+	UmbTreeItemDataResolver,
+	UmbTreeRepository,
+} from '@umbraco-cms/backoffice/tree';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -33,7 +37,7 @@ export class UmbDocumentTreeRepository
 	createTreeItemDataResolver(
 		host: UmbControllerHost,
 		args?: UmbCreateTreeItemDataResolverArgs,
-	): UmbDocumentItemDataResolver<UmbDocumentTreeItemModel> | undefined {
+	): UmbTreeItemDataResolver<UmbDocumentTreeItemModel> | undefined {
 		if (args?.entityType === UMB_DOCUMENT_ENTITY_TYPE) {
 			return new UmbDocumentItemDataResolver(host);
 		}
