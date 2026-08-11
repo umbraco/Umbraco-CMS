@@ -12,9 +12,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 ///     Tests covering the MediaTypeContainerService
 /// </summary>
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class MediaTypeContainerServiceTests : UmbracoIntegrationTest
+internal sealed class MediaTypeContainerServiceTests : EntityTypeContainerServiceTestsBase<IMediaType>
 {
+    protected override IEntityTypeContainerService<IMediaType> ContainerService => MediaTypeContainerService;
+
+    protected override async Task<Guid> CreateContainedEntityAsync(EntityContainer container)
+    {
+        IMediaType mediaType = new MediaType(ShortStringHelper, container.Id)
+        {
+            Alias = $"alias{Guid.NewGuid():N}",
+            Name = $"Name {Guid.NewGuid():N}",
+        };
+
+        var result = await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, $"Failed to create media type: {result.Result}");
+        return mediaType.Key;
+    }
+
     private IMediaTypeContainerService MediaTypeContainerService => GetRequiredService<IMediaTypeContainerService>();
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();

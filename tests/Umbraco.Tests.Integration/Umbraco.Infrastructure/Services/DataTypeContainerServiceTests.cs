@@ -14,9 +14,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 ///     Tests covering the DataTypeContainerService
 /// </summary>
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class DataTypeContainerServiceTests : UmbracoIntegrationTest
+internal sealed class DataTypeContainerServiceTests : EntityTypeContainerServiceTestsBase<IDataType>
 {
+    protected override IEntityTypeContainerService<IDataType> ContainerService => DataTypeContainerService;
+
+    protected override async Task<Guid> CreateContainedEntityAsync(EntityContainer container)
+    {
+        IDataType dataType = new DataType(
+            new TextboxPropertyEditor(DataValueEditorFactory, IOHelper),
+            ConfigurationEditorJsonSerializer,
+            container.Id)
+        {
+            Name = $"Data Type {Guid.NewGuid():N}",
+        };
+
+        var result = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, $"Failed to create data type: {result.Status}");
+        return dataType.Key;
+    }
+
     private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();

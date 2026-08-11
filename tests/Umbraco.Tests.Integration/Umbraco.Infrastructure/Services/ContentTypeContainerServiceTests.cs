@@ -12,9 +12,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 ///     Tests covering the ContentTypeContainerService
 /// </summary>
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class ContentTypeContainerServiceTests : UmbracoIntegrationTest
+internal sealed class ContentTypeContainerServiceTests : EntityTypeContainerServiceTestsBase<IContentType>
 {
+    protected override IEntityTypeContainerService<IContentType> ContainerService => ContentTypeContainerService;
+
+    protected override async Task<Guid> CreateContainedEntityAsync(EntityContainer container)
+    {
+        IContentType contentType = new ContentType(ShortStringHelper, container.Id)
+        {
+            Alias = $"alias{Guid.NewGuid():N}",
+            Name = $"Name {Guid.NewGuid():N}",
+        };
+
+        var result = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, $"Failed to create content type: {result.Result}");
+        return contentType.Key;
+    }
+
     private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
