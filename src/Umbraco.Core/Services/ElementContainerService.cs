@@ -98,7 +98,13 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                 return new EntityContainerMovedToRecycleBinNotification(moveEventInfo, eventMessages);
             });
 
-        scope.Complete();
+        // Only complete the scope when the move succeeded. A failure part way through rewriting the descendants
+        // must roll back, or the subtree is left with a mix of old and new paths.
+        if (moveResult.Success)
+        {
+            scope.Complete();
+        }
+
         return moveResult;
     }
 
