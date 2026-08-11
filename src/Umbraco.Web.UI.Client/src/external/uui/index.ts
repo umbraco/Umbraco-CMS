@@ -1,11 +1,11 @@
 import '@umbraco-ui/uui';
-import {
+import { UUITimer } from '@umbraco-ui/uui';
+import type {
 	UUIActiveMixinInterface,
 	UUILabelMixinInterface,
 	UUIPopoverTargetMixinInterface,
 	UUISelectableMixinInterface,
 	UUISelectOnlyMixinInterface,
-	UUITimer,
 } from '@umbraco-ui/uui';
 export * from '@umbraco-ui/uui';
 
