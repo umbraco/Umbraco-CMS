@@ -1,8 +1,10 @@
 using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.Services.References;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Element.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Element.References;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -75,6 +77,16 @@ internal sealed class ElementPresentationFactory
     public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus>
         CreateCulturePublishScheduleModels(PublishElementRequestModel requestModel)
         => CreateCulturePublishScheduleModels(requestModel.PublishSchedules);
+
+    /// <inheritdoc />
+    public async Task<ReferencedElementWithPendingChangesResponseModel> CreateReferencedElementWithPendingChangesResponseModelAsync(
+        ReferencedElementWithPendingChanges referencedElement)
+        => new()
+        {
+            Element = await CreateItemResponseModelAsync(referencedElement.Element),
+            State = referencedElement.State,
+            IsScheduled = referencedElement.IsScheduled,
+        };
 
     /// <inheritdoc />
     protected override ElementVariantItemResponseModel CreateVariantItemResponseModel(

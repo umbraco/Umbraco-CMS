@@ -1,9 +1,14 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService, PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { ReferencedElementWithPendingChangesResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type { UmbEntityReferenceDataSource, UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
+import type {
+	UmbEntityReferenceDataSource,
+	UmbReferenceItemModel,
+	UmbReferencedElementWithPendingChangesModel,
+} from '@umbraco-cms/backoffice/relations';
 import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
 
@@ -118,4 +123,64 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 
 		return { data, error };
 	}
+
+	/**
+	 * Fetches the elements directly referenced by the given unique that are not fully published.
+	 * @param {string} unique - The unique identifier of the referencing document.
+	 * @param {number} skip - The number of items to skip.
+	 * @param {number} take - The maximum number of items to return.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferencedElementWithPendingChangesModel>>>} - Referenced elements that are not fully published.
+	 * @memberof UmbDocumentReferenceServerDataSource
+	 */
+	async getReferencedElementsWithPendingChanges(
+		unique: string,
+		skip = 0,
+		take = 20,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferencedElementWithPendingChangesModel>>> {
+		const { data, error } = await tryExecute(
+			this,
+			DocumentService.getDocumentByIdReferencedElementsWithPendingChanges({ path: { id: unique }, query: { skip, take } }),
+		);
+
+		if (data) {
+			return { data: { items: data.items.map(mapReferencedElementWithPendingChanges), total: data.total } };
+		}
+
+		return { data, error };
+	}
+}
+
+// Not imported from `@umbraco-cms/backoffice/element` (which would create a documents<->elements package
+// cycle — elements already imports from documents) — same literal value as UMB_ELEMENT_ENTITY_TYPE.
+const ELEMENT_ENTITY_TYPE = 'element';
+
+// Maps the server's { element, state, isScheduled } shape into a flat, element-item-shaped row that
+// <umb-element-item-ref> can render directly, plus the two aggregate fields it doesn't otherwise carry. Rows
+// render as Elements (not Documents) even though this endpoint hangs off /document/{id} — it lists the elements
+// the document references, not the document itself.
+function mapReferencedElementWithPendingChanges(
+	item: ReferencedElementWithPendingChangesResponseModel,
+): UmbReferencedElementWithPendingChangesModel {
+	const { element } = item;
+	return {
+		documentType: {
+			unique: element.documentType.id,
+			icon: element.documentType.icon,
+			collection: null,
+		},
+		entityType: ELEMENT_ENTITY_TYPE,
+		hasChildren: element.hasChildren,
+		isTrashed: element.isTrashed,
+		parent: element.parent ? { unique: element.parent.id } : null,
+		unique: element.id,
+		variants: element.variants.map((variant) => ({
+			culture: variant.culture || null,
+			name: variant.name,
+			state: variant.state,
+			flags: variant.flags,
+		})),
+		flags: element.flags,
+		state: item.state === PublishableVariantStateModel.DRAFT ? 'draft' : 'publishedPendingChanges',
+		isScheduled: item.isScheduled,
+	} as UmbReferencedElementWithPendingChangesModel;
 }

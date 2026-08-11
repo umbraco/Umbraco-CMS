@@ -17,12 +17,19 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 	@state()
 	private _descendantsTotal = 0;
 
+	@state()
+	private _pendingChangesTotal = 0;
+
 	#onReferencedByChange(event: UmbChangeEvent) {
 		this._referencedByTotal = (event.target as UmbEntityReferenceListElement).getTotal();
 	}
 
 	#onDescendantsChange(event: UmbChangeEvent) {
 		this._descendantsTotal = (event.target as UmbEntityReferenceListElement).getTotal();
+	}
+
+	#onPendingChangesChange(event: UmbChangeEvent) {
+		this._pendingChangesTotal = (event.target as UmbEntityReferenceListElement).getTotal();
 	}
 
 	#close() {
@@ -54,6 +61,15 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 						.itemRepositoryAlias=${this.data.itemRepositoryAlias}
 						source="descendantsWithReferences"
 						@change=${this.#onDescendantsChange}></umb-entity-reference-list>
+				</div>
+				<div ?hidden=${!this.data.includeReferencedElementsWithPendingChanges || !this._pendingChangesTotal}>
+					<p><umb-localize key="references_labelElementsWithPendingChanges"></umb-localize></p>
+					<umb-entity-reference-list
+						readonly
+						.unique=${this.data.unique}
+						.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
+						source="referencedElementsWithPendingChanges"
+						@change=${this.#onPendingChangesChange}></umb-entity-reference-list>
 				</div>
 
 				<div slot="actions">

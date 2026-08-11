@@ -266,6 +266,18 @@ public interface IRelationService : IService
     IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
     /// <summary>
+    ///     Returns all child entities for a related parent id, filtered by relation type alias.
+    /// </summary>
+    /// <param name="parentId">The parent entity id.</param>
+    /// <param name="relationTypeAliases">Relation type aliases to filter by. Pass an empty sequence to include all relation types.</param>
+    /// <param name="entityType">The entity type to filter by.</param>
+    /// <returns>The distinct child entities of the given type related to the specified parent.</returns>
+    IEnumerable<IUmbracoEntity> GetChildEntitiesByParentId(
+        int parentId,
+        IEnumerable<string> relationTypeAliases,
+        UmbracoObjectTypes entityType);
+
+    /// <summary>
     ///     Gets the Parent and Child objects from a list of Relations as a list of <see cref="IUmbracoEntity" /> objects.
     /// </summary>
     /// <param name="relations">List of relations to retrieve parent and child objects from</param>

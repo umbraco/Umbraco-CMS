@@ -7,6 +7,8 @@ import type {
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
+import { UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/repository/constants.js';
+import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/repository/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UmbDocumentUnpublishManifestEntityActionMeta } from '../unpublish/entity-action/constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../../constants.js';
@@ -17,6 +19,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_DISCARD_CHANGES_MODAL, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { UmbEntityReferenceCountManager } from '@umbraco-cms/backoffice/relations';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import {
@@ -50,6 +53,28 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * @memberof UmbDocumentPublishingWorkspaceContext
 	 */
 	public readonly publishedPendingChanges = new UmbDocumentPublishedPendingChangesManager(this);
+
+	/**
+	 * Tracks how many items reference this document, so the publish flow can decide whether the confirmation
+	 * dialog has anything to say for a single-variant document (it always has something to say once there are
+	 * multiple variants to choose between). Loaded lazily, at the point of publishing/scheduling.
+	 * @memberof UmbDocumentPublishingWorkspaceContext
+	 */
+	public readonly referenceCount = new UmbEntityReferenceCountManager(this, {
+		referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
+		prefetch: false,
+	});
+
+	/**
+	 * Tracks how many elements this document directly references that are not fully published, for the same
+	 * publish-confirmation decision as {@link referenceCount}.
+	 * @memberof UmbDocumentPublishingWorkspaceContext
+	 */
+	public readonly referencedElementsWithPendingChangesCount = new UmbEntityReferenceCountManager(this, {
+		referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
+		source: 'referencedElementsWithPendingChanges',
+		prefetch: false,
+	});
 
 	#init: Promise<unknown>;
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
@@ -156,6 +181,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 						unpublishTime: option.variant?.scheduledUnpublishDate,
 					},
 				})),
+				unique,
+				itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+				referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
 			},
 		}).catch(() => undefined);
 
@@ -204,6 +232,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
 					await this.#documentWorkspaceContext.reload();
 					this.#loadAndProcessLastPublished();
+					this.referenceCount.clear();
+					this.referencedElementsWithPendingChangesCount.clear();
 
 					// request reload of this entity
 					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
@@ -445,6 +475,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
 		await this.#documentWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
+		this.referenceCount.clear();
+		this.referencedElementsWithPendingChangesCount.clear();
 	}
 
 	/**
@@ -471,14 +503,18 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const { options, selected } = await this.#determineVariantOptions();
 
-		// If there is only one variant, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
-		} else if (options.length === 1) {
-			// If only one option we will skip ahead and save the document with the only variant available:
+		}
+
+		// Skip the confirmation dialog only when it would have nothing to say: a single variant to publish,
+		// nothing referencing this document, and no referenced element left unpublished. Otherwise open it —
+		// the modal hides the variant picker when there is only one option, showing just the reference sections.
+		const needsModal = await this.#needsPublishConfirmationModal(options);
+
+		if (!needsModal) {
 			variantIds.push(UmbVariantId.Create(options[0]));
 		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
 			const result = await umbOpenModal(this, UMB_CONTENT_PUBLISH_MODAL, {
 				data: {
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
@@ -486,6 +522,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 					// The shared modal's pickableFilter is typed against the generic UmbEntityVariantOptionModel, but
 					// #determineVariantOptions() (which supplies `options` above) only ever returns document variants here.
 					pickableFilter: (option) => this.#publishableVariantsFilter(option as UmbDocumentVariantOptionModel),
+					unique,
+					itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+					referenceRepositoryAlias: UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS,
 				},
 				value: { selection: selected },
 			}).catch(() => undefined);
@@ -516,6 +555,29 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			},
 			(reason?: unknown) => this.#saveWithoutPublishing(variantIds, saveData, reason),
 		);
+	}
+
+	/**
+	 * Whether the publish confirmation modal has anything to say: either there is more than one variant to choose
+	 * between, something references this document, or this document uses an element that is not fully published.
+	 * @param {Array<UmbDocumentVariantOptionModel>} options - The variant options being published.
+	 * @returns {Promise<boolean>} Whether the confirmation modal should be shown.
+	 */
+	async #needsPublishConfirmationModal(options: Array<UmbDocumentVariantOptionModel>): Promise<boolean> {
+		if (options.length > 1) return true;
+		// A document that has never been saved has no server-side references in either direction yet.
+		if (this.#documentWorkspaceContext?.getIsNew()) return false;
+		try {
+			const [referencedBy, elementsWithPendingChanges] = await Promise.all([
+				this.referenceCount.getTotalAsync(),
+				this.referencedElementsWithPendingChangesCount.getTotalAsync(),
+			]);
+			return referencedBy > 0 || elementsWithPendingChanges > 0;
+		} catch {
+			// Couldn't determine one of the counts — show the modal rather than risk publishing silently past
+			// references we failed to check for.
+			return true;
+		}
 	}
 
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
@@ -568,6 +630,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		}
 
 		await this.#loadAndProcessLastPublished();
+		this.referenceCount.clear();
+		this.referencedElementsWithPendingChangesCount.clear();
 
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		this.#eventContext?.dispatchEvent(event);
@@ -647,6 +711,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				}
 
 				this.#currentUnique = unique;
+				this.referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
+				this.referencedElementsWithPendingChangesCount.setUnique(unique ?? undefined).catch(() => undefined);
 
 				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished().catch(() => undefined);

@@ -477,6 +477,25 @@ public class RelationService : RepositoryService, IRelationService
     }
 
     /// <inheritdoc />
+    public IEnumerable<IUmbracoEntity> GetChildEntitiesByParentId(
+        int parentId,
+        IEnumerable<string> relationTypeAliases,
+        UmbracoObjectTypes entityType)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        ICollection<string> aliases = relationTypeAliases as ICollection<string> ?? relationTypeAliases.ToArray();
+        var relationTypeIds = ResolveRelationTypeIdFilter(aliases);
+        if (relationTypeIds is { Length: 0 })
+        {
+            return [];
+        }
+
+        return _relationRepository.GetPagedChildEntitiesByParentId(
+            parentId, 0, int.MaxValue, out _, relationTypeIds ?? [], entityType.GetGuid());
+    }
+
+    /// <inheritdoc />
     public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations)
     {
         // TODO: Argh! N+1

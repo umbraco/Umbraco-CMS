@@ -181,7 +181,10 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 				${this.#renderOptions()}
 				${when(
 					this._referencesConfig,
-					() => html`<umb-entity-references-summary .config=${this._referencesConfig}></umb-entity-references-summary>`,
+					() =>
+						html`<umb-entity-references-summary
+							include-pending-changes
+							.config=${this._referencesConfig}></umb-entity-references-summary>`,
 				)}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>

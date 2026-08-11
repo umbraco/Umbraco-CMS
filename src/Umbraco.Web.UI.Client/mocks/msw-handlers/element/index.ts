@@ -5,7 +5,7 @@ import { publishingHandlers } from './publishing.handlers.js';
 import { detailHandlers } from './detail.handlers.js';
 import { folderHandlers } from './folder.handlers.js';
 import { moveCopyHandlers } from './move-copy.handlers.js';
-import { blockReferenceHandlers } from './block-reference.handlers.js';
+import { referencePendingChangesHandlers } from './reference-pending-changes.handlers.js';
 
 export const handlers = [
 	...recycleBinHandlers,
@@ -15,5 +15,5 @@ export const handlers = [
 	...detailHandlers,
 	...folderHandlers,
 	...moveCopyHandlers,
-	...blockReferenceHandlers,
+	...referencePendingChangesHandlers,
 ];

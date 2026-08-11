@@ -11,6 +11,22 @@ import type { UmbDataSourceResponse, UmbPagedModel, UmbRepositoryResponse } from
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbReferenceItemModel extends UmbEntityModel {}
 
+/**
+ * The aggregate ("worst") publish state of a referenced element that is not fully published — see
+ * {@link UmbReferencedElementWithPendingChangesModel}.
+ */
+export type UmbReferencedElementPendingChangesState = 'draft' | 'publishedPendingChanges';
+
+/**
+ * An element that the entity references (directly, via an Element Picker property or as embedded reusable block
+ * content) and that is not fully published. `state` is the worst-wins aggregate across all variants; `isScheduled`
+ * only says a future scheduled publish exists on some variant, not when.
+ */
+export interface UmbReferencedElementWithPendingChangesModel extends UmbReferenceItemModel {
+	state: UmbReferencedElementPendingChangesState;
+	isScheduled: boolean;
+}
+
 export type UmbReferenceModel =
 	| DefaultReferenceResponseModel
 	| DocumentReferenceResponseModel
@@ -35,6 +51,12 @@ export interface UmbEntityReferenceRepository extends UmbApi {
 		skip?: number,
 		take?: number,
 	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbEntityModel>>>;
+
+	requestReferencedElementsWithPendingChanges?(
+		unique: string,
+		skip?: number,
+		take?: number,
+	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbReferencedElementWithPendingChangesModel>>>;
 }
 
 export interface UmbEntityReferenceDataSource {
@@ -55,4 +77,10 @@ export interface UmbEntityReferenceDataSource {
 		skip?: number,
 		take?: number,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>>;
+
+	getReferencedElementsWithPendingChanges?(
+		unique: string,
+		skip?: number,
+		take?: number,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferencedElementWithPendingChangesModel>>>;
 }

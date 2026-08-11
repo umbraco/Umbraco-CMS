@@ -1873,6 +1873,8 @@ declare global {
 		references_itemHasNoReferences: string;
 		references_labelDependentDescendants: string;
 		references_labelDependsOnThis: string;
+		references_labelElementsWithPendingChanges: string;
+		references_labelElementsWithPendingChangesCount: (count: number) => string;
 		references_labelMoreReferences: (count: number) => string;
 		references_labelUsedByCount: (count: number) => string;
 		references_labelUsedByDocuments: string;
@@ -1886,6 +1888,9 @@ declare global {
 		references_labelUsedItems: string;
 		references_listViewDialogWarning: string;
 		references_tabName: string;
+		references_tagDraft: string;
+		references_tagPendingChanges: string;
+		references_tagScheduled: string;
 		references_unpublishWarning: string;
 		references_usedByProperties: string;
 		relatedlinks_caption: string;

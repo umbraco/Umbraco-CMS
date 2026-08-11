@@ -4,8 +4,17 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+export type UmbEntityReferenceCountSource = 'referencedBy' | 'referencedElementsWithPendingChanges';
+
 export interface UmbEntityReferenceCountManagerArgs {
 	referenceRepositoryAlias: string;
+	/** Which repository lookup to count. Defaults to `'referencedBy'`. */
+	source?: UmbEntityReferenceCountSource;
+	/**
+	 * When `false`, `setUnique` only resets the cached total rather than loading it — the first
+	 * `getTotalAsync()` call after that loads it on demand. Defaults to `true`.
+	 */
+	prefetch?: boolean;
 }
 
 /**
@@ -22,6 +31,8 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	public readonly total = this.#total.asObservable();
 
 	readonly #referenceRepositoryAlias: string;
+	readonly #source: UmbEntityReferenceCountSource;
+	readonly #prefetch: boolean;
 	#unique?: string;
 	#reloadToken = 0;
 	#repository?: UmbEntityReferenceRepository;
@@ -31,6 +42,8 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	constructor(host: UmbControllerHost, args: UmbEntityReferenceCountManagerArgs) {
 		super(host);
 		this.#referenceRepositoryAlias = args.referenceRepositoryAlias;
+		this.#source = args.source ?? 'referencedBy';
+		this.#prefetch = args.prefetch ?? true;
 	}
 
 	/**
@@ -57,14 +70,34 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	}
 
 	/**
-	 * Set the entity to count references for, and (re)load the count. A no-op if the unique is unchanged.
+	 * Set the entity to count references for. A no-op if the unique is unchanged. When `prefetch` is enabled
+	 * (the default), also (re)loads the count immediately; otherwise the count is loaded lazily, on the first
+	 * {@link getTotalAsync} call.
 	 * @param {string | undefined} unique - The unique identifier of the entity, or `undefined` to clear.
 	 * @returns {Promise<void>}
 	 */
 	async setUnique(unique: string | undefined): Promise<void> {
 		if (this.#unique === unique) return;
 		this.#unique = unique;
+
+		if (!this.#prefetch) {
+			++this.#reloadToken; // invalidate any reload already in flight for the previous unique
+			this.#total.setValue(undefined);
+			return;
+		}
+
 		await this.reload();
+	}
+
+	/**
+	 * Drops the cached count (if any) without changing the current unique, so the next {@link getTotalAsync} call
+	 * re-reads it from the server. Cheaper than {@link reload} for lazy (`prefetch: false`) consumers that don't
+	 * need the fresh value immediately — e.g. right after a publish/unpublish/schedule action.
+	 * @returns {void}
+	 */
+	clear(): void {
+		++this.#reloadToken; // invalidate any reload already in flight
+		this.#total.setValue(undefined);
 	}
 
 	/**
@@ -90,13 +123,30 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 			return;
 		}
 
-		const repository = await this.#getRepository();
-		const { data } = await repository.requestReferencedBy(unique, 0, 1);
+		const total = await this.#requestTotal(unique);
 
 		// A newer reload (e.g. the unique changed again) has since started — its result should win, not ours.
 		if (token !== this.#reloadToken) return;
 
-		this.#total.setValue(data?.total ?? 0);
+		this.#total.setValue(total);
+	}
+
+	async #requestTotal(unique: string): Promise<number> {
+		const repository = await this.#getRepository();
+
+		if (this.#source === 'referencedElementsWithPendingChanges') {
+			// The repository not supporting this lookup at all is not a failure — it just means this entity type
+			// hasn't opted in, so there's nothing to count.
+			if (!repository.requestReferencedElementsWithPendingChanges) return 0;
+
+			const { data, error } = await repository.requestReferencedElementsWithPendingChanges(unique, 0, 0);
+			if (error) throw error;
+			return data?.total ?? 0;
+		}
+
+		const { data, error } = await repository.requestReferencedBy(unique, 0, 1);
+		if (error) throw error;
+		return data?.total ?? 0;
 	}
 
 	async #getRepository(): Promise<UmbEntityReferenceRepository> {

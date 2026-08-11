@@ -10,9 +10,11 @@ import {
 } from '../../workspace/context/document-workspace-context.test-utils.js';
 import { UMB_DISCARD_CHANGES_MODAL, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbDocumentPublishingServerDataSource } from '../repository/document-publishing.server.data-source.js';
-import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { UmbDocumentReferenceRepository } from '../../reference/repository/document-reference.repository.js';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
+const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
 const DA = UmbVariantId.Create({ culture: 'da', segment: null });
 
@@ -252,6 +254,98 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 
 			expect(modals, 'no discard prompt').to.not.include(UMB_DISCARD_CHANGES_MODAL.toString());
 			expect(reachedUnpublish, 'went straight to unpublishing').to.be.true;
+		});
+	});
+
+	describe('save and publish — reference-awareness gating for single-variant documents', () => {
+		/**
+		 * Tracks whether UMB_CONTENT_PUBLISH_MODAL was opened while `run` executes, and immediately rejects
+		 * every modal so the flow bails out early (mirrors the cancel path) without needing full rendering.
+		 */
+		async function runSaveAndPublishTrackingModal(run: () => Promise<unknown>) {
+			let opened = false;
+			const originalOpen = UmbModalManagerContext.prototype.open;
+			UmbModalManagerContext.prototype.open = function (
+				this: UmbModalManagerContext,
+				...args: Parameters<typeof originalOpen>
+			) {
+				if (String(args[1]) === UMB_CONTENT_PUBLISH_MODAL.toString()) opened = true;
+				const modalContext = originalOpen.apply(this, args as never);
+				modalContext.reject();
+				return modalContext;
+			} as typeof originalOpen;
+
+			try {
+				await run();
+			} finally {
+				UmbModalManagerContext.prototype.open = originalOpen;
+			}
+
+			return opened;
+		}
+
+		beforeEach(async () => {
+			await context.load(INVARIANT_DOCUMENT_ID);
+			await aTimeout(0);
+		});
+
+		it('publishes immediately, with no modal, when nothing references this document and no referenced element has pending changes', async () => {
+			let published = false;
+			const originalUpdateAndPublish = UmbDocumentPublishingServerDataSource.prototype.updateAndPublish;
+			UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = async function (...args) {
+				published = true;
+				return originalUpdateAndPublish.apply(this, args as never);
+			};
+
+			try {
+				const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+				expect(opened, 'modal opened').to.be.false;
+				expect(published, 'publish went through').to.be.true;
+			} finally {
+				UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = originalUpdateAndPublish;
+			}
+		});
+
+		it('opens the modal when something references this document', async () => {
+			const original = UmbDocumentReferenceRepository.prototype.requestReferencedBy;
+			UmbDocumentReferenceRepository.prototype.requestReferencedBy = async () => ({
+				data: { items: [], total: 1 },
+			});
+
+			try {
+				const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+				expect(opened, 'modal opened').to.be.true;
+			} finally {
+				UmbDocumentReferenceRepository.prototype.requestReferencedBy = original;
+			}
+		});
+
+		it('opens the modal when this document references an element that is not fully published', async () => {
+			const original = UmbDocumentReferenceRepository.prototype.requestReferencedElementsWithPendingChanges;
+			UmbDocumentReferenceRepository.prototype.requestReferencedElementsWithPendingChanges = async () => ({
+				data: { items: [], total: 1 },
+			});
+
+			try {
+				const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+				expect(opened, 'modal opened').to.be.true;
+			} finally {
+				UmbDocumentReferenceRepository.prototype.requestReferencedElementsWithPendingChanges = original;
+			}
+		});
+
+		it('opens the modal rather than risk publishing silently when a reference count lookup fails', async () => {
+			const original = UmbDocumentReferenceRepository.prototype.requestReferencedBy;
+			UmbDocumentReferenceRepository.prototype.requestReferencedBy = async () => {
+				throw new Error('Simulated network error');
+			};
+
+			try {
+				const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+				expect(opened, 'modal opened').to.be.true;
+			} finally {
+				UmbDocumentReferenceRepository.prototype.requestReferencedBy = original;
+			}
 		});
 	});
 });

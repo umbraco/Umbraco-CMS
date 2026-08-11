@@ -40,11 +40,24 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	/**
 	 * Tracks how many items reference this element, so the publish flow can decide whether the confirmation
 	 * dialog has anything to say for a single-variant element (it always has something to say once there are
-	 * multiple variants to choose between).
+	 * multiple variants to choose between). Loaded lazily, at the point of publishing/scheduling, rather than
+	 * on workspace load.
 	 * @memberof UmbElementPublishingWorkspaceContext
 	 */
 	public readonly referenceCount = new UmbEntityReferenceCountManager(this, {
 		referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
+		prefetch: false,
+	});
+
+	/**
+	 * Tracks how many elements this element directly references that are not fully published, for the same
+	 * publish-confirmation decision as {@link referenceCount}.
+	 * @memberof UmbElementPublishingWorkspaceContext
+	 */
+	public readonly referencedElementsWithPendingChangesCount = new UmbEntityReferenceCountManager(this, {
+		referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
+		source: 'referencedElementsWithPendingChanges',
+		prefetch: false,
 	});
 
 	#init: Promise<unknown>;
@@ -145,7 +158,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// Reload workspace data to reflect the unpublished state
 		await this.#elementWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
-		this.referenceCount.reload().catch(() => undefined);
+		this.referenceCount.clear();
+		this.referencedElementsWithPendingChangesCount.clear();
 	}
 
 	/**
@@ -226,7 +240,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 					// reload the element so all states are updated after the schedule operation
 					await this.#elementWorkspaceContext.reload();
-					this.referenceCount.reload().catch(() => undefined);
+					this.referenceCount.clear();
+					this.referencedElementsWithPendingChangesCount.clear();
 
 					// request reload of this entity
 					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
@@ -346,16 +361,20 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 	/**
 	 * Whether the publish confirmation modal has anything to say: either there is more than one variant to choose
-	 * between, or something references this element.
+	 * between, something references this element, or this element uses an element that is not fully published.
 	 * @param {Array<UmbElementVariantOptionModel>} options - The variant options being published.
 	 * @returns {Promise<boolean>} Whether the confirmation modal should be shown.
 	 */
 	async #needsPublishConfirmationModal(options: Array<UmbElementVariantOptionModel>): Promise<boolean> {
 		if (options.length > 1) return true;
 		try {
-			return (await this.referenceCount.getTotalAsync()) > 0;
+			const [referencedBy, elementsWithPendingChanges] = await Promise.all([
+				this.referenceCount.getTotalAsync(),
+				this.referencedElementsWithPendingChangesCount.getTotalAsync(),
+			]);
+			return referencedBy > 0 || elementsWithPendingChanges > 0;
 		} catch {
-			// Couldn't determine the reference count — show the modal rather than risk publishing silently past
+			// Couldn't determine one of the counts — show the modal rather than risk publishing silently past
 			// references we failed to check for.
 			return true;
 		}
@@ -411,7 +430,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		}
 
 		await this.#loadAndProcessLastPublished();
-		this.referenceCount.reload().catch(() => undefined);
+		this.referenceCount.clear();
+		this.referencedElementsWithPendingChangesCount.clear();
 
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		this.#eventContext?.dispatchEvent(event);
@@ -485,6 +505,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 				this.#currentUnique = unique;
 				this.referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
+				this.referencedElementsWithPendingChangesCount.setUnique(unique ?? undefined).catch(() => undefined);
 
 				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished();

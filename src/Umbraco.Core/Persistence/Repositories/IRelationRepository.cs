@@ -78,6 +78,18 @@ public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
     IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes);
 
     /// <summary>
+    ///     Gets paged child entities for a parent entity, filtered by relation type.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent entity.</param>
+    /// <param name="pageIndex">The page index.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalRecords">Returns the total number of records.</param>
+    /// <param name="relationTypes">Relation type IDs to filter by. Pass an empty array to include all relation types.</param>
+    /// <param name="entityTypes">The entity types to filter by.</param>
+    /// <returns>A collection of child entities for the specified page.</returns>
+    IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes);
+
+    /// <summary>
     ///     Gets paged relations by child entity key.
     /// </summary>
     /// <param name="childKey">The unique key of the child entity.</param>

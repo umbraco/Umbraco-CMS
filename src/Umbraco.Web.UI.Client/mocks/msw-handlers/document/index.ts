@@ -8,6 +8,7 @@ import { detailHandlers } from './detail.handlers.js';
 import { domainHandlers } from './domain.handlers.js';
 import { collectionHandlers } from './collection.handlers.js';
 import { urlHandlers } from './url.handlers.js';
+import { referencePendingChangesHandlers } from './reference-pending-changes.handlers.js';
 
 export const handlers = [
 	...auditLogHandlers,
@@ -20,4 +21,5 @@ export const handlers = [
 	...detailHandlers,
 	...domainHandlers,
 	...collectionHandlers,
+	...referencePendingChangesHandlers,
 ];

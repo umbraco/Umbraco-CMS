@@ -2701,6 +2701,12 @@ export default {
 			return `...and ${count} more items`;
 		},
 		labelUsedByCount: (count: number) => `Referenced by ${count} ${count === 1 ? 'item' : 'items'}`,
+		labelElementsWithPendingChanges: 'The following referenced elements are not fully published',
+		labelElementsWithPendingChangesCount: (count: number) =>
+			`${count} referenced ${count === 1 ? 'element has' : 'elements have'} pending changes`,
+		tagDraft: 'Draft',
+		tagPendingChanges: 'Pending changes',
+		tagScheduled: 'Scheduled',
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',

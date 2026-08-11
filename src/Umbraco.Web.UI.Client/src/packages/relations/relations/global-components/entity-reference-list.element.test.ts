@@ -1,6 +1,6 @@
 import type { UmbEntityReferenceListElement } from './entity-reference-list.element.js';
 import './entity-reference-list.element.js';
-import type { UmbEntityReferenceRepository } from '../reference/types.js';
+import type { UmbEntityReferenceRepository, UmbReferencedElementWithPendingChangesModel } from '../reference/types.js';
 import { aTimeout, expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
@@ -20,9 +20,19 @@ function makeItems(count: number): Array<UmbEntityModel> {
 	return Array.from({ length: count }, (_, i) => ({ unique: `item-${i}`, entityType: 'unknown' }));
 }
 
+function makePendingChangesItems(count: number): Array<UmbReferencedElementWithPendingChangesModel> {
+	return Array.from({ length: count }, (_, i) => ({
+		unique: `element-${i}`,
+		entityType: 'element',
+		state: i % 2 === 0 ? 'draft' : 'publishedPendingChanges',
+		isScheduled: i === 0,
+	}));
+}
+
 class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 	static referencedByItems: Array<UmbEntityModel> = [];
 	static descendantItems: Array<UmbEntityModel> = [];
+	static pendingChangesItems: Array<UmbReferencedElementWithPendingChangesModel> = [];
 
 	async requestReferencedBy(_unique: string, skip = 0, take = 20) {
 		const items = UmbTestReferenceRepository.referencedByItems;
@@ -35,6 +45,11 @@ class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 
 	async requestDescendantsWithReferences(_unique: string, skip = 0, take = 20) {
 		const items = UmbTestReferenceRepository.descendantItems;
+		return { data: { items: items.slice(skip, skip + take), total: items.length } };
+	}
+
+	async requestReferencedElementsWithPendingChanges(_unique: string, skip = 0, take = 20) {
+		const items = UmbTestReferenceRepository.pendingChangesItems;
 		return { data: { items: items.slice(skip, skip + take), total: items.length } };
 	}
 
@@ -79,6 +94,7 @@ describe('UmbEntityReferenceListElement', () => {
 	beforeEach(() => {
 		UmbTestReferenceRepository.referencedByItems = [];
 		UmbTestReferenceRepository.descendantItems = [];
+		UmbTestReferenceRepository.pendingChangesItems = [];
 		element = document.createElement('umb-entity-reference-list') as UmbEntityReferenceListElement;
 	});
 
@@ -165,6 +181,62 @@ describe('UmbEntityReferenceListElement', () => {
 				element.referenceRepositoryAlias = alias;
 				element.source = 'descendantsWithReferences';
 				element.unique = 'elm-1';
+				document.body.appendChild(element);
+				await aTimeout(0);
+
+				expect(element.getTotal()).to.equal(0);
+			} finally {
+				umbExtensionsRegistry.unregister(alias);
+			}
+		});
+	});
+
+	describe('referencedElementsWithPendingChanges source', () => {
+		it('renders one row per item, each tagged with its state', async () => {
+			UmbTestReferenceRepository.pendingChangesItems = makePendingChangesItems(2);
+			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
+			element.source = 'referencedElementsWithPendingChanges';
+			element.unique = 'doc-1';
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(element.getTotal()).to.equal(2);
+			const rows = element.shadowRoot?.querySelectorAll('umb-entity-item-ref');
+			expect(rows).to.have.lengthOf(2);
+
+			const firstRowTags = rows?.[0]?.querySelectorAll('uui-tag[slot="tag"]');
+			// item 0 is 'draft' and isScheduled — expect both the state tag and the scheduled tag.
+			expect(firstRowTags, 'draft + scheduled tags').to.have.lengthOf(2);
+
+			const secondRowTags = rows?.[1]?.querySelectorAll('uui-tag[slot="tag"]');
+			// item 1 is 'publishedPendingChanges' and not scheduled — expect only the state tag.
+			expect(secondRowTags, 'pending-changes tag only').to.have.lengthOf(1);
+		});
+
+		it('reports zero when the repository does not support the lookup', async () => {
+			class UmbTestReferenceRepositoryWithoutPendingChanges implements UmbEntityReferenceRepository {
+				async requestReferencedBy() {
+					return { data: { items: [], total: 0 } };
+				}
+				async requestAreReferenced() {
+					return { data: { items: [], total: 0 } };
+				}
+				destroy() {}
+			}
+
+			const alias = 'Umb.Test.EntityReferenceList.ReferenceRepository.NoPendingChanges';
+			const manifest: ManifestApi<UmbTestReferenceRepositoryWithoutPendingChanges> = {
+				type: 'my-test-type',
+				alias,
+				name: 'Test Entity Reference Repository Without Pending Changes',
+				api: UmbTestReferenceRepositoryWithoutPendingChanges,
+			};
+			umbExtensionsRegistry.register(manifest);
+
+			try {
+				element.referenceRepositoryAlias = alias;
+				element.source = 'referencedElementsWithPendingChanges';
+				element.unique = 'doc-1';
 				document.body.appendChild(element);
 				await aTimeout(0);
 
