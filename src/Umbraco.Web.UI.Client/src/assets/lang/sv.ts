@@ -1272,4 +1272,7 @@ export default {
 		configCultureSpecificDocumentLinksDescription:
 			'Aktivera möjligheten att ange en kultur vid länkning till dokument.',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} objekt ${count === 1 ? 'valt' : 'valda'}`,
+	},
 } as UmbLocalizationDictionary;
