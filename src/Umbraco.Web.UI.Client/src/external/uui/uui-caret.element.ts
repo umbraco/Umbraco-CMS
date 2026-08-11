@@ -1,4 +1,4 @@
-import { defineElement } from '.';
+import { defineElement } from '@umbraco-ui/uui';
 import { css, html, LitElement, property } from '../lit';
 
 /**

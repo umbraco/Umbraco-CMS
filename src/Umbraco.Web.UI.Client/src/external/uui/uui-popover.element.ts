@@ -1,6 +1,6 @@
-import { defineElement } from '.';
+import { defineElement } from '@umbraco-ui/uui';
 import { property, query, css, html, LitElement } from '../lit';
-import { UUIPopoverEvent } from './UUIPopoverEvent';
+import { UUIPopoverEvent } from './UUIPopoverEvent.js';
 
 export type PopoverPlacement =
 	| 'auto'
