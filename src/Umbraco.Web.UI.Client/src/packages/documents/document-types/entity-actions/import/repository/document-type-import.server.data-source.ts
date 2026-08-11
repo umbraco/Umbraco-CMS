@@ -21,8 +21,8 @@ export class UmbDocumentTypeImportServerDataSource {
 
 	/**
 	 * Import an item for the given id to the destination unique
-	 * @param {temporaryUnique} temporaryUnique
-	 * @returns {*}
+	 * @param {temporaryUnique} temporaryUnique - The unique identifier of the temporary file to import.
+	 * @returns {*} The imported document type.
 	 * @memberof UmbDocumentTypeImportServerDataSource
 	 */
 	async import(temporaryUnique: string) {

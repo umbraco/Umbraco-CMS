@@ -166,7 +166,7 @@ export class UmbTreeItemChildrenManager<
 
 	/**
 	 * Sets the hasChildren state
-	 * @param {boolean} hasChildren
+	 * @param {boolean} hasChildren - Whether the current tree item has children
 	 * @memberof UmbTreeItemChildrenManager
 	 */
 	public setHasChildren(hasChildren: boolean) {
@@ -505,7 +505,7 @@ export class UmbTreeItemChildrenManager<
 
 	/**
 	 * Checks if a specific child is loaded
-	 * @param {(UmbEntityModel | undefined)} entity
+	 * @param {(UmbEntityModel | undefined)} entity - The entity to check
 	 * @returns {boolean} - True if items has been loaded
 	 * @memberof UmbRepositoryTreeItemChildrenManager
 	 */

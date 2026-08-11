@@ -21,6 +21,7 @@ export class UmbDeleteEntityBulkAction<
 	#items: Array<any> = [];
 	/**
 	 * @deprecated this has been turned into a private property and cannot be used from v.18. Will be removed in v.18
+	 * @returns {Array<any>} The items to be bulk-deleted.
 	 */
 	protected get _items() {
 		return this.#items;

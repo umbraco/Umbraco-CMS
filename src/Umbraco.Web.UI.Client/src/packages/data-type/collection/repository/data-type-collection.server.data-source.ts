@@ -35,8 +35,8 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Gets the DataType collection filtered by the given filter.
-	 * @param {UmbDataTypeCollectionFilterModel} query
-	 * @returns {*}
+	 * @param {UmbDataTypeCollectionFilterModel} query - The filter to apply to the collection.
+	 * @returns {*} The filtered data-type collection.
 	 * @DataTypeof UmbDataTypeCollectionServerDataSource
 	 */
 	async getCollection(query: UmbDataTypeCollectionFilterModel) {

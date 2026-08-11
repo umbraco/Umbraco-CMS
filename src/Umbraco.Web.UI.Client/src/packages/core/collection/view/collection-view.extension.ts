@@ -1,8 +1,7 @@
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestCollectionView
-	extends ManifestElement,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+	extends ManifestElement, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'collectionView';
 	meta: MetaCollectionView;
 }

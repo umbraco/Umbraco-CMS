@@ -2,8 +2,7 @@ import type { UmbDashboardElement } from './dashboard-element.interface.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestDashboard
-	extends ManifestElement<UmbDashboardElement>,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+	extends ManifestElement<UmbDashboardElement>, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'dashboard';
 	meta: MetaDashboard;
 }

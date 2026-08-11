@@ -3,7 +3,8 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestPropertyAction<MetaType extends MetaPropertyAction = MetaPropertyAction>
-	extends ManifestElementAndApi<UmbControllerHostElement, UmbPropertyAction<MetaType>>,
+	extends
+		ManifestElementAndApi<UmbControllerHostElement, UmbPropertyAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'propertyAction';
 	forPropertyEditorUis: string[];

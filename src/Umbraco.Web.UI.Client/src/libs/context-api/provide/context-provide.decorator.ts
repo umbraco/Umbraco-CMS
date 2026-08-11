@@ -94,8 +94,9 @@ export function provideContext<
  *
  * Note: Standard decorators currently don't work with @state()/@property()
  * decorators, which is why we still need the legacy branch.
- * @param protoOrTarget
- * @param context
+ * @param {any} protoOrTarget The class prototype or target being decorated.
+ * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to provide.
+ * @returns {object} An accessor descriptor that intercepts the property initialization.
  */
 function setupStandardDecorator<
 	BaseType extends UmbContextMinimal,
@@ -133,9 +134,9 @@ function setupStandardDecorator<
  * 1. addInitializer (if available, e.g., on LitElement classes)
  * 2. hostConnected wrapper (for UmbController classes)
  * 3. Warning (if neither is available)
- * @param protoOrTarget
- * @param propertyKey
- * @param context
+ * @param {any} protoOrTarget The class prototype being decorated.
+ * @param {string} propertyKey The property name.
+ * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to provide.
  */
 function setupLegacyDecorator<
 	BaseType extends UmbContextMinimal,

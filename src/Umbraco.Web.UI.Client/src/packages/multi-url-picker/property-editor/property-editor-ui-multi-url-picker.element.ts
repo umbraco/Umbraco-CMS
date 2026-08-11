@@ -90,9 +90,13 @@ export class UmbPropertyEditorUIMultiUrlPickerElement
 	constructor() {
 		super();
 
-		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
-			this._interactionMemories = interactionMemories ?? [];
-		});
+		this.observe(
+			this.#interactionMemoryManager.memoriesForPropertyEditor,
+			(interactionMemories) => {
+				this._interactionMemories = interactionMemories ?? [];
+			},
+			null,
+		);
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this._label = context?.getLabel();

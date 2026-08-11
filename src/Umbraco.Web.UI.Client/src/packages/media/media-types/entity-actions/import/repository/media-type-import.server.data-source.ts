@@ -12,7 +12,7 @@ export class UmbMediaTypeImportServerDataSource {
 
 	/**
 	 * Creates an instance of UmbMediaTypeImportServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMediaTypeImportServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -21,8 +21,8 @@ export class UmbMediaTypeImportServerDataSource {
 
 	/**
 	 * Import an item for the given id to the destination unique
-	 * @param {temporaryUnique} temporaryUnique
-	 * @returns {*}
+	 * @param {temporaryUnique} temporaryUnique - The unique ID of the temporary file to import
+	 * @returns {*} The imported media type
 	 * @memberof UmbMediaTypeImportServerDataSource
 	 */
 	async import(temporaryUnique: string) {

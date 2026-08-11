@@ -98,7 +98,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		/**
 		 * Remove a controller from this element by its alias.
 		 * Notice this will also destroy the controller.
-		 * @param {string | symbol} controllerAlias
+		 * @param {string | symbol} controllerAlias The alias of the controller(s) to remove.
 		 */
 		removeUmbControllerByAlias(controllerAlias: UmbController['controllerAlias']): void {
 			if (controllerAlias && this._controllers) {

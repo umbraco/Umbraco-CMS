@@ -46,9 +46,9 @@ export class UmbPathPattern<
 	}
 	/**
 	 * generate an absolute path from the path pattern
-	 * @param params
-	 * @param baseParams
-	 * @returns
+	 * @param {LocalParamsType} params - The local pattern parameters.
+	 * @param {BaseParamsType} baseParams - The base pattern parameters.
+	 * @returns {string} The generated absolute path.
 	 */
 	generateAbsolute(params: LocalParamsType & BaseParamsType) {
 		return (
@@ -60,7 +60,7 @@ export class UmbPathPattern<
 	/**
 	 * Get the full absolute pattern string including base path.
 	 * Use this when chaining patterns to preserve the full path.
-	 * @returns The complete pattern string (base + local)
+	 * @returns {string} The complete pattern string (base + local)
 	 */
 	toAbsolutePatternString(): string {
 		return this.#base + this.#local;

@@ -88,7 +88,10 @@ export abstract class UmbTreeItemApiContextBase<
 	#entityContext = new UmbEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
-	/** Public accessor for the tree context. Kept public for backward compatibility. */
+	/**
+	 * Public accessor for the tree context. Kept public for backward compatibility.
+	 * @returns {typeof UMB_TREE_CONTEXT.TYPE | undefined} The tree context
+	 */
 	public get treeContext(): typeof UMB_TREE_CONTEXT.TYPE | undefined {
 		return this._treeContext;
 	}
@@ -194,7 +197,7 @@ export abstract class UmbTreeItemApiContextBase<
 
 	/**
 	 * Hook called when the tree context is received or changes. Subclasses can override to add additional observations.
-	 * @param _context
+	 * @param {typeof UMB_TREE_CONTEXT.TYPE} _context - The tree context
 	 */
 	protected _onTreeContextChanged(_context: typeof UMB_TREE_CONTEXT.TYPE): void {
 		this.#observeActive();

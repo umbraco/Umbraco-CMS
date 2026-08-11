@@ -4,7 +4,9 @@ import type { ManifestApi, ManifestWithDynamicConditions } from '@umbraco-cms/ba
 
 export interface ManifestEntityCreateOptionAction<
 	MetaType extends MetaEntityCreateOptionAction = MetaEntityCreateOptionAction,
-> extends ManifestApi<UmbEntityCreateOptionAction<MetaType>>,
+>
+	extends
+		ManifestApi<UmbEntityCreateOptionAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: typeof UMB_EXTENSION_TYPE_ENTITY_CREATE_OPTION_ACTION;
 	forEntityTypes: Array<string>;

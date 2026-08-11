@@ -42,5 +42,4 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbModalManagerContext(host);
 	new UmbActionEventContext(host);
 	new UmbInteractionMemoryContext(host);
-
 };

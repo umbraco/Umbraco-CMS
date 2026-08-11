@@ -1,5 +1,5 @@
-import { UmbShortcutController } from '@umbraco-cms/backoffice/shortcut';
 import { UMB_VIEW_CONTEXT } from './view.context-token.js';
+import { UmbShortcutController } from '@umbraco-cms/backoffice/shortcut';
 import { UmbClassState, UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbHintController } from '@umbraco-cms/backoffice/hint';
@@ -230,6 +230,7 @@ export class UmbViewController extends UmbControllerBase {
 	/**
 	 * @internal
 	 * Notify that a view context has been activated.
+	 * @returns {boolean} true if the view is (or becomes) active.
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_requestActivate(): boolean {

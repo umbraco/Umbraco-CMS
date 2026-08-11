@@ -24,7 +24,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	/**
 	 * Creates a new client credentials for a user
 	 * @param {UmbCreateUserClientCredentialRequestArgs} args - The user and client to create the credentials for
-	 * @returns {*}
+	 * @returns {*} The created client credential.
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
 	async create(args: UmbCreateUserClientCredentialRequestArgs) {
@@ -49,7 +49,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	/**
 	 * Reads the client credentials for a user
 	 * @param {UmbUserClientCredentialRequestArgs} args - The user to read the credentials for
-	 * @returns {*}
+	 * @returns {*} The client credentials for the user.
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
 	async read(args: UmbUserClientCredentialRequestArgs) {
@@ -74,7 +74,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	/**
 	 * Deletes the client credentials for a user
 	 * @param {UmbDeleteUserClientCredentialRequestArgs} args - The user and client unique to delete the credentials for
-	 * @returns {*}
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
 	delete(args: UmbDeleteUserClientCredentialRequestArgs) {

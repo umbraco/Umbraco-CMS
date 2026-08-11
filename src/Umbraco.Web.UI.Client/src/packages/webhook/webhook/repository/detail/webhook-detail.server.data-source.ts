@@ -29,8 +29,8 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 
 	/**
 	 * Creates a new Webhook scaffold
-	 * @param {Partial<UmbWebhookDetailModel>} [preset]
-	 * @returns { CreateWebhookRequestModel }
+	 * @param {Partial<UmbWebhookDetailModel>} [preset] Initial values to seed the scaffold with
+	 * @returns { CreateWebhookRequestModel } The scaffolded Webhook
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbWebhookDetailModel> = {}) {
@@ -52,8 +52,8 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 
 	/**
 	 * Fetches a Webhook with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique The unique id of the Webhook
+	 * @returns {*} The Webhook
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async read(unique: string) {
@@ -83,8 +83,8 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 
 	/**
 	 * Inserts a new Webhook on the server
-	 * @param {UmbWebhookDetailModel} model
-	 * @returns {*}
+	 * @param {UmbWebhookDetailModel} model The Webhook to create
+	 * @returns {*} The created Webhook
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async create(model: UmbWebhookDetailModel) {
@@ -118,9 +118,8 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 
 	/**
 	 * Updates a Webhook on the server
-	 * @param {UmbWebhookDetailModel} Webhook
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbWebhookDetailModel} model The Webhook to update
+	 * @returns {*} The updated Webhook
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async update(model: UmbWebhookDetailModel) {
@@ -154,8 +153,8 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 
 	/**
 	 * Deletes a Webhook on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique The unique id of the Webhook
+	 * @returns {*} The result of the deletion
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
 	async delete(unique: string) {

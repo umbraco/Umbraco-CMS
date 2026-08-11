@@ -21,7 +21,8 @@ export interface UmbCurrentUserAction<ArgsMetaType = never> extends UmbAction<Um
 }
 
 export interface ManifestCurrentUserAction<MetaType extends MetaCurrentUserAction = MetaCurrentUserAction>
-	extends ManifestElementAndApi<UmbControllerHostElement, UmbCurrentUserAction<MetaType>>,
+	extends
+		ManifestElementAndApi<UmbControllerHostElement, UmbCurrentUserAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'currentUserAction';
 	meta: MetaType;

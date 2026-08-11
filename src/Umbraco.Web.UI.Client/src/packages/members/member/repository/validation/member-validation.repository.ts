@@ -23,7 +23,7 @@ export class UmbMemberValidationRepository
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {DetailModelType} model - The model to validate
 	 * @param {string | null} [parentUnique] - The parent unique
-	 * @returns {*}
+	 * @returns {*} The validation result.
 	 */
 	async validateCreate(model: DetailModelType, parentUnique: string | null) {
 		if (!model) throw new Error('Data is missing');
@@ -35,7 +35,7 @@ export class UmbMemberValidationRepository
 	 * Saves the given data
 	 * @param {DetailModelType} model - The model to save
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
-	 * @returns {*}
+	 * @returns {*} The validation result.
 	 */
 	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>) {
 		if (!model) throw new Error('Data is missing');

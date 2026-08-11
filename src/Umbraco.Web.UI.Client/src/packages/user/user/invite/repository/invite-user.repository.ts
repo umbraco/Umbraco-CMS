@@ -13,8 +13,8 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Invites a user
-	 * @param {UmbInviteUserRequestModel} request
-	 * @returns {*}
+	 * @param {UmbInviteUserRequestModel} request - The invite request data.
+	 * @returns {*} The result of the invite operation.
 	 * @memberof UmbInviteUserRepository
 	 */
 	async invite(request: UmbInviteUserRequestModel) {
@@ -35,9 +35,9 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Resend an invite to a user
-	 * @param {string} userUnique
-	 * @param {InviteUserRequestModel} request
-	 * @returns {*}
+	 * @param {string} userUnique - The unique id of the user to resend the invite to.
+	 * @param {InviteUserRequestModel} request - The resend invite request data.
+	 * @returns {*} The result of the resend invite operation.
 	 * @memberof UmbInviteUserRepository
 	 */
 	async resendInvite(request: UmbResendUserInviteRequestModel) {

@@ -288,7 +288,8 @@ export default {
 		compositionUsageHeading: 'Где используется эта композиция?',
 		compositionUsageSpecification: 'Эта композиция сейчас используется при создании следующих типов документов:',
 		compositionUsageSpecificationMediaType: 'Эта композиция сейчас используется при создании следующих типов медиа:',
-		compositionUsageSpecificationMemberType: 'Эта композиция сейчас используется при создании следующих типов участников:',
+		compositionUsageSpecificationMemberType:
+			'Эта композиция сейчас используется при создании следующих типов участников:',
 		noAvailableCompositions: 'В настоящее время нет типов документов, допустимых для построения композиции.',
 		noAvailableCompositionsMediaType: 'В настоящее время нет типов медиа, допустимых для построения композиции.',
 		noAvailableCompositionsMemberType: 'В настоящее время нет типов участников, допустимых для построения композиции.',

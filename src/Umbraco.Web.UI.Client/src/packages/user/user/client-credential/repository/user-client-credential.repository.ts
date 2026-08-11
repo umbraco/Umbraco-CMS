@@ -30,7 +30,7 @@ export class UmbUserClientCredentialRepository extends UmbRepositoryBase {
 	/**
 	 * Creates a new client credentials for a user
 	 * @param {UmbCreateUserClientCredentialRequestArgs} args - The user and client to create the credentials for
-	 * @returns {*}
+	 * @returns {*} The created client credential.
 	 * @memberof UmbUserClientCredentialRepository
 	 */
 	async requestCreate(args: UmbCreateUserClientCredentialRequestArgs) {
@@ -40,7 +40,7 @@ export class UmbUserClientCredentialRepository extends UmbRepositoryBase {
 	/**
 	 * Reads the client credentials for a user
 	 * @param {UmbUserClientCredentialRequestArgs} args - The user to read the credentials for
-	 * @returns {*}
+	 * @returns {*} The client credentials for the user.
 	 * @memberof UmbUserClientCredentialRepository
 	 */
 	async requestClientCredentials(args: UmbUserClientCredentialRequestArgs) {
@@ -50,7 +50,7 @@ export class UmbUserClientCredentialRepository extends UmbRepositoryBase {
 	/**
 	 * Deletes the client credentials for a user
 	 * @param {UmbDeleteUserClientCredentialRequestArgs} args - The user and client unique to delete the credentials for
-	 * @returns {*}
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbUserClientCredentialRepository
 	 */
 	async requestDelete(args: UmbDeleteUserClientCredentialRequestArgs) {

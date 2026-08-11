@@ -12,7 +12,7 @@ export class UmbMemberTypeImportServerDataSource {
 
 	/**
 	 * Creates an instance of UmbMemberTypeImportServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbMemberTypeImportServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -21,8 +21,8 @@ export class UmbMemberTypeImportServerDataSource {
 
 	/**
 	 * Import an item for the given id to the destination unique
-	 * @param {temporaryUnique} temporaryUnique
-	 * @returns {*}
+	 * @param {temporaryUnique} temporaryUnique - The unique identifier of the temporary file to import
+	 * @returns {*} An error, if the import failed
 	 * @memberof UmbMemberTypeImportServerDataSource
 	 */
 	async import(temporaryUnique: string) {

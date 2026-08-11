@@ -25,7 +25,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Creates a new Member Type scaffold
 	 * @param {Partial<UmbMemberTypeDetailModel>} [preset] - Optional preset data to merge with the scaffold
-	 * @returns { CreateMemberTypeRequestModel }
+	 * @returns { CreateMemberTypeRequestModel } The scaffolded Member Type
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMemberTypeDetailModel> = {}) {
@@ -54,7 +54,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Fetches a Member Type with the given id from the server
 	 * @param {string} unique - The unique identifier of the Member Type to fetch
-	 * @returns {*}
+	 * @returns {*} The Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async read(unique: string) {
@@ -68,7 +68,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Fetches multiple Member Types by their unique IDs from the server
 	 * @param {Array<string>} uniques - The unique IDs of the member types to fetch
-	 * @returns {*}
+	 * @returns {*} The Member Types, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async readMany(uniques: Array<string>) {
@@ -87,7 +87,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Inserts a new Member Type on the server
 	 * @param {UmbMemberTypeDetailModel} model - Member Type Model
-	 * @returns {*}
+	 * @returns {*} The created Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async create(model: UmbMemberTypeDetailModel, parentUnique: string | null = null) {
@@ -139,7 +139,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Updates a MemberType on the server
 	 * @param { UmbMemberTypeDetailModel } model - Member Type Model
-	 * @returns {*}
+	 * @returns {*} The updated Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async update(model: UmbMemberTypeDetailModel) {
@@ -189,7 +189,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Deletes a Member Type on the server
 	 * @param {string} unique - The unique identifier of the Member Type to delete
-	 * @returns {*}
+	 * @returns {*} The result of the delete operation
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async delete(unique: string) {

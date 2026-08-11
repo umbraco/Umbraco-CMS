@@ -12,7 +12,7 @@ export class UmbExportMediaTypeServerDataSource {
 
 	/**
 	 * Creates an instance of UmbExportMediaTypeServerDataSource.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
 	 * @memberof UmbExportMediaTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -21,8 +21,8 @@ export class UmbExportMediaTypeServerDataSource {
 
 	/**
 	 * Export an item for the given id to the destination unique
-	 * @param {unique} unique
-	 * @returns {*}
+	 * @param {unique} unique The unique identifier of the item to export.
+	 * @returns {*} The result of the export operation.
 	 * @memberof UmbExportMediaTypeServerDataSource
 	 */
 	async export(unique: string) {

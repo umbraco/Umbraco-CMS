@@ -7,7 +7,8 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * For example for content you may wish to move one or more documents in bulk
  */
 export interface ManifestEntityBulkAction<MetaType extends MetaEntityBulkAction = MetaEntityBulkAction>
-	extends ManifestElementAndApi<UmbEntityBulkActionElement, UmbEntityBulkAction<MetaType>>,
+	extends
+		ManifestElementAndApi<UmbEntityBulkActionElement, UmbEntityBulkAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'entityBulkAction';
 	forEntityTypes: Array<string>;
@@ -45,8 +46,7 @@ export interface MetaEntityBulkActionDefaultKind extends MetaEntityBulkAction {
 }
 
 // DUPLICATE TO
-export interface ManifestEntityBulkActionDuplicateToKind
-	extends ManifestEntityBulkAction<MetaEntityBulkActionDuplicateToKind> {
+export interface ManifestEntityBulkActionDuplicateToKind extends ManifestEntityBulkAction<MetaEntityBulkActionDuplicateToKind> {
 	type: 'entityBulkAction';
 	kind: 'duplicateTo';
 }

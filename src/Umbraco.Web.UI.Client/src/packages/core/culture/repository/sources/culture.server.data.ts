@@ -22,10 +22,10 @@ export class UmbCultureServerDataSource implements UmbCultureDataSource {
 
 	/**
 	 * Get a list of cultures on the server
-	 * @param root0
-	 * @param root0.skip
-	 * @param root0.take
-	 * @returns {*}
+	 * @param {object} root0 - Pagination options.
+	 * @param {number} root0.skip - Number of items to skip.
+	 * @param {number} root0.take - Number of items to take.
+	 * @returns {*} The paginated list of cultures.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async getCollection({ skip, take }: { skip: number; take: number }) {

@@ -2,8 +2,7 @@ import type { UmbSectionViewElement } from './section-view-element.interface.js'
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSectionView
-	extends ManifestElement<UmbSectionViewElement>,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+	extends ManifestElement<UmbSectionViewElement>, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'sectionView';
 	meta: MetaSectionView;
 }
