@@ -22,7 +22,10 @@ export type UmbPropertyValueResolverValuesProcessor<
 	InnerPropertyValueType extends UmbPropertyValueData = PropertyValueType,
 > = (
 	value: PropertyValueType,
-	valuesProcessor: (values: Array<InnerPropertyValueType>) => Promise<Array<InnerPropertyValueType> | undefined>,
+	valuesProcessor: (
+		values: Array<InnerPropertyValueType>,
+		groupIdentifier?: string,
+	) => Promise<Array<InnerPropertyValueType> | undefined>,
 ) => PromiseLike<PropertyValueType | undefined>;
 
 export type UmbPropertyValueResolverVariantsProcessor<

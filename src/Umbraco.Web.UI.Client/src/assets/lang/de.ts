@@ -2109,4 +2109,7 @@ export default {
 		routeForbiddenDescription:
 			'Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte wenden Sie sich an Ihren Administrator, um Unterstützung zu erhalten.',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'Element' : 'Elemente'} ausgewählt`,
+	},
 } as UmbLocalizationDictionary;
