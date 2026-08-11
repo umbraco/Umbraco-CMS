@@ -13,7 +13,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentBlueprints)]
 public class GetAuditLogDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IAuditService _auditService;
