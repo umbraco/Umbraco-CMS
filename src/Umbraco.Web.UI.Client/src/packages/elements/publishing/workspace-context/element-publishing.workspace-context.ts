@@ -352,8 +352,13 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	 */
 	async #needsPublishConfirmationModal(options: Array<UmbElementVariantOptionModel>): Promise<boolean> {
 		if (options.length > 1) return true;
-		const referencedByCount = await this.referenceCount.getTotalAsync();
-		return referencedByCount > 0;
+		try {
+			return (await this.referenceCount.getTotalAsync()) > 0;
+		} catch {
+			// Couldn't determine the reference count — show the modal rather than risk publishing silently past
+			// references we failed to check for.
+			return true;
+		}
 	}
 
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbElementDetailModel): Promise<void> {
