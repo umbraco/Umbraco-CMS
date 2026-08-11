@@ -1,7 +1,7 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
-import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
@@ -13,10 +13,10 @@ import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interact
  * @augments {UmbControllerBase}
  */
 export class UmbCollectionWorkspaceViewInteractionMemoryController extends UmbControllerBase {
-	// Undefined rather than an empty array, as an array state emits [] on subscribe. The host forwards that to
-	// umb-collection, which takes an incoming snapshot as authoritative and would wipe what the collection has
-	// memorized on its own. Undefined means nothing to say yet, [] means clear.
-	readonly #memories = new UmbBasicState<Array<UmbInteractionMemoryModel> | undefined>(undefined);
+	readonly #memories = new UmbArrayState<UmbInteractionMemoryModel, string, undefined>(
+		undefined,
+		(memory) => memory.unique,
+	);
 	public readonly memories = this.#memories.asObservable();
 
 	#globalInteractionMemoryContext?: typeof UMB_INTERACTION_MEMORY_CONTEXT.TYPE;
