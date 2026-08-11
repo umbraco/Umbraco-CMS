@@ -205,8 +205,11 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     }
 
     /// <inheritdoc />
-    protected override void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<IElement> movedEntities, EventMessages eventMessages)
-        => scope.Notifications.Publish(new ElementTreeChangeNotification(movedEntities, TreeChangeTypes.RefreshNode, eventMessages));
+    protected override void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<MoveEventInfo<IElement>> movedEntities, EventMessages eventMessages)
+        => scope.Notifications.Publish(new ElementTreeChangeNotification(
+            movedEntities.Select(movedEntity => movedEntity.Entity).ToArray(),
+            TreeChangeTypes.RefreshNode,
+            eventMessages));
 
     private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteLockedAsync(
         ICoreScope scope,

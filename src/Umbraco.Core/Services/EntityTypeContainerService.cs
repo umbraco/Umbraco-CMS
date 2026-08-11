@@ -120,9 +120,12 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     ///     Called within the scope, after the move has been persisted.
     /// </summary>
     /// <param name="scope">The scope the move is running in.</param>
-    /// <param name="movedEntities">The moved entities.</param>
+    /// <param name="movedEntities">
+    ///     The moved entities, each carrying the path it had before the move. No new parent key is supplied, as a
+    ///     container move re-homes the container, leaving the parent of every entity within it unchanged.
+    /// </param>
     /// <param name="eventMessages">The event messages for the operation.</param>
-    protected virtual void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<TTreeEntity> movedEntities, EventMessages eventMessages)
+    protected virtual void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<MoveEventInfo<TTreeEntity>> movedEntities, EventMessages eventMessages)
     {
     }
 
@@ -449,7 +452,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
 
         var newContainerPath = $"{parentPath.TrimEnd(Constants.CharArrays.Comma)},{container.Id}";
         var levelDelta = 1 - container.Level + parentLevel;
-        var movedEntities = new List<TTreeEntity>();
+        var movedEntities = new List<MoveEventInfo<TTreeEntity>>();
         UmbracoObjectTypes containedObjectType = ObjectTypes.GetUmbracoObjectType(ContainedObjectType);
         Guid containerObjectTypeId = ContainerObjectType.GetGuid();
 
@@ -480,6 +483,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
                 {
                     TTreeEntity descendantEntity = GetContainedEntity(descendant.Id)
                                                    ?? throw new InvalidOperationException($"Descendant entity with ID {descendant.Id} was not found.");
+                    var descendantOriginalPath = descendantEntity.Path;
                     descendantEntity.Path = $"{newContainerPath}{descendant.Path[container.Path.Length..]}";
                     descendantEntity.Level += levelDelta;
 
@@ -490,7 +494,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
                     }
 
                     SaveContainedEntity(descendantEntity);
-                    movedEntities.Add(descendantEntity);
+                    movedEntities.Add(new MoveEventInfo<TTreeEntity>(descendantEntity, descendantOriginalPath, newParentKey: null));
                 }
             }
         }

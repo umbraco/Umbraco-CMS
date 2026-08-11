@@ -82,6 +82,18 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
             : OperationStatusResult(result.Status);
     }
 
+    protected async Task<IActionResult> MoveFolderAsync(Guid key, MoveFolderRequestModel moveFolderRequestModel)
+    {
+        Attempt<EntityContainerOperationStatus> result = await _treeEntityTypeContainerService.MoveAsync(
+            key,
+            moveFolderRequestModel.Target?.Id,
+            CurrentUserKey(_backOfficeSecurityAccessor));
+
+        return result.Success
+            ? Ok()
+            : OperationStatusResult(result.Result);
+    }
+
     internal static IActionResult OperationStatusResult(EntityContainerOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {

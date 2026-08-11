@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Locking;
@@ -47,6 +48,15 @@ internal sealed class MediaTypeContainerService : EntityTypeContainerService<IMe
 
     /// <inheritdoc />
     protected override void SaveContainedEntity(IMediaType entity) => _mediaTypeRepository.Save(entity);
+
+    /// <inheritdoc />
+    protected override void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<MoveEventInfo<IMediaType>> movedEntities, EventMessages eventMessages)
+    {
+        if (movedEntities.Count > 0)
+        {
+            scope.Notifications.Publish(new MediaTypeMovedNotification(movedEntities, eventMessages));
+        }
+    }
 
     /// <inheritdoc />
     protected override Guid ContainedObjectType => Constants.ObjectTypes.MediaType;

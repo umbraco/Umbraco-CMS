@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -56,6 +58,24 @@ internal sealed class ContentBlueprintContainerService : EntityTypeContainerServ
     {
         entity.Blueprint = true;
         _documentBlueprintRepository.Save(entity);
+    }
+
+    /// <inheritdoc />
+    protected override void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<MoveEventInfo<IContent>> movedEntities, EventMessages eventMessages)
+    {
+        if (movedEntities.Count == 0)
+        {
+            return;
+        }
+
+        scope.Notifications.Publish(new ContentMovedBlueprintNotification(movedEntities, eventMessages));
+
+        // Blueprints are content nodes, so the content tree change notification is what keeps the tree and the
+        // caches in step - matching what ContentService.MoveBlueprint publishes for a single blueprint move.
+        scope.Notifications.Publish(new ContentTreeChangeNotification(
+            movedEntities.Select(movedEntity => movedEntity.Entity).ToArray(),
+            TreeChangeTypes.RefreshNode,
+            eventMessages));
     }
 
     /// <inheritdoc />
