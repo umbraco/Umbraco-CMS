@@ -1,6 +1,6 @@
 import type { UmbEntityReferencesModalData, UmbEntityReferencesModalValue } from './types.js';
 import type { UmbEntityReferenceListElement } from '../../global-components/entity-reference-list.element.js';
-import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -12,10 +12,10 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 	UmbEntityReferencesModalValue
 > {
 	@state()
-	private _referencedByTotal?: number;
+	private _referencedByTotal = 0;
 
 	@state()
-	private _descendantsTotal?: number;
+	private _descendantsTotal = 0;
 
 	#onReferencedByChange(event: UmbChangeEvent) {
 		this._referencedByTotal = (event.target as UmbEntityReferenceListElement).getTotal();
@@ -36,31 +36,25 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 
 		return html`
 			<uui-dialog-layout headline=${headline}>
-				${when(
-					this._referencedByTotal !== 0,
-					() => html`
-						<p><umb-localize key="references_labelDependsOnThis"></umb-localize></p>
-						<umb-entity-reference-list
-							readonly
-							.unique=${this.data!.unique}
-							.referenceRepositoryAlias=${this.data!.referenceRepositoryAlias}
-							source="referencedBy"
-							@change=${this.#onReferencedByChange}></umb-entity-reference-list>
-					`,
-				)}
-				${when(
-					this._descendantsTotal !== 0,
-					() => html`
-						<p><umb-localize key="references_labelDependentDescendants"></umb-localize></p>
-						<umb-entity-reference-list
-							readonly
-							.unique=${this.data!.unique}
-							.referenceRepositoryAlias=${this.data!.referenceRepositoryAlias}
-							.itemRepositoryAlias=${this.data!.itemRepositoryAlias}
-							source="descendantsWithReferences"
-							@change=${this.#onDescendantsChange}></umb-entity-reference-list>
-					`,
-				)}
+				<div ?hidden=${!this._referencedByTotal}>
+					<p><umb-localize key="references_labelDependsOnThis"></umb-localize></p>
+					<umb-entity-reference-list
+						readonly
+						.unique=${this.data.unique}
+						.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
+						source="referencedBy"
+						@change=${this.#onReferencedByChange}></umb-entity-reference-list>
+				</div>
+				<div ?hidden=${!this._descendantsTotal}>
+					<p><umb-localize key="references_labelDependentDescendants"></umb-localize></p>
+					<umb-entity-reference-list
+						readonly
+						.unique=${this.data.unique}
+						.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
+						.itemRepositoryAlias=${this.data.itemRepositoryAlias}
+						source="descendantsWithReferences"
+						@change=${this.#onDescendantsChange}></umb-entity-reference-list>
+				</div>
 
 				<div slot="actions">
 					<uui-button
@@ -72,7 +66,7 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			:host {
 				display: block;

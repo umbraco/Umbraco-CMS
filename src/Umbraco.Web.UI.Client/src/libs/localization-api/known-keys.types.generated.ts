@@ -1884,7 +1884,6 @@ declare global {
 		references_labelUsedByMemberTypes: string;
 		references_labelUsedDescendants: string;
 		references_labelUsedItems: string;
-		references_labelViewAll: string;
 		references_listViewDialogWarning: string;
 		references_tabName: string;
 		references_unpublishWarning: string;

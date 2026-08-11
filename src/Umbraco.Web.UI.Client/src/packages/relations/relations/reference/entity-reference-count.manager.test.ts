@@ -67,7 +67,7 @@ describe('UmbEntityReferenceCountManager', () => {
 	});
 
 	it('has no total until a unique is set', () => {
-		expect(manager.getTotal()).to.be.undefined;
+		expect(manager.getTotal()).to.equal(undefined);
 	});
 
 	it('loads the total once a unique is set', async () => {
@@ -97,7 +97,7 @@ describe('UmbEntityReferenceCountManager', () => {
 		UmbTestReferenceRepository.responseQueue.push({ total: 3 });
 		await manager.setUnique('elm-1');
 		await manager.setUnique(undefined);
-		expect(manager.getTotal()).to.be.undefined;
+		expect(manager.getTotal()).to.equal(undefined);
 	});
 
 	describe('getTotalAsync', () => {

@@ -145,7 +145,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// Reload workspace data to reflect the unpublished state
 		await this.#elementWorkspaceContext.reload();
 		await this.#loadAndProcessLastPublished();
-		this.referenceCount.reload();
+		this.referenceCount.reload().catch(() => undefined);
 	}
 
 	/**
@@ -226,7 +226,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 					// reload the element so all states are updated after the schedule operation
 					await this.#elementWorkspaceContext.reload();
-					this.referenceCount.reload();
+					this.referenceCount.reload().catch(() => undefined);
 
 					// request reload of this entity
 					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
@@ -291,8 +291,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// Skip the confirmation dialog only when it would have nothing to say: a single variant to publish and no
 		// items referencing this element. Otherwise open it — the modal itself hides the variant picker when there
 		// is only one option, showing just the reference-awareness section.
-		const referencedByCount = await this.referenceCount.getTotalAsync();
-		const needsModal = options.length > 1 || referencedByCount > 0;
+		const needsModal = await this.#needsPublishConfirmationModal(options);
 
 		if (!needsModal) {
 			variantIds.push(UmbVariantId.Create(options[0]));
@@ -345,6 +344,18 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		);
 	}
 
+	/**
+	 * Whether the publish confirmation modal has anything to say: either there is more than one variant to choose
+	 * between, or something references this element.
+	 * @param {Array<UmbElementVariantOptionModel>} options - The variant options being published.
+	 * @returns {Promise<boolean>} Whether the confirmation modal should be shown.
+	 */
+	async #needsPublishConfirmationModal(options: Array<UmbElementVariantOptionModel>): Promise<boolean> {
+		if (options.length > 1) return true;
+		const referencedByCount = await this.referenceCount.getTotalAsync();
+		return referencedByCount > 0;
+	}
+
 	async #performSaveAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbElementDetailModel): Promise<void> {
 		await this.#init;
 		if (!this.#elementWorkspaceContext) throw new Error('Element workspace context is missing');
@@ -395,7 +406,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		}
 
 		await this.#loadAndProcessLastPublished();
-		this.referenceCount.reload();
+		this.referenceCount.reload().catch(() => undefined);
 
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		this.#eventContext?.dispatchEvent(event);
@@ -468,7 +479,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 				}
 
 				this.#currentUnique = unique;
-				this.referenceCount.setUnique(unique ?? undefined);
+				this.referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
 
 				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished();

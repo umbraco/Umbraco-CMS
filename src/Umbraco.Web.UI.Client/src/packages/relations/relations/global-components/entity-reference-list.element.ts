@@ -73,9 +73,9 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		return this._total;
 	}
 
-	protected override async firstUpdated(_changedProperties: PropertyValues): Promise<void> {
+	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);
-		await this.#init();
+		this.#init();
 	}
 
 	async #init() {
@@ -142,7 +142,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 			return;
 		}
 
-		const uniques = data.items.map((item) => item.unique).filter((unique) => unique) as Array<string>;
+		const uniques = data.items.map((item) => item.unique).filter(Boolean) as Array<string>;
 		const { data: items } = await this.#itemRepository.requestItems(uniques);
 		this._items = items ?? [];
 	}
@@ -192,7 +192,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			.no-items {

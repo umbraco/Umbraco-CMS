@@ -28,10 +28,19 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 
 	#referenceRepository?: UmbEntityReferenceRepository;
 
+	/**
+	 * The number of items referencing the entity in `config`. `0` until the count has loaded.
+	 * @returns {number} The referenced-by count.
+	 */
 	getTotalReferencedBy() {
 		return this._totalReferencedByItems;
 	}
 
+	/**
+	 * The number of descendants of the entity in `config` that are referenced elsewhere. `0` until the count
+	 * has loaded, or if the reference repository does not support this lookup.
+	 * @returns {number} The referenced-descendants count.
+	 */
 	getTotalDescendantsWithReferences() {
 		return this._totalDescendantsWithReferences;
 	}
@@ -119,7 +128,7 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 		`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		css`
 			.reference-summary {
 				display: flex;

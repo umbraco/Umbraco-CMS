@@ -1857,7 +1857,6 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'references_labelUsedByMemberTypes',
 	'references_labelUsedDescendants',
 	'references_labelUsedItems',
-	'references_labelViewAll',
 	'references_listViewDialogWarning',
 	'references_tabName',
 	'references_unpublishWarning',
