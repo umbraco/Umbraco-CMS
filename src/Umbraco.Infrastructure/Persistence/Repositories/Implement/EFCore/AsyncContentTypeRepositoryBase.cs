@@ -1258,7 +1258,12 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         IEnumerable<IContentTypeComposition> impacted)
     {
         var defaultLanguageId = await GetDefaultLanguageIdAsync();
-        var impactedL = impacted.Select(x => x.Id).ToList();
+        var impactedList = impacted.ToList();
+        var impactedL = impactedList.Select(x => x.Id).ToList();
+
+        ILookup<bool, IContentTypeComposition> impactedByIsElement = impactedList.ToLookup(x => x.IsElement);
+        var impactedDocumentIds = impactedByIsElement[false].Select(x => x.Id).ToList();
+        var impactedElementIds = impactedByIsElement[true].Select(x => x.Id).ToList();
 
         foreach (IGrouping<(ContentVariation FromVariation, ContentVariation ToVariation),
                      KeyValuePair<int, (ContentVariation FromVariation, ContentVariation ToVariation)>> grouping in
@@ -1275,14 +1280,16 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 // Culture has been enabled
                 await CopyPropertyDataAsync(null, defaultLanguageId, propertyTypeIds, impactedL);
                 await CopyTagDataAsync(null, defaultLanguageId, propertyTypeIds, impactedL);
-                await RenormalizeDocumentEditedFlagsAsync(propertyTypeIds, impactedL);
+                await RenormalizeDocumentEditedFlagsAsync(propertyTypeIds, impactedDocumentIds);
+                await RenormalizeElementEditedFlagsAsync(propertyTypeIds, impactedElementIds);
             }
             else if (fromCultureEnabled && !toCultureEnabled)
             {
                 // Culture has been disabled
                 await CopyPropertyDataAsync(defaultLanguageId, null, propertyTypeIds, impactedL);
                 await CopyTagDataAsync(defaultLanguageId, null, propertyTypeIds, impactedL);
-                await RenormalizeDocumentEditedFlagsAsync(propertyTypeIds, impactedL);
+                await RenormalizeDocumentEditedFlagsAsync(propertyTypeIds, impactedDocumentIds);
+                await RenormalizeElementEditedFlagsAsync(propertyTypeIds, impactedElementIds);
             }
         }
     }
@@ -1523,11 +1530,47 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
     ///     Re-normalizes the edited value in the umbracoDocumentCultureVariation and umbracoDocument table when
     ///     variations are changed.
     /// </summary>
-    private async Task RenormalizeDocumentEditedFlagsAsync(
+    private Task RenormalizeDocumentEditedFlagsAsync(
         IReadOnlyCollection<int> propertyTypeIds,
         IReadOnlyCollection<int>? contentTypeIds = null)
+        => RenormalizeEditedFlagsAsync(
+            propertyTypeIds,
+            contentTypeIds,
+            Constants.DatabaseSchema.Tables.DocumentVersion,
+            Constants.DatabaseSchema.Tables.DocumentCultureVariation,
+            Constants.DatabaseSchema.Tables.Document);
+
+    /// <summary>
+    ///     Re-normalizes the edited value in the umbracoElementCultureVariation and umbracoElement table when
+    ///     variations are changed.
+    /// </summary>
+    private Task RenormalizeElementEditedFlagsAsync(
+        IReadOnlyCollection<int> propertyTypeIds,
+        IReadOnlyCollection<int>? contentTypeIds = null)
+        => RenormalizeEditedFlagsAsync(
+            propertyTypeIds,
+            contentTypeIds,
+            Constants.DatabaseSchema.Tables.ElementVersion,
+            Constants.DatabaseSchema.Tables.ElementCultureVariation,
+            Constants.DatabaseSchema.Tables.Element);
+
+    /// <summary>
+    ///     Re-normalizes the edited value in the culture-variation and top-level content tables when variations are
+    ///     changed, for any node type sharing the standard publishable-content table shape (Documents, Elements).
+    /// </summary>
+    /// <remarks>
+    ///     If this is not done, then in some cases the "edited" value for a particular culture will remain true
+    ///     when it should be false if the property was changed to invariant. In order to do this we need to
+    ///     recalculate this value based on the values stored for each property, culture and current/published version.
+    /// </remarks>
+    private async Task RenormalizeEditedFlagsAsync(
+        IReadOnlyCollection<int> propertyTypeIds,
+        IReadOnlyCollection<int>? contentTypeIds,
+        string versionTableName,
+        string cultureVariationTableName,
+        string contentTableName)
     {
-        if (propertyTypeIds.Count == 0)
+        if (propertyTypeIds.Count == 0 || contentTypeIds is { Count: 0 })
         {
             return;
         }
@@ -1552,7 +1595,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
              INNER JOIN "{Constants.DatabaseSchema.Tables.ContentVersion}" cv ON cv."id" = pd."versionId"
              INNER JOIN "{PropertyTypeDto.TableName}" pt ON pt."{PropertyTypeDto.PrimaryKeyColumnName}" = pd."propertyTypeId"
              {contentJoin}
-             LEFT JOIN "{Constants.DatabaseSchema.Tables.DocumentVersion}" dv ON cv."id" = dv."id"
+             LEFT JOIN "{versionTableName}" dv ON cv."id" = dv."id"
              WHERE (cv."current" = 1 OR dv."published" = 1)
              AND pd."propertyTypeId" IN ({pts})
              {contentWhere}
@@ -1631,7 +1674,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             }
         }
 
-        // lookup all matching rows in umbracoDocumentCultureVariation
+        // lookup all matching rows in the culture-variation table
         // fetch in batches to keep statement size bounded
         var languageIds = editedLanguageVersions.Keys
             .Select(x => x.langId)
@@ -1640,7 +1683,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
             .Distinct()
             .ToArray();
         IEnumerable<int> nodeIds = editedLanguageVersions.Keys.Select(x => x.nodeId).Distinct();
-        var docCultureVariationsToUpdate = new Dictionary<(int NodeId, int? LanguageId), DocumentCultureVariationRow>();
+        var cultureVariationsToUpdate = new Dictionary<(int NodeId, int? LanguageId), CultureVariationRow>();
         if (languageIds.Length > 0)
         {
             foreach (IEnumerable<int> group in nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount - languageIds.Length))
@@ -1648,35 +1691,35 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
                 var sql =
                     $"""
                      SELECT "id" AS Id, "nodeId" AS NodeId, "languageId" AS LanguageId, "edited" AS Edited
-                     FROM "{Constants.DatabaseSchema.Tables.DocumentCultureVariation}"
+                     FROM "{cultureVariationTableName}"
                      WHERE "languageId" IN ({string.Join(",", languageIds)}) AND "nodeId" IN ({string.Join(",", group)})
                      """;
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
-                List<DocumentCultureVariationRow> batchRows = await ExecuteEfScopeAsync(db =>
-                    db.Database.SqlQueryRaw<DocumentCultureVariationRow>(sql).ToListAsync());
+                List<CultureVariationRow> batchRows = await ExecuteEfScopeAsync(db =>
+                    db.Database.SqlQueryRaw<CultureVariationRow>(sql).ToListAsync());
 #pragma warning restore EF1002
-                foreach (DocumentCultureVariationRow batchRow in batchRows)
+                foreach (CultureVariationRow batchRow in batchRows)
                 {
-                    docCultureVariationsToUpdate[(batchRow.NodeId, batchRow.LanguageId)] = batchRow;
+                    cultureVariationsToUpdate[(batchRow.NodeId, batchRow.LanguageId)] = batchRow;
                 }
             }
         }
 
-        var toUpdate = new List<DocumentCultureVariationRow>();
+        var toUpdate = new List<CultureVariationRow>();
         foreach (KeyValuePair<(int nodeId, int? langId), bool> ev in editedLanguageVersions)
         {
-            if (docCultureVariationsToUpdate.TryGetValue(ev.Key, out DocumentCultureVariationRow? docVariations))
+            if (cultureVariationsToUpdate.TryGetValue(ev.Key, out CultureVariationRow? variations))
             {
-                if (docVariations.Edited != ev.Value)
+                if (variations.Edited != ev.Value)
                 {
-                    docVariations.Edited = ev.Value;
-                    toUpdate.Add(docVariations);
+                    variations.Edited = ev.Value;
+                    toUpdate.Add(variations);
                 }
             }
             else if (ev.Key.langId.HasValue)
             {
                 // This can happen when a property changes from invariant to variant and the content was only
-                // created in non-default languages: there is no DocumentCultureVariation row for the default
+                // created in non-default languages: there is no culture-variation row for the default
                 // language, so there is no edited flag to update.
                 continue;
             }
@@ -1685,23 +1728,23 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
         await ExecuteEfScopeAsync(async db =>
         {
-            // bulk update umbracoDocumentCultureVariation, once for edited = true, another for edited = false
-            foreach (IGrouping<bool, DocumentCultureVariationRow> editValue in toUpdate.GroupBy(x => x.Edited))
+            // bulk update the culture-variation table, once for edited = true, another for edited = false
+            foreach (IGrouping<bool, CultureVariationRow> editValue in toUpdate.GroupBy(x => x.Edited))
             {
-                foreach (IEnumerable<DocumentCultureVariationRow> batch in editValue.InGroupsOf(Constants.Sql.MaxParameterCount))
+                foreach (IEnumerable<CultureVariationRow> batch in editValue.InGroupsOf(Constants.Sql.MaxParameterCount))
                 {
                     await db.Database.ExecuteSqlRawAsync(
-                        $"UPDATE \"{Constants.DatabaseSchema.Tables.DocumentCultureVariation}\" SET \"edited\" = {(editValue.Key ? 1 : 0)} WHERE \"id\" IN ({string.Join(",", batch.Select(x => x.Id))})");
+                        $"UPDATE \"{cultureVariationTableName}\" SET \"edited\" = {(editValue.Key ? 1 : 0)} WHERE \"id\" IN ({string.Join(",", batch.Select(x => x.Id))})");
                 }
             }
 
-            // bulk update the umbracoDocument table
+            // bulk update the top-level content table
             foreach (IGrouping<bool, KeyValuePair<int, bool>> groupByValue in editedDocument.GroupBy(x => x.Value))
             {
                 foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(Constants.Sql.MaxParameterCount))
                 {
                     await db.Database.ExecuteSqlRawAsync(
-                        $"UPDATE \"{Constants.DatabaseSchema.Tables.Document}\" SET \"edited\" = {(groupByValue.Key ? 1 : 0)} WHERE \"nodeId\" IN ({string.Join(",", batch.Select(x => x.Key))})");
+                        $"UPDATE \"{contentTableName}\" SET \"edited\" = {(groupByValue.Key ? 1 : 0)} WHERE \"nodeId\" IN ({string.Join(",", batch.Select(x => x.Key))})");
                 }
             }
         });
@@ -1921,7 +1964,7 @@ internal abstract class AsyncContentTypeRepositoryBase<TEntity> : AsyncEntityRep
         public int Variations { get; set; }
     }
 
-    private sealed class DocumentCultureVariationRow
+    private sealed class CultureVariationRow
     {
         public int Id { get; set; }
 
