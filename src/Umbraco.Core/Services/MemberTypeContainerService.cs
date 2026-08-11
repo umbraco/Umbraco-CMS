@@ -15,6 +15,8 @@ namespace Umbraco.Cms.Core.Services;
 /// </remarks>
 internal sealed class MemberTypeContainerService : EntityTypeContainerService<IMemberType, IMemberTypeContainerRepository>, IMemberTypeContainerService
 {
+    private readonly IMemberTypeRepository _memberTypeRepository;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberTypeContainerService" /> class.
     /// </summary>
@@ -25,6 +27,8 @@ internal sealed class MemberTypeContainerService : EntityTypeContainerService<IM
     /// <param name="auditService">The audit service for recording audit entries.</param>
     /// <param name="entityRepository">The entity repository for entity operations.</param>
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="memberTypeRepository">The member type repository.</param>
     public MemberTypeContainerService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -32,10 +36,17 @@ internal sealed class MemberTypeContainerService : EntityTypeContainerService<IM
         IMemberTypeContainerRepository entityContainerRepository,
         IAuditService auditService,
         IEntityRepository entityRepository,
-        IUserIdKeyResolver userIdKeyResolver)
-        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
-    {
-    }
+        IUserIdKeyResolver userIdKeyResolver,
+        IEntityService entityService,
+        IMemberTypeRepository memberTypeRepository)
+        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver, entityService)
+        => _memberTypeRepository = memberTypeRepository;
+
+    /// <inheritdoc />
+    protected override IMemberType? GetContainedEntity(int id) => _memberTypeRepository.Get(id);
+
+    /// <inheritdoc />
+    protected override void SaveContainedEntity(IMemberType entity) => _memberTypeRepository.Save(entity);
 
     /// <inheritdoc />
     protected override Guid ContainedObjectType => Constants.ObjectTypes.MemberType;

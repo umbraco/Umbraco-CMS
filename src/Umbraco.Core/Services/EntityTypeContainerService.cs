@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -26,6 +27,17 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     private readonly IAuditService _auditService;
     private readonly IEntityRepository _entityRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+
+    /// <summary>
+    ///     The number of descendants fetched per iteration when moving a container.
+    /// </summary>
+    /// <remarks>Internal so the tests can reach it.</remarks>
+    internal const int DescendantsIteratorPageSize = 500;
+
+    /// <summary>
+    ///     Gets the entity service, used to enumerate the descendants of a container.
+    /// </summary>
+    protected IEntityService EntityService { get; }
 
     /// <summary>
     ///     Gets the GUID identifying the type of objects contained within these containers.
@@ -57,6 +69,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     /// <param name="auditService">The audit service for logging operations.</param>
     /// <param name="entityRepository">The entity repository for general entity operations.</param>
     /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys.</param>
+    /// <param name="entityService">The entity service, used to enumerate the descendants of a container.</param>
     protected EntityTypeContainerService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -64,13 +77,53 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         TEntityContainerRepository entityContainerRepository,
         IAuditService auditService,
         IEntityRepository entityRepository,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IEntityService entityService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _entityContainerRepository = entityContainerRepository;
         _auditService = auditService;
         _entityRepository = entityRepository;
         _userIdKeyResolver = userIdKeyResolver;
+        EntityService = entityService;
+    }
+
+    /// <summary>
+    ///     Gets a contained (leaf) entity by its node ID, so its structural data can be rewritten as part of a
+    ///     container move.
+    /// </summary>
+    /// <param name="id">The node ID of the entity.</param>
+    /// <returns>The entity, or null if it does not exist.</returns>
+    protected abstract TTreeEntity? GetContainedEntity(int id);
+
+    /// <summary>
+    ///     Persists a contained (leaf) entity whose structural data was rewritten by a container move.
+    /// </summary>
+    /// <param name="entity">The entity to persist.</param>
+    protected abstract void SaveContainedEntity(TTreeEntity entity);
+
+    /// <summary>
+    ///     Applies any tree specific state to a contained (leaf) entity before it is persisted as part of a container
+    ///     move - for example recycle bin state.
+    /// </summary>
+    /// <param name="entity">The entity being moved.</param>
+    /// <param name="trash">Whether the entity is being moved to the recycle bin.</param>
+    /// <param name="userKey">Key of the user issuing the move.</param>
+    /// <returns>
+    ///     <see cref="EntityContainerOperationStatus.Success" /> to continue, or any other status to abort the move.
+    /// </returns>
+    protected virtual Task<EntityContainerOperationStatus> PrepareContainedEntityForMoveAsync(TTreeEntity entity, bool trash, Guid userKey)
+        => Task.FromResult(EntityContainerOperationStatus.Success);
+
+    /// <summary>
+    ///     Publishes the tree specific notifications for the contained (leaf) entities moved by a container move.
+    ///     Called within the scope, after the move has been persisted.
+    /// </summary>
+    /// <param name="scope">The scope the move is running in.</param>
+    /// <param name="movedEntities">The moved entities.</param>
+    /// <param name="eventMessages">The event messages for the operation.</param>
+    protected virtual void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<TTreeEntity> movedEntities, EventMessages eventMessages)
+    {
     }
 
     /// <inheritdoc />
@@ -222,6 +275,232 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
     }
 
+    /// <inheritdoc />
+    public virtual async Task<Attempt<EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
+        => await HandleMoveAsync(key, parentKey, userKey);
+
+    /// <summary>
+    ///     Moves a container to a new parent container, optionally requiring the container to be in the recycle bin
+    ///     (i.e. a restore).
+    /// </summary>
+    /// <param name="key">The key of the container to move.</param>
+    /// <param name="parentKey">The key of the parent container to move to, or null to move to the tree root.</param>
+    /// <param name="userKey">Key of the user issuing the move.</param>
+    /// <param name="mustBeInRecycleBin">Whether the container is required to be in the recycle bin.</param>
+    /// <returns>An <see cref="Attempt{TStatus}" /> describing the outcome of the operation.</returns>
+    protected async Task<Attempt<EntityContainerOperationStatus>> HandleMoveAsync(
+        Guid key,
+        Guid? parentKey,
+        Guid userKey,
+        bool mustBeInRecycleBin = false)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        WriteLock(scope);
+
+        EntityContainer? container = _entityContainerRepository.Get(key);
+        if (container is null)
+        {
+            return Attempt.Fail(EntityContainerOperationStatus.NotFound);
+        }
+
+        if (mustBeInRecycleBin && container.Trashed is false)
+        {
+            return Attempt.Fail(EntityContainerOperationStatus.NotInTrash);
+        }
+
+        var parentId = Constants.System.Root;
+        var parentPath = parentId.ToString();
+        var parentLevel = 0;
+        if (parentKey.HasValue && parentKey.Value != Guid.Empty)
+        {
+            EntityContainer? parent = _entityContainerRepository.Get(parentKey.Value);
+            if (parent is null)
+            {
+                return Attempt.Fail(EntityContainerOperationStatus.ParentNotFound);
+            }
+
+            if (parent.Trashed)
+            {
+                // Cannot move to a trashed container.
+                return Attempt.Fail(EntityContainerOperationStatus.InTrash);
+            }
+
+            parentId = parent.Id;
+            parentPath = parent.Path;
+            parentLevel = parent.Level;
+        }
+
+        var originalPath = container.Path;
+        Attempt<EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
+            scope,
+            key,
+            parentId,
+            parentPath,
+            parentLevel,
+            false,
+            userKey,
+            cont => parentPath.StartsWith(cont.Path)
+                ? EntityContainerOperationStatus.InvalidParent // Cannot move to descendant of self.
+                : EntityContainerOperationStatus.Success,
+            (cont, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentKey);
+                return new EntityContainerMovingNotification(moveEventInfo, eventMessages);
+            },
+            (cont, eventMessages) =>
+            {
+                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentKey);
+                return new EntityContainerMovedNotification(moveEventInfo, eventMessages);
+            });
+
+        scope.Complete();
+        return moveResult;
+    }
+
+    /// <summary>
+    ///     Moves a container, and everything below it, to a new parent, assuming the write lock has already been taken.
+    /// </summary>
+    /// <typeparam name="TNotification">
+    ///     The type of the cancelable notification published before the move is performed.
+    /// </typeparam>
+    /// <param name="scope">The scope the move is running in. Note that this method never completes the scope.</param>
+    /// <param name="key">The key of the container to move.</param>
+    /// <param name="parentId">The ID of the node to move the container to, for example the tree root or the recycle bin.</param>
+    /// <param name="parentPath">The path of the node identified by <paramref name="parentId" />, used to build the new paths.</param>
+    /// <param name="parentLevel">The level of the node identified by <paramref name="parentId" />, used to calculate the level delta.</param>
+    /// <param name="trash">Whether the container and its descendants are being moved to the recycle bin.</param>
+    /// <param name="userKey">Key of the user issuing the move.</param>
+    /// <param name="validateMove">
+    ///     Performs any move validation that depends on the resolved container, for example rejecting a move into the
+    ///     container's own descendants. Returning anything but
+    ///     <see cref="EntityContainerOperationStatus.Success" /> aborts the move.
+    /// </param>
+    /// <param name="movingNotificationFactory">
+    ///     Creates the cancelable notification published before the move. If a handler cancels it, the move is aborted
+    ///     with <see cref="EntityContainerOperationStatus.CancelledByNotification" />.
+    /// </param>
+    /// <param name="movedNotificationFactory">
+    ///     Creates the notification published after the move, with the state of the moving notification carried over.
+    /// </param>
+    /// <returns>An <see cref="Attempt{TStatus}" /> describing the outcome of the operation.</returns>
+    /// <remarks>
+    ///     The descendants are rewritten before the container itself is saved, as the rewrite slices the old container
+    ///     path off each descendant path. The paging always requests page zero, because the query matching descendants
+    ///     is based on the container path currently persisted - as descendants are rewritten they drop out of the
+    ///     result set.
+    /// </remarks>
+    protected async Task<Attempt<EntityContainerOperationStatus>> MoveLockedAsync<TNotification>(
+        ICoreScope scope,
+        Guid key,
+        int parentId,
+        string parentPath,
+        int parentLevel,
+        bool trash,
+        Guid userKey,
+        Func<EntityContainer, EntityContainerOperationStatus> validateMove,
+        Func<EntityContainer, EventMessages, TNotification> movingNotificationFactory,
+        Func<EntityContainer, EventMessages, IStatefulNotification> movedNotificationFactory)
+        where TNotification : IStatefulNotification, ICancelableNotification
+    {
+        EntityContainer? container = _entityContainerRepository.Get(key);
+        if (container is null)
+        {
+            return Attempt.Fail(EntityContainerOperationStatus.NotFound);
+        }
+
+        // Capture original path before any modifications (needed for audit message when trashing).
+        var originalPath = container.Path;
+
+        if (container.ParentId == parentId)
+        {
+            return Attempt.Succeed(EntityContainerOperationStatus.Success);
+        }
+
+        EntityContainerOperationStatus validateMoveResult = validateMove(container);
+        if (validateMoveResult != EntityContainerOperationStatus.Success)
+        {
+            return Attempt.Fail(validateMoveResult);
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        // Fire the moving notification and handle cancellation.
+        TNotification movingNotification = movingNotificationFactory(container, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(movingNotification))
+        {
+            return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
+        }
+
+        var newContainerPath = $"{parentPath.TrimEnd(Constants.CharArrays.Comma)},{container.Id}";
+        var levelDelta = 1 - container.Level + parentLevel;
+        var movedEntities = new List<TTreeEntity>();
+        UmbracoObjectTypes containedObjectType = ObjectTypes.GetUmbracoObjectType(ContainedObjectType);
+        Guid containerObjectTypeId = ContainerObjectType.GetGuid();
+
+        long total;
+
+        do
+        {
+            IEnumerable<IEntitySlim> descendants = EntityService.GetPagedDescendants(
+                container.Key,
+                ContainerObjectType,
+                [ContainerObjectType, containedObjectType],
+                0, // pageIndex = 0 because the move operation is path based (starts-with), and we update paths as we move through the descendants
+                DescendantsIteratorPageSize,
+                out total);
+
+            foreach (IEntitySlim descendant in descendants)
+            {
+                if (descendant.NodeObjectType == containerObjectTypeId)
+                {
+                    EntityContainer descendantContainer = _entityContainerRepository.Get(descendant.Id)
+                                                          ?? throw new InvalidOperationException($"Descendant container with ID {descendant.Id} was not found.");
+                    descendantContainer.Path = $"{newContainerPath}{descendant.Path[container.Path.Length..]}";
+                    descendantContainer.Level += levelDelta;
+                    descendantContainer.Trashed = trash;
+                    _entityContainerRepository.Save(descendantContainer);
+                }
+                else
+                {
+                    TTreeEntity descendantEntity = GetContainedEntity(descendant.Id)
+                                                   ?? throw new InvalidOperationException($"Descendant entity with ID {descendant.Id} was not found.");
+                    descendantEntity.Path = $"{newContainerPath}{descendant.Path[container.Path.Length..]}";
+                    descendantEntity.Level += levelDelta;
+
+                    EntityContainerOperationStatus prepareStatus = await PrepareContainedEntityForMoveAsync(descendantEntity, trash, userKey);
+                    if (prepareStatus != EntityContainerOperationStatus.Success)
+                    {
+                        return Attempt.Fail(prepareStatus);
+                    }
+
+                    SaveContainedEntity(descendantEntity);
+                    movedEntities.Add(descendantEntity);
+                }
+            }
+        }
+        while (total > DescendantsIteratorPageSize);
+
+        // NOTE: as long as the parent ID is correct, the container repo takes care of updating the rest of the
+        //       structural node data like path, level, sort orders etc.
+        container.ParentId = parentId;
+        container.Trashed = trash;
+
+        _entityContainerRepository.Save(container);
+
+        string? auditMessage = trash
+            ? $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}"
+            : null;
+        await AuditAsync(AuditType.Move, userKey, container.Id, auditMessage);
+
+        PublishContainedEntitiesMovedNotifications(scope, movedEntities, eventMessages);
+
+        // Fire the moved notification.
+        IStatefulNotification movedNotification = movedNotificationFactory(container, eventMessages);
+        scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));
+
+        return Attempt.Succeed(EntityContainerOperationStatus.Success);
+    }
+
     private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> SaveAsync(EntityContainer container, Guid userKey, Func<EntityContainerOperationStatus> operationValidation, AuditType auditType)
     {
         if (container.ContainedObjectType != ContainedObjectType)
@@ -268,6 +547,13 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         return _entityContainerRepository.Get(treeEntity.ParentId);
     }
 
+    /// <summary>
+    ///     Writes an audit entry for a container operation.
+    /// </summary>
+    /// <param name="type">The type of the audited operation.</param>
+    /// <param name="userKey">Key of the user issuing the operation.</param>
+    /// <param name="objectId">The ID of the container the operation was performed on.</param>
+    /// <param name="comment">An optional comment describing the operation.</param>
     protected async Task AuditAsync(AuditType type, Guid userKey, int objectId, string? comment = null) =>
         await _auditService.AddAsync(
             type,
@@ -276,7 +562,11 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
             ContainerObjectType.GetName(),
             comment);
 
-    private void ReadLock(ICoreScope scope)
+    /// <summary>
+    ///     Takes the read locks required by this container type, if any.
+    /// </summary>
+    /// <param name="scope">The scope to take the locks on.</param>
+    protected void ReadLock(ICoreScope scope)
     {
         if (ReadLockIds.Any())
         {
@@ -284,7 +574,11 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
         }
     }
 
-    private void WriteLock(ICoreScope scope)
+    /// <summary>
+    ///     Takes the write locks required by this container type, if any.
+    /// </summary>
+    /// <param name="scope">The scope to take the locks on.</param>
+    protected void WriteLock(ICoreScope scope)
     {
         if (WriteLockIds.Any())
         {

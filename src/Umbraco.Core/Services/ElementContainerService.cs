@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -20,7 +19,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
 {
     private readonly IElementContainerRepository _entityContainerRepository;
     private readonly IEntityRepository _entityRepository;
-    private readonly IEntityService _entityService;
     private readonly IElementRepository _elementRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IElementService _elementService;
@@ -28,9 +26,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
     private readonly IRelationService _relationService;
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly ILogger<ElementContainerService> _logger;
-
-    // internal so the tests can reach it
-    internal const int DescendantsIteratorPageSize = 500;
 
     public ElementContainerService(
         ICoreScopeProvider provider,
@@ -47,12 +42,11 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         IRelationService relationService,
         ITrackedReferencesService trackedReferencesService,
         ILogger<ElementContainerService> logger)
-        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver)
+        : base(provider, loggerFactory, eventMessagesFactory, entityContainerRepository, auditService, entityRepository, userIdKeyResolver, entityService)
     {
         _entityContainerRepository = entityContainerRepository;
         _entityRepository = entityRepository;
         _userIdKeyResolver = userIdKeyResolver;
-        _entityService = entityService;
         _elementRepository = elementRepository;
         _elementService = elementService;
         _contentSettingsOptions = contentSettingsOptions;
@@ -60,10 +54,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         _trackedReferencesService = trackedReferencesService;
         _logger = logger;
     }
-
-    /// <inheritdoc/>
-    public async Task<Attempt<EntityContainerOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleMoveAsync(key, parentKey, userKey);
 
     /// <inheritdoc/>
     public async Task<Attempt<EntityContainerOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
@@ -143,75 +133,6 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return deleteResult;
     }
 
-    private async Task<Attempt<EntityContainerOperationStatus>> HandleMoveAsync(
-        Guid key,
-        Guid? parentKey,
-        Guid userKey,
-        bool mustBeInRecycleBin = false)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.ElementTree);
-
-        EntityContainer? container = _entityContainerRepository.Get(key);
-        if (container is null)
-        {
-            return Attempt.Fail(EntityContainerOperationStatus.NotFound);
-        }
-
-        if (mustBeInRecycleBin && container.Trashed is false)
-        {
-            return Attempt.Fail(EntityContainerOperationStatus.NotInTrash);
-        }
-
-        var parentId = Constants.System.Root;
-        var parentPath = parentId.ToString();
-        var parentLevel = 0;
-        if (parentKey.HasValue && parentKey.Value != Guid.Empty)
-        {
-            EntityContainer? parent = _entityContainerRepository.Get(parentKey.Value);
-            if (parent is null)
-            {
-                return Attempt.Fail(EntityContainerOperationStatus.ParentNotFound);
-            }
-
-            if (parent.Trashed)
-            {
-                // cannot move to a trashed container
-                return Attempt.Fail(EntityContainerOperationStatus.InTrash);
-            }
-
-            parentId = parent.Id;
-            parentPath = parent.Path;
-            parentLevel = parent.Level;
-        }
-
-        var originalPath = container.Path;
-        Attempt<EntityContainerOperationStatus> moveResult = await MoveLockedAsync(
-            scope,
-            key,
-            parentId,
-            parentPath,
-            parentLevel,
-            false,
-            userKey,
-            cont => parentPath.StartsWith(cont.Path)
-                ? EntityContainerOperationStatus.InvalidParent // cannot move to descendant of self
-                : EntityContainerOperationStatus.Success,
-            (cont, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentKey);
-                return new EntityContainerMovingNotification(moveEventInfo, eventMessages);
-            },
-            (cont, eventMessages) =>
-            {
-                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentKey);
-                return new EntityContainerMovedNotification(moveEventInfo, eventMessages);
-            });
-
-        scope.Complete();
-        return moveResult;
-    }
-
     /// <inheritdoc/>
     public Task<Attempt<EntityContainerOperationStatus>> EmptyRecycleBinAsync(Guid userKey)
         => EmptyRecycleBinAsync(userKey, DescendantsIteratorPageSize);
@@ -254,119 +175,32 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
         return Attempt.Succeed(EntityContainerOperationStatus.Success);
     }
 
-    private async Task<Attempt<EntityContainerOperationStatus>> MoveLockedAsync<TNotification>(
-        ICoreScope scope,
-        Guid key,
-        int parentId,
-        string parentPath,
-        int parentLevel,
-        bool trash,
-        Guid userKey,
-        Func<EntityContainer, EntityContainerOperationStatus> validateMove,
-        Func<EntityContainer, EventMessages, TNotification> movingNotificationFactory,
-        Func<EntityContainer, EventMessages, IStatefulNotification> movedNotificationFactory)
-        where TNotification : IStatefulNotification, ICancelableNotification
+    /// <inheritdoc />
+    protected override IElement? GetContainedEntity(int id) => _elementRepository.Get(id);
+
+    /// <inheritdoc />
+    protected override void SaveContainedEntity(IElement entity) => _elementRepository.Save(entity);
+
+    /// <inheritdoc />
+    protected override async Task<EntityContainerOperationStatus> PrepareContainedEntityForMoveAsync(IElement entity, bool trash, Guid userKey)
     {
-        EntityContainer? container = _entityContainerRepository.Get(key);
-        if (container is null)
+        // make sure the element is unpublished if it is moved from trash
+        var unpublishSuccess = await ElementEditingService.UnpublishTrashedElementOnRestore(entity, userKey, _elementService, _userIdKeyResolver, _logger);
+        if (unpublishSuccess is false)
         {
-            return Attempt.Fail(EntityContainerOperationStatus.NotFound);
+            return EntityContainerOperationStatus.Unknown;
         }
 
-        // Capture original path before any modifications (needed for audit message when trashing)
-        var originalPath = container.Path;
+        // NOTE: this cast isn't pretty, but it's the best we can do now. the content and media services do something
+        //       similar, and at the time of writing this, we are subject to the limitations imposed there.
+        ((TreeEntityBase)entity).Trashed = trash;
 
-        if (container.ParentId == parentId)
-        {
-            return Attempt.Succeed(EntityContainerOperationStatus.Success);
-        }
-
-        EntityContainerOperationStatus validateMoveResult = validateMove(container);
-        if (validateMoveResult != EntityContainerOperationStatus.Success)
-        {
-            return Attempt.Fail(validateMoveResult);
-        }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        // fire the moving notification and handle cancellation
-        TNotification movingNotification = movingNotificationFactory(container, eventMessages);
-        if (await scope.Notifications.PublishCancelableAsync(movingNotification))
-        {
-            return Attempt.Fail(EntityContainerOperationStatus.CancelledByNotification);
-        }
-
-        var newContainerPath = $"{parentPath.TrimEnd(Constants.CharArrays.Comma)},{container.Id}";
-        var levelDelta = 1 - container.Level + parentLevel;
-        var movedElements = new List<IElement>();
-
-        long total;
-
-        do
-        {
-            IEnumerable<IEntitySlim> descendants = _entityService.GetPagedDescendants(
-                container.Key,
-                UmbracoObjectTypes.ElementContainer,
-                [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
-                0, // pageIndex = 0 because the move operation is path based (starts-with), and we update paths as we move through the descendants
-                DescendantsIteratorPageSize,
-                out total);
-
-            foreach (IEntitySlim descendant in descendants)
-            {
-                if (descendant.NodeObjectType == Constants.ObjectTypes.ElementContainer)
-                {
-                    EntityContainer descendantContainer = _entityContainerRepository.Get(descendant.Id)
-                                                          ?? throw new InvalidOperationException($"Descendant container with ID {descendant.Id} was not found.");
-                    descendantContainer.Path = $"{newContainerPath}{descendant.Path[container.Path.Length..]}";
-                    descendantContainer.Level += levelDelta;
-                    descendantContainer.Trashed = trash;
-                    _entityContainerRepository.Save(descendantContainer);
-                }
-                else
-                {
-                    IElement descendantElement = _elementRepository.Get(descendant.Id)
-                                                 ?? throw new InvalidOperationException($"Descendant element with ID {descendant.Id} was not found.");
-                    descendantElement.Path = $"{newContainerPath}{descendant.Path[container.Path.Length..]}";
-                    descendantElement.Level += levelDelta;
-
-                    // make sure the element is unpublished if it is moved from trash
-                    var unpublishSuccess = await ElementEditingService.UnpublishTrashedElementOnRestore(descendantElement, userKey, _elementService, _userIdKeyResolver, _logger);
-                    if (unpublishSuccess is false)
-                    {
-                        return Attempt.Fail(EntityContainerOperationStatus.Unknown);
-                    }
-
-                    // NOTE: this cast isn't pretty, but it's the best we can do now. the content and media services do something
-                    //       similar, and at the time of writing this, we are subject to the limitations imposed there.
-                    ((TreeEntityBase)descendantElement).Trashed = trash;
-                    _elementRepository.Save(descendantElement);
-                    movedElements.Add(descendantElement);
-                }
-            }
-        }
-        while (total > DescendantsIteratorPageSize);
-
-        // NOTE: as long as the parent ID is correct, the container repo takes care of updating the rest of the
-        //       structural node data like path, level, sort orders etc.
-        container.ParentId = parentId;
-        container.Trashed = trash;
-
-        _entityContainerRepository.Save(container);
-
-        string? auditMessage = trash
-            ? $"Moved to recycle bin from parent {originalPath.GetParentIdFromPath()}"
-            : null;
-        await AuditAsync(AuditType.Move, userKey, container.Id, auditMessage);
-
-        scope.Notifications.Publish(new ElementTreeChangeNotification(movedElements, TreeChangeTypes.RefreshNode, eventMessages));
-
-        // fire the moved notification
-        IStatefulNotification movedNotification = movedNotificationFactory(container, eventMessages);
-        scope.Notifications.Publish(movedNotification.WithStateFrom(movingNotification));
-
-        return Attempt.Succeed(EntityContainerOperationStatus.Success);
+        return EntityContainerOperationStatus.Success;
     }
+
+    /// <inheritdoc />
+    protected override void PublishContainedEntitiesMovedNotifications(ICoreScope scope, IReadOnlyCollection<IElement> movedEntities, EventMessages eventMessages)
+        => scope.Notifications.Publish(new ElementTreeChangeNotification(movedEntities, TreeChangeTypes.RefreshNode, eventMessages));
 
     private async Task<Attempt<EntityContainer?, EntityContainerOperationStatus>> DeleteLockedAsync(
         ICoreScope scope,
@@ -440,7 +274,7 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                 ? null
                 : Query<IUmbracoEntity>().Where(d => d.Path.SqlLessThan(pathCursor));
 
-            IEntitySlim[] descendants = _entityService.GetPagedDescendants(
+            IEntitySlim[] descendants = EntityService.GetPagedDescendants(
                 key,
                 objectType,
                 [UmbracoObjectTypes.ElementContainer, UmbracoObjectTypes.Element],
