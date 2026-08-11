@@ -49,15 +49,28 @@ export const demandCustomElement = (
 };
 
 /** @deprecated Use UUITimer instead */
+// TODO: Remove in v.18
 export const Timer = UUITimer;
 
 /** @deprecated Use UUIActiveMixinInterface instead */
+// TODO: Remove in v.18
 export type ActiveMixinInterface = UUIActiveMixinInterface;
 /** @deprecated Use UUILabelMixinInterface instead */
+// TODO: Remove in v.18
 export type LabelMixinInterface = UUILabelMixinInterface;
 /** @deprecated Use UUIPopoverTargetMixinInterface instead */
+// TODO: Remove in v.18
 export type PopoverTargetMixinInterface = UUIPopoverTargetMixinInterface;
 /** @deprecated Use UUISelectOnlyMixinInterface instead */
+// TODO: Remove in v.18
 export type SelectOnlyMixinInterface = UUISelectOnlyMixinInterface;
 /** @deprecated Use UUISelectableMixinInterface instead */
+// TODO: Remove in v.18
 export type SelectableMixinInterface = UUISelectableMixinInterface;
+
+// TODO: Remove in v.18
+export * from './uui-popover.element.js';
+// TODO: Remove in v.18
+export * from './UUIPopoverEvent.js';
+// TODO: Remove in v.18
+export * from './uui-caret.element.js';
