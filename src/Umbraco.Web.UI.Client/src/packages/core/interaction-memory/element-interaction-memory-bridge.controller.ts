@@ -52,25 +52,16 @@ export class UmbElementInteractionMemoryBridgeController extends UmbControllerBa
 	}
 
 	/**
-	 * Syncs the bridged manager to the provided snapshot. The incoming array is authoritative:
-	 * memories no longer present are removed, the rest are added or updated. Short-circuits when the
-	 * snapshot already matches to avoid redundant writes and the re-entrant change events they trigger.
+	 * Syncs the bridged manager to the provided snapshot. The incoming array is authoritative: memories no longer
+	 * present are removed, the rest are added or updated. Applied in one write, so restoring a snapshot never
+	 * dispatches a change event for the memories the element was just handed, nor for the intermediate states of
+	 * applying them one by one.
 	 * @param {Array<UmbInteractionMemoryModel> | undefined} value - The authoritative snapshot of interaction memories.
 	 * @memberof UmbElementInteractionMemoryBridgeController
 	 */
 	setMemories(value: Array<UmbInteractionMemoryModel> | undefined): void {
 		const next = value ?? [];
-		const current = this.#interactionMemory.getAllMemories();
-
 		this.#snapshot = next;
-
-		if (jsonStringComparison(next, current)) return;
-
-		const nextUniques = new Set(next.map((memory) => memory.unique));
-		current
-			.filter((memory) => !nextUniques.has(memory.unique))
-			.forEach((memory) => this.#interactionMemory.deleteMemory(memory.unique));
-
-		next.forEach((memory) => this.#interactionMemory.setMemory(memory));
+		this.#interactionMemory.setMemories(next);
 	}
 }
