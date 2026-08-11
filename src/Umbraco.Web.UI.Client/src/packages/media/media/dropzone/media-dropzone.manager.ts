@@ -234,8 +234,8 @@ export class UmbMediaDropzoneManager extends UmbDropzoneManager {
 		if (allowed) return allowed;
 
 		// Request information on this media type.
-		const { data } = await this.#mediaTypeStructure.requestAllowedChildrenOf(mediaTypeUnique, parentUnique);
-		if (!data) throw new Error('Parent media type does not exist');
+		const { data } = await this.#mediaTypeStructure.requestAllAllowedChildrenOf(mediaTypeUnique, parentUnique);
+		if (!data) throw new Error('Could not retrieve the media types allowed under the parent media type');
 
 		this.#allowedChildrenOf.appendOne({ mediaTypeUnique, allowedChildren: data.items });
 		return data.items;

@@ -3,6 +3,7 @@ import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
 import { UmbMockEntityNamedItemManager } from './utils/entity/entity-named-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
+import { pagedResult } from './utils/paged-result.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	AllowedMemberTypeModel,
@@ -21,10 +22,10 @@ class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
 		super('memberType', data);
 	}
 
-	getAllowedAtRoot(): PagedAllowedMemberTypeModel {
+	getAllowedAtRoot(skip = 0, take = 100): PagedAllowedMemberTypeModel {
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
 		const mappedItems = mockItems.map((item) => allowedMemberTypeMapper(item));
-		return { items: mappedItems, total: mappedItems.length };
+		return pagedResult(mappedItems, skip, take);
 	}
 }
 
