@@ -140,15 +140,16 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		let newValue = draftValue;
 
 		if (api.processValues) {
-			// Gather the persisted values by the optionally returned identifier
-			// the identifier is used for value matching when processing the draft values.
-			// A set of values identifier is provided by the resolver, the resolver knowns what makes a set of values unique.
-			const persistedValuesHolder = new Map<string, Array<UmbPotentialContentValueModel>>();
+			// Gather the the inner-values of the persisted value, grouped by the optionally returned identifier.
+			// The identifier is used for inner-value matching when processing the inner-values of the draft values.
+			// The identifier is provided by the resolver, the resolver knows what identifies a set of values.
+			const persistedInnerValues = new Map<string, Array<UmbPotentialContentValueModel>>();
 			let persistedFallbackIndex = 0;
 
 			if (persistedValue) {
 				await api.processValues(persistedValue, async (values, identifier) => {
-					persistedValuesHolder.set(
+					persistedInnerValues.set(
+						// Resolvers that do not supply an identifier will fallback to call order.
 						identifier ?? (persistedFallbackIndex++).toString(),
 						values as unknown as Array<UmbPotentialContentValueModel>,
 					);
@@ -159,9 +160,8 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			let valuesFallbackIndex = 0;
 			newValue =
 				(await api.processValues(newValue, async (values, identifier) => {
-					// Resolvers that do not supply an identifier only ever emit a single group, so falling
-					// back to call order keeps them working unchanged.
-					const persistedValues = persistedValuesHolder.get(identifier ?? (valuesFallbackIndex++).toString());
+					// Resolvers that do not supply an identifier will fallback to call order.
+					const persistedValues = persistedInnerValues.get(identifier ?? (valuesFallbackIndex++).toString());
 
 					return await this.#processValues(persistedValues, values, variantsToStore);
 				})) ?? newValue;
