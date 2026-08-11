@@ -92,13 +92,13 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	#configureReferences() {
-		if (!this.data?.unique || !this.data.itemRepositoryAlias || !this.data.referenceRepositoryAlias) return;
+		if (!this.data) return;
+		const { unique, itemRepositoryAlias, referenceRepositoryAlias } = this.data;
+		if (!unique) return;
+		if (!itemRepositoryAlias) return;
+		if (!referenceRepositoryAlias) return;
 
-		this._referencesConfig = {
-			unique: this.data.unique,
-			itemRepositoryAlias: this.data.itemRepositoryAlias,
-			referenceRepositoryAlias: this.data.referenceRepositoryAlias,
-		};
+		this._referencesConfig = { unique, itemRepositoryAlias, referenceRepositoryAlias };
 	}
 
 	async #configureSelectionManager() {

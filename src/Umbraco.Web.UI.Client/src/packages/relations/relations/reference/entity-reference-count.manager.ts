@@ -17,7 +17,7 @@ export interface UmbEntityReferenceCountManagerArgs {
  * @augments {UmbControllerBase}
  */
 export class UmbEntityReferenceCountManager extends UmbControllerBase {
-	#total = new UmbBasicState<number | undefined>(undefined);
+	readonly #total = new UmbBasicState<number | undefined>(undefined);
 	/** Observable emitting the current reference count. `undefined` until the first successful load. */
 	public readonly total = this.#total.asObservable();
 
@@ -26,6 +26,7 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	#reloadToken = 0;
 	#repository?: UmbEntityReferenceRepository;
 	#repositoryPromise?: Promise<UmbEntityReferenceRepository>;
+	#pendingReload?: Promise<void>;
 
 	constructor(host: UmbControllerHost, args: UmbEntityReferenceCountManagerArgs) {
 		super(host);
@@ -44,12 +45,14 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	/**
 	 * Get the current reference count, loading it first if it hasn't loaded yet. Use this at decision points
 	 * (e.g. "should a confirmation dialog open?") so an unlucky race with the initial load can't silently read as 0.
-	 * @returns {Promise<number>}
+	 * Piggybacks on a reload already in flight (e.g. from {@link setUnique}) rather than starting a second,
+	 * redundant one — starting a second one here would race the first and could win with a stale/empty result.
+	 * @returns {Promise<number>} The reference count.
 	 */
 	async getTotalAsync(): Promise<number> {
 		const current = this.getTotal();
 		if (current !== undefined) return current;
-		await this.reload();
+		await (this.#pendingReload ?? this.reload());
 		return this.getTotal() ?? 0;
 	}
 
@@ -69,6 +72,16 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	 * @returns {Promise<void>}
 	 */
 	async reload(): Promise<void> {
+		const promise = this.#doReload();
+		this.#pendingReload = promise;
+		try {
+			await promise;
+		} finally {
+			if (this.#pendingReload === promise) this.#pendingReload = undefined;
+		}
+	}
+
+	async #doReload(): Promise<void> {
 		const unique = this.#unique;
 		const token = ++this.#reloadToken;
 

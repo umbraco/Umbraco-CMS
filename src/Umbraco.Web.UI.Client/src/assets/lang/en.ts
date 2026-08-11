@@ -2689,7 +2689,6 @@ export default {
 			return `...and ${count} more items`;
 		},
 		labelUsedByCount: (count: number) => `Referenced by ${count} ${count === 1 ? 'item' : 'items'}`,
-		labelViewAll: 'View all',
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',
