@@ -16,6 +16,7 @@ declare global {
 }
 
 /**
+ * @deprecated
  * For v.17 we need to keep this function around for backwards compatibility with the legacy UUI 1.x custom elements.
  * TODO: To be removed in v.18.
  * Fire a warning if the custom element with the provided name isn't available.
