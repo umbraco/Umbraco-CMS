@@ -9,7 +9,7 @@ export class UmbCollectionFilterFieldElement extends UmbLitElement {
 	private _value = '';
 
 	#collectionContext?: typeof UMB_COLLECTION_CONTEXT.TYPE;
-	#hasUserInput = false;
+	#hasUncommittedInput = false;
 
 	constructor() {
 		super();
@@ -21,7 +21,8 @@ export class UmbCollectionFilterFieldElement extends UmbLitElement {
 			this.observe(
 				context?.filter,
 				(filter) => {
-					if (this.#hasUserInput) return;
+					// Keystrokes not yet written to the context must not be replaced by the value they are replacing.
+					if (this.#hasUncommittedInput) return;
 					this._value = (filter as { filter?: string } | undefined)?.filter ?? '';
 				},
 				'umbCollectionFilterFieldValueObserver',
@@ -29,12 +30,15 @@ export class UmbCollectionFilterFieldElement extends UmbLitElement {
 		});
 	}
 
-	#debouncedFilter = debounce((filter: string) => this.#collectionContext?.setFilter({ filter }), 500);
+	#debouncedFilter = debounce((filter: string) => {
+		this.#hasUncommittedInput = false;
+		this.#collectionContext?.setFilter({ filter });
+	}, 500);
 
 	#onInput(event: InputEvent & { target: HTMLInputElement }) {
-		this.#hasUserInput = true;
-		const filter = event.target.value ?? '';
-		this.#debouncedFilter(filter);
+		this.#hasUncommittedInput = true;
+		this._value = event.target.value ?? '';
+		this.#debouncedFilter(this._value);
 	}
 
 	override render() {
