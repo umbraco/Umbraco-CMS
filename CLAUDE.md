@@ -569,8 +569,6 @@ Allowed, and can name the specific issue, implementation, or use case it concern
 
 ## 10. Testing Practices
 
-### Derive tests from the contract
-
 A test for shared code asserts the general rule from §2, not the scenario that reported it, and is named for the rule.
 
 ### Tests for a bug fix must fail before the fix
