@@ -1,15 +1,18 @@
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
+const mediaTypeTargetFolderName = 'TestMediaTypeTargetFolder';
 const mediaTypeFolderName = 'TestMediaTypeFolder';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
+  await umbracoApi.mediaType.ensureNameNotExists(mediaTypeTargetFolderName);
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeFolderName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
 });
 
 test.afterEach(async ({umbracoApi}) => {
+  await umbracoApi.mediaType.ensureNameNotExists(mediaTypeTargetFolderName);
   await umbracoApi.mediaType.ensureNameNotExists(mediaTypeFolderName);
 });
 
@@ -135,4 +138,20 @@ test('can find a media type in a sibling nested folder', async ({umbracoApi}) =>
   // Assert
   expect(mediaTypeData).toBeTruthy();
   expect(mediaTypeData.id).toBe(targetMediaTypeId);
+});
+
+test('can move a media type folder to another media type folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const folderId = await umbracoApi.mediaType.createFolder(mediaTypeFolderName);
+  const targetFolderId = await umbracoApi.mediaType.createFolder(mediaTypeTargetFolderName);
+
+  // Act
+  await umbracoUi.mediaType.clickRootFolderCaretButton();
+  await umbracoUi.mediaType.clickActionsMenuForMediaType(mediaTypeFolderName);
+  await umbracoUi.mediaType.moveToFolder(mediaTypeTargetFolderName);
+
+  // Assert
+  await umbracoUi.mediaType.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
+  const targetFolderChildren = await umbracoApi.mediaType.getChildren(targetFolderId);
+  expect(targetFolderChildren.some((child) => child.id === folderId)).toBeTruthy();
 });
