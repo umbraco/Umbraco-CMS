@@ -2188,7 +2188,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         });
 
         await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
-        basePage = ContentTypeService.Get(basePage.Id);
+        basePage = await ContentTypeService.GetAsync(basePage.Id);
 
         Assert.Multiple(() =>
         {
@@ -2231,7 +2231,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         });
 
         await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
-        basePage = ContentTypeService.Get(basePage.Id);
+        basePage = await ContentTypeService.GetAsync(basePage.Id);
 
         Assert.Multiple(() =>
         {
@@ -2249,7 +2249,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
         await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
-        return ContentTypeService.Get(basePage.Id);
+        return await ContentTypeService.GetAsync(basePage.Id);
     }
 
     private async Task<IContentType> CreateContentTypeWithSingleUngroupedProperty()
@@ -2262,7 +2262,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 
         await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
 
-        return ContentTypeService.Get(basePage.Id);
+        return await ContentTypeService.GetAsync(basePage.Id);
     }
 
     private PropertyType CreateTitlePropertyType() =>

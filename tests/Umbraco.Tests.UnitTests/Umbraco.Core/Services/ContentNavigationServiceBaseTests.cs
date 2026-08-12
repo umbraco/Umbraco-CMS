@@ -2018,13 +2018,13 @@ public class ContentNavigationServiceBaseTests
 
         var resolvedAliases = new ConcurrentDictionary<string, int>();
         var contentTypeServiceMock = new Mock<IContentTypeService>();
-        contentTypeServiceMock.Setup(x => x.GetAll()).Returns([]);
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(Enumerable.Empty<IContentType>());
         contentTypeServiceMock
-            .Setup(x => x.Get(It.IsAny<string>()))
+            .Setup(x => x.GetAsync(It.IsAny<string>()))
             .Returns((string alias) =>
             {
                 resolvedAliases.AddOrUpdate(alias, 1, (_, count) => count + 1);
-                return contentTypes[alias];
+                return Task.FromResult<IContentType?>(contentTypes[alias]);
             });
 
         var navigationService = new TestContentNavigationService(

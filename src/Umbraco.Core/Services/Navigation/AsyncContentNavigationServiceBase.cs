@@ -16,7 +16,7 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly INavigationRepository _navigationRepository;
     private readonly TContentTypeService _typeService;
-    private readonly Lazy<Dictionary<string, Guid>> _contentTypeAliasToKeyMap;
+    private readonly Lazy<ConcurrentDictionary<string, Guid>> _contentTypeAliasToKeyMap;
 
     /// <summary>
     ///     Bundles a navigation structure dictionary and its root keys into a single reference so that
@@ -99,7 +99,7 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
         _coreScopeProvider = coreScopeProvider;
         _navigationRepository = navigationRepository;
         _typeService = typeService;
-        _contentTypeAliasToKeyMap = new Lazy<Dictionary<string, Guid>>(LoadContentTypes);
+        _contentTypeAliasToKeyMap = new Lazy<ConcurrentDictionary<string, Guid>>(LoadContentTypes);
     }
 
     /// <summary>
@@ -1024,7 +1024,7 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
 
     private bool TryGetContentTypeKey(string contentTypeAlias, out Guid? contentTypeKey)
     {
-        Dictionary<string, Guid> aliasToKeyMap = _contentTypeAliasToKeyMap.Value;
+        ConcurrentDictionary<string, Guid> aliasToKeyMap = _contentTypeAliasToKeyMap.Value;
 
         if (aliasToKeyMap.TryGetValue(contentTypeAlias, out Guid key))
         {
@@ -1075,7 +1075,7 @@ internal abstract class AsyncContentNavigationServiceBase<TContentType, TContent
         }
     }
 
-    private Dictionary<string, Guid> LoadContentTypes()
-        => _typeService.GetAllAsync().GetAwaiter().GetResult().ToDictionary(ct => ct.Alias, ct => ct.Key);
+    private ConcurrentDictionary<string, Guid> LoadContentTypes()
+        => new(_typeService.GetAllAsync().GetAwaiter().GetResult().ToDictionary(ct => ct.Alias, ct => ct.Key));
 }
 
