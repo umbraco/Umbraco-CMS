@@ -61,10 +61,10 @@ cases nobody has described yet.
 
 **Design to the contract.** When you change shared code, work out the rule the layer
 must uphold for *any* implementation of it, and make that rule hold there. Name a
-concrete implementation freely inside the package that owns it; in a shared or generic
-layer, handle only the contract. A specific editor alias, entity type, or manifest type
-appearing in generic code is the signal that a fix has been fitted to one caller —
-express it as a capability the contract exposes instead.
+concrete implementation freely in the code that owns it — a specific service, package,
+or project; a shared or generic layer implements only the contract. A specific editor
+alias, entity type, or manifest type appearing in generic code is the signal that a fix
+has been fitted to one caller — express it instead as a capability the contract exposes.
 
 **Describe the contract.** Comments and public docs use the vocabulary of the layer they
 sit in. In public XML doc / JSDoc a concrete illustration is welcome where it reads as
