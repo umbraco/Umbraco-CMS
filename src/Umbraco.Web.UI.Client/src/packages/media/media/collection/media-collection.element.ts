@@ -99,7 +99,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		`;
 	}
 
-	override _renderEmptyState() {
+	protected override _renderEmptyState() {
 		return html`<umb-empty-media-state @browse=${() => this._dropzone?.browse()}> </umb-empty-media-state> `;
 	}
 

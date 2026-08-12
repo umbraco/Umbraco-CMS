@@ -2,7 +2,11 @@ import { UmbMediaDropzoneManager } from './media-dropzone.manager.js';
 import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInputDropzoneElement, UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import type { UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
-import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
+import {
+	UUIBlinkAnimationValue,
+	UUIBlinkKeyframes,
+	type UUIFileDropzoneEvent,
+} from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * A dropzone for uploading files and folders as media items. It is hidden by default and will be shown when dragging files over the window.
@@ -112,10 +116,12 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 
 	static override styles = [
 		...UmbInputDropzoneElement.styles,
+		UUIBlinkKeyframes,
 		css`
 			:host(:not([disabled])[dragging]) #dropzone {
 				opacity: 1;
 				pointer-events: all;
+				animation: ${UUIBlinkAnimationValue};
 			}
 
 			[dropzone] {
@@ -130,8 +136,6 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 				justify-content: center;
 				position: absolute;
 				z-index: 100;
-				border-radius: var(--uui-border-radius);
-				border: 1px solid var(--uui-color-focus);
 				box-sizing: border-box;
 			}
 		`,

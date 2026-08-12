@@ -1,4 +1,4 @@
-import { customElement, html, css, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-empty-media-state')
@@ -6,7 +6,7 @@ export class UmbEmptyMediaStateElement extends UmbLitElement {
 	#dragCounter = 0;
 
 	// Event handlers as arrow functions to maintain consistent references
-	#handleDragEnter = (e: DragEvent) => {
+	#handleDragEnter = () => {
 		this.#dragCounter++;
 		this.toggleAttribute('dragging', true);
 	};
@@ -39,7 +39,7 @@ export class UmbEmptyMediaStateElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-icon name="icon-image-up"></uui-icon>
-			<p>${unsafeHTML(this.localize.term('media_dropFilesOr'))}</p>
+			<p>${this.localize.htmlString('media_dropFilesOr')}</p>
 			<uui-button
 				look="outline"
 				label=${this.localize.term('media_browseFilesAction')}
@@ -73,7 +73,6 @@ export class UmbEmptyMediaStateElement extends UmbLitElement {
 			p {
 				text-align: center;
 				line-height: 1.5;
-				color: var(--uui-color-disabled-standalone);
 			}
 
 			uui-icon {
