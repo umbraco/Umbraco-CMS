@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Search.Core.Extensions;
 /// <summary>
 /// Provides extension methods for <see cref="PropertyValueHandlerCollection"/>.
 /// </summary>
-internal static class PropertyValueHandlerCollectionExtensions
+public static class PropertyValueHandlerCollectionExtensions
 {
     /// <summary>
     /// Finds the handler that applies to the given property type, preferring a custom handler over a built-in one.
