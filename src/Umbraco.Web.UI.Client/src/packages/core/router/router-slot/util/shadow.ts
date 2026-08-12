@@ -3,7 +3,8 @@ import type { IRouterSlot } from '../model.js';
 
 /**
  * Queries the parent router.
- * @param $elem
+ * @param {Element} $elem - The element to start the query from.
+ * @returns {IRouterSlot<D> | null} The parent router slot, or null if none was found.
  */
 export function queryParentRouterSlot<D = any>($elem: Element): IRouterSlot<D> | null {
 	return queryParentRoots<IRouterSlot<D>>($elem, ROUTER_SLOT_TAG_NAME);
@@ -12,10 +13,11 @@ export function queryParentRouterSlot<D = any>($elem: Element): IRouterSlot<D> |
 /**
  * Traverses the roots and returns the first match.
  * The minRoots parameter indicates how many roots should be traversed before we started matching with the query.
- * @param $elem
- * @param query
- * @param minRoots
- * @param roots
+ * @param {Element} $elem - The element to start the traversal from.
+ * @param {string} query - The selector to match against.
+ * @param {number} [minRoots] - The minimum number of roots to traverse before matching.
+ * @param {number} [roots] - The number of roots already traversed.
+ * @returns {T | null} The first matching element, or null if none was found.
  */
 export function queryParentRoots<T>($elem: Element, query: string, minRoots: number = 0, roots: number = 0): T | null {
 	// Grab the rood node and query it

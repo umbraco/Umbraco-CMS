@@ -25,8 +25,8 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 
 	/**
 	 * Gets the member group collection filtered by the given filter.
-	 * @param {UmbMemberGroupCollectionFilterModel} filter
-	 * @returns {*}
+	 * @param {UmbMemberGroupCollectionFilterModel} filter The filter to apply to the collection.
+	 * @returns {*} The member group collection.
 	 * @memberof UmbMemberGroupCollectionServerDataSource
 	 */
 	async getCollection(query: UmbMemberGroupCollectionFilterModel) {

@@ -1,6 +1,6 @@
 import { UMB_TREE_PICKER_MODAL } from '../../tree-picker-modal/index.js';
-import type { MetaEntityActionDuplicateToKind, UmbDuplicateToRepository } from './types.js';
 import type { UmbTreeRepository } from '../../data/tree-repository.interface.js';
+import type { MetaEntityActionDuplicateToKind, UmbDuplicateToRepository } from './types.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
@@ -51,7 +51,10 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 
 	async #requestAncestors() {
 		try {
-			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
+			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(
+				this,
+				this.args.meta.treeRepositoryAlias,
+			);
 			const { data } =
 				(await treeRepository?.requestTreeItemAncestors({
 					treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },

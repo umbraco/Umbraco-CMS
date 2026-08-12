@@ -11,9 +11,9 @@ export class UmbDictionaryExportServerDataSource {
 
 	/**
 	 * @description - Export a Dictionary, optionally including child items.
-	 * @param {string} unique
-	 * @param {boolean} includeChildren
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the dictionary to export.
+	 * @param {boolean} includeChildren - Whether to include child items in the export.
+	 * @returns {*} The exported dictionary.
 	 * @memberof UmbDictionaryExportServerDataSource
 	 */
 	async export(unique: string, includeChildren: boolean) {

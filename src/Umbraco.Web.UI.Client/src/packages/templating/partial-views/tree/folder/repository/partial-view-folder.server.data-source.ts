@@ -28,8 +28,8 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Creates a scaffold for a Partial View folder
-	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbFolderModel>} [preset] - Initial data to seed the scaffold with
+	 * @returns {*} The scaffolded Partial View folder
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -45,8 +45,8 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Fetches a Partial View folder from the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {string} unique - The unique identifier of the Partial View folder
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The Partial View folder
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -78,8 +78,8 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Creates a Partial View folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {UmbFolderModel} model - The Partial View folder to create
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The created Partial View folder
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -112,8 +112,8 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Deletes a Partial View folder on the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceErrorResponse}
+	 * @param {string} unique - The unique identifier of the Partial View folder
+	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
 	 * @memberof UmbPartialViewServerDataSource
 	 */
 	async delete(unique: string) {

@@ -24,8 +24,8 @@ export class UmbUniqueTreeStore extends UmbStoreBase<UmbTreeItemModel> implement
 
 	/**
 	 * Returns an observable to observe the children of a given parent
-	 * @param {(string | null)} parentUnique
-	 * @returns {*}
+	 * @param {(string | null)} parentUnique - The unique of the parent
+	 * @returns {*} An observable of the children
 	 * @memberof UmbUniqueTreeStore
 	 */
 	childrenOf(parentUnique: string | null) {

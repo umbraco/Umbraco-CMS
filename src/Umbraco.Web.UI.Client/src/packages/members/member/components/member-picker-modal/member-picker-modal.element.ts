@@ -33,7 +33,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				this.updateValue({ selection });
 				this.requestUpdate();
 			},
-			'umbSelectionObserver',
+			null,
 		);
 
 		this.observe(
@@ -41,7 +41,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 			(query) => {
 				this._searchQuery = query?.query;
 			},
-			'umbPickerSearchQueryObserver',
+			null,
 		);
 	}
 

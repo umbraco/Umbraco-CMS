@@ -14,7 +14,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Creates an instance of UmbInviteUserServerDataSource.
-	 * @param host
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to.
 	 * @memberof UmbInviteUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -24,8 +24,8 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Invites a user
-	 * @param {UmbInviteUserRequestModel} request
-	 * @returns
+	 * @param {UmbInviteUserRequestModel} request - The invite request data.
+	 * @returns {*} The invited user.
 	 * @memberof UmbInviteUserServerDataSource
 	 */
 	async invite(request: UmbInviteUserRequestModel) {
@@ -57,8 +57,8 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Resend an invite to a user
-	 * @param {UmbResendUserInviteRequestModel} request
-	 * @returns
+	 * @param {UmbResendUserInviteRequestModel} request - The resend invite request data.
+	 * @returns {*} The result of the resend invite operation.
 	 * @memberof UmbInviteUserServerDataSource
 	 */
 	async resendInvite(request: UmbResendUserInviteRequestModel) {

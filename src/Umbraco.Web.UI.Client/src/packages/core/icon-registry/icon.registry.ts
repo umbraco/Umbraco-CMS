@@ -39,7 +39,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 		this.#icons = [...this.#icons, ...icons];
 	}
 	/**
-	 * @param {string} iconName
+	 * @param {string} iconName - The name of the icon
 	 * @returns {*}  {boolean}
 	 * @memberof UmbIconStore
 	 */

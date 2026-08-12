@@ -12,14 +12,11 @@ import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffic
  * A data source for the Media Type Composition that fetches data from the server
  * @class UmbMediaTypeCompositionServerDataSource
  */
-export class UmbMediaTypeCompositionServerDataSource
-	implements
-		UmbContentTypeCompositionDataSource<
-			UmbMediaTypeCompositionReferenceModel,
-			UmbMediaTypeCompositionCompatibleModel,
-			UmbMediaTypeAvailableCompositionRequestModel
-		>
-{
+export class UmbMediaTypeCompositionServerDataSource implements UmbContentTypeCompositionDataSource<
+	UmbMediaTypeCompositionReferenceModel,
+	UmbMediaTypeCompositionCompatibleModel,
+	UmbMediaTypeAvailableCompositionRequestModel
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -32,8 +29,8 @@ export class UmbMediaTypeCompositionServerDataSource
 	}
 	/**
 	 * Fetches the compatible compositions for a Media type from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique ID of the media type
+	 * @returns {*} The compatible compositions
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
@@ -54,9 +51,9 @@ export class UmbMediaTypeCompositionServerDataSource
 	}
 	/**
 	 * Updates the compositions for a media type on the server
-	 * @param {MediaTypeCompositionRequestModel} body
-	 * @param args
-	 * @returns {*}
+	 * @param {MediaTypeCompositionRequestModel} body - The request body
+	 * @param {UmbMediaTypeAvailableCompositionRequestModel} args - The composition request arguments
+	 * @returns {*} The available compositions
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
 	async availableCompositions(args: UmbMediaTypeAvailableCompositionRequestModel) {

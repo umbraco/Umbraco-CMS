@@ -24,7 +24,7 @@ export class UmbMediaValidationServerDataSource {
 	 * Validate a new Media on the server
 	 * @param {UmbMediaDetailModel} model - Media Model
 	 * @param {UmbEntityUnique} parentUnique - Parent Unique
-	 * @returns {*}
+	 * @returns {*} The response from the server
 	 */
 	async validateCreate(
 		model: UmbMediaDetailModel,
