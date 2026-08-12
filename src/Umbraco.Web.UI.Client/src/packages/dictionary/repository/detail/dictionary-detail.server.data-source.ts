@@ -103,7 +103,6 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Updates a Dictionary on the server
-	 * @param {UmbDictionaryDetailModel} Dictionary - The dictionary to update.
 	 * @param {UmbDictionaryDetailModel} model - The dictionary to update.
 	 * @returns {*} The updated dictionary.
 	 * @memberof UmbDictionaryServerDataSource

@@ -21,8 +21,6 @@ export class UmbMoveMediaTypeServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Move an item for the given id to the target unique
-	 * @param {string} unique - The unique ID of the media type to move
-	 * @param {(string | null)} targetUnique - The unique ID of the destination
 	 * @param {UmbMoveToRequestArgs} args - The move request arguments
 	 * @returns {*} A promise that resolves once the media type has been moved
 	 * @memberof UmbMoveMediaTypeServerDataSource

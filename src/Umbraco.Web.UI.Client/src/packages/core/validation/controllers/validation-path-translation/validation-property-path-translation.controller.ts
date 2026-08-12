@@ -8,7 +8,6 @@ import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cm
 export class UmbValidationPropertyPathTranslationController extends UmbControllerBase {
 	/**
 	 * translates the property data.
-	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
 	 * @param {Array<string>} paths - The paths to be translated.
 	 * @param {Array<UmbPropertyValueDataPotentiallyWithEditorAlias>} data - The property data to translate against.
 	 * @param {(entry: UmbPropertyValueDataPotentiallyWithEditorAlias) => string} queryConstructor - Builds a lookup query for a given property data entry.

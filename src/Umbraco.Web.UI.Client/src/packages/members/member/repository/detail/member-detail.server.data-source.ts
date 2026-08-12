@@ -170,7 +170,6 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 
 	/**
 	 * Updates a Member on the server
-	 * @param {UmbMemberDetailModel} Member - The member to update.
 	 * @param {UmbMemberDetailModel} model - The member to update.
 	 * @returns {*} The updated member.
 	 * @memberof UmbMemberServerDataSource

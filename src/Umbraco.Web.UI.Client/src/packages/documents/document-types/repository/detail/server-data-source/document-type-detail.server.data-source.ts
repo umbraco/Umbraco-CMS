@@ -24,7 +24,6 @@ export class UmbDocumentTypeDetailServerDataSource
 
 	/**
 	 * Creates a new Document Type scaffold
-	 * @param {(string | null)} parentUnique - The unique identifier of the parent document type.
 	 * @param {Partial<UmbDocumentTypeDetailModel>} preset - The preset data to populate the scaffold with.
 	 * @returns { CreateDocumentTypeRequestModel } The document type scaffold.
 	 * @memberof UmbDocumentTypeServerDataSource
@@ -156,7 +155,6 @@ export class UmbDocumentTypeDetailServerDataSource
 
 	/**
 	 * Updates a DocumentType on the server
-	 * @param {UmbDocumentTypeDetailModel} DocumentType - The document type to update.
 	 * @param {UmbDocumentTypeDetailModel} model - The document type to update.
 	 * @returns {*} The updated document type.
 	 * @memberof UmbDocumentTypeServerDataSource
