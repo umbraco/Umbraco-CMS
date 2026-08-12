@@ -658,11 +658,11 @@ export default {
 	dictionary: {
 		noItems: 'Der er ingen ordbogselementer.',
 		importDictionaryItemHelp:
-			'\n      To import a dictionary item, find the ".udt" file on your computer by clicking the\n      "Import" button (you\'ll be asked for confirmation on the next screen)\n    ',
-		itemDoesNotExists: 'Dictionary item does not exist.',
-		parentDoesNotExists: 'Parent item does not exist.',
-		noItemsInFile: 'There are no dictionary items in this file.',
-		noItemsFound: 'There were no dictionary items found.',
+			'\n      For at importere et ordbogselement skal du finde ".udt"-filen på din computer ved at klikke på knappen\n      "Importér" (du bliver bedt om at bekræfte i næste trin)\n    ',
+		itemDoesNotExists: 'Ordbogselementet findes ikke.',
+		parentDoesNotExists: 'Overordnet element findes ikke',
+		noItemsInFile: 'Der er ingen ordbogselementer i denne fil.',
+		noItemsFound: 'Der blev ikke fundet nogen ordbogselementer.',
 		createNew: 'Opret ordbogselement',
 		pickFile: 'Vælg fil',
 		pickFileRequired: 'Vælg venligst en ".udt" fil',
