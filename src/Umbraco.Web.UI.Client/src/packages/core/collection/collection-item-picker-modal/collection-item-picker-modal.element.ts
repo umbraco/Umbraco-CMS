@@ -172,7 +172,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
 		return html`
-			<umb-picker-search-field></umb-picker-search-field>
+			<umb-picker-search-field .alias=${this.data?.collection.alias}></umb-picker-search-field>
 			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
 		`;
 	}

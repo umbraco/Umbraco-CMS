@@ -212,7 +212,7 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 		if (!this._isSearchable) return nothing;
 
 		return html`
-			<umb-picker-search-field></umb-picker-search-field>
+			<umb-picker-search-field .alias=${UMB_DOCUMENT_TREE_ALIAS}></umb-picker-search-field>
 			<umb-picker-search-result></umb-picker-search-result>
 		`;
 	}

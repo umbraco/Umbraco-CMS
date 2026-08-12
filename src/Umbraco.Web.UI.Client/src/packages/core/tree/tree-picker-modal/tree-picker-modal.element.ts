@@ -80,7 +80,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@query('umb-picker-search-field')
 	private _searchField?: UmbPickerSearchFieldElement;
 
-	#treeAlias?: string;
+	@state()
+	private _treeAlias?: string;
 	private _initialStartNode?: UmbTreeStartNode;
 	private _repository?: UmbTreeRepository;
 	private _breadcrumbLoaded = false;
@@ -135,8 +136,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				multiple,
 			};
 
-			if (this.data?.treeAlias && this.data.treeAlias !== this.#treeAlias) {
-				this.#treeAlias = this.data.treeAlias;
+			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
+				this._treeAlias = this.data.treeAlias;
 				this._initialStartNode = this.data.startNode;
 				this._currentLocation = this.data.startNode;
 				this._breadcrumb = [];
@@ -453,7 +454,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
 		return html`
-			<umb-picker-search-field></umb-picker-search-field>
+			<umb-picker-search-field .alias=${this._treeAlias}></umb-picker-search-field>
 			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
 		`;
 	}

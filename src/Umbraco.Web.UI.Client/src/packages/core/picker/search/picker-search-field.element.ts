@@ -1,12 +1,15 @@
 import type { UmbPickerContext } from '../picker.context.js';
 import { UMB_PICKER_CONTEXT } from '../picker.context.token.js';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { html, customElement, state, nothing, css, query } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, css, query, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-picker-search-field')
 export class UmbPickerSearchFieldElement extends UmbLitElement {
+	@property({ type: String, attribute: 'alias', reflect: false })
+	alias?: string;
+
 	@state()
 	private _query: string = '';
 
@@ -50,6 +53,7 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 
 		return html`
 			<uui-input
+				.name=${'search-of-' + (this.alias ?? '')}
 				.value=${this._query}
 				label=${this.localize.term('general_search')}
 				placeholder=${this.localize.term('placeholders_search')}
