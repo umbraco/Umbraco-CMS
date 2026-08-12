@@ -573,6 +573,8 @@ export default {
 		next: 'След',
 		no: 'Нет',
 		noItemsInList: 'Здесь пока нет элементов',
+		noResults: 'Нет результатов',
+		noResultsFor: (query: string) => `Нет результатов по запросу "${query}".`,
 		of: 'из',
 		off: 'Выкл',
 		ok: 'Ok',
@@ -1340,6 +1342,10 @@ export default {
 		stylesheets: 'Стили CSS',
 		templates: 'Шаблоны',
 		users: 'Пользователи',
+	},
+	picker: {
+		browseTab: 'Обзор',
+		searchTab: 'Поиск',
 	},
 	update: {
 		updateAvailable: 'Доступны обновления',

@@ -772,6 +772,8 @@ export default {
 		next: 'Sljedeći',
 		no: 'Ne',
 		nodeName: 'Ime čvora',
+		noResults: 'Nema rezultata',
+		noResultsFor: (query: string) => `Nema rezultata za "${query}".`,
 		of: 'od',
 		off: 'Isključeno',
 		ok: 'OK',
@@ -1755,6 +1757,10 @@ export default {
 		templatingGroup: 'Predložak',
 		thirdPartyGroup: 'Treća strana',
 		webhooks: 'Webhooks',
+	},
+	picker: {
+		browseTab: 'Pregledaj',
+		searchTab: 'Pretraži',
 	},
 	update: {
 		updateAvailable: 'Postoji nova verzija',

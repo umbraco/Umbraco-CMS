@@ -901,6 +901,8 @@ export default {
 		no: 'Não',
 		nodeName: 'Nome do Nó',
 		notFound: 'Não encontrado',
+		noResults: 'Sem resultados',
+		noResultsFor: (query: string) => `Nenhum resultado para "${query}".`,
 		of: 'de',
 		off: 'Desligado',
 		ok: 'OK',
@@ -2866,6 +2868,8 @@ export default {
 		invalidTimeZone: 'O fuso horário selecionado não é válido',
 	},
 	picker: {
+		browseTab: 'Procurar',
+		searchTab: 'Pesquisar',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
 	},
 } as UmbLocalizationDictionary;

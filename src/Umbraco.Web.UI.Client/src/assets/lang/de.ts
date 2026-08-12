@@ -830,6 +830,8 @@ export default {
 		next: 'Weiter',
 		no: 'Nein',
 		nodeName: 'Knoten Name',
+		noResults: 'Keine Ergebnisse',
+		noResultsFor: (query: string) => `Kein Ergebnis für "${query}".`,
 		of: 'von',
 		off: 'Aus',
 		ok: 'Ok',
@@ -2080,6 +2082,8 @@ export default {
 			'Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte wenden Sie sich an Ihren Administrator, um Unterstützung zu erhalten.',
 	},
 	picker: {
+		browseTab: 'Durchsuchen',
+		searchTab: 'Suchen',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'Element' : 'Elemente'} ausgewählt`,
 	},
 } as UmbLocalizationDictionary;

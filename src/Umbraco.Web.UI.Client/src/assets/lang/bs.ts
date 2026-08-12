@@ -770,6 +770,8 @@ export default {
 		next: 'Sljedeći',
 		no: 'Ne',
 		nodeName: 'Ime čvora',
+		noResults: 'Nema rezultata',
+		noResultsFor: (query: string) => `Nema rezultata za "${query}".`,
 		of: 'od',
 		off: 'Isključeno',
 		ok: 'OK',
@@ -1694,6 +1696,10 @@ export default {
 		settingsGroup: 'Postavke',
 		templatingGroup: 'Predložak',
 		thirdPartyGroup: 'Treća strana',
+	},
+	picker: {
+		browseTab: 'Pregledaj',
+		searchTab: 'Pretraži',
 	},
 	update: {
 		updateAvailable: 'Novo ažuriranje spremno',
