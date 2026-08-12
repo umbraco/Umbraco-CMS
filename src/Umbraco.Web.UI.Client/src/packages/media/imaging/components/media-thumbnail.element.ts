@@ -10,7 +10,7 @@ import { UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
  * Displays a thumbnail for a media item, with optional server-side cropping and transparency support.
  * This is the recommended component for rendering media images in the backoffice.
  * @element umb-media-thumbnail
- * @cssprop [--umb-media-thumbnail-background] - Background shown behind the image. Defaults to a checkerboard
+ * @cssprop --umb-media-thumbnail-background - Background shown behind the image. Defaults to a checkerboard
  * pattern that reveals transparency; set to `none` for a transparent background.
  * @csspart img - The underlying `<img>` element.
  */
