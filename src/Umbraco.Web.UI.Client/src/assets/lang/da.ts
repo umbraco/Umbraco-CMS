@@ -805,6 +805,7 @@ export default {
 		by: 'af',
 		cancel: 'Fortryd',
 		cellMargin: 'Celle margen',
+		changeView: 'Skift visning',
 		choose: 'Vælg',
 		clear: 'Ryd',
 		close: 'Luk',

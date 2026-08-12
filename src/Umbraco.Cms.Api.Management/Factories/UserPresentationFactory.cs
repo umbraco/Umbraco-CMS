@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Mapping.Permissions;
 using Umbraco.Cms.Api.Management.Routing;
@@ -42,6 +42,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly Dictionary<Type, IPermissionPresentationMapper> _permissionPresentationMappersByType;
     private readonly IContentPermissionService _contentPermissionService;
     private readonly IElementPermissionService _elementPermissionService;
+    private readonly IElementContainerPermissionService _elementContainerPermissionService;
     private readonly ISessionExpiryAccessor _sessionExpiryAccessor;
 
     /// <summary>
@@ -60,6 +61,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     /// <param name="permissionPresentationMappers">Collection of mappers for permission presentation models.</param>
     /// <param name="contentPermissionService">Service for managing content permissions.</param>
     /// <param name="elementPermissionService">Service for managing element permissions.</param>
+    /// <param name="elementContainerPermissionService">Service for managing element container permissions.</param>
     /// <param name="sessionExpiryAccessor">Accessor for the current session expiry.</param>
     public UserPresentationFactory(
         IEntityService entityService,
@@ -75,6 +77,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers,
         IContentPermissionService contentPermissionService,
         IElementPermissionService elementPermissionService,
+        IElementContainerPermissionService elementContainerPermissionService,
         ISessionExpiryAccessor sessionExpiryAccessor)
     {
         _entityService = entityService;
@@ -90,6 +93,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         _permissionPresentationMappersByType = permissionPresentationMappers.ToDictionary(x => x.PresentationModelToHandle);
         _contentPermissionService = contentPermissionService;
         _elementPermissionService = elementPermissionService;
+        _elementContainerPermissionService = elementContainerPermissionService;
         _sessionExpiryAccessor = sessionExpiryAccessor;
     }
 
@@ -138,6 +142,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             permissionPresentationMappers,
             contentPermissionService,
             elementPermissionService,
+            StaticServiceProvider.Instance.GetRequiredService<IElementContainerPermissionService>(),
             StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
     {
     }
@@ -185,6 +190,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             permissionPresentationMappers,
             contentPermissionService,
             StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IElementContainerPermissionService>(),
             StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
     {
     }
@@ -230,6 +236,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             permissionPresentationMappers,
             StaticServiceProvider.Instance.GetRequiredService<IContentPermissionService>(),
             StaticServiceProvider.Instance.GetRequiredService<IElementPermissionService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IElementContainerPermissionService>(),
             StaticServiceProvider.Instance.GetRequiredService<ISessionExpiryAccessor>())
     {
     }
@@ -392,12 +399,11 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         HashSet<IPermissionPresentationModel> permissions = GetAggregatedGranularPermissions(user, presentationGroups);
 
-        // Filter the user group default (fallback) permissions through document and element permission services so custom
-        // implementations control UI visibility for actions that rely on default permissions (no granular assignment).
-        ISet<string> fallbackPermissions = await _contentPermissionService.FilterFallbackPermissionsAsync(
+        // Filter the user group default (fallback) permissions through the permission services so custom implementations
+        // control UI visibility for actions that rely on default permissions (no granular assignment).
+        ISet<string> fallbackPermissions = await FilterFallbackPermissionsAsync(
             user,
             presentationGroups.SelectMany(x => x.FallbackPermissions).ToHashSet());
-        fallbackPermissions = await _elementPermissionService.FilterFallbackPermissionsAsync(user, fallbackPermissions);
 
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
 
@@ -426,6 +432,22 @@ public class UserPresentationFactory : IUserPresentationFactory
             IsAdmin = user.IsAdmin(),
             UserGroupIds = presentationUser.UserGroupIds,
         };
+    }
+
+    // Each permission service filters its own copy of the aggregated (unfiltered) fallback permissions, and the
+    // results are intersected. This keeps filtering order-independent, so no service can resurrect a verb another
+    // service removed. Seeding from the aggregated set means only removals are honoured; a verb an implementation
+    // adds is intersected away. Each service needs its own copy because implementations may return (and mutate) the
+    // set they were given - the stock implementations pass the instance straight back.
+    private async Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> aggregatedFallbackPermissions)
+    {
+        var filtered = new HashSet<string>(aggregatedFallbackPermissions);
+
+        filtered.IntersectWith(await _contentPermissionService.FilterFallbackPermissionsAsync(user, new HashSet<string>(aggregatedFallbackPermissions)));
+        filtered.IntersectWith(await _elementPermissionService.FilterFallbackPermissionsAsync(user, new HashSet<string>(aggregatedFallbackPermissions)));
+        filtered.IntersectWith(await _elementContainerPermissionService.FilterFallbackPermissionsAsync(user, new HashSet<string>(aggregatedFallbackPermissions)));
+
+        return filtered;
     }
 
     private HashSet<IPermissionPresentationModel> GetAggregatedGranularPermissions(IUser user, IEnumerable<UserGroupResponseModel> presentationGroups)
