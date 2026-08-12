@@ -72,19 +72,6 @@ export abstract class UmbTreeItemApiContextBase<
 
 	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
 
-	// Cold on purpose: nothing subscribes to the registry unless someone observes hasActions.
-	#hasActions = combineLatest([
-		this._treeItem.asObservablePart((item) => item?.entityType),
-		umbExtensionsRegistry.byType('entityAction'),
-		this.#hideTreeItemActions.asObservable(),
-	]).pipe(
-		map(
-			([entityType, actions, hide]) =>
-				!hide && !!entityType && actions.some((action) => action.forEntityTypes.includes(entityType)),
-		),
-		distinctUntilChanged(),
-	);
-
 	/**
 	 * @returns {Observable<boolean>} True if any entity action is registered for this entity type
 	 * @deprecated Deprecated since v17. This only tells whether a manifest exists for the entity type, it does not
@@ -99,7 +86,17 @@ export abstract class UmbTreeItemApiContextBase<
 				'Render <umb-entity-actions-bundle>, which resolves the entity actions that are permitted for the item.',
 		}).warn();
 
-		return this.#hasActions;
+		return combineLatest([
+			this._treeItem.asObservablePart((item) => item?.entityType),
+			umbExtensionsRegistry.byType('entityAction'),
+			this.#hideTreeItemActions.asObservable(),
+		]).pipe(
+			map(
+				([entityType, actions, hide]) =>
+					!hide && !!entityType && actions.some((action) => action.forEntityTypes.includes(entityType)),
+			),
+			distinctUntilChanged(),
+		);
 	}
 
 	protected readonly _selectOnly = new UmbBooleanState(false);
