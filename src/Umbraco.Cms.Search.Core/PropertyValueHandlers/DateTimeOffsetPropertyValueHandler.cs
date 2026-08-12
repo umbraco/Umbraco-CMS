@@ -24,8 +24,8 @@ internal sealed class DateTimeOffsetPropertyValueHandler : IPropertyValueHandler
     }
 
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.DateTime
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.DateTime
             or Cms.Core.Constants.PropertyEditors.Aliases.PlainDateTime
             or Cms.Core.Constants.PropertyEditors.Aliases.DateOnly
             or Cms.Core.Constants.PropertyEditors.Aliases.TimeOnly

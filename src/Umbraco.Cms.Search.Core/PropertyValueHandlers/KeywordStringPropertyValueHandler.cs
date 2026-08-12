@@ -19,8 +19,10 @@ internal sealed class KeywordStringPropertyValueHandler : IPropertyValueHandler,
         => _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.DropDownListFlexible or Cms.Core.Constants.PropertyEditors.Aliases.RadioButtonList or Cms.Core.Constants.PropertyEditors.Aliases.CheckBoxList;
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.DropDownListFlexible
+            or Cms.Core.Constants.PropertyEditors.Aliases.RadioButtonList
+            or Cms.Core.Constants.PropertyEditors.Aliases.CheckBoxList;
 
     /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)

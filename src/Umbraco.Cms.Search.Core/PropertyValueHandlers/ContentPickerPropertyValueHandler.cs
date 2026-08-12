@@ -12,8 +12,8 @@ namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 internal sealed class ContentPickerPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.ContentPicker;
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.ContentPicker;
 
     /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)

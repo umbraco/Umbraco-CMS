@@ -18,8 +18,8 @@ internal sealed class MarkdownPropertyValueHandler : IPropertyValueHandler, ICor
         => _htmlIndexValueParser = htmlIndexValueParser;
 
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.MarkdownEditor;
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.MarkdownEditor;
 
     /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)

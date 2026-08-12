@@ -13,9 +13,9 @@ public interface IPropertyValueHandler : IDiscoverable
     /// <summary>
     /// Determines whether the property value handler can handle a concrete property.
     /// </summary>
-    /// <param name="propertyEditorAlias">The property editor alias of the property.</param>
+    /// <param name="propertyType">The property type of the property.</param>
     /// <returns>True if the property can be handled, false otherwise.</returns>
-    bool CanHandle(string propertyEditorAlias);
+    bool CanHandle(IPropertyType propertyType);
 
     /// <summary>
     /// Parses index fields for a property.

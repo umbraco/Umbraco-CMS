@@ -18,7 +18,7 @@ public static class PropertyValueHandlerCollectionExtensions
     public static IPropertyValueHandler? GetPropertyValueHandler(this PropertyValueHandlerCollection collection, IPropertyType propertyType)
     {
         IPropertyValueHandler[] applicableHandlers = collection
-            .Where(handler => handler.CanHandle(propertyType.PropertyEditorAlias))
+            .Where(handler => handler.CanHandle(propertyType))
             .ToArray();
 
         // always prioritize custom value handlers over the built-in ones

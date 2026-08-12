@@ -42,7 +42,7 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
     }
 
     /// <inheritdoc />
-    public abstract bool CanHandle(string propertyEditorAlias);
+    public abstract bool CanHandle(IPropertyType propertyType);
 
     /// <inheritdoc />
     public virtual IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)

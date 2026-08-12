@@ -9,8 +9,8 @@ namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 internal sealed class NoopPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.EmailAddress
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.EmailAddress
             or Cms.Core.Constants.PropertyEditors.Aliases.ColorPicker
             or Cms.Core.Constants.PropertyEditors.Aliases.ColorPickerEyeDropper
             or Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker3

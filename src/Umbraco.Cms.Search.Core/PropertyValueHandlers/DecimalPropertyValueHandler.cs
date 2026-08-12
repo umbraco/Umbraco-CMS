@@ -9,8 +9,8 @@ namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 internal sealed class DecimalPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.Decimal
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.Decimal
             or Cms.Core.Constants.PropertyEditors.Aliases.PlainDecimal;
 
     /// <inheritdoc />

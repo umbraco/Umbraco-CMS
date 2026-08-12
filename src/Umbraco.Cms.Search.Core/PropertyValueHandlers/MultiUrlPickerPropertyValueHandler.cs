@@ -21,8 +21,8 @@ internal sealed class MultiUrlPickerPropertyValueHandler : IPropertyValueHandler
         => _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.MultiUrlPicker;
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.MultiUrlPicker;
 
     /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)

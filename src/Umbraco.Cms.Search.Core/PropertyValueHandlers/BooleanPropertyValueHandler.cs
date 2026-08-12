@@ -9,8 +9,8 @@ namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 internal sealed class BooleanPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Boolean;
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Boolean;
 
     /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)

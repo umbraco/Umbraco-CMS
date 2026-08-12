@@ -9,8 +9,8 @@ namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 internal sealed class IntegerPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.Integer
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.Integer
             or Cms.Core.Constants.PropertyEditors.Aliases.PlainInteger;
 
     /// <inheritdoc />

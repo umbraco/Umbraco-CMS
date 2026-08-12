@@ -9,8 +9,8 @@ namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 internal sealed class PlainStringPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.TextBox
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.TextBox
             or Cms.Core.Constants.PropertyEditors.Aliases.TextArea
             or Cms.Core.Constants.PropertyEditors.Aliases.PlainString;
 

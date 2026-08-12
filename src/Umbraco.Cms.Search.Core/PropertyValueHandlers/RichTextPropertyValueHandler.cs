@@ -38,8 +38,8 @@ internal sealed class RichTextPropertyValueHandler : BlockEditorPropertyValueHan
     }
 
     /// <inheritdoc />
-    public override bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.RichText;
+    public override bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.RichText;
 
     /// <inheritdoc />
     public override IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)

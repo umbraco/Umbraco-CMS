@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -25,6 +26,6 @@ internal sealed class BlockGridPropertyValueHandler : BlockEditorPropertyValueHa
     }
 
     /// <inheritdoc />
-    public override bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.BlockGrid;
+    public override bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.BlockGrid;
 }

@@ -24,8 +24,8 @@ internal sealed class MultiNodeTreePickerPropertyValueHandler : IPropertyValueHa
         => _dataTypeConfigurationCache = dataTypeConfigurationCache;
 
     /// <inheritdoc />
-    public bool CanHandle(string propertyEditorAlias)
-        => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.MultiNodeTreePicker;
+    public bool CanHandle(IPropertyType propertyType)
+        => propertyType.PropertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.MultiNodeTreePicker;
 
     /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
