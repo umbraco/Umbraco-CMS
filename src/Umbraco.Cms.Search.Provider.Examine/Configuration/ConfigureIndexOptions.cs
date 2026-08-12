@@ -66,7 +66,7 @@ internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirec
                 FieldValues.Decimals => Constants.FieldValues.Decimals,
                 FieldValues.DateTimeOffsets => Constants.FieldValues.DateTimeOffsets,
                 FieldValues.Keywords => Constants.FieldValues.Keywords,
-                _ => throw new ArgumentOutOfRangeException(nameof(field.FieldValues))
+                _ => throw new ArgumentOutOfRangeException(nameof(fields), field.FieldValues, "Unsupported field value")
             };
 
             var fieldDefinitionType = field.FieldValues switch
@@ -83,7 +83,7 @@ internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirec
                 FieldValues.DateTimeOffsets => field.Facetable
                     ? FieldDefinitionTypes.FacetDateTime
                     : FieldDefinitionTypes.DateTime,
-                _ => throw new ArgumentOutOfRangeException(nameof(field.FieldValues))
+                _ => throw new ArgumentOutOfRangeException(nameof(fields), field.FieldValues, "Unsupported field value")
             };
 
             var fieldName = getFieldName(field, fieldValues);

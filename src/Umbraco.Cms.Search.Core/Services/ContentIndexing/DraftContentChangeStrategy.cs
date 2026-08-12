@@ -269,7 +269,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
             UmbracoObjectTypes.Document => _contentService.GetById(change.Id),
             UmbracoObjectTypes.Media => _mediaService.GetById(change.Id),
             UmbracoObjectTypes.Member => _memberService.GetById(change.Id),
-            _ => throw new ArgumentOutOfRangeException(nameof(change.ObjectType))
+            _ => throw new ArgumentOutOfRangeException(nameof(change), change.ObjectType, "This strategy only supports documents, media and members")
         };
 
     private async Task RebuildAsync(
@@ -339,7 +339,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
                 UmbracoObjectTypes.Document => ContentChange.Document(content.Key, ChangeImpact.RefreshWithDescendants, ContentState.Draft),
                 UmbracoObjectTypes.Media => ContentChange.Media(content.Key, ChangeImpact.RefreshWithDescendants, ContentState.Draft),
                 UmbracoObjectTypes.Member => ContentChange.Member(content.Key, ChangeImpact.Refresh, ContentState.Draft),
-                _ => throw new ArgumentOutOfRangeException(nameof(objectType), objectType, "This strategy only supports documents, media and members")
+                _ => throw new ArgumentOutOfRangeException(nameof(content), objectType, "This strategy only supports documents, media and members")
             };
             return contentChange;
         }

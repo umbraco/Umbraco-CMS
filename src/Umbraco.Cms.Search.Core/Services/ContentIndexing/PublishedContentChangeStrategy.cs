@@ -322,7 +322,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
             UmbracoObjectTypes.Document => _contentService.GetById(change.Id),
             UmbracoObjectTypes.Media => _mediaService.GetById(change.Id),
             UmbracoObjectTypes.Member => _memberService.GetById(change.Id),
-            _ => throw new ArgumentOutOfRangeException(nameof(change.ObjectType))
+            _ => throw new ArgumentOutOfRangeException(nameof(change), change.ObjectType, "This strategy only supports documents, media and members")
         };
 
     private static bool ContainsSupportedObjectType(ContentIndexInfo indexInfo)

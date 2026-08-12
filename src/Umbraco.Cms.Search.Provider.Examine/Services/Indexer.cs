@@ -76,7 +76,7 @@ public class Indexer : IExamineIndexer
             valuesToIndex.Add(new ValueSet(
                 indexKey,
                 objectType.ToString(),
-                MapToDictionary(fieldsToMap, variationGroup.Key, variationGroup.Select(x => x.Segment).Distinct(), protection)));
+                MapToDictionary(fieldsToMap, variationGroup.Key, protection)));
         }
 
         index.IndexItems(valuesToIndex);
@@ -259,7 +259,7 @@ public class Indexer : IExamineIndexer
         return Task.CompletedTask;
     }
 
-    private Dictionary<string, IEnumerable<object>> MapToDictionary(IEnumerable<IndexField> fields, string? culture, IEnumerable<string?> segments, ContentProtection? protection)
+    private Dictionary<string, IEnumerable<object>> MapToDictionary(IEnumerable<IndexField> fields, string? culture, ContentProtection? protection)
     {
         var result = new Dictionary<string, IEnumerable<object>>();
 

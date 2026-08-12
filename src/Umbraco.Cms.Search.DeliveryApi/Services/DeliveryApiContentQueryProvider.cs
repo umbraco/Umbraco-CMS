@@ -222,7 +222,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
                 };
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(fieldType), fieldType, null);
+                throw new ArgumentOutOfRangeException(nameof(fieldName), fieldType, "Unsupported field type");
         }
 
         return filter != null;
@@ -253,7 +253,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
             FieldType.StringAnalyzed or FieldType.StringSortable => new TextSorter(fieldName, direction),
             FieldType.Number => new DecimalSorter(fieldName, direction),
             FieldType.Date => new DateTimeOffsetSorter(fieldName, direction),
-            _ => throw new ArgumentOutOfRangeException(nameof(fieldType), fieldType, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(fieldName), fieldType, "Unsupported field type")
         };
 
         return true;
