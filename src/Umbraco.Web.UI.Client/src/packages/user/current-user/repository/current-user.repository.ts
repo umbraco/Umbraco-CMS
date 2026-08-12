@@ -103,7 +103,6 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Enable an MFA provider
-	 * @param {string} provider The provider to enable
 	 * @param {string} providerName The name of the provider to enable
 	 * @param {string} code The activation code of the provider to enable
 	 * @param {string} secret The secret used to verify the provider's activation code
@@ -124,7 +123,6 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 	/**
 	 * Disable an MFA provider
-	 * @param {string} provider The provider to disable
 	 * @param {string} providerName The name of the provider to disable
 	 * @param {string} code The activation code of the provider to disable
 	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the provider could not be disabled
@@ -143,10 +141,8 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 	}
 	/**
 	 * Change password for current user
-	 * @param {string} userId The id of the user to change the password for
 	 * @param {string} newPassword The new password
 	 * @param {string} oldPassword The old password
-	 * @param {boolean} isCurrentUser Whether the change is for the current user
 	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of the change password request
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {

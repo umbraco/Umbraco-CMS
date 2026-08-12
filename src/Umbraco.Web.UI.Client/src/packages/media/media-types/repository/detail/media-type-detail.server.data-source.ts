@@ -145,7 +145,6 @@ export class UmbMediaTypeDetailServerDataSource
 
 	/**
 	 * Updates a MediaType on the server
-	 * @param {UmbMediaTypeDetailModel} MediaType - The media type to update
 	 * @param {UmbMediaTypeDetailModel} model - The media type to update
 	 * @returns {*} The updated media type
 	 * @memberof UmbMediaTypeDetailServerDataSource

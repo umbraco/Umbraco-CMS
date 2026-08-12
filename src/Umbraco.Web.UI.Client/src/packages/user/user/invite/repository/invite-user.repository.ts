@@ -36,7 +36,6 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Resend an invite to a user
-	 * @param {string} userUnique - The unique id of the user to resend the invite to.
 	 * @param {InviteUserRequestModel} request - The resend invite request data.
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the resend invite operation.
 	 * @memberof UmbInviteUserRepository

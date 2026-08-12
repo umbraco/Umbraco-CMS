@@ -140,10 +140,8 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Change the password for current user
-	 * @param {string} id The id of the user to change the password for
 	 * @param {string} newPassword The new password
 	 * @param {string} oldPassword The old password
-	 * @param {boolean} isCurrentUser Whether the change is for the current user
 	 * @returns {Promise<UmbDataSourceResponse<unknown>>} The result of the change password request
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {

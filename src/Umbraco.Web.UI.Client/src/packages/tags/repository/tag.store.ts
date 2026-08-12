@@ -35,7 +35,6 @@ export class UmbTagStore extends UmbStoreBase {
 
 	/**
 	 * Append a tag to the store
-	 * @param {id} TagResponseModel id.
 	 * @param {TagResponseModel['id']} id - The unique identifier of the tag to fetch.
 	 * @returns {*} The tag observable part.
 	 * @memberof UmbTagStore

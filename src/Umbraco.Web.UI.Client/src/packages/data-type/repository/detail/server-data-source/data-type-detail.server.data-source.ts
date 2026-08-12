@@ -24,7 +24,6 @@ export class UmbDataTypeServerDataSource
 
 	/**
 	 * Creates a new Data Type scaffold
-	 * @param {(string | null)} parentUnique - The unique identifier of the parent, if any.
 	 * @param {Partial<UmbDataTypeDetailModel>} preset - The preset data to populate the scaffold with.
 	 * @returns { CreateDataTypeRequestModel } The data type scaffold.
 	 * @memberof UmbDataTypeServerDataSource
@@ -117,7 +116,6 @@ export class UmbDataTypeServerDataSource
 
 	/**
 	 * Updates a DataType on the server
-	 * @param {UmbDataTypeDetailModel} DataType - The data type to update.
 	 * @param {UmbDataTypeDetailModel} model - The data type to update.
 	 * @returns {*} The updated data type.
 	 * @memberof UmbDataTypeServerDataSource
