@@ -3,7 +3,12 @@ import type { UmbTreeItemModel } from '../../types.js';
 import type { UmbTreeRepository } from '../../data/tree-repository.interface.js';
 import type { UmbMoveRepository } from './move-repository.interface.js';
 import type { MetaEntityActionMoveToKind } from './types.js';
-import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
+import {
+	UmbEntityActionBase,
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -61,7 +66,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 			throw error;
 		}
 
-		this.#reloadMenu();
+		await this.#reloadMenu(destinationUnique);
 	}
 
 	async #requestAncestors() {
@@ -79,7 +84,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		}
 	}
 
-	async #reloadMenu() {
+	async #reloadMenu(destinationUnique: string | null) {
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		if (!actionEventContext) throw new Error('Action Event Context is not available');
 		const event = new UmbRequestReloadStructureForEntityEvent({
@@ -89,7 +94,43 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 
 		actionEventContext.dispatchEvent(event);
 
-		// TODO: Reload destination
+		const destination = await this.#requestDestination(destinationUnique);
+		if (destination) {
+			actionEventContext.dispatchEvent(new UmbRequestReloadChildrenOfEntityEvent(destination));
+		}
+	}
+
+	/**
+	 * Resolves the entity to reload the children of, so that the moved item appears under its new parent.
+	 * @remarks
+	 * The picker only hands back the destination's unique, but the children of an entity are reloaded by unique
+	 * *and* entity type. The moved item now sits under the destination, so the destination is one of its
+	 * ancestors - which is where the entity type comes from.
+	 */
+	async #requestDestination(destinationUnique: string | null): Promise<UmbEntityModel | undefined> {
+		try {
+			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(
+				this,
+				this.args.meta.treeRepositoryAlias,
+			);
+			if (!treeRepository) return undefined;
+
+			if (destinationUnique === null) {
+				const { data } = await treeRepository.requestTreeRoot();
+				return data ? { unique: data.unique, entityType: data.entityType } : undefined;
+			}
+
+			const { data } = await treeRepository.requestTreeItemAncestors({
+				treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
+			});
+
+			const destination = data?.find((item) => item.unique === destinationUnique);
+			return destination ? { unique: destination.unique, entityType: destination.entityType } : undefined;
+		} catch {
+			// The move itself has already succeeded, so a failure to resolve the destination must not surface as
+			// a failed move - the destination is simply left to be reloaded manually.
+			return undefined;
+		}
 	}
 }
 
