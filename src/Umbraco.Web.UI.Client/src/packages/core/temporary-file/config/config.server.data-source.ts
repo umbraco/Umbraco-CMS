@@ -11,6 +11,7 @@ export class UmbTemporaryFileConfigServerDataSource {
 
 	/**
 	 * Get the temporary file configuration.
+	 * @returns {*} The temporary file configuration
 	 */
 	getConfig() {
 		return tryExecute(this.#host, TemporaryFileService.getTemporaryFileConfiguration(), { disableNotifications: true });

@@ -1,20 +1,21 @@
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import type { UmbMediaItemModel } from '../types.js';
 import type { UmbMediaSearchItemModel, UmbMediaSearchRequestArgs } from './types.js';
 import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { MediaService, type MediaItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
-import type { UmbMediaItemModel } from '../types.js';
 
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbMediaSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMediaSearchServerDataSource
-	implements UmbSearchDataSource<UmbMediaSearchItemModel, UmbMediaSearchRequestArgs>
-{
+export class UmbMediaSearchServerDataSource implements UmbSearchDataSource<
+	UmbMediaSearchItemModel,
+	UmbMediaSearchRequestArgs
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -55,7 +56,7 @@ export class UmbMediaSearchServerDataSource
 	/**
 	 * Get a list of versions for a data
 	 * @param {UmbMediaSearchRequestArgs}args - The arguments for the search
-	 * @returns {*}
+	 * @returns {*} The search results
 	 * @memberof UmbMediaSearchServerDataSource
 	 */
 	async search(args: UmbMediaSearchRequestArgs) {
@@ -112,6 +113,11 @@ export class UmbMediaSearchServerDataSource
 	}
 }
 
+/**
+ * Maps an ancestor response model to an item model
+ * @param {MediaItemResponseModel} ancestor - The ancestor to map
+ * @returns {UmbMediaItemModel} The mapped item model
+ */
 function mapAncestorToItemModel(ancestor: MediaItemResponseModel): UmbMediaItemModel {
 	return {
 		entityType: UMB_MEDIA_ENTITY_TYPE,

@@ -40,7 +40,7 @@ export abstract class UmbTreeItemElementBase<
 	protected _noAccess: boolean = false;
 
 	/**
-	 * @param item - The item from which to extract flags.
+	 * @param {TreeItemModelType | undefined} item - The item from which to extract flags.
 	 * @description This method is called whenever the `item` property is set. It extracts the flags from the item and assigns them to the `_flags` state property.
 	 * This method is in some cases overridden in subclasses to customize how flags are extracted!
 	 */

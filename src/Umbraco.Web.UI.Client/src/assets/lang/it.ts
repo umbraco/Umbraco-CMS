@@ -1580,8 +1580,10 @@ export default {
 		tabHasNoSortOrder: 'la scheda non ha un ordine',
 		compositionUsageHeading: 'Dove è usata questa composizione?',
 		compositionUsageSpecification: 'Questa composizione è usata nella composizione dei seguenti tipi di contenuto:',
-		compositionUsageSpecificationMediaType: 'Questa composizione è usata nella composizione dei seguenti tipi di media:',
-		compositionUsageSpecificationMemberType: 'Questa composizione è usata nella composizione dei seguenti tipi di membro:',
+		compositionUsageSpecificationMediaType:
+			'Questa composizione è usata nella composizione dei seguenti tipi di media:',
+		compositionUsageSpecificationMemberType:
+			'Questa composizione è usata nella composizione dei seguenti tipi di membro:',
 		variantsHeading: 'Consenti variazioni',
 		cultureVariantHeading: 'Consenti variazioni in base alla lingua',
 		segmentVariantHeading: 'Consenti segmentazione',
@@ -2302,5 +2304,8 @@ export default {
 	treeSearch: {
 		searchResult: 'oggetto trovato',
 		searchResults: 'oggetti trovati',
+	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento selezionato' : 'elementi selezionati'}`,
 	},
 } as UmbLocalizationDictionary;

@@ -1535,8 +1535,10 @@ export default {
 		tabHasNoSortOrder: 'kartica nema redoslijed sortiranja',
 		compositionUsageHeading: 'Gdje se koristi ovaj sastav?',
 		compositionUsageSpecification: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa sadržaja:\n    ',
-		compositionUsageSpecificationMediaType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa medija:\n    ',
-		compositionUsageSpecificationMemberType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa člana:\n    ',
+		compositionUsageSpecificationMediaType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa medija:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa člana:\n    ',
 		variantsHeading: 'Dozvoli varijacije',
 		cultureVariantHeading: 'Dozvolite varirati u zavisnosti od kulture',
 		segmentVariantHeading: 'Dozvoli segmentaciju',

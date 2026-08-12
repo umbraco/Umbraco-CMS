@@ -21,13 +21,13 @@ export class UmbTagServerDataSource {
 
 	/**
 	 * Get a list of tags on the server
-	 * @param root0
-	 * @param root0.query
-	 * @param root0.skip
-	 * @param root0.take
-	 * @param root0.tagGroup
-	 * @param root0.culture
-	 * @returns {*}
+	 * @param {object} root0 - The parameters for the tag search.
+	 * @param {string} root0.query - The search query.
+	 * @param {number} root0.skip - The number of tags to skip.
+	 * @param {number} root0.take - The number of tags to take.
+	 * @param {string} [root0.tagGroup] - The tag group to filter by.
+	 * @param {string} [root0.culture] - The culture to filter by.
+	 * @returns {*} The list of tags.
 	 * @memberof UmbTagServerDataSource
 	 */
 	async getCollection({

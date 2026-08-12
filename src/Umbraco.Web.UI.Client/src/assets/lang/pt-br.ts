@@ -554,4 +554,7 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: 'Selecionar tudo',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
+	},
 } as UmbLocalizationDictionary;

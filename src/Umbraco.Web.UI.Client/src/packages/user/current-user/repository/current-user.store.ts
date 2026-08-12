@@ -43,7 +43,7 @@ export class UmbCurrentUserStore extends UmbContextBase {
 
 	/**
 	 * Set the current user
-	 * @param {UmbCurrentUserModel} data
+	 * @param {UmbCurrentUserModel} data The current user
 	 * @memberof UmbCurrentUserStore
 	 */
 	set(data: UmbCurrentUserModel) {
@@ -52,7 +52,7 @@ export class UmbCurrentUserStore extends UmbContextBase {
 
 	/**
 	 * Update the current user
-	 * @param {Partial<UmbCurrentUserModel>} data
+	 * @param {Partial<UmbCurrentUserModel>} data The partial current user data to update
 	 * @memberof UmbCurrentUserStore
 	 */
 	update(data: Partial<UmbCurrentUserModel>) {
