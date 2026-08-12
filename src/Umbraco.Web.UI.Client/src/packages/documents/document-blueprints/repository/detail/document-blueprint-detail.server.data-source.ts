@@ -146,7 +146,6 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 
 	/**
 	 * Updates a Document on the server
-	 * @param {UmbDocumentBlueprintDetailModel} Document - The document blueprint to update.
 	 * @param {UmbDocumentBlueprintDetailModel} model - The document blueprint to update.
 	 * @returns {*} The updated document blueprint.
 	 * @memberof UmbDocumentBlueprintServerDataSource
