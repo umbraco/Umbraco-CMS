@@ -211,6 +211,7 @@ public class UnattendedUpgraderTests
         {
             Refresher(ContentCacheRefresher.UniqueId),
             Refresher(MediaCacheRefresher.UniqueId),
+            Refresher(ElementCacheRefresher.UniqueId),
             Refresher(DomainCacheRefresher.UniqueId),
         });
 

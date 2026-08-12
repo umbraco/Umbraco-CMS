@@ -442,8 +442,6 @@ export default {
 		greeting4: 'ברוכים הבאים',
 		greeting5: 'ברוכים הבאים',
 		greeting6: 'ברוכים הבאים',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 	},
 	main: {
 		dashboard: 'לוח הבקרה',
@@ -551,16 +549,11 @@ export default {
 		editscript: 'ערוך קובץ סקריפט',
 	},
 	sections: {
-		concierge: 'Concierge',
 		content: 'תוכן',
-		courier: 'Courier',
-		developer: 'מפתח',
-		installer: 'אשף הגדרת אומברקו',
+		library: 'ספרייה',
 		media: 'מדיה',
 		member: 'חברים',
-		newsletters: 'עיתון',
 		settings: 'הגדרות',
-		statistics: 'סטטיסטיקות',
 		translation: 'תירגום',
 		users: 'משתמשים',
 	},

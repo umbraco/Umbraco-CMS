@@ -15,13 +15,13 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 import '@umbraco-cms/backoffice/entity-item';
 
 @customElement('umb-user-group-input')
-export class UmbUserGroupInputElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbUserGroupInputElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}

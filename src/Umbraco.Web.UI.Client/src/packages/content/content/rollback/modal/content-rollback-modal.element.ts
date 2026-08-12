@@ -7,7 +7,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -51,7 +51,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 	private _isInvariant = true;
 
 	@state()
-	private _availableVariants: Array<Option> = [];
+	private _availableVariants: Array<UUISelectOption> = [];
 
 	@state()
 	private _diffs: Array<{ alias: string; diff: Array<UmbDiffChange> }> = [];

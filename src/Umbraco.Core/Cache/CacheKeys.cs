@@ -32,6 +32,11 @@ public static class CacheKeys
     public const string UserAllMediaStartNodesPrefix = "AllMediaStartNodes";
 
     /// <summary>
+    ///     Cache key prefix for user's element start nodes.
+    /// </summary>
+    public const string UserAllElementStartNodesPrefix = "AllElementStartNodes";
+
+    /// <summary>
     ///     Cache key prefix for user's media start node paths.
     /// </summary>
     public const string UserMediaStartNodePathsPrefix = "MediaStartNodePaths";
@@ -42,6 +47,11 @@ public static class CacheKeys
     public const string UserContentStartNodePathsPrefix = "ContentStartNodePaths";
 
     /// <summary>
+    ///     Cache key prefix for user's elemtent start node paths.
+    /// </summary>
+    public const string UserElementStartNodePathsPrefix = "ElementStartNodePaths";
+
+    /// <summary>
     ///     Cache key for content recycle bin.
     /// </summary>
     public const string ContentRecycleBinCacheKey = "recycleBin_content";
@@ -50,6 +60,11 @@ public static class CacheKeys
     ///     Cache key for media recycle bin.
     /// </summary>
     public const string MediaRecycleBinCacheKey = "recycleBin_media";
+
+    /// <summary>
+    ///     Cache key for element recycle bin.
+    /// </summary>
+    public const string ElementRecycleBinCacheKey = "recycleBin_element";
 
     /// <summary>
     ///     Cache key prefix for preview (draft) property cache values.

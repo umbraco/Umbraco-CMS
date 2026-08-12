@@ -1,4 +1,3 @@
-import type { ManifestCollection } from './extensions/types.js';
 import type { UmbCollectionItemModel } from './item/types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
@@ -56,8 +55,6 @@ export type UmbCollectionBulkActionConfiguration = {
 export interface UmbCollectionContext {
 	setConfig(config: UmbCollectionConfiguration): void;
 	getConfig(): UmbCollectionConfiguration | undefined;
-	setManifest(manifest: ManifestCollection): void;
-	getManifest(): ManifestCollection | undefined;
 	requestCollection(): Promise<void>;
 	requestItemHref?(item: UmbCollectionItemModel): Promise<string | undefined>;
 	pagination: UmbPaginationManager;

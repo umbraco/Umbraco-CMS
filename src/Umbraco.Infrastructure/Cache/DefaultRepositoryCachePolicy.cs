@@ -44,26 +44,6 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultRepositoryCachePolicy{TEntity, TId}"/> class, which manages caching for repository entities.
-    /// </summary>
-    /// <param name="cache">The application-level policy cache used for storing cached items.</param>
-    /// <param name="scopeAccessor">Provides access to the current scope for cache operations.</param>
-    /// <param name="options">The configuration options for the repository cache policy.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public DefaultRepositoryCachePolicy(
-        IAppPolicyCache cache,
-        IScopeAccessor scopeAccessor,
-        RepositoryCachePolicyOptions options)
-        : this(
-            cache,
-            scopeAccessor,
-            options,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
-    }
-
     protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 
     /// <inheritdoc />

@@ -62,7 +62,6 @@ public class BackOfficeUserStore :
     /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
     /// <param name="logger">Logger instance for logging operations related to the user store.</param>
     /// <param name="backOfficeUserReader">The shared reader used for back office user lookups.</param>
-    [ActivatorUtilitiesConstructor]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
         IEntityService entityService,

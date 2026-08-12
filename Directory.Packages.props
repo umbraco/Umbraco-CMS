@@ -8,13 +8,17 @@
   <ItemGroup>
     <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.10.91" />
     <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
-    <GlobalPackageReference Include="Umbraco.Code" Version="2.4.0" />
+    <!-- TODO (V18): Bump Umbraco.Code to 3.0.0 stable before release of 18.0.0 -->
+    <GlobalPackageReference Include="Umbraco.Code" Version="3.0.0-beta" />
     <GlobalPackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" />
   </ItemGroup>
   <!-- Microsoft packages -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <!-- When updating this version, also update templates/UmbracoExtension/Umbraco.Extension.csproj -->
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.6.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.6.0" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
@@ -42,8 +46,8 @@
   </ItemGroup>
   <!-- Third-party packages -->
   <ItemGroup>
-    <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.1" />
-    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
+    <PackageVersion Include="Asp.Versioning.Mvc" Version="10.2.1" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.2.1" />
     <PackageVersion Include="BitFaster.Caching" Version="2.6.0" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
     <PackageVersion Include="Examine" Version="3.9.0" />
@@ -52,7 +56,7 @@
     <PackageVersion Include="JsonPatch.Net" Version="3.3.0" />
     <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.8" />
     <PackageVersion Include="MailKit" Version="4.17.0" />
-    <PackageVersion Include="Markdig" Version="0.45.0" />
+    <PackageVersion Include="Markdig" Version="1.3.2" />
     <PackageVersion Include="Markdown" Version="2.2.1" />
     <PackageVersion Include="MessagePack" Version="3.1.8" />
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
@@ -64,21 +68,20 @@
     <PackageVersion Include="OpenIddict.AspNetCore" Version="7.6.0" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.6.0" />
     <PackageVersion Include="Serilog" Version="4.4.0" />
-    <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageVersion Include="Serilog.Expressions" Version="5.0.0" />
-    <PackageVersion Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0" />
     <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
     <PackageVersion Include="Serilog.Formatting.Compact.Reader" Version="4.0.0" />
-    <PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.1" />
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="Serilog.Sinks.Map" Version="2.0.0" />
     <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
-    <!-- When updating this version, also update templates/UmbracoExtension/Umbraco.Extension.csproj -->
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
@@ -99,16 +102,8 @@
       Microsoft.AspNetCore.OpenApi and Swashbuckle only require Microsoft.OpenApi >= 2.0.0, which otherwise
       resolves to a vulnerable 2.0.0 (CVE-2026-49451, GHSA-v5pm-xwqc-g5wc). Pin forward to a patched 2.x
       until the referencing packages raise their floor.
-
-      HOLD at 2.9.0 - do not bump. Microsoft.OpenApi 2.10.0+ reworked OpenAPI 3.0 nullability serialization
-      (regression confirmed in 2.11.0): nullable, type-less schemas emit "enum": [null] and nullable oneOf
-      $refs drop "nullable" entirely, which corrupts the generated Delivery API 3.0 contract (fails
-      OpenApiContractTest) and misleads client code generation. 2.9.0 is already CVE-patched, so holding
-      carries no security cost. Tracked upstream at https://github.com/microsoft/OpenAPI.NET/issues/2967;
-      bump only once the 2.x track ships a fix. If a security advisory forces a bump sooner, a Swashbuckle
-      schema-filter workaround will be needed to restore the 3.0 nullable output.
     -->
-    <PackageVersion Include="Microsoft.OpenApi" Version="2.9.0" />
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.11.0" />
     <!--
       Microsoft.Data.Sqlite and Microsoft.EntityFrameworkCore.Sqlite (via SQLitePCLRaw.bundle_e_sqlite3)
       otherwise resolve the native SQLitePCLRaw.lib.e_sqlite3 down to a vulnerable 2.1.11

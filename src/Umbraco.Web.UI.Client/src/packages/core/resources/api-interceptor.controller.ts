@@ -295,11 +295,15 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 				if (!isUmbNotifications(notifications)) return response;
 
 				for (const notification of notifications) {
+					// Backend event messages may contain HTML (e.g. links) and are rendered sanitized by the
+					// notification layout via htmlMessage. The plain message must stay markup-free because it is
+					// read by screen readers (see umb-backoffice-notification-container).
 					this.#peekError(
 						notification.category,
-						notification.message,
+						this.#extractText(notification.message),
 						undefined,
 						extractUmbNotificationColor(notification.type),
+						notification.message,
 					);
 				}
 			} catch {
@@ -356,25 +360,26 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Helper to create a new Response with correct Content-Type.
 	 * @param {unknown} body The body of the response, can be a string or an object.
-	 * @param {Response} originalResponse The original response to copy status and headers from.
+	 * @param {Response} [originalResponse] The original response to copy status and headers from, if any.
+	 * @param {number} [fallbackStatus] Status to use when no upstream response is available. Defaults to 500.
 	 * @returns {Response} The new Response object with the correct Content-Type and body.
 	 */
-	#createResponse(body: unknown, originalResponse: Response): Response {
+	#createResponse(body: unknown, originalResponse?: Response, fallbackStatus: number = 500): Response {
 		const isString = typeof body === 'string';
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
 		// Construct new headers but preserve "X-" headers from the original response
 		const headersOverride: Record<string, string> = {};
-		originalResponse.headers.forEach((value, key) => {
+		originalResponse?.headers.forEach((value, key) => {
 			if (key.toLowerCase().startsWith('x-')) {
 				headersOverride[key] = value;
 			}
 		});
 
 		return new Response(responseBody, {
-			status: originalResponse.status,
-			statusText: originalResponse.statusText,
+			status: originalResponse?.status ?? fallbackStatus,
+			statusText: originalResponse?.statusText ?? '',
 			headers: {
 				...headersOverride,
 				'Content-Type': contentType,
@@ -383,13 +388,29 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
+	 * Extracts the plain text of an HTML string using an inert document, so nothing is executed or loaded.
+	 * @param {string} html The HTML string.
+	 * @returns {string} The text content of the parsed HTML.
+	 */
+	#extractText(html: string): string {
+		return new DOMParser().parseFromString(html, 'text/html').body.textContent ?? '';
+	}
+
+	/**
 	 * Helper to show a notification error.
 	 * @param {string} headline The headline of the error notification.
 	 * @param {string} message The message of the error notification.
 	 * @param {Record<string, string[]>} [errors] Validation errors keyed by field name.
 	 * @param {UmbNotificationColor} [color] The color of the notification.
+	 * @param {string} [htmlMessage] A message rendered as sanitized HTML, taking precedence over `message`.
 	 */
-	async #peekError(headline: string, message: string, errors?: Record<string, string[]>, color?: UmbNotificationColor) {
+	async #peekError(
+		headline: string,
+		message: string,
+		errors?: Record<string, string[]>,
+		color?: UmbNotificationColor,
+		htmlMessage?: string,
+	) {
 		// Store the host for usage in the following async context
 		const host = this._host;
 
@@ -397,6 +418,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		(await import('@umbraco-cms/backoffice/notification')).umbPeekError(host, {
 			headline,
 			message,
+			htmlMessage,
 			errors,
 			color,
 		});

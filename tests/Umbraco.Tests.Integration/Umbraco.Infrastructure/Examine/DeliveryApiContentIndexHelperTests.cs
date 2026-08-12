@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -16,25 +17,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Examine;
 [TestFixture]
 public class DeliveryApiContentIndexHelperTests : UmbracoIntegrationTestWithContent
 {
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
 
         // Save an extra, published content item of a different type to those created via the base class,
         // that we'll use to test filtering out disallowed content types.
         var template = TemplateBuilder.CreateTextPageTemplate("textPage2");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage2", defaultTemplateId: template.Id);
         contentType.Key = Guid.NewGuid();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         ContentType.AllowedContentTypes =
         [
             new ContentTypeSort(ContentType.Key, 0, "umbTextpage"),
             new ContentTypeSort(contentType.Key, 1, "umbTextpage2"),
         ];
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
 
         var subpage = ContentBuilder.CreateSimpleContent(contentType, "Alternate Text Page 4", Textpage.Id);
         ContentService.Save(subpage);

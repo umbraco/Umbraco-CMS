@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Api.Management.Services.Flags;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup.Tree;
 
@@ -18,19 +17,8 @@ public class RootMemberGroupTreeController : MemberGroupTreeControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="RootMemberGroupTreeController"/> class.
     /// </summary>
-    /// <param name="entityService">The <see cref="IEntityService"/> instance used to perform member group operations.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public RootMemberGroupTreeController(IEntityService entityService)
-        : base(entityService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RootMemberGroupTreeController"/> class.
-    /// </summary>
     /// <param name="entityService">The <see cref="IEntityService"/> used to manage member group entities.</param>
     /// <param name="flagProviders">A collection of <see cref="FlagProviderCollection"/> used to provide flagging functionality.</param>
-    [ActivatorUtilitiesConstructor]
     public RootMemberGroupTreeController(IEntityService entityService, FlagProviderCollection flagProviders)
         : base(entityService, flagProviders)
     {

@@ -139,8 +139,6 @@ internal sealed class MigrationPlanExecutorTests : UmbracoIntegrationTest
             return Task.FromResult(Attempt.Succeed(DatabaseCacheRebuildResult.Success));
         }
 
-#pragma warning disable CS0618 // Type or member is obsolete
-        public void RebuildDatabaseCacheIfSerializerChanged() => throw new NotSupportedException();
-#pragma warning restore CS0618 // Type or member is obsolete
+        public Task RebuildDatabaseCacheIfSerializerChangedAsync() => throw new NotSupportedException();
     }
 }

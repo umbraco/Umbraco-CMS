@@ -1,4 +1,5 @@
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 
@@ -10,7 +11,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 /// </summary>
 /// <remarks>
 ///     This handler listens for the <see cref="PostRuntimePremigrationsUpgradeNotification"/> and
-///     triggers a rebuild of both document and media navigation structures, including their
+///     triggers a rebuild of document, media, and element navigation structures, including their
 ///     respective recycle bins.
 /// </remarks>
 public sealed class NavigationInitializationNotificationHandler : INotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification>
@@ -18,6 +19,7 @@ public sealed class NavigationInitializationNotificationHandler : INotificationA
     private readonly IRuntimeState _runtimeState;
     private readonly IDocumentNavigationManagementService _documentNavigationManagementService;
     private readonly IMediaNavigationManagementService _mediaNavigationManagementService;
+    private readonly IElementNavigationManagementService _elementNavigationManagementService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="NavigationInitializationNotificationHandler"/> class.
@@ -25,14 +27,36 @@ public sealed class NavigationInitializationNotificationHandler : INotificationA
     /// <param name="runtimeState">The runtime state service for checking the current runtime level.</param>
     /// <param name="documentNavigationManagementService">The document navigation management service.</param>
     /// <param name="mediaNavigationManagementService">The media navigation management service.</param>
+    /// <param name="elementNavigationManagementService">The element navigation management service.</param>
     public NavigationInitializationNotificationHandler(
         IRuntimeState runtimeState,
         IDocumentNavigationManagementService documentNavigationManagementService,
-        IMediaNavigationManagementService mediaNavigationManagementService)
+        IMediaNavigationManagementService mediaNavigationManagementService,
+        IElementNavigationManagementService elementNavigationManagementService)
     {
         _runtimeState = runtimeState;
         _documentNavigationManagementService = documentNavigationManagementService;
         _mediaNavigationManagementService = mediaNavigationManagementService;
+        _elementNavigationManagementService = elementNavigationManagementService;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="NavigationInitializationNotificationHandler"/> class.
+    /// </summary>
+    /// <param name="runtimeState">The runtime state service for checking the current runtime level.</param>
+    /// <param name="documentNavigationManagementService">The document navigation management service.</param>
+    /// <param name="mediaNavigationManagementService">The media navigation management service.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public NavigationInitializationNotificationHandler(
+        IRuntimeState runtimeState,
+        IDocumentNavigationManagementService documentNavigationManagementService,
+        IMediaNavigationManagementService mediaNavigationManagementService)
+        : this(
+            runtimeState,
+            documentNavigationManagementService,
+            mediaNavigationManagementService,
+            StaticServiceProvider.Instance.GetRequiredService<IElementNavigationManagementService>())
+    {
     }
 
     /// <summary>
@@ -49,7 +73,7 @@ public sealed class NavigationInitializationNotificationHandler : INotificationA
     /// </remarks>
     public async Task HandleAsync(PostRuntimePremigrationsUpgradeNotification notification, CancellationToken cancellationToken)
     {
-        if(_runtimeState.Level < RuntimeLevel.Upgrade)
+        if (_runtimeState.Level < RuntimeLevel.Upgrade)
         {
             return;
         }
@@ -58,5 +82,7 @@ public sealed class NavigationInitializationNotificationHandler : INotificationA
         await _documentNavigationManagementService.RebuildBinAsync();
         await _mediaNavigationManagementService.RebuildAsync();
         await _mediaNavigationManagementService.RebuildBinAsync();
+        await _elementNavigationManagementService.RebuildAsync();
+        await _elementNavigationManagementService.RebuildBinAsync();
     }
 }

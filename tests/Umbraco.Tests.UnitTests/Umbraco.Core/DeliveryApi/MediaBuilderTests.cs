@@ -16,7 +16,6 @@ public class MediaBuilderTests : DeliveryApiTests
         var media = SetupMedia(
             key,
             "The media",
-            "media-url-segment",
             new Dictionary<string, object>
             {
                 { Constants.Conventions.Media.Width, 111 },
@@ -44,7 +43,6 @@ public class MediaBuilderTests : DeliveryApiTests
         var media = SetupMedia(
             Guid.NewGuid(),
             "The media",
-            "media-url-segment",
             new Dictionary<string, object>());
 
         var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
@@ -59,7 +57,6 @@ public class MediaBuilderTests : DeliveryApiTests
         var media = SetupMedia(
             Guid.NewGuid(),
             "The media",
-            "media-url-segment",
             new Dictionary<string, object> { { "myProperty", 123 }, { "anotherProperty", "A value goes here" } });
 
         var builder = new ApiMediaBuilder(new ApiContentNameProvider(), SetupMediaUrlProvider(), Mock.Of<IPublishedValueFallback>(), CreateOutputExpansionStrategyAccessor());
@@ -70,7 +67,7 @@ public class MediaBuilderTests : DeliveryApiTests
         Assert.AreEqual("A value goes here", result.Properties["anotherProperty"]);
     }
 
-    private IPublishedContent SetupMedia(Guid key, string name, string urlSegment, Dictionary<string, object> properties)
+    private IPublishedContent SetupMedia(Guid key, string name, Dictionary<string, object> properties)
     {
         var media = new Mock<IPublishedContent>();
 
@@ -80,7 +77,6 @@ public class MediaBuilderTests : DeliveryApiTests
         var mediaProperties = properties.Select(kvp => SetupProperty(kvp.Key, kvp.Value)).ToArray();
 
         media.SetupGet(c => c.Properties).Returns(mediaProperties);
-        media.SetupGet(c => c.UrlSegment).Returns(urlSegment);
         media.SetupGet(c => c.Name).Returns(name);
         media.SetupGet(c => c.Key).Returns(key);
         media.SetupGet(c => c.ContentType).Returns(mediaType.Object);
@@ -100,10 +96,10 @@ public class MediaBuilderTests : DeliveryApiTests
         return propertyMock.Object;
     }
 
-    private IApiMediaUrlProvider SetupMediaUrlProvider()
+    private IApiMediaUrlProvider SetupMediaUrlProvider(string urlSegment = "media-url-segment")
     {
         var mock = new Mock<IApiMediaUrlProvider>();
-        mock.Setup(m => m.GetUrl(It.IsAny<IPublishedContent>())).Returns((IPublishedContent media) => $"media-url:{media.UrlSegment}");
+        mock.Setup(m => m.GetUrl(It.IsAny<IPublishedContent>())).Returns($"media-url:{urlSegment}");
         return mock.Object;
     }
 }

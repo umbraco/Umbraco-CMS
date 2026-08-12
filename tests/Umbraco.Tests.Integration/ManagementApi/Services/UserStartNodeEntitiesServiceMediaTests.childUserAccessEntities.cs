@@ -8,13 +8,13 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task ChildUserAccessEntities_FirstAndLastChildOfRoot_YieldsBothInFirstPage_AsAllowed()
     {
-        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(_mediaByName["1-1"].Id, _mediaByName["1-10"].Id);
+        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["1-1"].Id, ItemsByName["1-10"].Id);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["1"].Key,
+                ItemsByName["1"].Key,
                 0,
                 3,
                 BySortOrder,
@@ -27,8 +27,8 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.Multiple(() =>
         {
             // first and last media items are the ones allowed
-            Assert.AreEqual(_mediaByName["1-1"].Key, children[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["1-10"].Key, children[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["1-1"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["1-10"].Key, children[1].Entity.Key);
 
             // explicitly verify the entity sort order, both so we know sorting works,
             // and so we know it's actually the first and last item below "1"
@@ -44,14 +44,14 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task ChildUserAccessEntities_InAndOutOfScope_YieldsOnlyChildrenInScope()
     {
-        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(_mediaByName["1-5"].Id, _mediaByName["2-10"].Id);
+        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["1-5"].Id, ItemsByName["2-10"].Id);
         Assert.AreEqual(2, mediaStartNodePaths.Length);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["2"].Key,
+                ItemsByName["2"].Key,
                 0,
                 10,
                 BySortOrder,
@@ -63,7 +63,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.Multiple(() =>
         {
             // only the "2-10" media item is returned, as "1-5" is out of scope
-            Assert.AreEqual(_mediaByName["2-10"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["2-10"].Key, children[0].Entity.Key);
             Assert.IsTrue(children[0].HasAccess);
         });
     }
@@ -71,14 +71,14 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task ChildUserAccessEntities_OutOfScope_YieldsNothing()
     {
-        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(_mediaByName["1-5"].Id, _mediaByName["2-10"].Id);
+        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["1-5"].Id, ItemsByName["2-10"].Id);
         Assert.AreEqual(2, mediaStartNodePaths.Length);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["3"].Key,
+                ItemsByName["3"].Key,
                 0,
                 10,
                 BySortOrder,
@@ -93,17 +93,17 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     public async Task ChildUserAccessEntities_SpanningMultipleResultPages_CanPaginate()
     {
         var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(
-            _mediaByName["1-1"].Id,
-            _mediaByName["1-3"].Id,
-            _mediaByName["1-5"].Id,
-            _mediaByName["1-7"].Id,
-            _mediaByName["1-9"].Id);
+            ItemsByName["1-1"].Id,
+            ItemsByName["1-3"].Id,
+            ItemsByName["1-5"].Id,
+            ItemsByName["1-7"].Id,
+            ItemsByName["1-9"].Id);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["1"].Key,
+                ItemsByName["1"].Key,
                 0,
                 2,
                 BySortOrder,
@@ -115,8 +115,8 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.AreEqual(2, children.Length);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_mediaByName["1-1"].Key, children[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["1-3"].Key, children[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["1-1"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["1-3"].Key, children[1].Entity.Key);
             Assert.IsTrue(children[0].HasAccess);
             Assert.IsTrue(children[1].HasAccess);
         });
@@ -126,7 +126,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["1"].Key,
+                ItemsByName["1"].Key,
                 2,
                 2,
                 BySortOrder,
@@ -138,8 +138,8 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.AreEqual(2, children.Length);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_mediaByName["1-5"].Key, children[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["1-7"].Key, children[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["1-5"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["1-7"].Key, children[1].Entity.Key);
             Assert.IsTrue(children[0].HasAccess);
             Assert.IsTrue(children[1].HasAccess);
         });
@@ -149,7 +149,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["1"].Key,
+                ItemsByName["1"].Key,
                 4,
                 2,
                 BySortOrder,
@@ -161,7 +161,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.AreEqual(1, children.Length);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_mediaByName["1-9"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["1-9"].Key, children[0].Entity.Key);
             Assert.IsTrue(children[0].HasAccess);
         });
     }
@@ -169,13 +169,13 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task ChildUserAccessEntities_ChildrenAsStartNode_YieldsAllGrandchildren_AsAllowed()
     {
-        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(_mediaByName["3-3"].Id);
+        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["3-3"].Id);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["3-3"].Key,
+                ItemsByName["3-3"].Key,
                 0,
                 100,
                 BySortOrder,
@@ -190,7 +190,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
             foreach (var childNumber in Enumerable.Range(1, 5))
             {
                 var child = children[childNumber - 1];
-                Assert.AreEqual(_mediaByName[$"3-3-{childNumber}"].Key, child.Entity.Key);
+                Assert.AreEqual(ItemsByName[$"3-3-{childNumber}"].Key, child.Entity.Key);
                 Assert.IsTrue(child.HasAccess);
             }
         });
@@ -199,13 +199,13 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task ChildUserAccessEntities_GrandchildrenAsStartNode_YieldsGrandchildren_AsAllowed()
     {
-        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(_mediaByName["3-3-3"].Id, _mediaByName["3-3-4"].Id);
+        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["3-3-3"].Id, ItemsByName["3-3-4"].Id);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["3-3"].Key,
+                ItemsByName["3-3"].Key,
                 0,
                 3,
                 BySortOrder,
@@ -217,8 +217,8 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.Multiple(() =>
         {
             // the two items are the children of "3-3" - that is, the actual start nodes
-            Assert.AreEqual(_mediaByName["3-3-3"].Key, children[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["3-3-4"].Key, children[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-3-3"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-3-4"].Key, children[1].Entity.Key);
 
             // both are allowed (they are the actual start nodes)
             Assert.IsTrue(children[0].HasAccess);
@@ -229,13 +229,13 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task ChildUserAccessEntities_GrandchildrenAsStartNode_YieldsChildren_AsNotAllowed()
     {
-        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(_mediaByName["3-3-3"].Id, _mediaByName["3-5-3"].Id);
+        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["3-3-3"].Id, ItemsByName["3-5-3"].Id);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["3"].Key,
+                ItemsByName["3"].Key,
                 0,
                 3,
                 BySortOrder,
@@ -247,8 +247,8 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.Multiple(() =>
         {
             // the two items are the children of "3" - that is, the parents of the actual start nodes
-            Assert.AreEqual(_mediaByName["3-3"].Key, children[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["3-5"].Key, children[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-3"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-5"].Key, children[1].Entity.Key);
 
             // both are disallowed - only the two children (the actual start nodes) are allowed
             Assert.IsFalse(children[0].HasAccess);
@@ -264,14 +264,14 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         //       and the ancestor start node is ignored. this differs somewhat from the norm; we normally consider
         //       permissions additive (which in this case would mean ignoring the descendant rather than the ancestor).
 
-        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(_mediaByName["3-3"].Id, _mediaByName["3-3-1"].Id, _mediaByName["3-3-5"].Id);
+        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["3-3"].Id, ItemsByName["3-3-1"].Id, ItemsByName["3-3-5"].Id);
         Assert.AreEqual(2, mediaStartNodePaths.Length);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["3"].Key,
+                ItemsByName["3"].Key,
                 0,
                 10,
                 BySortOrder,
@@ -281,7 +281,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.AreEqual(1, children.Length);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_mediaByName["3-3"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-3"].Key, children[0].Entity.Key);
             Assert.IsFalse(children[0].HasAccess);
         });
 
@@ -289,7 +289,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["3-3"].Key,
+                ItemsByName["3-3"].Key,
                 0,
                 10,
                 BySortOrder,
@@ -301,8 +301,8 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.Multiple(() =>
         {
             // the two items are the children of "3-3" - that is, the actual start nodes
-            Assert.AreEqual(_mediaByName["3-3-1"].Key, children[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["3-3-5"].Key, children[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-3-1"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-3-5"].Key, children[1].Entity.Key);
 
             Assert.IsTrue(children[0].HasAccess);
             Assert.IsTrue(children[1].HasAccess);
@@ -312,13 +312,13 @@ public partial class UserStartNodeEntitiesServiceMediaTests
     [Test]
     public async Task ChildUserAccessEntities_ReverseStartNodeOrder_DoesNotAffectResultOrder()
     {
-        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(_mediaByName["3-3"].Id, _mediaByName["3-2"].Id, _mediaByName["3-1"].Id);
+        var mediaStartNodePaths = await CreateUserAndGetStartNodePaths(ItemsByName["3-3"].Id, ItemsByName["3-2"].Id, ItemsByName["3-1"].Id);
 
         var children = UserStartNodeEntitiesService
             .ChildUserAccessEntities(
                 UmbracoObjectTypes.Media,
                 mediaStartNodePaths,
-                _mediaByName["3"].Key,
+                ItemsByName["3"].Key,
                 0,
                 10,
                 BySortOrder,
@@ -328,9 +328,9 @@ public partial class UserStartNodeEntitiesServiceMediaTests
         Assert.AreEqual(3, children.Length);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(_mediaByName["3-1"].Key, children[0].Entity.Key);
-            Assert.AreEqual(_mediaByName["3-2"].Key, children[1].Entity.Key);
-            Assert.AreEqual(_mediaByName["3-3"].Key, children[2].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-1"].Key, children[0].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-2"].Key, children[1].Entity.Key);
+            Assert.AreEqual(ItemsByName["3-3"].Key, children[2].Entity.Key);
         });
     }
 }

@@ -51,6 +51,15 @@ public class IdKeyMapTests
         Assert.AreEqual(Constants.System.RecycleBinMedia, result.Result);
     }
 
+    [TestCase(UmbracoObjectTypes.Element)]
+    [TestCase(UmbracoObjectTypes.ElementContainer)]
+    public void Can_Resolve_Element_Recycle_Bin_Id_From_Key(UmbracoObjectTypes objectType)
+    {
+        var result = GetIdKeyMap().GetIdForKey(Constants.System.RecycleBinElementKey, objectType);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(Constants.System.RecycleBinElement, result.Result);
+    }
+
     [Test]
     public void Can_Resolve_Content_Recycle_Bin_Key_From_Id()
     {
@@ -65,6 +74,15 @@ public class IdKeyMapTests
         var result = GetIdKeyMap().GetKeyForId(Constants.System.RecycleBinMedia, UmbracoObjectTypes.Media);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(Constants.System.RecycleBinMediaKey, result.Result);
+    }
+
+    [TestCase(UmbracoObjectTypes.Element)]
+    [TestCase(UmbracoObjectTypes.ElementContainer)]
+    public void Can_Resolve_Element_Recycle_Bin_Key_From_Id(UmbracoObjectTypes objectType)
+    {
+        var result = GetIdKeyMap().GetKeyForId(Constants.System.RecycleBinElement, objectType);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(Constants.System.RecycleBinElementKey, result.Result);
     }
 
     [Test]

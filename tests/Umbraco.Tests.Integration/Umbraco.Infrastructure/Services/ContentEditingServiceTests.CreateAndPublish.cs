@@ -12,7 +12,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Can_CreateAndPublish_Invariant_Content()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var createModel = new ContentCreateModel
         {
@@ -168,7 +168,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Can_CreateAndPublish_With_Explicit_Key()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
         var explicitKey = Guid.NewGuid();
 
         var createModel = new ContentCreateModel
@@ -215,7 +215,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Cannot_CreateAndPublish_With_Non_Existing_Parent()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var createModel = new ContentCreateModel
         {
@@ -235,7 +235,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Cannot_CreateAndPublish_With_Non_Existing_Template()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var createModel = new ContentCreateModel
         {
@@ -283,7 +283,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Cannot_CreateAndPublish_Invariant_Without_Name()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var createModel = new ContentCreateModel
         {

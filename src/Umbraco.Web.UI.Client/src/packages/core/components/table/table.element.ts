@@ -421,7 +421,7 @@ export class UmbTableElement extends UmbLitElement {
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
 							?checked=${allSelected}
-							.indeterminate=${indeterminate}></uui-checkbox>
+							?indeterminate=${indeterminate}></uui-checkbox>
 					`,
 				)}
 			</uui-table-head-cell>
@@ -576,17 +576,6 @@ export class UmbTableElement extends UmbLitElement {
 				uui-table-row:active {
 					cursor: grabbing;
 				}
-			}
-
-			uui-table {
-				box-shadow: var(--uui-shadow-depth-1);
-			}
-
-			uui-table-head {
-				position: sticky;
-				top: 0;
-				z-index: 1;
-				background-color: var(--uui-color-surface, #fff);
 			}
 
 			uui-table-row uui-checkbox {

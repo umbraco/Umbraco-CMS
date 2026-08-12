@@ -199,7 +199,7 @@ public abstract class DateTimePropertyEditorBase : DataEditor, IValueSchemaProvi
         /// <summary>
         /// Validates the date time selection for the DateTime2 property editor.
         /// </summary>
-        private class DateTimeValidator : ITypedJsonValidator<DateTimeEditorValue, DateTimeConfiguration>
+        private class DateTimeValidator : ITypedValidator<DateTimeEditorValue, DateTimeConfiguration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 

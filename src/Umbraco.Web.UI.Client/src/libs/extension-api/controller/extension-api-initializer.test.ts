@@ -7,8 +7,7 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import type { UmbControllerHostElement, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
-import type { ManifestSection } from '@umbraco-cms/backoffice/section';
-import type { SwitchConditionConfig } from 'src/packages/core/extension-registry/conditions/switch.condition.js';
+import type { SwitchConditionConfig } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
 // Element is used in tests

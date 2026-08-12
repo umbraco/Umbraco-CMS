@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Services.Entities;
 /// <remarks>
 /// Contains the shared filtering logic for tree controllers that support user start node access.
 /// Concrete implementations provide the start node resolution for their specific domain
-/// (documents or media).
+/// (documents, media, or elements).
 /// </remarks>
 internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilterService
 {
@@ -34,9 +34,9 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
     }
 
     /// <summary>
-    /// Gets the object type to include in tree queries.
+    /// Gets the object types to include in tree queries.
     /// </summary>
-    protected abstract UmbracoObjectTypes TreeObjectType { get; }
+    protected abstract UmbracoObjectTypes[] TreeObjectTypes { get; }
 
     private int[] UserStartNodeIds => field ??= CalculateUserStartNodeIds();
 
@@ -50,7 +50,7 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
     public UserAccessEntity[] GetFilteredRootEntities(out long totalItems)
     {
         UserAccessEntity[] result = _userStartNodeEntitiesService
-            .RootUserAccessEntities(TreeObjectType, UserStartNodeIds)
+            .RootUserAccessEntities(TreeObjectTypes, UserStartNodeIds)
             .ToArray();
 
         totalItems = result.Length;
@@ -66,7 +66,7 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
         out long totalItems)
     {
         UserAccessEntity[] result = _userStartNodeEntitiesService.ChildUserAccessEntities(
-                TreeObjectType,
+                TreeObjectTypes,
                 UserStartNodePaths,
                 parentKey,
                 skip,
@@ -88,7 +88,7 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
         out long totalAfter)
     {
         UserAccessEntity[] result = _userStartNodeEntitiesService.SiblingUserAccessEntities(
-                TreeObjectType,
+                TreeObjectTypes,
                 UserStartNodePaths,
                 target,
                 before,

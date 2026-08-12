@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -21,7 +19,6 @@ public class BackOfficeDefaultController : Controller
     /// Initializes a new instance of the <see cref="BackOfficeDefaultController"/> class.
     /// </summary>
     /// <param name="umbracoRuntime">An instance of <see cref="IRuntime"/> representing the Umbraco runtime environment.</param>
-    [ActivatorUtilitiesConstructor]
     public BackOfficeDefaultController(IRuntime umbracoRuntime)
         => _umbracoRuntime = umbracoRuntime;
 

@@ -67,6 +67,5 @@ public interface IConfigManipulator
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
-    Task SetImagingHmacSecretKeyAsync(string base64Key)
-        => Task.CompletedTask; // TODO (V18): Remove the default implementation
+    Task SetImagingHmacSecretKeyAsync(string base64Key);
 }

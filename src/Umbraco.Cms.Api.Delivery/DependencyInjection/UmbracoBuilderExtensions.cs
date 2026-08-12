@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
@@ -53,7 +54,7 @@ public static class UmbracoBuilderExtensions
             provider =>
             {
                 HttpContext? httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
+                ApiVersion? apiVersion = httpContext?.RequestedApiVersion;
                 if (apiVersion is null)
                 {
                     return provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
@@ -67,7 +68,6 @@ public static class UmbracoBuilderExtensions
             ServiceLifetime.Scoped);
 
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
-        builder.Services.AddSingleton<IRequestSegmmentService, RequestSegmentService>();
         builder.Services.AddSingleton<IRequestSegmentService, RequestSegmentService>();
         builder.Services.AddSingleton<IRequestRoutingService, RequestRoutingService>();
         builder.Services.AddSingleton<IRequestRedirectService, RequestRedirectService>();
@@ -86,19 +86,27 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
         builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
 
-        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
-        builder.AddUmbracoApiOpenApiUI();
+        builder.AddUmbracoOpenApi();
+        builder.AddUmbracoOpenApiDocument<ConfigureUmbracoDeliveryApiOpenApiOptions>(
+            DeliveryApiConfiguration.ApiName,
+            DeliveryApiConfiguration.ApiTitle,
+            Constants.JsonOptionsNames.DeliveryApi);
 
         builder
             .Services
             .AddControllers()
-            .AddJsonOptions(Constants.JsonOptionsNames.DeliveryApi, options =>
-            {
-                // all Delivery API specific JSON options go here
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+            .AddJsonOptions(
+                Constants.JsonOptionsNames.DeliveryApi,
+                options =>
+                {
+                    // all Delivery API specific JSON options go here
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
+        // Configures the JSON options for the Open API schema generation (based on the Delivery API MVC JSON options)
+        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryHttpJsonOptions>();
 
         builder.Services.AddAuthentication();
         builder.AddUmbracoOpenIddict();
@@ -157,6 +165,7 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, DeliveryApiDocumentOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, DeliveryApiMediaOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, DeliveryApiMemberOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<ElementCacheRefresherNotification, DeliveryApiElementOutputCacheEvictionHandler>();
 
         // Register extension point default implementations.
         builder.Services.AddSingleton<IDeliveryApiOutputCacheTagProvider, DeliveryApiContentTypeOutputCacheTagProvider>();
@@ -171,4 +180,5 @@ public static class UmbracoBuilderExtensions
 
         return builder;
     }
+
 }

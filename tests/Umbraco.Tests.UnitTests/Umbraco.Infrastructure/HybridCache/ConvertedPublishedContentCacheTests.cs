@@ -15,7 +15,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Track_Count_And_Bytes_On_Set_And_Remove()
     {
-        var cache = new UnboundedConvertedPublishedContentCache<string>();
+        var cache = new UnboundedConvertedPublishedContentCache<string, IPublishedContent>();
 
         cache.Set("a", Content(), 100);
         cache.Set("b", Content(), 50);
@@ -38,7 +38,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Adjust_Bytes_When_Overwriting_Existing_Key()
     {
-        var cache = new UnboundedConvertedPublishedContentCache<string>();
+        var cache = new UnboundedConvertedPublishedContentCache<string, IPublishedContent>();
 
         cache.Set("a", Content(), 100);
         cache.Set("a", Content(), 30);
@@ -53,7 +53,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Reset_Bytes_On_Clear()
     {
-        var cache = new UnboundedConvertedPublishedContentCache<string>();
+        var cache = new UnboundedConvertedPublishedContentCache<string, IPublishedContent>();
 
         cache.Set("a", Content(), 100);
         cache.Clear();
@@ -68,7 +68,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Remove_Matching_Entries_With_RemoveWhere()
     {
-        var cache = new UnboundedConvertedPublishedContentCache<string>();
+        var cache = new UnboundedConvertedPublishedContentCache<string, IPublishedContent>();
 
         cache.Set("a", ContentOfType(1), 100);
         cache.Set("b", ContentOfType(2), 40);
@@ -85,7 +85,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Bound_Entry_Count_When_Maximum_Configured()
     {
-        var cache = new BoundedConvertedPublishedContentCache<string>(5);
+        var cache = new BoundedConvertedPublishedContentCache<string, IPublishedContent>(5);
 
         for (var i = 0; i < 100; i++)
         {
@@ -109,7 +109,7 @@ public class ConvertedPublishedContentCacheTests
         // is guaranteed by structure rather than by the marginal frequency comparison for window/probation
         // residents (which depends on count-min sketch hashing and buffer behaviour). Int keys keep that hashing
         // stable across processes, as .NET randomizes string.GetHashCode().
-        var cache = new BoundedConvertedPublishedContentCache<int>(10);
+        var cache = new BoundedConvertedPublishedContentCache<int, IPublishedContent>(10);
 
         int[] hot = [0, 1, 2];
 
@@ -161,7 +161,7 @@ public class ConvertedPublishedContentCacheTests
     [Test]
     public void Can_Remove_And_Clear_When_Bounded()
     {
-        var cache = new BoundedConvertedPublishedContentCache<string>(10);
+        var cache = new BoundedConvertedPublishedContentCache<string, IPublishedContent>(10);
 
         cache.Set("a", ContentOfType(1), 10);
         cache.Set("b", ContentOfType(2), 10);
@@ -176,7 +176,25 @@ public class ConvertedPublishedContentCacheTests
         Assert.That(cache.Count, Is.EqualTo(0));
     }
 
+    [Test]
+    public void Can_Track_Element_Values()
+    {
+        var cache = new UnboundedConvertedPublishedContentCache<string, IPublishedElement>();
+
+        cache.Set("a", Element(), 100);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cache.Count, Is.EqualTo(1));
+            Assert.That(cache.ApproximateSizeInBytes, Is.EqualTo(100));
+            Assert.That(cache.TryGet("a", out IPublishedElement? element), Is.True);
+            Assert.That(element, Is.Not.Null);
+        });
+    }
+
     private static IPublishedContent Content() => new Mock<IPublishedContent>().Object;
+
+    private static IPublishedElement Element() => new Mock<IPublishedElement>().Object;
 
     private static IPublishedContent ContentOfType(int contentTypeId)
     {

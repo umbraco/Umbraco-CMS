@@ -85,6 +85,34 @@ public static partial class Constants
         public const string RecycleBinMediaPathPrefix = "-1,-21,";
 
         /// <summary>
+        /// The integer identifier for element's recycle bin.
+        /// </summary>
+        public const int RecycleBinElement = -22;
+
+        /// <summary>
+        /// The string identifier for element's recycle bin.
+        /// </summary>
+        /// <remarks>
+        /// Use this instead of re-creating the string everywhere.
+        /// </remarks>
+        public const string RecycleBinElementString = "-22";
+
+        /// <summary>
+        /// The GUID identifier for element's recycle bin.
+        /// </summary>
+        public static readonly Guid RecycleBinElementKey = new("F055FC2F-C936-4F04-8C9B-5129C58C77D8");
+
+        /// <summary>
+        /// The string path prefix of the element's recycle bin.
+        /// </summary>
+        /// <remarks>
+        /// <para>Everything that is in the element recycle bin, has a path that starts with the prefix.</para>
+        /// <para>Use this instead of re-creating the string everywhere.</para>
+        /// </remarks>
+        public const string RecycleBinElementPathPrefix = "-1,-22,";
+
+
+        /// <summary>
         /// The default label data type identifier.
         /// </summary>
         public const int DefaultLabelDataTypeId = -92;

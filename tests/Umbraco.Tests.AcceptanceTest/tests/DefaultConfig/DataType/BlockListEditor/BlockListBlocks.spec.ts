@@ -284,7 +284,6 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(secondStylesheetName);
-  
 
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);

@@ -44,16 +44,6 @@ public class UpdateDomainsController : DocumentControllerBase
         _domainPresentationFactory = domainPresentationFactory;
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public UpdateDomainsController(IDomainService domainService, IUmbracoMapper umbracoMapper, IDomainPresentationFactory domainPresentationFactory)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>(),
-            domainService,
-            umbracoMapper,
-            domainPresentationFactory)
-    {
-    }
-
     /// <summary>
     /// Updates the domains assigned to the specified document.
     /// </summary>

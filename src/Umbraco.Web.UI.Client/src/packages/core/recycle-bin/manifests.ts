@@ -3,6 +3,7 @@ import { manifests as conditionManifests } from './conditions/manifests.js';
 import { manifests as emptyRecycleBinEntityActionManifests } from './entity-action/empty-recycle-bin/manifests.js';
 import { manifests as restoreFromRecycleBinEntityActionManifests } from './entity-action/restore-from-recycle-bin/manifests.js';
 import { manifests as trashEntityActionManifests } from './entity-action/trash/manifests.js';
+import { manifests as trashFolderEntityActionManifests } from './entity-action/trash-folder/manifests.js';
 import { manifests as trashEntityBulkActionManifests } from './entity-bulk-action/bulk-trash/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 
@@ -14,6 +15,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...emptyRecycleBinEntityActionManifests,
 	...restoreFromRecycleBinEntityActionManifests,
 	...trashEntityActionManifests,
+	...trashFolderEntityActionManifests,
 	...trashEntityBulkActionManifests,
 	...treeManifests,
 ];

@@ -1,9 +1,9 @@
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentVariantState } from '../../../../variant-state.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import { UmbDocumentVariantState } from '../../../../variant-state.js';
 
 @customElement('umb-document-table-column-property-value')
 export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {

@@ -258,14 +258,15 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         }
     }
 
-    private class NoOpMigration : MigrationBase
+    private class NoOpMigration : AsyncMigrationBase
     {
         public NoOpMigration(IMigrationContext context) : base(context)
         {
         }
 
-        protected override void Migrate()
+        protected override Task MigrateAsync()
         {
+            return Task.CompletedTask;
         }
     }
 
@@ -276,7 +277,7 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
 
 
 // This is just some basic migrations to test the migration plans...
-internal class ErrorMigration : MigrationBase
+internal class ErrorMigration : AsyncMigrationBase
 {
     // Used to determine if an exception should be thrown, used to test re-running migrations
     public static bool ShouldExplode { get; set; } = true;
@@ -285,31 +286,37 @@ internal class ErrorMigration : MigrationBase
     {
     }
 
-    protected override void Migrate()
+    protected override Task MigrateAsync()
     {
         if (ShouldExplode)
         {
             throw new PanicException();
         }
+
+        return Task.CompletedTask;
     }
 }
 
-internal class CreateTableMigration : MigrationBase
+internal class CreateTableMigration : AsyncMigrationBase
 {
     public CreateTableMigration(IMigrationContext context) : base(context)
     {
     }
 
-    protected override void Migrate() => Create.Table<TestDto>().Do();
+    protected override Task MigrateAsync()
+    {
+        Create.Table<TestDto>().Do();
+        return Task.CompletedTask;
+    }
 }
 
-internal class AddColumnMigration : MigrationBase
+internal class AddColumnMigration : AsyncMigrationBase
 {
     public AddColumnMigration(IMigrationContext context) : base(context)
     {
     }
 
-    protected override void Migrate() => Create
+    protected override async Task MigrateAsync() => Create
         .Column(PartialMigrationsTests.ColumnName)
         .OnTable(PartialMigrationsTests.TableName)
         .AsString()
@@ -344,7 +351,7 @@ internal class AssertScopeUnscopedTestMigration : UnscopedAsyncMigrationBase
     }
 }
 
-internal class AsserScopeScopedTestMigration : MigrationBase
+internal class AsserScopeScopedTestMigration : AsyncMigrationBase
 {
     private readonly IScopeProvider _scopeProvider;
     private readonly IScopeAccessor _scopeAccessor;
@@ -358,13 +365,15 @@ internal class AsserScopeScopedTestMigration : MigrationBase
         _scopeAccessor = scopeAccessor;
     }
 
-    protected override void Migrate()
+    protected override Task MigrateAsync()
     {
         Assert.IsNotNull(_scopeAccessor.AmbientScope);
 
         using var scope = _scopeProvider.CreateScope();
 
         Assert.IsNotNull(((Scope)scope).ParentScope);
+
+        return Task.CompletedTask;
     }
 }
 
@@ -423,7 +432,7 @@ internal class SimpleMigrationPlan : MigrationPlan
     }
 }
 
-internal class SimpleMigrationStep : MigrationBase
+internal class SimpleMigrationStep : AsyncMigrationBase
 {
     private readonly ILogger<SimpleMigrationStep> _logger;
 
@@ -432,5 +441,9 @@ internal class SimpleMigrationStep : MigrationBase
         ILogger<SimpleMigrationStep> logger)
         : base(context) => _logger = logger;
 
-    protected override void Migrate() => _logger.LogDebug("Here be migration");
+    protected override Task MigrateAsync()
+    {
+        _logger.LogDebug("Here be migration");
+        return Task.CompletedTask;
+    }
 }

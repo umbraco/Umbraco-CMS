@@ -116,4 +116,11 @@ public class PackageDefinition
     /// </summary>
     [DataMember(Name = "mediaLoadChildNodes")]
     public bool MediaLoadChildNodes { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the collection of element keys included in this package.
+    /// </summary>
+    /// <remarks>Each element's container (folder) ancestry is preserved during export and recreated on import.</remarks>
+    [DataMember(Name = "elements")]
+    public IList<Guid> Elements { get; set; } = new List<Guid>();
 }

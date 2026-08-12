@@ -7,7 +7,6 @@ import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/e
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Collection action for emptying the recycle bin.
@@ -15,19 +14,19 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @augments {UmbCollectionActionBase}
  */
 export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase {
-	#manifest: ManifestCollectionActionEmptyRecycleBinKind;
 
-	constructor(host: UmbControllerHost, manifest: ManifestCollectionActionEmptyRecycleBinKind) {
-		super(host);
-		this.#manifest = manifest;
-	}
+	/**
+	 * The manifest for this action. Assigned by `umb-extension-with-api-slot` after construction.
+	 */
+	public manifest?: ManifestCollectionActionEmptyRecycleBinKind;
 
 	/**
 	 * Executes the action.
 	 * @memberof UmbEmptyRecycleBinCollectionAction
 	 */
 	async execute() {
-		if (!this.#manifest.meta.recycleBinRepositoryAlias) {
+		const recycleBinRepositoryAlias = this.manifest?.meta.recycleBinRepositoryAlias;
+		if (!recycleBinRepositoryAlias) {
 			throw new Error('Recycle Bin Repository Alias is not defined in the manifest meta');
 		}
 
@@ -40,7 +39,7 @@ export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase 
 
 		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
 			this,
-			this.#manifest.meta.recycleBinRepositoryAlias,
+			recycleBinRepositoryAlias,
 		);
 
 		const { error } = await recycleBinRepository.requestEmpty();

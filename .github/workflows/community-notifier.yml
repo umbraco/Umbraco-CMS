@@ -1,0 +1,184 @@
+name: Community Notifier
+
+on:
+  issues:
+    types: [opened, labeled]
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  check-and-comment:
+    # Only run for a new PR, a new issue, or an issue labeled 'community/up-for-grabs'
+    if: >
+      github.event_name == 'pull_request_target' ||
+      (github.event_name == 'issues' && github.event.action == 'opened') ||
+      (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'community/up-for-grabs')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      actions: read
+    steps:
+      - name: Restore cached team list
+        uses: actions/cache/restore@v6
+        with:
+          path: team-members.json
+          key: team-members-cache-
+          restore-keys: |
+            team-members-cache-
+
+      - name: Fetch org teams if cache is missing
+        # cache-hit is only 'true' on an exact key match, not a restore-keys
+        # prefix match (the normal case here), so check the file directly.
+        if: hashFiles('team-members.json') == ''
+        uses: actions/github-script@v9
+        with:
+          # PAT or GitHub App token with org:read:org (Members/Teams: Read).
+          github-token: ${{ secrets.ORG_READ_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const org = 'umbraco';
+
+            // Keep this list identical to update-team-cache.yml
+            const excludedTeams = [
+              'hq-only-teams',
+            ];
+
+            const excludedUsers = new Set();
+            let hadError = false;
+
+            for (const team_slug of excludedTeams) {
+              try {
+                const members = await github.paginate(github.rest.teams.listMembersInOrg, {
+                  org,
+                  team_slug,
+                  per_page: 100
+                });
+                members.forEach(m => excludedUsers.add(m.login.toLowerCase()));
+              } catch (err) {
+                core.error(`Failed to fetch team ${team_slug}: ${err.message}`);
+                hadError = true;
+              }
+            }
+
+            if (hadError) {
+              // Don't comment with a possibly-incomplete exclusion list — that
+              // risks an HQ author getting an automated response.
+              core.setFailed('Failed to fetch one or more teams live; skipping comment this run.');
+              return;
+            }
+
+            core.warning('Cache miss — fetched team memberships live for this run.');
+            fs.writeFileSync('team-members.json', JSON.stringify(Array.from(excludedUsers)));
+
+      - name: Check author and comment
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+
+            const author = (context.payload.issue || context.payload.pull_request).user.login;
+            const issueNumber = (context.payload.issue || context.payload.pull_request).number;
+
+            if (!fs.existsSync('team-members.json')) {
+              // Fail closed, consistent with the cache-miss fallback step:
+              // never comment without a confirmed exclusion list, or an HQ
+              // author could slip through and get an automated response.
+              core.setFailed('team-members.json not found; skipping comment this run.');
+              return;
+            }
+            const excludedUsers = JSON.parse(fs.readFileSync('team-members.json', 'utf8'));
+
+            const authorType = (context.payload.issue || context.payload.pull_request).user.type;
+            if (authorType === 'Bot') {
+              core.info(`Author ${author} is a bot. Skipping comment.`);
+              return;
+            }
+
+            if (excludedUsers.includes(author.toLowerCase())) {
+              core.info(`User ${author} is in an excluded team. Skipping comment.`);
+              return;
+            }
+
+            // Static comment templates with {{issueowner}} / {{checksurl}} placeholders
+            const templates = {
+              'issues-opened': `Hi there {{issueowner}}!
+
+            Firstly, a big thank you for raising this issue. Every piece of feedback we receive helps us to make Umbraco better.
+
+            We really appreciate your patience while we wait for our team to have a look at this but we wanted to let you know that we see this and share with you the plan for what comes next.
+
+            - We'll assess whether this issue relates to something that has already been fixed in a later version of the release that it has been raised for.
+            - If it's a bug, is it related to a release that we are actively supporting or is it related to a release that's in the end-of-life or security-only phase?
+            - We'll replicate the issue to ensure that the problem is as described.
+            - We'll decide whether the behavior is an issue or if the behavior is intended.
+
+            We wish we could work with everyone directly and assess your issue immediately but we're in the fortunate position of having lots of contributions to work with and only a few humans who are able to do it. We are making progress though and in the meantime, we will keep you in the loop and let you know when we have any questions.
+
+            Thanks, from your friendly Umbraco GitHub bot :robot: :slightly_smiling_face:`,
+
+              'pull_request_target': `Hi there {{issueowner}}, thank you for this contribution! 👍
+
+            While we wait for someone to have a look at your work, we wanted to let you know about that we have a checklist for some of the things we will consider during review:
+
+            - It's clear what problem this is solving, there's a connected issue or a description of what the changes do and how to test them
+            - The automated tests all pass (see "[Checks]({{checksurl}})" tab on this PR)
+            - The level of security for this contribution is the same or improved
+            - The level of performance for this contribution is the same or improved
+            - Avoids introducing [unwanted changes](https://docs.umbraco.com/contributing/umbraco-cms/contributing/unwanted-changes); note that behavioral changes might also be perceived as breaking
+            - Have a look at [what to check before you start](https://docs.umbraco.com/contributing/umbraco-cms/contributing/before-you-start) contributing; if this is a larger PR, it's best to discuss it with Umbraco HQ first
+            - [ ] 💡 The contribution looks original and the [contributor is presumably allowed to share it](https://docs.umbraco.com/contributing/umbraco-cms/contributing/before-you-start#ownership-and-copyright)
+
+            Don't worry if you got something wrong. We like to think of a pull request as the start of a conversation, we're happy to provide guidance on improving your contribution.
+
+            If you realize that you might want to make some changes then you can do that by adding new commits to the branch you created for this work and pushing new commits. They should then automatically show up as updates to this pull request.
+
+            Thanks, from your friendly Umbraco GitHub bot 🤖 🙂`,
+
+              'issues-labeled': `Hi {{issueowner}},
+
+            We're writing to let you know that we would love some help with this issue. We feel that this issue is ideal to flag for a community member to work on it. Once flagged here, folk looking for issues to work on will know to look at yours. Of course, please feel free work on this yourself ;-). If there are any changes to this status, we'll be sure to let you know.
+
+            For more information about issues and states, have a look at [this blog post](https://umbraco.com/blog/the-umbraco-issue-tracker-process/).
+
+            Thanks muchly, from your friendly Umbraco GitHub bot :-)`
+            };
+
+            const templateKey = context.eventName === 'issues'
+              ? `issues-${context.payload.action}`
+              : context.eventName;
+
+            // Each comment carries a hidden marker so we never post the same
+            // automated response twice on the same issue/PR (e.g. if a label
+            // is removed and re-applied). Different templates (opened vs.
+            // labeled up-for-grabs) are independent of each other.
+            const marker = `<!-- community-notifier:${templateKey} -->`;
+
+            const existingComments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              per_page: 100
+            });
+            if (existingComments.some(c => c.body?.includes(marker))) {
+              core.info(`Already posted the ${templateKey} response on #${issueNumber}. Skipping.`);
+              return;
+            }
+
+            // Template literals above are indented to match the YAML script
+            // block; strip that leading whitespace back out line by line.
+            const dedent = str => str.split('\n').map(l => l.trimStart()).join('\n');
+
+            const checksUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/pull/${issueNumber}/checks`;
+
+            const commentBody = dedent(templates[templateKey])
+              .replaceAll('{{issueowner}}', `@${author}`)
+              .replaceAll('{{checksurl}}', checksUrl)
+              + `\n\n${marker}`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: commentBody
+            });

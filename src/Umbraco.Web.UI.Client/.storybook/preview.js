@@ -49,7 +49,6 @@ import { manifests as propertyEditorManifests } from '../src/packages/property-e
 import { manifests as publishCacheManifests } from '../src/packages/publish-cache/umbraco-package';
 import { manifests as relationsManifests } from '../src/packages/relations/umbraco-package';
 import { manifests as rteManifests } from '../src/packages/rte/umbraco-package';
-import { manifests as searchManifests } from '../src/packages/core/search/manifests';
 import { manifests as segmentManifests } from '../src/packages/segment/umbraco-package';
 import { manifests as settingsManifests } from '../src/packages/settings/umbraco-package';
 import { manifests as staticFileManifests } from '../src/packages/static-file/umbraco-package';
@@ -162,8 +161,6 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'globalContext', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'store', [this]);
-		// TODO: Remove this in Umbraco 18, use the repository instead
-		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'treeStore', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'itemStore', [this]);
 
 		this._umbIconRegistry.setIcons(icons);

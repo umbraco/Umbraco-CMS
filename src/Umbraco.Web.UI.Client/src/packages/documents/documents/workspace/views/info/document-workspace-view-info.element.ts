@@ -1,8 +1,8 @@
+import { UmbDocumentVariantState } from '../../../variant-state.js';
 import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import type { UmbDocumentVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../../publishing/index.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbDocumentVariantState } from '../../../variant-state.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -74,7 +74,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._documentTypeUnique = this.#workspaceContext?.getContentTypeId();
+			this._documentTypeUnique = this.#workspaceContext?.getContentTypeUnique();
 			this.#observeContent();
 		});
 

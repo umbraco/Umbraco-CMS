@@ -9,11 +9,10 @@ namespace Umbraco.Cms.Core.HealthChecks;
 /// </summary>
 public class HealthCheckResults
 {
-    // TODO (V18): Convert to property to comply with SA1401 (fields should be private)
     /// <summary>
     ///     Indicates whether all health checks completed successfully.
     /// </summary>
-    public readonly bool AllChecksSuccessful;
+    public bool AllChecksSuccessful { get; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HealthCheckResults" /> class.

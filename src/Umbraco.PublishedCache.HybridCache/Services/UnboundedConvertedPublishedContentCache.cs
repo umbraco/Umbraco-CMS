@@ -8,9 +8,11 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 ///     that only ever evicts on content change or explicit clear. Walking the whole published tree (Delivery API
 ///     crawl, sitemap, warm-up) therefore retains the whole tree's converted form.
 /// </summary>
-/// <typeparam name="TKey">The cache key type (string for documents, Guid for media).</typeparam>
-internal sealed class UnboundedConvertedPublishedContentCache<TKey> : IConvertedPublishedContentCache<TKey>
+/// <typeparam name="TKey">The cache key type.</typeparam>
+/// <typeparam name="TValue">The cached converted type.</typeparam>
+internal sealed class UnboundedConvertedPublishedContentCache<TKey, TValue> : IConvertedPublishedContentCache<TKey, TValue>
     where TKey : notnull
+    where TValue : class, IPublishedElement
 {
     private readonly ConcurrentDictionary<TKey, CacheEntry> _cache = new();
     private long _approximateSizeInBytes;
@@ -22,7 +24,7 @@ internal sealed class UnboundedConvertedPublishedContentCache<TKey> : IConverted
     public long ApproximateSizeInBytes => Math.Max(0, Interlocked.Read(ref _approximateSizeInBytes));
 
     /// <inheritdoc />
-    public bool TryGet(TKey key, out IPublishedContent? content)
+    public bool TryGet(TKey key, out TValue? content)
     {
         if (_cache.TryGetValue(key, out CacheEntry entry))
         {
@@ -35,7 +37,7 @@ internal sealed class UnboundedConvertedPublishedContentCache<TKey> : IConverted
     }
 
     /// <inheritdoc />
-    public void Set(TKey key, IPublishedContent content, long approximateSizeInBytes)
+    public void Set(TKey key, TValue content, long approximateSizeInBytes)
     {
         var entry = new CacheEntry(content, approximateSizeInBytes);
 
@@ -65,7 +67,7 @@ internal sealed class UnboundedConvertedPublishedContentCache<TKey> : IConverted
     }
 
     /// <inheritdoc />
-    public void RemoveWhere(Func<IPublishedContent, bool> predicate)
+    public void RemoveWhere(Func<TValue, bool> predicate)
     {
         foreach (KeyValuePair<TKey, CacheEntry> entry in _cache)
         {
@@ -83,5 +85,5 @@ internal sealed class UnboundedConvertedPublishedContentCache<TKey> : IConverted
         Interlocked.Exchange(ref _approximateSizeInBytes, 0);
     }
 
-    private readonly record struct CacheEntry(IPublishedContent Content, long Size);
+    private readonly record struct CacheEntry(TValue Content, long Size);
 }

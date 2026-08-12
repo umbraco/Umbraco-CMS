@@ -57,6 +57,10 @@ public static class UdiEntityTypeHelper
                 return Constants.UdiEntityType.FormsDataSource;
             case UmbracoObjectTypes.Language:
                 return Constants.UdiEntityType.Language;
+            case UmbracoObjectTypes.Element:
+                return Constants.UdiEntityType.Element;
+            case UmbracoObjectTypes.ElementContainer:
+                return Constants.UdiEntityType.ElementContainer;
         }
 
         throw new NotSupportedException(
@@ -113,6 +117,10 @@ public static class UdiEntityTypeHelper
                 return UmbracoObjectTypes.FormsDataSource;
             case Constants.UdiEntityType.Language:
                 return UmbracoObjectTypes.Language;
+            case Constants.UdiEntityType.Element:
+                return UmbracoObjectTypes.Element;
+            case Constants.UdiEntityType.ElementContainer:
+                return UmbracoObjectTypes.ElementContainer;
         }
 
         throw new NotSupportedException(

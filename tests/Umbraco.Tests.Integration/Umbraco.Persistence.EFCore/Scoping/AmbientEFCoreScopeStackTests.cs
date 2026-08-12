@@ -20,28 +20,28 @@ internal sealed class AmbientEFCoreScopeStackTests
 
         Drain(sut);
 
-        sut.Push(Mock.Of<IEfCoreScope<TestUmbracoDbContext>>());
+        sut.Push(Mock.Of<IEFCoreScope<TestUmbracoDbContext>>());
         sut.Pop();
 
-        IEfCoreScope<TestUmbracoDbContext> scopeA = Mock.Of<IEfCoreScope<TestUmbracoDbContext>>();
-        IEfCoreScope<TestUmbracoDbContext> scopeB = Mock.Of<IEfCoreScope<TestUmbracoDbContext>>();
+        IEFCoreScope<TestUmbracoDbContext> scopeA = Mock.Of<IEFCoreScope<TestUmbracoDbContext>>();
+        IEFCoreScope<TestUmbracoDbContext> scopeB = Mock.Of<IEFCoreScope<TestUmbracoDbContext>>();
         (FlowBarriers barriersA, FlowBarriers barriersB) = FlowBarriers.CreatePair();
 
-        async Task<IEfCoreScope<TestUmbracoDbContext>?> RunFlow(
-            IEfCoreScope<TestUmbracoDbContext> scope,
+        async Task<IEFCoreScope<TestUmbracoDbContext>?> RunFlow(
+            IEFCoreScope<TestUmbracoDbContext> scope,
             FlowBarriers barriers)
         {
             sut.Push(scope);
             await barriers.EveryFlowHasPushed();
 
-            IEfCoreScope<TestUmbracoDbContext>? ambientScope = sut.AmbientScope;
+            IEFCoreScope<TestUmbracoDbContext>? ambientScope = sut.AmbientScope;
             await barriers.EveryFlowHasRead();
 
             sut.Pop();
             return ambientScope;
         }
 
-        IEfCoreScope<TestUmbracoDbContext>?[] ambient = await Task.WhenAll(
+        IEFCoreScope<TestUmbracoDbContext>?[] ambient = await Task.WhenAll(
             Task.Run(() => RunFlow(scopeA, barriersA)),
             Task.Run(() => RunFlow(scopeB, barriersB)));
 
@@ -60,8 +60,8 @@ internal sealed class AmbientEFCoreScopeStackTests
 
         Drain(sut);
 
-        IEfCoreScope<TestUmbracoDbContext> outer = Mock.Of<IEfCoreScope<TestUmbracoDbContext>>();
-        IEfCoreScope<TestUmbracoDbContext> inner = Mock.Of<IEfCoreScope<TestUmbracoDbContext>>();
+        IEFCoreScope<TestUmbracoDbContext> outer = Mock.Of<IEFCoreScope<TestUmbracoDbContext>>();
+        IEFCoreScope<TestUmbracoDbContext> inner = Mock.Of<IEFCoreScope<TestUmbracoDbContext>>();
 
         sut.Push(outer);
         sut.Push(inner);

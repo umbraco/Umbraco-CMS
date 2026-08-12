@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrationTest
 {
-    private IEFCoreScopeProvider<TestUmbracoDbContext> EfCoreScopeProvider =>
+    private IEFCoreScopeProvider<TestUmbracoDbContext> EFCoreScopeProvider =>
         GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
 
     private IScopeProvider InfrastructureScopeProvider =>
@@ -32,7 +32,7 @@ internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrati
     [Test]
     public async Task ScopesCanShareNonEagerLocks()
     {
-        using IEfCoreScope<TestUmbracoDbContext> parentScope = EfCoreScopeProvider.CreateScope();
+        using IEFCoreScope<TestUmbracoDbContext> parentScope = EFCoreScopeProvider.CreateScope();
         await parentScope.ExecuteWithContextAsync<Task>(async database =>
         {
             parentScope.Locks.WriteLock(parentScope.InstanceId, Constants.Locks.Servers);
@@ -54,7 +54,7 @@ internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrati
     [Test]
     public async Task ScopesCanShareEagerLocks()
     {
-        using IEfCoreScope<TestUmbracoDbContext> parentScope = EfCoreScopeProvider.CreateScope();
+        using IEFCoreScope<TestUmbracoDbContext> parentScope = EFCoreScopeProvider.CreateScope();
         await parentScope.ExecuteWithContextAsync<Task>(async database =>
         {
             parentScope.Locks.EagerWriteLock(parentScope.InstanceId, Constants.Locks.Servers);
@@ -77,7 +77,7 @@ internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrati
     public void EFCoreScopeAsParent_Child_Scope_Can_Send_Notification()
     {
         var currentAssertCount = TestContext.CurrentContext.AssertCount;
-        using (var scope = EfCoreScopeProvider.CreateScope())
+        using (var scope = EFCoreScopeProvider.CreateScope())
         {
             using (var childScope = InfrastructureScopeProvider.CreateScope())
             {
@@ -101,7 +101,7 @@ internal sealed class EFCoreScopeInfrastructureScopeLockTests : UmbracoIntegrati
         var currentAssertCount = TestContext.CurrentContext.AssertCount;
         using (var scope = InfrastructureScopeProvider.CreateScope())
         {
-            using (var childScope = EfCoreScopeProvider.CreateScope())
+            using (var childScope = EFCoreScopeProvider.CreateScope())
             {
                 var savingNotification = new TestSendNotification();
                 childScope.Notifications.Publish(savingNotification);

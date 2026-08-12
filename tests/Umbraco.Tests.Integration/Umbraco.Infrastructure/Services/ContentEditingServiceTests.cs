@@ -38,7 +38,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return contentType;
     }
@@ -58,7 +58,7 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
         {
             new (contentType.Key, 1, contentType.Alias)
         };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         createModel.ParentKey = root.Key;
         createModel.Variants = [new() { Name = childName }];

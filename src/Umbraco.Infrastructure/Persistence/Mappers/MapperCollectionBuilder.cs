@@ -39,6 +39,7 @@ public class MapperCollectionBuilder : SetCollectionBuilderBase<MapperCollection
         Add<AccessMapper>();
         Add<AuditItemMapper>();
         Add<ContentMapper>();
+        Add<ElementMapper>();
         Add<ContentTypeMapper>();
         Add<SimpleContentTypeMapper>();
         Add<DataTypeMapper>();

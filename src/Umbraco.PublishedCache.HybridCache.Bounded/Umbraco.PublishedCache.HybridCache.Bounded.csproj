@@ -2,7 +2,7 @@
   <PropertyGroup>
     <PackageId>Umbraco.Cms.PublishedCache.HybridCache.Bounded</PackageId>
     <Title>Umbraco CMS - Published cache - HybridCache - Bounded local cache</Title>
-    <Description>Optional add-on that makes the Umbraco in-process (L0) published-content cache bounded and scan-resistant (W-TinyLFU). Install this package and set Umbraco:CMS:Cache:Entry:Document:MaximumLocalCacheItems / ...Media.MaximumLocalCacheItems to enable it.</Description>
+    <Description>Optional add-on that makes the Umbraco in-process (L0) published-content cache bounded and scan-resistant (W-TinyLFU). Install this package and set Umbraco:CMS:Cache:Entry:Document:MaximumLocalCacheItems / ...Media.MaximumLocalCacheItems / ...Element.MaximumLocalCacheItems to enable it.</Description>
     <RootNamespace>Umbraco.Cms.Infrastructure.HybridCache.Bounded</RootNamespace>
 
     <!-- TODO: New package with no published baseline to diff against; re-enable once a baseline version ships. -->

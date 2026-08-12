@@ -77,6 +77,7 @@ export class UiBaseLocators extends BasePage {
   public readonly containerSaveAndPublishBtn: Locator;
   public readonly createModalBtn: Locator;
   public readonly copyModalBtn: Locator;
+  public readonly restoreModalBtn: Locator;
 
   // Document Type & Property Editor
   public readonly documentTypeNode: Locator;
@@ -87,6 +88,7 @@ export class UiBaseLocators extends BasePage {
   public readonly property: Locator;
   public readonly addPropertyBtn: Locator;
   public readonly labelAboveBtn: Locator;
+  public readonly propertyEditorChangeBtn: Locator;
 
   // Group & Tab Management
   public readonly addGroupBtn: Locator;
@@ -108,6 +110,7 @@ export class UiBaseLocators extends BasePage {
   public readonly allowAtRootBtn: Locator;
   public readonly allowedChildNodesModal: Locator;
   public readonly addCollectionBtn: Locator;
+  public readonly allowInLibraryBtn: Locator;
 
   // Reorder
   public readonly iAmDoneReorderingBtn: Locator;
@@ -246,6 +249,10 @@ export class UiBaseLocators extends BasePage {
   // Block
   public readonly blockTypeCard: Locator;
 
+  // User & User Group
+  public readonly allowAccessToAllElementsBtn: Locator;
+  public readonly elementStartNode: Locator;
+
   constructor(page: Page) {
     super(page);
 
@@ -255,7 +262,7 @@ export class UiBaseLocators extends BasePage {
     this.confirmBtn = page.getByLabel("Confirm");
     // The element/entity pickers render two "Choose" controls (a modal-opening link and a button)
     // with the same accessible name; .first() keeps this unambiguous (a no-op for single-Choose pickers).
-    this.chooseBtn = page.getByLabel("Choose", { exact: true });
+    this.chooseBtn = page.getByLabel("Choose", { exact: true }).first();
     // The tree-picker modal's primary confirm button is labelled by its action: "Choose" for entity
     // pickers, "Move" for a move, "Copy" for a duplicate. Match any so one helper covers all three.
     this.chooseModalBtn = page
@@ -355,6 +362,7 @@ export class UiBaseLocators extends BasePage {
       exact: true,
     });
     this.copyModalBtn = this.sidebarModal.getByLabel("Copy", { exact: true });
+    this.restoreModalBtn = this.sidebarModal.getByLabel("Restore", { exact: true });
 
     // Document Type & Property Editor
     this.documentTypeNode = page.locator("uui-ref-node-document-type");
@@ -368,6 +376,7 @@ export class UiBaseLocators extends BasePage {
       .locator("uui-modal-sidebar")
       .getByTestId("input:propertytype-description")
       .locator("#textarea");
+    this.propertyEditorChangeBtn = page.locator('[label="Property editor"]').getByLabel('Change');
     this.property = page.locator("umb-property");
     this.addPropertyBtn = page.getByLabel("Add property", { exact: true });
     this.labelAboveBtn = page
@@ -406,6 +415,7 @@ export class UiBaseLocators extends BasePage {
     this.addCollectionBtn = page.locator(
       "umb-input-content-type-collection-configuration #create-button",
     );
+    this.allowInLibraryBtn = page.locator("label").filter({ hasText: "Allow in library" });
 
     // Reorder
     this.iAmDoneReorderingBtn = page.getByLabel("I am done reordering");
@@ -584,19 +594,13 @@ export class UiBaseLocators extends BasePage {
     this.confirmActionModalEntityReferences = page.locator(
       "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
     );
+    this.entityItemRef = page.locator('umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references,umb-entity-references-workspace-info-app').locator('uui-ref-list').first().getByTestId('entity-item-ref');
     this.referenceHeadline = page
       .locator(
         "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
       )
       .locator("#reference-headline")
       .first();
-    this.entityItemRef = page
-      .locator(
-        "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
-      )
-      .locator("uui-ref-list")
-      .first()
-      .getByTestId("entity-item-ref");
     this.entityItem = page.locator("umb-entity-item-ref");
 
     // Workspace & Action
@@ -629,6 +633,10 @@ export class UiBaseLocators extends BasePage {
 
     // Block
     this.blockTypeCard = page.locator("uui-card-block-type");
+
+    // User & User Group
+    this.allowAccessToAllElementsBtn = page.getByText('Allow access to all elements');
+    this.elementStartNode = page.locator('[label="Select element start node"]').locator('umb-input-entity-data');
   }
 
   // Helper Methods
@@ -1043,6 +1051,10 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.copyModalBtn);
   }
 
+  async clickRestoreModalButton() {
+    await this.click(this.restoreModalBtn);
+  }
+
   // Container Methods
   async clickContainerSaveAndPublishButton() {
     await this.click(this.containerSaveAndPublishBtn);
@@ -1081,6 +1093,10 @@ export class UiBaseLocators extends BasePage {
   async goToSettingsTreeItem(settingsTreeItemName: string) {
     await this.goToSection(ConstantHelper.sections.settings);
     await this.clickTreeItemWithName(settingsTreeItemName);
+  }
+
+  async goToWorkspacePath(path: string) {
+    await this.page.goto(`${this.page.url()}${path}`);
   }
 
   async isSectionWithNameVisible(
@@ -1221,7 +1237,7 @@ export class UiBaseLocators extends BasePage {
 
   async updatePropertyEditor(propertyEditorName: string) {
     await this.clickEditorSettingsButton();
-    await this.clickChangeButton();
+    await this.click(this.propertyEditorChangeBtn);
     await this.searchForTypeToFilterValue(propertyEditorName);
     await this.click(this.page.getByText(propertyEditorName, { exact: true }));
     await this.enterAPropertyName(propertyEditorName);
@@ -1405,6 +1421,10 @@ export class UiBaseLocators extends BasePage {
 
   async clickAllowAtRootButton() {
     await this.click(this.allowAtRootBtn);
+  }
+
+  async clickAllowInLibraryButton() {
+    await this.click(this.allowInLibraryBtn);
   }
 
   async clickAllowedChildNodesButton() {
@@ -1753,15 +1773,11 @@ export class UiBaseLocators extends BasePage {
 
   // User Methods
   async clickCurrentUserAvatarButton() {
-    // Retry the open: the first click can land before the avatar is interactive, leaving the modal closed.
-    await expect(async () => {
-      if (!(await this.currentUserModal.isVisible())) {
-        await this.click(this.currentUserAvatarBtn);
-      }
-      await expect(this.currentUserModal).toBeVisible({
-        timeout: ConstantHelper.timeout.short,
-      });
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    // Wait for the backoffice to finish loading; clicking before the current-user extension bundle is ready
+    // no-ops, so the modal never opens.
+    await this.waitForPageLoad();
+    await this.click(this.currentUserAvatarBtn);
+    await expect(this.currentUserModal).toBeVisible({timeout: ConstantHelper.timeout.long});
   }
 
   // Collection Methods
@@ -2156,13 +2172,25 @@ export class UiBaseLocators extends BasePage {
     await this.page.waitForTimeout(ConstantHelper.wait.medium);
   }
 
-  async isSelectCheckboxVisibleForMediaName(
-    mediaName: string,
-    isVisible: boolean = true,
-  ) {
-    const selectCheckboxLocator = this.mediaCardItems
-      .filter({ hasText: mediaName })
-      .locator("#select-checkbox");
+  async clickAllowAccessToAllElements() {
+    await this.click(this.allowAccessToAllElementsBtn);
+  }
+
+  async clickChooseElementStartNodeButton() {
+    await this.click(this.elementStartNode.getByLabel('Choose'));
+  }
+
+  async clickRemoveButtonForElementNodeWithName(elementStartNodeName: string) {
+    await this.click(this.elementStartNode.filter({hasText: elementStartNodeName}).getByLabel('Remove'));
+  }
+
+  async isRestoreFromRecycleBinMessageVisible(restoreItem: string, targetFolderName: string) {
+    const message = 'Restore ' + restoreItem + ' to ' + targetFolderName;
+    return await this.doesModalHaveText(message);
+  }
+
+  async isSelectCheckboxVisibleForMediaName(mediaName: string, isVisible: boolean = true) {
+    const selectCheckboxLocator = this.mediaCardItems.filter({hasText: mediaName}).locator('#select-checkbox');
     await this.isVisible(selectCheckboxLocator, isVisible);
   }
 

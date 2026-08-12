@@ -21,8 +21,8 @@ const manifest: ManifestPropertyEditorUi = {
 			properties: [
 				{
 					alias: 'filter',
-					label: 'Allow items of type',
-					description: 'Select the applicable types',
+					label: 'Accepted types',
+					description: 'Limit to specific types',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ContentPicker.SourceType',
 				},
 			],

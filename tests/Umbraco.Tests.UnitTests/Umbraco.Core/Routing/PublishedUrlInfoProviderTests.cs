@@ -188,8 +188,7 @@ public class PublishedUrlInfoProviderTests
             Mock.Of<IUmbracoContextAccessor>(),
             _textService.Object,
             NullLogger<PublishedUrlInfoProvider>.Instance,
-            new UriUtility(hostingEnvironment.Object),
-            Mock.Of<IVariationContextAccessor>());
+            new UriUtility(hostingEnvironment.Object));
     }
 
     private static ILanguage CreateLanguage(string isoCode)

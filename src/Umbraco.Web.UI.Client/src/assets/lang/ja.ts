@@ -608,8 +608,6 @@ export default {
 		greeting6: 'ようこそ',
 		instruction: 'ウェブサイトにログインします。',
 		timeout: 'セッションタイムアウトしました。',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ',
 	},
 	main: {
 		dashboard: 'ダッシュボード',
@@ -732,20 +730,13 @@ export default {
 		editscript: 'スクリプトファイルの編集',
 	},
 	sections: {
-		concierge: '管理人',
 		content: 'コンテンツ',
-		courier: 'Courier',
-		developer: '開発',
-		installer: 'Umbraco 設定ウィザード',
+		library: 'ライブラリ',
 		media: 'メディア',
 		member: 'メンバー',
-		newsletters: 'ニュースレター',
 		settings: '設定',
-		statistics: '統計',
 		translation: '翻訳',
 		users: 'ユーザー',
-		help: 'ヘルプ',
-		forms: 'フォーム',
 	},
 	settings: {
 		defaulttemplate: '既定のテンプレート',

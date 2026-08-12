@@ -132,7 +132,7 @@ public partial class ContentBlueprintEditingServiceTests
 
     private async Task<(IContent Content, List<Guid> BlockKeys)> CreateBlueprintWithBlocksEditor(bool variant, string editorAlias)
     {
-        var contentType = variant ? await CreateVariantContentType() : CreateInvariantContentType();
+        var contentType = variant ? await CreateVariantContentType() : await CreateInvariantContentType();
 
         // Create element type
         var elementContentType = new ContentTypeBuilder()

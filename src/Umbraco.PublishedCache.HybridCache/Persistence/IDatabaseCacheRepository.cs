@@ -8,80 +8,38 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 /// </summary>
 internal interface IDatabaseCacheRepository
 {
-    /// <summary>
-    /// Deletes the specified content item from the cache database.
-    /// </summary>
-    Task DeleteContentItemAsync(int id);
+    #region Document methods
 
     /// <summary>
     /// Gets a single cache node for a document key.
     /// </summary>
     /// <param name="key">The document key.</param>
     /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
-    Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false);
+    Task<ContentCacheNode?> GetDocumentSourceAsync(Guid key, bool preview = false);
 
     /// <summary>
     /// Gets both draft and published cache nodes for a document key in a single query.
     /// </summary>
     /// <param name="key">The document key.</param>
     /// <returns>A tuple containing the draft and published cache nodes (either may be null).</returns>
-    // TODO (V18): Remove the default implementation on this method.
-    async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetContentSourceForPublishStatesAsync(Guid key)
-    {
-        ContentCacheNode? draftNode = await GetContentSourceAsync(key, preview: true);
-        ContentCacheNode? publishedNode = await GetContentSourceAsync(key, preview: false);
-        return (draftNode, publishedNode);
-    }
+    Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetDocumentSourceForPublishStatesAsync(Guid key);
 
     /// <summary>
     /// Gets a collection of cache nodes for a collection of document keys.
     /// </summary>
     /// <param name="keys">The document keys.</param>
     /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
-    // TODO (V18): Remove the default implementation on this method.
-    async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
-    {
-        var contentCacheNodes = new List<ContentCacheNode>();
-        foreach (Guid key in keys)
-        {
-            ContentCacheNode? contentSource = await GetContentSourceAsync(key, preview);
-            if (contentSource is not null)
-            {
-                contentCacheNodes.Add(contentSource);
-            }
-        }
-
-        return contentCacheNodes;
-    }
+    Task<IEnumerable<ContentCacheNode>> GetDocumentSourcesAsync(IEnumerable<Guid> keys, bool preview = false);
 
     /// <summary>
-    /// Gets a single cache node for a media key.
+    /// Refreshes the cache for the given document cache node.
     /// </summary>
-    Task<ContentCacheNode?> GetMediaSourceAsync(Guid key);
+    Task RefreshDocumentAsync(ContentCacheNode contentCacheNode);
 
     /// <summary>
-    /// Gets a collection of cache nodes for a collection of media keys.
+    /// Removes the cache of published content for the given document.
     /// </summary>
-    // TODO (V18): Remove the default implementation on this method.
-    async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
-    {
-        var contentCacheNodes = new List<ContentCacheNode>();
-        foreach (Guid key in keys)
-        {
-            ContentCacheNode? contentSource = await GetMediaSourceAsync(key);
-            if (contentSource is not null)
-            {
-                contentCacheNodes.Add(contentSource);
-            }
-        }
-
-        return contentCacheNodes;
-    }
-
-    /// <summary>
-    /// Gets a collection of cache nodes for a collection of content type keys and entity type.
-    /// </summary>
-    IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType);
+    Task RemovePublishedDocumentAsync(int id);
 
     /// <summary>
     /// Gets all content keys of specific document types.
@@ -96,26 +54,21 @@ internal interface IDatabaseCacheRepository
     /// </summary>
     /// <param name="contentTypeKeys">The document type keys to find content for.</param>
     /// <returns>Tuples of content key and whether the cache entry is a draft.</returns>
-    // TODO (V18): Remove the default implementation on this method.
-    IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys)
-        => GetContentByContentTypeKey(contentTypeKeys, ContentCacheDataSerializerEntityType.Document)
-            .Select(x => (x.Key, x.IsDraft));
+    IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys);
+
+    #endregion
+
+    #region Media methods
 
     /// <summary>
-    /// Gets all media content keys for specific media types.
-    /// Uses a lightweight query that avoids loading serialized data.
+    /// Gets a single cache node for a media key.
     /// </summary>
-    /// <param name="mediaTypeKeys">The media type keys to find media for.</param>
-    /// <returns>The keys of all media items using the specified media types.</returns>
-    // TODO (V18): Remove the default implementation on this method.
-    IEnumerable<Guid> GetMediaKeysByContentTypeKeys(IEnumerable<Guid> mediaTypeKeys)
-        => GetContentByContentTypeKey(mediaTypeKeys, ContentCacheDataSerializerEntityType.Media)
-            .Select(x => x.Key);
+    Task<ContentCacheNode?> GetMediaSourceAsync(Guid key);
 
     /// <summary>
-    /// Refreshes the cache for the given document cache node.
+    /// Gets a collection of cache nodes for a collection of media keys.
     /// </summary>
-    Task RefreshContentAsync(ContentCacheNode contentCacheNode);
+    Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys);
 
     /// <summary>
     /// Refreshes the cache row for the given media cache node.
@@ -123,12 +76,72 @@ internal interface IDatabaseCacheRepository
     Task RefreshMediaAsync(ContentCacheNode contentCacheNode);
 
     /// <summary>
-    /// Removes the cache of published content for the given document.
+    /// Gets all media content keys for specific media types.
+    /// Uses a lightweight query that avoids loading serialized data.
     /// </summary>
-    Task RemovePublishedContentAsync(int id);
+    /// <param name="mediaTypeKeys">The media type keys to find media for.</param>
+    /// <returns>The keys of all media items using the specified media types.</returns>
+    IEnumerable<Guid> GetMediaKeysByContentTypeKeys(IEnumerable<Guid> mediaTypeKeys);
+
+    #endregion
+
+    #region Element methods
 
     /// <summary>
-    /// Rebuilds the caches for content, media and/or members based on the content type ids specified.
+    /// Gets a single cache node for an element key.
+    /// </summary>
+    /// <param name="key">The element key.</param>
+    /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
+    Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false);
+
+    /// <summary>
+    /// Gets both draft and published cache nodes for an element key in a single query.
+    /// </summary>
+    /// <param name="key">The element key.</param>
+    /// <returns>A tuple containing the draft and published cache nodes (either may be null).</returns>
+    Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetElementSourceForPublishStatesAsync(Guid key);
+
+    /// <summary>
+    /// Gets a collection of cache nodes for a collection of element keys.
+    /// </summary>
+    /// <param name="keys">The element keys.</param>
+    /// <param name="preview">A flag indicating whether to get the draft (preview) version or the published version.</param>
+    Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false);
+
+    /// <summary>
+    /// Gets all element keys of specific element types.
+    /// </summary>
+    /// <param name="keys">The element types to find elements using.</param>
+    /// <param name="published">A flag indicating whether to restrict to just published elements.</param>
+    /// <returns>The keys of all elements using the specified element types.</returns>
+    IEnumerable<Guid> GetElementKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false);
+
+    /// <summary>
+    /// Refreshes the cache for the given element cache node.
+    /// </summary>
+    Task RefreshElementAsync(ContentCacheNode contentCacheNode);
+
+    /// <summary>
+    /// Removes the cache of published content for the given element.
+    /// </summary>
+    Task RemovePublishedElementAsync(int id);
+
+    #endregion
+
+    #region Shared methods
+
+    /// <summary>
+    /// Deletes the specified content item from the cache database.
+    /// </summary>
+    Task DeleteContentItemAsync(int id);
+
+    /// <summary>
+    /// Gets a collection of cache nodes for a collection of content type keys and entity type.
+    /// </summary>
+    IEnumerable<ContentCacheNode> GetContentByContentTypeKey(IEnumerable<Guid> keys, ContentCacheDataSerializerEntityType entityType);
+
+    /// <summary>
+    /// Rebuilds the caches for content, media, members and/or elements based on the content type ids specified.
     /// </summary>
     /// <param name="contentTypeIds">
     ///     If not null will process content for the matching content types, if empty will process all
@@ -142,27 +155,9 @@ internal interface IDatabaseCacheRepository
     ///     If not null will process content for the matching members types, if empty will process all
     ///     members.
     /// </param>
-    [Obsolete("Use the overload accepting an executeStep delegate. Scheduled for removal in Umbraco 19.")]
-    void Rebuild(
-        IReadOnlyCollection<int>? contentTypeIds = null,
-        IReadOnlyCollection<int>? mediaTypeIds = null,
-        IReadOnlyCollection<int>? memberTypeIds = null)
-        => Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds, null);
-
-    /// <summary>
-    /// Rebuilds the caches for content, media and/or members based on the content type ids specified.
-    /// </summary>
-    /// <param name="contentTypeIds">
-    ///     If not null will process content for the matching content types, if empty will process all
-    ///     content.
-    /// </param>
-    /// <param name="mediaTypeIds">
-    ///     If not null will process content for the matching media types, if empty will process all
-    ///     media.
-    /// </param>
-    /// <param name="memberTypeIds">
-    ///     If not null will process content for the matching members types, if empty will process all
-    ///     members.
+    /// <param name="elementTypeIds">
+    ///     If not null will process content for the matching element types, if empty will process all
+    ///     elements.
     /// </param>
     /// <param name="executeStep">
     ///     Optional delegate that wraps each discrete step (delete, page read + insert) in a scope.
@@ -175,5 +170,8 @@ internal interface IDatabaseCacheRepository
         IReadOnlyCollection<int>? contentTypeIds,
         IReadOnlyCollection<int>? mediaTypeIds,
         IReadOnlyCollection<int>? memberTypeIds,
+        IReadOnlyCollection<int>? elementTypeIds,
         Action<Action>? executeStep);
+
+    #endregion
 }

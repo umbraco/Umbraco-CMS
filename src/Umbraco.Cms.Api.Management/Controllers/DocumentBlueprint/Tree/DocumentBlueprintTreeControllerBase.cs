@@ -26,20 +26,6 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentBlueprintTreeControllerBase"/> class.
-    /// </summary>
-    /// <param name="entityService">Service used for entity operations within the document blueprint tree.</param>
-    /// <param name="documentPresentationFactory">Factory responsible for creating document presentation models.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DocumentBlueprintTreeControllerBase(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              documentPresentationFactory)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="DocumentBlueprintTreeControllerBase"/> class, providing required services for managing document blueprint trees.
     /// </summary>
     /// <param name="entityService">The service used to interact with entities in the system.</param>
@@ -80,15 +66,19 @@ public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<Docu
         }
     }
 
-    protected override DocumentBlueprintTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
-        => entities.Select(entity =>
+    protected override async Task<DocumentBlueprintTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentId, IEntitySlim[] entities)
+    {
+        IEnumerable<Task<DocumentBlueprintTreeItemResponseModel>> tasks = entities.Select(async entity =>
         {
-            DocumentBlueprintTreeItemResponseModel responseModel = MapTreeItemViewModel(parentId, entity);
+            DocumentBlueprintTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentId, entity);
             if (entity is IDocumentEntitySlim documentEntitySlim)
             {
                 responseModel.HasChildren = false;
                 responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
             }
             return responseModel;
-        }).ToArray();
+        });
+
+        return await Task.WhenAll(tasks);
+    }
 }

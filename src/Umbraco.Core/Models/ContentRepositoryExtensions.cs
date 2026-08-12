@@ -78,7 +78,7 @@ public static class ContentRepositoryExtensions
     ///     these dates assigned to them differ by a couple of Ticks, but we need to ensure they are persisted at the exact
     ///     same time.
     /// </remarks>
-    public static void AdjustDates(this IContent content, DateTime date, bool publishing)
+    public static void AdjustDates(this IPublishableContentBase content, DateTime date, bool publishing)
     {
         if (content.EditedCultures is not null)
         {
@@ -140,7 +140,7 @@ public static class ContentRepositoryExtensions
     ///     Gets the cultures that have been flagged for unpublishing.
     /// </summary>
     /// <remarks>Gets cultures for which content.UnpublishCulture() has been invoked.</remarks>
-    public static IReadOnlyList<string>? GetCulturesUnpublishing(this IContent content)
+    public static IReadOnlyList<string>? GetCulturesUnpublishing(this IPublishableContentBase content)
     {
         if (!content.Published || !content.ContentType.VariesByCulture() ||
             !content.IsPropertyDirty("PublishCultureInfos"))
@@ -158,7 +158,7 @@ public static class ContentRepositoryExtensions
     /// <summary>
     ///     Copies values from another document.
     /// </summary>
-    public static void CopyFrom(this IContent content, IContent other, string? culture = "*")
+    public static void CopyFrom(this IPublishableContentBase content, IPublishableContentBase other, string? culture = "*")
     {
         if (other.ContentTypeId != content.ContentTypeId)
         {
@@ -264,7 +264,7 @@ public static class ContentRepositoryExtensions
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="name" /> or <paramref name="culture" /> is empty or whitespace.</exception>
     /// <exception cref="CultureNotFoundException">Thrown when <paramref name="culture" /> is not a valid culture code.</exception>
-    public static void SetPublishInfo(this IContent content, string? culture, string? name, DateTime date)
+    public static void SetPublishInfo(this IPublishableContentBase content, string? culture, string? name, DateTime date)
     {
         if (name == null)
         {
@@ -298,7 +298,7 @@ public static class ContentRepositoryExtensions
     /// </summary>
     /// <param name="content">The content item to update.</param>
     /// <param name="cultures">The collection of culture codes that have been edited, or null to clear.</param>
-    public static void SetCultureEdited(this IContent content, IEnumerable<string?>? cultures)
+    public static void SetCultureEdited(this IPublishableContentBase content, IEnumerable<string?>? cultures)
     {
         if (cultures == null)
         {
@@ -324,7 +324,7 @@ public static class ContentRepositoryExtensions
     ///     A value indicating whether it was possible to publish the names and values for the specified
     ///     culture(s). The method may fail if required names are not set, but it does NOT validate property data
     /// </returns>
-    public static bool PublishCulture(this IContent content, CultureImpact? impact, DateTime publishTime, PropertyEditorCollection propertyEditorCollection)
+    public static bool PublishCulture(this IPublishableContentBase content, CultureImpact? impact, DateTime publishTime, PropertyEditorCollection propertyEditorCollection)
     {
         if (impact == null)
         {
@@ -393,7 +393,7 @@ public static class ContentRepositoryExtensions
         return true;
     }
 
-    private static void PublishPropertyValues(IContent content, IProperty property, string? culture, PropertyEditorCollection propertyEditorCollection)
+    private static void PublishPropertyValues(IPublishableContentBase content, IProperty property, string? culture, PropertyEditorCollection propertyEditorCollection)
     {
         // if the content varies by culture, let data editor opt-in to perform partial property publishing (per culture)
         if (content.ContentType.VariesByCulture()
@@ -415,7 +415,7 @@ public static class ContentRepositoryExtensions
     /// <param name="content"></param>
     /// <param name="culture"></param>
     /// <returns></returns>
-    public static bool UnpublishCulture(this IContent content, string? culture = "*")
+    public static bool UnpublishCulture(this IPublishableContentBase content, string? culture = "*")
     {
         culture = culture?.NullOrWhiteSpaceAsNull();
 
@@ -457,7 +457,7 @@ public static class ContentRepositoryExtensions
     ///     Clears all publish culture information from the content item.
     /// </summary>
     /// <param name="content">The content item to clear publish information from.</param>
-    public static void ClearPublishInfos(this IContent content)
+    public static void ClearPublishInfos(this IPublishableContentBase content)
     {
         if (content.PublishCultureInfos is null)
         {
@@ -482,7 +482,7 @@ public static class ContentRepositoryExtensions
     /// <param name="content"></param>
     /// <param name="culture"></param>
     /// <returns></returns>
-    public static bool ClearPublishInfo(this IContent content, string? culture)
+    public static bool ClearPublishInfo(this IPublishableContentBase content, string? culture)
     {
         if (culture == null)
         {

@@ -121,7 +121,7 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			...this.value,
 			src: item.url,
 			crops,
-			focalPoint: this.value.focalPoint ?? { left: 0.5, top: 0.5 },
+			focalPoint: this.value.focalPoint ?? null,
 		};
 		this._imageCropperValue = value;
 	}
@@ -158,7 +158,12 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 			this._imageCropperValue.focalPoint = value.focalPoint;
 		}
 
-		this.value = { key: this._key, unique: this._unique, crops: value.crops, focalPoint: value.focalPoint };
+		this.value = {
+			key: this._key,
+			unique: this._unique,
+			crops: value.crops,
+			focalPoint: value.focalPoint,
+		};
 	}
 
 	override render() {
@@ -275,9 +280,6 @@ export class UmbImageCropperEditorModalElement extends UmbModalBaseElement<
 		`,
 	];
 }
-
-/** @deprecated Should be exported as `element` only; to be removed in Umbraco 18. */
-export default UmbImageCropperEditorModalElement;
 
 export { UmbImageCropperEditorModalElement as element };
 

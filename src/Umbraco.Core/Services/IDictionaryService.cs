@@ -11,5 +11,5 @@ public interface IDictionaryService
     /// <param name="parentId">The unique identifier of the parent dictionary item, or <c>null</c> for root items.</param>
     /// <param name="sourceId">The source identifier of the dictionary item.</param>
     /// <returns>The calculated path string.</returns>
-    string CalculatePath(Guid? parentId, int sourceId);
+    Task<string> CalculatePathAsync(Guid? parentId, int sourceId);
 }

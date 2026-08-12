@@ -37,6 +37,7 @@ import {WebhookApiHelper} from "./WebhookApiHelper";
 import {MediaDeliveryApiHelper} from './differentAppSettingsHelpers/MediaDeliveryApiHelper';
 import {ContentDeliveryApiHelper} from "./differentAppSettingsHelpers/ContentDeliveryApiHelper";
 import {SmtpApiHelper} from './SmtpApiHelper';
+import {ElementApiHelper} from "./ElementApiHelper";
 
 export class ApiHelpers {
   baseUrl: string = umbracoConfig.environment.baseUrl;
@@ -76,6 +77,7 @@ export class ApiHelpers {
   mediaDeliveryApi: MediaDeliveryApiHelper;
   contentDeliveryApi: ContentDeliveryApiHelper;
   smtp: SmtpApiHelper;
+  element: ElementApiHelper;
 
   constructor(page: Page) {
     this.page = page;
@@ -114,6 +116,7 @@ export class ApiHelpers {
     this.mediaDeliveryApi = new MediaDeliveryApiHelper(this);
     this.contentDeliveryApi = new ContentDeliveryApiHelper(this);
     this.smtp = new SmtpApiHelper(this);
+    this.element = new ElementApiHelper(this);
   }
 
   async getHeaders() {

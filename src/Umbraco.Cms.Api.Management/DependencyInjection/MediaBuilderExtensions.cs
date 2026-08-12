@@ -21,9 +21,9 @@ internal static class MediaBuilderExtensions
         builder.Services.AddTransient<IUrlAssembler, DefaultUrlAssembler>();
         builder.Services.AddTransient<IMediaUrlFactory, MediaUrlFactory>();
 
-        // TODO (V19): Revert to the simple AddTransient<IReziseImageUrlFactory, ReziseImageUrlFactory>() registration once the
-        // obsolete constructors on ReziseImageUrlFactory are removed.
-        builder.Services.AddTransient<IReziseImageUrlFactory>(serviceProvider => new ReziseImageUrlFactory(
+        // TODO (V19): Revert to the simple AddTransient<IResizeImageUrlFactory, ResizeImageUrlFactory>() registration once the
+        // obsolete constructors on ResizeImageUrlFactory are removed.
+        builder.Services.AddTransient<IResizeImageUrlFactory>(serviceProvider => new ResizeImageUrlFactory(
             serviceProvider.GetRequiredService<IImageUrlGenerator>(),
             serviceProvider.GetRequiredService<IOptions<ContentSettings>>(),
             serviceProvider.GetRequiredService<MediaUrlGeneratorCollection>(),

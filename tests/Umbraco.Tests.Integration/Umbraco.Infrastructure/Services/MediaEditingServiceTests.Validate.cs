@@ -15,7 +15,7 @@ internal sealed partial class MediaEditingServiceTests
     [Test]
     public async Task Cannot_Validate_Create_At_Root_When_Not_Allowed_As_Root()
     {
-        var createModel = BuildTestMediaRootCreateModel(allowedAsRoot: false);
+        var createModel = await BuildTestMediaRootCreateModel(allowedAsRoot: false);
 
         var result = await MediaEditingService.ValidateCreateAsync(createModel);
 
@@ -27,7 +27,7 @@ internal sealed partial class MediaEditingServiceTests
     [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowTestMediaAtRoot))]
     public async Task Cannot_Validate_Create_At_Root_With_Content_Type_Filter()
     {
-        var createModel = BuildTestMediaRootCreateModel(allowedAsRoot: true);
+        var createModel = await BuildTestMediaRootCreateModel(allowedAsRoot: true);
 
         var result = await MediaEditingService.ValidateCreateAsync(createModel);
 
@@ -39,7 +39,7 @@ internal sealed partial class MediaEditingServiceTests
     [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToAllowTestMediaAtRoot))]
     public async Task Can_Validate_Create_At_Root_With_Content_Type_Filter()
     {
-        var createModel = BuildTestMediaRootCreateModel(allowedAsRoot: true);
+        var createModel = await BuildTestMediaRootCreateModel(allowedAsRoot: true);
 
         var result = await MediaEditingService.ValidateCreateAsync(createModel);
 
@@ -82,11 +82,11 @@ internal sealed partial class MediaEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
     }
 
-    private MediaCreateModel BuildTestMediaRootCreateModel(bool allowedAsRoot)
+    private async Task<MediaCreateModel> BuildTestMediaRootCreateModel(bool allowedAsRoot)
     {
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
         mediaType.AllowedAsRoot = allowedAsRoot;
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         return new MediaCreateModel
         {
@@ -100,7 +100,7 @@ internal sealed partial class MediaEditingServiceTests
     {
         var childMediaType = MediaTypeBuilder.CreateSimpleMediaType("childMedia", "Child Media");
         childMediaType.AllowedAsRoot = false;
-        MediaTypeService.Save(childMediaType);
+        await MediaTypeService.CreateAsync(childMediaType, Constants.Security.SuperUserKey);
 
         var parentMediaType = MediaTypeBuilder.CreateSimpleMediaType("parentMedia", "Parent Media");
         parentMediaType.AllowedAsRoot = true;
@@ -112,7 +112,7 @@ internal sealed partial class MediaEditingServiceTests
             };
         }
 
-        MediaTypeService.Save(parentMediaType);
+        await MediaTypeService.CreateAsync(parentMediaType, Constants.Security.SuperUserKey);
 
         var parentKey = (await MediaEditingService.CreateAsync(
             new MediaCreateModel

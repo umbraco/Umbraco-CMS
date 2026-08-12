@@ -31,26 +31,6 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
     /// <param name="idKeyMap">The ID-key mapping service.</param>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="factory">The cache refresher notification factory.</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            eventAggregator,
-            factory,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberPartialViewCacheInvalidator>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MemberCacheRefresher" /> class.
-    /// </summary>
-    /// <param name="appCaches">The application caches.</param>
-    /// <param name="serializer">The JSON serializer.</param>
-    /// <param name="idKeyMap">The ID-key mapping service.</param>
-    /// <param name="eventAggregator">The event aggregator.</param>
-    /// <param name="factory">The cache refresher notification factory.</param>
     /// <param name="memberPartialViewCacheInvalidator">The member partial view cache invalidator.</param>
     public MemberCacheRefresher(
         AppCaches appCaches,

@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.Models;
@@ -23,24 +21,6 @@ public class DistributedJobService : IDistributedJobService
     // Which jobs align to the clock is a startup configuration concern (changing it requires a restart), so it is
     // captured once in the constructor rather than re-evaluated on every poll.
     private readonly HashSet<string> _clockAlignedJobNames;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
-    /// </summary>
-    [Obsolete("Use the constructor that accepts IOptions<DistributedJobSettings>. Scheduled for removal in Umbraco 18.")]
-    public DistributedJobService(
-        ICoreScopeProvider coreScopeProvider,
-        IDistributedJobRepository distributedJobRepository,
-        IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs,
-        ILogger<DistributedJobService> logger)
-        : this(
-            coreScopeProvider,
-            distributedJobRepository,
-            distributedBackgroundJobs,
-            logger,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<DistributedJobSettings>>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.

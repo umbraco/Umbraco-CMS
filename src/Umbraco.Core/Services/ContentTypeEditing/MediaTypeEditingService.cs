@@ -55,7 +55,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         if (result.Success)
         {
             IMediaType mediaType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForCreationAsync)} succeeded but did not yield any result");
-            await _mediaTypeService.SaveAsync(mediaType, userKey);
+            await _mediaTypeService.CreateAsync(mediaType, userKey);
         }
 
         return result;
@@ -73,7 +73,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
         if (result.Success)
         {
             mediaType = result.Result ?? throw new InvalidOperationException($"{nameof(ValidateAndMapForUpdateAsync)} succeeded but did not yield any result");
-            await _mediaTypeService.SaveAsync(mediaType, userKey);
+            await _mediaTypeService.UpdateAsync(mediaType, userKey);
         }
 
         return result;

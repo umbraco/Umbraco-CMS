@@ -1,4 +1,5 @@
 import type { ManifestUfmComponent } from '../extensions/ufm-component.extension.js';
+import { manifests as elementNameManifests } from './element-name/manifests.js';
 
 export const manifests: Array<ManifestUfmComponent> = [
 	{
@@ -22,6 +23,7 @@ export const manifests: Array<ManifestUfmComponent> = [
 		api: () => import('./content-name/content-name.component.js'),
 		meta: { alias: 'umbContentName' },
 	},
+	...elementNameManifests,
 	{
 		type: 'ufmComponent',
 		alias: 'Umb.Markdown.Link',

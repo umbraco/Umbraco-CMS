@@ -2,12 +2,10 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
@@ -43,7 +41,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     private readonly IKeyValueService _keyValueService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IDomainCacheService _domainCacheService;
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
     private readonly IServerRoleAccessor _serverRoleAccessor;
@@ -165,48 +163,6 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentUrlService(
-        ILogger<DocumentUrlService> logger,
-        IDocumentUrlRepository documentUrlRepository,
-        IDocumentRepository documentRepository,
-        ICoreScopeProvider coreScopeProvider,
-        IOptions<GlobalSettings> globalSettings,
-        UrlSegmentProviderCollection urlSegmentProviderCollection,
-        IContentService contentService,
-        IShortStringHelper shortStringHelper,
-        ILanguageService languageService,
-        IKeyValueService keyValueService,
-        IIdKeyMap idKeyMap,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        IDomainCacheService domainCacheService)
-#pragma warning disable CS0618 // Type or member is obsolete
-        : this(
-            logger,
-            documentUrlRepository,
-            documentRepository,
-            coreScopeProvider,
-            globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>(),
-            urlSegmentProviderCollection,
-            contentService,
-            shortStringHelper,
-            languageService,
-            keyValueService,
-            idKeyMap,
-            documentNavigationQueryService,
-            publishStatusQueryService,
-            domainCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
-#pragma warning restore CS0618 // Type or member is obsolete
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
@@ -221,48 +177,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         IKeyValueService keyValueService,
         IIdKeyMap idKeyMap,
         IDocumentNavigationQueryService documentNavigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        IDomainCacheService domainCacheService,
-        IDefaultCultureAccessor defaultCultureAccessor)
-        : this(
-            logger,
-            documentUrlRepository,
-            documentRepository,
-            coreScopeProvider,
-            globalSettings,
-            webRoutingSettings,
-            urlSegmentProviderCollection,
-            contentService,
-            shortStringHelper,
-            languageService,
-            keyValueService,
-            idKeyMap,
-            documentNavigationQueryService,
-            publishStatusQueryService,
-            domainCacheService,
-            defaultCultureAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IServerRoleAccessor>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
-    /// </summary>
-    public DocumentUrlService(
-        ILogger<DocumentUrlService> logger,
-        IDocumentUrlRepository documentUrlRepository,
-        IDocumentRepository documentRepository,
-        ICoreScopeProvider coreScopeProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IOptions<WebRoutingSettings> webRoutingSettings,
-        UrlSegmentProviderCollection urlSegmentProviderCollection,
-        IContentService contentService,
-        IShortStringHelper shortStringHelper,
-        ILanguageService languageService,
-        IKeyValueService keyValueService,
-        IIdKeyMap idKeyMap,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IDomainCacheService domainCacheService,
         IDefaultCultureAccessor defaultCultureAccessor,
         IServerRoleAccessor serverRoleAccessor)
@@ -397,7 +312,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         foreach (PublishedDocumentUrlSegment model in publishedDocumentUrlSegments)
         {
             // Group using composite key of document/language/draft.
-            (Guid DocumentKey, int? LanguageId, bool IsDraft) key = (model.DocumentKey, model.NullableLanguageId, model.IsDraft);
+            (Guid DocumentKey, int? LanguageId, bool IsDraft) key = (model.DocumentKey, model.LanguageId, model.IsDraft);
 
             if (grouped.TryGetValue(key, out (string? Primary, List<string> Alternates) segments) is false)
             {
@@ -901,7 +816,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         yield return new PublishedDocumentUrlSegment
         {
             DocumentKey = cacheKey.DocumentKey,
-            NullableLanguageId = cacheKey.LanguageId,
+            LanguageId = cacheKey.LanguageId,
             UrlSegment = cache.PrimarySegment,
             IsDraft = cacheKey.IsDraft,
             IsPrimary = true,
@@ -915,7 +830,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
                 yield return new PublishedDocumentUrlSegment
                 {
                     DocumentKey = cacheKey.DocumentKey,
-                    NullableLanguageId = cacheKey.LanguageId,
+                    LanguageId = cacheKey.LanguageId,
                     UrlSegment = segment,
                     IsDraft = cacheKey.IsDraft,
                     IsPrimary = false,
@@ -1103,7 +1018,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
         return attempt.Success ? attempt.Result : null;
     }
 
-    private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsDocumentPublished(contentKey, culture);
+    private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsPublished(contentKey, culture);
 
     /// <summary>
     /// Gets the children based on the latest published version of the content. (No aware of things in this scope).
@@ -1201,7 +1116,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return Constants.Routing.Unroutable;
         }
 
-        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
+        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsPublished(documentKey, culture) is false)
         {
             return Constants.Routing.Unroutable;
         }

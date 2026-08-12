@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { UmbMergeContentVariantDataController } from './merge-content-variant-data.controller.js';
-import type { UmbContentLikeDetailModel } from '../types.js';
+import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -46,7 +46,7 @@ export class TestPropertyValueResolver
 }
 
 type TestBlockValueType = {
-	contentData: Array<{ key: string; values: Array<UmbPropertyValueData> }>;
+	contentData: Array<{ key: string; values: Array<UmbPotentialContentValueModel> }>;
 };
 
 /**
@@ -88,7 +88,7 @@ const blockValue = (contentData: TestBlockValueType['contentData']) => ({
 	value: { contentData },
 });
 
-const innerValue = (culture: string | null, value: string): UmbPropertyValueData => ({
+const innerValue = (culture: string | null, value: string): UmbPotentialContentValueModel => ({
 	editorAlias: 'some-editor',
 	alias: 'text',
 	culture,
@@ -185,7 +185,7 @@ describe('UmbMergeContentVariantDataController', () => {
 						alias: 'test',
 						culture: null,
 						segment: null,
-						entityType: '',
+
 						value: {
 							nestedValue: {
 								editorAlias: 'some-editor',
@@ -206,7 +206,7 @@ describe('UmbMergeContentVariantDataController', () => {
 						alias: 'test',
 						culture: null,
 						segment: null,
-						entityType: '',
+
 						value: {
 							nestedValue: {
 								editorAlias: 'some-editor',
@@ -236,7 +236,7 @@ describe('UmbMergeContentVariantDataController', () => {
 						alias: 'test',
 						culture: null,
 						segment: null,
-						entityType: '',
+
 						value: {
 							nestedValue: {
 								editorAlias: 'some-editor',
@@ -257,7 +257,7 @@ describe('UmbMergeContentVariantDataController', () => {
 						alias: 'test',
 						culture: null,
 						segment: null,
-						entityType: '',
+
 						value: {
 							nestedValue: {
 								editorAlias: 'some-editor',

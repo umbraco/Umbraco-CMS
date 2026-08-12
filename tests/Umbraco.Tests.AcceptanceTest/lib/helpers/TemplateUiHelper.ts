@@ -1,19 +1,19 @@
-﻿import {Page, Locator} from "@playwright/test"
+import {Page, Locator} from "@playwright/test"
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
 export class TemplateUiHelper extends UiBaseLocators {
-  private readonly changeMasterTemplateBtn: Locator;
+  private readonly changeLayoutTemplateBtn: Locator;
   private readonly sectionsBtn: Locator;
-  private readonly removeMasterTemplateBtn: Locator;
+  private readonly removeLayoutTemplateBtn: Locator;
   private readonly sectionNameTxt: Locator;
   private readonly templateTree: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.changeMasterTemplateBtn = page.locator('#master-template-button');
+    this.changeLayoutTemplateBtn = page.locator('#layout-template-button');
     this.sectionsBtn = page.locator('#sections-button', {hasText: 'Sections'});
-    this.removeMasterTemplateBtn = page.locator('[name="icon-delete"] svg');
+    this.removeLayoutTemplateBtn = page.locator('[name="icon-delete"] svg');
     this.sectionNameTxt = page.getByLabel('Section Name');
     this.templateTree = page.locator('umb-tree[alias="Umb.Tree.Template"]');
   }
@@ -48,8 +48,8 @@ export class TemplateUiHelper extends UiBaseLocators {
     await this.click(this.sectionsBtn);
   }
 
-  async clickChangeMasterTemplateButton() {
-    await this.click(this.changeMasterTemplateBtn);
+  async clickChangeLayoutTemplateButton() {
+    await this.click(this.changeLayoutTemplateBtn);
   }
 
   async enterTemplateName(templateName: string) {
@@ -62,12 +62,12 @@ export class TemplateUiHelper extends UiBaseLocators {
     await this.enterMonacoEditorValue(templateContent);
   }
 
-  async isMasterTemplateNameVisible(templateName: string, isVisible: boolean = true) {
-    await this.isVisible(this.page.getByLabel(`Master template: ${templateName}`), isVisible);
+  async isLayoutTemplateNameVisible(templateName: string, isVisible: boolean = true) {
+    await this.isVisible(this.page.getByLabel(`Layout template: ${templateName}`), isVisible);
   }
 
-  async clickRemoveMasterTemplateButton() {
-    await this.click(this.removeMasterTemplateBtn);
+  async clickRemoveLayoutTemplateButton() {
+    await this.click(this.removeLayoutTemplateBtn);
   }
 
   async insertSection(sectionType: string, sectionName: string = '') {

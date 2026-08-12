@@ -72,6 +72,7 @@ const treeItemMapper = (model: UmbMockDataTypeModel): DataTypeTreeItemResponseMo
 		isFolder: model.isFolder,
 		isDeletable: model.isDeletable,
 		flags: model.flags,
+		noAccess: model.noAccess,
 	};
 };
 
@@ -88,6 +89,7 @@ const createFolderMockMapper = (request: CreateFolderRequestModel): UmbMockDataT
 		canIgnoreStartNodes: false,
 		values: [],
 		flags: [],
+		noAccess: false,
 	};
 };
 
@@ -104,6 +106,7 @@ const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDat
 		hasChildren: false,
 		isDeletable: true,
 		flags: [],
+		noAccess: false,
 	};
 };
 

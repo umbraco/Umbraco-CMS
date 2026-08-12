@@ -21,10 +21,11 @@ public interface ITemplateService : IService
     Task<IEnumerable<ITemplate>> GetAllAsync(Guid[] keys);
 
     /// <summary>
-    ///     Gets a list of all <see cref="ITemplate" /> objects
+    ///     Gets the child templates of a layout template.
     /// </summary>
-    /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    Task<IEnumerable<ITemplate>> GetChildrenAsync(int masterTemplateId);
+    /// <param name="layoutTemplateId">The identifier of the layout template.</param>
+    /// <returns>An enumerable list of <see cref="ITemplate" /> objects.</returns>
+    Task<IEnumerable<ITemplate>> GetChildrenAsync(int layoutTemplateId);
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
@@ -48,11 +49,11 @@ public interface ITemplateService : IService
     Task<ITemplate?> GetAsync(Guid id);
 
     /// <summary>
-    ///     Gets the template descendants
+    ///     Gets all descendant templates of a layout template.
     /// </summary>
-    /// <param name="masterTemplateId"></param>
-    /// <returns></returns>
-    Task<IEnumerable<ITemplate>> GetDescendantsAsync(int masterTemplateId);
+    /// <param name="layoutTemplateId">The identifier of the layout template.</param>
+    /// <returns>An enumerable list of descendant <see cref="ITemplate" /> objects.</returns>
+    Task<IEnumerable<ITemplate>> GetDescendantsAsync(int layoutTemplateId);
 
     /// <summary>
     ///     Updates a <see cref="ITemplate" />
@@ -87,18 +88,11 @@ public interface ITemplateService : IService
     /// <returns>
     ///     The template created
     /// </returns>
-    async Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
+    Task<Attempt<ITemplate?, TemplateOperationStatus>> CreateForContentTypeAsync(
         string name,
         string alias,
         string contentTypeAlias,
-        Guid userKey)
-    {
-        // TODO (V18): Remove default implementation
-        Attempt<ITemplate, TemplateOperationStatus> result = await CreateForContentTypeAsync(contentTypeAlias, name, userKey);
-        return result.Success
-            ? Attempt<ITemplate?, TemplateOperationStatus>.Succeed(result.Status, result.Result)
-            : Attempt<ITemplate?, TemplateOperationStatus>.Fail(result.Status);
-    }
+        Guid userKey);
 
     /// <summary>
     ///     Creates a new template

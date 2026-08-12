@@ -203,21 +203,10 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <summary>
     ///     Saves a single <see cref="IMember" /> object
     /// </summary>
-    /// <param name="media">The <see cref="IMember" /> to save</param>
+    /// <param name="member">The <see cref="IMember" /> to save</param>
     /// <param name="userId">Id of the User saving the Member</param>
     /// <returns>An <see cref="Attempt{OperationResult}"/> indicating the result of the save operation.</returns>
-    Attempt<OperationResult?> Save(IMember media, int userId = Constants.Security.SuperUserId); // TODO (V18): Rename parameter 'media' to 'member'.
-
-    /// <summary>
-    ///     Saves a list of <see cref="IMember" /> objects
-    /// </summary>
-    /// <param name="members">Collection of <see cref="IMember" /> to save</param>
-    /// <param name="userId">Id of the User saving the Members</param>
-    /// <returns>An <see cref="Attempt{OperationResult}"/> indicating the result of the save operation.</returns>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
+    Attempt<OperationResult?> Save(IMember member, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets the count of Members by an optional MemberType alias
@@ -233,20 +222,6 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     /// <param name="id">Id of the Member</param>
     /// <returns><c>True</c> if the Member exists otherwise <c>False</c></returns>
     bool Exists(int id);
-
-    /// <summary>
-    ///     Gets a Member by the unique key
-    /// </summary>
-    /// <remarks>
-    ///     The guid key corresponds to the unique id in the database
-    ///     and the user id in the membership provider.
-    /// </remarks>
-    /// <param name="id"><see cref="Guid" /> Id</param>
-    /// <returns>
-    ///     <see cref="IMember" />
-    /// </returns>
-    [Obsolete($"Use {nameof(GetById)}. Scheduled for removal in Umbraco 18.")]
-    IMember? GetByKey(Guid id) => GetById(id);
 
     /// <summary>
     ///     Gets a Member by its integer id
@@ -352,85 +327,6 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
         int pageSize,
         out long totalRecords,
         StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
-
-    /// <summary>
-    ///     Gets a list of Members based on a property search
-    /// </summary>
-    /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="string" /> Value to match</param>
-    /// <param name="matchType">
-    ///     The type of match to make as <see cref="StringPropertyMatchType" />. Default is
-    ///     <see cref="StringPropertyMatchType.Exact" />
-    /// </param>
-    /// <returns>
-    ///     <see cref="IEnumerable{IMember}" />
-    /// </returns>
-    /// <remarks>
-    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
-    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
-    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
-    /// </remarks>
-    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
-    IEnumerable<IMember> GetMembersByPropertyValue(
-        string propertyTypeAlias,
-        string value,
-        StringPropertyMatchType matchType = StringPropertyMatchType.Exact);
-
-    /// <summary>
-    ///     Gets a list of Members based on a property search
-    /// </summary>
-    /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="int" /> Value to match</param>
-    /// <param name="matchType">
-    ///     The type of match to make as <see cref="StringPropertyMatchType" />. Default is
-    ///     <see cref="StringPropertyMatchType.Exact" />
-    /// </param>
-    /// <returns>
-    ///     <see cref="IEnumerable{IMember}" />
-    /// </returns>
-    /// <remarks>
-    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
-    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
-    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
-    /// </remarks>
-    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
-    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
-
-    /// <summary>
-    ///     Gets a list of Members based on a property search
-    /// </summary>
-    /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="bool" /> Value to match</param>
-    /// <returns>
-    ///     <see cref="IEnumerable{IMember}" />
-    /// </returns>
-    /// <remarks>
-    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
-    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
-    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
-    /// </remarks>
-    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
-    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value);
-
-    /// <summary>
-    ///     Gets a list of Members based on a property search
-    /// </summary>
-    /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
-    /// <param name="value"><see cref="System.DateTime" /> Value to match</param>
-    /// <param name="matchType">
-    ///     The type of match to make as <see cref="StringPropertyMatchType" />. Default is
-    ///     <see cref="StringPropertyMatchType.Exact" />
-    /// </param>
-    /// <returns>
-    ///     <see cref="IEnumerable{IMember}" />
-    /// </returns>
-    /// <remarks>
-    /// Instead of using this method, which queries the database directly, we advise using search (Examine).
-    /// You can configure an `IValueSetValidator` to ensure all the properties you need are indexed.
-    /// <see href="https://docs.umbraco.com/umbraco-cms/reference/searching/examine/indexing#changing-ivaluesetvalidator" />
-    /// </remarks>
-    [Obsolete("Please use Search (Examine) instead, scheduled for removal in Umbraco 18.")]
-    IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
     /// <summary>
     /// Saves only the properties related to login for the member, using an optimized, non-locking update.

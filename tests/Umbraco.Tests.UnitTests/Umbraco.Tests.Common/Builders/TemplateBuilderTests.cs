@@ -23,8 +23,8 @@ public class TemplateBuilderTests
         var testUpdateDate = DateTime.UtcNow;
         const string testPath = "-1,3";
         const string testContent = "blah";
-        const string testMasterTemplateAlias = "master";
-        const int testMasterTemplateId = 88;
+        const string testLayoutTemplateAlias = "master";
+        const int testLayoutTemplateId = 88;
 
         var builder = new TemplateBuilder();
 
@@ -38,7 +38,7 @@ public class TemplateBuilderTests
             .WithKey(testKey)
             .WithPath(testPath)
             .WithContent(testContent)
-            .AsMasterTemplate(testMasterTemplateAlias, testMasterTemplateId)
+            .AsLayoutTemplate(testLayoutTemplateAlias, testLayoutTemplateId)
             .Build();
 
         // Assert
@@ -50,8 +50,8 @@ public class TemplateBuilderTests
         Assert.AreEqual(testKey, template.Key);
         Assert.AreEqual(testPath, template.Path);
         Assert.AreEqual(testContent, template.Content);
-        Assert.IsTrue(template.IsMasterTemplate);
-        Assert.AreEqual(testMasterTemplateAlias, template.MasterTemplateAlias);
-        Assert.AreEqual(testMasterTemplateId, ((Template)template).MasterTemplateId.Value);
+        Assert.IsTrue(template.IsLayoutTemplate);
+        Assert.AreEqual(testLayoutTemplateAlias, template.LayoutTemplateAlias);
+        Assert.AreEqual(testLayoutTemplateId, ((Template)template).LayoutTemplateId.Value);
     }
 }

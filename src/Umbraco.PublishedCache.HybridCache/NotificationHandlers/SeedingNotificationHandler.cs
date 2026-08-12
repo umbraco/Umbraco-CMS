@@ -12,13 +12,20 @@ internal sealed class SeedingNotificationHandler : INotificationAsyncHandler<Umb
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
+    private readonly IElementCacheService _elementCacheService;
     private readonly IRuntimeState _runtimeState;
     private readonly GlobalSettings _globalSettings;
 
-    public SeedingNotificationHandler(IDocumentCacheService documentCacheService, IMediaCacheService mediaCacheService, IRuntimeState runtimeState, IOptions<GlobalSettings> globalSettings)
+    public SeedingNotificationHandler(
+        IDocumentCacheService documentCacheService,
+        IMediaCacheService mediaCacheService,
+        IElementCacheService elementCacheService,
+        IRuntimeState runtimeState,
+        IOptions<GlobalSettings> globalSettings)
     {
         _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
+        _elementCacheService = elementCacheService;
         _runtimeState = runtimeState;
         _globalSettings = globalSettings.Value;
     }
@@ -27,7 +34,6 @@ internal sealed class SeedingNotificationHandler : INotificationAsyncHandler<Umb
         UmbracoApplicationStartingNotification notification,
         CancellationToken cancellationToken)
     {
-
         if (_runtimeState.ShouldSkipStartupSeeding(_globalSettings))
         {
             return;
@@ -35,5 +41,6 @@ internal sealed class SeedingNotificationHandler : INotificationAsyncHandler<Umb
 
         await _documentCacheService.SeedAsync(cancellationToken);
         await _mediaCacheService.SeedAsync(cancellationToken);
+        await _elementCacheService.SeedAsync(cancellationToken);
     }
 }

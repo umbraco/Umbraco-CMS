@@ -31,6 +31,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     private string? _icon = "icon-folder";
     private Guid? _listView;
     private bool _isElement;
+    private bool _allowedInLibrary;
     private PropertyGroupCollection _propertyGroups;
     private string? _thumbnail = "folder.png";
     private ContentVariation _variations;
@@ -219,6 +220,14 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     {
         get => _isElement;
         set => SetPropertyValueAndDetectChanges(value, ref _isElement, nameof(IsElement));
+    }
+
+    /// <inheritdoc />
+    [DataMember]
+    public bool AllowedInLibrary
+    {
+        get => _allowedInLibrary;
+        set => SetPropertyValueAndDetectChanges(value, ref _allowedInLibrary, nameof(AllowedInLibrary));
     }
 
     /// <summary>

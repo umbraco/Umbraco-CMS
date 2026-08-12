@@ -220,8 +220,38 @@ public class BlockEditorDataConverterTests
     [Test]
     public void Can_Populate_References_From_Layout()
     {
+        // References are read from the layout's ContentKey/SettingsKey. Legacy (v13) contentUdi/settingsUdi
+        // layout resolution was removed in V18 - by then the data has been migrated to keys during the
+        // upgrade to V17, so V18 only ever sees the key-based layout format used here.
+        var json = $$"""
+        {
+            "layout": {
+                "Umbraco.BlockList": [
+                    {
+                        "contentKey": "{{_contentKey}}",
+                        "settingsKey": "{{_settingsKey}}"
+                    }
+                ]
+            },
+            "contentData": [
+                {
+                    "key": "{{_contentKey}}",
+                    "contentTypeKey": "a1d1123c-289b-4a05-b33f-9f06cb723da1",
+                    "values": [ { "alias": "text", "value": "Hello world" } ]
+                }
+            ],
+            "settingsData": [
+                {
+                    "key": "{{_settingsKey}}",
+                    "contentTypeKey": "b2e2234d-390c-4b16-c44f-af17dc834eb2",
+                    "values": [ { "alias": "cssClasses", "value": "text-xl" } ]
+                }
+            ]
+        }
+        """;
+
         BlockListEditorDataConverter converter = CreateConverter();
-        BlockEditorData<BlockListValue, BlockListLayoutItem> result = converter.Deserialize(LegacyJsonWithContentAndSettings);
+        BlockEditorData<BlockListValue, BlockListLayoutItem> result = converter.Deserialize(json);
 
         Assert.AreEqual(1, result.References.Count);
         Assert.Multiple(() =>

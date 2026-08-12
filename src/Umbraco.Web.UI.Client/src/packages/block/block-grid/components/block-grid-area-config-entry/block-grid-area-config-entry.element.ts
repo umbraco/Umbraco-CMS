@@ -100,14 +100,14 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 				position: relative;
 				display: block;
 				box-sizing: border-box;
-				background-color: var(--uui-color-disabled);
+				background-color: var(--uui-color-surface);
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 				transition: background-color 120ms;
 			}
 
 			:host(:hover) {
-				background-color: var(--uui-color-disabled-standalone);
+				background-color: var(--uui-color-surface-hover);
 			}
 
 			:host([drag-placeholder]) {
@@ -122,6 +122,10 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 
 			.alias {
 				padding: var(--uui-size-space-4);
+			}
+
+			umb-block-scale-handler {
+				inset: -1px;
 			}
 		`,
 	];

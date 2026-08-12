@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
-using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Features;
@@ -73,13 +73,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         };
 
     /// <summary>
-    /// Instantiates and returns a new <see cref="MemberConfigurationResponseModel"/>.
-    /// </summary>
-    /// <returns>A new <see cref="MemberConfigurationResponseModel"/>.</returns>
-    public MemberConfigurationResponseModel CreateMemberConfigurationResponseModel() =>
-        new();
-
-    /// <summary>
     /// Creates a <see cref="MemberTypeConfigurationResponseModel"/> containing the reserved member field names.
     /// </summary>
     /// <returns>A <see cref="MemberTypeConfigurationResponseModel"/> with reserved member field names populated.</returns>
@@ -93,12 +86,11 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
     /// Creates a new instance of <see cref="MediaConfigurationResponseModel"/> with media configuration settings.
     /// </summary>
     /// <returns>A <see cref="MediaConfigurationResponseModel"/> containing the media configuration.</returns>
-    public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel() =>
-        new()
-        {
-            DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
-            DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
-        };
+    public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel() => new()
+    {
+        DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
+        DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
+    };
 
     /// <summary>
     /// Creates a new instance of <see cref="MediaTypeConfigurationResponseModel"/> containing configuration data for media types.
@@ -110,5 +102,14 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         new()
         {
             ReservedFieldNames = _reservedFieldNamesService.GetMediaReservedFieldNames(),
+        };
+
+    public ElementConfigurationResponseModel CreateElementConfigurationResponseModel() =>
+        new()
+        {
+            DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
+            DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
+            AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
+            AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
         };
 }

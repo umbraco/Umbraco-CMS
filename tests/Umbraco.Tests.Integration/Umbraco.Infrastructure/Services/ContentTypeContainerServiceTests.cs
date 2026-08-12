@@ -181,7 +181,7 @@ internal sealed class ContentTypeContainerServiceTests : UmbracoIntegrationTest
         {
             Alias = "test", Name = "Test"
         };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var result = await ContentTypeContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);

@@ -34,6 +34,11 @@ public interface IUser : IMembershipUser, IRememberBeingDirty
     int[]? StartMediaIds { get; set; }
 
     /// <summary>
+    ///     Gets or sets the starting element node identifiers for this user.
+    /// </summary>
+    int[]? StartElementIds { get; set; }
+
+    /// <summary>
     ///     Gets or sets the preferred language for the user's backoffice UI.
     /// </summary>
     string? Language { get; set; }

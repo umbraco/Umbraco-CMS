@@ -120,23 +120,8 @@ export class UserUiHelper extends UiBaseLocators {
     return await this.isVisible(this.page.getByText(name, {exact: true}), isVisible);
   }
 
-  async clickChangePhotoButton() {
-    await this.click(this.changePhotoBtn);
-  }
-
   async clickRemoveButtonForUserGroupWithName(userGroupName: string) {
     await this.click(this.page.locator('umb-user-group-ref', {hasText: userGroupName}).locator('[label="Remove"]'));
-  }
-
-  async clickRemovePhotoButton() {
-    await this.click(this.removePhotoBtn);
-  }
-
-  async changePhotoWithFileChooser(filePath: string) {
-    const fileChooserPromise = this.page.waitForEvent('filechooser');
-    await this.clickChangePhotoButton();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(filePath);
   }
 
   async searchInUserSection(name: string) {
@@ -203,10 +188,6 @@ export class UserUiHelper extends UiBaseLocators {
 
   async clickChooseContainerButton() {
     await this.click(this.chooseContainerBtn);
-  }
-
-  async selectUserLanguage(language: string) {
-    await this.languageBtn.selectOption(language, {force: true});
   }
 
   async clickRemoveButtonForContentNodeWithName(name: string) {
@@ -303,5 +284,9 @@ export class UserUiHelper extends UiBaseLocators {
     const userGroupRefLocator = this.page.locator('umb-user-group-ref').filter({has: this.page.getByText(userGroupName, {exact: true})});
     const detailsLocator = userGroupRefLocator.locator('#details');
     return await this.containsText(detailsLocator, details);
+  }
+
+  async doesUserHaveAccessToElementNodeWithName(name: string) {
+    await this.isVisible(this.elementStartNode.locator(`[name="${name}"]`));
   }
 }

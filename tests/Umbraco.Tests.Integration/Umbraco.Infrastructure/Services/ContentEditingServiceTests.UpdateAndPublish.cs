@@ -130,7 +130,7 @@ public partial class ContentEditingServiceTests
     [Test]
     public async Task Can_UpdateAndPublish_Already_Published_Content()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         // create and publish initially
         var createModel = new ContentCreateModel

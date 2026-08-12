@@ -94,27 +94,6 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
     {
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public ContentFinderByConfigured404(
-        ILogger<ContentFinderByConfigured404> logger,
-        IEntityService entityService,
-        IOptionsMonitor<ContentSettings> contentSettings,
-        IExamineManager examineManager,
-        IVariationContextAccessor variationContextAccessor,
-        IUmbracoContextAccessor umbracoContextAccessor)
-        : this(
-            logger,
-            entityService,
-            contentSettings,
-            examineManager,
-            variationContextAccessor,
-            umbracoContextAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>())
-    {
-    }
-
     /// <summary>
     ///     Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
     /// </summary>

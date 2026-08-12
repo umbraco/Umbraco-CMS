@@ -10,8 +10,6 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
@@ -61,8 +59,4 @@ public class BackOfficeAreaRoutesTests
         => new BackOfficeAreaRoutes(
             Mock.Of<IRuntimeState>(x => x.Level == level),
             Options.Create(new SignalRSettings()));
-
-    [IsBackOffice]
-    private class Testing1Controller : UmbracoApiController
-    { }
 }

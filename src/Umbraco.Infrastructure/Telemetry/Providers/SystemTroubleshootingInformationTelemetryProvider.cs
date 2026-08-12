@@ -18,7 +18,7 @@ internal sealed class SystemTroubleshootingInformationTelemetryProvider : IDetai
 {
     private readonly IHostEnvironment _hostEnvironment;
     private readonly HostingSettings _hostingSettings;
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
     private readonly ModelsBuilderSettings _modelsBuilderSettings;
     private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
     private readonly IUmbracoVersion _version;
@@ -29,7 +29,7 @@ internal sealed class SystemTroubleshootingInformationTelemetryProvider : IDetai
     /// Initializes a new instance of the <see cref="SystemTroubleshootingInformationTelemetryProvider"/> class.
     /// </summary>
     /// <param name="version">Provides information about the current Umbraco version.</param>
-    /// <param name="localizationService">Service used for localization and translations.</param>
+    /// <param name="languageService">Service used for language operations.</param>
     /// <param name="modelsBuilderSettings">Monitors the configuration settings for the Models Builder feature.</param>
     /// <param name="hostingSettings">Monitors the configuration settings related to hosting.</param>
     /// <param name="hostEnvironment">Provides information about the web hosting environment.</param>
@@ -38,7 +38,7 @@ internal sealed class SystemTroubleshootingInformationTelemetryProvider : IDetai
     /// <param name="runtimeSettings">Monitors the runtime configuration settings.</param>
     public SystemTroubleshootingInformationTelemetryProvider(
         IUmbracoVersion version,
-        ILocalizationService localizationService,
+        ILanguageService languageService,
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
         IOptionsMonitor<HostingSettings> hostingSettings,
         IHostEnvironment hostEnvironment,
@@ -47,7 +47,7 @@ internal sealed class SystemTroubleshootingInformationTelemetryProvider : IDetai
         IOptionsMonitor<RuntimeSettings> runtimeSettings)
     {
         _version = version;
-        _localizationService = localizationService;
+        _languageService = languageService;
         _hostEnvironment = hostEnvironment;
         _umbracoDatabaseFactory = umbracoDatabaseFactory;
         _serverRoleAccessor = serverRoleAccessor;
@@ -99,7 +99,7 @@ internal sealed class SystemTroubleshootingInformationTelemetryProvider : IDetai
         {
             { "Server OS", ServerOs },
             { "Server Framework", ServerFramework },
-            { "Default Language", _localizationService.GetDefaultLanguageIsoCode() },
+            { "Default Language", _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult() },
             { "Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild() },
             { "Current Culture", CurrentCulture },
             { "Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString() },

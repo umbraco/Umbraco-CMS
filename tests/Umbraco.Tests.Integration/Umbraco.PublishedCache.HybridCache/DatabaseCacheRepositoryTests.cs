@@ -58,9 +58,9 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
 
     private IMedia MediaItem3 { get; set; }
 
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
 
         // Add a few media items so the media-side methods have something to read.
         MediaType = MediaTypeService.Get("image")!;
@@ -73,7 +73,7 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
-    public async Task GetContentSourcesAsync_With_Keys_Returns_Matching_Sources()
+    public async Task GetDocumentSourcesAsync_With_Keys_Returns_Matching_Sources()
     {
         // Arrange — publish the root so we exercise the published branch of the filter, and leave
         // the subpages in draft. Base fixture gives us 4 non-trashed documents.
@@ -83,7 +83,7 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
 
         // Act — preview = true so draft-only subpages are also returned.
         using var scope = ScopeProvider.CreateScope(autoComplete: true);
-        var sources = (await DatabaseCacheRepository.GetContentSourcesAsync(requestedKeys, preview: true)).ToList();
+        var sources = (await DatabaseCacheRepository.GetDocumentSourcesAsync(requestedKeys, preview: true)).ToList();
 
         // Assert — only the three requested nodes come back, ignoring Subpage3 and the trashed node.
         var returnedKeys = sources.Select(s => s.Key).ToHashSet();
@@ -91,12 +91,12 @@ internal sealed class DatabaseCacheRepositoryTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
-    public async Task GetContentSourcesAsync_With_Empty_Keys_Returns_Nothing()
+    public async Task GetDocumentSourcesAsync_With_Empty_Keys_Returns_Nothing()
     {
         // The batched loop iterates zero groups when the input is empty — no rows should be
         // returned, and the database must not be hit with a malformed `WHERE id IN ()`.
         using var scope = ScopeProvider.CreateScope(autoComplete: true);
-        var sources = await DatabaseCacheRepository.GetContentSourcesAsync(Array.Empty<Guid>(), preview: true);
+        var sources = await DatabaseCacheRepository.GetDocumentSourcesAsync(Array.Empty<Guid>(), preview: true);
 
         Assert.That(sources, Is.Empty);
     }

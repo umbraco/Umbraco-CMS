@@ -59,7 +59,7 @@ src/Umbraco.Infrastructure/
 │
 ├── Migrations/                    # Database migration system
 │   ├── Install/                   # Initial database schema
-│   ├── Upgrade/                   # Version upgrade migrations (21 versions)
+│   ├── Upgrade/                   # Version upgrade migrations (V17+)
 │   ├── PostMigrations/            # Post-upgrade data fixes
 │   ├── MigrationPlan.cs           # Migration orchestration
 │   └── MigrationPlanExecutor.cs   # Migration execution
@@ -187,7 +187,7 @@ dotnet build src/Umbraco.Infrastructure /p:TreatWarningsAsErrors=true
 This project contains the migration framework but **migrations are NOT run via EF Core**. Migrations run at application startup via `MigrationPlanExecutor`.
 
 To create a new migration:
-1. Create class inheriting `MigrationBase` in `Migrations/Upgrade/`
+1. Create class inheriting `AsyncMigrationBase` in `Migrations/Upgrade/`
 2. Add to `UmbracoPlan` migration plan
 3. Restart application - migration runs automatically
 
@@ -535,7 +535,7 @@ using (var outer = ScopeProvider.CreateCoreScope())
 **Data Migrations** - Can be slow:
 - Migrations run at startup (blocking)
 - Large data migrations (> 100k rows) should be chunked
-- Use `AsyncMigrationBase` for long-running operations
+- All migrations use `AsyncMigrationBase`
 
 **Schema-seeding migrations MUST assign the same fixed keys as a clean install**:
 - A migration that adds built-in schema entities (media/content/member types, property types,
@@ -547,6 +547,22 @@ using (var outer = ScopeProvider.CreateCoreScope())
   "the key changed" schema diffs across environments (see issue #23337).
 - Keep the Guids in **one place** (a shared `Constants` value referenced by both `DatabaseDataCreator`
   and the migration) so they cannot drift.
+
+**Migrations merged UP into an already-released version line must be re-applied at the plan's end**:
+- The upgrader only ever walks the migration chain **forward** from the state stored in the database.
+  A migration merged up from a lower version (e.g. a 17.6 migration merged into v18) lands in the
+  `UmbracoPlan` in namespace order — i.e. **before** the higher line's own migrations.
+- Sites already released on the higher line have a stored state **past** that insertion point, so they
+  will **never** run it (e.g. sites on 18.0.x skip a 17.6-positioned migration when upgrading to 18.1).
+- **Fix**: re-apply the migration at the **end** of the plan under a new version section with a new GUID.
+  Migrations are already required to be idempotent (guard with `IndexExists`, existence checks, etc.),
+  so upgrade paths that hit it twice are unaffected.
+- Implement the re-run as an **empty subclass of the original migration** placed in the **new version's**
+  namespace (e.g. `V_18_1_0.AddContentTypeIdIndexForContent : V_17_6_0.AddContentTypeIdIndexForContent`).
+  Do **not** re-list the original type directly: `UmbracoPlan.GetVersionForState` (used by
+  `RuntimeState.CurrentMigrationVersion`) derives the database version from the **final** migration
+  type's `V_{major}_{minor}_{patch}` namespace, so the last step must live in the new version's namespace
+  to report the correct version. See PR #23328 (original) and #23466 (re-application).
 
 ### Repository Edge Cases
 
@@ -614,9 +630,9 @@ using (var outer = ScopeProvider.CreateCoreScope())
 3. Which version does this target?
 
 **Workflow**:
-1. **Create Migration Class** in `Migrations/Upgrade/V{Version}/`
-   - Inherit from `MigrationBase` (schema) or `AsyncMigrationBase` (data)
-   - Implement `Migrate()` method
+1. **Create Migration Class** in `Migrations/Upgrade/V_{Version}/`
+   - Inherit from `AsyncMigrationBase`
+   - Implement `MigrateAsync()` method
 2. **Add to UmbracoPlan** in `Migrations/Upgrade/UmbracoPlan.cs`
    - Specify dependencies (runs after which migrations?)
 3. **Test Migration**:
@@ -649,7 +665,7 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - 47 repositories × ~3 files each (repo, mapper, factory) = ~141 files
 - 75 property editors × ~2 files each = ~150 files
 - 80 DTOs for database tables = 80 files
-- 21 versions × ~5 migrations each = ~105 files
+- 7 version dirs (V17+) × ~5 migrations each = ~36 files
 - Remaining: services, background jobs, search, email, logging, etc.
 
 **Why NPoco + Custom Migrations?**

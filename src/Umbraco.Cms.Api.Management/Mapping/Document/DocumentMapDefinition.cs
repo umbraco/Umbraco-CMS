@@ -1,10 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Mapping;
@@ -34,22 +33,6 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         => _commonMapper = commonMapper;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Mapping.Document.DocumentMapDefinition"/> class.
-    /// </summary>
-    /// <param name="propertyEditorCollection">A <see cref="PropertyEditorCollection"/> containing the available property editors.</param>
-    /// <param name="commonMapper">An instance of <see cref="CommonMapper"/> used for common mapping operations.</param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public DocumentMapDefinition(
-        PropertyEditorCollection propertyEditorCollection,
-        CommonMapper commonMapper)
-        : this(
-            propertyEditorCollection,
-            commonMapper,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
-    /// <summary>
     /// Configures the object mappings for document-related models in the Umbraco CMS API.
     /// This method registers mappings between <see cref="IContent"/> and various document response models,
     /// as well as between <see cref="ContentScheduleCollection"/> and <see cref="DocumentResponseModel"/>,
@@ -75,7 +58,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = DocumentVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);
@@ -94,9 +77,9 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             (culture, _, documentVariantViewModel) =>
             {
                 documentVariantViewModel.Name = source.GetPublishName(culture) ?? documentVariantViewModel.Name;
-                DocumentVariantState variantState = DocumentVariantStateHelper.GetState(source, culture);
-                documentVariantViewModel.State = variantState == DocumentVariantState.PublishedPendingChanges
-                        ? DocumentVariantState.Published
+                PublishableVariantState variantState = PublishableVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.State = variantState == PublishableVariantState.PublishedPendingChanges
+                        ? PublishableVariantState.Published
                         : variantState;
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
@@ -131,7 +114,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = DocumentVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);
@@ -149,34 +132,10 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = DocumentVariantState.Draft;
+                documentVariantViewModel.State = PublishableVariantState.Draft;
             });
     }
 
     private void Map(ContentScheduleCollection source, DocumentResponseModel target, MapperContext context)
-    {
-        foreach (ContentSchedule schedule in source.FullSchedule)
-        {
-            DocumentVariantResponseModel? variant = target.Variants
-                .FirstOrDefault(v =>
-                    v.Culture == schedule.Culture ||
-                    (IsInvariant(v.Culture) && IsInvariant(schedule.Culture)));
-            if (variant is null)
-            {
-                continue;
-            }
-
-            switch (schedule.Action)
-            {
-                case ContentScheduleAction.Release:
-                    variant.ScheduledPublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
-                    break;
-                case ContentScheduleAction.Expire:
-                    variant.ScheduledUnpublishDate = new DateTimeOffset(schedule.Date, TimeSpan.Zero);
-                    break;
-            }
-        }
-    }
-
-    private static bool IsInvariant(string? culture) => culture.IsNullOrWhiteSpace() || culture == Core.Constants.System.InvariantCulture;
+        => MapContentScheduleCollection<DocumentResponseModel, DocumentVariantResponseModel>(source, target, context);
 }

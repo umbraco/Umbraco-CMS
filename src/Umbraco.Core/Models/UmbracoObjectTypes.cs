@@ -188,4 +188,27 @@ public enum UmbracoObjectTypes
     [UmbracoObjectType(Constants.ObjectTypes.Strings.IdReservation)]
     [FriendlyName("Identifier Reservation")]
     IdReservation,
+
+    /// <summary>
+    ///     Element
+    /// </summary>
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.Element, typeof(IElement))]
+    [FriendlyName("Element")]
+    [UmbracoUdiType(Constants.UdiEntityType.Element)]
+    Element,
+
+    /// <summary>
+    ///     Element container.
+    /// </summary>
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.ElementContainer)]
+    [FriendlyName("Element Container")]
+    [UmbracoUdiType(Constants.UdiEntityType.ElementContainer)]
+    ElementContainer,
+
+    /// <summary>
+    ///     Element Recycle Bin
+    /// </summary>
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.ElementRecycleBin)]
+    [FriendlyName("Element Recycle Bin")]
+    ElementRecycleBin,
 }

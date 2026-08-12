@@ -102,9 +102,7 @@ public interface IContentPermissionService
     /// <param name="contentKeys">The identifiers of the content items to filter.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into the set of authorized content keys.</returns>
-    // TODO (V18): Remove default implementation.
-    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck)
-        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck);
 
     /// <summary>
     ///     Gets the effective permissions for a user on the specified content items.
@@ -132,6 +130,18 @@ public interface IContentPermissionService
     /// <param name="user"><see cref="IUser" /> to filter permissions for.</param>
     /// <param name="fallbackPermissions">The fallback permissions aggregated from the user's groups.</param>
     /// <returns>A task resolving into the filtered set of fallback permissions.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         Only removals are honoured. The returned set is intersected with the supplied one, so a verb added by an
+    ///         implementation is discarded. Every permission service is given its own copy of the same unfiltered set,
+    ///         which also means no implementation can reinstate a verb that another has removed.
+    ///     </para>
+    ///     <para>
+    ///         The supplied set holds every fallback verb assigned to the user, not only those relating to documents, and
+    ///         permission verbs carry nothing that identifies the entity type they belong to. An implementation should
+    ///         therefore only remove verbs it owns.
+    ///     </para>
+    /// </remarks>
     // TODO (V19): Remove the default implementation.
     // Default passes through unchanged for backward compatibility with custom implementations
     // that predate this method.

@@ -75,6 +75,9 @@ public class CompiledPackageXmlParser
                 Enumerable.Empty<CompiledPackageContentBase>(),
             Media = xml.Root.Element("MediaItems")?.Elements()?.Select(CompiledPackageContentBase.Create) ??
                     Enumerable.Empty<CompiledPackageContentBase>(),
+            Elements =
+                xml.Root.Element("Elements")?.Elements("ElementSet")?.Select(CompiledPackageContentBase.Create) ??
+                Enumerable.Empty<CompiledPackageContentBase>(),
         };
 
         def.Warnings = GetInstallWarnings(def);

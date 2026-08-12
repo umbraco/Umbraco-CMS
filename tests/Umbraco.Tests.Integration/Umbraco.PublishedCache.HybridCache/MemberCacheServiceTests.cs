@@ -44,9 +44,9 @@ internal sealed class MemberCacheServiceTests : UmbracoIntegrationTestWithConten
 
     private IMember Member { get; set; }
 
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
 
         // Create and Save Member "MemberItem" based on "Member" member type
         MemberType = MemberTypeService.Get("Member")!;
