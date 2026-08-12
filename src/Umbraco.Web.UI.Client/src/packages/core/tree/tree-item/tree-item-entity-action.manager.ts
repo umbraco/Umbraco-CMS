@@ -18,7 +18,7 @@ export class UmbTreeItemEntityActionManager<
 	/**
 	 * Set the parent for which to load children.
 	 * @param {(TreeItemType | TreeRootType | undefined)} treeItem - The tree item model
-	 * @memberof UmbTreeItemChildrenManager
+	 * @memberof UmbTreeItemEntityActionManager
 	 */
 	public setTreeItem(treeItem: TreeItemType | TreeRootType | undefined) {
 		// If we don't get a tree item stop the observation
@@ -39,7 +39,7 @@ export class UmbTreeItemEntityActionManager<
 	/**
 	 * Gets the tree item for which to load children.
 	 * @returns {TreeItemType | TreeRootType | undefined} - The tree item for the children
-	 * @memberof UmbTreeItemChildrenManager
+	 * @memberof UmbTreeItemEntityActionManager
 	 */
 	public getTreeItem(): TreeItemType | TreeRootType | undefined {
 		return this.#treeItem;

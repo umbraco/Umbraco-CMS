@@ -1,6 +1,7 @@
 import UmbTiptapToolbarDefaultExtensionApi from '../../extensions/default-tiptap-toolbar-api.js';
 import type { Editor } from '../../externals.js';
 import type { UmbTiptapToolbarValue } from '../types.js';
+import type { UmbInputTiptapElement } from '../input-tiptap/input-tiptap.element.js';
 import { css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

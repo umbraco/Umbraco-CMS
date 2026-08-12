@@ -12,7 +12,7 @@ import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice
 /**
  * A data source for the Media that fetches data from the server
  * @class UmbMediaServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDetailDataSource<UmbMediaDetailModel> {
 	/**

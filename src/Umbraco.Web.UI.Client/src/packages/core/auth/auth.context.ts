@@ -19,6 +19,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import type { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * The multiplier for the token expiry time.
@@ -108,7 +109,7 @@ export class UmbAuthContext extends UmbContextBase {
 		return this.#isInitializedObservable;
 	}
 
-	/** Internal, non-warning view of {@link isInitialized} for use inside this class. */
+	/** Internal, non-warning view of {@link UmbAuthContext#isInitialized} for use inside this class. */
 	readonly #isInitializedObservable = this.#isInitialized.asObservable();
 
 	/**

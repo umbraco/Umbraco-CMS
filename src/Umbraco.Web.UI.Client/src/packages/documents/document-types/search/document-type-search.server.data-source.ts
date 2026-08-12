@@ -9,7 +9,7 @@ import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbDocumentTypeSearchServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSearchDataSource}
  */
 export class UmbDocumentTypeSearchServerDataSource implements UmbSearchDataSource<UmbDocumentTypeSearchItemModel> {
 	#host: UmbControllerHost;

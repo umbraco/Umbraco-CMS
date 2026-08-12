@@ -13,7 +13,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Dictionary that fetches data from the server
  * @class UmbDictionaryServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbDictionaryDetailModel>}
  */
 export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDictionaryDetailModel> {
 	#host: UmbControllerHost;
@@ -29,7 +29,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Creates a new Dictionary scaffold
-	 * @returns { CreateDictionaryRequestModel } The dictionary scaffold.
+	 * @returns { CreateDictionaryItemRequestModel } The dictionary scaffold.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async createScaffold() {

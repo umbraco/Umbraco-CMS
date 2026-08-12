@@ -39,7 +39,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Gets persisted data
 	 * @returns {(ModelType | undefined)} The persisted data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	getPersisted() {
 		return this._persisted.getValue();
@@ -48,7 +48,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Sets the persisted data
 	 * @param {(ModelType | undefined)} data The data to persist.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	setPersisted(data: ModelType | undefined) {
 		this._persisted.setValue(data);
@@ -57,7 +57,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Updates the persisted data
 	 * @param {Partial<ModelType>} partialData The partial data to merge into the persisted data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	updatePersisted(partialData: Partial<ModelType>) {
 		this._persisted.update(partialData);
@@ -77,7 +77,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Gets the current data
 	 * @returns {(ModelType | undefined)} The current data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	getCurrent() {
 		return this._current.getValue();
@@ -86,7 +86,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Sets the current data
 	 * @param {(ModelType | undefined)} data The data to set as current.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	setCurrent(data: ModelType | undefined) {
 		if (data) {
@@ -101,7 +101,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Updates the current data
 	 * @param {Partial<ModelType>} partialData - The partial data to merge into the current data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	updateCurrent(partialData: Partial<ModelType>) {
 		if (partialData) {
@@ -127,7 +127,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Checks if there are unpersisted changes
 	 * @returns {*} Whether the current data differs from the persisted data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	getHasUnpersistedChanges() {
 		const persisted = this._persisted.getValue();
@@ -142,7 +142,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Resets the current data to the persisted data
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	resetCurrent() {
 		this._current.setValue(this._persisted.getValue());
@@ -150,7 +150,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Clears the data
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	clear() {
 		this._persisted.setValue(undefined);

@@ -20,7 +20,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the User that fetches data from the server
  * @class UmbUserServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbUserDetailModel>}
  */
 export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetailModel> {
 	#host: UmbControllerHost;

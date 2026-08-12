@@ -36,7 +36,7 @@ export interface UmbTreeDataSource<
 
 	/**
 	 * Gets the children of the given parent item.
-	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
+	 * @returns {Promise<UmbDataSourceResponse<UmbTargetPagedModel<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
 	getChildrenOf(args: TreeChildrenOfRequestArgsType): Promise<UmbDataSourceResponse<UmbTargetPagedModel<TreeItemType>>>;

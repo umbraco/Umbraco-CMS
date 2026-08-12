@@ -16,7 +16,7 @@ export class UmbNotificationContext extends UmbContextBase {
 
 	/**
 	 * @private
-	 * @param {UmbNotificationOptions<UmbNotificationData>} options - The notification options
+	 * @param {UmbNotificationOptions} options - The notification options
 	 * @returns {*}  {UmbNotificationHandler}
 	 * @memberof UmbNotificationContext
 	 */
@@ -51,7 +51,7 @@ export class UmbNotificationContext extends UmbContextBase {
 	/**
 	 * Opens a notification that automatically goes away after 6 sek.
 	 * @param {UmbNotificationColor} color - The notification color
-	 * @param {UmbNotificationOptions<UmbNotificationData>} options - The notification options
+	 * @param {UmbNotificationOptions} options - The notification options
 	 * @returns {*} The notification handler
 	 * @memberof UmbNotificationContext
 	 */
@@ -65,7 +65,7 @@ export class UmbNotificationContext extends UmbContextBase {
 	/**
 	 * Opens a notification that stays on the screen until dismissed by the user or custom code
 	 * @param {UmbNotificationColor} color - The notification color
-	 * @param {UmbNotificationOptions<UmbNotificationData>} options - The notification options
+	 * @param {UmbNotificationOptions} options - The notification options
 	 * @returns {*} The notification handler
 	 * @memberof UmbNotificationContext
 	 */

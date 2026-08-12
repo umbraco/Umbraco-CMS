@@ -18,7 +18,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the User Group that fetches data from the server
  * @class UmbUserGroupServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbUserGroupServerDataSource
 	extends UmbControllerBase

@@ -9,7 +9,7 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 /**
  * A data source for a Document Blueprint folder that fetches data from the server
  * @class UmbDocumentBlueprintFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbFolderModel>}
  */
 export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
@@ -130,7 +130,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	 * Deletes a Document Blueprint folder on the server
 	 * @param {string} unique - The unique identifier of the folder to delete.
 	 * @returns {*} The result of the delete operation.
-	 * @memberof UmbDocumentBlueprintServerDataSource
+	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');

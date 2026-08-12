@@ -239,7 +239,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 
 /**
  * @class UmbSorterController
- * @implements {UmbControllerInterface}
+ * @augments {UmbControllerBase}
  * @description This controller can make user able to sort items.
  * @example
  *

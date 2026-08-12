@@ -5,7 +5,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Tag that fetches data from the server
  * @class UmbTagServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbTagServerDataSource {
 	#host: UmbControllerHost;

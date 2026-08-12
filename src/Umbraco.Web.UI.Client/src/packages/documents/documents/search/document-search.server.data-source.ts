@@ -10,7 +10,7 @@ import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/enti
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbDocumentSearchServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSearchDataSource}
  */
 export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<
 	UmbDocumentSearchItemModel,

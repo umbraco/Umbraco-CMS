@@ -5,7 +5,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbRollbackServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbRollbackServerDataSource {
 	#host: UmbControllerHost;

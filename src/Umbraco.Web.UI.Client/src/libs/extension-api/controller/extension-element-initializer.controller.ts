@@ -34,7 +34,7 @@ export class UmbExtensionElementInitializer<
 	/**
 	 * The props that are passed to the component.
 	 * @type {Record<string, any>}
-	 * @memberof UmbElementExtensionController
+	 * @memberof UmbExtensionElementInitializer
 	 * @example
 	 * ```ts
 	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);

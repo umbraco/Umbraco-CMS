@@ -6,12 +6,16 @@ import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDetailDataSource,
+	UmbDataSourceResponse,
+	UmbDataSourceErrorResponse,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Partial View folders that fetches data from the server
  * @class UmbPartialViewFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbFolderModel>}
  */
 export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
@@ -114,7 +118,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 	 * Deletes a Partial View folder on the server
 	 * @param {string} unique - The unique identifier of the Partial View folder
 	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
-	 * @memberof UmbPartialViewServerDataSource
+	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');

@@ -8,7 +8,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbMediaTypeSearchServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSearchDataSource}
  */
 export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<UmbMediaTypeSearchItemModel> {
 	#host: UmbControllerHost;

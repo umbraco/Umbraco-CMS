@@ -21,7 +21,6 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 /**
  * A server data source for Document publishing
  * @class UmbDocumentPublishingServerDataSource
- * @implements {DocumentTreeDataSource}
  */
 export class UmbDocumentPublishingServerDataSource {
 	#host: UmbControllerHost;

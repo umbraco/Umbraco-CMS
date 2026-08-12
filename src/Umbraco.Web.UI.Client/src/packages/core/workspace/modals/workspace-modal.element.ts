@@ -1,6 +1,6 @@
 import type { UmbWorkspaceModalData } from './workspace-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 

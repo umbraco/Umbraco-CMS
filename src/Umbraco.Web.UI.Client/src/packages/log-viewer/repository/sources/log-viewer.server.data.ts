@@ -13,7 +13,7 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 /**
  * A data source for the log saved searches
  * @class UmbLogSearchesServerDataSource
- * @implements {TemplateDetailDataSource}
+ * @implements {UmbLogSearchDataSource}
  */
 export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	#host: UmbControllerHost;

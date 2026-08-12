@@ -8,6 +8,7 @@ import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/m
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 
 type UmbMfaLoginProviderOption = UmbUserMfaProviderModel & {
 	displayName: string;

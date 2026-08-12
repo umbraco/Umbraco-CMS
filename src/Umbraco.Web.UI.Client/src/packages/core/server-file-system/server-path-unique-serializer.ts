@@ -5,7 +5,7 @@ export class UmbServerFilePathUniqueSerializer {
 	 * Converts a server file path to a unique URL friendly string that can be used in the client
 	 * @param {string} serverFilePath - The server file path to convert
 	 * @returns {*}  {(string | null)}
-	 * @memberof UmbServerFilePathSerializer
+	 * @memberof UmbServerFilePathUniqueSerializer
 	 */
 	toUnique(serverFilePath: string): string {
 		const urlSafeServerFilePath = serverFilePath?.replace('.', this.#magicDot);
@@ -16,7 +16,7 @@ export class UmbServerFilePathUniqueSerializer {
 	 * Converts a unique URL friendly string to a server path
 	 * @param {string} serverFilePathUnique - The unique to convert
 	 * @returns {*}  {(string | null)}
-	 * @memberof UmbServerFilePathSerializer
+	 * @memberof UmbServerFilePathUniqueSerializer
 	 */
 	toServerPath(serverFilePathUnique: string | null): string | null {
 		if (serverFilePathUnique === undefined) throw new Error('Server file path unique is missing');

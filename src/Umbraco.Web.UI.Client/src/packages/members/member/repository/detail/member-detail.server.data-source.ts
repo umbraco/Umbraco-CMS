@@ -13,7 +13,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 /**
  * A data source for the Member that fetches data from the server
  * @class UmbMemberServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbMemberServerDataSource extends UmbControllerBase implements UmbDetailDataSource<UmbMemberDetailModel> {
 	/**

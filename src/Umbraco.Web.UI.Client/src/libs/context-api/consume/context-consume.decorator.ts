@@ -49,6 +49,8 @@ export interface UmbConsumeOptions<
  * host's own lifecycle to fire `hostConnected` before first render. No Lit
  * `ReactiveController` wrapper is needed — `UmbControllerHostMixin` lazy-inits
  * its controllers list, so `addUmbController` is safe during `addInitializer`.
+ * @template BaseType
+ * @template {BaseType} ResultType
  * @param {UmbConsumeOptions} options Configuration object containing context, callback, and subscribe options
  * @example
  * ```ts

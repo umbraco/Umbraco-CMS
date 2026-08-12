@@ -13,7 +13,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 /**
  * A data source for the Data Type that fetches data from the server
  * @class UmbDataTypeServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbDataTypeDetailModel>}
  */
 export class UmbDataTypeServerDataSource
 	extends UmbControllerBase

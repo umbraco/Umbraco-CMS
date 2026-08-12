@@ -12,7 +12,7 @@ export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType 
 /**
  * A data source base for items that fetches items from the server
  * @class UmbItemServerDataSourceBase
- * @implements {DocumentTreeDataSource}
+ * @implements {UmbItemDataSource}
  */
 export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType extends { unique: string }>
 	extends UmbControllerBase

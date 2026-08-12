@@ -43,7 +43,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	/**
 	 * @description Data manager for the workspace.
 	 * @protected
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
@@ -309,7 +309,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	/**
 	 * Method to check if the workspace data is loaded.
 	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	public isLoaded(): Promise<any> | undefined {
 		return this._getDataPromise;
@@ -403,7 +403,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @protected
 	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
 	 * @returns {boolean} true if the workspace is navigating away.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
 		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);

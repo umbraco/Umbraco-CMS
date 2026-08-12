@@ -12,7 +12,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Language that fetches data from the server
  * @class UmbLanguageServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLanguageDetailModel> {
 	#host: UmbControllerHost;

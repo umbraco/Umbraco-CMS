@@ -13,7 +13,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Template that fetches data from the server
  * @class UmbTemplateServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTemplateDetailModel> {
 	#host: UmbControllerHost;

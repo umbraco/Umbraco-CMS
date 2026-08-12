@@ -6,7 +6,6 @@ import { tryExecute, tryXhrRequest } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source to upload temporary files to the server
  * @class UmbTemporaryFileServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbTemporaryFileServerDataSource {
 	#host: UmbControllerHost;

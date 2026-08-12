@@ -9,7 +9,7 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 /**
  * A data source for a Member Type folder that fetches data from the server
  * @class UmbMemberTypeFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbFolderModel>}
  */
 export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
@@ -102,7 +102,7 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Updates a Member Type folder on the server
-	 * @param {UmbUpdateFolderModel} model - The member type folder to update.
+	 * @param {UmbFolderModel} model - The member type folder to update.
 	 * @returns {*} The updated member type folder.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
@@ -130,7 +130,7 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 	 * Deletes a Member Type folder on the server
 	 * @param {string} unique - The unique identifier of the folder to delete.
 	 * @returns {*} The result of the delete operation.
-	 * @memberof UmbMemberTypeServerDataSource
+	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');

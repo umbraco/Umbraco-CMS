@@ -2,6 +2,8 @@ import type { UmbDeepPartialObject } from '../type/deep-partial-object.type.js';
 
 /**
  * Deep merge two objects.
+ * @template {{ [key: string]: any }} T
+ * @template {UmbDeepPartialObject<T>} PartialType
  * @param {PartialType} source - The partial object to merge into the fallback.
  * @param {T} fallback - The object providing the default values.
  * @returns {T} The merged object.

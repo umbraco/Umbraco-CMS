@@ -8,7 +8,7 @@ import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/bac
 /**
  * A data source for the Rollback that fetches data from the server
  * @class UmbDictionarySearchServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSearchDataSource<UmbDictionarySearchItemModel>}
  */
 export class UmbDictionarySearchServerDataSource implements UmbSearchDataSource<UmbDictionarySearchItemModel> {
 	#host: UmbControllerHost;

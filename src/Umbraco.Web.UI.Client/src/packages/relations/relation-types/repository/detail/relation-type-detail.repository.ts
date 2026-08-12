@@ -29,7 +29,7 @@ export class UmbRelationTypeDetailRepository
 	 * Requests the detail for the given unique
 	 * @param {string} unique - The unique identifier of the relation type.
 	 * @returns {*} The relation type detail.
-	 * @memberof UmbDetailRepositoryBase
+	 * @memberof UmbRelationTypeDetailRepository
 	 */
 	async requestByUnique(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
@@ -48,7 +48,7 @@ export class UmbRelationTypeDetailRepository
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {string} unique - The unique identifier of the relation type.
 	 * @returns {*} An observable of the relation type detail.
-	 * @memberof UmbDetailRepositoryBase
+	 * @memberof UmbRelationTypeDetailRepository
 	 */
 	async byUnique(unique: string) {
 		if (!unique) throw new Error('Unique is missing');

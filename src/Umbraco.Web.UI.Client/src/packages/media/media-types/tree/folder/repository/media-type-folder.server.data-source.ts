@@ -9,7 +9,7 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 /**
  * A data source for a Media Type folder that fetches data from the server
  * @class UmbMediaTypeFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbFolderModel>}
  */
 export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
@@ -102,7 +102,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 
 	/**
 	 * Updates a Media Type folder on the server
-	 * @param {UmbUpdateFolderModel} model - The Media Type folder to update
+	 * @param {UmbFolderModel} model - The Media Type folder to update
 	 * @returns {*} The updated Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
@@ -130,7 +130,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	 * Deletes a Media Type folder on the server
 	 * @param {string} unique - The unique ID of the Media Type folder
 	 * @returns {*} A promise that resolves once the Media Type folder has been deleted
-	 * @memberof UmbMediaTypeServerDataSource
+	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');

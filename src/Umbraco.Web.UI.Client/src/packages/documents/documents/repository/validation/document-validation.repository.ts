@@ -24,7 +24,7 @@ export class UmbDocumentValidationRepository
 	 * @param {DetailModelType} model - The document data to validate.
 	 * @param {string | null} [parentUnique] - The unique identifier of the parent document.
 	 * @returns {*} The validation result.
-	 * @memberof UmbDetailRepositoryBase
+	 * @memberof UmbDocumentValidationRepository
 	 */
 	async validateCreate(model: DetailModelType, parentUnique: string | null) {
 		if (!model) throw new Error('Data is missing');
@@ -37,7 +37,7 @@ export class UmbDocumentValidationRepository
 	 * @param {DetailModelType} model - The document data to validate.
 	 * @param {Array<UmbVariantId>} variantIds - The variants to validate.
 	 * @returns {*} The validation result.
-	 * @memberof UmbDetailRepositoryBase
+	 * @memberof UmbDocumentValidationRepository
 	 */
 	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>) {
 		if (!model) throw new Error('Data is missing');

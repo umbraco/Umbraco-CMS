@@ -14,7 +14,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 /**
  * A data source for the Media Type that fetches data from the server
  * @class UmbMediaTypeDetailServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbMediaTypeDetailServerDataSource
 	extends UmbControllerBase
