@@ -24,8 +24,8 @@ export class UmbRelationTypeDetailServerDataSource implements UmbReadDetailDataS
 
 	/**
 	 * Fetches a Relation Type with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the relation type.
+	 * @returns {*} The relation type detail.
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
 	async read(unique: string) {

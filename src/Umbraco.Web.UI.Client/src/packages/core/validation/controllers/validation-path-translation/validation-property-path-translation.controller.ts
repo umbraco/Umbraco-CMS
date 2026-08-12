@@ -9,9 +9,9 @@ export class UmbValidationPropertyPathTranslationController extends UmbControlle
 	/**
 	 * translates the property data.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} property - The property data.
-	 * @param paths
-	 * @param data
-	 * @param queryConstructor
+	 * @param {Array<string>} paths - The paths to be translated.
+	 * @param {Array<UmbPropertyValueDataPotentiallyWithEditorAlias>} data - The property data to translate against.
+	 * @param {(entry: UmbPropertyValueDataPotentiallyWithEditorAlias) => string} queryConstructor - Builds a lookup query for a given property data entry.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the cloned property data.
 	 */
 	async translateProperties(

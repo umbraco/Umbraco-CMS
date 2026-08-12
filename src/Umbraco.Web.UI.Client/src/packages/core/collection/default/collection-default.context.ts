@@ -56,9 +56,9 @@ type UmbCollectionMemorizedFilter = {
 };
 
 export class UmbDefaultCollectionContext<
-		CollectionItemType extends { entityType: string; unique: string } = any,
-		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
-	>
+	CollectionItemType extends { entityType: string; unique: string } = any,
+	FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
+>
 	extends UmbContextBase
 	implements UmbCollectionContext, UmbApi
 {
@@ -278,7 +278,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the configuration for the collection.
-	 * @param {UmbCollectionConfiguration} config
+	 * @param {UmbCollectionConfiguration} config The collection configuration.
 	 * @memberof UmbCollectionContext
 	 */
 	public setConfig(config: UmbCollectionConfiguration) {
@@ -344,7 +344,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the filter for the collection and refreshes the collection.
-	 * @param {Partial<FilterModelType>} filter
+	 * @param {Partial<FilterModelType>} filter The filter to merge into the current filter.
 	 * @memberof UmbCollectionContext
 	 */
 	public setFilter(filter: Partial<FilterModelType>) {

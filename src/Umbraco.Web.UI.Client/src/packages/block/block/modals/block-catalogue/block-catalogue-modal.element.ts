@@ -85,9 +85,13 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			this._manager = manager;
 		});
 
-		this.observe(this.#itemManager.items, async (items) => {
-			this.#observeBlockTypes(items);
-		});
+		this.observe(
+			this.#itemManager.items,
+			async (items) => {
+				this.#observeBlockTypes(items);
+			},
+			null,
+		);
 	}
 
 	override connectedCallback() {

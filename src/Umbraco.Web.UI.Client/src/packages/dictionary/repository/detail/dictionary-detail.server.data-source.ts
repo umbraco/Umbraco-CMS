@@ -29,7 +29,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Creates a new Dictionary scaffold
-	 * @returns { CreateDictionaryRequestModel }
+	 * @returns { CreateDictionaryRequestModel } The dictionary scaffold.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async createScaffold() {
@@ -45,8 +45,8 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Fetches a Dictionary with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the dictionary to fetch.
+	 * @returns {*} The dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async read(unique: string) {
@@ -71,9 +71,9 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Inserts a new Dictionary on the server
-	 * @param {UmbDictionaryDetailModel} model
-	 * @param parentUnique
-	 * @returns {*}
+	 * @param {UmbDictionaryDetailModel} model - The dictionary to create.
+	 * @param {string | null} parentUnique - The unique identifier of the parent, if any.
+	 * @returns {*} The created dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async create(model: UmbDictionaryDetailModel, parentUnique: string | null) {
@@ -103,9 +103,9 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Updates a Dictionary on the server
-	 * @param {UmbDictionaryDetailModel} Dictionary
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbDictionaryDetailModel} Dictionary - The dictionary to update.
+	 * @param {UmbDictionaryDetailModel} model - The dictionary to update.
+	 * @returns {*} The updated dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async update(model: UmbDictionaryDetailModel) {
@@ -134,8 +134,8 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 
 	/**
 	 * Deletes a Dictionary on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the dictionary to delete.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async delete(unique: string) {

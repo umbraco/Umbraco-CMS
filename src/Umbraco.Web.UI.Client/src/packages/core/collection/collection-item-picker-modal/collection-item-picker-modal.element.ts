@@ -36,9 +36,13 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	constructor() {
 		super();
 		this.#pickerContext.selection.setSelectable(true);
-		this.observe(this.#pickerContext.selection.hasSelection, (hasSelection) => {
-			this._hasSelection = hasSelection;
-		});
+		this.observe(
+			this.#pickerContext.selection.hasSelection,
+			(hasSelection) => {
+				this._hasSelection = hasSelection;
+			},
+			null,
+		);
 		this.#observePickerSelection();
 		this.#observeSearch();
 	}

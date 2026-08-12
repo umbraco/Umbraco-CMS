@@ -1420,8 +1420,10 @@ export default {
 		tabHasNoSortOrder: 'sekmesinde sıralama düzeni yok',
 		compositionUsageHeading: 'Bu beste nerede kullanılıyor?',
 		compositionUsageSpecification: 'Bu beste şu anda aşağıdaki içerik türlerinin oluşturulmasında kullanılmaktadır:',
-		compositionUsageSpecificationMediaType: 'Bu beste şu anda aşağıdaki medya türlerinin oluşturulmasında kullanılmaktadır:',
-		compositionUsageSpecificationMemberType: 'Bu beste şu anda aşağıdaki üye türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMediaType:
+			'Bu beste şu anda aşağıdaki medya türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMemberType:
+			'Bu beste şu anda aşağıdaki üye türlerinin oluşturulmasında kullanılmaktadır:',
 		cultureVariantHeading: 'Kültüre göre değişikliklere izin ver',
 		segmentVariantHeading: 'Segmentasyona izin ver',
 		cultureVariantLabel: 'Kültüre göre değişiklik yapın',

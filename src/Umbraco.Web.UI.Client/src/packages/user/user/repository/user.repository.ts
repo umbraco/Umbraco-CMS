@@ -23,7 +23,8 @@ export class UmbUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Request the MFA providers for a user
-	 * @param unique The unique id of the user
+	 * @param {string} unique The unique id of the user
+	 * @returns {*} The MFA providers for the user
 	 * @memberof UmbUserRepository
 	 */
 	async requestMfaProviders(unique: string) {
@@ -33,9 +34,10 @@ export class UmbUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Disables a MFA provider for a user
-	 * @param unique The unique id of the user
-	 * @param providerName The name of the provider
-	 * @param displayName The display name of the provider to show in the notification (optional)
+	 * @param {string} unique The unique id of the user
+	 * @param {string} providerName The name of the provider
+	 * @param {string} displayName The display name of the provider to show in the notification (optional)
+	 * @returns {*} The result of disabling the MFA provider
 	 * @memberof UmbUserRepository
 	 */
 	async disableMfaProvider(unique: string, providerName: string, displayName?: string) {

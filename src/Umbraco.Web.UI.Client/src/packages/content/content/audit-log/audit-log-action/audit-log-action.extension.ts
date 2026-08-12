@@ -2,7 +2,8 @@ import type { UmbEntityActionElement, UmbEntityAction } from '@umbraco-cms/backo
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestAuditLogAction<MetaType extends MetaAuditLogAction = MetaAuditLogAction>
-	extends ManifestElementAndApi<UmbEntityActionElement, UmbEntityAction<MetaType>>,
+	extends
+		ManifestElementAndApi<UmbEntityActionElement, UmbEntityAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'auditLogAction';
 	forEntityTypes: Array<string>;

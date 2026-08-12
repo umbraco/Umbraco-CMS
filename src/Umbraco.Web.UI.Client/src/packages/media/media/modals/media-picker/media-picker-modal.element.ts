@@ -622,7 +622,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					look="outline"
 					color="default"
 					.disabled=${this._noAccess}></uui-button>
-				<uui-button compact popovertarget="media-picker-view-popover" label="View">
+				<uui-button compact popovertarget="media-picker-view-popover" label=${this.localize.term('general_view')}>
 					<umb-icon name=${this._currentView === 'cards' ? 'icon-grid' : 'icon-table'}></umb-icon>
 				</uui-button>
 				<uui-popover-container id="media-picker-view-popover" placement="bottom-end">

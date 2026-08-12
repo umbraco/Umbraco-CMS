@@ -1,8 +1,8 @@
 import type { UmbTreeItemModel } from '../../types.js';
+import type { UmbTreeItemCardApi } from '../types.js';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbTreeItemCardApi } from '../types.js';
 
 @customElement('umb-default-tree-item-card')
 export class UmbDefaultTreeItemCardElement extends UmbLitElement {
@@ -113,7 +113,9 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 
 	#renderActions() {
 		if (!this._hasActions) return nothing;
-		return html`<umb-entity-actions-bundle slot="actions" .label=${this.localize.string(this.item?.name ?? '')}></umb-entity-actions-bundle>`;
+		return html`<umb-entity-actions-bundle
+			slot="actions"
+			.label=${this.localize.string(this.item?.name ?? '')}></umb-entity-actions-bundle>`;
 	}
 }
 

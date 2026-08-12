@@ -20,10 +20,10 @@ export class UmbUserSetGroupsServerDataSource {
 
 	/**
 	 * Set groups for users
-	 * @param {Array<string>} id
-	 * @param userIds
-	 * @param userGroupIds
-	 * @returns {*}
+	 * @param {Array<string>} id - The ids of the users to set groups for
+	 * @param {Array<string>} userIds - The ids of the users to set groups for
+	 * @param {Array<string>} userGroupIds - The ids of the groups to set for the users
+	 * @returns {*} The result of setting the groups
 	 * @memberof UmbUserSetGroupsServerDataSource
 	 */
 	async setGroups(userIds: string[], userGroupIds: string[]) {

@@ -14,7 +14,7 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 
 	/**
 	 * Gets the current redirect URL tracker status.
-	 * @returns {*}
+	 * @returns {*} The current tracker status.
 	 * @memberof UmbDocumentRedirectManagementRepository
 	 */
 	async requestStatus() {
@@ -24,7 +24,7 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	/**
 	 * Enables or disables the redirect URL tracker.
 	 * @param {boolean} enabled - Whether the tracker should be enabled.
-	 * @returns {*}
+	 * @returns {*} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentRedirectManagementRepository
 	 * @deprecated Deprecated since v17. The backend endpoint is now a no-op; set the
 	 *   `Umbraco:CMS:WebRouting:DisableRedirectUrlTracking` configuration key instead.
@@ -44,7 +44,7 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	/**
 	 * Gets the redirects pointing to a specific document.
 	 * @param {string} unique - The document unique identifier.
-	 * @returns {*}
+	 * @returns {*} The redirects pointing to the document.
 	 * @memberof UmbDocumentRedirectManagementRepository
 	 */
 	async requestByDocumentUnique(unique: string) {
@@ -55,7 +55,7 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	/**
 	 * Gets a paginated, filtered list of redirects.
 	 * @param {UmbDocumentRedirectFilterArgs} [args] - Optional filter, skip and take arguments.
-	 * @returns {*}
+	 * @returns {*} The requested page of redirects.
 	 * @memberof UmbDocumentRedirectManagementRepository
 	 */
 	async requestRedirects(args: UmbDocumentRedirectFilterArgs = {}) {
@@ -65,7 +65,7 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	/**
 	 * Deletes a redirect by its unique identifier.
 	 * @param {string} unique - The redirect unique identifier.
-	 * @returns {*}
+	 * @returns {*} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentRedirectManagementRepository
 	 */
 	async delete(unique: string) {

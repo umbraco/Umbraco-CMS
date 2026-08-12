@@ -78,7 +78,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 	// Views
 	/**
 	 * Sets the current view.
-	 * @param {ManifestCollectionView} view
+	 * @param {ManifestCollectionView} view The view to set as current.
 	 * @memberof UmbCollectionContext
 	 */
 	public setCurrentView(view: ManifestCollectionView) {
@@ -88,7 +88,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 
 	/**
 	 * Returns the current view.
-	 * @returns {ManifestCollectionView}
+	 * @returns {ManifestCollectionView} The current view.
 	 * @memberof UmbCollectionContext
 	 */
 	public getCurrentView() {

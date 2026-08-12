@@ -18,7 +18,7 @@ export abstract class UmbDetailStoreBase<T extends UmbEntityModel>
 	/**
 	 * Creates an instance of UmbDetailStoreBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @param storeAlias - The alias of the store
+	 * @param {UmbContextToken<any> | string} storeAlias - The alias of the store
 	 * @memberof UmbDetailStoreBase
 	 */
 	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string) {
@@ -27,9 +27,8 @@ export abstract class UmbDetailStoreBase<T extends UmbEntityModel>
 
 	/**
 	 * Retrieve a detail model from the store
-	 * @param {unique} string unique identifier
-	 * @param unique
-	 * @returns {Observable<T>}
+	 * @param {string} unique - Unique identifier
+	 * @returns {Observable<T>} An observable of the detail model
 	 * @memberof UmbDetailStoreBase
 	 */
 	byUnique(unique: string) {
@@ -39,7 +38,7 @@ export abstract class UmbDetailStoreBase<T extends UmbEntityModel>
 	/**
 	 * Retrieve multiple detail models from the store
 	 * @param {Array<string>} uniques - Array of unique identifiers
-	 * @returns {Observable<Array<T>>}
+	 * @returns {Observable<Array<T>>} An observable of the detail models
 	 * @memberof UmbDetailStoreBase
 	 */
 	byUniques(uniques: Array<string>) {
