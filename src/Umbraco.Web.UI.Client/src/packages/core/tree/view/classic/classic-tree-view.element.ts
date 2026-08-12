@@ -69,11 +69,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 		);
 		this.observe(this._treeContext?.isMenu, (value) => (this._isMenu = value ?? false), '_observeIsMenu');
 		this.observe(this._treeContext?.startNode, (value) => (this._startNode = value), '_observeStartNode');
-		this.observe(
-			this._treeContext?.startNodes,
-			(value) => (this._startNodes = value ?? []),
-			'_observeStartNodes',
-		);
+		this.observe(this._treeContext?.startNodes, (value) => (this._startNodes = value ?? []), '_observeStartNodes');
 	}
 
 	// The start nodes replace the tree root as the top level, exactly as a single start node does.

@@ -243,6 +243,7 @@ export class UmbTreeItemChildrenManager<
 	 * Resolves the parent to load children for. With multiple start nodes the start nodes are the children, so
 	 * this is only consulted when they cannot be resolved as items, in which case the first one is used — which
 	 * is the behaviour of a tree that only understands a single start node.
+	 * @returns {TreeItemType | TreeRootType | UmbTreeStartNode | undefined} The parent to load children for
 	 */
 	#getParent(): TreeItemType | TreeRootType | UmbTreeStartNode | undefined {
 		return this.getStartNode() ?? this.getStartNodes()[0] ?? this.getTreeItem();
@@ -252,6 +253,7 @@ export class UmbTreeItemChildrenManager<
 	 * Whether the start nodes themselves should be loaded as the children of this manager. Only ever true for the
 	 * manager owned by the tree, never for the one owned by a tree item, and only while the tree repository can
 	 * resolve items by unique — a repository can only report that it cannot once it has been asked.
+	 * @returns {boolean} Whether the start nodes are the children of this manager
 	 */
 	#loadsStartNodesAsChildren(): boolean {
 		if (this.#startNodeItemsNotSupported) return false;
@@ -385,6 +387,8 @@ export class UmbTreeItemChildrenManager<
 	/**
 	 * Loads the start nodes as the children of this manager. The start nodes are already known, so they are
 	 * paginated client side and only the current window is resolved into items.
+	 * @param {boolean} reload - Whether to start over from the first page instead of continuing from the current offset
+	 * @returns {Promise<void>} Resolves once the current window of start nodes has been loaded
 	 */
 	async #loadStartNodesAsChildren(reload = false): Promise<void> {
 		const repository = this.#treeContext?.getRepository();

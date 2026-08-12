@@ -170,8 +170,8 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Requests the tree items with the given uniques
-	 * @param {UmbTreeItemsRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbTreeItemsRequestArgs} args - The request arguments
+	 * @returns {*} The tree items with the given uniques, or an error if the data source cannot resolve items
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItems(args: UmbTreeItemsRequestArgs): Promise<UmbRepositoryResponse<TreeItemType[]>> {
