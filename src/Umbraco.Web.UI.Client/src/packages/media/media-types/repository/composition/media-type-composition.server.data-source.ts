@@ -51,7 +51,6 @@ export class UmbMediaTypeCompositionServerDataSource implements UmbContentTypeCo
 	}
 	/**
 	 * Updates the compositions for a media type on the server
-	 * @param {MediaTypeCompositionRequestModel} body - The request body
 	 * @param {UmbMediaTypeAvailableCompositionRequestModel} args - The composition request arguments
 	 * @returns {*} The available compositions
 	 * @memberof UmbMediaTypeCompositionServerDataSource

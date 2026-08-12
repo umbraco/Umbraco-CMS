@@ -3,7 +3,6 @@ import type { UmbBlockDataModel } from '../types.js';
 /**
  * Validation Data Path Query generator for Block Element Data.
  * write a JSON-Path filter similar to `?(@.key == 'my-key://1234')`
- * @param {string} key - The key of the block Element data.
  * @param {{key: string}} data - A data object with the key property.
  * @returns {string} The JSON-Path filter query.
  */

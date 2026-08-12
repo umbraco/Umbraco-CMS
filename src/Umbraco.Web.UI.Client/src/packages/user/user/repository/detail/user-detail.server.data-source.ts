@@ -32,7 +32,6 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 	/**
 	 * Creates a new User scaffold
-	 * @param {(string | null)} parentUnique - The unique id of the parent
 	 * @returns { CreateUserRequestModel } The scaffolded user
 	 * @memberof UmbUserServerDataSource
 	 */
@@ -178,7 +177,6 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 	/**
 	 * Updates a User on the server
-	 * @param {UmbUserDetailModel} User - The user to update
 	 * @param {UmbUserDetailModel} model - The user model to update
 	 * @returns {*} The updated user
 	 * @memberof UmbUserServerDataSource

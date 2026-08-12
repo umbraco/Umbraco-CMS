@@ -23,7 +23,6 @@ export class UmbUserGroupServerDataSource
 
 	/**
 	 * Creates a new User Group scaffold
-	 * @param {(string | null)} parentUnique - The unique id of the parent User Group.
 	 * @returns {CreateUserGroupRequestModel} The User Group scaffold.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
@@ -157,7 +156,6 @@ export class UmbUserGroupServerDataSource
 
 	/**
 	 * Updates a UserGroup on the server
-	 * @param {UmbUserGroupDetailModel} UserGroup - The User Group to update.
 	 * @param {UmbUserGroupDetailModel} model - The User Group to update.
 	 * @returns {*} The updated User Group.
 	 * @memberof UmbUserGroupServerDataSource

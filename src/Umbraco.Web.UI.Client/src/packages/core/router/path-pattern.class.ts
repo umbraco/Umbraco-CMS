@@ -47,7 +47,6 @@ export class UmbPathPattern<
 	/**
 	 * generate an absolute path from the path pattern
 	 * @param {LocalParamsType} params - The local pattern parameters.
-	 * @param {BaseParamsType} baseParams - The base pattern parameters.
 	 * @returns {string} The generated absolute path.
 	 */
 	generateAbsolute(params: LocalParamsType & BaseParamsType) {

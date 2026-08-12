@@ -26,7 +26,6 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Creates a new Member Group scaffold
-	 * @param {(string | null)} parentUnique - The unique identifier of the parent, if any.
 	 * @returns { CreateMemberGroupRequestModel } The scaffolded Member Group.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */

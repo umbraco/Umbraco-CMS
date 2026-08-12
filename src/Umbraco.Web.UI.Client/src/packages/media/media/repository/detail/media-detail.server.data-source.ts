@@ -145,7 +145,6 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 
 	/**
 	 * Updates a Media on the server
-	 * @param {UmbMediaDetailModel} Media - The media to update
 	 * @param {UmbMediaDetailModel} model - The media to update
 	 * @returns {*} The updated media
 	 * @memberof UmbMediaServerDataSource

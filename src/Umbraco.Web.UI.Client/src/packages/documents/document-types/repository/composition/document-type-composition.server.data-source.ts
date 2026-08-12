@@ -54,7 +54,6 @@ export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTyp
 	}
 	/**
 	 * Updates the compositions for a document type on the server
-	 * @param {DocumentTypeCompositionRequestModel} body - The composition request body.
 	 * @param {UmbDocumentTypeAvailableCompositionRequestModel} args - The arguments to determine the available compositions.
 	 * @returns {*} The compatible compositions for the document type.
 	 * @memberof UmbDocumentTypeCompositionServerDataSource

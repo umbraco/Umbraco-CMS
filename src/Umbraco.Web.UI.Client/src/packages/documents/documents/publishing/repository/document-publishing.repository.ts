@@ -40,8 +40,6 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 	/**
 	 * Publish one or more variants of a Document
-	 * @param {string} id - The unique of the Document
-	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
 	 * @param {string} unique - The unique of the Document
 	 * @param {Array<UmbDocumentVariantPublishModel>} variants - The variants to publish
 	 * @returns {*} The result of the publish request
