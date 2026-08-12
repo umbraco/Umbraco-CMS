@@ -99,6 +99,7 @@ test('can add a description to property in a media type', {tag: '@smoke'}, async
 
   // Assert
   await expect(umbracoUi.mediaType.enterDescriptionTxt).toBeVisible();
+  await umbracoUi.mediaType.doesDescriptionHaveValue(descriptionText);
   const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
   expect(mediaTypeData.properties[0].description).toBe(descriptionText);
 });

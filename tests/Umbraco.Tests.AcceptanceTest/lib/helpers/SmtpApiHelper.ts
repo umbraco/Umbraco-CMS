@@ -61,8 +61,8 @@ export class SmtpApiHelper {
   }
 
   async doesNotificationEmailWithSubjectExist(actionName: string, contentName: string, timeout: number = ConstantHelper.timeout.veryLong) {
-    const expectedSubject = `Notification about ${actionName} performed on ${contentName}`
-    var email;
+    const expectedSubject = `Notification about ${actionName} performed on ${contentName}`;
+    let email;
     await expect.poll(async () => email = await this.findEmailBySubject(expectedSubject), {timeout}).toBeTruthy();
     return email;
   }

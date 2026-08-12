@@ -1,4 +1,4 @@
-import {expect, Locator, Page} from "@playwright/test"
+import {expect, Locator, Page} from "@playwright/test";
 import {ConstantHelper} from "./ConstantHelper";
 import {StylesheetUiHelper} from "./StylesheetUiHelper";
 import {umbracoConfig} from "../umbraco.config";
