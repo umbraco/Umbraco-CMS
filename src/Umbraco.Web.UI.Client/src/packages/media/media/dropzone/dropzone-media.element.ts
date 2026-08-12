@@ -70,11 +70,6 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	constructor() {
 		super();
 
-		document.addEventListener('dragenter', this.#handleDragEnter);
-		document.addEventListener('dragleave', this.#handleDragLeave);
-		document.addEventListener('dragover', this.#handleDragOver);
-		document.addEventListener('drop', this.#handleDrop);
-
 		// TODO: Revisit this. I am not sure why it is needed to call these methods here when they are already called in the constructor of the parent class.
 		// If we do not call them here, the observer will use the wrong instance of the dropzone manager (UmbDropZoneManager instead of UmbMediaDropzoneManager).
 		this._observeProgress();
@@ -93,6 +88,14 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 			},
 			'_observeProgressItemsComplete',
 		);
+	}
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+		document.addEventListener('dragenter', this.#handleDragEnter);
+		document.addEventListener('dragleave', this.#handleDragLeave);
+		document.addEventListener('dragover', this.#handleDragOver);
+		document.addEventListener('drop', this.#handleDrop);
 	}
 
 	override disconnectedCallback(): void {

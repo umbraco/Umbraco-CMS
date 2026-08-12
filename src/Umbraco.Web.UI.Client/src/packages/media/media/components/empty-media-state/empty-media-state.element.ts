@@ -1,7 +1,36 @@
-import { LitElement, customElement, html, css } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, css, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-empty-media-state')
-export class UmbEmptyMediaStateElement extends LitElement {
+export class UmbEmptyMediaStateElement extends UmbLitElement {
+	#dragCounter = 0;
+
+	// Event handlers as arrow functions to maintain consistent references
+	#handleDragEnter = (e: DragEvent) => {
+		this.#dragCounter++;
+		this.toggleAttribute('dragging', true);
+	};
+
+	#handleDragLeave = () => {
+		this.#dragCounter--;
+		if (this.#dragCounter <= 0) {
+			this.toggleAttribute('dragging', false);
+			this.#dragCounter = 0;
+		}
+	};
+
+	override connectedCallback() {
+		super.connectedCallback();
+		document.addEventListener('dragenter', this.#handleDragEnter);
+		document.addEventListener('dragleave', this.#handleDragLeave);
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		document.removeEventListener('dragenter', this.#handleDragEnter);
+		document.removeEventListener('dragleave', this.#handleDragLeave);
+	}
+
 	#onBrowse() {
 		// Dispatch a custom event so the parent knows the button was clicked
 		this.dispatchEvent(new CustomEvent('browse', { bubbles: false, composed: false }));
@@ -9,27 +38,26 @@ export class UmbEmptyMediaStateElement extends LitElement {
 
 	override render() {
 		return html`
-			<uui-icon name="icon-picture"></uui-icon>
-			<p>Drag and drop your media files here</p>
-			<p>or</p>
-			<uui-button look="primary" label="Browse files" @click=${this.#onBrowse}> Browse files </uui-button>
+			<uui-icon name="icon-image-up"></uui-icon>
+			<p>${unsafeHTML(this.localize.term('media_dropFilesOr'))}</p>
+			<uui-button
+				look="outline"
+				label=${this.localize.term('media_browseFilesAction')}
+				@click=${this.#onBrowse}></uui-button>
 		`;
 	}
 
 	static override styles = [
 		css`
 			:host {
-				cursor: pointer;
 				display: flex;
 				flex-direction: column;
 				align-items: center;
 				justify-content: center;
-				background-color: var(--uui-palette-sand);
-				border: 1px dashed var(--uui-color-border-standalone, --uui-palette-grey-light);
+				border: 1px dashed var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
-				color: var(--uui-color-default);
 				opacity: 0;
-				animation: fadeInEmptyState 0.2s ease-in forwards 0.15s;
+				animation: fadeInEmptyState 840ms forwards 640ms;
 			}
 
 			@keyframes fadeInEmptyState {
@@ -38,16 +66,19 @@ export class UmbEmptyMediaStateElement extends LitElement {
 				}
 			}
 
-			uui-icon {
-				font-size: clamp(1rem, 2.5vw, 3rem);
-				margin-bottom: var(--uui-size-space-4);
-				color: var(--uui-color-default);
+			:host([dragging]) {
+				visibility: hidden;
 			}
 
-			uui-button {
-				z-index: 1000;
-				position: relative;
-				pointer-events: auto; /* Ensures the button is always clickable even if the host ignores pointers */
+			p {
+				text-align: center;
+				line-height: 1.5;
+				color: var(--uui-color-disabled-standalone);
+			}
+
+			uui-icon {
+				font-size: 4em;
+				color: var(--uui-color-border-standalone);
 			}
 		`,
 	];
