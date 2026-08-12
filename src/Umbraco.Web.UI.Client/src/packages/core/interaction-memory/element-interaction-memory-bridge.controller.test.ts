@@ -1,4 +1,4 @@
-import { UmbElementInteractionMemoryBridgeController } from './element-interaction-memory-bridge.controller.js';
+import { UmbElementInteractionMemoryEventDispatchController } from './element-interaction-memory-bridge.controller.js';
 import { UmbInteractionMemoriesChangeEvent } from './event/interaction-memories-change.event.js';
 import { UmbInteractionMemoryManager } from './interaction-memory.manager.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -11,30 +11,30 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 describe('UmbElementInteractionMemoryBridgeController', () => {
 	let hostElement: UmbTestControllerHostElement;
 	let interactionMemory: UmbInteractionMemoryManager;
-	let bridge: UmbElementInteractionMemoryBridgeController;
+	let dispatcher: UmbElementInteractionMemoryEventDispatchController;
 	let snapshots: Array<Array<string>>;
 
 	beforeEach(() => {
 		hostElement = new UmbTestControllerHostElement();
 		interactionMemory = new UmbInteractionMemoryManager(hostElement);
-		bridge = new UmbElementInteractionMemoryBridgeController(hostElement, interactionMemory);
+		dispatcher = new UmbElementInteractionMemoryEventDispatchController(hostElement, interactionMemory);
 		snapshots = [];
 		hostElement.addEventListener(UmbInteractionMemoriesChangeEvent.TYPE, () =>
-			snapshots.push(bridge.getMemories().map((memory) => memory.unique)),
+			snapshots.push(dispatcher.getMemories().map((memory) => memory.unique)),
 		);
 	});
 
 	describe('setMemories()', () => {
 		it('applies the snapshot without dispatching a change event', () => {
-			bridge.setMemories([{ unique: 'a' }, { unique: 'b' }, { unique: 'c' }]);
-			expect(bridge.getMemories().map((memory) => memory.unique)).to.eql(['a', 'b', 'c']);
+			dispatcher.setMemories([{ unique: 'a' }, { unique: 'b' }, { unique: 'c' }]);
+			expect(dispatcher.getMemories().map((memory) => memory.unique)).to.eql(['a', 'b', 'c']);
 			expect(snapshots).to.eql([]);
 		});
 
 		it('applies a snapshot that both removes and adds memories in one go', () => {
-			bridge.setMemories([{ unique: 'a' }, { unique: 'b' }]);
-			bridge.setMemories([{ unique: 'c' }]);
-			expect(bridge.getMemories().map((memory) => memory.unique)).to.eql(['c']);
+			dispatcher.setMemories([{ unique: 'a' }, { unique: 'b' }]);
+			dispatcher.setMemories([{ unique: 'c' }]);
+			expect(dispatcher.getMemories().map((memory) => memory.unique)).to.eql(['c']);
 			expect(snapshots).to.eql([]);
 		});
 	});
@@ -48,7 +48,7 @@ describe('UmbElementInteractionMemoryBridgeController', () => {
 		});
 
 		it('dispatches a single change event when the manager changes after a snapshot was applied', async () => {
-			bridge.setMemories([{ unique: 'a' }, { unique: 'b' }]);
+			dispatcher.setMemories([{ unique: 'a' }, { unique: 'b' }]);
 			const listener = oneEvent(hostElement, UmbInteractionMemoriesChangeEvent.TYPE);
 			interactionMemory.setMemory({ unique: 'c' });
 			await listener;
