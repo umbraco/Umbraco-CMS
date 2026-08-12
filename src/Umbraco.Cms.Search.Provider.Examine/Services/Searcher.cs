@@ -46,15 +46,15 @@ public class Searcher : IExamineSearcher
 
     public async Task<SearchResult> SearchAsync(
         string indexAlias,
-        string? query,
-        IEnumerable<Filter>? filters,
-        IEnumerable<Facet>? facets,
-        IEnumerable<Sorter>? sorters,
-        string? culture,
-        string? segment,
-        AccessContext? accessContext,
-        int skip,
-        int take,
+        string? query = null,
+        IEnumerable<Filter>? filters = null,
+        IEnumerable<Facet>? facets = null,
+        IEnumerable<Sorter>? sorters = null,
+        string? culture = null,
+        string? segment = null,
+        AccessContext? accessContext = null,
+        int skip = 0,
+        int take = 10,
         int maxSuggestions = 0)
     {
         // Special case if no parameters are provided, return an empty list.

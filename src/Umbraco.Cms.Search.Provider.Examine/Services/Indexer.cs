@@ -41,7 +41,7 @@ public class Indexer : IExamineIndexer
 
     public Task AddOrUpdateAsync(
         string indexAlias,
-        Guid key,
+        Guid id,
         UmbracoObjectTypes objectType,
         IEnumerable<Variation> variations,
         IEnumerable<IndexField> fields,
@@ -49,7 +49,7 @@ public class Indexer : IExamineIndexer
     {
         IIndex index = GetWriteTargetIndex(indexAlias);
 
-        DeleteSingleDoc(index, key);
+        DeleteSingleDoc(index, id);
 
         var valuesToIndex = new List<ValueSet>();
 
@@ -59,7 +59,7 @@ public class Indexer : IExamineIndexer
 
         foreach (IGrouping<string?, Variation> variationGroup in variationGroups)
         {
-            var indexKey = DocumentIdHelper.CalculateDocumentId(key, variationGroup.Key);
+            var indexKey = DocumentIdHelper.CalculateDocumentId(id, variationGroup.Key);
             IEnumerable<IndexField> fieldsToMap = MapFields(fieldsAsArray.Where(x => x.Culture is null || x.Culture == variationGroup.Key), variationGroup.Key);
 
             valuesToIndex.Add(new ValueSet(
@@ -205,9 +205,9 @@ public class Indexer : IExamineIndexer
         }
     }
 
-    private void DeleteSingleDoc(IIndex index, Guid key)
+    private void DeleteSingleDoc(IIndex index, Guid id)
     {
-        ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.FieldNames.Id, Constants.FieldValues.Keywords), key.AsKeyword()).Execute();
+        ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.FieldNames.Id, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
 
         var idsToDelete = new HashSet<string>();
 
@@ -222,14 +222,14 @@ public class Indexer : IExamineIndexer
         }
     }
 
-    public Task DeleteAsync(string indexAlias, IEnumerable<Guid> keys)
+    public Task DeleteAsync(string indexAlias, IEnumerable<Guid> ids)
     {
         IIndex index = GetWriteTargetIndex(indexAlias);
         var idsToDelete = new HashSet<string>();
 
-        foreach (Guid key in keys)
+        foreach (Guid id in ids)
         {
-            ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.FieldNames.PathIds, Constants.FieldValues.Keywords), key.AsKeyword()).Execute();
+            ISearchResults documents = index.Searcher.CreateQuery().Field(FieldNameHelper.FieldName(CoreConstants.FieldNames.PathIds, Constants.FieldValues.Keywords), id.AsKeyword()).Execute();
             foreach (ISearchResult document in documents)
             {
                 idsToDelete.Add(document.Id);
