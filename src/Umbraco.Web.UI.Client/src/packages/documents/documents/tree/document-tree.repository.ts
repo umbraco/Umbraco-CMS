@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbDocumentItemDataResolver } from '../item/index.js';
+import { UmbDocumentTreeItemDataResolver } from './document-tree-item-data-resolver.js';
 import { UmbDocumentTreeServerDataSource } from './server-data-source/document-tree.server.data-source.js';
 import type { UmbDocumentTreeItemModel, UmbDocumentTreeRootModel } from './types.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
@@ -39,7 +39,7 @@ export class UmbDocumentTreeRepository
 		args?: UmbCreateTreeItemDataResolverArgs,
 	): UmbTreeItemDataResolver<UmbDocumentTreeItemModel> | undefined {
 		if (args?.entityType === UMB_DOCUMENT_ENTITY_TYPE) {
-			return new UmbDocumentItemDataResolver(host);
+			return new UmbDocumentTreeItemDataResolver(host);
 		}
 
 		return undefined;

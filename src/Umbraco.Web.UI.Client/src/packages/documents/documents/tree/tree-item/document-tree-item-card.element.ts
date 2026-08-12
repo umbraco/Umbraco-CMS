@@ -1,5 +1,5 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
-import { UmbDocumentItemDataResolver } from '../../item/index.js';
+import { UmbDocumentTreeItemDataResolver } from '../document-tree-item-data-resolver.js';
 import { UmbDocumentVariantState } from '../../variant-state.js';
 import { getDocumentVariantStateTagConfig } from '../../variant-state/utils.js';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
@@ -12,7 +12,7 @@ const elementName = 'umb-document-tree-item-card';
 @customElement(elementName)
 export class UmbDocumentTreeItemCardElement extends UmbLitElement {
 	#api?: UmbTreeItemApi;
-	#item = new UmbDocumentItemDataResolver(this);
+	#item = new UmbDocumentTreeItemDataResolver(this);
 
 	@property({ type: Object, attribute: false })
 	public set api(value: UmbTreeItemApi | undefined) {
