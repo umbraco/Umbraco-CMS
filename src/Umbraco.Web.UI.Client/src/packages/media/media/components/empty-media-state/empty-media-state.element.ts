@@ -39,7 +39,7 @@ export class UmbEmptyMediaStateElement extends UmbLitElement {
 	override render() {
 		return html`
 			<uui-icon name="icon-image-up"></uui-icon>
-			<p>${this.localize.htmlString('media_dropFilesOr')}</p>
+			<p>${this.localize.htmlString('#media_dropFilesOr')}</p>
 			<uui-button
 				look="outline"
 				label=${this.localize.term('media_browseFilesAction')}
