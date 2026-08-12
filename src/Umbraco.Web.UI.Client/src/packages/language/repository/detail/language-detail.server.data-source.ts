@@ -1,6 +1,10 @@
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UMB_LANGUAGE_ENTITY_TYPE } from '../../entity.js';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateLanguageRequestModel,
 	UpdateLanguageRequestModel,
@@ -49,7 +53,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Fetches a Language with the given id from the server
 	 * @param {string} unique The iso code of the language to fetch.
-	 * @returns {*} The language.
+	 * @returns {Promise<UmbDataSourceResponse<UmbLanguageDetailModel>>} The language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async read(unique: string) {
@@ -80,7 +84,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Inserts a new Language on the server
 	 * @param {UmbLanguageDetailModel} model The language to create.
-	 * @returns {*} The created language.
+	 * @returns {Promise<UmbDataSourceResponse<UmbLanguageDetailModel>>} The created language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async create(model: UmbLanguageDetailModel) {
@@ -112,7 +116,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Updates a Language on the server
 	 * @param {UmbLanguageDetailModel} model The language to update.
-	 * @returns {*} The updated language.
+	 * @returns {Promise<UmbDataSourceResponse<UmbLanguageDetailModel>>} The updated language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async update(model: UmbLanguageDetailModel) {
@@ -144,7 +148,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	/**
 	 * Deletes a Language on the server
 	 * @param {string} unique The iso code of the language to delete.
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async delete(unique: string) {

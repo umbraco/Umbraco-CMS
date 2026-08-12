@@ -1,5 +1,6 @@
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/tree';
 
@@ -22,7 +23,7 @@ export class UmbMoveDocumentServerDataSource implements UmbMoveDataSource {
 	/**
 	 * Move an item for the given id to the target unique
 	 * @param {UmbMoveToRequestArgs} args - The move request arguments
-	 * @returns {*} The result of the move request
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the move request
 	 * @memberof UmbMoveDocumentServerDataSource
 	 */
 	async moveTo(args: UmbMoveToRequestArgs) {

@@ -2,7 +2,11 @@ import type { UmbMediaTypeDetailModel } from '../../types.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbManagementApiMediaTypeDetailDataRequestManager } from './server-data-source/media-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateMediaTypeRequestModel,
 	MediaTypeResponseModel,
@@ -54,7 +58,7 @@ export class UmbMediaTypeDetailServerDataSource
 	/**
 	 * Fetches a Media Type with the given id from the server
 	 * @param {string} unique - The unique ID of the media type
-	 * @returns {*} The media type
+	 * @returns {Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>>} The media type
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async read(unique: string) {
@@ -68,7 +72,7 @@ export class UmbMediaTypeDetailServerDataSource
 	/**
 	 * Fetches multiple Media Types by their unique IDs from the server
 	 * @param {Array<string>} uniques - The unique IDs of the media types to fetch
-	 * @returns {*} The media types
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMediaTypeDetailModel>>>} The media types
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async readMany(uniques: Array<string>) {
@@ -88,7 +92,7 @@ export class UmbMediaTypeDetailServerDataSource
 	 * Inserts a new Media Type on the server
 	 * @param {UmbMediaTypeDetailModel} model - The media type to create
 	 * @param {string | null} parentUnique - The unique ID of the parent media type
-	 * @returns {*} The created media type
+	 * @returns {Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>>} The created media type
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async create(model: UmbMediaTypeDetailModel, parentUnique: string | null = null) {
@@ -146,7 +150,7 @@ export class UmbMediaTypeDetailServerDataSource
 	/**
 	 * Updates a MediaType on the server
 	 * @param {UmbMediaTypeDetailModel} model - The media type to update
-	 * @returns {*} The updated media type
+	 * @returns {Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>>} The updated media type
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async update(model: UmbMediaTypeDetailModel) {
@@ -201,7 +205,7 @@ export class UmbMediaTypeDetailServerDataSource
 	/**
 	 * Deletes a Media Type on the server
 	 * @param {string} unique - The unique ID of the media type
-	 * @returns {*} A promise that resolves once the media type has been deleted
+	 * @returns {Promise<UmbDataSourceErrorResponse>} A promise that resolves once the media type has been deleted
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async delete(unique: string) {

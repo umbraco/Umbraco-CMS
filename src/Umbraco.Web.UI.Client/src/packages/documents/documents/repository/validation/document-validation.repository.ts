@@ -2,7 +2,7 @@ import type { UmbDocumentDetailModel } from '../../types.js';
 import { UmbDocumentValidationServerDataSource } from './document-validation.server.data-source.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbContentValidationRepository } from '@umbraco-cms/backoffice/content';
 
 type DetailModelType = UmbDocumentDetailModel;
@@ -23,7 +23,7 @@ export class UmbDocumentValidationRepository
 	 * Returns a promise with an observable of the detail for the given unique
 	 * @param {DetailModelType} model - The document data to validate.
 	 * @param {string | null} [parentUnique] - The unique identifier of the parent document.
-	 * @returns {*} The validation result.
+	 * @returns {Promise<UmbRepositoryResponse<string>>} The validation result.
 	 * @memberof UmbDocumentValidationRepository
 	 */
 	async validateCreate(model: DetailModelType, parentUnique: string | null) {
@@ -36,7 +36,7 @@ export class UmbDocumentValidationRepository
 	 * Saves the given data
 	 * @param {DetailModelType} model - The document data to validate.
 	 * @param {Array<UmbVariantId>} variantIds - The variants to validate.
-	 * @returns {*} The validation result.
+	 * @returns {Promise<UmbRepositoryResponse<string>>} The validation result.
 	 * @memberof UmbDocumentValidationRepository
 	 */
 	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>) {

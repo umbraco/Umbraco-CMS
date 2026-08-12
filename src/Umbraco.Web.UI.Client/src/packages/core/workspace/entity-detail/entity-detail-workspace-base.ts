@@ -308,7 +308,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Method to check if the workspace data is loaded.
-	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
+	 * @returns { Promise<UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>> | undefined } true if the workspace data is loaded.
 	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	public isLoaded(): Promise<any> | undefined {
@@ -322,7 +322,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @param {UmbEntityUnique} args.parent.unique The unique identifier of the parent entity.
 	 * @param {string} args.parent.entityType The entity type of the parent entity.
 	 * @param {Partial<DetailModelType>} args.preset The preset data.
-	 * @returns { Promise<any> | undefined } The data of the scaffold.
+	 * @returns { Promise<DetailModelType | undefined> } The data of the scaffold.
 	 */
 	public async createScaffold(args: CreateArgsType) {
 		this.resetState();

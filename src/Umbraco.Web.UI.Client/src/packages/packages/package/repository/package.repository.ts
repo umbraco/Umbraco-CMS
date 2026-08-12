@@ -1,4 +1,4 @@
-import type { UmbCreatedPackageDefinition, UmbCreatedPackages } from '../../types.js';
+import type { UmbCreatedPackageDefinition, UmbCreatedPackages, UmbPackage } from '../../types.js';
 import { UMB_PACKAGE_STORE_TOKEN } from './package.store.context-token.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
 import type { UmbPackageStore } from './package.store.js';
@@ -7,6 +7,8 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A repository for Packages which mimics a tree store.
@@ -186,7 +188,7 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Observable of root items
-	 * @returns {*} The root items observable.
+	 * @returns {Promise<Observable<Array<UmbPackage>>>} The root items observable.
 	 * @memberof UmbPackageRepository
 	 */
 	async rootItems() {
@@ -196,7 +198,7 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Observable of extensions
-	 * @returns {*} The extensions observable.
+	 * @returns {Promise<Observable<Array<ManifestBase>>>} The extensions observable.
 	 * @memberof UmbPackageRepository
 	 */
 	async extensions() {
@@ -206,7 +208,7 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Observable of migrations
-	 * @returns {*} The migrations observable.
+	 * @returns {Promise<Observable<Array<PackageMigrationStatusResponseModel>>>} The migrations observable.
 	 * @memberof UmbPackageRepository
 	 */
 	async migrations() {

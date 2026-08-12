@@ -1,7 +1,11 @@
 import type { UmbDocumentBlueprintDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDataSourceResponse, UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentBlueprintRequestModel,
 	DocumentBlueprintResponseModel,
@@ -73,7 +77,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	/**
 	 * Fetches a Document with the given id from the server
 	 * @param {string} unique - The unique identifier of the document blueprint to fetch.
-	 * @returns {*} The document blueprint.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>>} The document blueprint.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async read(unique: string): Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>> {
@@ -114,7 +118,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	 * Inserts a new Document on the server
 	 * @param {UmbDocumentBlueprintDetailModel} model - The document blueprint to create.
 	 * @param {string | null} parentUnique - The unique identifier of the parent, if any.
-	 * @returns {*} The created document blueprint.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>>} The created document blueprint.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async create(model: UmbDocumentBlueprintDetailModel, parentUnique: string | null = null) {
@@ -147,7 +151,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	/**
 	 * Updates a Document on the server
 	 * @param {UmbDocumentBlueprintDetailModel} model - The document blueprint to update.
-	 * @returns {*} The updated document blueprint.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentBlueprintDetailModel>>} The updated document blueprint.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async update(model: UmbDocumentBlueprintDetailModel) {
@@ -177,7 +181,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	/**
 	 * Deletes a Document on the server
 	 * @param {string} unique - The unique identifier of the document blueprint to delete.
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async delete(unique: string) {

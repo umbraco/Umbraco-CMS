@@ -4,6 +4,7 @@ import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection
 import { RelationTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source that fetches the relation type collection data from the server.
@@ -28,7 +29,7 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 	/**
 	 * Gets the relation type collection filtered by the given filter.
 	 * @param {UmbRelationTypeCollectionFilterModel} filter - The filter to apply to the collection.
-	 * @returns {*} The relation type collection.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbRelationTypeCollectionItemModel>>>} The relation type collection.
 	 * @memberof UmbRelationTypeCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbRelationTypeCollectionFilterModel) {

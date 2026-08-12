@@ -1,6 +1,7 @@
 import type { UmbDocumentTypeTemplateModel } from '../../types.js';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -22,7 +23,7 @@ export class UmbDocumentTypeTemplateServerDataSource {
 	 * Creates a template for a document type on the server
 	 * @param {string} unique - The unique identifier of the document type.
 	 * @param {UmbDocumentTypeTemplateModel} model - The template to create.
-	 * @returns {*} The unique identifier of the created template.
+	 * @returns {Promise<UmbDataSourceResponse<string>>} The unique identifier of the created template.
 	 * @memberof UmbDocumentTypeTemplateServerDataSource
 	 */
 	async createTemplate(unique: string, model: UmbDocumentTypeTemplateModel) {

@@ -1,4 +1,5 @@
 import { UmbStylesheetDetailServerDataSource } from '../../repository/stylesheet-detail.server.data-source.js';
+import type { UmbStylesheetDetailModel } from '../../types.js';
 import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
@@ -7,6 +8,7 @@ import type { RenameStylesheetRequestModel } from '@umbraco-cms/backoffice/exter
 import { StylesheetService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export class UmbRenameStylesheetServerDataSource {
 	#host: UmbControllerHost;
@@ -22,7 +24,7 @@ export class UmbRenameStylesheetServerDataSource {
 	 * Rename Stylesheet
 	 * @param {string} unique - The unique identifier of the Stylesheet
 	 * @param {string} name - The new name of the Stylesheet
-	 * @returns {*} The renamed Stylesheet
+	 * @returns {UmbDataSourceResponse<UmbStylesheetDetailModel>} The renamed Stylesheet
 	 * @memberof UmbRenameStylesheetServerDataSource
 	 */
 	async rename(unique: string, name: string) {

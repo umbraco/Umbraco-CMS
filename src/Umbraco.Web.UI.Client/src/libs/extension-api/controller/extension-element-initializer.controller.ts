@@ -33,7 +33,7 @@ export class UmbExtensionElementInitializer<
 
 	/**
 	 * The props that are passed to the component.
-	 * @type {Record<string, any>}
+	 * @type {Record<string, unknown>}
 	 * @memberof UmbExtensionElementInitializer
 	 * @example
 	 * ```ts

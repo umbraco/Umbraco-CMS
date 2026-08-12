@@ -7,6 +7,11 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { RedirectManagementService, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { RedirectUrlResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbPagedModel,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Document Redirect Management feature that fetches data from the server.
@@ -26,7 +31,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 
 	/**
 	 * Gets the current redirect URL tracker status.
-	 * @returns {*} The current tracker status.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentRedirectStatusModel>>} The current tracker status.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
 	async getStatus() {
@@ -46,7 +51,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	/**
 	 * Enables or disables the redirect URL tracker.
 	 * @param {boolean} enabled - Whether the tracker should be enabled.
-	 * @returns {*} Undefined if the operation succeeded, otherwise an error.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 * @deprecated Deprecated since v17. The backend endpoint is now a no-op; set the
 	 *   `Umbraco:CMS:WebRouting:DisableRedirectUrlTracking` configuration key instead.
@@ -64,7 +69,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	/**
 	 * Gets the redirects pointing to a specific document.
 	 * @param {string} unique - The document unique identifier.
-	 * @returns {*} The redirects pointing to the document.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>>} The redirects pointing to the document.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
 	async getByDocumentUnique(unique: string) {
@@ -88,7 +93,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	/**
 	 * Gets a paginated, filtered list of redirects.
 	 * @param {UmbDocumentRedirectFilterArgs} args - Filter, skip and take arguments.
-	 * @returns {*} The requested page of redirects.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>>} The requested page of redirects.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
 	async filter(args: UmbDocumentRedirectFilterArgs) {
@@ -114,7 +119,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	/**
 	 * Deletes a redirect by its unique identifier.
 	 * @param {string} unique - The redirect unique identifier.
-	 * @returns {*} Undefined if the operation succeeded, otherwise an error.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
 	async delete(unique: string) {

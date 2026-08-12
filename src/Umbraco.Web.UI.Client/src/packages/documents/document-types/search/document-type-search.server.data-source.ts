@@ -4,6 +4,7 @@ import type { UmbDocumentTypeSearchRequestArgs } from './types.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 
 /**
@@ -26,7 +27,7 @@ export class UmbDocumentTypeSearchServerDataSource implements UmbSearchDataSourc
 	/**
 	 * Get a list of versions for a data
 	 * @param {UmbDocumentTypeSearchRequestArgs} args - The arguments for the search
-	 * @returns {*} The search results.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentTypeSearchItemModel>>>} The search results.
 	 * @memberof UmbDocumentTypeSearchServerDataSource
 	 */
 	async search(args: UmbDocumentTypeSearchRequestArgs) {

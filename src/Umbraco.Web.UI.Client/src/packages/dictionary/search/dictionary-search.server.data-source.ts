@@ -3,6 +3,7 @@ import type { UmbDictionarySearchItemModel } from './dictionary.search-provider.
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { DictionaryService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { UmbSearchDataSource, UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 
 /**
@@ -25,7 +26,7 @@ export class UmbDictionarySearchServerDataSource implements UmbSearchDataSource<
 	/**
 	 * Get a list of versions for a data
 	 * @param {UmbSearchRequestArgs} args - The arguments for the search
-	 * @returns {*} The search results.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDictionarySearchItemModel>>>} The search results.
 	 * @memberof UmbDictionarySearchServerDataSource
 	 */
 	async search(args: UmbSearchRequestArgs) {

@@ -1,6 +1,11 @@
 import { UmbDictionaryDetailRepository } from '../detail/index.js';
+import type { UmbDictionaryDetailModel } from '../../types.js';
 import { UmbDictionaryImportServerDataSource } from './dictionary-import.server.data-source.js';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import {
+	UmbRepositoryBase,
+	type UmbDataSourceResponse,
+	type UmbRepositoryResponseWithAsObservable,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDictionaryImportRepository extends UmbRepositoryBase {
@@ -17,7 +22,7 @@ export class UmbDictionaryImportRepository extends UmbRepositoryBase {
 	 * @description - Import a dictionary
 	 * @param {string} temporaryFileUnique - The unique identifier of the uploaded temporary file to import.
 	 * @param {string} [parentUnique] - The unique identifier of the parent to import into, if any.
-	 * @returns {*} The imported dictionary.
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbDictionaryDetailModel | undefined> | UmbDataSourceResponse<string>>} The imported dictionary.
 	 * @memberof UmbDictionaryImportRepository
 	 */
 	async requestImport(temporaryFileUnique: string, parentUnique: string | null) {

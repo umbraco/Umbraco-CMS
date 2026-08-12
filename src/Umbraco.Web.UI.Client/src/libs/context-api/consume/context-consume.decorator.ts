@@ -13,6 +13,7 @@ import type { UmbContextToken } from '../token/index.js';
 import type { UmbContextMinimal } from '../types.js';
 import { UmbContextConsumerController } from './context-consumer.controller.js';
 import type { UmbContextCallback } from './context-request.event.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbConsumeOptions<
 	BaseType extends UmbContextMinimal = UmbContextMinimal,
@@ -93,7 +94,7 @@ export function consumeContext<
  * mode resolves once via `asPromise()` — that promise may reject (no provider
  * resolves before the RAF timeout, or the host disconnects); the rejection is
  * intentionally swallowed and the property is left unset.
- * @param {any} host The UmbControllerHost to attach the consumer to.
+ * @param {UmbControllerHost} host The UmbControllerHost to attach the consumer to.
  * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to request.
  * @param {(value: ResultType | undefined) => void} assign Callback that writes the resolved value into the decorated field.
  * @param {UmbContextCallback<ResultType> | undefined} callback Optional user callback forwarded to the consumer.
@@ -126,8 +127,8 @@ function setupConsumer<BaseType extends UmbContextMinimal, ResultType extends Ba
 
 /**
  * Standard decorator (Stage 3 TC39) path for `accessor` fields.
- * @param {any} protoOrTarget The class prototype or target being decorated.
- * @param {ClassAccessorDecoratorContext<any, ResultType>} decoratorContext The standard decorator context.
+ * @param {ClassAccessorDecoratorTarget<Interface<ReactiveEntity>, ResultType>} protoOrTarget The class prototype or target being decorated.
+ * @param {ClassAccessorDecoratorContext<Interface<ReactiveEntity>, ResultType>} decoratorContext The standard decorator context.
  * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to request.
  * @param {UmbContextCallback<ResultType> | undefined} callback Optional user callback forwarded to the consumer.
  * @param {boolean} subscribe When true, subscribe to context changes; when false, resolve once.
@@ -154,7 +155,7 @@ function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType e
 
 /**
  * Legacy decorator (TypeScript experimental) path for regular properties.
- * @param {any} protoOrTarget The class prototype being decorated.
+ * @param {Interface<ReactiveEntity>} protoOrTarget The class prototype being decorated.
  * @param {string} propertyKey The name of the decorated property.
  * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to request.
  * @param {UmbContextCallback<ResultType> | undefined} callback Optional user callback forwarded to the consumer.

@@ -6,6 +6,7 @@ import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
@@ -36,7 +37,7 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 	/**
 	 * Gets the DataType collection filtered by the given filter.
 	 * @param {UmbDataTypeCollectionFilterModel} query - The filter to apply to the collection.
-	 * @returns {*} The filtered data-type collection.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDataTypeItemModel>>>} The filtered data-type collection.
 	 * @memberof UmbDataTypeCollectionServerDataSource
 	 */
 	async getCollection(query: UmbDataTypeCollectionFilterModel) {

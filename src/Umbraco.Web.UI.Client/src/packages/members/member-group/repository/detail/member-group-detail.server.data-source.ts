@@ -1,7 +1,11 @@
 import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { CreateMemberGroupRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -42,7 +46,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Fetches a Member Group with the given id from the server
 	 * @param {string} unique - The unique identifier of the Member Group to fetch.
-	 * @returns {*} The Member Group, or an error.
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>>} The Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async read(unique: string) {
@@ -69,7 +73,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Inserts a new Member Group on the server
 	 * @param {UmbMemberGroupDetailModel} model - The Member Group to create.
-	 * @returns {*} The created Member Group, or an error.
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>>} The created Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async create(model: UmbMemberGroupDetailModel) {
@@ -97,7 +101,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Updates a MemberGroup on the server
 	 * @param {UmbMemberGroupDetailModel} model - The Member Group to update.
-	 * @returns {*} The updated Member Group, or an error.
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>>} The updated Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async update(model: UmbMemberGroupDetailModel) {
@@ -127,7 +131,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	/**
 	 * Deletes a Member Group on the server
 	 * @param {string} unique - The unique identifier of the Member Group to delete.
-	 * @returns {*} Undefined if successful, or an error.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if successful, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async delete(unique: string) {

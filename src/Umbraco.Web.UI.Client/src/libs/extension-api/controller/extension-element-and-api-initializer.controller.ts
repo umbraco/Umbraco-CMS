@@ -53,7 +53,7 @@ export class UmbExtensionElementAndApiInitializer<
 
 	/**
 	 * The props that are passed to the component.
-	 * @type {Record<string, any>}
+	 * @type {Record<string, unknown>}
 	 * @memberof UmbExtensionElementAndApiInitializer
 	 * @example
 	 * ```ts
@@ -77,7 +77,7 @@ export class UmbExtensionElementAndApiInitializer<
 
 	/**
 	 * The props that are passed to the api.
-	 * @type {Record<string, any>}
+	 * @type {Record<string, unknown>}
 	 * @memberof UmbExtensionElementAndApiInitializer
 	 * @example
 	 * ```ts

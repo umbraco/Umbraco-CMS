@@ -2,7 +2,11 @@ import type { UmbMemberTypeDetailModel } from '../../types.js';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbManagementApiMemberTypeDetailDataRequestManager } from './server-data-source/member-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateMemberTypeRequestModel,
 	MemberTypeResponseModel,
@@ -54,7 +58,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Fetches a Member Type with the given id from the server
 	 * @param {string} unique - The unique identifier of the Member Type to fetch
-	 * @returns {*} The Member Type, or an error
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>>} The Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async read(unique: string) {
@@ -68,7 +72,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Fetches multiple Member Types by their unique IDs from the server
 	 * @param {Array<string>} uniques - The unique IDs of the member types to fetch
-	 * @returns {*} The Member Types, or an error
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMemberTypeDetailModel>>>} The Member Types, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async readMany(uniques: Array<string>) {
@@ -87,7 +91,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Inserts a new Member Type on the server
 	 * @param {UmbMemberTypeDetailModel} model - Member Type Model
-	 * @returns {*} The created Member Type, or an error
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>>} The created Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async create(model: UmbMemberTypeDetailModel, parentUnique: string | null = null) {
@@ -139,7 +143,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Updates a MemberType on the server
 	 * @param { UmbMemberTypeDetailModel } model - Member Type Model
-	 * @returns {*} The updated Member Type, or an error
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>>} The updated Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async update(model: UmbMemberTypeDetailModel) {
@@ -189,7 +193,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Deletes a Member Type on the server
 	 * @param {string} unique - The unique identifier of the Member Type to delete
-	 * @returns {*} The result of the delete operation
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async delete(unique: string) {

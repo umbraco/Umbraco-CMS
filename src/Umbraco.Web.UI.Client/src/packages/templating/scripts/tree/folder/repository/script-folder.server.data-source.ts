@@ -33,7 +33,7 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 	/**
 	 * Creates a scaffold for a Script folder
 	 * @param {Partial<UmbFolderModel>} [preset] - Initial data to seed the scaffold with
-	 * @returns {*} The scaffolded Script folder
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The scaffolded Script folder
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {

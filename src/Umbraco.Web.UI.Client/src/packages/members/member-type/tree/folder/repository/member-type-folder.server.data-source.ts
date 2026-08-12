@@ -4,7 +4,11 @@ import { MemberTypeService } from '@umbraco-cms/backoffice/external/backend-api'
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for a Member Type folder that fetches data from the server
@@ -26,7 +30,7 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 	/**
 	 * Creates a scaffold for a Member Type folder
 	 * @param {Partial<UmbFolderModel>} [preset] - The preset data to populate the scaffold with.
-	 * @returns {*} The member type folder scaffold.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The member type folder scaffold.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -43,7 +47,7 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 	/**
 	 * Fetches a Member Type folder from the server
 	 * @param {string} unique - The unique identifier of the folder to fetch.
-	 * @returns {*} The member type folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The member type folder.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -72,7 +76,7 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 	/**
 	 * Creates a Member Type folder on the server
 	 * @param {UmbFolderModel} model - The member type folder to create.
-	 * @returns {*} The created member type folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The created member type folder.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -103,7 +107,7 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 	/**
 	 * Updates a Member Type folder on the server
 	 * @param {UmbFolderModel} model - The member type folder to update.
-	 * @returns {*} The updated member type folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The updated member type folder.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async update(model: UmbFolderModel) {
@@ -129,7 +133,7 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 	/**
 	 * Deletes a Member Type folder on the server
 	 * @param {string} unique - The unique identifier of the folder to delete.
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async delete(unique: string) {

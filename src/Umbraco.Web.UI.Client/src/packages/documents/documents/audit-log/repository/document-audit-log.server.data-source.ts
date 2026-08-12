@@ -4,6 +4,7 @@ import type { UmbAuditLogDataSource, UmbAuditLogRequestArgs } from '@umbraco-cms
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -25,7 +26,7 @@ export class UmbDocumentAuditLogServerDataSource implements UmbAuditLogDataSourc
 	/**
 	 * Get the audit log for a document
 	 * @param {UmbAuditLogRequestArgs} args - The request arguments
-	 * @returns {*} The audit log data
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentAuditLogModel>>>} The audit log data
 	 * @memberof UmbDocumentAuditLogServerDataSource
 	 */
 	async getAuditLog(args: UmbAuditLogRequestArgs) {

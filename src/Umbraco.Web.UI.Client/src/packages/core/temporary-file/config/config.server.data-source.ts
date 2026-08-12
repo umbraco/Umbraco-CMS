@@ -1,6 +1,8 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { TemporaryFileService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { TemporaryFileConfigurationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbApiResponse } from '@umbraco-cms/backoffice/resources';
 
 export class UmbTemporaryFileConfigServerDataSource {
 	#host;
@@ -11,7 +13,7 @@ export class UmbTemporaryFileConfigServerDataSource {
 
 	/**
 	 * Get the temporary file configuration.
-	 * @returns {*} The temporary file configuration
+	 * @returns {Promise<UmbApiResponse<TemporaryFileConfigurationResponseModel>>} The temporary file configuration
 	 */
 	getConfig() {
 		return tryExecute(this.#host, TemporaryFileService.getTemporaryFileConfiguration(), { disableNotifications: true });

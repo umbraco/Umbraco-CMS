@@ -33,7 +33,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 	/**
 	 * Creates a scaffold for a Partial View folder
 	 * @param {Partial<UmbFolderModel>} [preset] - Initial data to seed the scaffold with
-	 * @returns {*} The scaffolded Partial View folder
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The scaffolded Partial View folder
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {

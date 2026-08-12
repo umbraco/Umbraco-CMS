@@ -4,7 +4,11 @@ import { DocumentTypeService } from '@umbraco-cms/backoffice/external/backend-ap
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for a Document Type folder that fetches data from the server
@@ -26,7 +30,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Creates a scaffold for a Document Type folder
 	 * @param {Partial<UmbFolderModel>} [preset] - The preset data to populate the scaffold with.
-	 * @returns {*} The document type folder scaffold.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The document type folder scaffold.
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -43,7 +47,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Fetches a Document Type folder from the server
 	 * @param {string} unique - The unique identifier of the folder to fetch.
-	 * @returns {*} The document type folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The document type folder.
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -72,7 +76,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Creates a Document Type folder on the server
 	 * @param {UmbFolderModel} model - The folder to create.
-	 * @returns {*} The created document type folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The created document type folder.
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -103,7 +107,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Updates a Document Type folder on the server
 	 * @param {UmbFolderModel} model - The folder to update.
-	 * @returns {*} The updated document type folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The updated document type folder.
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async update(model: UmbFolderModel) {
@@ -128,7 +132,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 	/**
 	 * Deletes a Document Type folder on the server
 	 * @param {string} unique - The unique identifier of the folder to delete.
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async delete(unique: string) {

@@ -1,7 +1,11 @@
 import type { UmbTemplateDetailModel } from '../../types.js';
 import { UMB_TEMPLATE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateTemplateRequestModel,
 	UpdateTemplateRequestModel,
@@ -53,7 +57,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Fetches a Template with the given id from the server
 	 * @param {string} unique - The unique identifier of the Template
-	 * @returns {*} The Template
+	 * @returns {Promise<UmbDataSourceResponse<UmbTemplateDetailModel>>} The Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async read(unique: string) {
@@ -81,7 +85,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Inserts a new Template on the server
 	 * @param {UmbTemplateDetailModel} model - The Template to create
-	 * @returns {*} The created Template
+	 * @returns {Promise<UmbDataSourceResponse<UmbTemplateDetailModel>>} The created Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async create(model: UmbTemplateDetailModel) {
@@ -112,7 +116,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Updates a Template on the server
 	 * @param {UmbTemplateDetailModel} model - The Template to update
-	 * @returns {*} The updated Template
+	 * @returns {Promise<UmbDataSourceResponse<UmbTemplateDetailModel>>} The updated Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async update(model: UmbTemplateDetailModel) {
@@ -143,7 +147,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Deletes a Template on the server
 	 * @param {string} unique - The unique identifier of the Template
-	 * @returns {*} The result of the delete operation
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async delete(unique: string) {

@@ -36,7 +36,7 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 	/**
 	 * Fetches the items for the given uniques from the server
 	 * @param {Array<string>} uniques - The uniques of the items to fetch
-	 * @returns {*} The mapped items
+	 * @returns {Promise<UmbDataSourceResponse<Array<ClientItemType>>>} The mapped items
 	 * @memberof UmbItemServerDataSourceBase
 	 */
 	async getItems(uniques: Array<string>) {

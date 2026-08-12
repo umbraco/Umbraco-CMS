@@ -1,6 +1,11 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DocumentVersionService } from '@umbraco-cms/backoffice/external/backend-api';
+import {
+	DocumentVersionService,
+	type DocumentVersionResponseModel,
+	type PagedDocumentVersionItemResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Rollback that fetches data from the server
@@ -22,7 +27,7 @@ export class UmbRollbackServerDataSource {
 	 * Get a list of versions for a document
 	 * @param {string} id - The document unique identifier.
 	 * @param {string} [culture] - The culture to get versions for.
-	 * @returns {*} The versions for the document.
+	 * @returns {Promise<UmbDataSourceResponse<PagedDocumentVersionItemResponseModel>>} The versions for the document.
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionsByDocumentId(id: string, culture?: string) {
@@ -32,7 +37,7 @@ export class UmbRollbackServerDataSource {
 	/**
 	 * Get a specific version by id
 	 * @param {string} versionId - The version unique identifier.
-	 * @returns {*} The requested version.
+	 * @returns {Promise<UmbDataSourceResponse<DocumentVersionResponseModel>>} The requested version.
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionById(versionId: string) {

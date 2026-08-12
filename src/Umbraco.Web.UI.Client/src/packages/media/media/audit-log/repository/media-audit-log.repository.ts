@@ -8,7 +8,7 @@ import type {
 	UmbAuditLogTagData,
 } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase, type UmbRepositoryResponse, type UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Repository for the Media audit log
@@ -34,7 +34,7 @@ export class UmbMediaAuditLogRepository
 	/**
 	 * Request the audit log for a Media
 	 * @param {UmbAuditLogRequestArgs} args - The audit log request arguments
-	 * @returns {*} The audit log for the media
+	 * @returns {UmbRepositoryResponse<UmbPagedModel<UmbMediaAuditLogModel>>} The audit log for the media
 	 * @memberof UmbMediaAuditLogRepository
 	 */
 	async requestAuditLog(args: UmbAuditLogRequestArgs) {

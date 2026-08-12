@@ -10,6 +10,7 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffice/content-type';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Document Type Composition that fetches data from the server
@@ -33,7 +34,7 @@ export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTyp
 	/**
 	 * Fetches the compatible compositions for a document type from the server
 	 * @param {string} unique - The unique identifier of the document type.
-	 * @returns {*} The compositions referencing the document type.
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionReferenceModel>>>} The compositions referencing the document type.
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
@@ -55,7 +56,7 @@ export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTyp
 	/**
 	 * Updates the compositions for a document type on the server
 	 * @param {UmbDocumentTypeAvailableCompositionRequestModel} args - The arguments to determine the available compositions.
-	 * @returns {*} The compatible compositions for the document type.
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionCompatibleModel>>>} The compatible compositions for the document type.
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
 	async availableCompositions(args: UmbDocumentTypeAvailableCompositionRequestModel) {

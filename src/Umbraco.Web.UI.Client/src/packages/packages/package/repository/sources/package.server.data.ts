@@ -2,9 +2,13 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ManifestService, PackageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	CreatePackageRequestModel,
+	ManifestResponseModel,
+	PackageConfigurationResponseModel,
+	PagedPackageMigrationStatusResponseModel,
 	UpdatePackageRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Data source for packages from the server
@@ -31,7 +35,7 @@ export class UmbPackageServerDataSource {
 
 	/**
 	 * Get the root items from the server
-	 * @returns {*} The root items.
+	 * @returns {Promise<UmbDataSourceResponse<Array<ManifestResponseModel>>>} The root items.
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getRootItems() {
@@ -40,7 +44,7 @@ export class UmbPackageServerDataSource {
 
 	/**
 	 * Get the package configuration from the server
-	 * @returns {*} The package configuration.
+	 * @returns {Promise<UmbDataSourceResponse<PackageConfigurationResponseModel>>} The package configuration.
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getPackageConfiguration() {
@@ -49,7 +53,7 @@ export class UmbPackageServerDataSource {
 
 	/**
 	 * Get the package migrations from the server
-	 * @returns {*} The package migrations.
+	 * @returns {Promise<UmbDataSourceResponse<PagedPackageMigrationStatusResponseModel>>} The package migrations.
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getPackageMigrations() {

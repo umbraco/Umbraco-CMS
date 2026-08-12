@@ -1,5 +1,6 @@
-import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceErrorResponse, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { TemporaryFileService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { TemporaryFileResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute, tryXhrRequest } from '@umbraco-cms/backoffice/resources';
 
@@ -23,7 +24,7 @@ export class UmbTemporaryFileServerDataSource {
 	 * Uploads a temporary file to the server
 	 * @param {string} id - The unique identifier of the temporary file
 	 * @param {File} file - The file to upload
-	 * @returns {*} The upload response
+	 * @returns {Promise<UmbDataSourceResponse<unknown>>} The upload response
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
 	async create(
@@ -50,7 +51,7 @@ export class UmbTemporaryFileServerDataSource {
 	/**
 	 * Gets a temporary file from the server
 	 * @param {string} id - The unique identifier of the temporary file
-	 * @returns {*} The temporary file
+	 * @returns {Promise<UmbDataSourceResponse<TemporaryFileResponseModel>>} The temporary file
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
 	read(id: string) {
@@ -61,7 +62,7 @@ export class UmbTemporaryFileServerDataSource {
 	/**
 	 * Deletes a temporary file from the server
 	 * @param {string} id - The unique identifier of the temporary file
-	 * @returns {*} The delete response
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The delete response
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
 	delete(id: string) {

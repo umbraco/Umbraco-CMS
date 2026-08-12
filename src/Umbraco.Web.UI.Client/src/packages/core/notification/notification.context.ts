@@ -17,7 +17,7 @@ export class UmbNotificationContext extends UmbContextBase {
 	/**
 	 * @private
 	 * @param {UmbNotificationOptions} options - The notification options
-	 * @returns {*}  {UmbNotificationHandler}
+	 * @returns {UmbNotificationHandler} The notification handler
 	 * @memberof UmbNotificationContext
 	 */
 	#open<T extends UmbNotificationOptions = UmbNotificationOptions>(options: T): UmbNotificationHandler {
@@ -52,7 +52,7 @@ export class UmbNotificationContext extends UmbContextBase {
 	 * Opens a notification that automatically goes away after 6 sek.
 	 * @param {UmbNotificationColor} color - The notification color
 	 * @param {UmbNotificationOptions} options - The notification options
-	 * @returns {*} The notification handler
+	 * @returns {UmbNotificationHandler} The notification handler
 	 * @memberof UmbNotificationContext
 	 */
 	public peek<T extends UmbNotificationOptions = UmbNotificationOptions>(
@@ -66,7 +66,7 @@ export class UmbNotificationContext extends UmbContextBase {
 	 * Opens a notification that stays on the screen until dismissed by the user or custom code
 	 * @param {UmbNotificationColor} color - The notification color
 	 * @param {UmbNotificationOptions} options - The notification options
-	 * @returns {*} The notification handler
+	 * @returns {UmbNotificationHandler} The notification handler
 	 * @memberof UmbNotificationContext
 	 */
 	public stay<T extends UmbNotificationOptions = UmbNotificationOptions>(

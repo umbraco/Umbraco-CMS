@@ -4,7 +4,11 @@ import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for a Media Type folder that fetches data from the server
@@ -26,7 +30,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	/**
 	 * Creates a scaffold for a Media Type folder
 	 * @param {Partial<UmbFolderModel>} [preset] - The preset to use for the scaffold
-	 * @returns {*} The scaffolded Media Type folder
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The scaffolded Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -43,7 +47,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	/**
 	 * Fetches a Media Type folder from the server
 	 * @param {string} unique - The unique ID of the Media Type folder
-	 * @returns {*} The Media Type folder
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -72,7 +76,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	/**
 	 * Creates a Media Type folder on the server
 	 * @param {UmbFolderModel} model - The Media Type folder to create
-	 * @returns {*} The created Media Type folder
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The created Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -103,7 +107,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	/**
 	 * Updates a Media Type folder on the server
 	 * @param {UmbFolderModel} model - The Media Type folder to update
-	 * @returns {*} The updated Media Type folder
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The updated Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async update(model: UmbFolderModel) {
@@ -129,7 +133,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	/**
 	 * Deletes a Media Type folder on the server
 	 * @param {string} unique - The unique ID of the Media Type folder
-	 * @returns {*} A promise that resolves once the Media Type folder has been deleted
+	 * @returns {Promise<UmbDataSourceErrorResponse>} A promise that resolves once the Media Type folder has been deleted
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async delete(unique: string) {

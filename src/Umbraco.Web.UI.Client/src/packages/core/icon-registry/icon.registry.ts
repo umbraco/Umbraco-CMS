@@ -40,7 +40,7 @@ export class UmbIconRegistry extends UUIIconRegistry {
 	}
 	/**
 	 * @param {string} iconName - The name of the icon
-	 * @returns {*}  {boolean}
+	 * @returns {boolean} Always true; the icon is loaded asynchronously.
 	 * @memberof UmbIconRegistry
 	 */
 	override acceptIcon(iconName: string): boolean {

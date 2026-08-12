@@ -3,7 +3,7 @@ import type { UmbDetailStore } from './detail-store.interface.js';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbContextMinimal, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * @class UmbDetailStoreBase
@@ -18,7 +18,7 @@ export abstract class UmbDetailStoreBase<T extends UmbEntityModel>
 	/**
 	 * Creates an instance of UmbDetailStoreBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @param {UmbContextToken<any> | string} storeAlias - The alias of the store
+	 * @param {UmbContextToken<UmbContextMinimal> | string} storeAlias - The alias of the store
 	 * @memberof UmbDetailStoreBase
 	 */
 	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string) {

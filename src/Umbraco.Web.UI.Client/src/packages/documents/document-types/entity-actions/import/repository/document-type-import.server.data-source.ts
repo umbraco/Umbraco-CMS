@@ -1,5 +1,6 @@
 import { DocumentTypeService, type ImportDocumentTypeRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -21,7 +22,7 @@ export class UmbDocumentTypeImportServerDataSource {
 	/**
 	 * Import an item for the given id to the destination unique
 	 * @param {temporaryUnique} temporaryUnique - The unique identifier of the temporary file to import.
-	 * @returns {*} The imported document type.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the import request.
 	 * @memberof UmbDocumentTypeImportServerDataSource
 	 */
 	async import(temporaryUnique: string) {

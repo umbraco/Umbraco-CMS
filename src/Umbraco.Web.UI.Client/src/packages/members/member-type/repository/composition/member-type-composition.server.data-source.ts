@@ -10,6 +10,7 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffice/content-type';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Member Type Composition that fetches data from the server
@@ -33,7 +34,7 @@ export class UmbMemberTypeCompositionServerDataSource implements UmbContentTypeC
 	/**
 	 * Fetches the compatible compositions for a document type from the server
 	 * @param {string} unique - The unique identifier of the Member Type
-	 * @returns {*} The composition references, or an error
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionReferenceModel>>>} The composition references, or an error
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
@@ -55,7 +56,7 @@ export class UmbMemberTypeCompositionServerDataSource implements UmbContentTypeC
 	/**
 	 * Updates the compositions for a document type on the server
 	 * @param {UmbMemberTypeAvailableCompositionRequestModel} args - The arguments for the available compositions request
-	 * @returns {*} The compatible compositions, or an error
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionCompatibleModel>>>} The compatible compositions, or an error
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
 	async availableCompositions(args: UmbMemberTypeAvailableCompositionRequestModel) {

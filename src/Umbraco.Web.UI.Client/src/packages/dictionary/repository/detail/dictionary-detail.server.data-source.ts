@@ -1,7 +1,11 @@
 import type { UmbDictionaryDetailModel } from '../../types.js';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDictionaryItemRequestModel,
 	UpdateDictionaryItemRequestModel,
@@ -46,7 +50,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Fetches a Dictionary with the given id from the server
 	 * @param {string} unique - The unique identifier of the dictionary to fetch.
-	 * @returns {*} The dictionary.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>>} The dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async read(unique: string) {
@@ -73,7 +77,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	 * Inserts a new Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} model - The dictionary to create.
 	 * @param {string | null} parentUnique - The unique identifier of the parent, if any.
-	 * @returns {*} The created dictionary.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>>} The created dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async create(model: UmbDictionaryDetailModel, parentUnique: string | null) {
@@ -104,7 +108,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Updates a Dictionary on the server
 	 * @param {UmbDictionaryDetailModel} model - The dictionary to update.
-	 * @returns {*} The updated dictionary.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>>} The updated dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async update(model: UmbDictionaryDetailModel) {
@@ -134,7 +138,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	/**
 	 * Deletes a Dictionary on the server
 	 * @param {string} unique - The unique identifier of the dictionary to delete.
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
 	async delete(unique: string) {

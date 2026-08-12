@@ -1,6 +1,8 @@
 import { UmbTemporaryFileServerDataSource } from './temporary-file.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbRepositoryErrorResponse, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
+import type { TemporaryFileResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A repository for uploading temporary files
@@ -26,7 +28,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	 * @param {File} file - The file to upload
 	 * @param {(progress: ProgressEvent) => void} [onProgress] - Callback invoked with upload progress
 	 * @param {AbortSignal} [abortSignal] - Signal to abort the upload
-	 * @returns {*} The upload response
+	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The upload response
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	upload(id: string, file: File, onProgress?: (progress: ProgressEvent) => void, abortSignal?: AbortSignal) {
@@ -36,7 +38,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	/**
 	 * Deletes a temporary file
 	 * @param {string} id - The unique identifier of the temporary file
-	 * @returns {*} The delete response
+	 * @returns {Promise<UmbRepositoryErrorResponse>} The delete response
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	delete(id: string) {
@@ -46,7 +48,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	/**
 	 * Gets a temporary file
 	 * @param {string} id - The unique identifier of the temporary file
-	 * @returns {*} The temporary file
+	 * @returns {Promise<UmbRepositoryResponse<TemporaryFileResponseModel>>} The temporary file
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	requestById(id: string) {

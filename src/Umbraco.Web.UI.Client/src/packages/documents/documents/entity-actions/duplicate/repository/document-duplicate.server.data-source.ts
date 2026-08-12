@@ -1,6 +1,7 @@
 import type { UmbDuplicateDocumentRequestArgs } from './types.js';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -22,7 +23,7 @@ export class UmbDuplicateDocumentServerDataSource {
 	/**
 	 * Duplicate an item for the given id to the destination unique
 	 * @param {UmbDuplicateDocumentRequestArgs} args - The duplicate request arguments
-	 * @returns {*} The result of the duplicate request
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the duplicate request
 	 * @memberof UmbDuplicateDocumentServerDataSource
 	 */
 	async duplicate(args: UmbDuplicateDocumentRequestArgs) {

@@ -2,6 +2,7 @@ import { MediaTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbMoveDataSource, UmbMoveToRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Move Media Type Server Data Source
@@ -22,7 +23,7 @@ export class UmbMoveMediaTypeServerDataSource implements UmbMoveDataSource {
 	/**
 	 * Move an item for the given id to the target unique
 	 * @param {UmbMoveToRequestArgs} args - The move request arguments
-	 * @returns {*} A promise that resolves once the media type has been moved
+	 * @returns {UmbDataSourceErrorResponse} A promise that resolves once the media type has been moved
 	 * @memberof UmbMoveMediaTypeServerDataSource
 	 */
 	async moveTo(args: UmbMoveToRequestArgs) {

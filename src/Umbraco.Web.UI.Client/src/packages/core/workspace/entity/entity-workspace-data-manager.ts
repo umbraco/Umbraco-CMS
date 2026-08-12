@@ -1,6 +1,7 @@
 import type { UmbWorkspaceDataManager } from '../data-manager/workspace-data-manager.interface.js';
 import { jsonStringComparison, UmbObjectState, type MappingFunction } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * Manages the workspace data for an entity.
@@ -67,7 +68,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * Creates an observable part of the persisted data
 	 * @template ReturnType
 	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction Function to map the persisted data to the observable part.
-	 * @returns {*} The mapped observable part.
+	 * @returns {Observable<ReturnType>} The mapped observable part.
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	createObservablePartOfPersisted<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
@@ -117,7 +118,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * Creates an observable part of the current data
 	 * @template ReturnType
 	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction - Maps the current data to the observed value.
-	 * @returns {*} An observable of the mapped value.
+	 * @returns {Observable<ReturnType>} An observable of the mapped value.
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	createObservablePartOfCurrent<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
@@ -126,7 +127,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Checks if there are unpersisted changes
-	 * @returns {*} Whether the current data differs from the persisted data.
+	 * @returns {boolean} Whether the current data differs from the persisted data.
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	getHasUnpersistedChanges() {

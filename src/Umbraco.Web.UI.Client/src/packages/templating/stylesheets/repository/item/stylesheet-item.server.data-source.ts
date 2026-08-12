@@ -2,7 +2,7 @@ import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '.
 import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbManagementApiStylesheetItemDataRequestManager } from './stylesheet-item.server.request-manager.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse, UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -20,7 +20,7 @@ export class UmbStylesheetItemServerDataSource
 	/**
 	 * Fetches the items for the given uniques from the server
 	 * @param {Array<string>} uniques - The unique identifiers of the stylesheets
-	 * @returns {*} The stylesheet items
+	 * @returns {UmbDataSourceResponse<Array<UmbStylesheetItemModel>>} The stylesheet items
 	 * @memberof UmbStylesheetItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {
