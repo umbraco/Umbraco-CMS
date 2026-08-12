@@ -2,6 +2,13 @@ import {ApiHelpers} from "./ApiHelpers";
 import {AliasHelper} from "./AliasHelper";
 import {DocumentBlueprintsBuilder} from "../builders";
 
+// The fields of a tree item this helper needs in order to delete it and recurse into its children.
+type DocumentBlueprintTreeItem = {
+  id: string;
+  hasChildren?: boolean;
+  isFolder?: boolean;
+};
+
 export class DocumentBlueprintApiHelper {
   api: ApiHelpers;
 
@@ -79,7 +86,7 @@ export class DocumentBlueprintApiHelper {
     return await this.getByName(name);
   }
 
-  private async recurseDeleteItem(item) {
+  private async recurseDeleteItem(item: DocumentBlueprintTreeItem) {
     if (item.hasChildren) {
       const items = await this.getChildren(item.id);
 

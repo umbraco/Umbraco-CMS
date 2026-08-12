@@ -342,8 +342,8 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
             parentLevel,
             false,
             userKey,
-            cont => parentPath.StartsWith(cont.Path)
-                ? EntityContainerOperationStatus.InvalidParent // Cannot move to descendant of self.
+            cont => IsSelfOrDescendant(parentPath, cont.Path)
+                ? EntityContainerOperationStatus.InvalidParent // Cannot move to self or to a descendant of self.
                 : EntityContainerOperationStatus.Success,
             (cont, eventMessages) =>
             {
@@ -554,6 +554,17 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
 
         return Attempt.SucceedWithStatus<EntityContainer?, EntityContainerOperationStatus>(EntityContainerOperationStatus.Success, container);
     }
+
+    /// <summary>
+    ///     Determines whether the node at <paramref name="path" /> is the container being moved, or sits below it.
+    /// </summary>
+    /// <remarks>
+    ///     Paths are comma separated IDs, so they have to be compared a whole segment at a time. Comparing the raw
+    ///     prefix would treat "-1,21" as a descendant of "-1,2" and reject a perfectly valid move.
+    /// </remarks>
+    /// <remarks>Internal so the tests can reach it.</remarks>
+    internal static bool IsSelfOrDescendant(string path, string containerPath)
+        => path == containerPath || path.StartsWith($"{containerPath},", StringComparison.Ordinal);
 
     private EntityContainer? GetParent(ITreeEntity treeEntity)
     {
