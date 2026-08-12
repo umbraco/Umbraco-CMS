@@ -98,6 +98,9 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
 
+	@property({ type: Array, attribute: false })
+	startNodes?: Array<UmbTreeStartNode>;
+
 	@property({ type: Boolean, attribute: false })
 	foldersOnly?: boolean = false;
 
@@ -160,6 +163,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this._api!.setStartNode(this.startNode);
 		}
 
+		if (_changedProperties.has('startNodes')) {
+			this._api!.setStartNodes?.(this.startNodes);
+		}
+
 		if (_changedProperties.has('hideTreeRoot')) {
 			this._api!.setHideTreeRoot(this.hideTreeRoot);
 		}
@@ -219,7 +226,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		// The empty state belongs to the children list, not a single view, so it is presented once here — mirroring
 		// the collection pattern. It is only relevant when the children are shown on their own (root hidden or drilled
 		// into a start node) and never in the sidebar menu.
-		if (this.isMenu || !(this.hideTreeRoot || this.startNode)) return nothing;
+		if (this.isMenu || !(this.hideTreeRoot || this.startNode || this.startNodes?.length)) return nothing;
 		if (!this._initialLoadDone) {
 			return html`<umb-view-loader></umb-view-loader>`;
 		}

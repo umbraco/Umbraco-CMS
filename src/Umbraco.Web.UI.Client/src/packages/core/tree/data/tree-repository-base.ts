@@ -2,9 +2,11 @@ import type { UmbTreeItemModel, UmbTreeRootModel } from '../types.js';
 import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
+import { UmbTreeItemsNotSupportedError } from './tree-items-not-supported.error.js';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
+	UmbTreeItemsRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
 import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
@@ -162,6 +164,29 @@ export abstract class UmbTreeRepositoryBase<
 		const { data, error } = await this._treeSource.getAncestorsOf(args);
 
 		// TODO: implement observable for ancestor items in the store
+		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
+		return { data, error: error as any };
+	}
+
+	/**
+	 * Requests the tree items with the given uniques
+	 * @param {UmbTreeItemsRequestArgs} args - The request arguments
+	 * @returns {*} The tree items with the given uniques, or an error if the data source cannot resolve items
+	 * @memberof UmbTreeRepositoryBase
+	 */
+	async requestTreeItems(args: UmbTreeItemsRequestArgs): Promise<UmbRepositoryResponse<TreeItemType[]>> {
+		await this._init;
+
+		if (!this._treeSource.getItems) {
+			return { data: undefined, error: new UmbTreeItemsNotSupportedError() };
+		}
+
+		const { data, error } = await this._treeSource.getItems(args);
+
+		if (data) {
+			this._treeStore?.appendItems(data);
+		}
+
 		// TODO: Fix the type of error, it should be UmbApiError, but currently it is any.
 		return { data, error: error as any };
 	}

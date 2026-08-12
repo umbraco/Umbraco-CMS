@@ -68,6 +68,9 @@ export class UmbPropertyEditorUIContentPickerElement
 	private _rootUnique?: string | null;
 
 	@state()
+	private _rootUniques?: Array<string>;
+
+	@state()
 	private _rootEntityType?: string;
 
 	@state()
@@ -179,6 +182,7 @@ export class UmbPropertyEditorUIContentPickerElement
 		const result = await this.#dynamicRootRepository.requestRoot(this.#dynamicRoot, unique, parentUnique);
 		if (result && result.length > 0) {
 			this._rootUnique = result[0];
+			this._rootUniques = result;
 		}
 	}
 
@@ -212,9 +216,14 @@ export class UmbPropertyEditorUIContentPickerElement
 	}
 
 	override render() {
+		const entityType = this._rootEntityType;
 		const startNode: UmbTreeStartNode | undefined =
-			this._rootUnique && this._rootEntityType
-				? { unique: this._rootUnique, entityType: this._rootEntityType }
+			this._rootUnique && entityType ? { unique: this._rootUnique, entityType } : undefined;
+
+		// A dynamic root query can resolve to more than one node, and all of them are made available to the picker.
+		const startNodes: Array<UmbTreeStartNode> | undefined =
+			this._rootUniques && this._rootUniques.length > 1 && entityType
+				? this._rootUniques.map((unique) => ({ unique, entityType }))
 				: undefined;
 
 		return html`
@@ -226,6 +235,7 @@ export class UmbPropertyEditorUIContentPickerElement
 				.max=${this._max}
 				.maxMessage=${this._maxMessage}
 				.startNode=${startNode}
+				.startNodes=${startNodes}
 				.allowedContentTypeIds=${this._allowedContentTypeUniques}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}

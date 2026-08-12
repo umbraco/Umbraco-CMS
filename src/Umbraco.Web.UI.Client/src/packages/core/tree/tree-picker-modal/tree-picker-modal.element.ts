@@ -4,6 +4,7 @@ import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbTreeStartN
 import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { ManifestTree } from '../extensions/types.js';
 import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
+import { umbResolveTreeStartNodes } from '../utils/index.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
 import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
@@ -15,6 +16,7 @@ import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 
 const TREE_MEMORY_UNIQUE = 'UmbTreeItemPickerTree';
 const LOCATION_MEMORY_UNIQUE = 'UmbTreeItemPickerLocation';
@@ -67,6 +69,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#treeAlias?: string;
 	private _initialStartNode?: UmbTreeStartNode;
+	private _initialStartNodes?: Array<UmbTreeStartNode>;
 	private _repository?: UmbTreeRepository;
 	private _breadcrumbLoaded = false;
 	private _breadcrumbLoadPromise?: Promise<void>;
@@ -104,10 +107,14 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has('data')) {
+			const resolvedStartNodes = umbResolveTreeStartNodes(this.data?.startNode, this.data?.startNodes);
+			this.#startNodeUniques = new Set(resolvedStartNodes.startNodes?.map((startNode) => startNode.unique) ?? []);
+
 			if (this.data?.search) {
 				this._pickerContext.search.updateConfig({
 					...this.data.search,
-					searchFrom: this.data.startNode,
+					// There is no server side search across multiple parents, so the scope is applied client side.
+					searchFrom: resolvedStartNodes.startNode,
 					dataTypeUnique: this._pickerContext.dataType?.unique,
 				});
 			}
@@ -122,8 +129,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 			if (this.data?.treeAlias && this.data.treeAlias !== this.#treeAlias) {
 				this.#treeAlias = this.data.treeAlias;
-				this._initialStartNode = this.data.startNode;
-				this._currentLocation = this.data.startNode;
+				const { startNode, startNodes } = umbResolveTreeStartNodes(this.data.startNode, this.data.startNodes);
+				this._initialStartNode = startNode;
+				this._initialStartNodes = startNodes;
+				this._currentLocation = startNode;
 				this._breadcrumb = [];
 				this._breadcrumbLoaded = false;
 				this._breadcrumbLoadPromise = undefined;
@@ -167,6 +176,19 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		);
 	}
 
+	// Ancestors above the scope of the picker must not be reachable from the breadcrumb, so the chain is cut at
+	// the start node it belongs to — with multiple start nodes, whichever of them is an ancestor or self.
+	#sliceAncestorsToScope<ItemType extends { unique: string | null }>(items: Array<ItemType>): Array<ItemType> {
+		const scopeUniques = this._initialStartNode
+			? [this._initialStartNode.unique]
+			: (this._initialStartNodes?.map((startNode) => startNode.unique) ?? []);
+
+		if (scopeUniques.length === 0) return items;
+
+		const ceilingIndex = items.findIndex((item) => item.unique !== null && scopeUniques.includes(item.unique));
+		return ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
+	}
+
 	async #loadInitialBreadcrumb() {
 		if (!this._repository) return;
 
@@ -174,10 +196,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			const { data } = await this._repository.requestTreeItemAncestors({
 				treeItem: this._initialStartNode,
 			});
-			const items = data ?? [];
-			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
-			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
-			this._breadcrumb = sliced.map((item) => ({
+			this._breadcrumb = this.#sliceAncestorsToScope(data ?? []).map((item) => ({
 				unique: item.unique,
 				entityType: item.entityType,
 				name: item.name,
@@ -207,9 +226,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		const items = data ?? [];
 
 		if (this._initialStartNode) {
-			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
-			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
-			this._breadcrumb = sliced.map((item) => ({
+			this._breadcrumb = this.#sliceAncestorsToScope(items).map((item) => ({
 				unique: item.unique,
 				entityType: item.entityType,
 				name: item.name,
@@ -218,7 +235,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			const root = this._breadcrumb[0];
 			this._breadcrumb = [
 				...(root ? [root] : []),
-				...items.map((item) => ({
+				...this.#sliceAncestorsToScope(items).map((item) => ({
 					unique: item.unique,
 					entityType: item.entityType,
 					name: item.name,
@@ -253,10 +270,14 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		const entity = this.#getLocationFromInteractionMemory();
 		if (!entity || !this._repository) return;
 
-		if (this._initialStartNode) {
+		const scopeUniques = this._initialStartNode
+			? [this._initialStartNode.unique]
+			: (this._initialStartNodes?.map((startNode) => startNode.unique) ?? []);
+
+		if (scopeUniques.length > 0) {
 			const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
-			const isWithinStartNode = (data ?? []).some((a) => a.unique === this._initialStartNode!.unique);
-			if (!isWithinStartNode) return;
+			const isWithinScope = (data ?? []).some((ancestor) => scopeUniques.includes(ancestor.unique));
+			if (!isWithinScope) return;
 		}
 
 		await this.#navigateToLocation(entity);
@@ -382,7 +403,32 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		}
 	}
 
-	#searchSelectableFilter = () => true;
+	#startNodeUniques = new Set<string>();
+
+	// The start nodes are only there to be browsed, so they are not pickable — matching the single start node
+	// case, where the start node is not rendered at all.
+	#selectableFilter = (item: TreeItemType) => {
+		const unique = (item as { unique?: string | null }).unique;
+		if (unique && this.#startNodeUniques.has(unique)) return false;
+		return this.data?.pickableFilter?.(item) ?? true;
+	};
+
+	// Search cannot be scoped server side to more than one parent, so out-of-scope results are filtered here.
+	#searchSelectableFilter = (item: UmbSearchResultItemModel & TreeItemType) => {
+		const baseFilter: ((item: UmbSearchResultItemModel & TreeItemType) => boolean) | undefined =
+			this.data?.search?.pickableFilter ?? this.data?.pickableFilter;
+		if (baseFilter && !baseFilter(item)) return false;
+		if (this.#startNodeUniques.size === 0) return true;
+
+		const unique = item.unique;
+		if (unique && this.#startNodeUniques.has(unique)) return false;
+
+		// Without a resolved ancestor chain there is nothing to compare the scope against.
+		const ancestors = (item as { ancestors?: Array<{ unique: string }> }).ancestors;
+		if (!ancestors) return true;
+
+		return ancestors.some((ancestor) => this.#startNodeUniques.has(ancestor.unique));
+	};
 
 	override render() {
 		return html`
@@ -393,12 +439,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#renderSearch() {
-		const selectableFilter =
-			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
-
 		return html`
 			<umb-picker-search-field></umb-picker-search-field>
-			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
+			<umb-picker-search-result .pickableFilter=${this.#searchSelectableFilter}></umb-picker-search-result>
 		`;
 	}
 
@@ -418,8 +461,10 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					expandTreeRoot: this.data?.expandTreeRoot,
 					selectionConfiguration: this._selectionConfiguration,
 					filter: this.data?.filter,
-					selectableFilter: this.data?.pickableFilter,
+					selectableFilter: this.#selectableFilter,
 					startNode: this._currentLocation,
+					// Once drilled into a location the tree is scoped to that single node again.
+					startNodes: this._currentLocation ? undefined : this._initialStartNodes,
 					foldersOnly: this.data?.foldersOnly,
 					expansion: this._treeExpansion,
 					interactionMemories: this._treeInteractionMemories,

@@ -1035,6 +1035,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async clickCaretButtonForModalMenuItemWithName(name: string) {
+    await this.click(this.sidebarModal.locator(`uui-menu-item[label="${name}"] #caret-button`).last());
+  }
+
   async doesModalHaveText(text: string) {
     await this.containsText(this.openedModal, text);
   }

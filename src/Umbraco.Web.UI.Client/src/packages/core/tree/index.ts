@@ -19,5 +19,6 @@ export * from './tree-item-children/index.js';
 export * from './tree-menu-item/index.js';
 export * from './tree.element.js';
 export * from './entity-actions/move/index.js';
+export * from './utils/index.js';
 export * from './view/index.js';
 export type * from './types.js';

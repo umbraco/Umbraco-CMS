@@ -1,10 +1,11 @@
-using Umbraco.Cms.Core.Scoping;
+﻿using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 
 /// <summary>
-///     A query step that finds the nearest (closest) ancestor or self matching the specified document type criteria.
-///     This step traverses up the content tree from the origin and returns the first matching node.
+///     A query step that finds the nearest (closest) ancestors or self matching the specified document type criteria.
+///     This step traverses up the content tree from each origin and returns the closest matching nodes, one for each
+///     origin.
 /// </summary>
 public class NearestAncestorOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
 {
@@ -39,9 +40,7 @@ public class NearestAncestorOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        var result = (await _nodeFilterRepository.NearestAncestorOrSelfAsync(origins, filter)) is Guid key
-            ? [key]
-            : Array.Empty<Guid>();
+        ICollection<Guid> result = await _nodeFilterRepository.NearestAncestorsOrSelfAsync(origins, filter);
 
         return Attempt<ICollection<Guid>>.Succeed(result);
     }

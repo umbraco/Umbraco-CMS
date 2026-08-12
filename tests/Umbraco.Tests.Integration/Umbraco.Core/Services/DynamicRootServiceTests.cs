@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
@@ -36,6 +36,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
     public enum DynamicRootStepAlias
     {
         NearestAncestorOrSelf,
+        FurthestAncestorOrSelf,
         NearestDescendantOrSelf,
         FurthestDescendantOrSelf,
     }
@@ -379,6 +380,141 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(1, result.Count());
             CollectionAssert.Contains(result, contentNewActs.Key);
         });
+    }
+
+    /// <summary>
+    ///     Verifies that DescendantOrSelf steps return all matches at the resolved level, ordered as they appear
+    ///     in the backoffice tree rather than in an arbitrary database order (#23600).
+    /// </summary>
+    [TestCase(DynamicRootStepAlias.NearestDescendantOrSelf)]
+    [TestCase(DynamicRootStepAlias.FurthestDescendantOrSelf)]
+    public async Task GetDynamicRootsAsync_DescendantOrSelfWithMultipleMatches_ReturnsRootsInTreeOrder(
+        DynamicRootStepAlias dynamicRootAlias)
+    {
+        // Arrange
+        (Content origin, ContentType matchedContentType, Content[] expected) =
+            dynamicRootAlias == DynamicRootStepAlias.NearestDescendantOrSelf
+                ? (ContentYears, ContentTypeYear,
+                    new[] { ContentYear2024, ContentYear2023, ContentYear2022 })
+                : (ContentStages2022, ContentTypeStage,
+                    new[] { ContentStage2022Blue, ContentStage2022Red });
+
+        // Sort the matches so that the tree order and the creation (identifier) order disagree
+        ContentService.SortChildren(origin.Id, expected.Select(x => x.Id).ToArray());
+
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.ByKey.ToString(),
+            OriginKey = origin.Key,
+            Context = new DynamicRootContext() { CurrentKey = origin.Key, ParentKey = origin.Key },
+            QuerySteps =
+            [
+                new DynamicRootQueryStep()
+                {
+                    Alias = dynamicRootAlias.ToString(),
+                    AnyOfDocTypeKeys = [matchedContentType.Key],
+                },
+            ],
+        };
+
+        // Act
+        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
+
+        // Assert
+        CollectionAssert.AreEqual(expected.Select(x => x.Key), result);
+    }
+
+    /// <summary>
+    ///     Verifies that AncestorOrSelf steps resolve an ancestor for each origin in turn, rather than a single one
+    ///     for the whole set of origins (#23600).
+    /// </summary>
+    [TestCase(DynamicRootStepAlias.NearestAncestorOrSelf)]
+    [TestCase(DynamicRootStepAlias.FurthestAncestorOrSelf)]
+    public async Task GetDynamicRootsAsync_AncestorOrSelfWithMultipleOrigins_ResolvesAnAncestorPerOrigin(
+        DynamicRootStepAlias dynamicRootAlias)
+    {
+        // Arrange
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.ByKey.ToString(),
+            OriginKey = ContentYears.Key,
+            Context = new DynamicRootContext() { CurrentKey = ContentYears.Key, ParentKey = ContentYears.Key },
+
+            // The first step resolves Ran-D, Red and Blue, so the ancestor step runs with origins in two branches
+            QuerySteps =
+            [
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.FurthestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeAct.Key, ContentTypeStage.Key],
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = dynamicRootAlias.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeActs.Key, ContentTypeStages.Key],
+                },
+            ],
+        };
+
+        // Act
+        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
+
+        // Assert - Ran-D resolves to Acts and the two stages to Stages, where previously a single one was picked
+        CollectionAssert.AreEquivalent(new[] { ContentActs2022.Key, ContentStages2022.Key }, result);
+    }
+
+    /// <summary>
+    ///     Verifies that DescendantOrSelf steps resolve the matching level for each origin in turn, so an origin whose
+    ///     matches sit deeper than another's still contributes its own (#23600).
+    /// </summary>
+    [TestCase(DynamicRootStepAlias.NearestDescendantOrSelf)]
+    [TestCase(DynamicRootStepAlias.FurthestDescendantOrSelf)]
+    public async Task GetDynamicRootsAsync_DescendantOrSelfWithMultipleOrigins_ResolvesTheLevelPerOrigin(
+        DynamicRootStepAlias dynamicRootAlias)
+    {
+        // Arrange - allow stages to nest, so 2023 can hold a stage one level deeper than the stages of 2022
+        ContentTypeStages.AllowedContentTypes =
+            ContentTypeStages.AllowedContentTypes!.Union([CreateContentTypeSort(ContentTypeStages, 1)]);
+        await ContentTypeService.UpdateAsync(ContentTypeStages, Constants.Security.SuperUserKey);
+
+        var stages2023 = ContentBuilder.CreateSimpleContent(ContentTypeStages, "Stages", ContentYear2023.Id);
+        ContentService.Save(stages2023, -1);
+
+        var nestedStages2023 = ContentBuilder.CreateSimpleContent(ContentTypeStages, "Nested Stages", stages2023.Id);
+        ContentService.Save(nestedStages2023, -1);
+
+        var deepStage2023 = ContentBuilder.CreateSimpleContent(ContentTypeStage, "Deep", nestedStages2023.Id);
+        ContentService.Save(deepStage2023, -1);
+
+        // The first step resolves all three years, so the second step runs with multiple origins: the stages of
+        // 2022 are at level 4, the stage of 2023 is at level 5, and 2024 has none at all.
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.ByKey.ToString(),
+            OriginKey = ContentYears.Key,
+            Context = new DynamicRootContext() { CurrentKey = ContentYears.Key, ParentKey = ContentYears.Key },
+            QuerySteps =
+            [
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeYear.Key],
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = dynamicRootAlias.ToString(),
+                    AnyOfDocTypeKeys = [ContentTypeStage.Key],
+                },
+            ],
+        };
+
+        // Act
+        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
+
+        // Assert
+        CollectionAssert.AreEquivalent(
+            new[] { ContentStage2022Red.Key, ContentStage2022Blue.Key, deepStage2023.Key },
+            result);
     }
 
     /// <summary>
