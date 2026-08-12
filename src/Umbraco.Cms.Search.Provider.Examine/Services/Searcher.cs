@@ -118,7 +118,7 @@ public class Searcher : IExamineSearcher
         {
             IBooleanOperation searchQuery = index.Searcher
                 .CreateQuery()
-                .GroupedOr([Constants.SystemFields.Culture], culture is null ? [Constants.Variance.Invariant] : [culture, Constants.Variance.Invariant]);
+                .GroupedOr([Constants.SystemFields.Culture], string.IsNullOrEmpty(culture) ? [Constants.Variance.Invariant] : [culture, Constants.Variance.Invariant]);
 
             if (query is not null)
             {
