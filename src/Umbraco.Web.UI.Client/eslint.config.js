@@ -50,6 +50,11 @@ export default [
 			'no-var': 'error',
 			'import-x/namespace': 'off',
 			'import-x/no-unresolved': 'off',
+			// Off: this codebase deliberately gives many classes/elements both a named export and a
+			// `export default` (the default is required for manifest-driven dynamic `js: () => import(...)`
+			// loading). The rule then flags every plain `import Foo from './foo.js'` of that class elsewhere,
+			// forcing `import { Foo } from './foo.js'` for no behavioural benefit.
+			'import-x/no-named-as-default': 'off',
 			// Off: false-positives on barrel files that reach the same underlying binding via two `export *`
 			// paths (e.g. an index.ts re-exporting both a submodule barrel and that submodule's constants
 			// directly) — harmless per the ES module spec, but the rule doesn't resolve to the original
