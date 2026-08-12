@@ -53,7 +53,7 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
         var redirectUris = await openIddictAppManager.GetRedirectUrisAsync(application);
         Assert.That(
             redirectUris,
-            Does.Contain(new Uri("https://server1.local/umbraco/oauth_complete")),
+            Does.Contain(new Uri("https://server1.local/umbraco")),
             "Server1 redirect URI should exist after first initialization");
 
         // Act: Initialize with second server URL (simulating server2 startup on same database)
@@ -68,11 +68,11 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
 
         Assert.That(
             redirectUris,
-            Does.Contain(new Uri("https://server1.local/umbraco/oauth_complete")),
+            Does.Contain(new Uri("https://server1.local/umbraco")),
             "Server1 redirect URI should still exist after server2 initialization (BUG: This will fail until #21138 is fixed)");
         Assert.That(
             redirectUris,
-            Does.Contain(new Uri("https://server2.local/umbraco/oauth_complete")),
+            Does.Contain(new Uri("https://server2.local/umbraco")),
             "Server2 redirect URI should exist after server2 initialization");
 
         // Act: Add third server (further validation)
@@ -88,15 +88,15 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
         Assert.That(redirectUriList, Has.Count.EqualTo(3), "Should have redirect URIs for all three servers");
         Assert.That(
             redirectUriList,
-            Does.Contain(new Uri("https://server1.local/umbraco/oauth_complete")),
+            Does.Contain(new Uri("https://server1.local/umbraco")),
             "Server1 redirect URI should still exist");
         Assert.That(
             redirectUriList,
-            Does.Contain(new Uri("https://server2.local/umbraco/oauth_complete")),
+            Does.Contain(new Uri("https://server2.local/umbraco")),
             "Server2 redirect URI should still exist");
         Assert.That(
             redirectUriList,
-            Does.Contain(new Uri("https://cms.domain.com/umbraco/oauth_complete")),
+            Does.Contain(new Uri("https://cms.domain.com/umbraco")),
             "Server3 redirect URI should exist");
     }
 
@@ -126,12 +126,12 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
         Assert.That(redirectUriList, Has.Count.EqualTo(1), "Should not create duplicate redirect URIs");
         Assert.That(
             redirectUriList,
-            Does.Contain(new Uri("https://server1.local/umbraco/oauth_complete")));
+            Does.Contain(new Uri("https://server1.local/umbraco")));
     }
 
     /// <summary>
     /// Tests that PostLogoutRedirectUris are also preserved across multiple server initializations.
-    /// Note: The current implementation adds both oauth_complete and logout paths to PostLogoutRedirectUris.
+    /// Note: The current implementation adds both the callback and logout paths to PostLogoutRedirectUris.
     /// </summary>
     [Test]
     public async Task EnsureBackOfficeApplicationAsync_MultipleServerUrls_PreservesAllPostLogoutRedirectUris()
@@ -152,8 +152,8 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
 
         Assert.That(
             postLogoutUris,
-            Does.Contain(new Uri("https://server1.local/umbraco/oauth_complete")),
-            "Server1 oauth_complete post-logout URI should exist");
+            Does.Contain(new Uri("https://server1.local/umbraco")),
+            "Server1 callback post-logout URI should exist");
         Assert.That(
             postLogoutUris,
             Does.Contain(new Uri("https://server1.local/umbraco/logout")),
@@ -172,8 +172,8 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
         // Server 1 URIs (2 paths per server)
         Assert.That(
             postLogoutUriList,
-            Does.Contain(new Uri("https://server1.local/umbraco/oauth_complete")),
-            "Server1 oauth_complete should still exist (BUG: This will fail until #21138 is fixed)");
+            Does.Contain(new Uri("https://server1.local/umbraco")),
+            "Server1 callback should still exist (BUG: This will fail until #21138 is fixed)");
         Assert.That(
             postLogoutUriList,
             Does.Contain(new Uri("https://server1.local/umbraco/logout")),
@@ -182,8 +182,8 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
         // Server 2 URIs (2 paths per server)
         Assert.That(
             postLogoutUriList,
-            Does.Contain(new Uri("https://server2.local/umbraco/oauth_complete")),
-            "Server2 oauth_complete should exist");
+            Does.Contain(new Uri("https://server2.local/umbraco")),
+            "Server2 callback should exist");
         Assert.That(
             postLogoutUriList,
             Does.Contain(new Uri("https://server2.local/umbraco/logout")),
@@ -218,8 +218,8 @@ public class BackOfficeApplicationManagerTests : UmbracoTestServerTestBase
         var redirectUriList = redirectUris.ToList();
 
         Assert.That(redirectUriList, Has.Count.EqualTo(3), "Should register all three URIs");
-        Assert.That(redirectUriList, Does.Contain(new Uri("https://server1.local/umbraco/oauth_complete")));
-        Assert.That(redirectUriList, Does.Contain(new Uri("https://server2.local/umbraco/oauth_complete")));
-        Assert.That(redirectUriList, Does.Contain(new Uri("https://cms.domain.com/umbraco/oauth_complete")));
+        Assert.That(redirectUriList, Does.Contain(new Uri("https://server1.local/umbraco")));
+        Assert.That(redirectUriList, Does.Contain(new Uri("https://server2.local/umbraco")));
+        Assert.That(redirectUriList, Does.Contain(new Uri("https://cms.domain.com/umbraco")));
     }
 }

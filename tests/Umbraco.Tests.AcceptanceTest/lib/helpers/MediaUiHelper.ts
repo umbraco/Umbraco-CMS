@@ -36,7 +36,7 @@ export class MediaUiHelper extends UiBaseLocators {
     this.mediaListView = this.page.locator('umb-media-table-collection-view');
     this.mediaGridView = this.page.locator('umb-media-grid-collection-view');
     this.mediaListHeader = this.mediaListView.locator('uui-table-head-cell span');
-    this.mediaCardItemsValues = this.mediaCardItems.locator('span');
+    this.mediaCardItemsValues = this.mediaCardItems.locator('#name');
     this.mediaListNameValues = this.mediaListView.locator('umb-media-table-column-name span');
     this.bulkTrashBtn = page.locator('umb-entity-bulk-action uui-button').filter({hasText: 'Trash'});
     this.bulkMoveToBtn = page.locator('umb-entity-bulk-action uui-button').filter({hasText: 'Move to'});

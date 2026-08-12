@@ -1412,15 +1412,18 @@ export class DataTypeApiHelper {
 
   // List View - Media data type
   async updateListViewMediaDataType(alias: string, newValue: any) {
+    return await this.updateListViewMediaDataTypeValues([{alias: alias, value: newValue}]);
+  }
+
+  async updateListViewMediaDataTypeValues(values: {alias: string, value: any}[]) {
     const listViewMediaData = await this.getByName('List View - Media');
-    const valueData = listViewMediaData.values.find(value => value.alias === alias);
-    if (valueData) {
-      valueData.value = newValue;
-    } else {
-      listViewMediaData.values.push({
-        "alias": alias,
-        "value": newValue
-      });
+    for (const {alias, value} of values) {
+      const valueData = listViewMediaData.values.find(v => v.alias === alias);
+      if (valueData) {
+        valueData.value = value;
+      } else {
+        listViewMediaData.values.push({"alias": alias, "value": value});
+      }
     }
     return await this.update(listViewMediaData.id, listViewMediaData);
   }

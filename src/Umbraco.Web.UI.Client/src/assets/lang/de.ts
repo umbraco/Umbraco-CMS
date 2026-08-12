@@ -326,7 +326,7 @@ export default {
 		notReadyToPublish: 'Wir sind für Veröffentlichungen bereit',
 		readyToPublish: 'Bereit zu Veröffentlichen?',
 		readyToSave: 'Bereit zu Sichern?',
-		resetFocalPoint: 'Fokus zurücksetzten.',
+		resetFocalPoint: 'Fokus zurücksetzen',
 		sendForApproval: 'Freigabe anfordern',
 		schedulePublishHelp: 'Wählen Sie Datum und Uhrzeit für die Veröffentlichung bzw. deren Rücknahme.',
 		createEmpty: 'Neues Element anlegen',
@@ -338,6 +338,8 @@ export default {
 		variantScheduleNotAllowed: 'Plannung ist nicht erlaubt',
 		variantUnpublishNotAllowed: 'Veröffentlichung zurücknehmen ist nicht erlaubt.',
 		saveModalTitle: 'Speichern',
+		saveAndPublishDescendantsModalTitle: 'Speichern und veröffentlichen mit Unterknoten',
+		saveAndScheduleModalTitle: 'Speichern und Veröffentlichung planen',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Erzeuge eine neue Inhaltsvorlage von <em>%0%</em>',

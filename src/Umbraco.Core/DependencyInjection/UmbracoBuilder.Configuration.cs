@@ -109,7 +109,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
             .AddUmbracoOptions<ScheduledPublishingSettings>(options => options.ValidateOnStart())
-            .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
             .AddUmbracoOptions<WebsiteSettings>()
             .AddUmbracoOptions<SignalRSettings>();
 

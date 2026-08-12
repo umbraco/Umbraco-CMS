@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -1991,6 +1992,104 @@ public class ContentNavigationServiceBaseTests
         var descendantsCountAfterRestore = restoredDescendantsKeys.Count();
 
         Assert.AreEqual(initialDescendantsCount, descendantsCountAfterRestore);
+    }
+
+    [Test]
+    public async Task Concurrent_Queries_By_Unmapped_Aliases_Do_Not_Corrupt_The_Alias_Map()
+    {
+        // Arrange
+        // The alias-to-key map is seeded from GetAll(); returning nothing here sends the first
+        // lookup per alias through the miss path, which resolves the type individually and writes
+        // it back to the map (later lookups of the same alias read the cached entry). Concurrent
+        // writes to a non-thread-safe map corrupt its internal state, after which every navigation
+        // query by alias throws (or livelocks) until the process is restarted.
+        const int AliasCount = 512;
+        const int ThreadCount = 8;
+
+        // Built up front so the worker threads run nothing but the lookup under test: anything else
+        // running there can fail for its own reasons and read as a corrupted map.
+        var contentTypes = Enumerable.Range(0, AliasCount).ToDictionary(
+            i => $"alias{i}",
+            _ =>
+            {
+                var key = Guid.NewGuid();
+                return Mock.Of<IContentType>(x => x.Key == key);
+            });
+
+        var resolvedAliases = new ConcurrentDictionary<string, int>();
+        var contentTypeServiceMock = new Mock<IContentTypeService>();
+        contentTypeServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(Enumerable.Empty<IContentType>());
+        contentTypeServiceMock
+            .Setup(x => x.GetAsync(It.IsAny<string>()))
+            .Returns((string alias) =>
+            {
+                resolvedAliases.AddOrUpdate(alias, 1, (_, count) => count + 1);
+                return Task.FromResult<IContentType?>(contentTypes[alias]);
+            });
+
+        var navigationService = new TestContentNavigationService(
+            Mock.Of<ICoreScopeProvider>(),
+            Mock.Of<INavigationRepository>(),
+            contentTypeServiceMock.Object);
+
+        var exceptions = new ConcurrentQueue<Exception>();
+
+        // All workers start their lookups together to maximise concurrent misses on the map, on
+        // dedicated threads so releasing the gate never waits on thread pool growth.
+        var startGate = new Barrier(ThreadCount);
+
+        // Act
+        Task workers = Task.WhenAll(Enumerable.Range(0, ThreadCount).Select(thread => Task.Factory.StartNew(
+            () =>
+            {
+                startGate.SignalAndWait();
+                for (var i = 0; i < AliasCount; i++)
+                {
+                    try
+                    {
+                        navigationService.TryGetRootKeysOfType($"alias{i}", out _);
+                    }
+                    catch (Exception exception)
+                    {
+                        exceptions.Enqueue(exception);
+                    }
+                }
+            },
+            TaskCreationOptions.LongRunning)));
+
+        // A corrupted dictionary can also livelock readers in an infinite bucket cycle, so a hang
+        // here is a failure mode of its own, not just slowness.
+        Task completed = await Task.WhenAny(workers, Task.Delay(TimeSpan.FromSeconds(30)));
+
+        // Assert
+        // The gate is disposed only once the workers are done, never with `using`: on the livelock
+        // path they are still blocked on it.
+        Assert.Multiple(() =>
+        {
+            Assert.AreSame(workers, completed, "Concurrent alias lookups did not finish; the alias map has likely livelocked.");
+            Assert.IsEmpty(exceptions, $"Concurrent alias lookups threw: {exceptions.FirstOrDefault()}");
+        });
+
+        // Observe any worker fault raised outside the per-lookup try (e.g. from the start gate).
+        await workers;
+        startGate.Dispose();
+
+        Assert.AreEqual(AliasCount, resolvedAliases.Count, "Not every alias was resolved through the miss path, so the concurrent map writes under test never ran.");
+
+        // Every alias must now be served from the map, and resolve to its own key: one root node per
+        // content type makes a crossed entry visible as the wrong node rather than just a true result.
+        resolvedAliases.Clear();
+        for (var i = 0; i < AliasCount; i++)
+        {
+            var alias = $"alias{i}";
+            var rootKey = Guid.NewGuid();
+            navigationService.Add(rootKey, contentTypes[alias].Key);
+
+            Assert.IsTrue(navigationService.TryGetRootKeysOfType(alias, out IEnumerable<Guid> rootKeys));
+            CollectionAssert.AreEqual(new[] { rootKey }, rootKeys, $"Alias '{alias}' did not resolve to its own content type key.");
+        }
+
+        Assert.IsEmpty(resolvedAliases, "Aliases were resolved through the content type service again, so not every concurrent write reached the alias map.");
     }
 
     private void CreateTestData()

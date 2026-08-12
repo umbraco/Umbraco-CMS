@@ -53,6 +53,7 @@ public class BackOfficeController : SecurityControllerBase
     private const string RedirectFlowParameter = "flow";
     private const string RedirectStatusParameter = "status";
     private const string RedirectErrorCodeParameter = "errorCode";
+    private const string ExternalLoginReturnUrlKey = "returnUrl";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeController"/> class.
@@ -270,6 +271,7 @@ public class BackOfficeController : SecurityControllerBase
             ? await AuthorizeInternal(request)
             : await AuthorizeExternal(request);
     }
+
     /// <summary>
     /// Issues or refreshes access tokens for authenticated users via supported OpenID Connect grant types.
     /// </summary>
@@ -277,7 +279,6 @@ public class BackOfficeController : SecurityControllerBase
     /// Supports authorization code, refresh token, and client credentials grant types. Returns an error if the request is invalid or the user cannot be found.
     /// </remarks>
     /// <returns>An <see cref="IActionResult"/> representing the result of the token issuance or refresh process, including error details if applicable.</returns>
-
     [AllowAnonymous]
     [HttpPost("token")]
     [EndpointSummary("Issues access tokens.")]
@@ -375,10 +376,31 @@ public class BackOfficeController : SecurityControllerBase
             return Redirect(redirectUri.ToString());
         }
 
-        // Returning a SignOutResult will ask OpenIddict to redirect the user agent
-        // to the post_logout_redirect_uri specified by the client application.
-        return SignOut(Constants.Security.BackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        // The auth cookie was already cleared by SignOutAsync above, and back-office auth is
+        // cookie-only, so there is no OpenIddict end-session to run. Redirect straight to the client
+        // logout landing; a plain redirect also avoids OpenIddict's post_logout_redirect_uri validation,
+        // which rejected client hosts not registered on the OpenIddict client (ID2052).
+        return Redirect(ClientRedirectUrl(_securitySettings.Value.GetEffectiveLogoutPathName()));
     }
+
+    /// <summary>
+    /// Keeps the current back-office session alive by renewing the authentication ticket.
+    /// </summary>
+    /// <remarks>
+    /// The renewal itself is performed by the cookie middleware's OnValidatePrincipal, which forces
+    /// a ticket renewal when it sees a request to this endpoint (see ConfigureBackOfficeCookieOptions).
+    /// The cookie is re-issued with a fresh expiry regardless of the KeepUserLoggedIn setting, so an
+    /// actively-working user can dismiss the session-timeout warning without being logged out. The
+    /// updated expiry is observed on the next request (e.g. GET current-user/configuration).
+    /// </remarks>
+    /// <returns>200 OK once the session ticket has been renewed.</returns>
+    [HttpPost("keep-alive")]
+    [MapToApiVersion("1.0")]
+    [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+    [EndpointSummary("Keeps the current back-office session alive.")]
+    [EndpointDescription("Renews the current user's authentication ticket to extend the session.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult KeepAlive() => Ok();
 
     // Creates and retains a short lived secret to use in the link-login
     // endpoint because we can not protect that method with a bearer token for reasons explained there
@@ -430,7 +452,7 @@ public class BackOfficeController : SecurityControllerBase
 
         if (claimsPrincipleAttempt.Success == false)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
+            return Redirect(ClientRedirectUrl(_securitySettings.Value.GetEffectiveErrorPathName()).AppendQueryStringToUrl(
                 $"{RedirectFlowParameter}=link-login",
                 $"{RedirectStatusParameter}=unauthorized"));
         }
@@ -438,7 +460,7 @@ public class BackOfficeController : SecurityControllerBase
         BackOfficeIdentityUser? user = await _backOfficeUserManager.GetUserAsync(claimsPrincipleAttempt.Result!);
         if (user == null)
         {
-            return Redirect(_securitySettings.Value.BackOfficeHost + "/" + _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
+            return Redirect(ClientRedirectUrl(_securitySettings.Value.GetEffectiveErrorPathName()).AppendQueryStringToUrl(
                 $"{RedirectFlowParameter}=link-login",
                 $"{RedirectStatusParameter}=user-not-found"));
         }
@@ -487,6 +509,103 @@ public class BackOfficeController : SecurityControllerBase
 
         RedirectResult RedirectWithStatus(string status)
             => CallbackErrorRedirectWithStatus("external-login-callback", status, handleResult.Result);
+    }
+
+    /// <summary>
+    ///     Initiates an anonymous, cookie-based external login challenge for the back office.
+    /// </summary>
+    /// <remarks>
+    ///     This is the initial-login counterpart to <see cref="LinkLogin(LinkLoginRequestModel)" />: there is
+    ///     no authenticated user to link to. The <see cref="ExternalLoginCallback" /> completes the flow by
+    ///     signing the user into the back-office cookie, without issuing an OpenIddict token.
+    /// </remarks>
+    /// <param name="provider">The scheme name of the external login provider to challenge.</param>
+    /// <param name="returnUrl">An optional local URL to return to once login completes.</param>
+    /// <returns>A challenge (302) redirecting to the external provider, or 400 for invalid input.</returns>
+    [HttpGet("external-login")]
+    [EndpointSummary("Initiates an external login.")]
+    [EndpointDescription("Initiates a cookie-based external login challenge for the back office.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status302Found)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+    {
+        if (provider.IsNullOrWhiteSpace())
+        {
+            return BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Missing provider")
+                .WithDetail("An external login provider must be specified.")
+                .Build());
+        }
+
+        if (returnUrl is not null && Url.IsLocalUrl(returnUrl) is false)
+        {
+            return BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid returnUrl")
+                .WithDetail("The returnUrl must be a local URL.")
+                .Build());
+        }
+
+        var callbackUrl = Url.Action(nameof(ExternalLoginCallback), this.GetControllerName());
+        AuthenticationProperties properties =
+            _backOfficeSignInManager.ConfigureExternalAuthenticationProperties(provider, callbackUrl);
+        if (returnUrl.IsNullOrWhiteSpace() is false)
+        {
+            properties.Items[ExternalLoginReturnUrlKey] = returnUrl;
+        }
+
+        return new ChallengeResult(provider, properties);
+    }
+
+    /// <summary>
+    ///     Callback for the anonymous external login flow initiated by <see cref="ExternalLogin" />. Signs the
+    ///     user into the back-office cookie and redirects to the client lander, without issuing an OpenIddict token.
+    /// </summary>
+    /// <returns>
+    ///     A redirect (302) to the client: the post-login lander on success, or the client error path with
+    ///     <c>flow=external-login</c> and a <c>status</c> describing the failure.
+    /// </returns>
+    [HttpGet("ExternalLoginCallback")]
+    [EndpointSummary("Handles an external login callback.")]
+    [EndpointDescription("Handles the callback from an external login provider and signs the user into the back office.")]
+    [AllowAnonymous]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status302Found)]
+    public async Task<IActionResult> ExternalLoginCallback()
+    {
+        ExternalLoginInfo? loginInfo = await _backOfficeSignInManager.GetExternalLoginInfoAsync();
+        if (loginInfo?.Principal is null)
+        {
+            return ExternalLoginErrorRedirect("external-info-not-found");
+        }
+
+        IdentitySignInResult result = await _backOfficeSignInManager.ExternalLoginSignInAsync(
+            loginInfo,
+            isPersistent: false,
+            bypassTwoFactor: _securitySettings.Value.UserBypassTwoFactorForExternalLogins);
+
+        if (result.Succeeded)
+        {
+            await _backOfficeSignInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
+
+            string? returnUrl = null;
+            loginInfo.AuthenticationProperties?.Items.TryGetValue(ExternalLoginReturnUrlKey, out returnUrl);
+            return Redirect(ExternalLoginSuccessRedirectUrl(returnUrl));
+        }
+
+        return result switch
+        {
+            { IsLockedOut: true } => ExternalLoginErrorRedirect("locked-out"),
+            { IsNotAllowed: true } => ExternalLoginErrorRedirect("not-allowed"),
+
+            // The provider authenticated the user but Umbraco still wants a second factor, which is a
+            // pending sign-in rather than a failure. The two-factor cookie survives this redirect, so the
+            // client can complete the flow against verify-2fa - but it can only do that if it is told
+            // apart from a genuine failure.
+            { RequiresTwoFactor: true } => ExternalLoginErrorRedirect("two-factor-required"),
+            _ => ExternalLoginErrorRedirect("failed"),
+        };
     }
 
     /// <summary>
@@ -629,15 +748,38 @@ public class BackOfficeController : SecurityControllerBase
 
     private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);
 
+    private string ExternalLoginSuccessRedirectUrl(string? returnUrl)
+    {
+        var url = ClientRedirectUrl(_securitySettings.Value.CallbackPathName.EnsureEndsWith('/') + "auth-callback");
+
+        // The value round-trips through the external provider's state, so re-validate it as untrusted input.
+        if (returnUrl.IsNullOrWhiteSpace() is false && Url.IsLocalUrl(returnUrl))
+        {
+            url = url.AppendQueryStringToUrl($"{ExternalLoginReturnUrlKey}={Uri.EscapeDataString(returnUrl)}");
+        }
+
+        return url;
+    }
+
+    // Builds an absolute URL to a client (back-office) path. Uses the host authority, which drops any
+    // trailing slash on BackOfficeHost, so a configured "https://host/" + "/error" doesn't produce a
+    // double slash. Falls back to a host-relative path when BackOfficeHost isn't configured (same origin).
+    private string ClientRedirectUrl(string path)
+        => (_securitySettings.Value.BackOfficeHost?.GetLeftPart(UriPartial.Authority) ?? string.Empty)
+            + path.EnsureStartsWith('/');
+
+    private RedirectResult ExternalLoginErrorRedirect(string status)
+        => CallbackErrorRedirectWithStatus("external-login", status, Array.Empty<IdentityError>());
+
     private RedirectResult CallbackErrorRedirectWithStatus(string flowType, string status, IEnumerable<IdentityError> identityErrors)
     {
-        var redirectUrl = _securitySettings.Value.BackOfficeHost + "/" +
-                          _securitySettings.Value.AuthorizeCallbackErrorPathName.TrimStart('/').AppendQueryStringToUrl(
-                              $"{RedirectFlowParameter}={flowType}",
-                              $"{RedirectStatusParameter}={status}");
+        var redirectUrl = ClientRedirectUrl(_securitySettings.Value.GetEffectiveErrorPathName()).AppendQueryStringToUrl(
+            $"{RedirectFlowParameter}={flowType}",
+            $"{RedirectStatusParameter}={status}");
         foreach (IdentityError identityError in identityErrors)
         {
-            redirectUrl.AppendQueryStringToUrl($"{RedirectErrorCodeParameter}={identityError.Code}");
+            // AppendQueryStringToUrl is pure, so the result has to be reassigned or the codes are lost.
+            redirectUrl = redirectUrl.AppendQueryStringToUrl($"{RedirectErrorCodeParameter}={identityError.Code}");
         }
 
         return Redirect(redirectUrl);

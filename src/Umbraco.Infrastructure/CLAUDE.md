@@ -243,13 +243,12 @@ internal class ContentFactory : IEntityFactory<IContent, ContentDto>
 - Converts DTO → Domain entity
 - Always `internal` (implementation detail)
 
-**Service Naming** (from Services/Implement/):
+**Service Naming** (`Services/Implement/`):
 ```csharp
-internal sealed class ContentService : RepositoryService, IContentService
+internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>, IContentSearchService
 ```
-- Pattern: `{Domain}Service : RepositoryService, I{Domain}Service`
-- Inherits `RepositoryService` for scope/repository access
-- Always `internal sealed`
+- Pattern: `{Domain}Service : I{Domain}Service` (base class varies by concern)
+- Only services with genuine Infrastructure dependencies live here (search, packaging, webhooks, log viewing); the `RepositoryService`-based domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/` — see root CLAUDE.md §4
 
 ### Key Code Patterns
 
@@ -439,7 +438,7 @@ using (ICoreScope scope = ScopeProvider.CreateCoreScope())
 - 16 service implementations
 - Services fire notifications before/after operations
 - Services manage scopes (not repositories)
-- Example: `ContentService`, `MediaService`, `UserService`
+- Example: `ContentSearchService`, `PackagingService`, `WebhookFiringService` — the Infrastructure-dependent services; the main domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/`
 
 ### Code Smells to Watch For
 
@@ -612,6 +611,22 @@ using (var outer = ScopeProvider.CreateCoreScope())
   "the key changed" schema diffs across environments (see issue #23337).
 - Keep the Guids in **one place** (a shared `Constants` value referenced by both `DatabaseDataCreator`
   and the migration) so they cannot drift.
+
+**Migrations merged UP into an already-released version line must be re-applied at the plan's end**:
+- The upgrader only ever walks the migration chain **forward** from the state stored in the database.
+  A migration merged up from a lower version (e.g. a 17.6 migration merged into v18) lands in the
+  `UmbracoPlan` in namespace order — i.e. **before** the higher line's own migrations.
+- Sites already released on the higher line have a stored state **past** that insertion point, so they
+  will **never** run it (e.g. sites on 18.0.x skip a 17.6-positioned migration when upgrading to 18.1).
+- **Fix**: re-apply the migration at the **end** of the plan under a new version section with a new GUID.
+  Migrations are already required to be idempotent (guard with `IndexExists`, existence checks, etc.),
+  so upgrade paths that hit it twice are unaffected.
+- Implement the re-run as an **empty subclass of the original migration** placed in the **new version's**
+  namespace (e.g. `V_18_1_0.AddContentTypeIdIndexForContent : V_17_6_0.AddContentTypeIdIndexForContent`).
+  Do **not** re-list the original type directly: `UmbracoPlan.GetVersionForState` (used by
+  `RuntimeState.CurrentMigrationVersion`) derives the database version from the **final** migration
+  type's `V_{major}_{minor}_{patch}` namespace, so the last step must live in the new version's namespace
+  to report the correct version. See PR #23328 (original) and #23466 (re-application).
 
 ### Repository Edge Cases
 
@@ -1111,7 +1126,7 @@ dotnet pack src/Umbraco.Infrastructure -c Release
 - **Scope Provider**: `src/Umbraco.Infrastructure/Scoping/ScopeProvider.cs`
 - **Database Factory**: `src/Umbraco.Infrastructure/Persistence/UmbracoDatabaseFactory.cs`
 - **Migration Executor**: `src/Umbraco.Infrastructure/Migrations/MigrationPlanExecutor.cs`
-- **Content Service**: `src/Umbraco.Infrastructure/Services/Implement/ContentService.cs`
+- **Content Search Service**: `src/Umbraco.Infrastructure/Services/Implement/ContentSearchService.cs`
 - **User Repository**: `src/Umbraco.Infrastructure/Persistence/Repositories/Implement/UserRepository.cs`
 
 ### Critical Patterns
