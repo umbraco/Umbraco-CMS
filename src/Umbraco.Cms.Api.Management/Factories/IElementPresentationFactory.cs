@@ -1,9 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Api.Management.Services.References;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Element.Item;
-using Umbraco.Cms.Api.Management.ViewModels.Element.References;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -66,13 +64,4 @@ public interface IElementPresentationFactory
     /// <param name="requestModel">The request model containing culture-specific scheduling information for publishing elements.</param>
     /// <returns>An <see cref="Attempt{List{CulturePublishScheduleModel}, ContentPublishingOperationStatus}"/> containing the resulting list of culture publish schedules if validation succeeds, or a failure status with partial results if validation fails.</returns>
     Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishElementRequestModel requestModel);
-
-    /// <summary>
-    /// Creates a response model for an element that is referenced by an item being published and is not fully
-    /// published itself.
-    /// </summary>
-    /// <param name="referencedElement">The referenced element and its aggregate publish state.</param>
-    /// <returns>A <see cref="ReferencedElementWithPendingChangesResponseModel"/> representing the referenced element.</returns>
-    Task<ReferencedElementWithPendingChangesResponseModel> CreateReferencedElementWithPendingChangesResponseModelAsync(
-        ReferencedElementWithPendingChanges referencedElement);
 }

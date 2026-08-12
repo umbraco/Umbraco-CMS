@@ -387,7 +387,16 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
         return results.Values;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Retrieves a paged collection of child entities related to the specified parent entity by its ID.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent entity.</param>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The number of child entities to include per page.</param>
+    /// <param name="totalRecords">When this method returns, contains the total number of child entities related to the parent.</param>
+    /// <param name="relationTypes">An optional array of relation type IDs to filter the relations. Pass an empty array to include all relation types.</param>
+    /// <param name="entityTypes">A set of entity type GUIDs to filter the child entities. This parameter is variadic (params).</param>
+    /// <returns>An enumerable collection of child entities that match the specified criteria.</returns>
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
 
         // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }

@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Mapping.Element;
 using Umbraco.Cms.Api.Management.Services.PermissionFilter;
-using Umbraco.Cms.Api.Management.Services.References;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 
@@ -24,7 +23,6 @@ internal static class ElementBuilderExtensions
         builder.Services.AddTransient<IElementEditingPresentationFactory, ElementEditingPresentationFactory>();
         builder.Services.AddTransient<IElementVersionPresentationFactory, ElementVersionPresentationFactory>();
         builder.Services.AddScoped<IElementPermissionFilterService, ElementPermissionFilterService>();
-        builder.Services.AddTransient<IReferencedElementsService, ReferencedElementsService>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<ElementMapDefinition>()
