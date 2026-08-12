@@ -6,12 +6,18 @@ using Umbraco.Cms.Search.Core.Models.Persistence;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
+/// <summary>
+/// Default implementation of <see cref="IContentIndexingDataCollectionService"/>.
+/// </summary>
 internal sealed class ContentIndexingDataCollectionService : IContentIndexingDataCollectionService
 {
     private readonly ISet<IContentIndexer> _contentIndexers;
     private readonly ILogger<ContentIndexingDataCollectionService> _logger;
     private readonly IIndexDocumentService _indexDocumentService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentIndexingDataCollectionService"/> class.
+    /// </summary>
     public ContentIndexingDataCollectionService(IEnumerable<IContentIndexer> contentIndexers, ILogger<ContentIndexingDataCollectionService> logger, IIndexDocumentService indexDocumentService)
     {
         _contentIndexers = contentIndexers.ToHashSet();
@@ -19,6 +25,7 @@ internal sealed class ContentIndexingDataCollectionService : IContentIndexingDat
         _indexDocumentService = indexDocumentService;
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<IndexField>?> CollectAsync(IContentBase content, bool published, CancellationToken cancellationToken)
     {
         IndexDocument? document = await _indexDocumentService.GetAsync(content.Key, published);

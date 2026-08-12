@@ -7,20 +7,28 @@ using IndexValue = Umbraco.Cms.Search.Core.Models.Indexing.IndexValue;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes label property values as the underlying value type configured for the label (integer, decimal, date or string).
+/// </summary>
 internal sealed class LabelPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     private readonly IDateTimeOffsetConverter _dateTimeOffsetConverter;
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LabelPropertyValueHandler"/> class.
+    /// </summary>
     public LabelPropertyValueHandler(IDateTimeOffsetConverter dateTimeOffsetConverter, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _dateTimeOffsetConverter = dateTimeOffsetConverter;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
+    /// <inheritdoc />
     public bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Label;
 
+    /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         var value = property.GetValue(culture, segment, published);

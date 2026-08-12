@@ -9,6 +9,10 @@ using Umbraco.Cms.Search.Core.Models.Indexing;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing.Indexers;
 
+/// <summary>
+/// Default implementation of <see cref="ISystemFieldsContentIndexer"/>: indexes Id, ParentId, PathIds, ContentTypeId,
+/// CreateDate, UpdateDate, Level, ObjectType, SortOrder, Name and tags for a content item.
+/// </summary>
 internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
 {
     private readonly IIdKeyMap _idKeyMap;
@@ -16,6 +20,9 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
     private readonly IDateTimeOffsetConverter _dateTimeOffsetConverter;
     private readonly ILogger<SystemFieldsContentIndexer> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SystemFieldsContentIndexer"/> class.
+    /// </summary>
     public SystemFieldsContentIndexer(
         IIdKeyMap idKeyMap,
         ITagService tagService,
@@ -28,6 +35,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public Task<IEnumerable<IndexField>> GetIndexFieldsAsync(IContentBase content, string?[] cultures, bool published, CancellationToken cancellationToken)
         => Task.FromResult(CollectSystemFields(content, cultures));
 

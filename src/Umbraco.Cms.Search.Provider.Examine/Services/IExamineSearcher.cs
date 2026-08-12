@@ -2,7 +2,9 @@
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
-// public marker interface allowing for explicit index registrations using the Examine searcher
+/// <summary>
+/// Marker interface for <see cref="ISearcher"/>, allowing explicit index registrations against the Examine-based searcher.
+/// </summary>
 public interface IExamineSearcher : ISearcher
 {
 }

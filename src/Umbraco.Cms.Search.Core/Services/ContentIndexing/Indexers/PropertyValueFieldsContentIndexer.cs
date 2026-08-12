@@ -9,12 +9,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing.Indexers;
 
+/// <summary>
+/// Indexes property values for a content item, delegating each property to the matching <see cref="IPropertyValueHandler"/>.
+/// Sensitive member properties are excluded.
+/// </summary>
 internal sealed class PropertyValueFieldsContentIndexer : IContentIndexer
 {
     private readonly PropertyValueHandlerCollection _propertyValueHandlerCollection;
     private readonly IMemberTypeService _memberTypeService;
     private readonly ILogger<PropertyValueFieldsContentIndexer> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyValueFieldsContentIndexer"/> class.
+    /// </summary>
     public PropertyValueFieldsContentIndexer(
         PropertyValueHandlerCollection propertyValueHandlerCollection,
         IMemberTypeService memberTypeService,
@@ -25,6 +32,7 @@ internal sealed class PropertyValueFieldsContentIndexer : IContentIndexer
         _memberTypeService = memberTypeService;
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<IndexField>> GetIndexFieldsAsync(IContentBase content, string?[] cultures, bool published, CancellationToken cancellationToken)
         => await CollectPropertyValueFields(content, cultures, published);
 

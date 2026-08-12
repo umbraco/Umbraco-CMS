@@ -11,18 +11,28 @@ using Umbraco.Cms.Search.Core.Services;
 
 namespace Umbraco.Cms.Search.Core.Controllers;
 
+/// <summary>
+/// Lists all registered content indexes with their provider name, document count, and health status.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetAllIndexesApiController : ApiControllerBase
 {
     private readonly IIndexerResolver _indexerResolver;
     private readonly IndexOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetAllIndexesApiController"/> class.
+    /// </summary>
     public GetAllIndexesApiController(IIndexerResolver indexerResolver, IOptions<IndexOptions> options)
     {
         _indexerResolver = indexerResolver;
         _options = options.Value;
     }
 
+    /// <summary>
+    /// Gets all registered content indexes.
+    /// </summary>
+    /// <returns>A paged model of index view models.</returns>
     [HttpGet("indexes")]
     [ProducesResponseType<PagedViewModel<IndexViewModel>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Indexes()

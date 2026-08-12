@@ -7,6 +7,10 @@ using Umbraco.Cms.Search.Provider.Examine.Services;
 namespace Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 
 // NOTE: This notification handler is only active when zero downtime reindexing is in effect
+/// <summary>
+/// Implements the active/shadow index swap for zero-downtime rebuilds: marks an index as rebuilding when it starts,
+/// then waits for the shadow index to commit and verifies it is healthy before swapping it in, cancelling the swap otherwise.
+/// </summary>
 internal sealed class ZeroDowntimeRebuildNotificationHandler :
     INotificationHandler<IndexRebuildStartingNotification>,
     INotificationAsyncHandler<IndexRebuildCompletedNotification>
@@ -16,6 +20,9 @@ internal sealed class ZeroDowntimeRebuildNotificationHandler :
     private readonly IIndexCommitMonitor _indexCommitMonitor;
     private readonly ILogger<ZeroDowntimeRebuildNotificationHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ZeroDowntimeRebuildNotificationHandler"/> class.
+    /// </summary>
     public ZeroDowntimeRebuildNotificationHandler(
         IActiveIndexManager activeIndexManager,
         IExamineManager examineManager,
@@ -28,9 +35,11 @@ internal sealed class ZeroDowntimeRebuildNotificationHandler :
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public void Handle(IndexRebuildStartingNotification notification)
         => _activeIndexManager.StartRebuilding(notification.IndexAlias);
 
+    /// <inheritdoc />
     public async Task HandleAsync(IndexRebuildCompletedNotification notification, CancellationToken cancellationToken)
     {
         var shadowIndexName = _activeIndexManager.ResolveShadowIndexName(notification.IndexAlias);

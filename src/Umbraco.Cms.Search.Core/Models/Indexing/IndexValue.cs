@@ -1,5 +1,8 @@
 ﻿namespace Umbraco.Cms.Search.Core.Models.Indexing;
 
+/// <summary>
+/// Represents the typed value(s) to index for a single field. Only the members relevant to the field's type are populated.
+/// </summary>
 public record IndexValue
 {
     /// <summary>
@@ -22,11 +25,23 @@ public record IndexValue
     /// </summary>
     public IEnumerable<string>? Texts { get; init; }
 
+    /// <summary>
+    /// Exact-match keyword values.
+    /// </summary>
     public IEnumerable<string>? Keywords { get; init; }
 
+    /// <summary>
+    /// Integer values.
+    /// </summary>
     public IEnumerable<int>? Integers { get; init; }
 
+    /// <summary>
+    /// Decimal values.
+    /// </summary>
     public IEnumerable<decimal>? Decimals { get; init; }
 
+    /// <summary>
+    /// Date/time values.
+    /// </summary>
     public IEnumerable<DateTimeOffset>? DateTimeOffsets { get; init; }
 }

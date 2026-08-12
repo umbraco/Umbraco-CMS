@@ -5,6 +5,9 @@ using Umbraco.Cms.Search.Core.Models.Indexing;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
+/// <summary>
+/// Default implementation of <see cref="IContentTypeIndexingService"/>.
+/// </summary>
 internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
 {
     private readonly IContentIndexingService _contentIndexingService;
@@ -17,6 +20,9 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
     private readonly IMemberService _memberService;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentTypeIndexingService"/> class.
+    /// </summary>
     public ContentTypeIndexingService(
         IContentIndexingService contentIndexingService,
         IIndexDocumentService indexDocumentService,
@@ -39,6 +45,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         _backgroundTaskQueue = backgroundTaskQueue;
     }
 
+    /// <inheritdoc />
     public void ReindexByContentTypes(Guid[] contentTypeKeys, UmbracoObjectTypes objectType, string origin)
         => _backgroundTaskQueue.QueueBackgroundWorkItem(async _ =>
         {

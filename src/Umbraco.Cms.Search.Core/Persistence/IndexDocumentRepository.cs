@@ -11,11 +11,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Persistence;
 
+/// <summary>
+/// Persists <see cref="IndexDocument"/> snapshots to the database, using MessagePack (with Lz4 compression) to serialize fields.
+/// </summary>
 public class IndexDocumentRepository : IIndexDocumentRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
     private readonly MessagePackSerializerOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexDocumentRepository"/> class.
+    /// </summary>
     public IndexDocumentRepository(IScopeAccessor scopeAccessor)
     {
         _scopeAccessor = scopeAccessor;
@@ -28,6 +34,7 @@ public class IndexDocumentRepository : IIndexDocumentRepository
             .WithSecurity(MessagePackSecurity.UntrustedData);
     }
 
+    /// <inheritdoc />
     public async Task AddAsync(IndexDocument indexDocument)
     {
         if (_scopeAccessor.AmbientScope is null)
@@ -39,6 +46,7 @@ public class IndexDocumentRepository : IIndexDocumentRepository
         await _scopeAccessor.AmbientScope.Database.InsertAsync(dto);
     }
 
+    /// <inheritdoc />
     public async Task<IndexDocument?> GetAsync(Guid id, bool published)
     {
         if (_scopeAccessor.AmbientScope is null)
@@ -56,6 +64,7 @@ public class IndexDocumentRepository : IIndexDocumentRepository
         return ToDocument(documentDto);
     }
 
+    /// <inheritdoc />
     public async Task DeleteAsync(Guid[] ids, bool published)
     {
         if (_scopeAccessor.AmbientScope is null)
@@ -71,6 +80,7 @@ public class IndexDocumentRepository : IIndexDocumentRepository
         await _scopeAccessor.AmbientScope.Database.ExecuteAsync(sql);
     }
 
+    /// <inheritdoc />
     public async Task DeleteAllAsync()
     {
         if (_scopeAccessor.AmbientScope is null)
@@ -84,6 +94,7 @@ public class IndexDocumentRepository : IIndexDocumentRepository
         await _scopeAccessor.AmbientScope.Database.ExecuteAsync(sql);
     }
 
+    /// <inheritdoc />
     public async Task<PagedModel<IndexDocument>> GetPagedAsync(long currentPage, int pageSize)
     {
         if (_scopeAccessor.AmbientScope is null)

@@ -20,6 +20,9 @@ using Constants = Umbraco.Cms.Search.Core.Constants;
 namespace Umbraco.Cms.Search.DeliveryApi.Services;
 
 // TODO: implement IApiMediaQueryProvider when that's a thing
+/// <summary>
+/// Executes Delivery API content queries against the search abstractions, translating selector, filter and sort options into index queries.
+/// </summary>
 internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
 {
     private readonly ISearcher _searcher;
@@ -30,6 +33,9 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
     private readonly ILogger<DeliveryApiContentQueryProvider> _logger;
     private readonly Dictionary<string, FieldType> _fieldTypes;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeliveryApiContentQueryProvider"/> class.
+    /// </summary>
     public DeliveryApiContentQueryProvider(
         ISearcher searcher,
         ContentIndexHandlerCollection contentIndexHandlerCollection,
@@ -53,6 +59,17 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
             .ToDictionary(field => field.FieldName, field => field.FieldType, StringComparer.InvariantCultureIgnoreCase);
     }
 
+    /// <summary>
+    /// Returns a page of item ids that passed the search criteria, without any protected content access restrictions.
+    /// </summary>
+    /// <param name="selectorOption">The selector option of the search criteria.</param>
+    /// <param name="filterOptions">The filter options of the search criteria.</param>
+    /// <param name="sortOptions">The sorting options of the search criteria.</param>
+    /// <param name="culture">The requested culture.</param>
+    /// <param name="preview">Whether or not to search for preview content.</param>
+    /// <param name="skip">Number of search results to skip (for pagination).</param>
+    /// <param name="take">Number of search results to retrieve (for pagination).</param>
+    /// <returns>A paged model containing the resulting IDs and the total number of results matching the search criteria.</returns>
     [Obsolete($"Use the {nameof(ExecuteQuery)} method that accepts {nameof(ProtectedAccess)}. Will be removed in V14.")]
     public PagedModel<Guid> ExecuteQuery(
         SelectorOption selectorOption,
@@ -64,6 +81,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
         int take)
         => ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, ProtectedAccess.None, preview, skip, take);
 
+    /// <inheritdoc />
     public PagedModel<Guid> ExecuteQuery(
         SelectorOption selectorOption,
         IList<FilterOption> filterOptions,
@@ -111,6 +129,7 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
         return new PagedModel<Guid>(result.Total, result.Documents.Select(document => document.Id).ToArray());
     }
 
+    /// <inheritdoc />
     public SelectorOption AllContentSelectorOption()
         => new() { FieldName = string.Empty, Values = [] };
 

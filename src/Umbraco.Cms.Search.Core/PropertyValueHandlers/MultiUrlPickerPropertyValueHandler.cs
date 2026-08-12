@@ -7,16 +7,24 @@ using IndexValue = Umbraco.Cms.Search.Core.Models.Indexing.IndexValue;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes multi URL picker property values as the picked links' display names (text).
+/// </summary>
 internal sealed class MultiUrlPickerPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     private readonly IJsonSerializer _jsonSerializer;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MultiUrlPickerPropertyValueHandler"/> class.
+    /// </summary>
     public MultiUrlPickerPropertyValueHandler(IJsonSerializer jsonSerializer)
         => _jsonSerializer = jsonSerializer;
 
+    /// <inheritdoc />
     public bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.MultiUrlPicker;
 
+    /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         var texts = ParsePropertyValue(property, culture, segment, published);

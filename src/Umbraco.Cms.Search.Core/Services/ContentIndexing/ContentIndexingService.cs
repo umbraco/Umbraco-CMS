@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
+/// <summary>
+/// Default implementation of <see cref="IContentIndexingService"/>.
+/// </summary>
 internal sealed class ContentIndexingService : IContentIndexingService
 {
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
@@ -22,6 +25,9 @@ internal sealed class ContentIndexingService : IContentIndexingService
     private readonly IServiceProvider _serviceProvider;
     private readonly IOriginProvider _originProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentIndexingService"/> class.
+    /// </summary>
     public ContentIndexingService(
         IBackgroundTaskQueue backgroundTaskQueue,
         IEventAggregator eventAggregator,
@@ -38,6 +44,7 @@ internal sealed class ContentIndexingService : IContentIndexingService
         _originProvider = originProvider;
     }
 
+    /// <inheritdoc />
     public void Handle(IEnumerable<ContentChange> changes, string origin)
     {
         ContentChange[] changesAsArray = changes as ContentChange[] ?? changes.ToArray();
@@ -73,6 +80,7 @@ internal sealed class ContentIndexingService : IContentIndexingService
         }
     }
 
+    /// <inheritdoc />
     public void Rebuild(string indexAlias, string origin)
     {
         ContentIndexRegistration? indexRegistration = _indexOptions.GetContentIndexRegistration(indexAlias);

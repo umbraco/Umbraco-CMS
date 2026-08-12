@@ -5,14 +5,25 @@ using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 namespace Umbraco.Cms.Search.Core.Controllers;
 
+/// <summary>
+/// Triggers a full rebuild of a content index, distributed across all servers.
+/// </summary>
 [ApiVersion("1.0")]
 public class RebuildIndexApiController : ApiControllerBase
 {
     private readonly IDistributedContentIndexRebuilder _distributedContentIndexRebuilder;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RebuildIndexApiController"/> class.
+    /// </summary>
     public RebuildIndexApiController(IDistributedContentIndexRebuilder distributedContentIndexRebuilder)
         => _distributedContentIndexRebuilder = distributedContentIndexRebuilder;
 
+    /// <summary>
+    /// Rebuilds the specified content index.
+    /// </summary>
+    /// <param name="indexAlias">The alias of the index to rebuild.</param>
+    /// <returns>200 OK if the rebuild was triggered; otherwise an error.</returns>
     [HttpPut("rebuild")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

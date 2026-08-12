@@ -6,11 +6,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes content picker property values as the picked content's key (Keyword).
+/// </summary>
 internal sealed class ContentPickerPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
+    /// <inheritdoc />
     public bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.ContentPicker;
 
+    /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         Guid? key = ParsePropertyValue(property, culture, segment, published);

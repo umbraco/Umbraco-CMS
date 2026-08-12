@@ -7,6 +7,9 @@ using Umbraco.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Controllers;
 
+/// <summary>
+/// Base class for the Examine search provider's Management API controllers.
+/// </summary>
 [ApiController]
 [BackOfficeRoute("examine/api/v{version:apiVersion}")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

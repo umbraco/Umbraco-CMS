@@ -6,15 +6,21 @@ namespace Umbraco.Cms.Search.Provider.Examine.Services;
 /// </summary>
 internal sealed class NoopActiveIndexManager : IActiveIndexManager
 {
+    /// <inheritdoc />
     public string ResolveActiveIndexName(string indexAlias) => indexAlias;
 
+    /// <inheritdoc />
     public string ResolveShadowIndexName(string indexAlias) => indexAlias;
 
+    /// <inheritdoc />
     public bool IsRebuilding(string indexAlias) => false;
 
+    /// <inheritdoc />
     public void StartRebuilding(string indexAlias) { }
 
+    /// <inheritdoc />
     public void CompleteRebuilding(string indexAlias) { }
 
+    /// <inheritdoc />
     public void CancelRebuilding(string indexAlias) { }
 }

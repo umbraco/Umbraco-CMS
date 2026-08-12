@@ -5,11 +5,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes slider property values as decimals (one value, or two for a range slider).
+/// </summary>
 internal sealed class SliderPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
+    /// <inheritdoc />
     public bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Slider;
 
+    /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         var values = ParsePropertyValue(property, culture, segment, published);

@@ -10,6 +10,9 @@ using IndexOptions = Umbraco.Cms.Search.Core.Configuration.IndexOptions;
 
 namespace Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 
+/// <summary>
+/// On application startup, rebuilds any registered index whose active physical Lucene index does not yet exist.
+/// </summary>
 public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicationStartedNotification>
 {
     private readonly IExamineManager _examineManager;
@@ -19,6 +22,9 @@ public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicatio
     private readonly IOriginProvider _originProvider;
     private readonly IndexOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RebuildNotificationHandler"/> class.
+    /// </summary>
     public RebuildNotificationHandler(
         IExamineManager examineManager,
         IActiveIndexManager activeIndexManager,
@@ -35,6 +41,7 @@ public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicatio
         _options = options.Value;
     }
 
+    /// <inheritdoc />
     public void Handle(UmbracoApplicationStartedNotification notification)
     {
         _logger.LogInformation("Boot detected, determining indexes to rebuild");

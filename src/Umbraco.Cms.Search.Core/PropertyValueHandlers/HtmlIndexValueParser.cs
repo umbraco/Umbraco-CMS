@@ -11,9 +11,13 @@ internal sealed partial class HtmlIndexValueParser : IHtmlIndexValueParser
 {
     private readonly ILogger<HtmlIndexValueParser> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HtmlIndexValueParser"/> class.
+    /// </summary>
     public HtmlIndexValueParser(ILogger<HtmlIndexValueParser> logger)
         => _logger = logger;
 
+    /// <inheritdoc />
     public IndexValue? Parse(string html)
     {
         try

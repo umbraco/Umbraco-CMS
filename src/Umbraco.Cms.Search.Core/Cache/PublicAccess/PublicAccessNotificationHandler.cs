@@ -8,14 +8,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Cache.PublicAccess;
 
+/// <summary>
+/// Reacts to public access entry changes and broadcasts them via <see cref="PublicAccessDetailedCacheRefresher"/>, one payload per affected protected content node.
+/// </summary>
 internal sealed class PublicAccessNotificationHandler : ContentNotificationHandlerBase<PublicAccessDetailedCacheRefresher.JsonPayload>,
     IDistributedCacheNotificationHandler<PublicAccessEntrySavedNotification>,
     IDistributedCacheNotificationHandler<PublicAccessEntryDeletedNotification>
 {
     private readonly IIdKeyMap _idKeyMap;
 
+    /// <inheritdoc />
     protected override Guid CacheRefresherUniqueId => PublicAccessDetailedCacheRefresher.UniqueId;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublicAccessNotificationHandler"/> class.
+    /// </summary>
     public PublicAccessNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,
@@ -24,9 +31,11 @@ internal sealed class PublicAccessNotificationHandler : ContentNotificationHandl
         : base(distributedCache, originProvider, indexDocumentService)
         => _idKeyMap = idKeyMap;
 
+    /// <inheritdoc />
     public void Handle(PublicAccessEntrySavedNotification notification)
         => Handle(notification.SavedEntities);
 
+    /// <inheritdoc />
     public void Handle(PublicAccessEntryDeletedNotification notification)
         => Handle(notification.DeletedEntities);
 

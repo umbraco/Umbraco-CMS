@@ -9,16 +9,25 @@ using IndexValue = Umbraco.Cms.Search.Core.Models.Indexing.IndexValue;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes multi-node tree picker property values as the picked documents' keys (Keywords). Picker configurations
+/// targeting non-document object types (e.g. media) are not indexed.
+/// </summary>
 internal sealed class MultiNodeTreePickerPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MultiNodeTreePickerPropertyValueHandler"/> class.
+    /// </summary>
     public MultiNodeTreePickerPropertyValueHandler(IDataTypeConfigurationCache dataTypeConfigurationCache)
         => _dataTypeConfigurationCache = dataTypeConfigurationCache;
 
+    /// <inheritdoc />
     public bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.MultiNodeTreePicker;
 
+    /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         MultiNodePickerConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<MultiNodePickerConfiguration>(property.PropertyType.DataTypeKey);

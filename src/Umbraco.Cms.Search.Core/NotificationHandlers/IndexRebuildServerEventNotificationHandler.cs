@@ -14,11 +14,17 @@ internal sealed class IndexRebuildServerEventNotificationHandler :
 {
     private readonly IServerEventRouter _serverEventRouter;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexRebuildServerEventNotificationHandler"/> class.
+    /// </summary>
     public IndexRebuildServerEventNotificationHandler(IServerEventRouter serverEventRouter)
     {
         _serverEventRouter = serverEventRouter;
     }
 
+    /// <summary>
+    /// Broadcasts an "IndexRebuildStarting" server event for the index that is about to be rebuilt.
+    /// </summary>
     public async Task HandleAsync(IndexRebuildStartingNotification notification, CancellationToken cancellationToken)
     {
         await _serverEventRouter.BroadcastEventAsync(new ServerEvent
@@ -28,6 +34,9 @@ internal sealed class IndexRebuildServerEventNotificationHandler :
         });
     }
 
+    /// <summary>
+    /// Broadcasts an "IndexRebuildCompleted" server event for the index that finished rebuilding.
+    /// </summary>
     public async Task HandleAsync(IndexRebuildCompletedNotification notification, CancellationToken cancellationToken)
     {
         await _serverEventRouter.BroadcastEventAsync(new ServerEvent

@@ -8,12 +8,18 @@ using IndexField = Umbraco.Cms.Search.Core.Models.Indexing.IndexField;
 
 namespace Umbraco.Cms.Search.DeliveryApi.Services;
 
+/// <summary>
+/// Indexes Delivery API selector, filter and sorter field values for content, using the registered Delivery API content index handlers.
+/// </summary>
 internal sealed class DeliveryApiContentIndexer : IContentIndexer
 {
     private readonly ContentIndexHandlerCollection _contentIndexHandlerCollection;
     private readonly IDateTimeOffsetConverter _dateTimeOffsetConverter;
     private readonly ILogger<DeliveryApiContentIndexer> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeliveryApiContentIndexer"/> class.
+    /// </summary>
     public DeliveryApiContentIndexer(
         ContentIndexHandlerCollection contentIndexHandlerCollection,
         IDateTimeOffsetConverter dateTimeOffsetConverter,
@@ -24,6 +30,14 @@ internal sealed class DeliveryApiContentIndexer : IContentIndexer
         _logger = logger;
     }
 
+    /// <summary>
+    /// Builds the index fields for Delivery API selectors, filters and sorters for the given content, one set per requested culture.
+    /// </summary>
+    /// <param name="content">The content to index. Only <see cref="IContent"/> is supported; other types yield no fields.</param>
+    /// <param name="cultures">The cultures to build fields for.</param>
+    /// <param name="published">Whether the published or draft version of the content is being indexed.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The Delivery API index fields for the content.</returns>
     public Task<IEnumerable<IndexField>> GetIndexFieldsAsync(IContentBase content, string?[] cultures, bool published, CancellationToken cancellationToken)
     {
         if (content is not IContent concreteContent)

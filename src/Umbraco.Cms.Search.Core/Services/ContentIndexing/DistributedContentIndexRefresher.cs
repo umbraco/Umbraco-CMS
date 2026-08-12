@@ -6,6 +6,9 @@ using Umbraco.Cms.Search.Core.Models.Indexing;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
+/// <summary>
+/// Default implementation of <see cref="IDistributedContentIndexRefresher"/>, backed by the search cache refreshers.
+/// </summary>
 internal sealed class DistributedContentIndexRefresher : IDistributedContentIndexRefresher
 {
     private readonly DraftContentNotificationHandler _draftContentNotificationHandler;
@@ -13,6 +16,9 @@ internal sealed class DistributedContentIndexRefresher : IDistributedContentInde
     private readonly DraftMediaNotificationHandler _draftMediaNotificationHandler;
     private readonly DraftMemberNotificationHandler _draftMemberNotificationHandler;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DistributedContentIndexRefresher"/> class.
+    /// </summary>
     public DistributedContentIndexRefresher(
         DraftContentNotificationHandler draftContentNotificationHandler,
         PublishedContentNotificationHandler publishedContentNotificationHandler,
@@ -25,6 +31,7 @@ internal sealed class DistributedContentIndexRefresher : IDistributedContentInde
         _draftMemberNotificationHandler = draftMemberNotificationHandler;
     }
 
+    /// <inheritdoc />
     public void RefreshContent(IEnumerable<IContent> entities, ContentState contentState)
     {
         switch (contentState)
@@ -40,9 +47,11 @@ internal sealed class DistributedContentIndexRefresher : IDistributedContentInde
         }
     }
 
+    /// <inheritdoc />
     public void RefreshMedia(IEnumerable<IMedia> entities)
         => _draftMediaNotificationHandler.Refresh(entities);
 
+    /// <inheritdoc />
     public void RefreshMember(IEnumerable<IMember> entities)
         => _draftMemberNotificationHandler.Refresh(entities);
 }

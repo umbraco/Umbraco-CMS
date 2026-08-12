@@ -7,14 +7,25 @@ using Umbraco.Cms.Search.Core.Services;
 
 namespace Umbraco.Cms.Search.Core.Controllers;
 
+/// <summary>
+/// Gets a single registered index's provider name, document count, and health status.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetIndexApiController : ApiControllerBase
 {
     private readonly IIndexerResolver _indexerResolver;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetIndexApiController"/> class.
+    /// </summary>
     public GetIndexApiController(IIndexerResolver indexerResolver)
         => _indexerResolver = indexerResolver;
 
+    /// <summary>
+    /// Gets the specified index.
+    /// </summary>
+    /// <param name="indexAlias">The alias of the index.</param>
+    /// <returns>The index view model, or an error if the index alias is missing or could not be resolved.</returns>
     [HttpGet("indexes/{indexAlias}")]
     [ProducesResponseType<IndexViewModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

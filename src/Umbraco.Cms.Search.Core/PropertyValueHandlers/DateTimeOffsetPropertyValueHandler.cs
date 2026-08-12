@@ -6,17 +6,24 @@ using Umbraco.Cms.Search.Core.Models.Indexing;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes date/time property values (date, time, date-only, time-only and variants) as dates.
+/// </summary>
 internal sealed class DateTimeOffsetPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     private readonly IDateTimeOffsetConverter _dateTimeOffsetConverter;
     private readonly IJsonSerializer _jsonSerializer;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DateTimeOffsetPropertyValueHandler"/> class.
+    /// </summary>
     public DateTimeOffsetPropertyValueHandler(IDateTimeOffsetConverter dateTimeOffsetConverter, IJsonSerializer jsonSerializer)
     {
         _dateTimeOffsetConverter = dateTimeOffsetConverter;
         _jsonSerializer = jsonSerializer;
     }
 
+    /// <inheritdoc />
     public bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.DateTime
             or Cms.Core.Constants.PropertyEditors.Aliases.PlainDateTime
@@ -25,6 +32,7 @@ internal sealed class DateTimeOffsetPropertyValueHandler : IPropertyValueHandler
             or Cms.Core.Constants.PropertyEditors.Aliases.DateTimeUnspecified
             or Cms.Core.Constants.PropertyEditors.Aliases.DateTimeWithTimeZone;
 
+    /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         DateTimeOffset? dateTimeOffset = ParsePropertyValue(property, culture, segment, published);

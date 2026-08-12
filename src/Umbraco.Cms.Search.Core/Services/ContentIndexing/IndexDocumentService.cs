@@ -7,17 +7,24 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
+/// <summary>
+/// Default implementation of <see cref="IIndexDocumentService"/>, backed by <see cref="IIndexDocumentRepository"/>.
+/// </summary>
 public class IndexDocumentService : IIndexDocumentService
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IIndexDocumentRepository _indexDocumentRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexDocumentService"/> class.
+    /// </summary>
     public IndexDocumentService(ICoreScopeProvider scopeProvider, IIndexDocumentRepository indexDocumentRepository)
     {
         _scopeProvider = scopeProvider;
         _indexDocumentRepository = indexDocumentRepository;
     }
 
+    /// <inheritdoc />
     public async Task AddAsync(IndexDocument indexDocument)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -25,6 +32,7 @@ public class IndexDocumentService : IIndexDocumentService
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task DeleteAsync(Guid[] ids, bool published)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -32,6 +40,7 @@ public class IndexDocumentService : IIndexDocumentService
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task<IndexDocument?> GetAsync(Guid id, bool published)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -41,6 +50,7 @@ public class IndexDocumentService : IIndexDocumentService
         return document;
     }
 
+    /// <inheritdoc />
     public async Task DeleteAllAsync()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
@@ -48,6 +58,7 @@ public class IndexDocumentService : IIndexDocumentService
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task DeleteCulturesAsync(IReadOnlyCollection<string> isoCodes)
     {
         long total;

@@ -4,6 +4,10 @@ using Umbraco.Cms.Search.Core.Models.Indexing;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Converts a property value editor's stored value into index field values. Implementations are auto-discovered
+/// and are matched to properties by property editor alias via <see cref="CanHandle"/>.
+/// </summary>
 public interface IPropertyValueHandler : IDiscoverable
 {
     /// <summary>

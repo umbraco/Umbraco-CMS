@@ -5,10 +5,16 @@ using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 namespace Umbraco.Cms.Search.Core.Cache.Language;
 
+/// <summary>
+/// Reacts to language deletions and broadcasts them via <see cref="LanguageCacheRefresher"/>, flushing the deleted cultures from the change-detection cache.
+/// </summary>
 internal sealed class LanguageNotificationHandler
     : ContentNotificationHandlerBase<LanguageCacheRefresher.JsonPayload>,
         IDistributedCacheNotificationHandler<LanguageDeletedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LanguageNotificationHandler"/> class.
+    /// </summary>
     public LanguageNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,
@@ -17,8 +23,10 @@ internal sealed class LanguageNotificationHandler
     {
     }
 
+    /// <inheritdoc />
     protected override Guid CacheRefresherUniqueId => LanguageCacheRefresher.UniqueId;
 
+    /// <inheritdoc />
     public void Handle(LanguageDeletedNotification notification)
     {
         ILanguage[] deletedEntities = notification.DeletedEntities.ToArray();

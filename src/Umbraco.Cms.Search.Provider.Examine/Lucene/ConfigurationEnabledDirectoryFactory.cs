@@ -21,6 +21,9 @@ public class ConfigurationEnabledDirectoryFactory : DirectoryFactoryBase
     private readonly ExamineSearchProviderSettings _settings;
     private IDirectoryFactory? _directoryFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigurationEnabledDirectoryFactory"/> class.
+    /// </summary>
     public ConfigurationEnabledDirectoryFactory(
         IServiceProvider services,
         IOptions<ExamineSearchProviderSettings> settings,
@@ -31,6 +34,7 @@ public class ConfigurationEnabledDirectoryFactory : DirectoryFactoryBase
         _settings = settings.Value;
     }
 
+    /// <inheritdoc />
     protected override Directory CreateDirectory(LuceneIndex luceneIndex, bool forceUnlock)
     {
         _directoryFactory = CreateFactory();

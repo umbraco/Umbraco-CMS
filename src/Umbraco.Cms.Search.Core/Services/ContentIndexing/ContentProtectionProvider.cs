@@ -5,12 +5,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
+/// <summary>
+/// Default implementation of <see cref="IContentProtectionProvider"/>, based on <see cref="IPublicAccessService"/> entries.
+/// </summary>
 internal sealed class ContentProtectionProvider : IContentProtectionProvider
 {
     private readonly IPublicAccessService _publicAccessService;
     private readonly IMemberService _memberService;
     private readonly IMemberGroupService _memberGroupService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentProtectionProvider"/> class.
+    /// </summary>
     public ContentProtectionProvider(IPublicAccessService publicAccessService, IMemberService memberService, IMemberGroupService memberGroupService)
     {
         _publicAccessService = publicAccessService;
@@ -18,6 +24,7 @@ internal sealed class ContentProtectionProvider : IContentProtectionProvider
         _memberGroupService = memberGroupService;
     }
 
+    /// <inheritdoc />
     public async Task<ContentProtection?> GetContentProtectionAsync(IContentBase content)
     {
         if (content is not IContent)

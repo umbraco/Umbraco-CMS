@@ -10,6 +10,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 
+/// <summary>
+/// Reacts to draft/published content, media and member cache refresher notifications by re-indexing the affected items.
+/// </summary>
 internal sealed class ContentIndexingNotificationHandler : IndexingNotificationHandlerBase,
     INotificationHandler<PublishedContentCacheRefresherNotification>,
     INotificationHandler<DraftContentCacheRefresherNotification>,
@@ -18,12 +21,18 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
 {
     private readonly IContentIndexingService _contentIndexingService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentIndexingNotificationHandler"/> class.
+    /// </summary>
     public ContentIndexingNotificationHandler(
         ICoreScopeProvider coreScopeProvider,
         IContentIndexingService contentIndexingService)
         : base(coreScopeProvider)
         => _contentIndexingService = contentIndexingService;
 
+    /// <summary>
+    /// Re-indexes published content affected by the notified changes.
+    /// </summary>
     public void Handle(PublishedContentCacheRefresherNotification notification)
     {
         PublishedContentCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<PublishedContentCacheRefresher.JsonPayload>(notification, out var origin);
@@ -34,6 +43,9 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
         ExecuteDeferred(() => _contentIndexingService.Handle(changes, origin));
     }
 
+    /// <summary>
+    /// Re-indexes draft content affected by the notified changes.
+    /// </summary>
     public void Handle(DraftContentCacheRefresherNotification notification)
     {
         DraftContentCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<DraftContentCacheRefresher.JsonPayload>(notification, out var origin);
@@ -44,6 +56,9 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
         ExecuteDeferred(() => _contentIndexingService.Handle(changes, origin));
     }
 
+    /// <summary>
+    /// Re-indexes media affected by the notified changes.
+    /// </summary>
     public void Handle(DraftMediaCacheRefresherNotification notification)
     {
         DraftMediaCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<DraftMediaCacheRefresher.JsonPayload>(notification, out var origin);
@@ -55,6 +70,9 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
     }
 
 
+    /// <summary>
+    /// Re-indexes members affected by the notified changes.
+    /// </summary>
     public void Handle(DraftMemberCacheRefresherNotification notification)
     {
         DraftMemberCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<DraftMemberCacheRefresher.JsonPayload>(notification, out var origin);

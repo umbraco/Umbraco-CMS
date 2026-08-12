@@ -11,8 +11,15 @@ using ServicesCollectionExtensions = Examine.ServicesCollectionExtensions;
 
 namespace Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
 
+/// <summary>
+/// Provides extension methods for registering the Examine search provider's own services on an <see cref="IServiceCollection"/>.
+/// </summary>
 internal static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Registers Examine itself, the Examine-backed <see cref="IIndexer"/>/<see cref="ISearcher"/> implementations,
+    /// and the content index registrations for the built-in document, media, and member indexes.
+    /// </summary>
     public static void AddExamineSearchProviderServices(this IServiceCollection services)
     {
         ServicesCollectionExtensions.AddExamine(services);

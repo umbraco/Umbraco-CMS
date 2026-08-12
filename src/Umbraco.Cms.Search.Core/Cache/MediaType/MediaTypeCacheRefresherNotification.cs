@@ -3,8 +3,14 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Search.Core.Cache.MediaType;
 
+/// <summary>
+/// The distributed notification broadcast by <see cref="MediaTypeCacheRefresher"/>.
+/// </summary>
 internal sealed class MediaTypeCacheRefresherNotification : CacheRefresherNotification
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaTypeCacheRefresherNotification"/> class.
+    /// </summary>
     public MediaTypeCacheRefresherNotification(object messageObject, MessageType messageType)
         : base(messageObject, messageType)
     {

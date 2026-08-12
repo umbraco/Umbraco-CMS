@@ -5,8 +5,12 @@ using Umbraco.Cms.Search.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Search.DeliveryApi.DependencyInjection;
 
+/// <summary>
+/// Registers the search core and Delivery API search services, when the Delivery API is composed.
+/// </summary>
 public sealed class DeliveryApiSearchComposer : IComposer
 {
+    /// <inheritdoc />
     public void Compose(IUmbracoBuilder builder)
     {
         // Only add Delivery API querying when the Delivery API is actually composed (AddDeliveryApi() registers

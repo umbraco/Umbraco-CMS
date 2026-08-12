@@ -14,6 +14,9 @@ using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 namespace Umbraco.Cms.Search.Core.NotificationHandlers;
 
+/// <summary>
+/// Triggers full or partial index rebuilds in response to language, content/media/member type changes, and explicit rebuild requests.
+/// </summary>
 internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHandlerBase,
     INotificationHandler<LanguageCacheRefresherNotification>,
     INotificationHandler<ContentTypeCacheRefresherNotification>,
@@ -25,6 +28,9 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
     private readonly IContentTypeIndexingService _contentTypeIndexingService;
     private readonly IndexOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RebuildIndexesNotificationHandler"/> class.
+    /// </summary>
     public RebuildIndexesNotificationHandler(
         IContentIndexingService contentIndexingService,
         IContentTypeIndexingService contentTypeIndexingService,
@@ -37,6 +43,9 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
         _options = options.Value;
     }
 
+    /// <summary>
+    /// Rebuilds every document index when a language is deleted.
+    /// </summary>
     public void Handle(LanguageCacheRefresherNotification notification)
     {
         LanguageCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<LanguageCacheRefresher.JsonPayload>(notification, out var origin);
@@ -54,6 +63,9 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
         }
     }
 
+    /// <summary>
+    /// Re-indexes content whose content type structure changed.
+    /// </summary>
     public void Handle(ContentTypeCacheRefresherNotification notification)
     {
         ContentTypeCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<ContentTypeCacheRefresher.JsonPayload>(notification, out var origin);
@@ -61,6 +73,9 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
         HandleContentTypeChanges(payloads.Select(payload => (payload.ContentTypeKey, payload.ChangeTypes)), UmbracoObjectTypes.Document, origin);
     }
 
+    /// <summary>
+    /// Re-indexes members whose member type structure changed.
+    /// </summary>
     public void Handle(MemberTypeCacheRefresherNotification notification)
     {
         MemberTypeCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<MemberTypeCacheRefresher.JsonPayload>(notification, out var origin);
@@ -68,6 +83,9 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
         HandleContentTypeChanges(payloads.Select(payload => (payload.MemberTypeKey, payload.ChangeTypes)), UmbracoObjectTypes.Member, origin);
     }
 
+    /// <summary>
+    /// Re-indexes media whose media type structure changed.
+    /// </summary>
     public void Handle(MediaTypeCacheRefresherNotification notification)
     {
         MediaTypeCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<MediaTypeCacheRefresher.JsonPayload>(notification, out var origin);
@@ -75,6 +93,9 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
         HandleContentTypeChanges(payloads.Select(payload => (payload.MediaTypeKey, payload.ChangeTypes)), UmbracoObjectTypes.Media, origin);
     }
 
+    /// <summary>
+    /// Rebuilds the index(es) named in an explicit rebuild request.
+    /// </summary>
     public void Handle(RebuildIndexCacheRefresherNotification notification)
     {
         RebuildIndexCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<RebuildIndexCacheRefresher.JsonPayload>(notification, out var origin);

@@ -8,20 +8,28 @@ using IndexValue = Umbraco.Cms.Search.Core.Models.Indexing.IndexValue;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes tags property values as keywords, parsing either JSON or delimiter-separated storage.
+/// </summary>
 internal sealed class TagsPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TagsPropertyValueHandler"/> class.
+    /// </summary>
     public TagsPropertyValueHandler(IJsonSerializer jsonSerializer, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _jsonSerializer = jsonSerializer;
         _dataTypeConfigurationCache = dataTypeConfigurationCache;
     }
 
+    /// <inheritdoc />
     public bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Tags;
 
+    /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         var values = ParsePropertyValue(property, culture, segment, published);

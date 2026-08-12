@@ -3,8 +3,14 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Search.Core.Cache.Content;
 
+/// <summary>
+/// The distributed notification broadcast by <see cref="DraftContentCacheRefresher"/>.
+/// </summary>
 internal sealed class DraftContentCacheRefresherNotification : CacheRefresherNotification
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DraftContentCacheRefresherNotification"/> class.
+    /// </summary>
     public DraftContentCacheRefresherNotification(object messageObject, MessageType messageType)
         : base(messageObject, messageType)
     {

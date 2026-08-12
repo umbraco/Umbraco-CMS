@@ -14,6 +14,9 @@ using Constants = Umbraco.Cms.Search.Core.Constants;
 
 namespace Umbraco.Cms.Search.BackOffice.Services;
 
+/// <summary>
+/// Provides backoffice entity search against search indexes, honoring user start node and recycle bin restrictions.
+/// </summary>
 internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIndexedEntitySearchService
 {
     private readonly ISearcherResolver _searcherResolver;
@@ -22,6 +25,9 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
     private readonly AppCaches _appCaches;
     private readonly IIdKeyMap _idKeyMap;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexedEntitySearchService"/> class.
+    /// </summary>
     public IndexedEntitySearchService(ISearcherResolver searcherResolver, IEntityService entityService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor, AppCaches appCaches, IIdKeyMap idKeyMap)
     {
         _searcherResolver = searcherResolver;
@@ -31,9 +37,19 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
         _idKeyMap = idKeyMap;
     }
 
+    /// <summary>
+    /// Synchronously searches for entities. See <see cref="SearchAsync"/>.
+    /// </summary>
+    /// <param name="objectType">The type of entities to search for.</param>
+    /// <param name="query">The search query string.</param>
+    /// <param name="skip">The number of results to skip for pagination.</param>
+    /// <param name="take">The maximum number of results to return.</param>
+    /// <param name="ignoreUserStartNodes">If true, ignores user start node restrictions when searching.</param>
+    /// <returns>A paged model containing the matching entities.</returns>
     public PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100, bool ignoreUserStartNodes = false)
         => SearchAsync(objectType, query, null, null, null, null, skip, take, ignoreUserStartNodes).GetAwaiter().GetResult();
 
+    /// <inheritdoc />
     public async Task<PagedModel<IEntitySlim>> SearchAsync(
         UmbracoObjectTypes objectType,
         string query,
@@ -126,6 +142,11 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
         return new PagedModel<IEntitySlim> { Items = resultEntities, Total = result.Total };
     }
 
+    /// <summary>
+    /// Resolves the current backoffice user's start node keys for the given entity type, if any are configured.
+    /// </summary>
+    /// <param name="objectType">The entity type to resolve start nodes for.</param>
+    /// <returns>The current user's start node keys, or an empty array if none apply.</returns>
     private Guid[] CurrentUserStartNodeKeys(UmbracoObjectTypes objectType)
     {
         IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;

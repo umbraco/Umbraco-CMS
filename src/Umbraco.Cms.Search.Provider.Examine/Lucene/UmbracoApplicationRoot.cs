@@ -14,9 +14,13 @@ public class UmbracoApplicationRoot : IApplicationRoot
 {
     private readonly IHostingEnvironment _hostingEnvironment;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoApplicationRoot"/> class.
+    /// </summary>
     public UmbracoApplicationRoot(IHostingEnvironment hostingEnvironment)
         => _hostingEnvironment = hostingEnvironment;
 
+    /// <inheritdoc />
     public DirectoryInfo ApplicationRoot
         => new(Path.Combine(
             _hostingEnvironment.MapPathContentRoot(Umbraco.Cms.Core.Constants.SystemDirectories.TempData),

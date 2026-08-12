@@ -3,10 +3,17 @@ using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 namespace Umbraco.Cms.Search.Core.Cache.Index;
 
+/// <summary>
+/// Broadcasts a request to rebuild the given search indexes via <see cref="RebuildIndexCacheRefresher"/>.
+/// </summary>
 internal sealed class RebuildIndexNotificationHandler : ContentNotificationHandlerBase<RebuildIndexCacheRefresher.JsonPayload>
 {
+    /// <inheritdoc />
     protected override Guid CacheRefresherUniqueId => RebuildIndexCacheRefresher.UniqueId;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RebuildIndexNotificationHandler"/> class.
+    /// </summary>
     public RebuildIndexNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,
@@ -15,6 +22,10 @@ internal sealed class RebuildIndexNotificationHandler : ContentNotificationHandl
     {
     }
 
+    /// <summary>
+    /// Broadcasts a rebuild request for the given index aliases.
+    /// </summary>
+    /// <param name="indexAliases">The aliases of the indexes to rebuild.</param>
     public void Handle(IEnumerable<string> indexAliases)
     {
         RebuildIndexCacheRefresher.JsonPayload[] payloads = indexAliases

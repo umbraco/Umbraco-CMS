@@ -6,6 +6,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.BackOffice.DependencyInjection;
 
+/// <summary>
+/// Provides extension methods for registering backoffice search on an <see cref="IUmbracoBuilder"/>.
+/// </summary>
 public static class UmbracoBuilderExtensions
 {
     /// <summary>

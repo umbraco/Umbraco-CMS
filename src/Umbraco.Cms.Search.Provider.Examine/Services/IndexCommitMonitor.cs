@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
+/// <inheritdoc cref="IIndexCommitMonitor" />
 internal sealed class IndexCommitMonitor : IIndexCommitMonitor
 {
     private static readonly TimeSpan _commitTimeout = TimeSpan.FromSeconds(30);
@@ -11,12 +12,16 @@ internal sealed class IndexCommitMonitor : IIndexCommitMonitor
     private readonly IExamineManager _examineManager;
     private readonly ILogger<IndexCommitMonitor> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexCommitMonitor"/> class.
+    /// </summary>
     public IndexCommitMonitor(IExamineManager examineManager, ILogger<IndexCommitMonitor> logger)
     {
         _examineManager = examineManager;
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public async Task<bool> WaitForCommitAsync(string indexAlias, CancellationToken cancellationToken)
     {
         if (_examineManager.TryGetIndex(indexAlias, out IIndex? index) is false || index is not LuceneIndex luceneIndex)

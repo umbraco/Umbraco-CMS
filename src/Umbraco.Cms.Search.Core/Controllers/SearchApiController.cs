@@ -11,6 +11,9 @@ using Umbraco.Cms.Search.Core.Services;
 
 namespace Umbraco.Cms.Search.Core.Controllers;
 
+/// <summary>
+/// Executes an ad-hoc search against a registered index, for use by the backoffice Search section.
+/// </summary>
 [ApiVersion("1.0")]
 public class SearchApiController : ApiControllerBase
 {
@@ -18,6 +21,9 @@ public class SearchApiController : ApiControllerBase
     private readonly IEntityService _entityService;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SearchApiController"/> class.
+    /// </summary>
     public SearchApiController(
         ISearcherResolver searcherResolver,
         IEntityService entityService,
@@ -28,6 +34,13 @@ public class SearchApiController : ApiControllerBase
         _variationContextAccessor = variationContextAccessor;
     }
 
+    /// <summary>
+    /// Executes a search against the index specified in the request.
+    /// </summary>
+    /// <param name="request">The search request, including index alias, query, filters, facets and sorters.</param>
+    /// <param name="skip">The number of results to skip for pagination.</param>
+    /// <param name="take">The maximum number of results to return.</param>
+    /// <returns>The search results, or an error if the index alias is missing or could not be resolved.</returns>
     [HttpPost("search")]
     [ProducesResponseType<SearchResultViewModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

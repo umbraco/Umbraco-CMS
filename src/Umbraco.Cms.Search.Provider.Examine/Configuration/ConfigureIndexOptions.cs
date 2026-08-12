@@ -9,20 +9,29 @@ using CoreConstants = Umbraco.Cms.Search.Core.Constants;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Configuration;
 
+/// <summary>
+/// Configures Lucene field definitions (raw/full-text/sortable/facetable) for the system fields and the
+/// configured <see cref="FieldOptions"/>, for every registered Lucene index.
+/// </summary>
 internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirectoryIndexOptions>
 {
     private readonly ExamineSearchProviderSettings _examineSearchProviderSettings;
     private readonly FieldOptions _fieldOptions;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigureIndexOptions"/> class.
+    /// </summary>
     public ConfigureIndexOptions(IOptions<FieldOptions> options, IOptions<ExamineSearchProviderSettings> settings)
     {
         _examineSearchProviderSettings = settings.Value;
         _fieldOptions = options.Value;
     }
 
+    /// <inheritdoc />
     public void Configure(string? name, LuceneDirectoryIndexOptions options)
         => AddOptions(options);
 
+    /// <inheritdoc />
     public void Configure(LuceneDirectoryIndexOptions options)
         => Configure(string.Empty, options);
 

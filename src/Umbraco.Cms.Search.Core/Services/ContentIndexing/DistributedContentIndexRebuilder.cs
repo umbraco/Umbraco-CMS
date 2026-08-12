@@ -5,12 +5,18 @@ using Umbraco.Cms.Search.Core.Configuration;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
+/// <summary>
+/// Default implementation of <see cref="IDistributedContentIndexRebuilder"/>.
+/// </summary>
 internal sealed class DistributedContentIndexRebuilder : IDistributedContentIndexRebuilder
 {
     private readonly RebuildIndexNotificationHandler _rebuildIndexNotificationHandler;
     private readonly IndexOptions _options;
     private readonly ILogger<DistributedContentIndexRebuilder> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DistributedContentIndexRebuilder"/> class.
+    /// </summary>
     public DistributedContentIndexRebuilder(
         RebuildIndexNotificationHandler rebuildIndexNotificationHandler,
         IOptions<IndexOptions> options,
@@ -21,6 +27,7 @@ internal sealed class DistributedContentIndexRebuilder : IDistributedContentInde
         _options = options.Value;
     }
 
+    /// <inheritdoc />
     public bool Rebuild(string indexAlias)
     {
         if (_options

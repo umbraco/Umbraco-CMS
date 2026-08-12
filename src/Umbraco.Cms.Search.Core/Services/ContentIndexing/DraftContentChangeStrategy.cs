@@ -11,6 +11,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
+/// <summary>
+/// Default implementation of <see cref="IDraftContentChangeStrategy"/>: indexes draft documents (including trashed
+/// content), and draft media/members, regardless of publish state.
+/// </summary>
 internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, IDraftContentChangeStrategy
 {
     private readonly IContentIndexingDataCollectionService _contentIndexingDataCollectionService;
@@ -19,8 +23,12 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
     private readonly IMemberService _memberService;
     private readonly IEventAggregator _eventAggregator;
 
+    /// <inheritdoc />
     protected override bool SupportsTrashedContent => true;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DraftContentChangeStrategy"/> class.
+    /// </summary>
     public DraftContentChangeStrategy(
         IContentIndexingDataCollectionService contentIndexingDataCollectionService,
         IContentService contentService,
@@ -39,6 +47,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         _eventAggregator = eventAggregator;
     }
 
+    /// <inheritdoc />
     public async Task HandleAsync(IEnumerable<ContentIndexInfo> indexInfos, IEnumerable<ContentChange> changes, CancellationToken cancellationToken)
     {
         ContentIndexInfo[] indexInfosAsArray = indexInfos as ContentIndexInfo[] ?? indexInfos.ToArray();
@@ -79,6 +88,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         await RemoveFromIndexAsync(indexInfosAsArray, pendingRemovals);
     }
 
+    /// <inheritdoc />
     public async Task RebuildAsync(ContentIndexInfo indexInfo, CancellationToken cancellationToken)
     {
         await indexInfo.Indexer.ResetAsync(indexInfo.IndexAlias);

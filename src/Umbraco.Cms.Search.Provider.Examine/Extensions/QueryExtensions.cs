@@ -4,8 +4,21 @@ using Umbraco.Cms.Search.Provider.Examine.Models.Searching.Filtering;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Extensions;
 
+/// <summary>
+/// Provides Examine query-building helpers for translating the search abstractions' range/exact filters into Lucene queries.
+/// </summary>
 internal static class QueryExtensions
 {
+    /// <summary>
+    /// Adds a range query for one or more ranges to the given field(s), with an inclusive lower bound and an
+    /// exclusive upper bound on each range.
+    /// </summary>
+    /// <typeparam name="T">The type of the range bounds.</typeparam>
+    /// <param name="query">The query to add the range filter to.</param>
+    /// <param name="fieldName">The invariant/culture field name to query.</param>
+    /// <param name="segmentFieldName">An additional segment-specific field name to query, or null if not segmented.</param>
+    /// <param name="negate">If true, matches documents whose field value falls outside all of <paramref name="ranges"/>.</param>
+    /// <param name="ranges">The ranges to match. A document matches if its field value falls within any one of these.</param>
     public static void AddRangeFilter<T>(this IBooleanOperation query, string fieldName, string? segmentFieldName, bool negate, IEnumerable<FilterRange<T>> ranges)
         where T : struct
     {
@@ -40,6 +53,14 @@ internal static class QueryExtensions
         }
     }
 
+    /// <summary>
+    /// Adds an exact-match query for one or more values to the given field(s).
+    /// </summary>
+    /// <typeparam name="T">The type of the filtered values.</typeparam>
+    /// <param name="query">The query to add the exact filter to.</param>
+    /// <param name="fieldName">The invariant/culture field name to query.</param>
+    /// <param name="segmentFieldName">An additional segment-specific field name to query, or null if not segmented.</param>
+    /// <param name="filter">The exact filter describing the values to match and whether to negate the match.</param>
     public static void AddExactFilter<T>(this IBooleanOperation query, string fieldName, string? segmentFieldName, ExactFilter<T> filter) where T : struct
     {
         if (filter.Values.Length == 0)

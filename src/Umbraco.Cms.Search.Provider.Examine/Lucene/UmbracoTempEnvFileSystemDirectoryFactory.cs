@@ -14,6 +14,9 @@ namespace Umbraco.Cms.Search.Provider.Examine.Lucene;
 /// </summary>
 public class UmbracoTempEnvFileSystemDirectoryFactory : FileSystemDirectoryFactory
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoTempEnvFileSystemDirectoryFactory"/> class.
+    /// </summary>
     public UmbracoTempEnvFileSystemDirectoryFactory(
         IApplicationIdentifier applicationIdentifier,
         ILockFactory lockFactory,
@@ -23,6 +26,13 @@ public class UmbracoTempEnvFileSystemDirectoryFactory : FileSystemDirectoryFacto
     {
     }
 
+    /// <summary>
+    /// Computes the temp-folder path index files are stored under, hashed from the site name and application identifier
+    /// so a moved/relocated site does not pick up a stale index left behind by a previous worker.
+    /// </summary>
+    /// <param name="applicationIdentifier">Identifies the running application instance.</param>
+    /// <param name="hostingEnvironment">The hosting environment, used to read the site name.</param>
+    /// <returns>The temp-folder path for this application's Examine indexes.</returns>
     public static string GetTempPath(IApplicationIdentifier applicationIdentifier, IHostingEnvironment hostingEnvironment)
     {
         var hashString = hostingEnvironment.SiteName + "::" + applicationIdentifier.GetApplicationUniqueIdentifier();

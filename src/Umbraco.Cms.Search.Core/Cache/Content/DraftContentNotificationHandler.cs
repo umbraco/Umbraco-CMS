@@ -7,14 +7,21 @@ using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 namespace Umbraco.Cms.Search.Core.Cache.Content;
 
+/// <summary>
+/// Reacts to draft content changes and broadcasts them via <see cref="DraftContentCacheRefresher"/>, flushing the affected index documents from the change-detection cache.
+/// </summary>
 internal sealed class DraftContentNotificationHandler : ContentNotificationHandlerBase<DraftContentCacheRefresher.JsonPayload>,
     IDistributedCacheNotificationHandler<ContentSavedNotification>,
     IDistributedCacheNotificationHandler<ContentMovedNotification>,
     IDistributedCacheNotificationHandler<ContentMovedToRecycleBinNotification>,
     IDistributedCacheNotificationHandler<ContentDeletedNotification>
 {
+    /// <inheritdoc />
     protected override Guid CacheRefresherUniqueId => DraftContentCacheRefresher.UniqueId;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DraftContentNotificationHandler"/> class.
+    /// </summary>
     public DraftContentNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,
@@ -23,6 +30,10 @@ internal sealed class DraftContentNotificationHandler : ContentNotificationHandl
     {
     }
 
+    /// <summary>
+    /// Flushes the change-detection cache for the given content items and broadcasts a refresh-node change for each.
+    /// </summary>
+    /// <param name="entities">The content items to refresh.</param>
     public void Refresh(IEnumerable<IContent> entities)
     {
         IContent[] entitiesAsArray = entities as IContent[] ?? entities.ToArray();
@@ -40,15 +51,19 @@ internal sealed class DraftContentNotificationHandler : ContentNotificationHandl
         HandlePayloads(payloads);
     }
 
+    /// <inheritdoc />
     public void Handle(ContentSavedNotification notification)
         => Refresh(notification.SavedEntities);
 
+    /// <inheritdoc />
     public void Handle(ContentMovedNotification notification)
         => HandleMove(notification.MoveInfoCollection);
 
+    /// <inheritdoc />
     public void Handle(ContentMovedToRecycleBinNotification notification)
         => HandleMove(notification.MoveInfoCollection);
 
+    /// <inheritdoc />
     public void Handle(ContentDeletedNotification notification)
     {
         IContent[] deletedEntities = notification.DeletedEntities.ToArray();

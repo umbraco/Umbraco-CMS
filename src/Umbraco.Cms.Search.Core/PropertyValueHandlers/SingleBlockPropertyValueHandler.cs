@@ -6,8 +6,14 @@ using Umbraco.Cms.Search.Core.PropertyValueHandlers.Collection;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes single block property values by recursively indexing the block's content.
+/// </summary>
 internal sealed class SingleBlockPropertyValueHandler : BlockEditorPropertyValueHandler, ICorePropertyValueHandler
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SingleBlockPropertyValueHandler"/> class.
+    /// </summary>
     public SingleBlockPropertyValueHandler(
         IJsonSerializer jsonSerializer,
         IContentTypeService contentTypeService,
@@ -18,6 +24,7 @@ internal sealed class SingleBlockPropertyValueHandler : BlockEditorPropertyValue
     {
     }
 
+    /// <inheritdoc />
     public override bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.SingleBlock;
 }

@@ -28,6 +28,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.DependencyInjection;
 
+/// <summary>
+/// Provides extension methods for registering the core Umbraco Search services on an <see cref="IUmbracoBuilder"/>.
+/// </summary>
 public static class UmbracoBuilderExtensions
 {
     /// <summary>

@@ -10,11 +10,18 @@ using CoreConstants = Umbraco.Cms.Search.Core.Constants;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
+/// <summary>
+/// Implements <see cref="Umbraco.Cms.Search.Core.Services.IIndexer"/> against Examine/Lucene, mapping core <see cref="IndexField"/> values to
+/// Examine field definitions and writing to whichever physical index slot (active or shadow) is currently the write target.
+/// </summary>
 public class Indexer : IExamineIndexer
 {
     private readonly IExamineManager _examineManager;
     private readonly IActiveIndexManager _activeIndexManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Indexer"/> class.
+    /// </summary>
     public Indexer(IExamineManager examineManager, IOptions<FieldOptions> fieldOptions, IActiveIndexManager activeIndexManager)
     {
         _examineManager = examineManager;
@@ -39,6 +46,7 @@ public class Indexer : IExamineIndexer
         // No-op by default. Override in derived classes to handle custom IndexValue types.
     }
 
+    /// <inheritdoc />
     public Task AddOrUpdateAsync(
         string indexAlias,
         Guid id,
@@ -147,6 +155,7 @@ public class Indexer : IExamineIndexer
         return list;
     }
 
+    /// <inheritdoc />
     public Task ResetAsync(string indexAlias)
     {
         var physicalName = ResolveWriteTargetName(indexAlias);
@@ -161,6 +170,7 @@ public class Indexer : IExamineIndexer
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public Task<IndexMetadata> GetMetadataAsync(string indexAlias)
     {
         if (_activeIndexManager.IsRebuilding(indexAlias))
@@ -222,6 +232,7 @@ public class Indexer : IExamineIndexer
         }
     }
 
+    /// <inheritdoc />
     public Task DeleteAsync(string indexAlias, IEnumerable<Guid> ids)
     {
         IIndex index = GetWriteTargetIndex(indexAlias);

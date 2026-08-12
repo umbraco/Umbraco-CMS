@@ -39,8 +39,17 @@ namespace Umbraco.Cms.Search.Core.Cache;
  * make an informed decision of how much to re-index when public access changes occur.
  *
  */
+
+/// <summary>
+/// Provides extension methods for registering the custom cache refresher notification handlers in <see cref="Umbraco.Cms.Search.Core.Cache"/>.
+/// </summary>
 public static class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Registers the notification handlers that feed the custom published content and detailed public access cache refreshers.
+    /// </summary>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <returns>The Umbraco builder.</returns>
     public static IUmbracoBuilder AddCustomCacheRefresherNotificationHandlers(this IUmbracoBuilder builder)
     {
         builder.AddNotificationHandler<ContentPublishedNotification, PublishedContentNotificationHandler>();

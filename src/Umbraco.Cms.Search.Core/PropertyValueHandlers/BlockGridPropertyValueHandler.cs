@@ -6,8 +6,14 @@ using Umbraco.Cms.Search.Core.PropertyValueHandlers.Collection;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes block grid property values by recursively indexing the contained blocks' content.
+/// </summary>
 internal sealed class BlockGridPropertyValueHandler : BlockEditorPropertyValueHandler, ICorePropertyValueHandler
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BlockGridPropertyValueHandler"/> class.
+    /// </summary>
     public BlockGridPropertyValueHandler(
         IJsonSerializer jsonSerializer,
         IContentTypeService contentTypeService,
@@ -18,6 +24,7 @@ internal sealed class BlockGridPropertyValueHandler : BlockEditorPropertyValueHa
     {
     }
 
+    /// <inheritdoc />
     public override bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.BlockGrid;
 }

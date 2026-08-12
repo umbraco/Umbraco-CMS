@@ -22,11 +22,18 @@ using SearchResult = Umbraco.Cms.Search.Core.Models.Searching.SearchResult;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
+/// <summary>
+/// Implements <see cref="Umbraco.Cms.Search.Core.Services.ISearcher"/> against Examine/Lucene, translating core
+/// <see cref="Filter"/>, <see cref="Facet"/>, and <see cref="Sorter"/> types into Examine query operations.
+/// </summary>
 public class Searcher : IExamineSearcher
 {
     private readonly IActiveIndexManager _activeIndexManager;
     private static readonly ConcurrentDictionary<string, bool> InitializedIndexes = new();
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Searcher"/> class.
+    /// </summary>
     public Searcher(IExamineManager examineManager, IOptions<SearcherOptions> searcherOptions, IActiveIndexManager activeIndexManager)
     {
         _activeIndexManager = activeIndexManager;
@@ -44,6 +51,7 @@ public class Searcher : IExamineSearcher
     /// </summary>
     protected SearcherOptions SearcherOptions { get; }
 
+    /// <inheritdoc />
     public async Task<SearchResult> SearchAsync(
         string indexAlias,
         string? query = null,

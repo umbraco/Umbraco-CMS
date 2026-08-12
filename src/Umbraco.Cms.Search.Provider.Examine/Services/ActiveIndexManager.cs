@@ -7,14 +7,26 @@ using IndexOptions = Umbraco.Cms.Search.Core.Configuration.IndexOptions;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Services;
 
+/// <inheritdoc cref="IActiveIndexManager" />
 internal sealed class ActiveIndexManager : IActiveIndexManager
 {
     private readonly ILogger<ActiveIndexManager> _logger;
     private readonly ConcurrentDictionary<string, Index> _indexes = new();
 
+    /// <summary>
+    /// The physical index name suffix for slot A.
+    /// </summary>
     internal const string SuffixA = "_a";
+
+    /// <summary>
+    /// The physical index name suffix for slot B.
+    /// </summary>
     internal const string SuffixB = "_b";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ActiveIndexManager"/> class, determining the initial active slot
+    /// for each registered index from whichever physical slot already has documents.
+    /// </summary>
     public ActiveIndexManager(IExamineManager examineManager, ILogger<ActiveIndexManager> logger, IOptions<IndexOptions> indexOptions)
     {
         _logger = logger;
@@ -25,14 +37,18 @@ internal sealed class ActiveIndexManager : IActiveIndexManager
         }
     }
 
+    /// <inheritdoc />
     public string ResolveActiveIndexName(string indexAlias)
         => indexAlias + (_indexes.TryGetValue(indexAlias, out Index? index) ? index.ActiveSuffix : SuffixA);
 
+    /// <inheritdoc />
     public string ResolveShadowIndexName(string indexAlias)
         => indexAlias + (_indexes.TryGetValue(indexAlias, out Index? index) ? index.ShadowSuffix : SuffixB);
 
+    /// <inheritdoc />
     public bool IsRebuilding(string indexAlias) => _indexes.TryGetValue(indexAlias, out Index? index) && index.IsRebuilding;
 
+    /// <inheritdoc />
     public void StartRebuilding(string indexAlias)
     {
         if (_indexes.TryGetValue(indexAlias, out Index? current) is false)
@@ -56,6 +72,7 @@ internal sealed class ActiveIndexManager : IActiveIndexManager
         _indexes[indexAlias] = current with { IsRebuilding = true };
     }
 
+    /// <inheritdoc />
     public void CompleteRebuilding(string indexAlias)
     {
         if (_indexes.TryGetValue(indexAlias, out Index? current) is false)
@@ -79,6 +96,7 @@ internal sealed class ActiveIndexManager : IActiveIndexManager
         _indexes[indexAlias] = new Index(current.ShadowSuffix, false);
     }
 
+    /// <inheritdoc />
     public void CancelRebuilding(string indexAlias)
     {
         if (_indexes.TryGetValue(indexAlias, out Index? current) is false)

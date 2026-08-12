@@ -9,6 +9,9 @@ using Umbraco.Cms.Search.Provider.Examine.Services;
 
 namespace Umbraco.Cms.Search.Provider.Examine.Controllers;
 
+/// <summary>
+/// Exposes the raw indexed field values for a single document, backing the backoffice "Show Fields" feature.
+/// </summary>
 [ApiVersion("1.0")]
 [ApiExplorerSettings(GroupName = "Umbraco Search (Examine Provider)")]
 public class ExamineApiController : ExamineApiControllerBase
@@ -16,12 +19,21 @@ public class ExamineApiController : ExamineApiControllerBase
     private readonly IExamineManager _examineManager;
     private readonly IActiveIndexManager _activeIndexManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExamineApiController"/> class.
+    /// </summary>
     public ExamineApiController(IExamineManager examineManager, IActiveIndexManager activeIndexManager)
     {
         _examineManager = examineManager;
         _activeIndexManager = activeIndexManager;
     }
 
+    /// <summary>
+    /// Gets the raw indexed field values for a document, one entry per culture variant.
+    /// </summary>
+    /// <param name="indexAlias">The alias of the index to look up the document in.</param>
+    /// <param name="documentKey">The key of the document to retrieve.</param>
+    /// <returns>The document's indexed fields, or 404 if the index or document could not be found.</returns>
     [HttpGet("{indexAlias}/document/{documentKey:guid}")]
     [ProducesResponseType<DocumentViewModel>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

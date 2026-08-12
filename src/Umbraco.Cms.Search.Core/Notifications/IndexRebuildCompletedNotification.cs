@@ -11,6 +11,9 @@ namespace Umbraco.Cms.Search.Core.Notifications;
 /// </remarks>
 public sealed class IndexRebuildCompletedNotification : INotification
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexRebuildCompletedNotification"/> class.
+    /// </summary>
     public IndexRebuildCompletedNotification(string indexAlias)
     {
         IndexAlias = indexAlias;

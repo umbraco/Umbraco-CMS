@@ -11,6 +11,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
+/// <summary>
+/// Default implementation of <see cref="IPublishedContentChangeStrategy"/>: indexes published documents, and
+/// draft media/members, honoring publish-routing state (an ancestor must be published in the same culture) and
+/// content protection.
+/// </summary>
 internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase, IPublishedContentChangeStrategy
 {
     private readonly IContentIndexingDataCollectionService _contentIndexingDataCollectionService;
@@ -21,8 +26,12 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
     private readonly IEventAggregator _eventAggregator;
     private readonly ILogger<PublishedContentChangeStrategy> _logger;
 
+    /// <inheritdoc />
     protected override bool SupportsTrashedContent => false;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishedContentChangeStrategy"/> class.
+    /// </summary>
     public PublishedContentChangeStrategy(
         IContentIndexingDataCollectionService contentIndexingDataCollectionService,
         IContentProtectionProvider contentProtectionProvider,
@@ -44,6 +53,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         _eventAggregator = eventAggregator;
     }
 
+    /// <inheritdoc />
     public async Task HandleAsync(IEnumerable<ContentIndexInfo> indexInfos, IEnumerable<ContentChange> changes, CancellationToken cancellationToken)
     {
         // make sure all indexes can handle documents, media or members
@@ -91,6 +101,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         await RemoveFromIndexAsync(indexInfosAsArray, pendingRemovals);
     }
 
+    /// <inheritdoc />
     public async Task RebuildAsync(ContentIndexInfo indexInfo, CancellationToken cancellationToken)
     {
         await indexInfo.Indexer.ResetAsync(indexInfo.IndexAlias);

@@ -7,14 +7,21 @@ using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 namespace Umbraco.Cms.Search.Core.Cache.Media;
 
+/// <summary>
+/// Reacts to media changes and broadcasts them via <see cref="DraftMediaCacheRefresher"/>, flushing the affected index documents from the change-detection cache.
+/// </summary>
 internal sealed class DraftMediaNotificationHandler : ContentNotificationHandlerBase<DraftMediaCacheRefresher.JsonPayload>,
     IDistributedCacheNotificationHandler<MediaSavedNotification>,
     IDistributedCacheNotificationHandler<MediaMovedNotification>,
     IDistributedCacheNotificationHandler<MediaMovedToRecycleBinNotification>,
     IDistributedCacheNotificationHandler<MediaDeletedNotification>
 {
+    /// <inheritdoc />
     protected override Guid CacheRefresherUniqueId => DraftMediaCacheRefresher.UniqueId;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DraftMediaNotificationHandler"/> class.
+    /// </summary>
     public DraftMediaNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,
@@ -23,6 +30,10 @@ internal sealed class DraftMediaNotificationHandler : ContentNotificationHandler
     {
     }
 
+    /// <summary>
+    /// Flushes the change-detection cache for the given media items and broadcasts a refresh-node change for each.
+    /// </summary>
+    /// <param name="entities">The media items to refresh.</param>
     public void Refresh(IEnumerable<IMedia> entities)
     {
         IMedia[] entitiesAsArray = entities as IMedia[] ?? entities.ToArray();
@@ -40,15 +51,19 @@ internal sealed class DraftMediaNotificationHandler : ContentNotificationHandler
         HandlePayloads(payloads);
     }
 
+    /// <inheritdoc />
     public void Handle(MediaSavedNotification notification)
         => Refresh(notification.SavedEntities);
 
+    /// <inheritdoc />
     public void Handle(MediaMovedNotification notification)
         => HandleMove(notification.MoveInfoCollection);
 
+    /// <inheritdoc />
     public void Handle(MediaMovedToRecycleBinNotification notification)
         => HandleMove(notification.MoveInfoCollection);
 
+    /// <inheritdoc />
     public void Handle(MediaDeletedNotification notification)
     {
         IMedia[] deletedEntities = notification.DeletedEntities.ToArray();

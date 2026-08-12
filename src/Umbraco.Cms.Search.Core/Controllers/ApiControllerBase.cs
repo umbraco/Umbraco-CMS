@@ -7,6 +7,9 @@ using Umbraco.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.Search.Core.Controllers;
 
+/// <summary>
+/// Base class for the Search Management API controllers.
+/// </summary>
 [ApiController]
 [BackOfficeRoute("search/api/v{version:apiVersion}")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

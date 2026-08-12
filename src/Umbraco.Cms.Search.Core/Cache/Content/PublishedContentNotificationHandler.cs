@@ -8,14 +8,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.Core.Cache.Content;
 
+/// <summary>
+/// Reacts to published content changes and broadcasts them via <see cref="PublishedContentCacheRefresher"/>, flushing the affected index documents from the change-detection cache.
+/// </summary>
 internal sealed class PublishedContentNotificationHandler : ContentNotificationHandlerBase<PublishedContentCacheRefresher.JsonPayload>,
     IDistributedCacheNotificationHandler<ContentPublishedNotification>,
     IDistributedCacheNotificationHandler<ContentUnpublishedNotification>,
     IDistributedCacheNotificationHandler<ContentMovedNotification>,
     IDistributedCacheNotificationHandler<ContentMovedToRecycleBinNotification>
 {
+    /// <inheritdoc />
     protected override Guid CacheRefresherUniqueId => PublishedContentCacheRefresher.UniqueId;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishedContentNotificationHandler"/> class.
+    /// </summary>
     public PublishedContentNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,
@@ -24,7 +31,10 @@ internal sealed class PublishedContentNotificationHandler : ContentNotificationH
     {
     }
 
-
+    /// <summary>
+    /// Flushes the change-detection cache for the given content items and broadcasts a refresh-node change for each.
+    /// </summary>
+    /// <param name="entities">The content items to refresh.</param>
     public void Refresh(IEnumerable<IContent> entities)
     {
         IContent[] entitiesAsArray = entities as IContent[] ?? entities.ToArray();
@@ -46,6 +56,7 @@ internal sealed class PublishedContentNotificationHandler : ContentNotificationH
         HandlePayloads(payloads);
     }
 
+    /// <inheritdoc />
     public void Handle(ContentPublishedNotification notification)
     {
         // we sometimes get unpublished entities here... filter those out, we don't need them
@@ -78,6 +89,7 @@ internal sealed class PublishedContentNotificationHandler : ContentNotificationH
         HandlePayloads(payloads);
     }
 
+    /// <inheritdoc />
     public void Handle(ContentUnpublishedNotification notification)
     {
         IContent[] unpublishedEntities = notification.UnpublishedEntities.ToArray();
@@ -95,9 +107,11 @@ internal sealed class PublishedContentNotificationHandler : ContentNotificationH
         HandlePayloads(payloads);
     }
 
+    /// <inheritdoc />
     public void Handle(ContentMovedNotification notification)
         => HandleMove(notification.MoveInfoCollection, TreeChangeTypes.RefreshBranch);
 
+    /// <inheritdoc />
     public void Handle(ContentMovedToRecycleBinNotification notification)
         => HandleMove(notification.MoveInfoCollection, TreeChangeTypes.Remove);
 

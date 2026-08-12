@@ -14,10 +14,15 @@ namespace Umbraco.Cms.Search.Provider.Examine.Lucene;
 /// </remarks>
 public class NoPrefixSimpleFsLockFactory : SimpleFSLockFactory
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NoPrefixSimpleFsLockFactory"/> class.
+    /// </summary>
+    /// <param name="lockDir">The directory in which lock files are created.</param>
     public NoPrefixSimpleFsLockFactory(DirectoryInfo lockDir) : base(lockDir)
     {
     }
 
+    /// <inheritdoc />
     public override string LockPrefix
     {
         get => base.LockPrefix;

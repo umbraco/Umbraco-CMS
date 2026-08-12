@@ -4,16 +4,24 @@ using Umbraco.Cms.Search.Core.Models.Indexing;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes markdown property values by converting the markdown to HTML and parsing it into indexable text.
+/// </summary>
 internal sealed class MarkdownPropertyValueHandler : IPropertyValueHandler, ICorePropertyValueHandler
 {
     private readonly IHtmlIndexValueParser _htmlIndexValueParser;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MarkdownPropertyValueHandler"/> class.
+    /// </summary>
     public MarkdownPropertyValueHandler(IHtmlIndexValueParser htmlIndexValueParser)
         => _htmlIndexValueParser = htmlIndexValueParser;
 
+    /// <inheritdoc />
     public bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.MarkdownEditor;
 
+    /// <inheritdoc />
     public IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         if (property.GetValue(culture, segment, published) is not string markdown)

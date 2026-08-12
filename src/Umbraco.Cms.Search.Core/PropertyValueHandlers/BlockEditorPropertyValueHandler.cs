@@ -12,6 +12,10 @@ using IndexValue = Umbraco.Cms.Search.Core.Models.Indexing.IndexValue;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Base class for property value handlers of block-based editors (block list, block grid, single block, rich text).
+/// Recursively indexes the property values of the blocks' content, accumulating them per culture/segment variation.
+/// </summary>
 internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
 {
     private readonly IJsonSerializer _jsonSerializer;
@@ -20,6 +24,9 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
     private readonly PropertyValueHandlerCollection _propertyValueHandlerCollection;
     private readonly ILogger<BlockEditorPropertyValueHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BlockEditorPropertyValueHandler"/> class.
+    /// </summary>
     protected BlockEditorPropertyValueHandler(
         IJsonSerializer jsonSerializer,
         IContentTypeService contentTypeService,
@@ -34,8 +41,10 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public abstract bool CanHandle(string propertyEditorAlias);
 
+    /// <inheritdoc />
     public virtual IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         BlockValue? blockValue = ParsePropertyValue(property, culture, segment, published);
@@ -56,6 +65,16 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
             : null;
     }
 
+    /// <summary>
+    /// Builds the cumulative index values for all contained blocks of a block property, keyed by culture/segment variation.
+    /// </summary>
+    /// <param name="blockValue">The parsed block property value.</param>
+    /// <param name="property">The block property.</param>
+    /// <param name="culture">The requested culture.</param>
+    /// <param name="segment">The requested segment.</param>
+    /// <param name="published">Whether to index the published or draft values.</param>
+    /// <param name="contentContext">The content the block property belongs to.</param>
+    /// <returns>The cumulative index values per culture/segment variation.</returns>
     protected Dictionary<(string? Culture, string? Segment), CumulativeIndexValue> GetCumulativeIndexValues(
         BlockValue blockValue,
         IProperty property,
@@ -65,6 +84,17 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
         IContentBase contentContext)
         => GetCumulativeIndexValues(blockValue.ContentData, blockValue.Expose, property, culture, segment, published, contentContext);
 
+    /// <summary>
+    /// Builds the cumulative index values for the given block content items, keyed by culture/segment variation.
+    /// </summary>
+    /// <param name="items">The block content items to index.</param>
+    /// <param name="expose">The block variations exposed for publishing.</param>
+    /// <param name="property">The block property.</param>
+    /// <param name="culture">The requested culture.</param>
+    /// <param name="segment">The requested segment.</param>
+    /// <param name="published">Whether to index the published or draft values.</param>
+    /// <param name="contentContext">The content the block property belongs to.</param>
+    /// <returns>The cumulative index values per culture/segment variation.</returns>
     protected Dictionary<(string? Culture, string? Segment), CumulativeIndexValue> GetCumulativeIndexValues(
         IList<BlockItemData> items,
         IList<BlockItemVariation> expose,
@@ -166,6 +196,11 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
         return cumulativeIndexValuesByVariation;
     }
 
+    /// <summary>
+    /// Merges an index value's field values into a cumulative index value.
+    /// </summary>
+    /// <param name="cumulativeIndexValue">The cumulative index value to merge into.</param>
+    /// <param name="indexValue">The index value to merge from.</param>
     protected void AmendCumulativeIndexValue(CumulativeIndexValue cumulativeIndexValue, IndexValue indexValue)
     {
         cumulativeIndexValue.TextsR1.AddRange(indexValue.TextsR1.EmptyNull());
@@ -178,6 +213,11 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
         cumulativeIndexValue.DateTimeOffsets.AddRange(indexValue.DateTimeOffsets.EmptyNull());
     }
 
+    /// <summary>
+    /// Converts a cumulative index value into an index value, or null if it carries no data.
+    /// </summary>
+    /// <param name="cumulativeIndexValue">The cumulative index value to convert.</param>
+    /// <returns>The resulting index value, or null if it is empty.</returns>
     protected IndexValue? ToIndexValue(CumulativeIndexValue cumulativeIndexValue)
         => cumulativeIndexValue.TextsR1.Count > 0
            || cumulativeIndexValue.TextsR2.Count > 0
@@ -200,6 +240,12 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
             }
             : null;
 
+    /// <summary>
+    /// Converts cumulative index values per culture/segment variation into index fields for the given property alias.
+    /// </summary>
+    /// <param name="cumulativeIndexValues">The cumulative index values per culture/segment variation.</param>
+    /// <param name="propertyAlias">The alias of the property being indexed.</param>
+    /// <returns>The resulting index fields, omitting any empty variations.</returns>
     protected IEnumerable<IndexField> ToIndexFields(Dictionary<(string? Culture, string? Segment), CumulativeIndexValue> cumulativeIndexValues, string propertyAlias)
         => cumulativeIndexValues.Select(kvp
                 => ToIndexValue(kvp.Value) is { } indexValue
@@ -260,29 +306,65 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
             .ToDictionary(x => x.Alias);
     }
 
+    /// <summary>
+    /// Represents the deserialized value of a block property.
+    /// </summary>
     protected class BlockValue
     {
+        /// <summary>
+        /// Gets the block content items.
+        /// </summary>
         public required List<BlockItemData> ContentData { get; init; }
 
+        /// <summary>
+        /// Gets the block variations exposed for publishing.
+        /// </summary>
         public required List<BlockItemVariation> Expose { get; init; }
     }
 
+    /// <summary>
+    /// Accumulates index field values across all blocks contained in a block property, for a single culture/segment variation.
+    /// </summary>
     protected record CumulativeIndexValue
     {
+        /// <summary>
+        /// Gets the accumulated heading-1 relevance texts.
+        /// </summary>
         public List<string> TextsR1 { get; } = [];
 
+        /// <summary>
+        /// Gets the accumulated heading-2 relevance texts.
+        /// </summary>
         public List<string> TextsR2 { get; } = [];
 
+        /// <summary>
+        /// Gets the accumulated heading-3 relevance texts.
+        /// </summary>
         public List<string> TextsR3 { get; } = [];
 
+        /// <summary>
+        /// Gets the accumulated body texts.
+        /// </summary>
         public List<string> Texts { get; } = [];
 
+        /// <summary>
+        /// Gets the accumulated keywords.
+        /// </summary>
         public List<string> Keywords { get; } = [];
 
+        /// <summary>
+        /// Gets the accumulated integers.
+        /// </summary>
         public List<int> Integers { get; } = [];
 
+        /// <summary>
+        /// Gets the accumulated decimals.
+        /// </summary>
         public List<decimal> Decimals { get; } = [];
 
+        /// <summary>
+        /// Gets the accumulated dates.
+        /// </summary>
         public List<DateTimeOffset> DateTimeOffsets { get; } = [];
     }
 }

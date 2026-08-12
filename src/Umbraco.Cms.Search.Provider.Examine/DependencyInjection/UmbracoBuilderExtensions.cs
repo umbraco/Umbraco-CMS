@@ -21,6 +21,9 @@ using Umbraco.Cms.Search.Provider.Examine.Telemetry;
 
 namespace Umbraco.Cms.Search.Provider.Examine.DependencyInjection;
 
+/// <summary>
+/// Provides extension methods for registering the Examine search provider on an <see cref="IUmbracoBuilder"/>.
+/// </summary>
 public static class UmbracoBuilderExtensions
 {
     /// <summary>

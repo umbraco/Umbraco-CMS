@@ -10,12 +10,19 @@ using IndexValue = Umbraco.Cms.Search.Core.Models.Indexing.IndexValue;
 
 namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 
+/// <summary>
+/// Indexes rich text property values, extracting HTML text (weighted by heading level) and recursively indexing
+/// any blocks embedded in the rich text.
+/// </summary>
 internal sealed class RichTextPropertyValueHandler : BlockEditorPropertyValueHandler, ICorePropertyValueHandler
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IHtmlIndexValueParser _htmlIndexValueParser;
     private readonly ILogger<RichTextPropertyValueHandler> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RichTextPropertyValueHandler"/> class.
+    /// </summary>
     public RichTextPropertyValueHandler(
         IJsonSerializer jsonSerializer,
         IContentTypeService contentTypeService,
@@ -30,9 +37,11 @@ internal sealed class RichTextPropertyValueHandler : BlockEditorPropertyValueHan
         _jsonSerializer = jsonSerializer;
     }
 
+    /// <inheritdoc />
     public override bool CanHandle(string propertyEditorAlias)
         => propertyEditorAlias is Cms.Core.Constants.PropertyEditors.Aliases.RichText;
 
+    /// <inheritdoc />
     public override IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
         var source = property.GetValue(culture, segment, published);

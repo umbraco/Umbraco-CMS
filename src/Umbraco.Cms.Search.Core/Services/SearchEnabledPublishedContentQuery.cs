@@ -22,6 +22,9 @@ internal sealed class SearchEnabledPublishedContentQuery : PublishedContentQuery
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPublishedContentCache _publishedContentCache;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SearchEnabledPublishedContentQuery"/> class.
+    /// </summary>
     public SearchEnabledPublishedContentQuery(
         ISearcherResolver searcherResolver,
         IVariationContextAccessor variationContextAccessor,
@@ -36,6 +39,7 @@ internal sealed class SearchEnabledPublishedContentQuery : PublishedContentQuery
         _publishedContentCache = publishedContent;
     }
 
+    /// <inheritdoc />
     public override IEnumerable<PublishedSearchResult> Search(
         string term,
         int skip,

@@ -7,6 +7,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Search.DeliveryApi.DependencyInjection;
 
+/// <summary>
+/// Provides extension methods for registering Delivery API search on an <see cref="IUmbracoBuilder"/>.
+/// </summary>
 public static class UmbracoBuilderExtensions
 {
     /// <summary>

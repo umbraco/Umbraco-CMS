@@ -14,6 +14,9 @@ internal sealed class ExamineTelemetryProvider : IDetailedTelemetryProvider
 {
     private readonly IExamineManager _examineManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExamineTelemetryProvider"/> class.
+    /// </summary>
     public ExamineTelemetryProvider(IExamineManager examineManager) => _examineManager = examineManager;
 
     /// <summary>

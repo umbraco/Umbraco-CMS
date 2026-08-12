@@ -4,9 +4,15 @@ using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 namespace Umbraco.Cms.Search.Core.Cache.MemberType;
 
+/// <summary>
+/// Reacts to member type changes and broadcasts them via <see cref="MemberTypeCacheRefresher"/>.
+/// </summary>
 internal sealed class MemberTypeNotificationHandler : ContentNotificationHandlerBase<MemberTypeCacheRefresher.JsonPayload>,
         IDistributedCacheNotificationHandler<MemberTypeChangedNotification>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MemberTypeNotificationHandler"/> class.
+    /// </summary>
     public MemberTypeNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,
@@ -15,8 +21,10 @@ internal sealed class MemberTypeNotificationHandler : ContentNotificationHandler
     {
     }
 
+    /// <inheritdoc />
     protected override Guid CacheRefresherUniqueId => MemberTypeCacheRefresher.UniqueId;
 
+    /// <inheritdoc />
     public void Handle(MemberTypeChangedNotification notification)
     {
         MemberTypeCacheRefresher.JsonPayload[] payloads = notification
