@@ -140,11 +140,9 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		let newValue = draftValue;
 
 		if (api.processValues) {
-			// A property value resolver may resolve more than one group of inner values (a block editor
-			// emits one group per block). Gather the persisted groups keyed by the identifier the resolver
-			// supplies, so a draft group is paired with the persisted group belonging to the *same* block.
-			// Pairing on call order breaks as soon as the two arrays stop lining up, which shifts inner
-			// values onto neighbouring blocks and drops those falling off the end (#23525).
+			// A resolver may emit several groups of inner values.
+			// Pair each draft group with its persisted group by the
+			// identifier the resolver supplies, not by call order.
 			const persistedValuesHolder = new Map<string, Array<UmbPotentialContentValueModel>>();
 			let persistedIndex = 0;
 
