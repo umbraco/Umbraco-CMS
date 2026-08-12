@@ -766,6 +766,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
+    Attempt<OperationResult?> IAsyncContentServiceBase<TContent>.Save(IEnumerable<TContent> contents, int userId) =>
+        Attempt.Succeed(Save(contents, userId));
+
+    /// <inheritdoc />
     public OperationResult Save(IEnumerable<TContent> contents, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();

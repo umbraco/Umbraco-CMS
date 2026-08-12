@@ -2304,5 +2304,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     #endregion
 
-    public Attempt<OperationResult?> Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
+    /// <inheritdoc />
+    // AsyncPublishableContentServiceBase<IContent> no longer implements IPublishableContentService<IContent> (that
+    // would re-lock every one of its ~54 members from ever being deleted as they convert one at a time), so this
+    // explicit shim lives here instead of the base class - ContentService is the only type that actually declares
+    // implementing IContentServiceBase<IContent> (transitively, via IContentService : IPublishableContentService<IContent>).
+    Attempt<OperationResult?> IContentServiceBase<IContent>.Save(IEnumerable<IContent> contents, int userId) =>
+        Attempt.Succeed(base.Save(contents, userId));
 }
