@@ -33,10 +33,12 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="validationService">The content validation service.</param>
     /// <param name="containerService">The content blueprint container service.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
     public ContentBlueprintEditingService(
         IContentService contentService,
         IContentTypeService contentTypeService,
