@@ -2303,4 +2303,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         => new ContentRolledBackNotification(target, messages);
 
     #endregion
+
+    public Attempt<OperationResult?> Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 }
