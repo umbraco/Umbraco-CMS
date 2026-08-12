@@ -139,7 +139,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
 
         // Act — delete via the element service
         var elementService = GetRequiredService<IElementService>();
-        var element = elementService.GetById(elementKey);
+        var element = await elementService.GetByIdAsync(elementKey, CancellationToken.None);
         Assert.That(element, Is.Not.Null);
         elementService.Delete(element!);
 

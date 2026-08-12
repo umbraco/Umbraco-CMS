@@ -955,7 +955,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
         // Verify only block 2's headline was updated
-        var updatedContent = ContentService.GetById(documentKey);
+        var updatedContent = await ContentService.GetByIdAsync(documentKey, CancellationToken.None);
         Assert.IsNotNull(updatedContent);
 
         var updatedBlockListJson = updatedContent.GetValue<string>("contentBlocks");
@@ -1163,7 +1163,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
         // Verify the block list now has 3 blocks
-        var updatedContent = ContentService.GetById(documentKey);
+        var updatedContent = await ContentService.GetByIdAsync(documentKey, CancellationToken.None);
         Assert.IsNotNull(updatedContent);
 
         var updatedBlockListJson = updatedContent.GetValue<string>("contentBlocks");

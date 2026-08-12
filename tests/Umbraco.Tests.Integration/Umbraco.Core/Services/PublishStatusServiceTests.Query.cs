@@ -49,7 +49,7 @@ internal sealed partial class PublishStatusServiceTests
 
         var publishResults = ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        var subPage2FromDB = ContentService.GetById(Subpage2.Key);
+        var subPage2FromDB = ContentService.GetByIdAsync(Subpage2.Key, CancellationToken.None).GetAwaiter().GetResult();
         var publishResult = ContentService.Unpublish(subPage2FromDB);
         Assert.Multiple(() =>
         {
@@ -173,7 +173,7 @@ internal sealed partial class PublishStatusServiceTests
         ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"]);
 
         // must refresh the child instance before unpublishing it, to reflect the state changes from the branch publish above
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
         ContentService.Unpublish(child, cultureToUnpublish);
 
         var publishedCulture = cultureToUnpublish is "en-US" ? "da-DK" : "en-US";
@@ -226,7 +226,7 @@ internal sealed partial class PublishStatusServiceTests
         ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"]);
 
         // must refresh the child instance before unpublishing it, to reflect the state changes from the branch publish above
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
 
         if (unpublishAllCulturesAtOnce)
         {
@@ -237,12 +237,12 @@ internal sealed partial class PublishStatusServiceTests
             ContentService.Unpublish(child, "en-US");
 
             // refresh again before unpublishing the last culture
-            child = ContentService.GetById(child.Key)!;
+            child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
             ContentService.Unpublish(child, "da-DK");
         }
 
         // refresh to get the latest state
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
         Assert.IsFalse(child.Published);
         Assert.IsEmpty(child.PublishedCultures);
         Assert.IsEmpty(child.PublishCultureInfos!);

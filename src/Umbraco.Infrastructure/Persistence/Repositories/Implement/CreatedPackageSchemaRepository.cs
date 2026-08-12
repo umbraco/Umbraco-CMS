@@ -739,7 +739,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             return;
         }
 
-        IContent? content = _contentService.GetById(contentNodeKey);
+        IContent? content = _contentService.GetByIdAsync(contentNodeKey, CancellationToken.None).GetAwaiter().GetResult();
         if (content is null)
         {
             return;

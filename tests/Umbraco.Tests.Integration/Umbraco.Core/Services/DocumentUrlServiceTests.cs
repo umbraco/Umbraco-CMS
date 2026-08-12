@@ -745,7 +745,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Reload content from database to pick up the new content type variation
-        var subpage = ContentService.GetById(Subpage.Key)!;
+        var subpage = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
 
         // Update content to have culture-specific names (required for variant content)
         subpage.SetCultureName("Text Page 1", defaultLanguage!.IsoCode);
@@ -795,7 +795,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Reload content from database to pick up the new content type variation
-        var subpage = ContentService.GetById(Subpage.Key)!;
+        var subpage = (await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!;
 
         // Update content with culture-specific name and republish as variant
         subpage.SetCultureName("Text Page 1", defaultLanguage!.IsoCode);

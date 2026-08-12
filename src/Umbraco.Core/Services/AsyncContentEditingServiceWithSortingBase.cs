@@ -17,7 +17,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
     : AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition
-    where TContentService : IContentServiceBase<TContent>
+    where TContentService : IAsyncContentServiceBase<TContent>
     where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
 {
     private readonly ILogger<AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
@@ -114,7 +114,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
         Guid userKey)
     {
         var contentId = parentKey.HasValue
-            ? ContentService.GetById(parentKey.Value)?.Id
+            ? (await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None))?.Id
             : Constants.System.Root;
 
         if (contentId.HasValue is false)
@@ -158,7 +158,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
         Guid userKey)
     {
         var contentId = parentKey.HasValue
-            ? ContentService.GetById(parentKey.Value)?.Id
+            ? (await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None))?.Id
             : Constants.System.Root;
 
         if (contentId.HasValue is false)

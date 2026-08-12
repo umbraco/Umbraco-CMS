@@ -431,42 +431,6 @@ public class DataValueEditor : IDataValueEditor
     }
 
     /// <summary>
-    /// Retrieves a <see cref="IContent"/> instance by its unique identifier, using the provided request cache to avoid redundant
-    /// lookups within the same request.
-    /// </summary>
-    /// <remarks>
-    /// This method caches content lookups for the duration of the current request to improve performance when the same content
-    /// item may be accessed multiple times. This is particularly useful in scenarios involving multiple languages or blocks.
-    /// </remarks>
-    /// <param name="key">The unique identifier of the content item to retrieve.</param>
-    /// <param name="requestCache">The request-scoped cache used to store and retrieve content items for the duration of the current request.</param>
-    /// <param name="contentService">The content service used to fetch the content item if it is not found in the cache.</param>
-    /// <returns>The <see cref="IContent"/> instance corresponding to the specified key, or null if no such content item exists.</returns>
-    [Obsolete("This method is available for support of request caching retrieved entities in derived property value editors. " +
-          "The intention is to supersede this with lazy loaded read locks, which will make this unnecessary. " +
-          "Scheduled for removal in Umbraco 19.")]
-    protected static IContent? GetAndCacheContentById(Guid key, IRequestCache requestCache, IContentService contentService)
-    {
-        if (requestCache.IsAvailable is false)
-        {
-            return contentService.GetById(key);
-        }
-
-        var cacheKey = string.Format(ContentCacheKeyFormat, key);
-        IContent? content = requestCache.GetCacheItem<IContent?>(cacheKey);
-        if (content is null)
-        {
-            content = contentService.GetById(key);
-            if (content is not null)
-            {
-                requestCache.Set(cacheKey, content);
-            }
-        }
-
-        return content;
-    }
-
-    /// <summary>
     /// Adds the specified <see cref="IContent"/> item to the request cache using its unique key.
     /// </summary>
     /// <param name="content">The content item to cache.</param>

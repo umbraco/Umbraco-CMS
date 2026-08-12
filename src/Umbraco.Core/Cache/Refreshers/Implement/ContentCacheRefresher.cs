@@ -466,7 +466,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
-            IContent? content = _contentService.GetById(payload.Key.Value);
+            IContent? content = _contentService.GetByIdAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
 
             if (content is null)
             {
@@ -478,7 +478,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            IContent? content = _contentService.GetById(payload.Key.Value);
+            IContent? content = _contentService.GetByIdAsync(payload.Key.Value, CancellationToken.None).GetAwaiter().GetResult();
 
             if (content is null)
             {

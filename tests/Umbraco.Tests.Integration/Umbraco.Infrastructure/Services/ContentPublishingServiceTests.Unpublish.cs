@@ -162,7 +162,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
     }
@@ -194,7 +194,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsNotPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
@@ -225,7 +225,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsNotPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
@@ -259,14 +259,14 @@ public partial class ContentPublishingServiceTests
             Constants.Security.SuperUserKey);
 
         VerifyIsPublished(content.Key);
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(3, content.PublishedCultures.Count());
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string> { langDa.IsoCode, langSe.IsoCode }, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsPublished(content.Key);
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
     }
 
@@ -293,7 +293,7 @@ public partial class ContentPublishingServiceTests
 
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string> { langEn.IsoCode }, Constants.Security.SuperUserKey);
@@ -301,7 +301,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsNotPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
@@ -327,7 +327,7 @@ public partial class ContentPublishingServiceTests
             Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { langDa.IsoCode }, Constants.Security.SuperUserKey);
@@ -335,7 +335,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
     }
 
@@ -343,7 +343,7 @@ public partial class ContentPublishingServiceTests
     public async Task Can_Unpublish_From_Trash()
     {
         ContentService.MoveToRecycleBin(Subpage);
-        Assert.IsTrue(ContentService.GetById(Subpage.Key)!.Trashed);
+        Assert.IsTrue((await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!.Trashed);
 
         var result = await ContentPublishingService.UnpublishAsync(Subpage.Key, null, Constants.Security.SuperUserKey);
 
@@ -380,7 +380,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
     }
 
@@ -413,7 +413,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
         VerifyIsPublished(content.Key);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
     }
 

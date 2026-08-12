@@ -77,16 +77,13 @@ internal sealed class ElementEditingService
     protected override string RelateParentOnDeleteAlias
         => Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias;
 
-    public override Task<IElement?> GetAsync(Guid key)
-    {
-        IElement? element = ContentService.GetById(key);
-        return Task.FromResult(element);
-    }
+    public override async Task<IElement?> GetAsync(Guid key)
+        => await ContentService.GetByIdAsync(key, CancellationToken.None);
 
     /// <inheritdoc/>
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ValidateElementUpdateModel updateModel, Guid userKey)
     {
-        IElement? content = _elementService.GetById(key);
+        IElement? content = await _elementService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
@@ -173,7 +170,7 @@ internal sealed class ElementEditingService
 
     private async Task<Attempt<ElementUpdateResult, ContentEditingOperationStatus>> HandleUpdateAsync(Guid key, ElementUpdateModel updateModel, string[]? culturesToPublish, Guid userKey)
     {
-        IElement? element = ContentService.GetById(key);
+        IElement? element = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (element is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ElementUpdateResult());

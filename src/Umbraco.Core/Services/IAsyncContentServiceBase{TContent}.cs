@@ -6,24 +6,15 @@ namespace Umbraco.Cms.Core.Services;
 ///     Asynchronous counterpart of <see cref="IContentServiceBase{TItem}" />.
 /// </summary>
 /// <remarks>
-///     A pure 1:1 copy of <see cref="IContentServiceBase{TItem}" /> — same members, unchanged, only the interface
-///     name gets the "Async" suffix — plus <see cref="GetByIdAsync" />, the one member from this tier that has
-///     already been migrated. This is scaffolding: giving the async hierarchy the exact shape of the sync one up
-///     front means later increments only ever swap an implementation, never touch a contract, so migrating one
-///     member at a time never risks breaking other consumers of the shared base class (e.g. <see cref="ElementService" />,
-///     which still derives from the original synchronous class).
+///     Started as a pure 1:1 copy of <see cref="IContentServiceBase{TItem}" /> plus <see cref="GetByIdAsync" />.
+///     <c>GetById(Guid)</c> has since been retired from this tier now that <see cref="GetByIdAsync" /> is its
+///     replacement - this interface is implemented only by <see cref="IContentService" /> so far, so removing it
+///     here is scoped to Document.
 /// </remarks>
 /// <typeparam name="TContent">The type of content item managed by this service.</typeparam>
 public interface IAsyncContentServiceBase<TContent> : IAsyncContentServiceBase
     where TContent : class, IContentBase
 {
-    /// <summary>
-    ///     Gets a content item by its unique identifier.
-    /// </summary>
-    /// <param name="key">The unique identifier of the content item.</param>
-    /// <returns>The content item, or <c>null</c> if not found.</returns>
-    TContent? GetById(Guid key);
-
     /// <summary>
     ///     Saves a collection of content items.
     /// </summary>

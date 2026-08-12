@@ -60,7 +60,7 @@ public static class ContentServiceExtensions
                                                 " which is required by content");
         }
 
-        IContent? parent = contentService.GetById(guidUdi.Guid);
+        IContent? parent = contentService.GetByIdAsync(guidUdi.Guid, CancellationToken.None).GetAwaiter().GetResult();
         return contentService.Create(name, parent, contentTypeAlias, userId);
     }
 

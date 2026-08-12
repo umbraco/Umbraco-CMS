@@ -45,7 +45,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         var publishResult = ContentService.Publish(content, [publishCultureCode]);
         Assert.IsTrue(publishResult.Success);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.Multiple(() =>
         {
             Assert.IsTrue(content.Published);
@@ -73,7 +73,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         var unpublishResult = ContentService.Unpublish(content, unpublishCultureCode);
         Assert.IsTrue(unpublishResult.Success);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.Multiple(() =>
         {
             Assert.IsFalse(content.Published);
@@ -105,7 +105,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         Assert.IsTrue(publishResult.First().Success);
         Assert.IsTrue(publishResult.Last().Success);
 
-        root = ContentService.GetById(root.Key)!;
+        root = (await ContentService.GetByIdAsync(root.Key, CancellationToken.None))!;
         Assert.Multiple(() =>
         {
             Assert.IsTrue(root.Published);
@@ -113,7 +113,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
             Assert.AreEqual("en-US", root.PublishedCultures.FirstOrDefault());
         });
 
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
         Assert.Multiple(() =>
         {
             Assert.IsTrue(child.Published);

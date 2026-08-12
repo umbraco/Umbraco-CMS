@@ -77,11 +77,8 @@ internal sealed class ContentEditingService
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
 
     /// <inheritdoc />
-    public override Task<IContent?> GetAsync(Guid key)
-    {
-        IContent? content = ContentService.GetById(key);
-        return Task.FromResult(content);
-    }
+    public override async Task<IContent?> GetAsync(Guid key)
+        => await ContentService.GetByIdAsync(key, CancellationToken.None);
 
     /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(
@@ -89,7 +86,7 @@ internal sealed class ContentEditingService
         ValidateContentUpdateModel updateModel,
         Guid userKey)
     {
-        IContent? content = ContentService.GetById(key);
+        IContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         return content is not null
             ? await ValidateCulturesAndPropertiesAsync(
                 updateModel,
@@ -168,7 +165,7 @@ internal sealed class ContentEditingService
 
     private async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> HandleUpdateAsync(Guid key, ContentUpdateModel updateModel, string[]? culturesToPublish, Guid userKey)
     {
-        IContent? content = ContentService.GetById(key);
+        IContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());

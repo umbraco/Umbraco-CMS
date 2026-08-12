@@ -119,7 +119,7 @@ public class DomainService : AsyncRepositoryService, IDomainService
     /// <inheritdoc />
     public async Task<Attempt<DomainUpdateResult, DomainOperationStatus>> UpdateDomainsAsync(Guid contentKey, DomainsUpdateModel updateModel)
     {
-        IContent? content = _contentService.GetById(contentKey);
+        IContent? content = await _contentService.GetByIdAsync(contentKey, CancellationToken.None);
         if (content == null)
         {
             return Attempt.FailWithStatus(DomainOperationStatus.ContentNotFound, new DomainUpdateResult());

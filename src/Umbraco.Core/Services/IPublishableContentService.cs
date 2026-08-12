@@ -2,9 +2,20 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IPublishableContentService<TContent> : IContentServiceBase<TContent>
+public interface IPublishableContentService<TContent> : IContentServiceBase
     where TContent : class, IPublishableContentBase
 {
+    // Deliberately not IContentServiceBase<TContent> - that would bring back GetById(Guid), which has been
+    // retired from the Document surface in favour of the async GetByIdAsync. Save is redeclared directly here
+    // since it's still needed by every implementer (Document, Element).
+    /// <summary>
+    ///     Saves content.
+    /// </summary>
+    /// <param name="contents">The content to save.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the operation result.</returns>
+    Attempt<OperationResult?> Save(IEnumerable<TContent> contents, int userId = Constants.Security.SuperUserId);
+
     /// <summary>
     ///     Gets content.
     /// </summary>

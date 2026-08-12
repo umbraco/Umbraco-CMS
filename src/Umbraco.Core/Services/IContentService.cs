@@ -11,12 +11,10 @@ namespace Umbraco.Cms.Core.Services;
 public interface IContentService : IPublishableContentService<IContent>, IAsyncPublishableContentService<IContent>
 {
     // IPublishableContentService<IContent> and IAsyncPublishableContentService<IContent> both derive from a
-    // base interface declaring these members with an identical signature (IContentServiceBase<IContent> and
-    // IAsyncContentServiceBase<IContent> respectively), so without redeclaring them here every call site that
-    // holds an IContentService reference and invokes them directly is ambiguous (CS0121). A single
-    // implementation still satisfies both interface members implicitly.
-    new IContent? GetById(Guid key);
-
+    // base interface declaring this member with an identical signature (IContentServiceBase and
+    // IAsyncContentServiceBase respectively), so without redeclaring it here every call site that holds an
+    // IContentService reference and invokes it directly is ambiguous (CS0121). A single implementation still
+    // satisfies both interface members implicitly.
     new ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
 
     #region Blueprints

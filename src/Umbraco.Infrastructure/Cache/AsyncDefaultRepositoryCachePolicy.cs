@@ -45,7 +45,7 @@ public class AsyncDefaultRepositoryCachePolicy<TEntity, TKey> : AsyncRepositoryC
     /// <summary>
     ///     Gets the cache key prefix for this entity type.
     /// </summary>
-    protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
+    protected virtual string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 
     /// <inheritdoc />
     public override async Task CreateAsync(TEntity entity, Func<TEntity, Task> persistNew)

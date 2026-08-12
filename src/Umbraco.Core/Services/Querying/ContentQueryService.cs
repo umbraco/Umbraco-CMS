@@ -31,23 +31,23 @@ public class ContentQueryService : IContentQueryService
     /// </summary>
     /// <param name="id">The id of the content.</param>
     /// <returns>The content with schedules.</returns>
-    public Task<Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>> GetWithSchedulesAsync(Guid id)
+    public async Task<Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>> GetWithSchedulesAsync(Guid id)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
 
-        IContent? content = _contentService.GetById(id);
+        IContent? content = await _contentService.GetByIdAsync(id, CancellationToken.None);
 
         if (content == null)
         {
-            return Task.FromResult(Attempt<ContentScheduleQueryResult, ContentQueryOperationStatus>.Fail(ContentQueryOperationStatus
-                .ContentNotFound));
+            return Attempt<ContentScheduleQueryResult, ContentQueryOperationStatus>.Fail(ContentQueryOperationStatus
+                .ContentNotFound);
         }
 
         ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(id);
 
-        return Task.FromResult(Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>
+        return Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>
             .Succeed(
                 ContentQueryOperationStatus.Success,
-                new ContentScheduleQueryResult(content, schedules)));
+                new ContentScheduleQueryResult(content, schedules));
     }
 }

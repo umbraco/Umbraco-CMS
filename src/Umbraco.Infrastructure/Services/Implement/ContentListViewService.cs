@@ -61,7 +61,7 @@ internal sealed class ContentListViewService : AsyncContentListViewServiceBase<I
         int skip,
         int take)
     {
-        IContent? content = _contentService.GetById(key);
+        IContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (content == null)
         {
             return Attempt.FailWithStatus<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotFound, null);

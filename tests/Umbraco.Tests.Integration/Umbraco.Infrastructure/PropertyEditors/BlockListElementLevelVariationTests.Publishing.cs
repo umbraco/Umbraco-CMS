@@ -2202,7 +2202,7 @@ internal partial class BlockListElementLevelVariationTests
         PublishContent(content, contentType, culturesToPublish);
 
         // 6. Verify: Get the published value and check for duplicates in the raw data
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
         Assert.IsNotNull(publishedValue, "Published value should not be null");
 
@@ -2397,7 +2397,7 @@ internal partial class BlockListElementLevelVariationTests
         PublishContent(content, contentType, culturesToPublish);
 
         // 6. Verify published JSON doesn't contain old invariant values for variantText
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
         Assert.IsNotNull(publishedValue, "Published value should not be null");
 
@@ -2506,13 +2506,13 @@ internal partial class BlockListElementLevelVariationTests
         Assert.IsTrue(updateResult.Success, "Content update should succeed");
 
         // Reload content to get fresh state.
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
 
         // Publish ALL cultures.
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         // Reload content from database to get fresh state with Edited flags set correctly.
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
 
         // Assert: Content should NOT show as edited for any culture after initial publish.
         // Bug #21223: Without the fix, the default language variant incorrectly shows as having

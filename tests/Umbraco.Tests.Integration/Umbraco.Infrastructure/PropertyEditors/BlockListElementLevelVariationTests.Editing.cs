@@ -120,7 +120,7 @@ internal partial class BlockListElementLevelVariationTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
         Assert.NotNull(savedBlocksValue);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
@@ -257,7 +257,7 @@ internal partial class BlockListElementLevelVariationTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
         Assert.NotNull(savedBlocksValue);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
@@ -409,7 +409,7 @@ internal partial class BlockListElementLevelVariationTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
         Assert.NotNull(savedBlocksValue);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
@@ -549,7 +549,7 @@ internal partial class BlockListElementLevelVariationTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
         blockListValue = savedBlocksValue is null ? null : JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
 
@@ -701,7 +701,7 @@ internal partial class BlockListElementLevelVariationTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
         Assert.NotNull(savedBlocksValue);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
@@ -863,7 +863,7 @@ internal partial class BlockListElementLevelVariationTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
         Assert.NotNull(savedBlocksValue);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
@@ -966,7 +966,7 @@ internal partial class BlockListElementLevelVariationTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
 
         // limited user access means English and German should not have been updated - changes should be rolled back to the initial block values
@@ -1081,7 +1081,7 @@ internal partial class BlockListElementLevelVariationTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
         Assert.NotNull(savedBlocksValue);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
@@ -1240,7 +1240,7 @@ internal partial class BlockListElementLevelVariationTests
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
         Assert.NotNull(savedBlocksValue);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
@@ -1313,7 +1313,7 @@ internal partial class BlockListElementLevelVariationTests
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // re-fetch content
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
 
@@ -1372,7 +1372,7 @@ internal partial class BlockListElementLevelVariationTests
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
 
@@ -1433,7 +1433,7 @@ internal partial class BlockListElementLevelVariationTests
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
-        content = ContentService.GetById(content.Key);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
 

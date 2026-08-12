@@ -322,7 +322,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task GetAsync_MatchesContentServiceOnScalarFields()
     {
-        IContent? fromService = ContentService.GetById(_textpage.Key);
+        IContent? fromService = await ContentService.GetByIdAsync(_textpage.Key, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -346,7 +346,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     [Test]
     public async Task GetAsync_MatchesContentServiceOnProperties()
     {
-        IContent? fromService = ContentService.GetById(_textpage.Key);
+        IContent? fromService = await ContentService.GetByIdAsync(_textpage.Key, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -462,7 +462,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         ContentService.Publish(doc, doc.AvailableCultures.ToArray());
 
         // Re-fetch so the entity has the published state, then edit fr only.
-        doc = ContentService.GetById(doc.Key)!;
+        doc = (await ContentService.GetByIdAsync(doc.Key, CancellationToken.None))!;
         doc.SetCultureName("Nom Modifié", "fr");
         ContentService.Save(doc);
 
@@ -1018,7 +1018,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         ContentService.Publish(doc, ["en-US", "fr"]);
 
         // Edit the draft value without re-publishing.
-        doc = ContentService.GetById(doc.Key)!;
+        doc = (await ContentService.GetByIdAsync(doc.Key, CancellationToken.None))!;
         doc.SetValue("variantTitle", "draft value", "en-US");
         ContentService.Save(doc);
 

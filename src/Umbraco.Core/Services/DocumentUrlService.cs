@@ -519,7 +519,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <inheritdoc/>
     public async Task CreateOrUpdateUrlSegmentsAsync(Guid key)
     {
-        IContent? content = _contentService.GetById(key);
+        IContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
 
         if (content is not null)
         {
@@ -553,7 +553,7 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <inheritdoc/>
     public async Task UpdateUrlSegmentCacheAsync(Guid key)
     {
-        IContent? content = _contentService.GetById(key);
+        IContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (content is not null)
         {
             await CreateOrUpdateUrlSegmentsInternalAsync(content.Yield(), skipDatabaseWrite: true);

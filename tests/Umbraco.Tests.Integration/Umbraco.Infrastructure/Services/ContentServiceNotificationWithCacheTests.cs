@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -79,7 +79,7 @@ internal sealed class ContentServiceNotificationWithCacheTests : UmbracoIntegrat
 
             var saved = notification.SavedEntities.First();
             var documentById = ContentService.GetById(saved.Id)!;
-            var documentByKey = ContentService.GetById(saved.Key)!;
+            var documentByKey = ContentService.GetByIdAsync(saved.Key, CancellationToken.None).GetAwaiter().GetResult()!;
 
             Assert.Multiple(() =>
             {
@@ -95,7 +95,7 @@ internal sealed class ContentServiceNotificationWithCacheTests : UmbracoIntegrat
 
             var saved = notification.SavedEntities.First();
             var documentById = ContentService.GetById(saved.Id)!;
-            var documentByKey = ContentService.GetById(saved.Key)!;
+            var documentByKey = ContentService.GetByIdAsync(saved.Key, CancellationToken.None).GetAwaiter().GetResult()!;
 
             Assert.Multiple(() =>
             {

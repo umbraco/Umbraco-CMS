@@ -54,6 +54,15 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     #region Others
 
     /// <inheritdoc />
+    // No async repository exists for elements yet - wraps the synchronous lookup so the async contract can be
+    // satisfied now, without blocking the eventual real EF Core migration.
+    public Task<IElement?> GetByIdAsync(Guid key, CancellationToken cancellationToken) => Task.FromResult(GetById(key));
+
+    /// <inheritdoc />
+    Attempt<OperationResult?> IAsyncContentServiceBase<IElement>.Save(IEnumerable<IElement> contents, int userId) =>
+        Attempt.Succeed(Save(contents, userId));
+
+    /// <inheritdoc />
     public override ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         => CheckDataIntegrity(
             options,

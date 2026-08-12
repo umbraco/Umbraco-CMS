@@ -207,8 +207,8 @@ public class DocumentUrlAliasServiceTests
             CreateServiceWithMocks(languages: languages);
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias"));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, "my-alias"));
 
         List<PublishedDocumentUrlAlias>? savedAliases = null;
         aliasRepositoryMock.Setup(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()))
@@ -236,8 +236,8 @@ public class DocumentUrlAliasServiceTests
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks();
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, "alias-one, alias-two, alias-three"));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, "alias-one, alias-two, alias-three"));
 
         List<PublishedDocumentUrlAlias>? savedAliases = null;
         aliasRepositoryMock.Setup(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()))
@@ -268,8 +268,8 @@ public class DocumentUrlAliasServiceTests
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks();
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, "  /Some-Mixed-Case/  "));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, "  /Some-Mixed-Case/  "));
 
         List<PublishedDocumentUrlAlias>? savedAliases = null;
         aliasRepositoryMock.Setup(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()))
@@ -306,8 +306,8 @@ public class DocumentUrlAliasServiceTests
             { "en-US", "english-alias" },
             { "fr-FR", "alias-francais" },
         };
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateVariantContentWithCultureVaryingAlias(documentKey, aliasesByCulture));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateVariantContentWithCultureVaryingAlias(documentKey, aliasesByCulture));
 
         List<PublishedDocumentUrlAlias>? savedAliases = null;
         aliasRepositoryMock.Setup(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlAlias>>()))
@@ -337,7 +337,7 @@ public class DocumentUrlAliasServiceTests
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks();
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey)).Returns((IContent?)null);
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>())).ReturnsAsync((IContent?)null);
 
         // Act
         await service.CreateOrUpdateAliasesAsync(documentKey);
@@ -366,7 +366,7 @@ public class DocumentUrlAliasServiceTests
         contentMock.Setup(x => x.Key).Returns(documentKey);
         contentMock.Setup(x => x.Trashed).Returns(true);
         contentMock.Setup(x => x.Blueprint).Returns(false);
-        contentServiceMock.Setup(x => x.GetById(documentKey)).Returns(contentMock.Object);
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>())).ReturnsAsync(contentMock.Object);
 
         // Act
         await service.CreateOrUpdateAliasesAsync(documentKey);
@@ -394,7 +394,7 @@ public class DocumentUrlAliasServiceTests
         contentMock.Setup(x => x.Key).Returns(documentKey);
         contentMock.Setup(x => x.Trashed).Returns(false);
         contentMock.Setup(x => x.Blueprint).Returns(true);
-        contentServiceMock.Setup(x => x.GetById(documentKey)).Returns(contentMock.Object);
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>())).ReturnsAsync(contentMock.Object);
 
         // Act
         await service.CreateOrUpdateAliasesAsync(documentKey);
@@ -420,8 +420,8 @@ public class DocumentUrlAliasServiceTests
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(ServerRole.Subscriber);
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias"));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, "my-alias"));
 
         // Act
         await service.CreateOrUpdateAliasesAsync(documentKey);
@@ -448,8 +448,8 @@ public class DocumentUrlAliasServiceTests
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(role);
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias"));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, "my-alias"));
 
         // Act
         await service.CreateOrUpdateAliasesAsync(documentKey);
@@ -472,8 +472,8 @@ public class DocumentUrlAliasServiceTests
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(ServerRole.Subscriber);
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, aliasValue: null));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, aliasValue: null));
 
         // Act
         await service.CreateOrUpdateAliasesAsync(documentKey);
@@ -496,8 +496,8 @@ public class DocumentUrlAliasServiceTests
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks(ServerRole.Single);
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, aliasValue: null));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, aliasValue: null));
 
         // Act
         await service.CreateOrUpdateAliasesAsync(documentKey);
@@ -694,8 +694,8 @@ public class DocumentUrlAliasServiceTests
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks();
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias"));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, "my-alias"));
 
         await service.UpdateAliasCacheAsync(documentKey);
 
@@ -719,8 +719,8 @@ public class DocumentUrlAliasServiceTests
         var (service, aliasRepositoryMock, contentServiceMock) = CreateServiceWithMocks();
 
         var documentKey = Guid.NewGuid();
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, aliasValue: null));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, aliasValue: null));
 
         await service.UpdateAliasCacheAsync(documentKey);
 
@@ -767,8 +767,8 @@ public class DocumentUrlAliasServiceTests
             "Pre-condition: alias must not be resolvable after cache eviction.");
 
         // Wire up the content service so UpdateAliasCacheAsync can repopulate the cache.
-        contentServiceMock.Setup(x => x.GetById(documentKey))
-            .Returns(CreateInvariantContentWithAlias(documentKey, "my-alias"));
+        contentServiceMock.Setup(x => x.GetByIdAsync(documentKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateInvariantContentWithAlias(documentKey, "my-alias"));
 
         await service.UpdateAliasCacheAsync(documentKey);
 

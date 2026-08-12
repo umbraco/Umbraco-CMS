@@ -67,7 +67,7 @@ public class ByKeyElementController : ElementControllerBase
             return Forbidden();
         }
 
-        IElement? element = _elementService.GetById(id);
+        IElement? element = await _elementService.GetByIdAsync(id, cancellationToken);
         if (element is null)
         {
             return ContentEditingOperationStatusResult(ContentEditingOperationStatus.NotFound);

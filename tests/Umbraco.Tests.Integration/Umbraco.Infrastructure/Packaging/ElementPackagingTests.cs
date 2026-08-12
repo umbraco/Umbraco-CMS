@@ -98,7 +98,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
         ElementService.Delete(element);
         await ContentTypeService.DeleteAsync(elementType, Constants.Security.SuperUserKey);
 
-        Assert.That(ElementService.GetById(elementKey), Is.Null);
+        Assert.That(await ElementService.GetByIdAsync(elementKey, CancellationToken.None), Is.Null);
 
         // Act
         CompiledPackage compiledPackage = CompiledPackageXmlParser.ToCompiledPackage(packageXml);
@@ -120,7 +120,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
             Assert.That(installedElement!.Key, Is.EqualTo(elementKey));
         });
 
-        IElement reloaded = ElementService.GetById(elementKey);
+        IElement reloaded = await ElementService.GetByIdAsync(elementKey, CancellationToken.None);
         Assert.That(reloaded, Is.Not.Null);
         Assert.That(reloaded.GetValue<string>("title"), Is.EqualTo("The Element Title"));
     }
@@ -141,7 +141,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
         var elementKey = element.Key;
 
         // Reload so Level/Path (used to resolve the ancestor folders) are populated.
-        element = ElementService.GetById(elementKey)!;
+        element = (await ElementService.GetByIdAsync(elementKey, CancellationToken.None))!;
         XElement serialized = Serializer.Serialize(element);
 
         Assert.Multiple(() =>
@@ -168,7 +168,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
         await ElementContainerService.DeleteAsync(containerA.Key, Constants.Security.SuperUserKey);
         await ContentTypeService.DeleteAsync(elementType, Constants.Security.SuperUserKey);
 
-        Assert.That(ElementService.GetById(elementKey), Is.Null);
+        Assert.That(await ElementService.GetByIdAsync(elementKey, CancellationToken.None), Is.Null);
 
         // Act
         CompiledPackage compiledPackage = CompiledPackageXmlParser.ToCompiledPackage(packageXml);
@@ -177,7 +177,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 #pragma warning restore CS0618
 
         // Assert: both containers recreated and the element is placed back under the leaf container.
-        IElement reloaded = ElementService.GetById(elementKey)!;
+        IElement reloaded = (await ElementService.GetByIdAsync(elementKey, CancellationToken.None))!;
         Assert.That(reloaded, Is.Not.Null);
         Assert.That(reloaded.GetValue<string>("title"), Is.EqualTo("Nested Title"));
 
@@ -209,7 +209,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
         var elementKey = element.Key;
 
         // Reload so Level/Path are populated, then serialize.
-        element = ElementService.GetById(elementKey)!;
+        element = (await ElementService.GetByIdAsync(elementKey, CancellationToken.None))!;
         XElement serialized = Serializer.Serialize(element);
 
         // Simulate the package having been built while the folder still had its original name (same key).
@@ -229,7 +229,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         // Remove the element so the install genuinely re-creates it, but keep the (renamed) container.
         ElementService.Delete(element);
-        Assert.That(ElementService.GetById(elementKey), Is.Null);
+        Assert.That(await ElementService.GetByIdAsync(elementKey, CancellationToken.None), Is.Null);
 
         // Act
         CompiledPackage compiledPackage = CompiledPackageXmlParser.ToCompiledPackage(packageXml);
@@ -239,7 +239,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         // Assert: the existing folder is matched by key (not duplicated by its packaged name), so the element
         // lands back under it and no new container is installed.
-        IElement reloaded = ElementService.GetById(elementKey)!;
+        IElement reloaded = (await ElementService.GetByIdAsync(elementKey, CancellationToken.None))!;
         EntityContainer? parent = await ElementContainerService.GetParentAsync(reloaded);
         Assert.Multiple(() =>
         {

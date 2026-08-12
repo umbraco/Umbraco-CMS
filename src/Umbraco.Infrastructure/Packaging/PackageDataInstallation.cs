@@ -373,7 +373,42 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IContentServiceBase<TContentBase> service)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
-            => ImportContentBase(docs, importedDocumentTypes, userId, alias => typeService.Get(alias), service);
+            => ImportContentBase(
+                docs,
+                importedDocumentTypes,
+                userId,
+                alias => typeService.Get(alias),
+                service.GetById,
+                (contents, saveUserId) => service.Save(contents, saveUserId));
+
+        /// <summary>
+        /// Imports content base items of a specified type from the provided compiled package content documents,
+        /// using the async content service of content types that have already been migrated (e.g. documents,
+        /// elements).
+        /// </summary>
+        /// <typeparam name="TContentBase">The type of content base item to import, which must implement <see cref="IContentBase"/>.</typeparam>
+        /// <typeparam name="TContentTypeComposition">The type of content type composition, which must implement <see cref="IContentTypeComposition"/>.</typeparam>
+        /// <param name="docs">A collection of <see cref="CompiledPackageContentBase"/> documents to import content from.</param>
+        /// <param name="importedDocumentTypes">A dictionary mapping document type aliases to their imported <typeparamref name="TContentTypeComposition"/> instances.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <param name="typeService">The service used to manage content type compositions.</param>
+        /// <param name="service">The async service used to manage content base items.</param>
+        /// <returns>A read-only list containing the imported content base items of type <typeparamref name="TContentBase"/>.</returns>
+        public IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
+            IEnumerable<CompiledPackageContentBase> docs,
+            IDictionary<string, TContentTypeComposition> importedDocumentTypes,
+            int userId,
+            IContentTypeBaseService<TContentTypeComposition> typeService,
+            IAsyncContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            where TContentTypeComposition : IContentTypeComposition
+            => ImportContentBase(
+                docs,
+                importedDocumentTypes,
+                userId,
+                alias => typeService.Get(alias),
+                key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
+                (contents, saveUserId) => service.Save(contents, saveUserId));
 
         /// <summary>
         /// Imports content base items of a specified type from the provided compiled package content documents using the
@@ -398,14 +433,43 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 importedDocumentTypes,
                 userId,
                 alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
-                service);
+                service.GetById,
+                (contents, saveUserId) => service.Save(contents, saveUserId));
+
+        /// <summary>
+        /// Imports content base items of a specified type from the provided compiled package content documents using
+        /// the (asynchronous) document type service and the async content service of content types that have
+        /// already been migrated (e.g. documents, elements).
+        /// </summary>
+        /// <typeparam name="TContentBase">The type of content base item to import.</typeparam>
+        /// <param name="docs">A collection of <see cref="CompiledPackageContentBase"/> documents to import content from.</param>
+        /// <param name="importedDocumentTypes">A dictionary mapping document type aliases to their imported content types.</param>
+        /// <param name="userId">The identifier of the user performing the import operation.</param>
+        /// <param name="typeService">The document type service.</param>
+        /// <param name="service">The async service used to manage content base items.</param>
+        /// <returns>A read-only list containing the imported content base items.</returns>
+        public IReadOnlyList<TContentBase> ImportContentBase<TContentBase>(
+            IEnumerable<CompiledPackageContentBase> docs,
+            IDictionary<string, IContentType> importedDocumentTypes,
+            int userId,
+            IContentTypeService typeService,
+            IAsyncContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            => ImportContentBase(
+                docs,
+                importedDocumentTypes,
+                userId,
+                alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
+                key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
+                (contents, saveUserId) => service.Save(contents, saveUserId));
 
         private IReadOnlyList<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
             IEnumerable<CompiledPackageContentBase> docs,
             IDictionary<string, TContentTypeComposition> importedDocumentTypes,
             int userId,
             Func<string, TContentTypeComposition?> findContentType,
-            IContentServiceBase<TContentBase> service)
+            Func<Guid, TContentBase?> getById,
+            Action<IEnumerable<TContentBase>, int> save)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
             => docs.SelectMany(x =>
@@ -415,7 +479,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     importedDocumentTypes,
                     userId,
                     findContentType,
-                    service)).ToList();
+                    getById,
+                    save)).ToList();
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContent"/>
@@ -436,7 +501,43 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IContentServiceBase<TContentBase> service)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
-            => ImportContentBase(roots, parentId, importedDocumentTypes, userId, alias => typeService.Get(alias), service);
+            => ImportContentBase(
+                roots,
+                parentId,
+                importedDocumentTypes,
+                userId,
+                alias => typeService.Get(alias),
+                service.GetById,
+                (contents, saveUserId) => service.Save(contents, saveUserId));
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentBase"/> items, using the async content service of
+        /// content types that have already been migrated (e.g. documents, elements).
+        /// </summary>
+        /// <param name="roots">The root contents to import from</param>
+        /// <param name="typeService">The content type base service</param>
+        /// <param name="parentId">Optional parent Id for the content being imported</param>
+        /// <param name="importedDocumentTypes">A dictionary of already imported document types (basically used as a cache)</param>
+        /// <param name="userId">Optional Id of the user performing the import</param>
+        /// <param name="service">The async content service base</param>
+        /// <returns>An enumerable list of generated content</returns>
+        public IEnumerable<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
+            IEnumerable<XElement> roots,
+            int parentId,
+            IDictionary<string, TContentTypeComposition> importedDocumentTypes,
+            int userId,
+            IContentTypeBaseService<TContentTypeComposition> typeService,
+            IAsyncContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            where TContentTypeComposition : IContentTypeComposition
+            => ImportContentBase(
+                roots,
+                parentId,
+                importedDocumentTypes,
+                userId,
+                alias => typeService.Get(alias),
+                key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
+                (contents, saveUserId) => service.Save(contents, saveUserId));
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentBase"/> items using the (asynchronous) document type service.
@@ -462,7 +563,37 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 importedDocumentTypes,
                 userId,
                 alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
-                service);
+                service.GetById,
+                (contents, saveUserId) => service.Save(contents, saveUserId));
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentBase"/> items using the (asynchronous) document type
+        /// service and the async content service of content types that have already been migrated (e.g. documents,
+        /// elements).
+        /// </summary>
+        /// <param name="roots">The root contents to import from</param>
+        /// <param name="parentId">Optional parent Id for the content being imported</param>
+        /// <param name="importedDocumentTypes">A dictionary of already imported document types (basically used as a cache)</param>
+        /// <param name="userId">Optional Id of the user performing the import</param>
+        /// <param name="typeService">The document type service</param>
+        /// <param name="service">The async content service base</param>
+        /// <returns>An enumerable list of generated content</returns>
+        public IEnumerable<TContentBase> ImportContentBase<TContentBase>(
+            IEnumerable<XElement> roots,
+            int parentId,
+            IDictionary<string, IContentType> importedDocumentTypes,
+            int userId,
+            IContentTypeService typeService,
+            IAsyncContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            => ImportContentBase(
+                roots,
+                parentId,
+                importedDocumentTypes,
+                userId,
+                alias => typeService.GetAsync(alias).GetAwaiter().GetResult(),
+                key => service.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
+                (contents, saveUserId) => service.Save(contents, saveUserId));
 
         private IEnumerable<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
             IEnumerable<XElement> roots,
@@ -470,15 +601,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDictionary<string, TContentTypeComposition> importedDocumentTypes,
             int userId,
             Func<string, TContentTypeComposition?> findContentType,
-            IContentServiceBase<TContentBase> service)
+            Func<Guid, TContentBase?> getById,
+            Action<IEnumerable<TContentBase>, int> save)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
         {
-            var contents = ParseContentBaseRootXml(roots, parentId, importedDocumentTypes, findContentType, service)
+            var contents = ParseContentBaseRootXml(roots, parentId, importedDocumentTypes, findContentType, getById)
                 .ToList();
             if (contents.Any())
             {
-                service.Save(contents, userId);
+                save(contents, userId);
             }
 
             return contents;
@@ -505,7 +637,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             int parentId,
             IDictionary<string, TContentTypeComposition> importedContentTypes,
             Func<string, TContentTypeComposition?> findContentType,
-            IContentServiceBase<TContentBase> service)
+            Func<Guid, TContentBase?> getById)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
         {
@@ -523,7 +655,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                if (TryCreateContentFromXml(root, importedContentTypes[contentTypeAlias], null, parentId, service, out TContentBase content))
+                if (TryCreateContentFromXml(root, importedContentTypes[contentTypeAlias], null, parentId, getById, out TContentBase content))
                 {
                     contents.Add(content);
                 }
@@ -532,7 +664,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 if (children.Count > 0)
                 {
                     contents.AddRange(
-                        CreateContentFromXml(children, content, importedContentTypes, findContentType, service)
+                        CreateContentFromXml(children, content, importedContentTypes, findContentType, getById)
                             .WhereNotNull());
                 }
             }
@@ -545,7 +677,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             TContentBase parent,
             IDictionary<string, TContentTypeComposition> importedContentTypes,
             Func<string, TContentTypeComposition?> findContentType,
-            IContentServiceBase<TContentBase> service)
+            Func<Guid, TContentBase?> getById)
             where TContentBase : class, IContentBase
             where TContentTypeComposition : IContentTypeComposition
         {
@@ -567,7 +699,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         importedContentTypes[contentTypeAlias],
                         parent,
                         default,
-                        service,
+                        getById,
                         out TContentBase content))
                 {
                     list.Add(content);
@@ -582,7 +714,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         content,
                         importedContentTypes,
                         findContentType,
-                        service));
+                        getById));
                 }
             }
 
@@ -594,7 +726,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             TContentTypeComposition contentType,
             TContentBase? parent,
             int parentId,
-            IContentServiceBase<TContentBase> service,
+            Func<Guid, TContentBase?> getById,
             out TContentBase output)
             where TContentBase : class?, IContentBase
             where TContentTypeComposition : IContentTypeComposition
@@ -602,7 +734,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             Guid key = element.RequiredAttributeValue<Guid>("key");
 
             // we need to check if the content already exists and if so we ignore the installation for this item
-            TContentBase? value = service.GetById(key);
+            TContentBase? value = getById(key);
             if (value != null)
             {
                 output = value;

@@ -36,7 +36,7 @@ public partial class ElementServiceTests : UmbracoIntegrationTest
         Assert.That(result.Success, Is.True);
         Assert.That(result.Result, Is.EqualTo(OperationResultType.Success));
 
-        element = ElementService.GetById(element.Key);
+        element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
         Assert.That(element, Is.Not.Null);
         Assert.That(element.HasIdentity, Is.True);
         Assert.That(element.Name, Is.EqualTo("My Element"));

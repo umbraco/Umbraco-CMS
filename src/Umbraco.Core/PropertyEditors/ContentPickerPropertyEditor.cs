@@ -179,7 +179,7 @@ public class ContentPickerPropertyEditor : DataEditor, IValueSchemaProvider
             }
 
             using ICoreScope scope = coreScopeProvider.CreateCoreScope();
-            Guid? key = contentService.GetById(id)?.ContentType?.Key;
+            Guid? key = contentService.GetByIdAsync(id, CancellationToken.None).GetAwaiter().GetResult()?.ContentType?.Key;
             scope.Complete();
 
             if (key is null)

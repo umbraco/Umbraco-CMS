@@ -128,7 +128,7 @@ internal sealed class ContentBlueprintEditingService
     /// <inheritdoc />
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateFromContentAsync(Guid contentKey, string name, Guid? key, Guid userKey)
     {
-        IContent? content = ContentService.GetById(contentKey);
+        IContent? content = await ContentService.GetByIdAsync(contentKey, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentCreateResult());

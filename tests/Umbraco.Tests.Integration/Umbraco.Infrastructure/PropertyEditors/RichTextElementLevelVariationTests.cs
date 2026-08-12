@@ -911,7 +911,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         PublishContent(content, culturesToPublish);
 
         // 6. Verify published JSON doesn't contain old culture-specific values
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
         Assert.IsNotNull(publishedValue, "Published value should not be null");
 
@@ -1077,7 +1077,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         PublishContent(content, culturesToPublish);
 
         // 6. Verify published JSON doesn't contain old invariant values for variantText
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         var publishedValue = (string?)content.Properties["blocks"]!.GetValue(null, null, published: true);
         Assert.IsNotNull(publishedValue, "Published value should not be null");
 

@@ -31,8 +31,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
 
         IPublishableContentBase? reloaded = isElement
-            ? ElementService.GetById(instance.Key)
-            : ContentService.GetById(instance.Key);
+            ? await ElementService.GetByIdAsync(instance.Key, CancellationToken.None)
+            : await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
 
         Assert.IsNotNull(reloaded);
         Assert.AreEqual("invariant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
@@ -59,8 +59,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         IPublishableContentBase? reloaded = isElement
-            ? ElementService.GetById(instance.Key)
-            : ContentService.GetById(instance.Key);
+            ? await ElementService.GetByIdAsync(instance.Key, CancellationToken.None)
+            : await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
 
         Assert.IsNotNull(reloaded);
         Assert.AreEqual("default lang value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
@@ -116,8 +116,8 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
         IPublishableContentBase? reloaded = isElement
-            ? ElementService.GetById(instance.Key)
-            : ContentService.GetById(instance.Key);
+            ? await ElementService.GetByIdAsync(instance.Key, CancellationToken.None)
+            : await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
 
         Assert.IsNotNull(reloaded);
         Assert.AreEqual("composed invariant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
@@ -173,8 +173,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         IPublishableContentBase? reloaded = isElement
-            ? ElementService.GetById(instance.Key)
-            : ContentService.GetById(instance.Key);
+            ? await ElementService.GetByIdAsync(instance.Key, CancellationToken.None)
+            : await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
 
         Assert.IsNotNull(reloaded);
         Assert.AreEqual("composed variant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
@@ -230,8 +230,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         await ContentTypeService.UpdateAsync(composition, Constants.Security.SuperUserKey);
 
         IPublishableContentBase? reloaded = isElement
-            ? ElementService.GetById(instance.Key)
-            : ContentService.GetById(instance.Key);
+            ? await ElementService.GetByIdAsync(instance.Key, CancellationToken.None)
+            : await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
 
         Assert.IsNotNull(reloaded);
         Assert.AreEqual("composed invariant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
@@ -283,8 +283,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         await ContentTypeService.UpdateAsync(composition, Constants.Security.SuperUserKey);
 
         IPublishableContentBase? reloaded = isElement
-            ? ElementService.GetById(instance.Key)
-            : ContentService.GetById(instance.Key);
+            ? await ElementService.GetByIdAsync(instance.Key, CancellationToken.None)
+            : await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
 
         Assert.IsNotNull(reloaded);
         Assert.AreEqual("composed variant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
@@ -307,14 +307,14 @@ internal sealed partial class ContentTypeEditingServiceTests
         if (isElement)
         {
             ElementService.Publish((IElement)instance, ["*"]);
-            var elementToEdit = ElementService.GetById(instance.Key);
+            var elementToEdit = await ElementService.GetByIdAsync(instance.Key, CancellationToken.None);
             elementToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
             ElementService.Save(elementToEdit);
         }
         else
         {
             ContentService.Publish((IContent)instance, ["*"]);
-            var contentToEdit = ContentService.GetById(instance.Key);
+            var contentToEdit = await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
             contentToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
             ContentService.Save(contentToEdit);
         }
@@ -326,8 +326,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         var defaultCulture = await LanguageService.GetDefaultIsoCodeAsync();
 
         IPublishableContentBase? reloadedDraft = isElement
-            ? ElementService.GetById(instance.Key)
-            : ContentService.GetById(instance.Key);
+            ? await ElementService.GetByIdAsync(instance.Key, CancellationToken.None)
+            : await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
         Assert.IsNotNull(reloadedDraft);
         Assert.AreEqual("draft edited value", reloadedDraft!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
         Assert.IsNull(reloadedDraft.GetValue<string>(VarianceTestPropertyAlias));
@@ -361,14 +361,14 @@ internal sealed partial class ContentTypeEditingServiceTests
         if (isElement)
         {
             ElementService.Publish((IElement)instance, ["*"]);
-            var elementToEdit = ElementService.GetById(instance.Key);
+            var elementToEdit = await ElementService.GetByIdAsync(instance.Key, CancellationToken.None);
             elementToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
             ElementService.Save(elementToEdit);
         }
         else
         {
             ContentService.Publish((IContent)instance, ["*"]);
-            var contentToEdit = ContentService.GetById(instance.Key);
+            var contentToEdit = await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
             contentToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
             ContentService.Save(contentToEdit);
         }
@@ -378,8 +378,8 @@ internal sealed partial class ContentTypeEditingServiceTests
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         IPublishableContentBase? reloaded = isElement
-            ? ElementService.GetById(instance.Key)
-            : ContentService.GetById(instance.Key);
+            ? await ElementService.GetByIdAsync(instance.Key, CancellationToken.None)
+            : await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
 
         Assert.IsNotNull(reloaded);
         Assert.AreEqual("default value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));

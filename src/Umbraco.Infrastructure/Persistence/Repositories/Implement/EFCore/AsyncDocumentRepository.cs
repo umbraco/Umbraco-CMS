@@ -1944,6 +1944,11 @@ internal class AsyncDocumentRepository
                 documentCultureVariationsByNodeId.GetValueOrDefault(row.Node.NodeId, []),
                 isoCodeByLanguageId);
 
+            // Mirrors NPoco's MapDtoToContent/batch mapping (U4-1946): applying culture variations above
+            // dirties the entity via CultureInfos/PublishCultureInfos collection-changed notifications, so a
+            // freshly-assembled entity must be reset to a clean state before being handed to the caller.
+            entity.ResetDirtyProperties(false);
+
             entities.Add(entity);
         }
 

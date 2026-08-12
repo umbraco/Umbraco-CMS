@@ -747,7 +747,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     }
 
     /// <inheritdoc />
-    Attempt<OperationResult?> IContentServiceBase<TContent>.Save(IEnumerable<TContent> contents, int userId) =>
+    Attempt<OperationResult?> IPublishableContentService<TContent>.Save(IEnumerable<TContent> contents, int userId) =>
         Attempt.Succeed(Save(contents, userId));
 
     /// <inheritdoc />

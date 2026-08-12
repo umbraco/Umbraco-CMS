@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Services;
 internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>
     where TContent : class, IContentBase
     where TContentType : class, IContentTypeComposition
-    where TContentService : IContentServiceBase<TContent>
+    where TContentService : IAsyncContentServiceBase<TContent>
     where TContentTypeService : IAsyncContentTypeBaseService<TContentType>
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
@@ -341,7 +341,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
         ContentEditingOperationStatus referenceFailStatus)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        TContent? content = ContentService.GetById(key);
+        TContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (content == null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
@@ -403,7 +403,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false, bool includeDescendants = true)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        TContent? content = ContentService.GetById(key);
+        TContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
@@ -438,7 +438,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
         {
             // at this point the parent MUST exist - unless someone starts using this move method
             // e.g. for blueprints (which should be handled elsewhere).
-            TContent parentContent = ContentService.GetById(parentKey.Value) ?? throw new InvalidOperationException("The content parent ID was validated, but the parent was not found");
+            TContent parentContent = await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None) ?? throw new InvalidOperationException("The content parent ID was validated, but the parent was not found");
             if (parentContent.Path.GetIdsFromPath().Contains(content.Id))
             {
                 return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
@@ -465,7 +465,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
-        TContent? content = ContentService.GetById(key);
+        TContent? content = await ContentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content);
@@ -600,7 +600,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     protected virtual async Task<(int? ParentId, ContentEditingOperationStatus OperationStatus)> TryGetAndValidateParentIdAsync(Guid? parentKey, TContentType contentType)
     {
         TContent? parent = parentKey.HasValue
-            ? ContentService.GetById(parentKey.Value)
+            ? await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None)
             : null;
 
         if (parentKey.HasValue && parent == null)

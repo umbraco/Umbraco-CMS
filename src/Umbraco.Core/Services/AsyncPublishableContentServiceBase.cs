@@ -383,16 +383,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc/>
-    public TContent? GetById(Guid key)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.Get(key);
-        }
-    }
-
-    /// <inheritdoc/>
     public async Task<TContent?> GetByIdAsync(Guid key, CancellationToken cancellationToken)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))

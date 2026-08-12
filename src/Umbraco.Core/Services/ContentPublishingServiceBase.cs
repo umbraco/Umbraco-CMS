@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Services;
 
 internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     where TContent : class, IPublishableContentBase
-    where TContentService : IPublishableContentService<TContent>
+    where TContentService : IPublishableContentService<TContent>, IAsyncContentServiceBase<TContent>
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly TContentService _contentService;
@@ -106,7 +106,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockId);
-        TContent? content = _contentService.GetById(key);
+        TContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             scope.Complete();
@@ -269,7 +269,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, ISet<string>? cultures, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        TContent? content = _contentService.GetById(key);
+        TContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             scope.Complete();

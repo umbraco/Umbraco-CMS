@@ -126,7 +126,7 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langEn.IsoCode));
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
@@ -157,7 +157,7 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(publishResult.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, publishResult.Status);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langEn.IsoCode));
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
@@ -167,7 +167,7 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(unpublishResult.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, unpublishResult.Result);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
 
         publishResult = await ContentPublishingService.PublishAsync(
@@ -177,7 +177,7 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(publishResult.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, publishResult.Status);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
     }
@@ -210,12 +210,12 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(result.Success);
         AssertBranchResultSuccess(result.Result, root.Key, child.Key);
 
-        root = ContentService.GetById(root.Key)!;
+        root = (await ContentService.GetByIdAsync(root.Key, CancellationToken.None))!;
         Assert.AreEqual(2, root.PublishedCultures.Count());
         Assert.IsTrue(root.PublishedCultures.InvariantContains(langEn.IsoCode));
         Assert.IsTrue(root.PublishedCultures.InvariantContains(langDa.IsoCode));
 
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
         Assert.AreEqual(2, child.PublishedCultures.Count());
         Assert.IsTrue(child.PublishedCultures.InvariantContains(langEn.IsoCode));
         Assert.IsTrue(child.PublishedCultures.InvariantContains(langDa.IsoCode));
@@ -240,7 +240,7 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
         Assert.IsTrue(content.PublishedCultures.First().InvariantEquals(langEn.IsoCode));
     }
@@ -273,11 +273,11 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(result.Success);
         AssertBranchResultSuccess(result.Result, root.Key, child.Key);
 
-        root = ContentService.GetById(root.Key)!;
+        root = (await ContentService.GetByIdAsync(root.Key, CancellationToken.None))!;
         Assert.AreEqual(1, root.PublishedCultures.Count());
         Assert.IsTrue(root.PublishedCultures.InvariantContains(langEn.IsoCode));
 
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
         Assert.AreEqual(1, child.PublishedCultures.Count());
         Assert.IsTrue(child.PublishedCultures.InvariantContains(langEn.IsoCode));
     }
@@ -296,7 +296,7 @@ public partial class ContentPublishingServiceTests
         root.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(root);
 
-        root = ContentService.GetById(root.Key)!;
+        root = (await ContentService.GetByIdAsync(root.Key, CancellationToken.None))!;
 
         IContent child = new ContentBuilder()
             .WithContentType(contentType)
@@ -312,11 +312,11 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(result.Success);
         AssertBranchResultSuccess(result.Result, root.Key, child.Key);
 
-        root = ContentService.GetById(root.Key)!;
+        root = (await ContentService.GetByIdAsync(root.Key, CancellationToken.None))!;
         Assert.AreEqual(1, root.PublishedCultures.Count());
         Assert.IsTrue(root.PublishedCultures.InvariantContains(langEn.IsoCode));
 
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
         Assert.AreEqual(1, child.PublishedCultures.Count());
         Assert.IsTrue(child.PublishedCultures.InvariantContains(langEn.IsoCode));
     }
@@ -345,7 +345,7 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(2, content.PublishedCultures.Count());
     }
 
@@ -386,7 +386,7 @@ public partial class ContentPublishingServiceTests
 
         Assert.IsTrue(result.Success);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         content.SetValue("variantValue", "EN value updated", culture: "en-US");
         content.SetValue("variantValue", "DA value updated", culture: "da-DK");
         content.SetValue("invariantValue", null);
@@ -397,7 +397,7 @@ public partial class ContentPublishingServiceTests
             culturesToRepublish.Select(culture => new CulturePublishScheduleModel { Culture = culture }).ToArray(),
             Constants.Security.SuperUserKey);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
 
         Assert.Multiple(() =>
         {
@@ -477,7 +477,7 @@ public partial class ContentPublishingServiceTests
         var content = await CreateInvalidContent(Textpage);
         var child = ContentBuilder.CreateSimpleContent(ContentType, "Child page", content.Id);
         ContentService.Save(child, -1);
-        Assert.AreEqual(content.Id, ContentService.GetById(child.Key)!.ParentId);
+        Assert.AreEqual(content.Id, (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!.ParentId);
 
         var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
 
@@ -516,7 +516,7 @@ public partial class ContentPublishingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
@@ -542,7 +542,7 @@ public partial class ContentPublishingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.MandatoryCultureMissing, result.Status);
 
-        content = ContentService.GetById(content.Key)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
@@ -574,10 +574,10 @@ public partial class ContentPublishingServiceTests
         Assert.IsFalse(result.Success);
         AssertBranchResultFailed(result.Result, (root.Key, ContentPublishingOperationStatus.ContentInvalid));
 
-        root = ContentService.GetById(root.Key)!;
+        root = (await ContentService.GetByIdAsync(root.Key, CancellationToken.None))!;
         Assert.AreEqual(0, root.PublishedCultures.Count());
 
-        child = ContentService.GetById(child.Key)!;
+        child = (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!;
         Assert.AreEqual(0, child.PublishedCultures.Count());
     }
 
@@ -597,7 +597,7 @@ public partial class ContentPublishingServiceTests
     public async Task Cannot_Publish_From_Trash()
     {
         ContentService.MoveToRecycleBin(Subpage);
-        Assert.IsTrue(ContentService.GetById(Subpage.Key)!.Trashed);
+        Assert.IsTrue((await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None))!.Trashed);
 
         var result = await ContentPublishingService.PublishAsync(Subpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
 
@@ -673,7 +673,7 @@ public partial class ContentPublishingServiceTests
         // force an update on the child pages so they will be subject to branch republishing
         foreach (var key in new [] { Subpage.Key, Subpage2.Key, Subpage3.Key })
         {
-            var content = ContentService.GetById(key)!;
+            var content = (await ContentService.GetByIdAsync(key, CancellationToken.None))!;
             content.SetValue("title", "Updated");
             ContentService.Save(content);
         }
@@ -689,7 +689,7 @@ public partial class ContentPublishingServiceTests
         // if we didn't do this, the children would never be considered for branch publishing, as the publish logic
         // stops at the first invalid parent.
         // as an added bonus, this lets us test a partially successful branch publish :)
-        var textPage = ContentService.GetById(Textpage.Key)!;
+        var textPage = (await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None))!;
         textPage.SetValue("mandatoryProperty", "This is a valid value");
         ContentService.Save(textPage);
 

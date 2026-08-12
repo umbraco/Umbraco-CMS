@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -91,7 +91,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
             savingWasCalled = true;
 
             var saved = notification.SavedEntities.First();
-            var element = ElementService.GetById(saved.Key)!;
+            var element = ElementService.GetByIdAsync(saved.Key, CancellationToken.None).GetAwaiter().GetResult()!;
 
             Assert.Multiple(() =>
             {
@@ -105,7 +105,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
             savedWasCalled = true;
 
             var saved = notification.SavedEntities.First();
-            var element = ElementService.GetById(saved.Key)!;
+            var element = ElementService.GetByIdAsync(saved.Key, CancellationToken.None).GetAwaiter().GetResult()!;
 
             Assert.Multiple(() =>
             {

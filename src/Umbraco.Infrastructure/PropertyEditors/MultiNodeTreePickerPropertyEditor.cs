@@ -456,7 +456,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
             private IContentBase? GetContent(string objectType, Guid key) =>
                 objectType switch
                 {
-                    DocumentObjectType => _contentService.GetById(key),
+                    DocumentObjectType => _contentService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult(),
                     MediaObjectType => _mediaService.GetById(key),
                     MemberObjectType => _memberService.GetById(key),
                     _ => null,

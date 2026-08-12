@@ -83,7 +83,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
         {
             Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus> minimalAttempt
                 = await PerformPublishBranchAsync(key, cultures, publishBranchFilter, userKey, returnContent: true);
-            return MapInternalPublishingAttempt(minimalAttempt);
+            return await MapInternalPublishingAttemptAsync(minimalAttempt);
         }
 
         _logger.LogDebug("Starting long running operation for publishing branch {Key} on background thread.", key);
@@ -125,7 +125,7 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
         using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        IContent? content = _contentService.GetById(key);
+        IContent? content = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (content is null)
         {
             return Attempt.FailWithStatus(
@@ -192,20 +192,20 @@ internal sealed class ContentPublishingService : ContentPublishingServiceBase<IC
                 new ContentPublishingBranchResult());
         }
 
-        return MapInternalPublishingAttempt(result.Result);
+        return await MapInternalPublishingAttemptAsync(result.Result);
     }
 
-    private Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus> MapInternalPublishingAttempt(
+    private async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> MapInternalPublishingAttemptAsync(
         Attempt<ContentPublishingBranchInternalResult, ContentPublishingOperationStatus> minimalAttempt) =>
         minimalAttempt.Success
-            ? Attempt.SucceedWithStatus(minimalAttempt.Status, MapMinimalPublishingBranchResult(minimalAttempt.Result))
-            : Attempt.FailWithStatus(minimalAttempt.Status, MapMinimalPublishingBranchResult(minimalAttempt.Result));
+            ? Attempt.SucceedWithStatus(minimalAttempt.Status, await MapMinimalPublishingBranchResultAsync(minimalAttempt.Result))
+            : Attempt.FailWithStatus(minimalAttempt.Status, await MapMinimalPublishingBranchResultAsync(minimalAttempt.Result));
 
-    private ContentPublishingBranchResult MapMinimalPublishingBranchResult(ContentPublishingBranchInternalResult internalResult) =>
+    private async Task<ContentPublishingBranchResult> MapMinimalPublishingBranchResultAsync(ContentPublishingBranchInternalResult internalResult) =>
         new()
         {
             Content = internalResult.Content
-                      ?? (internalResult.ContentKey is null ? null : _contentService.GetById(internalResult.ContentKey.Value)),
+                      ?? (internalResult.ContentKey is null ? null : await _contentService.GetByIdAsync(internalResult.ContentKey.Value, CancellationToken.None)),
             SucceededItems = internalResult.SucceededItems,
             FailedItems = internalResult.FailedItems,
         };

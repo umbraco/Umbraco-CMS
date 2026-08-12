@@ -315,7 +315,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// </summary>
     private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey, bool forceSkipDatabaseWrite = false)
     {
-        IContent? document = _contentService.GetById(documentKey);
+        IContent? document = await _contentService.GetByIdAsync(documentKey, CancellationToken.None);
         if (document is null || document.Trashed || document.Blueprint)
         {
             // Remove from cache if document doesn't exist, is trashed, or is a blueprint.

@@ -111,6 +111,19 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     protected IEventAggregator EventAggregator { get; }
 
     /// <inheritdoc />
+    // The base AsyncDefaultRepositoryCachePolicy defaults to the int-style "uRepo_" cache key prefix even
+    // though TKey is Guid here. The NPoco Guid-keyed cache policy and ContentCacheRefresher already clear
+    // the "uRepoGuid_" prefix on every save/refresh, so this override reuses that exact prefix instead of
+    // sitting in an entirely uninvalidated key.
+    protected override IAsyncRepositoryCachePolicy<TEntity, Guid> CreateCachePolicy()
+        => new AsyncGuidReadRepositoryCachePolicy<TEntity>(
+            GlobalIsolatedCache,
+            ScopeAccessor,
+            DefaultOptions,
+            RepositoryCacheVersionService,
+            CacheSyncService);
+
+    /// <inheritdoc />
     public abstract Guid RecycleBinKey { get; }
 
     /// <inheritdoc />
