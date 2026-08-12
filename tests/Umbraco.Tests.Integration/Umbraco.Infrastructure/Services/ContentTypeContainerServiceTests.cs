@@ -18,7 +18,7 @@ internal sealed class ContentTypeContainerServiceTests : EntityTypeContainerServ
 
     protected override async Task<Guid> CreateContainedEntityAsync(EntityContainer container)
     {
-        IContentType contentType = new ContentType(ShortStringHelper, container.Id)
+        var contentType = new ContentType(ShortStringHelper, container.Id)
         {
             Alias = $"alias{Guid.NewGuid():N}",
             Name = $"Name {Guid.NewGuid():N}",

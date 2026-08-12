@@ -29,6 +29,11 @@ public sealed class EntityTypeMovedCacheRefresher : PayloadCacheRefresherBase<En
     /// <summary>
     /// Initializes a new instance of the <see cref="EntityTypeMovedCacheRefresher"/> class.
     /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The serializer used for the refresher payload.</param>
+    /// <param name="contentTypeCommonRepository">The repository holding the shared runtime cache of content types.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The factory for creating cache refresher notifications.</param>
     public EntityTypeMovedCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,

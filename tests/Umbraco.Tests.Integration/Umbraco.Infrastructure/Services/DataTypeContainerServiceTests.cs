@@ -20,7 +20,7 @@ internal sealed class DataTypeContainerServiceTests : EntityTypeContainerService
 
     protected override async Task<Guid> CreateContainedEntityAsync(EntityContainer container)
     {
-        IDataType dataType = new DataType(
+        var dataType = new DataType(
             new TextboxPropertyEditor(DataValueEditorFactory, IOHelper),
             ConfigurationEditorJsonSerializer,
             container.Id)

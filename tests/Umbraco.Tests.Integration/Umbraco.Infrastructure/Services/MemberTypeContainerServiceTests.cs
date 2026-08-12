@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 /// <summary>
-///     Tests covering the MemberTypeContainerService
+///     Tests covering the MemberTypeContainerService.
 /// </summary>
 [TestFixture]
 internal sealed class MemberTypeContainerServiceTests : EntityTypeContainerServiceTestsBase<IMemberType>
@@ -19,7 +19,7 @@ internal sealed class MemberTypeContainerServiceTests : EntityTypeContainerServi
 
     protected override async Task<Guid> CreateContainedEntityAsync(EntityContainer container)
     {
-        IMemberType memberType = new MemberType(ShortStringHelper, container.Id)
+        var memberType = new MemberType(ShortStringHelper, container.Id)
         {
             Alias = $"alias{Guid.NewGuid():N}",
             Name = $"Name {Guid.NewGuid():N}",

@@ -82,6 +82,12 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
             : OperationStatusResult(result.Status);
     }
 
+    /// <summary>
+    /// Moves a folder to the target supplied in the request model, or to the tree root when no target is supplied.
+    /// </summary>
+    /// <param name="key">The key of the folder to move.</param>
+    /// <param name="moveFolderRequestModel">The request model carrying the target to move to.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the move operation.</returns>
     protected async Task<IActionResult> MoveFolderAsync(Guid key, MoveFolderRequestModel moveFolderRequestModel)
     {
         Attempt<EntityContainerOperationStatus> result = await _treeEntityTypeContainerService.MoveAsync(

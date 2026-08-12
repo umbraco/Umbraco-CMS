@@ -18,7 +18,7 @@ internal sealed class MediaTypeContainerServiceTests : EntityTypeContainerServic
 
     protected override async Task<Guid> CreateContainedEntityAsync(EntityContainer container)
     {
-        IMediaType mediaType = new MediaType(ShortStringHelper, container.Id)
+        var mediaType = new MediaType(ShortStringHelper, container.Id)
         {
             Alias = $"alias{Guid.NewGuid():N}",
             Name = $"Name {Guid.NewGuid():N}",

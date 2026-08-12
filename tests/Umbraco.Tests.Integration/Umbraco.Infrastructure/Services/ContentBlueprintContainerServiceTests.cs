@@ -25,7 +25,7 @@ internal sealed class ContentBlueprintContainerServiceTests : EntityTypeContaine
     {
         // Deliberately not cached across calls: the fixture instance is reused for every test, while the database
         // is recreated per test, so a cached content type would not exist for the second test onwards.
-        IContentType contentType = ContentTypeBuilder.CreateBasicContentType($"test{Guid.NewGuid():N}", "Test");
+        var contentType = ContentTypeBuilder.CreateBasicContentType($"test{Guid.NewGuid():N}", "Test");
         var contentTypeResult = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         Assert.IsTrue(contentTypeResult.Success, $"Failed to create content type: {contentTypeResult.Result}");
 
@@ -288,6 +288,7 @@ internal sealed class ContentBlueprintContainerServiceTests : EntityTypeContaine
             Assert.AreEqual(EntityContainerOperationStatus.NotFound, result.Status);
         });
     }
+
     /// <summary>
     ///     A blueprint has to keep its document blueprint object type through a container move, or it stops being
     ///     reachable as a blueprint.

@@ -3,6 +3,9 @@
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Extension methods for working with tree paths held as comma-delimited IDs.
+/// </summary>
 public static partial class StringExtensions
 {
     /// <summary>

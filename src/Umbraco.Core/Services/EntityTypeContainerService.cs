@@ -574,6 +574,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
     /// <param name="userKey">Key of the user issuing the operation.</param>
     /// <param name="objectId">The ID of the container the operation was performed on.</param>
     /// <param name="comment">An optional comment describing the operation.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     protected async Task AuditAsync(AuditType type, Guid userKey, int objectId, string? comment = null) =>
         await _auditService.AddAsync(
             type,
