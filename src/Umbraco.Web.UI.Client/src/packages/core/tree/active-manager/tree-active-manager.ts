@@ -1,5 +1,10 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, UmbStringState, type Observable } from '@umbraco-cms/backoffice/observable-api';
+import {
+	mergeObservables,
+	UmbArrayState,
+	UmbStringState,
+	type Observable,
+} from '@umbraco-cms/backoffice/observable-api';
 import { combineLatest, distinctUntilChanged, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
 import { debounce, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
@@ -58,11 +63,11 @@ export class UmbTreeItemActiveManager extends UmbControllerBase {
 	 * @memberof UmbTreeItemActiveManager
 	 */
 	isCurrentLocation(path: Observable<string>): Observable<boolean> {
-		return combineLatest([this.#currentLocation.asObservable(), path]).pipe(
+		return mergeObservables(
+			[this.#currentLocation.asObservable(), path],
 			// Compare with trailing slashes so /path-1 does not match /path-1-2, and allow anything
 			// beyond the item path itself, such as the workspace view segment.
-			map(([currentLocation, itemPath]) => !!itemPath && ensureSlash(currentLocation).includes(ensureSlash(itemPath))),
-			distinctUntilChanged(),
+			([currentLocation, itemPath]) => !!itemPath && ensureSlash(currentLocation).includes(ensureSlash(itemPath)),
 		);
 	}
 
