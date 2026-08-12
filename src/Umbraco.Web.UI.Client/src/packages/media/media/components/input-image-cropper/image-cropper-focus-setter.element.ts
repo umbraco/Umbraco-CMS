@@ -28,10 +28,8 @@ import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
  * point is focused. Arrow keys move the focal point by 10 pixels, while
  * holding Shift moves it by 1 pixel.
  *
- * The component emits an `umb-focal-point-change` event when the focal point
- * is changed. Focal point coordinates are normalized between 0 and 1, where
- * `{ left: 0, top: 0 }` represents the top-left corner and
- * `{ left: 1, top: 1 }` represents the bottom-right corner.
+ * The focal point uses normalized coordinates between 0 and 1. The default
+ * focal point is the center of the image: { left: 0.5, top: 0.5 }.
  *
  * @element umb-image-cropper-focus-setter
  * @fires focalpoint-change - Dispatched when the focal point changes.
@@ -61,6 +59,10 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	@state()
 	private _coords = { x: 0, y: 0 };
 
+	/**
+ 	* The current focal point as normalized coordinates between 0 and 1.
+ 	* Defaults to the center of the image when not set.
+ 	*/
 	@property({ attribute: false })
 	set focalPoint(value) {
 		this.#focalPoint = value;
