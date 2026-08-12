@@ -195,7 +195,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
     this.heightTxt = page.getByLabel('Height', {exact: true});
     this.propertyCrops = page.getByTestId('property:crops');
     this.createCropBtn = this.propertyCrops.getByRole('button', {name: 'Create'});
-    this.editCropBtn = this.propertyCrops.getByRole('button', {name: 'Edit'});
+    this.editCropBtn = this.propertyCrops.locator('.crop-form uui-button[type="submit"]');
 
     // Numeric
     this.minimumTxt = page.getByTestId('property:min').locator('#input');
