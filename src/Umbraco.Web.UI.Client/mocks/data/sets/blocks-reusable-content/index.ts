@@ -8,8 +8,18 @@ import { data as element } from './element.data.js';
 import { data as language } from './language.data.js';
 import { data as user } from './user.data.js';
 import { data as userGroup } from './user-group.data.js';
+import { data as referencedElementsWithPendingChanges } from './reference-pending-changes.data.js';
 
-export { dataType, document, documentType, element, language, user, userGroup };
+export {
+	dataType,
+	document,
+	documentType,
+	element,
+	language,
+	user,
+	userGroup,
+	referencedElementsWithPendingChanges,
+};
 
 export const documentTypeConfiguration = {
 	dataTypesCanBeChanged: DataTypeChangeModeModel.TRUE,
@@ -28,4 +38,5 @@ export const documentTypeConfiguration = {
 	language,
 	user,
 	userGroup,
+	referencedElementsWithPendingChanges,
 } satisfies UmbMockDataSet);

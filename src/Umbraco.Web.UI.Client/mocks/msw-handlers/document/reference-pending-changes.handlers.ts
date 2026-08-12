@@ -1,26 +1,13 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { umbElementMockDb } from '../../db/element.db.js';
+import { umbDocumentMockDb } from '../../db/document.db.js';
+import { umbMockManager } from '../../mock-manager.js';
 import { UMB_SLUG } from './slug.js';
-import type { PagedReferencedElementWithPendingChangesResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	PagedReferencedElementWithPendingChangesResponseModel,
+	ReferencedElementWithPendingChangesResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-
-// Direct elements referenced by the document at the given id that are not fully published.
-// Keyed by the referencing document's id — see mocks/data/sets/blocks-reusable-content.
-const REFERENCED_ELEMENTS_BY_DOCUMENT_ID: Record<
-	string,
-	Array<{ id: string; state: PublishableVariantStateModel; isScheduled: boolean }>
-> = {
-	// Block Grid
-	'17cd53f2-93b3-4e34-ade2-916e7a6639ed': [
-		{ id: 'library-element-three-id', state: PublishableVariantStateModel.DRAFT, isScheduled: true },
-		{ id: 'library-element-four-id', state: PublishableVariantStateModel.PUBLISHED_PENDING_CHANGES, isScheduled: false },
-	],
-	// Block List
-	'39842212-489e-46ec-a63b-6eeff36c7156': [
-		{ id: 'library-element-three-id', state: PublishableVariantStateModel.DRAFT, isScheduled: true },
-	],
-};
 
 export const referencePendingChangesHandlers = [
 	http.get(umbracoPath(`${UMB_SLUG}/:id/referenced-elements-with-pending-changes`), ({ request, params }) => {
@@ -28,21 +15,33 @@ export const referencePendingChangesHandlers = [
 		if (!id) return new HttpResponse(null, { status: 400 });
 		if (id === 'forbidden') return new HttpResponse(null, { status: 403 });
 
+		try {
+			umbDocumentMockDb.detail.read(id);
+		} catch {
+			return new HttpResponse(null, { status: 404 });
+		}
+
 		const url = new URL(request.url);
 		const skip = url.searchParams.get('skip') ? parseInt(url.searchParams.get('skip') as string, 10) : 0;
 		const take = url.searchParams.get('take') ? parseInt(url.searchParams.get('take') as string, 10) : 100;
 
-		const entries = REFERENCED_ELEMENTS_BY_DOCUMENT_ID[id] ?? [];
-		const page = entries.slice(skip, skip + take);
-		const items = page.map((entry) => ({
-			element: umbElementMockDb.item.getItems([entry.id])[0],
-			state: entry.state,
-			isScheduled: entry.isScheduled,
-		}));
+		const entries = umbMockManager.getDataSet().referencedElementsWithPendingChanges?.[id] ?? [];
+
+		// The state comes from the referenced element's own mock data, not a duplicate literal here — so a
+		// referenced id that isn't (or is no longer) present in the active data set is dropped rather than
+		// serialized as a broken `element: undefined`.
+		const items = entries
+			.map((entry): ReferencedElementWithPendingChangesResponseModel | undefined => {
+				const element = umbElementMockDb.item.getItems([entry.id])[0];
+				const state = element?.variants[0]?.state;
+				if (!element || !state) return undefined;
+				return { element, state, isScheduled: entry.isScheduled };
+			})
+			.filter((item): item is ReferencedElementWithPendingChangesResponseModel => item !== undefined);
 
 		const response: PagedReferencedElementWithPendingChangesResponseModel = {
-			total: entries.length,
-			items,
+			total: items.length,
+			items: items.slice(skip, skip + take),
 		};
 
 		return HttpResponse.json(response);

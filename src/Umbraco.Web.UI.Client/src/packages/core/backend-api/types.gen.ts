@@ -5759,46 +5759,6 @@ export type GetDocumentByIdReferencedByResponses = {
 
 export type GetDocumentByIdReferencedByResponse = GetDocumentByIdReferencedByResponses[keyof GetDocumentByIdReferencedByResponses];
 
-// NOTE: hand-authored stand-in for `referenced-elements-with-pending-changes`, pending a real
-// `/umb-update-openapi` regeneration against a live backend (see CLAUDE.md "Updating OpenApi.json").
-export type GetDocumentByIdReferencedElementsWithPendingChangesData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: {
-        skip?: number;
-        take?: number;
-    };
-    url: '/umbraco/management/api/v1/document/{id}/referenced-elements-with-pending-changes';
-};
-
-export type GetDocumentByIdReferencedElementsWithPendingChangesErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-};
-
-export type GetDocumentByIdReferencedElementsWithPendingChangesError = GetDocumentByIdReferencedElementsWithPendingChangesErrors[keyof GetDocumentByIdReferencedElementsWithPendingChangesErrors];
-
-export type GetDocumentByIdReferencedElementsWithPendingChangesResponses = {
-    /**
-     * OK
-     */
-    200: PagedReferencedElementWithPendingChangesResponseModel;
-};
-
-export type GetDocumentByIdReferencedElementsWithPendingChangesResponse = GetDocumentByIdReferencedElementsWithPendingChangesResponses[keyof GetDocumentByIdReferencedElementsWithPendingChangesResponses];
-
 export type GetDocumentByIdReferencedDescendantsData = {
     body?: never;
     path: {
@@ -8880,57 +8840,6 @@ export type GetElementByIdReferencedByResponses = {
 };
 
 export type GetElementByIdReferencedByResponse = GetElementByIdReferencedByResponses[keyof GetElementByIdReferencedByResponses];
-
-// NOTE: hand-authored stand-in for `referenced-elements-with-pending-changes`, pending a real
-// `/umb-update-openapi` regeneration against a live backend (see CLAUDE.md "Updating OpenApi.json").
-export type ReferencedElementWithPendingChangesResponseModel = {
-    element: ElementItemResponseModel;
-    state: PublishableVariantStateModel;
-    isScheduled: boolean;
-};
-
-export type PagedReferencedElementWithPendingChangesResponseModel = {
-    total: number;
-    items: Array<ReferencedElementWithPendingChangesResponseModel>;
-};
-
-export type GetElementByIdReferencedElementsWithPendingChangesData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: {
-        skip?: number;
-        take?: number;
-    };
-    url: '/umbraco/management/api/v1/element/{id}/referenced-elements-with-pending-changes';
-};
-
-export type GetElementByIdReferencedElementsWithPendingChangesErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-};
-
-export type GetElementByIdReferencedElementsWithPendingChangesError = GetElementByIdReferencedElementsWithPendingChangesErrors[keyof GetElementByIdReferencedElementsWithPendingChangesErrors];
-
-export type GetElementByIdReferencedElementsWithPendingChangesResponses = {
-    /**
-     * OK
-     */
-    200: PagedReferencedElementWithPendingChangesResponseModel;
-};
-
-export type GetElementByIdReferencedElementsWithPendingChangesResponse = GetElementByIdReferencedElementsWithPendingChangesResponses[keyof GetElementByIdReferencedElementsWithPendingChangesResponses];
 
 export type PutElementByIdUnpublishData = {
     body: UnpublishElementRequestModel;
