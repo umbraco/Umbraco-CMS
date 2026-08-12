@@ -1,6 +1,6 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
 import { UmbDocumentTreeItemDataResolver } from '../document-tree-item-data-resolver.js';
-import { UmbDocumentVariantState } from '../../variant-state.js';
+import type { UmbDocumentVariantState } from '../../variant-state.js';
 import { getDocumentVariantStateTagConfig } from '../../variant-state/utils.js';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
