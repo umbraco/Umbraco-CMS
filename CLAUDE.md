@@ -54,27 +54,11 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ## 2. General-Purpose by Default
 
-This repository is a product platform, not an application. Every layer is consumed by
-code that does not live here — implementors, package developers, and other parts of the
-CMS. A change is finished when it serves the use case that prompted it *and* the use
-cases nobody has described yet.
+This repository is a product platform, not an application. Every layer is consumed by code that does not live here — implementors, package developers, and other parts of the CMS. A change is finished when it serves the use case that prompted it *and* the use cases nobody has described yet.
 
-**Design to the contract.** When you change shared code, work out the rule the layer
-must uphold for *any* implementation of it, and make that rule hold there. Name a
-concrete implementation freely in the code that owns it — a specific service, package,
-or project; a shared or generic layer implements only the contract. A specific editor
-alias, content type alias, or class name appearing in generic code is the signal that a
-fix has been fitted to one caller — express it instead as a capability the contract
-exposes.
+**Design to the contract.** When you change shared code, work out the rule the layer must uphold for *any* implementation of it, and make that rule hold there. Name a concrete implementation freely in the code that owns it — a specific service, package, or project; a shared or generic layer implements only the contract. A specific editor alias, content type alias, or class name appearing in generic code is the signal that a fix has been fitted to one caller — express it instead as a capability the contract exposes.
 
-**Describe the contract.** Comments and public docs use the vocabulary of the layer they
-sit in. In public XML doc / JSDoc a concrete illustration is welcome where it reads as
-one possible implementation ("for example, an editor that emits several groups may…"),
-never as the definition of the behaviour.
-
-**Derive tests from the contract.** A test for shared code asserts the general rule and
-is named for it, not for the scenario that reported it. See §10 for the fail-before-fix
-requirement.
+**Describe the contract.** Comments and public docs use the vocabulary of the layer they sit in. In public XML doc / JSDoc a concrete illustration is welcome where it reads as one possible implementation ("for example, an editor that emits several groups may…"), never as the definition of the behaviour.
 
 ---
 
@@ -560,7 +544,7 @@ Labels are only added, never removed. Claude applies only labels it is confident
 // identifier the resolver supplies, not by call order.
 ```
 
-**Keep issue references where they stay actionable.** A tracked issue link (`(#21996)`, `https://...`) earns its place on a workaround for a defect this code cannot fix — a browser quirk or an upstream library bug — so the workaround can be deleted when the fix lands; and on a regression test, to record why the test exists. Elsewhere the comment stands on its own in general terms.
+**Keep issue references where they stay actionable.** A tracked issue link (`(#21996)`, `https://...`) is welcome wherever it explains a non-obvious *why* — a guard whose reason isn't clear from the code, a workaround for a defect this code cannot fix (so it can be deleted when the fix lands), or a regression test recording why it exists. Elsewhere the comment stands on its own in general terms.
 
 **Let commit messages and PR descriptions carry provenance.** Which task, PR, or issue produced a change (`Fix for X`, `Used by Y`, `Added for the Z flow`, `See PR #1234`) is recorded in git history, where it stays accurate. Source describes the code as it is now.
 
@@ -571,6 +555,10 @@ Allowed, and can name the specific issue, implementation, or use case it concern
 ---
 
 ## 10. Testing Practices
+
+### Derive tests from the contract
+
+A test for shared code asserts the general rule from §2, not the scenario that reported it, and is named for the rule.
 
 ### Tests for a bug fix must fail before the fix
 
