@@ -168,6 +168,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'クリックしてアップロードする',
+		browseFilesAction: 'ファイルを参照',
+		dropFilesOr: 'メディアをここにドラッグ&ドロップ<br />または',
 		orClickHereToUpload: 'またはクリックしてファイルを選択',
 		maxFileSize: 'ファイルの最大サイズ',
 	},

@@ -842,6 +842,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Нажмите, чтобы загрузить',
+		browseFilesAction: 'Обзор файлов',
+		dropFilesOr: 'Перетащите медиафайлы сюда<br />или',
 		disallowedFileType: 'Невозможна загрузка этого файла, этот тип файлов не разрешен для загрузки',
 		orClickHereToUpload: 'или нажмите сюда, чтобы выбрать файлы',
 		maxFileSize: 'Максимально допустимый размер файла: ',

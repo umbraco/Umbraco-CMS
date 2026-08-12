@@ -157,6 +157,8 @@ export default {
 	},
 	media: {
 		clickToUpload: '點選以便上傳',
+		browseFilesAction: '瀏覽檔案',
+		dropFilesOr: '將媒體拖放至此處<br />或',
 		orClickHereToUpload: '或按這裡選擇檔案',
 		maxFileSize: '檔案大小上限為',
 	},

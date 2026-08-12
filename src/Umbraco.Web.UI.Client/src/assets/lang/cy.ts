@@ -345,6 +345,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Cliciwch i lanlwytho',
+		browseFilesAction: 'Pori ffeiliau',
+		dropFilesOr: 'Llusgwch a gollwng cyfryngau yma<br />neu',
 		orClickHereToUpload: 'neu cliciwch yma i ddewis ffeiliau',
 		disallowedFileType: "Ni ellir lanlwytho'r ffeil yma, nid yw math y ffeil yn wedi'i gymeradwyo",
 		maxFileSize: 'Maint ffeil uchaf',

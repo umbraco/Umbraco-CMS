@@ -316,6 +316,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikněte pro nahrání',
+		browseFilesAction: 'Procházet soubory',
+		dropFilesOr: 'Přetáhněte média sem<br />nebo',
 		orClickHereToUpload: 'nebo kliknutím sem vyberte soubory',
 		disallowedFileType: 'Tento soubor nelze nahrát, nemá povolený typ souboru',
 		maxFileSize: 'Maximální velikost souboru je',

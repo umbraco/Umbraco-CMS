@@ -335,6 +335,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klik om te uploaden',
+		browseFilesAction: 'Blader door bestanden',
+		dropFilesOr: 'Sleep media hierheen<br />of',
 		orClickHereToUpload: 'Of klik hier om bestanden te kiezen',
 		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype',
 		maxFileSize: 'Maximale bestandsgrootte is',

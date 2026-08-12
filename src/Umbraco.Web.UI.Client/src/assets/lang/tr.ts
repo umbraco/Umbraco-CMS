@@ -319,6 +319,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Yüklemek için tıklayın',
+		browseFilesAction: 'Dosyalara göz at',
+		dropFilesOr: 'Medyayı buraya sürükleyip bırakın<br />veya',
 		orClickHereToUpload: 'veya dosyaları seçmek için burayı tıklayın',
 		disallowedFileType: 'Bu dosya yüklenemiyor, onaylanmış bir dosya türüne sahip değil',
 		maxFileSize: 'Maksimum dosya boyutu',

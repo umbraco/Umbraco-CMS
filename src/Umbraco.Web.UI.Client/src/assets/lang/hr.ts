@@ -335,6 +335,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Kliknite za prijenos',
+		browseFilesAction: 'Pregledaj datoteke',
+		dropFilesOr: 'Povucite i ispustite medije ovdje<br />ili',
 		orClickHereToUpload: 'ili kliknite ovdje kako bi odaberali datoteke',
 		disallowedFileType: 'Nije moguće učitati ovu datoteku, jer nema odobrenu vrstu datoteke',
 		disallowedMediaType: "Nije moguće učitati ovu datoteku, format medija sa nastavkom '%0%' nije dozvoljen",

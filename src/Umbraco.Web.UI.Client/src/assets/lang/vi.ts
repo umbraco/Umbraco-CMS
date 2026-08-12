@@ -390,6 +390,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Nhấp để tải lên',
+		browseFilesAction: 'Duyệt tệp',
+		dropFilesOr: 'Kéo và thả tệp phương tiện vào đây<br />hoặc',
 		orClickHereToUpload: 'hoặc nhấp vào đây để chọn tệp',
 		disallowedFileType: 'Không thể tải lên tệp này, nó không có loại tệp được phê duyệt',
 		disallowedMediaType: "Không thể tải lên tệp này, loại phương tiện có bí danh '%0%' không được phép ở đây",
