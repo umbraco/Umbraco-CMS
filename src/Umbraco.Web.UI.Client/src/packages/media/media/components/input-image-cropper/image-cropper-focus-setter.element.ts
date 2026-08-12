@@ -34,7 +34,7 @@ import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
  * `{ left: 1, top: 1 }` represents the bottom-right corner.
  *
  * @element umb-image-cropper-focus-setter
- * @fires umb-focal-point-change - Dispatched when the focal point changes.
+ * @fires focalpoint-change - Dispatched when the focal point changes.
  *
  * @attr {boolean} hideFocalPoint - Hides the focal point and disables
  * interaction with it.
