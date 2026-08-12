@@ -20,6 +20,30 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
+/**
+ * Displays an image with an interactive focal point that can be positioned
+ * by clicking or dragging on the image.
+ *
+ * The focal point can also be adjusted using the keyboard when the focal
+ * point is focused. Arrow keys move the focal point by 10 pixels, while
+ * holding Shift moves it by 1 pixel.
+ *
+ * The component emits an `umb-focal-point-change` event when the focal point
+ * is changed. Focal point coordinates are normalized between 0 and 1, where
+ * `{ left: 0, top: 0 }` represents the top-left corner and
+ * `{ left: 1, top: 1 }` represents the bottom-right corner.
+ *
+ * @element umb-image-cropper-focus-setter
+ * @fires umb-focal-point-change - Dispatched when the focal point changes.
+ *
+ * @attr {boolean} hide-focal-point - Hides the focal point and disables
+ * interaction with it.
+ * @attr {boolean} disabled - Disables focal point interaction.
+ * @attr {string} src - The image source URL.
+ *
+ * @cssprop --umb-image-cropper-focus-setter-background - Background shown
+ * behind the image. Defaults to a checkerboard pattern that helps reveal
+ * transparent areas.
 @customElement('umb-image-cropper-focus-setter')
 export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	@query('#image')
@@ -288,12 +312,20 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		:host(:not([hidefocalpoint])) #wrapper {
 			cursor: crosshair;
 		}
+		
 		#image {
 			margin: auto;
 			position: relative;
 			max-width: 100%;
 			max-height: 100%;
+			background-image: var(
+				--umb-image-cropper-focus-setter-background,
+				url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill-opacity=".1"><path d="M50 0h50v50H50zM0 50h50v50H0z"/></svg>')
+			);
+			background-size: 10px 10px;
+			background-repeat: repeat;
 		}
+		
 		#focal-point {
 			content: '';
 			display: block;
