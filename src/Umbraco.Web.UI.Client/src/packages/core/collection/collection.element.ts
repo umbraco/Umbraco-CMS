@@ -3,7 +3,7 @@ import type { ManifestCollection } from './extensions/types.js';
 import type { UmbCollectionFilterModel } from './collection-filter-model.interface.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbElementInteractionMemoryEventDispatchController } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbElementInteractionMemoryBridgeController } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 
@@ -52,7 +52,8 @@ export class UmbCollectionElement<
 		return this.#interactionMemories;
 	}
 	#interactionMemories?: Array<UmbInteractionMemoryModel>;
-	#interactionMemoryDispatcher?: UmbElementInteractionMemoryEventDispatchController;
+
+	#interactionMemoryBridge?: UmbElementInteractionMemoryBridgeController;
 
 	protected override apiChanged(api: UmbApi | undefined): void {
 		super.apiChanged(api);
@@ -78,18 +79,18 @@ export class UmbCollectionElement<
 	}
 
 	#createInteractionMemoryBridge() {
-		this.#interactionMemoryDispatcher?.destroy();
-		this.#interactionMemoryDispatcher = undefined;
+		this.#interactionMemoryBridge?.destroy();
+		this.#interactionMemoryBridge = undefined;
 
 		const memoryManager = (this._api as UmbCollectionContext | undefined)?.interactionMemory;
 		if (!memoryManager) return;
 
-		this.#interactionMemoryDispatcher = new UmbElementInteractionMemoryEventDispatchController(this, memoryManager);
+		this.#interactionMemoryBridge = new UmbElementInteractionMemoryBridgeController(this, memoryManager);
 	}
 
 	#setInteractionMemories() {
 		if (!this.#interactionMemories) return;
-		this.#interactionMemoryDispatcher?.setMemories(this.#interactionMemories);
+		this.#interactionMemoryBridge?.setMemories(this.#interactionMemories);
 	}
 
 	/**
@@ -97,7 +98,7 @@ export class UmbCollectionElement<
 	 * @returns {Array<UmbInteractionMemoryModel>} The current memories of the collection.
 	 */
 	getInteractionMemories(): Array<UmbInteractionMemoryModel> {
-		return this.#interactionMemoryDispatcher?.getMemories() ?? [];
+		return this.#interactionMemoryBridge?.getMemories() ?? [];
 	}
 
 	getSelection() {

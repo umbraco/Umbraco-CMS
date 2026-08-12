@@ -6,25 +6,25 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * Exposing interaction memory changes via Event Dispatching on the host element. Memories are given to the manager through
- * {@link setMemories} — mirroring an `interactionMemories` property — and every change made to the manager
+ * Bridges an interaction memory manager to the element hosting it: memories are given to the manager through
+ * {@link setMemories} — mirroring an `interactionMemories` element property — and every change made to the manager
  * dispatches an `interaction-memories-change` event on the host element.
  *
  * Use this in an element that hands its interaction memories to whoever is responsible for storing them, ex. a
  * workspace view writing them to the global interaction memory.
  * @exports
- * @class UmbElementInteractionMemoryEventDispatchController
+ * @class UmbElementInteractionMemoryBridgeController
  * @augments {UmbControllerBase}
  */
-export class UmbElementInteractionMemoryEventDispatchController extends UmbControllerBase {
+export class UmbElementInteractionMemoryBridgeController extends UmbControllerBase {
 	#interactionMemory: UmbInteractionMemoryManager;
 	#snapshot: Array<UmbInteractionMemoryModel> = [];
 
 	/**
-	 * Creates an instance of UmbElementInteractionMemoryEventDispatchController.
+	 * Creates an instance of UmbElementInteractionMemoryBridgeController.
 	 * @param {UmbControllerHost} host - The host of this controller; the change event is dispatched on its element.
 	 * @param {UmbInteractionMemoryManager} interactionMemory - The interaction memory manager to bridge.
-	 * @memberof UmbElementInteractionMemoryEventDispatchController
+	 * @memberof UmbElementInteractionMemoryBridgeController
 	 */
 	constructor(host: UmbControllerHost, interactionMemory: UmbInteractionMemoryManager) {
 		super(host);
@@ -45,7 +45,7 @@ export class UmbElementInteractionMemoryEventDispatchController extends UmbContr
 	/**
 	 * Gets all interaction memories currently held by the bridged manager.
 	 * @returns {Array<UmbInteractionMemoryModel>} The current interaction memories.
-	 * @memberof UmbElementInteractionMemoryEventDispatchController
+	 * @memberof UmbElementInteractionMemoryBridgeController
 	 */
 	getMemories(): Array<UmbInteractionMemoryModel> {
 		return this.#interactionMemory.getAllMemories();
@@ -57,7 +57,7 @@ export class UmbElementInteractionMemoryEventDispatchController extends UmbContr
 	 * dispatches a change event for the memories the element was just handed, nor for the intermediate states of
 	 * applying them one by one.
 	 * @param {Array<UmbInteractionMemoryModel> | undefined} value - The authoritative snapshot of interaction memories.
-	 * @memberof UmbElementInteractionMemoryEventDispatchController
+	 * @memberof UmbElementInteractionMemoryBridgeController
 	 */
 	setMemories(value: Array<UmbInteractionMemoryModel> | undefined): void {
 		const next = value ?? [];
