@@ -115,7 +115,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the order direction filter for the collection and refreshes the collection.
-	 * @param {any} orderDirection - The direction to order the collection by.
+	 * @param {UmbDirectionType} orderDirection - The direction to order the collection by.
 	 * @memberof UmbUserCollectionContext
 	 */
 	setOrderDirectionFilter(orderDirection: UmbDirectionType) {

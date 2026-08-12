@@ -1,4 +1,4 @@
-import type { UmbUserDetailModel } from '../../types.js';
+import type { UmbUserDetailModel, UmbUserStartNodesModel } from '../../types.js';
 import type { UmbUserDetailDataSource } from './types.js';
 import { UmbUserServerDataSource } from './user-detail.server.data-source.js';
 import type { UmbUserDetailStore } from './user-detail.store.js';
@@ -6,6 +6,8 @@ import { UMB_USER_DETAIL_STORE_CONTEXT } from './user-detail.store.token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbDetailRepositoryBase,
+	type UmbDataSourceResponse,
+	type UmbRepositoryResponse,
 	type UmbRepositoryResponseWithAsObservable,
 } from '@umbraco-cms/backoffice/repository';
 
@@ -59,7 +61,7 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 	/**
 	 * Creates a new User detail
 	 * @param {UmbUserDetailModel} model - The user model to create
-	 * @returns {*} The created user details
+	 * @returns {Promise<UmbRepositoryResponse<UmbUserDetailModel>>} The created user details
 	 * @memberof UmbUserDetailRepository
 	 */
 	override async create(model: UmbUserDetailModel) {
@@ -69,7 +71,7 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 	/**
 	 * Requests the detail for the given unique
 	 * @param {string} unique - The unique id of the user
-	 * @returns {*} The calculated start nodes for the user
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserStartNodesModel>>} The calculated start nodes for the user
 	 * @memberof UmbUserDetailRepository
 	 */
 	requestCalculateStartNodes(unique: string) {

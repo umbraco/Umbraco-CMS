@@ -1,8 +1,13 @@
 import type { UmbCurrentUserModel } from '../types.js';
-import type { SetAvatarRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	SetAvatarRequestModel,
+	UserExternalLoginProviderModel,
+	UserTwoFactorProviderModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceErrorResponse, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -14,7 +19,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Get the current user
-	 * @returns {*} The current user data or an error
+	 * @returns {Promise<UmbDataSourceResponse<UmbCurrentUserModel>>} The current user data or an error
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getCurrentUser() {
@@ -72,7 +77,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Get the current user's external login providers
-	 * @returns {*} The external login providers data or an error
+	 * @returns {Promise<UmbDataSourceResponse<Array<UserExternalLoginProviderModel>>>} The external login providers data or an error
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getExternalLoginProviders() {
@@ -81,7 +86,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Get the current user's available MFA login providers
-	 * @returns {*} The MFA login providers data or an error
+	 * @returns {Promise<UmbDataSourceResponse<Array<UserTwoFactorProviderModel>>>} The MFA login providers data or an error
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getMfaLoginProviders() {
@@ -99,7 +104,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * @param {string} providerName The name of the provider to enable
 	 * @param {string} code The activation code of the provider to enable
 	 * @param {string} secret The secret used to verify the provider's activation code
-	 * @returns {*} An error if the provider could not be enabled
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the provider could not be enabled
 	 */
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
 		const { error } = await tryExecute(
@@ -118,7 +123,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * Disable an MFA provider
 	 * @param {string} providerName The name of the provider to disable
 	 * @param {string} code The activation code of the provider to disable
-	 * @returns {*} An error if the provider could not be disabled
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the provider could not be disabled
 	 */
 	async disableMfaProvider(providerName: string, code: string) {
 		const { error } = await tryExecute(
@@ -139,7 +144,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * @param {string} newPassword The new password
 	 * @param {string} oldPassword The old password
 	 * @param {boolean} isCurrentUser Whether the change is for the current user
-	 * @returns {*} The result of the change password request
+	 * @returns {Promise<UmbDataSourceResponse<unknown>>} The result of the change password request
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {
 		return tryExecute(
@@ -157,7 +162,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	/**
 	 * Upload an avatar for the current user using a temporary file unique
 	 * @param {string} fileUnique The unique of the temporary file to use as avatar
-	 * @returns {*} An error if the avatar upload failed
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the avatar upload failed
 	 */
 	async uploadCurrentUserAvatar(fileUnique: string) {
 		const body: SetAvatarRequestModel = {
@@ -171,7 +176,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Delete the current user's avatar
-	 * @returns {*} An error if the avatar deletion failed
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the avatar deletion failed
 	 */
 	async deleteCurrentUserAvatar() {
 		return tryExecute(this, UserService.deleteUserCurrentAvatar());
@@ -180,7 +185,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	/**
 	 * Update the current user's profile
 	 * @param {string} languageIsoCode The ISO code of the language to set for the current user
-	 * @returns {*} An error if the profile update failed
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the profile update failed
 	 */
 	async updateCurrentUserProfile(languageIsoCode: string) {
 		return tryExecute(

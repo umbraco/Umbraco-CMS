@@ -6,7 +6,12 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserGroupService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbManagementApiDataMapper, type UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import {
+	UmbManagementApiDataMapper,
+	type UmbDataSourceErrorResponse,
+	type UmbDataSourceResponse,
+	type UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
@@ -54,7 +59,7 @@ export class UmbUserGroupServerDataSource
 	/**
 	 * Fetches a User Group with the given id from the server
 	 * @param {string} unique - The unique id of the User Group.
-	 * @returns {*} The User Group.
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>>} The User Group.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async read(unique: string) {
@@ -108,7 +113,7 @@ export class UmbUserGroupServerDataSource
 	/**
 	 * Inserts a new User Group on the server
 	 * @param {UmbUserGroupDetailModel} model - The User Group to create.
-	 * @returns {*} The created User Group.
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>>} The created User Group.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async create(model: UmbUserGroupDetailModel) {
@@ -159,7 +164,7 @@ export class UmbUserGroupServerDataSource
 	 * Updates a UserGroup on the server
 	 * @param {UmbUserGroupDetailModel} UserGroup - The User Group to update.
 	 * @param {UmbUserGroupDetailModel} model - The User Group to update.
-	 * @returns {*} The updated User Group.
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>>} The updated User Group.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async update(model: UmbUserGroupDetailModel) {
@@ -210,7 +215,7 @@ export class UmbUserGroupServerDataSource
 	/**
 	 * Deletes a User Group on the server
 	 * @param {string} unique - The unique id of the User Group.
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
 	async delete(unique: string) {

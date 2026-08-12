@@ -1,5 +1,7 @@
+import type { UmbUserConfigurationModel, UmbCurrentUserConfigurationModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 export class UmbUserConfigServerDataSource {
@@ -11,7 +13,7 @@ export class UmbUserConfigServerDataSource {
 
 	/**
 	 * Get the user configuration.
-	 * @returns {*} The user configuration.
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserConfigurationModel>>} The user configuration.
 	 * @memberof UmbUserConfigServerDataSource
 	 */
 	getUserConfig() {
@@ -20,7 +22,7 @@ export class UmbUserConfigServerDataSource {
 
 	/**
 	 * Get the current user configuration.
-	 * @returns {*} The current user configuration.
+	 * @returns {Promise<UmbDataSourceResponse<UmbCurrentUserConfigurationModel>>} The current user configuration.
 	 * @memberof UmbUserConfigServerDataSource
 	 */
 	getCurrentUserConfig() {

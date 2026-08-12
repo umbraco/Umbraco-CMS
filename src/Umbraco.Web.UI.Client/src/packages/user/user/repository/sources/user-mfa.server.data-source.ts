@@ -1,6 +1,8 @@
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UserTwoFactorProviderModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceErrorResponse, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for User MFA items that fetches data from the server
@@ -21,7 +23,7 @@ export class UmbUserMfaServerDataSource {
 	/**
 	 * Request the MFA providers for a user
 	 * @param {string} unique The unique id of the user
-	 * @returns {*} The MFA providers for the user
+	 * @returns {Promise<UmbDataSourceResponse<Array<UserTwoFactorProviderModel>>>} The MFA providers for the user
 	 * @memberof UmbMfaServerDataSource
 	 */
 	requestMfaProviders(unique: string) {
@@ -39,7 +41,7 @@ export class UmbUserMfaServerDataSource {
 	 * Disables a MFA provider for a user
 	 * @param {string} unique The unique id of the user
 	 * @param {string} providerName The name of the provider
-	 * @returns {*} The result of disabling the MFA provider
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of disabling the MFA provider
 	 * @memberof UmbMfaServerDataSource
 	 */
 	disableMfaProvider(unique: string, providerName: string) {

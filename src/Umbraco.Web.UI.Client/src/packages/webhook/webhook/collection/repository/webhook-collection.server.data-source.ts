@@ -1,6 +1,7 @@
 import type { UmbWebhookCollectionFilterModel } from '../types.js';
 import { UMB_WEBHOOK_ENTITY_TYPE } from '../../../entity.js';
 import type { UmbWebhookDetailModel } from '../../types.js';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -25,7 +26,7 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 	/**
 	 * Gets the Webhook collection filtered by the given filter.
 	 * @param {UmbWebhookCollectionFilterModel} filter The filter to apply
-	 * @returns {*} The filtered webhook collection
+	 * @returns {Promise<UmbDataSourceResponse<{ items: Array<UmbWebhookDetailModel>; total: number }>>} The filtered webhook collection
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbWebhookCollectionFilterModel) {

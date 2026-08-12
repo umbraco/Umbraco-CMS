@@ -10,6 +10,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -32,7 +33,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	/**
 	 * Gets the user collection filtered by the given filter.
 	 * @param {UmbUserCollectionFilterModel} filter - The filter to apply to the user collection.
-	 * @returns {*} The filtered user collection.
+	 * @returns {Promise<UmbDataSourceResponse<{ items: Array<UmbUserDetailModel>; total: number }>>} The filtered user collection.
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbUserCollectionFilterModel) {

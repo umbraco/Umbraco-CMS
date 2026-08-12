@@ -1,11 +1,13 @@
 import type {
 	UmbCreateUserClientCredentialRequestArgs,
 	UmbDeleteUserClientCredentialRequestArgs,
+	UmbUserClientCredentialModel,
 	UmbUserClientCredentialRequestArgs,
 } from '../types.js';
 import type { UmbUserClientCredentialDataSource } from './types.js';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDataSourceErrorResponse, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -23,7 +25,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	/**
 	 * Creates a new client credentials for a user
 	 * @param {UmbCreateUserClientCredentialRequestArgs} args - The user and client to create the credentials for
-	 * @returns {*} The created client credential.
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserClientCredentialModel>>} The created client credential.
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
 	async create(args: UmbCreateUserClientCredentialRequestArgs) {
@@ -48,7 +50,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	/**
 	 * Reads the client credentials for a user
 	 * @param {UmbUserClientCredentialRequestArgs} args - The user to read the credentials for
-	 * @returns {*} The client credentials for the user.
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbUserClientCredentialModel>>>} The client credentials for the user.
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
 	async read(args: UmbUserClientCredentialRequestArgs) {
@@ -73,7 +75,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	/**
 	 * Deletes the client credentials for a user
 	 * @param {UmbDeleteUserClientCredentialRequestArgs} args - The user and client unique to delete the credentials for
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
 	delete(args: UmbDeleteUserClientCredentialRequestArgs) {
