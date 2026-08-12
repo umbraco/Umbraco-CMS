@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -18,7 +16,6 @@ public class PublishedContentQuery : IPublishedContentQuery
 {
     private readonly IPublishedContentCache _publishedContent;
     private readonly IPublishedMediaCache _publishedMediaCache;
-    private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
     private readonly IMediaNavigationQueryService _mediaNavigationQueryService;
 
@@ -26,13 +23,11 @@ public class PublishedContentQuery : IPublishedContentQuery
     ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
     /// </summary>
     public PublishedContentQuery(
-        IVariationContextAccessor variationContextAccessor,
         IPublishedContentCache publishedContent,
         IPublishedMediaCache publishedMediaCache,
         IDocumentNavigationQueryService documentNavigationQueryService,
         IMediaNavigationQueryService mediaNavigationQueryService)
     {
-        _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
         _publishedContent = publishedContent;
         _publishedMediaCache = publishedMediaCache;
         _documentNavigationQueryService = documentNavigationQueryService;
