@@ -2977,4 +2977,7 @@ export default {
 		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
 		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
+	},
 } as UmbLocalizationDictionary;

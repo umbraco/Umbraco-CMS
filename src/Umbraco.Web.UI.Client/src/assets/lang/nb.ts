@@ -1328,4 +1328,7 @@ export default {
 		tabCreateEmpty: 'Opprett tomt',
 		thumbnail: 'Miniatyrbilde',
 	},
+	picker: {
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
+	},
 } as UmbLocalizationDictionary;
