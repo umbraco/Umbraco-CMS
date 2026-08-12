@@ -403,7 +403,8 @@
 	    0: Comma delimitted list of failed folder paths
   	-->
     <key alias="umbracoApplicationUrlCheckResultTrue"><![CDATA[AppSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' je postavljen na <strong>%0%</strong>.]]></key>
-    <key alias="umbracoApplicationUrlCheckResultFalse">AppSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' nije postavljen.</key>
+    <key alias="umbracoApplicationUrlCheckResultFalse"><![CDATA[AppSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' nije postavljen, pa će se URL aplikacije automatski otkriti iz dolaznih zahtjeva. Preporučuje se da ga postavite izričito.]]></key>
+    <key alias="umbracoApplicationUrlCheckResultError"><![CDATA[AppSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' nije postavljen, a automatsko otkrivanje URL-a aplikacije je onemogućeno ('Umbraco:CMS:WebRouting:ApplicationUrlDetection' je 'None'). Značajke koje zahtijevaju apsolutni URL, poput e-pošte za poništavanje lozinke i pozivnica, neće raditi. Postavite URL aplikacije izričito ili omogućite automatsko otkrivanje.]]></key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->

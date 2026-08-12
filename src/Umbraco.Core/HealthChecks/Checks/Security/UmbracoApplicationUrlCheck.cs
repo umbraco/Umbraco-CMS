@@ -44,28 +44,34 @@ public class UmbracoApplicationUrlCheck : HealthCheck
 
     private HealthCheckStatus CheckUmbracoApplicationUrl()
     {
-        var url = _webRoutingSettings.CurrentValue.UmbracoApplicationUrl;
+        WebRoutingSettings settings = _webRoutingSettings.CurrentValue;
+        var url = settings.UmbracoApplicationUrl;
 
         string resultMessage;
         StatusResultType resultType;
-        var success = false;
 
-        if (url.IsNullOrWhiteSpace())
+        if (url.IsNullOrWhiteSpace() is false)
         {
-            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultFalse");
-            resultType = StatusResultType.Warning;
+            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultTrue", [url]);
+            resultType = StatusResultType.Success;
+        }
+        else if (settings.ApplicationUrlDetection == ApplicationUrlDetection.None)
+        {
+            // No explicit URL and auto-detection is disabled, so the application URL can never be established.
+            // Features that require an absolute URL (e.g. password reset and invitation emails) will not work.
+            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultError");
+            resultType = StatusResultType.Error;
         }
         else
         {
-            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultTrue", new[] { url });
-            resultType = StatusResultType.Success;
-            success = true;
+            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultFalse");
+            resultType = StatusResultType.Warning;
         }
 
         return new HealthCheckStatus(resultMessage)
         {
             ResultType = resultType,
-            ReadMoreLink = success
+            ReadMoreLink = resultType == StatusResultType.Success
                 ? null
                 : Constants.HealthChecks.DocumentationLinks.Security.UmbracoApplicationUrlCheck,
         };

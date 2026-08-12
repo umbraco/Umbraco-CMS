@@ -317,7 +317,7 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <param name="template">The template to save.</param>
     /// <param name="auditType">The type of audit entry to create.</param>
     /// <param name="userKey">The key of the user performing the operation.</param>
-    /// <param name="scopeValidator">An optional validation function to execute within the scope.</param>
+    /// <param name="scopeValidatorAsync">An optional validation function to execute within the scope.</param>
     /// <param name="contentTypeAlias">The optional content type alias for the saving notification.</param>
     /// <returns>An attempt result containing the template and operation status.</returns>
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(

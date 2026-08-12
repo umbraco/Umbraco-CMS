@@ -1,5 +1,6 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { umbMapDocumentCreateRequestBody, umbMapDocumentUpdateRequestBody } from './document-detail-request.mappers.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
@@ -23,8 +24,8 @@ export class UmbDocumentServerDataSource
 {
 	/**
 	 * Creates a new Document scaffold
-	 * @param preset
-	 * @returns { UmbDocumentDetailModel }
+	 * @param {UmbDeepPartialObject<UmbDocumentDetailModel>} preset - Partial data to merge into the scaffold.
+	 * @returns { UmbDocumentDetailModel } The scaffolded document.
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async createScaffold(preset: UmbDeepPartialObject<UmbDocumentDetailModel> = {}) {
@@ -38,11 +39,12 @@ export class UmbDocumentServerDataSource
 		const { data } = await new UmbDocumentTypeDetailServerDataSource(this).read(documentTypeUnique);
 		const documentTypeIcon = data?.icon ?? null;
 		const documentTypeCollection = data?.collection ?? null;
+		const defaultTemplate = data?.defaultTemplate ? { unique: data.defaultTemplate.id } : null;
 
 		const defaultData: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
-			template: null,
+			template: defaultTemplate,
 			documentType: {
 				unique: documentTypeUnique,
 				collection: documentTypeCollection,
@@ -61,8 +63,8 @@ export class UmbDocumentServerDataSource
 
 	/**
 	 * Fetches a Document with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The document unique identifier.
+	 * @returns {*} The requested document.
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async read(unique: string) {
@@ -117,23 +119,15 @@ export class UmbDocumentServerDataSource
 	/**
 	 * Inserts a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @param parentUnique
-	 * @returns {*}
+	 * @param {string | null} parentUnique - The unique identifier of the parent document.
+	 * @returns {*} The created document.
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async create(model: UmbDocumentDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: CreateDocumentRequestModel = {
-			id: model.unique,
-			parent: parentUnique ? { id: parentUnique } : null,
-			documentType: { id: model.documentType.unique },
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
+		const body: CreateDocumentRequestModel = umbMapDocumentCreateRequestBody(model, parentUnique);
 
 		const { data, error } = await tryExecute(
 			this,
@@ -152,18 +146,13 @@ export class UmbDocumentServerDataSource
 	/**
 	 * Updates a Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @returns {*}
+	 * @returns {*} The updated document.
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async update(model: UmbDocumentDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: UpdateDocumentRequestModel = {
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
+		const body: UpdateDocumentRequestModel = umbMapDocumentUpdateRequestBody(model);
 
 		const { error } = await tryExecute(
 			this,
@@ -182,8 +171,8 @@ export class UmbDocumentServerDataSource
 
 	/**
 	 * Deletes a Document on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The document unique identifier.
+	 * @returns {*} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async delete(unique: string) {

@@ -41,9 +41,9 @@ const LocalizationControllerAlias = Symbol();
  * }
  * ```
  */
-export class UmbLocalizationController<LocalizationSetType extends UmbLocalizationSetBase = UmbLocalizationSet>
-	implements UmbController
-{
+export class UmbLocalizationController<
+	LocalizationSetType extends UmbLocalizationSetBase = UmbLocalizationSet,
+> implements UmbController {
 	#host;
 	#hostEl?: HTMLElement & Partial<Pick<LitElement, 'requestUpdate'>>;
 	readonly controllerAlias = LocalizationControllerAlias;
@@ -228,7 +228,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * Outputs a localized date in the specified format.
 	 * @param {Date} dateToFormat - the date to format.
 	 * @param {Intl.DateTimeFormatOptions} options - the options to use when formatting the date.
-	 * @returns {string}
+	 * @returns {string} - the formatted date.
 	 */
 	date(dateToFormat: Date | string, options?: Intl.DateTimeFormatOptions): string {
 		dateToFormat = new Date(dateToFormat);
@@ -238,7 +238,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	/**
 	 * Outputs a localized date with time using short date and medium time format.
 	 * @param {Date | string} dateToFormat - the date to format.
-	 * @returns {string}
+	 * @returns {string} - the formatted date and time.
 	 */
 	dateTime(dateToFormat: Date | string): string {
 		dateToFormat = new Date(dateToFormat);
@@ -369,8 +369,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	htmlString(text: string | undefined, ...args: unknown[]) {
 		// `escapeHTML` short-circuits on non-strings, so we stringify first to also escape values
 		// like `{ toString: () => '<script>...' }`. `undefined` is preserved so `string()` can
-		// keep the original placeholder unmatched (existing semantics).
-		const escapedArgs = args.map((a) => (typeof a === 'undefined' ? a : escapeHTML(String(a))));
+		// keep the original placeholder unmatched (existing semantics). A plain object with no
+		// custom `toString` safely degrades to the literal "[object Object]" here.
+		const escapedArgs = args.map((a) => (a === undefined ? a : escapeHTML(String(a))));
 		return unsafeHTML(this.string(text, ...escapedArgs));
 	}
 }

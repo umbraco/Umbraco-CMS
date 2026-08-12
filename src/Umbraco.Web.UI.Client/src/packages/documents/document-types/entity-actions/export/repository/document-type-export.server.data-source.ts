@@ -20,8 +20,8 @@ export class UmbExportDocumentTypeServerDataSource {
 
 	/**
 	 * Export an item for the given id to the destination unique
-	 * @param {unique} unique
-	 * @returns {*}
+	 * @param {unique} unique - The unique identifier of the item to export.
+	 * @returns {*} The exported item.
 	 * @memberof UmbExportDocumentTypeServerDataSource
 	 */
 	async export(unique: string) {

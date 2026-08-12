@@ -394,9 +394,20 @@ WHERE nodeId IN (@0)";
     private bool FinalizeUpdateItem(UpdateItem updateItem, IDataValueEditor updatedValueEditor)
     {
         var editorValue = _jsonSerializer.Serialize(updateItem.UpdatedValue);
-        var dbValue = updateItem.UpdatedValue is SingleBlockValue
-            ? _dummySingleBlockValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null)
-            : updatedValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+
+        // Re-running FromEditor here is only to re-serialize the converted value; the referenced-entity
+        // caching it would otherwise trigger is wasted work that issues per-property content/media reads
+        // in separate scopes, contending with this migration's own scope. Suppress it.
+        object? dbValue;
+#pragma warning disable CS0618 // Type or member is obsolete
+        using (CacheReferencedEntitiesSuppression.Suppress())
+        {
+            dbValue = updateItem.UpdatedValue is SingleBlockValue
+                ? _dummySingleBlockValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null)
+                : updatedValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
         {
             _logger.LogWarning(

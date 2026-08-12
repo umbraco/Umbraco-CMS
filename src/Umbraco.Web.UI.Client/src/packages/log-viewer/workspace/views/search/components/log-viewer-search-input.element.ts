@@ -56,6 +56,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 				this._logViewerContext?.setFilterExpression(query);
 				this.#persist(query);
 			},
+			null,
 		);
 	}
 

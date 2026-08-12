@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 public abstract class ContentJsonTypeResolverBase : DefaultJsonTypeInfoResolver
 {
     /// <summary>
-    /// Gets the <see cref="System.Text.Json.Serialization.JsonTypeInfo"/> for the specified <see cref="System.Type"/>,
+    /// Gets the <see cref="JsonTypeInfo"/> for the specified <see cref="Type"/>,
     /// configuring polymorphic serialization options for derived types if applicable.
     /// </summary>
-    /// <param name="type">The type to get the <see cref="System.Text.Json.Serialization.JsonTypeInfo"/> for.</param>
-    /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions"/> to use when getting the type info.</param>
-    /// <returns>The <see cref="System.Text.Json.Serialization.JsonTypeInfo"/> for the specified type, with polymorphism options configured if derived types are present.</returns>
+    /// <param name="type">The type to get the <see cref="JsonTypeInfo"/> for.</param>
+    /// <param name="options">The <see cref="JsonSerializerOptions"/> to use when getting the type info.</param>
+    /// <returns>The <see cref="JsonTypeInfo"/> for the specified type, with polymorphism options configured if derived types are present.</returns>
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
     {
         JsonTypeInfo jsonTypeInfo = base.GetTypeInfo(type, options);
@@ -32,11 +32,11 @@ public abstract class ContentJsonTypeResolverBase : DefaultJsonTypeInfoResolver
     }
 
     /// <summary>
-    /// Returns the concrete types that are derived from the type described by the specified <see cref="System.Text.Json.Serialization.JsonTypeInfo" />.
+    /// Returns the concrete types that are derived from the type described by the specified <see cref="JsonTypeInfo" />.
     /// </summary>
     /// <param name="jsonTypeInfo">The JSON type information representing the base type for which to resolve derived types.</param>
     /// <returns>
-    /// An array of <see cref="System.Type" /> objects representing the known derived types for the given JSON type info.
+    /// An array of <see cref="Type" /> objects representing the known derived types for the given JSON type info.
     /// Returns an empty array if there are no known derived types.
     /// </returns>
     public virtual Type[] GetDerivedTypes(JsonTypeInfo jsonTypeInfo)

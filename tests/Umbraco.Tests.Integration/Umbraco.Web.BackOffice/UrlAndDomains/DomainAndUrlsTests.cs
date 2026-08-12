@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -26,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void Setup()
+    public new void Setup()
     {
         var xml = PackageMigrationResource.GetEmbeddedPackageDataManifest(GetType());
         var packagingService = GetRequiredService<IPackagingService>();
@@ -237,6 +236,66 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
                 Assert.IsTrue(rootUrls.Any(x => x.Url?.ToString() == "https://localhost" + domain && x.Message == null));
             }
         });
+    }
+
+    [Test]
+    public async Task Can_Resolve_Urls_Restricted_To_A_Single_Culture()
+    {
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = Cultures.Select(culture => new DomainModel
+            {
+                DomainName = GetDomainUrlFromCultureCode(culture),
+                IsoCode = culture,
+            })
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsTrue(result.Success);
+
+        var culture = Cultures[1];
+        var publishedUrlInfoProvider = GetRequiredService<IPublishedUrlInfoProvider>();
+
+        var allUrls = await publishedUrlInfoProvider.GetAllAsync(Root);
+        var cultureUrls = await publishedUrlInfoProvider.GetAllAsync(Root, culture);
+
+        Assert.Multiple(() =>
+        {
+            // The culture-scoped result contains only the requested culture.
+            Assert.IsNotEmpty(cultureUrls);
+            CollectionAssert.AreEquivalent(new[] { culture }, cultureUrls.Select(x => x.Culture).Distinct());
+
+            // The culture-scoped result equals the all-cultures result filtered to that culture.
+            CollectionAssert.AreEquivalent(
+                allUrls.Where(x => x.Culture == culture).Select(x => x.Url?.ToString()),
+                cultureUrls.Select(x => x.Url?.ToString()));
+        });
+    }
+
+    [Test]
+    public async Task Cannot_Resolve_Urls_For_An_Unknown_Culture()
+    {
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = Cultures.Select(culture => new DomainModel
+            {
+                DomainName = GetDomainUrlFromCultureCode(culture),
+                IsoCode = culture,
+            })
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsTrue(result.Success);
+
+        var publishedUrlInfoProvider = GetRequiredService<IPublishedUrlInfoProvider>();
+
+        var unknownCultureUrls = await publishedUrlInfoProvider.GetAllAsync(Root, "xx-XX");
+
+        // An unknown culture is not an installed culture, so there are no urls to report for it -
+        // rather than falling back to (expensively) resolving all cultures.
+        Assert.IsEmpty(unknownCultureUrls);
     }
 
     [Test]

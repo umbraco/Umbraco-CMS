@@ -319,6 +319,8 @@ export default {
 		createFromClipboard: 'Zalijepi iz međuspremnika',
 		nodeIsInTrash: 'Ova stavka je u korpi za otpatke',
 		saveModalTitle: 'Spremi',
+		saveAndPublishDescendantsModalTitle: 'Spremi i objavi sa potomcima',
+		saveAndScheduleModalTitle: 'Spremi i zakaži objavljivanje',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Kreirajte novi predložak sadržaja iz <em>%0%</em>',
@@ -768,6 +770,8 @@ export default {
 		next: 'Sljedeći',
 		no: 'Ne',
 		nodeName: 'Ime čvora',
+		noResults: 'Nema rezultata',
+		noResultsFor: (query: string) => `Nema rezultata za "${query}".`,
 		of: 'od',
 		off: 'Isključeno',
 		ok: 'OK',
@@ -1489,8 +1493,16 @@ export default {
 		chooseChildNode: 'Odaberite podređeni čvor',
 		compositionsDescription:
 			'Naslijediti kartice i svojstva iz postojeće vrste dokumenta. Nove kartice će biti\n      dodano trenutnoj vrsti dokumenta ili spojeno ako postoji kartica s identičnim imenom.\n    ',
+		compositionsDescriptionMediaType:
+			'Naslijediti kartice i svojstva iz postojeće vrste medija. Nove kartice će biti\n      dodano trenutnoj vrsti medija ili spojeno ako postoji kartica s identičnim imenom.\n    ',
+		compositionsDescriptionMemberType:
+			'Naslijediti kartice i svojstva iz postojeće vrste člana. Nove kartice će biti\n      dodano trenutnoj vrsti člana ili spojeno ako postoji kartica s identičnim imenom.\n    ',
 		compositionInUse: 'Ovaj tip sadržaja se koristi u kompoziciji i stoga se ne može sam sastaviti.\n    ',
+		compositionInUseMediaType: 'Ovaj tip medija se koristi u kompoziciji i stoga se ne može sam sastaviti.\n    ',
+		compositionInUseMemberType: 'Ovaj tip člana se koristi u kompoziciji i stoga se ne može sam sastaviti.\n    ',
 		noAvailableCompositions: 'Nema dostupnih tipova sadržaja za upotrebu kao kompozicija.',
+		noAvailableCompositionsMediaType: 'Nema dostupnih tipova medija za upotrebu kao kompozicija.',
+		noAvailableCompositionsMemberType: 'Nema dostupnih tipova člana za upotrebu kao kompozicija.',
 		compositionRemoveWarning:
 			'Uklanjanje kompozicije će izbrisati sve povezane podatke o svojstvu. Jednom ti\n      sačuvajte tip dokumenta, nema povratka.\n    ',
 		availableEditors: 'Napravi novi',
@@ -1525,6 +1537,10 @@ export default {
 		tabHasNoSortOrder: 'kartica nema redoslijed sortiranja',
 		compositionUsageHeading: 'Gdje se koristi ovaj sastav?',
 		compositionUsageSpecification: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa sadržaja:\n    ',
+		compositionUsageSpecificationMediaType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa medija:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa člana:\n    ',
 		variantsHeading: 'Dozvoli varijacije',
 		cultureVariantHeading: 'Dozvolite varirati u zavisnosti od kulture',
 		segmentVariantHeading: 'Dozvoli segmentaciju',
@@ -1680,6 +1696,10 @@ export default {
 		settingsGroup: 'Postavke',
 		templatingGroup: 'Predložak',
 		thirdPartyGroup: 'Treća strana',
+	},
+	picker: {
+		browseTab: 'Pregledaj',
+		searchTab: 'Pretraži',
 	},
 	update: {
 		updateAvailable: 'Novo ažuriranje spremno',

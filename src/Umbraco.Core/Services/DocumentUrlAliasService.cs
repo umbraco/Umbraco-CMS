@@ -32,8 +32,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// Here, however, the alias parsing logic is internal and not customizable, so we simply use a constant value.
     /// By doing this we can keep the same logic for rebuild on startup after a migration, provide a means of triggering
     /// a rebuild, and we have future-proofing in case the alias parsing logic changes in future versions.
+    /// Bumped to "2" so that installs which persisted draft alias values (before aliases were restricted to the
+    /// published property value, see #23206) rebuild once on startup and flush the stale entries.
     /// </remarks>
-    private const string CurrentRebuildValue = "1";
+    private const string CurrentRebuildValue = "2";
 
     private readonly ILogger<DocumentUrlAliasService> _logger;
     private readonly IDocumentUrlAliasRepository _documentUrlAliasRepository;
@@ -416,7 +418,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Use optimized SQL query to fetch only documents with aliases
         IEnumerable<DocumentUrlAliasRaw> rawAliases = _documentUrlAliasRepository.GetAllDocumentUrlAliases();
 
-        var documentKeys = rawAliases.Select(x => x.DocumentKey).Distinct().ToList();
         var toSave = new List<PublishedDocumentUrlAlias>();
 
         foreach (DocumentUrlAliasRaw raw in rawAliases)
@@ -448,9 +449,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             }
         }
 
-        // Clear existing database records and save new
         scope.WriteLock(Constants.Locks.DocumentUrlAliases);
-        _documentUrlAliasRepository.DeleteByDocumentKey(documentKeys);
+
+        // Clear the table first and repopulate from scratch in case the rebuild no longer includes document URL aliases
+        // that are currently stored.
+        _documentUrlAliasRepository.DeleteAll();
+
         if (toSave.Count > 0)
         {
             _documentUrlAliasRepository.Save(toSave);
@@ -485,7 +489,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Store alias for ALL languages (like DocumentUrlService).
         if (document.ContentType.VariesByCulture() is false || aliasPropertyVariesByCulture is false)
         {
-            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias);
+            // Aliases are routing data for the published site, so only the published property value counts -
+            // GetValue(published: true) returns null until the document is actually published.
+            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, published: true);
 
             if (!string.IsNullOrWhiteSpace(aliasValue))
             {
@@ -507,7 +513,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         foreach (ILanguage language in languages)
         {
-            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, language.IsoCode);
+            var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, language.IsoCode, published: true);
 
             if (string.IsNullOrWhiteSpace(aliasValue))
             {

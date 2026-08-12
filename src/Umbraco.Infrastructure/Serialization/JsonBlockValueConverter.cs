@@ -27,20 +27,9 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
             throw new JsonException("Expected start object");
         }
 
-        BlockValue? blockValue;
-        try
-        {
-            blockValue = (BlockValue?)Activator.CreateInstance(typeToConvert);
-        }
-        catch (Exception ex)
-        {
-            throw new JsonException($"Unable to create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}. Please make sure the type has an default (parameterless) constructor. See the inner exception for more details.", ex);
-        }
+        BlockValue? blockValue = GetBlockValue(typeToConvert);
 
-        if (blockValue is null)
-        {
-            throw new JsonException($"Could not create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}.");
-        }
+        var exposeSeen = false;
 
         while (reader.Read())
         {
@@ -70,21 +59,53 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                         break;
                     case nameof(BlockValue.Expose):
                         blockValue.Expose = DeserializeBlockVariation(ref reader, options, typeToConvert, nameof(BlockValue.Expose));
+                        exposeSeen = true;
                         break;
                 }
             }
+        }
+
+        // Legacy (pre-variant) block values had no "expose" property. The current format always
+        // serializes one (see Write), so its absence marks legacy data whose blocks must be exposed
+        // to preserve their published state on upgrade (#23379). Property-less blocks are the case
+        // the downstream converted-flag heuristic in BlockEditorDataConverter misses.
+        if (exposeSeen is false && blockValue.ContentData.Count > 0)
+        {
+            blockValue.Expose = blockValue.ContentData
+                .Select(cd => new BlockItemVariation(cd.Key, null, null))
+                .ToList();
+        }
+
+        return blockValue;
+    }
+
+    private static BlockValue GetBlockValue(Type typeToConvert)
+    {
+        BlockValue? blockValue;
+        try
+        {
+            blockValue = (BlockValue?)Activator.CreateInstance(typeToConvert);
+        }
+        catch (Exception ex)
+        {
+            throw new JsonException($"Unable to create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}. Please make sure the type has an default (parameterless) constructor. See the inner exception for more details.", ex);
+        }
+
+        if (blockValue is null)
+        {
+            throw new JsonException($"Could not create an instance of {nameof(BlockValue)} from type: {typeToConvert.FullName}.");
         }
 
         return blockValue;
     }
 
     /// <summary>
-    /// Writes the JSON representation of the specified <see cref="Umbraco.Cms.Core.Models.BlockValue" /> to the provided <see cref="System.Text.Json.Utf8JsonWriter" />.
+    /// Writes the JSON representation of the specified <see cref="BlockValue" /> to the provided <see cref="Utf8JsonWriter" />.
     /// The output includes the content data, optional settings data, expose data, and a layout object containing block layout items grouped by property editor alias.
     /// </summary>
-    /// <param name="writer">The <see cref="System.Text.Json.Utf8JsonWriter" /> to write the JSON to.</param>
-    /// <param name="value">The <see cref="Umbraco.Cms.Core.Models.BlockValue" /> instance to serialize.</param>
-    /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> to use when serializing the value.</param>
+    /// <param name="writer">The <see cref="Utf8JsonWriter" /> to write the JSON to.</param>
+    /// <param name="value">The <see cref="BlockValue" /> instance to serialize.</param>
+    /// <param name="options">The <see cref="JsonSerializerOptions" /> to use when serializing the value.</param>
     public override void Write(Utf8JsonWriter writer, BlockValue value, JsonSerializerOptions options)
     {
         value.Layout.TryGetValue(value.PropertyEditorAlias, out IEnumerable<IBlockLayoutItem>? blockLayoutItems);

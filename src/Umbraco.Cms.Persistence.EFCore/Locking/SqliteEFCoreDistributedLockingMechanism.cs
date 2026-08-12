@@ -184,17 +184,11 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
                         throw new ArgumentException($"LockObject with id={LockId} does not exist.");
                     }
                 }
-                catch (SqliteException ex) when (IsBusyOrLocked(ex))
+                catch (SqliteException ex) when (ex.IsBusyOrLocked())
                 {
                     throw new DistributedWriteLockTimeoutException(LockId);
                 }
             });
         }
-
-        private static bool IsBusyOrLocked(SqliteException ex) =>
-            ex.SqliteErrorCode
-                is raw.SQLITE_BUSY
-                or raw.SQLITE_LOCKED
-                or raw.SQLITE_LOCKED_SHAREDCACHE;
     }
 }

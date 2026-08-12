@@ -34,11 +34,11 @@ export class TemplateUiHelper extends UiBaseLocators {
     await this.goToSection(ConstantHelper.sections.settings);
     await this.reloadTemplateTree();
     if (childTemplateName === '') {
-      await this.click(this.page.getByLabel(templateName, {exact: true}));
+      await this.clickTreeItemWithName(templateName);
       await this.hasValue(this.enterAName, templateName);
     } else {
       await this.openCaretButtonForName(templateName);
-      await this.click(this.page.getByLabel(childTemplateName, {exact: true}));
+      await this.clickTreeItemWithName(childTemplateName);
       await this.hasValue(this.enterAName, childTemplateName);
     }
     await this.page.waitForTimeout(ConstantHelper.wait.medium);
@@ -101,7 +101,7 @@ export class TemplateUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForTemplateToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.template, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.template, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForTemplateToBeDeleted() {

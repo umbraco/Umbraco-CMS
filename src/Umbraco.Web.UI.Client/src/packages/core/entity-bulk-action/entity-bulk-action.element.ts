@@ -8,13 +8,11 @@ import type {
 	MetaEntityBulkActionDefaultKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-const elementName = 'umb-entity-bulk-action';
-
-@customElement(elementName)
+@customElement('umb-entity-bulk-action')
 export class UmbEntityBulkActionDefaultElement<
-		MetaType extends MetaEntityBulkActionDefaultKind = MetaEntityBulkActionDefaultKind,
-		ApiType extends UmbEntityBulkAction<MetaType> = UmbEntityBulkAction<MetaType>,
-	>
+	MetaType extends MetaEntityBulkActionDefaultKind = MetaEntityBulkActionDefaultKind,
+	ApiType extends UmbEntityBulkAction<MetaType> = UmbEntityBulkAction<MetaType>,
+>
 	extends UmbLitElement
 	implements UmbEntityBulkActionElement
 {
@@ -32,7 +30,11 @@ export class UmbEntityBulkActionDefaultElement<
 
 	override render() {
 		return html`
-			<uui-button color="default" look="secondary" label=${this.localize.string(this.manifest?.meta.label ?? '')} @click=${this.#onClick}>
+			<uui-button
+				color="default"
+				look="secondary"
+				label=${this.localize.string(this.manifest?.meta.label ?? '')}
+				@click=${this.#onClick}>
 				${when(this.manifest?.meta.icon, () => html`<uui-icon name=${this.manifest!.meta.icon}></uui-icon>`)}
 				<span>${this.localize.string(this.manifest?.meta.label ?? '')}</span>
 			</uui-button>
@@ -44,6 +46,6 @@ export default UmbEntityBulkActionDefaultElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbEntityBulkActionDefaultElement;
+		'umb-entity-bulk-action': UmbEntityBulkActionDefaultElement;
 	}
 }

@@ -11,7 +11,6 @@ import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observa
 import {
 	ReplaySubject,
 	Subject,
-	switchMap,
 	distinctUntilChanged,
 	throttleTime,
 	auditTime,
@@ -51,6 +50,12 @@ export class UmbAuthContext extends UmbContextBase {
 	#session = new UmbObjectState<UmbAuthSession | undefined>(undefined);
 	readonly session$ = this.#session.asObservable();
 
+	// Set when a refresh was definitively rejected by the server (e.g. invalid_grant).
+	// Distinguishes "no session yet" from "session is dead" so concurrent and subsequent
+	// API requests don't each fire their own doomed /token call. Cleared when a new
+	// session is established (login, peer tab, completed re-authentication).
+	#sessionDead = false;
+
 	// True only during the synchronous #updateSession() call inside the lock callback.
 	// Prevents re-entrant /token calls when session$ observers fire synchronously
 	// (e.g. keepUserLoggedIn=true with short expiresIn triggers #onSessionExpiring
@@ -85,21 +90,37 @@ export class UmbAuthContext extends UmbContextBase {
 	#postLogoutRedirectUri;
 
 	/**
-	 * Observable that emits true when the auth context is initialized.
-	 * @remark It will only emit once and then complete itself.
+	 * Observable that emits once, without a value, when the auth context is initialized.
+	 * For consumers: the boot sequence already awaits app entry points before the router evaluates
+	 * its guards, so by the time any extension code runs this has long since completed.
+	 * @internal
+	 * @deprecated Internal boot signal, never intended for public use. Scheduled for removal in Umbraco 19.
+	 * @remarks It will only emit once and then complete itself.
+	 * @returns {Observable<void>} An observable that emits once when the auth context is initialized.
 	 */
-	readonly isInitialized = this.#isInitialized.asObservable();
+	get isInitialized(): Observable<void> {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.isInitialized',
+			solution:
+				'Remove the dependency on this signal. It is an internal boot detail — the app awaits app entry points before routing, so extension code always runs after initialization. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
+		}).warn();
+		return this.#isInitializedObservable;
+	}
+
+	/** Internal, non-warning view of {@link isInitialized} for use inside this class. */
+	readonly #isInitializedObservable = this.#isInitialized.asObservable();
 
 	/**
 	 * Observable that emits true if the user is authorized, otherwise false.
-	 * @remark It will only emit when the authorization state changes.
+	 * @remarks It will only emit when the authorization state changes.
 	 */
 	readonly isAuthorized = this.#isAuthorized.asObservable().pipe(distinctUntilChanged());
 
 	/**
 	 * Observable that acts as a signal and emits when the user has timed out, i.e. the token has expired.
 	 * This can be used to show a timeout message to the user.
-	 * @remark It will emit once per second, so it can be used to trigger UI updates or other actions when the user has timed out.
+	 * @remarks It will emit once per second, so it can be used to trigger UI updates or other actions when the user has timed out.
 	 */
 	readonly timeoutSignal = this.#isTimeout.asObservable().pipe(
 		// Audit the timeout signal to ensure that it waits for 1s before allowing another emission, which prevents rapid firing of the signal.
@@ -110,8 +131,8 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Observable that acts as a signal for when the authorization state changes.
 	 * @deprecated Observe isAuthorized instead. Scheduled for removal in Umbraco 19.
-	 * @remark It will emit once per second, so it can be used to trigger UI updates or other actions when the authorization state changes.
-	 * @returns An observable that emits when the authorization state changes.
+	 * @remarks It will emit once per second, so it can be used to trigger UI updates or other actions when the authorization state changes.
+	 * @returns {Observable<void>} An observable that emits when the authorization state changes.
 	 */
 	get authorizationSignal(): Observable<void> {
 		new UmbDeprecation({
@@ -165,56 +186,18 @@ export class UmbAuthContext extends UmbContextBase {
 
 		// Set up cross-tab coordination via BroadcastChannel
 		this.#channel = new BroadcastChannel('umb:auth');
-		this.#channel.onmessage = (evt: MessageEvent) => {
-			switch (evt.data?.type) {
-				case 'authorized': {
-					// Apply locally — do NOT call #updateSession which would re-broadcast.
-					this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
-					this.#authorizationSignal.next();
-					break;
-				}
-				case 'sessionUpdate':
-					// Peer broadcast already-computed timestamps, so set the session
-					// directly. We still go through the `#inSessionUpdateCallback` guard
-					// so observers triggered re-entrantly skip a redundant /token call.
-					this.#inSessionUpdateCallback = true;
-					try {
-						this.#session.setValue({
-							accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
-							expiresAt: evt.data.expiresAt,
-						});
-						this.#isAuthorized.setValue(true);
-					} finally {
-						this.#inSessionUpdateCallback = false;
-					}
-					break;
-				case 'sessionCleared':
-					this.#session.setValue(undefined);
-					this.#isAuthorized.setValue(false);
-					break;
-				case 'signedOut':
-					this.#session.setValue(undefined);
-					this.#isAuthorized.setValue(false);
-					// Redirect to logout page — cookies already cleared by the tab that initiated sign-out
-					location.href = this.#postLogoutRedirectUri;
-					break;
-				case 'sessionRequest': {
-					// Another tab is asking for the current session state (e.g. new tab opening).
-					// Only share the session if it is still valid — an expired session would cause
-					// the recipient (e.g. a popup) to believe it is already authorized and skip
-					// the authorization code exchange.
-					if (this.isSessionValid()) {
-						this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
-					}
-					break;
-				}
-			}
-		};
+		this.#channel.onmessage = (evt: MessageEvent) => this.#handleChannelMessage(evt);
 
 		if (!isTestEnvironment()) {
 			// Start the session timeout controller
 			new UmbAuthSessionTimeoutController(this);
 		}
+
+		// The context is usable as soon as it is constructed. This used to be driven from the core
+		// entry point via setInitialized(), but the gate is redundant: app.element.ts awaits app entry
+		// points before the router evaluates its guards, so provider discovery has already settled by
+		// the time anything consumes this.
+		this.#setInitialized();
 
 		// When an HTTP interceptor is active it registers an UmbAuthSignalerContext on the host.
 		// Consume it to keep authorization state in sync and to react to timeout requests.
@@ -236,10 +219,10 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Initiates the login flow.
-	 * @param identityProvider The provider to use for login. Default is 'Umbraco'.
-	 * @param redirect If true, the user will be redirected to the login page.
-	 * @param usernameHint The username hint to use for login.
-	 * @param manifest The manifest for the registered provider.
+	 * @param {string} identityProvider The provider to use for login. Default is 'Umbraco'.
+	 * @param {boolean} redirect If true, the user will be redirected to the login page.
+	 * @param {string} usernameHint The username hint to use for login.
+	 * @param {ManifestAuthProvider} manifest The manifest for the registered provider.
 	 */
 	async makeAuthorizationRequest(
 		identityProvider = 'Umbraco',
@@ -329,7 +312,7 @@ export class UmbAuthContext extends UmbContextBase {
 	/**
 	 * Completes the login flow.
 	 * This is called on the oauth_complete page to exchange the authorization code for tokens.
-	 * @returns The token response timing, or null if no authorization was pending.
+	 * @returns {Promise<UmbTokenEndpointResponse | null>} The token response timing, or null if no authorization was pending.
 	 */
 	async completeAuthorizationRequest(): Promise<UmbTokenEndpointResponse | null> {
 		const searchParams = new URLSearchParams(window.location.search);
@@ -397,7 +380,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Checks if the user is authorized. If Authorization is bypassed, the user is always authorized.
-	 * @returns True if the user is authorized, otherwise false.
+	 * @returns {boolean} True if the user is authorized, otherwise false.
 	 */
 	getIsAuthorized() {
 		if (this.#isBypassed) {
@@ -425,6 +408,7 @@ export class UmbAuthContext extends UmbContextBase {
 		// Ask existing tabs for their session state (avoids a /token call for new tabs)
 		const peerSession = await this.#requestSessionFromPeers();
 		if (peerSession) {
+			this.#sessionDead = false;
 			this.#session.setValue(peerSession);
 			this.#isAuthorized.setValue(true);
 			return;
@@ -440,7 +424,6 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Gets the latest token from the Management API.
 	 * With cookie auth, this returns '[redacted]' — the real token is in the httpOnly cookie.
 	 * If the session has expired, it will attempt a refresh first.
-	 *
 	 * @example <caption>Using the latest token</caption>
 	 * ```js
 	 *   const token = await authContext.getLatestToken();
@@ -449,7 +432,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @see {@link configureClient} for automatic token handling with `@hey-api/openapi-ts` clients.
 	 * @see {@link getOpenApiConfiguration} for manual fetch calls with cookie-based auth.
 	 * @memberof UmbAuthContext
-	 * @returns The latest token from the Management API
+	 * @returns {Promise<string>} The latest token from the Management API
 	 */
 	async getLatestToken(): Promise<string> {
 		await this.#ensureTokenReady();
@@ -463,7 +446,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * call when the access token is still valid.
 	 * Uses Web Locks to deduplicate concurrent refresh requests across tabs.
 	 * @memberof UmbAuthContext
-	 * @returns True if the refresh succeeded, otherwise false
+	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false
 	 */
 	async validateToken(): Promise<boolean> {
 		return this.#isBypassed || this.makeRefreshTokenRequest();
@@ -471,19 +454,18 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Attempts to refresh the token using Web Locks to prevent concurrent refresh requests.
-	 * @returns True if the refresh was successful, otherwise false.
+	 * @returns {Promise<boolean>} True if the refresh was successful, otherwise false.
 	 */
 	async makeRefreshTokenRequest(): Promise<boolean> {
+		// A previous refresh was definitively rejected — retrying cannot succeed
+		// until a new session is established.
+		if (this.#sessionDead) return false;
+
 		// Fallback for environments without Web Locks (some enterprise/kiosk browsers)
 		if (!navigator.locks) {
 			console.warn('[UmbAuth] navigator.locks is not available — token refresh coordination disabled.');
 			if (this.#isAccessTokenValid()) return true;
-			const response = await this.#client.refreshToken();
-			if (response) {
-				this.#updateSession(response.expiresIn, response.issuedAt);
-				return true;
-			}
-			return false;
+			return this.#performRefresh();
 		}
 
 		// Capture the session before entering the lock queue. Inside the lock we check
@@ -501,22 +483,62 @@ export class UmbAuthContext extends UmbContextBase {
 		if (this.#inSessionUpdateCallback) return true;
 
 		return navigator.locks.request('umb:token-refresh', async () => {
+			// A queued caller may have latched the session as dead while we waited for the lock
+			if (this.#sessionDead) return false;
 			if (this.#session.getValue() !== sessionBefore && this.#isAccessTokenValid()) return true;
 
-			const response = await this.#client.refreshToken();
-			if (response) {
-				this.#updateSession(response.expiresIn, response.issuedAt);
-				return true;
-			}
-			return false;
+			return this.#performRefresh();
 		});
 	}
 
 	/**
+	 * Performs the actual refresh request and applies the result.
+	 * A definitive rejection (e.g. `invalid_grant`) marks the session as dead, so every
+	 * subsequent API request does not fire its own doomed refresh attempt. When the rejected
+	 * refresh belonged to an established session, the user is also timed out so the
+	 * re-authentication flow starts. Transient failures (network errors, 5xx) leave the
+	 * session state untouched so a later attempt can retry.
+	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false.
+	 */
+	async #performRefresh(): Promise<boolean> {
+		// A rejection with no session in hand means nobody is signed in — not that a session
+		// expired. Timing out there re-authenticates in a popup and leaves the caller to
+		// navigate, where a cold boot needs the ordinary login redirect.
+		const hadSession = !!this.#session.getValue();
+		const result = await this.#client.refreshToken();
+		if (result.response) {
+			this.#updateSession(result.response.expiresIn, result.response.issuedAt);
+			return true;
+		}
+		if (result.fatal) {
+			this.#sessionDead = true;
+			if (hadSession) {
+				this.timeOut();
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Checks if the current session is still valid.
-	 * @returns True if the session has not expired.
+	 * @deprecated Use {@link getIsAuthorized} or observe {@link session$} instead. Scheduled for removal in Umbraco 19.
+	 * @returns {boolean} True if the session has not expired.
 	 */
 	isSessionValid(): boolean {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.isSessionValid()',
+			solution:
+				'Use getIsAuthorized() for a synchronous check, or observe session$ to react to session changes. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
+		}).warn();
+		return this.#isSessionValid();
+	}
+
+	/**
+	 * Internal, non-warning implementation of {@link isSessionValid}.
+	 * @returns {boolean} True if the session has not expired.
+	 */
+	#isSessionValid(): boolean {
 		const session = this.#session.getValue();
 		return !!session && session.expiresAt > Math.floor(Date.now() / 1000);
 	}
@@ -525,6 +547,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Local-only check — no network call.
 	 * Returns true if the cached access token has not yet reached its expiry timestamp.
 	 * Does NOT check the refresh token or server state.
+	 * @returns {boolean} True if the access token has not yet expired.
 	 */
 	#isAccessTokenValid(): boolean {
 		const session = this.#session.getValue();
@@ -540,6 +563,9 @@ export class UmbAuthContext extends UmbContextBase {
 	 * - Otherwise: returns immediately with no network call.
 	 */
 	async #ensureTokenReady(): Promise<void> {
+		// The session is dead and re-authentication is already in progress — let the request
+		// proceed (and 401) so the interceptor queues it for replay after re-authentication.
+		if (this.#sessionDead) return;
 		if (!this.#isAccessTokenValid()) {
 			await this.validateToken();
 			return;
@@ -610,15 +636,22 @@ export class UmbAuthContext extends UmbContextBase {
 	 * 		headers: { Authorization: `Bearer ${await config.token()}` },
 	 * 	});
 	 * ```
-	 * @returns The server url to the Management API
+	 * @deprecated Consume {@link UMB_SERVER_CONTEXT} and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 19.
+	 * @returns {string} The server url to the Management API
 	 */
 	getServerUrl() {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.getServerUrl()',
+			solution:
+				'Consume UMB_SERVER_CONTEXT from @umbraco-cms/backoffice/server and use its getServerUrl(), which is the canonical source. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
+		}).warn();
 		return this.#serverUrl;
 	}
 
 	/**
 	 * Get the default OpenAPI configuration, which is set up to communicate with the Management API.
-	 * @remark This is useful if you want to communicate with your own resources generated by the [@hey-api/openapi-ts](https://github.com/hey-api/openapi-ts) library.
+	 * @remarks This is useful if you want to communicate with your own resources generated by the [@hey-api/openapi-ts](https://github.com/hey-api/openapi-ts) library.
 	 * @memberof UmbAuthContext
 	 * @example <caption>Using the default OpenAPI configuration</caption>
 	 * ```js
@@ -650,14 +683,13 @@ export class UmbAuthContext extends UmbContextBase {
 	 * the lifetime of the host (`<umb-app>`), so it's safe to call this method for
 	 * multiple clients (the core's {@link umbHttpClient} *and* an extension's own
 	 * generated client) without registering duplicate auth-signaler contexts.
-	 *
 	 * @example
 	 * ```js
 	 * const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 	 * authContext.configureClient(myClient);
 	 * // Now myClient automatically includes auth headers and interceptors
 	 * ```
-	 * @param client A `@hey-api/openapi-ts` client instance — either {@link umbHttpClient}
+	 * @param {UmbApiClient} client A `@hey-api/openapi-ts` client instance — either {@link umbHttpClient}
 	 * or one regenerated by an extension package against its own OpenAPI document.
 	 */
 	configureClient(client: UmbApiClient): void {
@@ -682,26 +714,61 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Sets the auth context as initialized, which means that the auth context is ready to be used.
-	 * @remark This is used to let the app context know that the core module is ready, which means that the core auth providers are available.
+	 * No code outside Umbraco core should ever call this — doing so opens the provider-discovery gate early.
+	 * @internal
+	 * @deprecated Internal boot hook, never intended for public use. Scheduled for removal in Umbraco 19.
+	 * @remarks The constructor already does this, so calling it again is a no-op on an
+	 * already-completed subject. It emits once, without a value.
 	 */
 	setInitialized() {
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.setInitialized()',
+			solution:
+				'Do not call this. It is an internal boot hook owned by the core entry point. Scheduled for removal in Umbraco 19.',
+			removeInVersion: '19.0.0',
+		}).warn();
+		this.#setInitialized();
+	}
+
+	/** Internal, non-warning implementation of {@link setInitialized}. */
+	#setInitialized() {
 		this.#isInitialized.next();
 		this.#isInitialized.complete();
 	}
 
 	/**
 	 * Gets all registered auth providers.
-	 * @param extensionsRegistry
+	 * @deprecated Query the extension registry directly: `umbExtensionsRegistry.byType('authProvider')`. Scheduled for removal in Umbraco 19.
+	 * @remarks The initialization gate this used to add is redundant — the app awaits app entry points
+	 * before the router evaluates its guards, so the provider list has already settled by then.
+	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extension registry to query.
+	 * @returns {Observable<Array<ManifestAuthProvider>>} An observable of the registered auth providers.
 	 */
 	getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
-		return this.#isInitialized.pipe(
-			switchMap(() => extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider')),
-		);
+		new UmbDeprecation({
+			deprecated: 'UmbAuthContext.getAuthProviders()',
+			solution:
+				"Query the extension registry directly with byType('authProvider'). The boot sequence already awaits app entry points before routing, so the provider list has settled. Scheduled for removal in Umbraco 19.",
+			removeInVersion: '19.0.0',
+		}).warn();
+		return this.#getAuthProviders(extensionsRegistry);
+	}
+
+	/**
+	 * Internal, non-warning implementation of {@link getAuthProviders}.
+	 * No initialization gate: the constructor completes #isInitialized, so piping through it only
+	 * added a micro-task delay. Ordering is guaranteed by the boot sequence awaiting app entry
+	 * points before the router evaluates its guards.
+	 * @param {UmbBackofficeExtensionRegistry} extensionsRegistry The extension registry to query.
+	 * @returns {Observable<Array<ManifestAuthProvider>>} An observable of the registered auth providers.
+	 */
+	#getAuthProviders(extensionsRegistry: UmbBackofficeExtensionRegistry) {
+		return extensionsRegistry.byType<'authProvider', ManifestAuthProvider>('authProvider');
 	}
 
 	/**
 	 * Gets the authorized redirect url.
-	 * @returns The redirect url, which is the backoffice path.
+	 * @returns {string} The redirect url, which is the backoffice path.
 	 */
 	getRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}oauth_complete`;
@@ -709,7 +776,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Gets the post logout redirect url.
-	 * @returns The post logout redirect url, which is the backoffice path with the logout path appended.
+	 * @returns {string} The post logout redirect url, which is the backoffice path with the logout path appended.
 	 */
 	getPostLogoutRedirectUrl() {
 		return `${window.location.origin}${this.#backofficePath}${this.#backofficePath.endsWith('/') ? '' : '/'}logout`;
@@ -717,7 +784,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Links the current user to the specified provider by redirecting to the link endpoint.
-	 * @param provider The provider to link to.
+	 * @param {string} provider The provider to link to.
 	 */
 	async linkLogin(provider: string): Promise<void> {
 		const linkKey = await this.#makeLinkTokenRequest(provider);
@@ -743,8 +810,9 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Unlinks the current user from the specified provider.
-	 * @param loginProvider
-	 * @param providerKey
+	 * @param {string} loginProvider The login provider to unlink from.
+	 * @param {string} providerKey The provider's key for the current user.
+	 * @returns {Promise<boolean>} True if the unlink succeeded.
 	 */
 	async unlinkLogin(loginProvider: string, providerKey: string): Promise<boolean> {
 		const request = new Request(this.#unlinkEndpoint, {
@@ -770,18 +838,72 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	/**
+	 * Handles a cross-tab message from the `umb:auth` BroadcastChannel.
+	 * @param {MessageEvent} evt The message event received from the channel.
+	 */
+	#handleChannelMessage(evt: MessageEvent) {
+		switch (evt.data?.type) {
+			case 'authorized': {
+				// Apply locally — do NOT call #updateSession which would re-broadcast.
+				this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
+				this.#authorizationSignal.next();
+				break;
+			}
+			case 'sessionUpdate':
+				// Peer broadcast already-computed timestamps, so set the session
+				// directly. We still go through the `#inSessionUpdateCallback` guard
+				// so observers triggered re-entrantly skip a redundant /token call.
+				this.#sessionDead = false;
+				this.#inSessionUpdateCallback = true;
+				try {
+					this.#session.setValue({
+						accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
+						expiresAt: evt.data.expiresAt,
+					});
+					this.#isAuthorized.setValue(true);
+				} finally {
+					this.#inSessionUpdateCallback = false;
+				}
+				break;
+			case 'sessionCleared':
+				this.#session.setValue(undefined);
+				this.#isAuthorized.setValue(false);
+				break;
+			case 'signedOut':
+				this.#session.setValue(undefined);
+				this.#isAuthorized.setValue(false);
+				// Redirect to logout page — cookies already cleared by the tab that initiated sign-out
+				location.href = this.#postLogoutRedirectUri;
+				break;
+			case 'sessionRequest': {
+				// Another tab is asking for the current session state (e.g. new tab opening).
+				// Only share the session if it is still valid — an expired session would cause
+				// the recipient (e.g. a popup) to believe it is already authorized and skip
+				// the authorization code exchange.
+				if (this.#isSessionValid()) {
+					this.#channel.postMessage({ type: 'sessionResponse', session: this.#session.getValue()! });
+				}
+				break;
+			}
+		}
+	}
+
+	/**
 	 * Sets the in-memory session state without broadcasting.
 	 * Use when the caller handles broadcasting separately (e.g. completeAuthorizationRequest).
 	 *
 	 * Sets #inSessionUpdateCallback around the setValue calls to prevent re-entrant /token
 	 * requests triggered by session$ observers firing synchronously (e.g. keepUserLoggedIn=true
 	 * with a short expiresIn causes #onSessionExpiring to fire immediately).
+	 * @param {number} expiresIn Seconds until the access token expires.
+	 * @param {number} issuedAt Unix timestamp (seconds) when the token was issued.
 	 */
 	#setSessionLocally(expiresIn: number, issuedAt: number) {
 		const accessTokenExpiresAt = issuedAt + expiresIn;
 		// The access_token lives for 1/4 of the refresh_token lifetime.
 		// Multiply to get the full session expiry.
 		const expiresAt = issuedAt + expiresIn * TOKEN_EXPIRY_MULTIPLIER;
+		this.#sessionDead = false;
 		this.#inSessionUpdateCallback = true;
 		try {
 			this.#session.setValue({ accessTokenExpiresAt, expiresAt });
@@ -793,6 +915,8 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Updates the in-memory session state and broadcasts to other tabs.
+	 * @param {number} expiresIn Seconds until the access token expires.
+	 * @param {number} issuedAt Unix timestamp (seconds) when the token was issued.
 	 */
 	#updateSession(expiresIn: number, issuedAt: number) {
 		this.#setSessionLocally(expiresIn, issuedAt);
@@ -809,6 +933,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Returns the first response within 300ms, or undefined if no peer responds.
 	 * The 300ms window is empirical — long enough for a loaded peer tab to respond
 	 * via the event loop, short enough to not noticeably delay login.
+	 * @returns {Promise<UmbAuthSession | undefined>} The peer's session, or undefined if none responded.
 	 */
 	#requestSessionFromPeers(): Promise<UmbAuthSession | undefined> {
 		return new Promise((resolve) => {
@@ -832,6 +957,8 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Requests the code_verifier from the parent window via postMessage (popup flow).
+	 * @param {string | null} state The PKCE state to match against the opener's response.
+	 * @returns {Promise<string | undefined>} The code_verifier, or undefined if the opener didn't respond.
 	 */
 	#requestCodeVerifierFromOpener(state: string | null): Promise<string | undefined> {
 		return new Promise((resolve) => {

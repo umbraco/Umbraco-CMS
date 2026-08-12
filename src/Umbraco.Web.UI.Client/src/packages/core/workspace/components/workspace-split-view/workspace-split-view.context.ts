@@ -2,7 +2,12 @@ import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../contexts/index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbBooleanState, UmbClassState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	createObservablePart,
+	UmbBooleanState,
+	UmbClassState,
+	UmbNumberState,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
@@ -24,6 +29,9 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
+	#notFound = new UmbBooleanState(undefined);
+	notFound = this.#notFound.asObservable();
+
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	variantId = this.#variantId.asObservable();
 
@@ -34,6 +42,7 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 			this.#workspaceContext = context;
 			this.#observeVariant();
 			this.#observeIsNew();
+			this.#observeVariantOption();
 		});
 
 		this.observe(
@@ -63,27 +72,46 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 
 		this.observe(
 			this.#workspaceContext.splitView.activeVariantByIndex(index),
-			async (activeVariantInfo) => {
-				if (this.#variantVariantValidationContext) {
-					this.#variantVariantValidationContext.unprovide();
-				}
+			(activeVariantInfo) => {
+				this.#variantVariantValidationContext?.unprovide();
+				this.#datasetContext?.destroy();
+
 				if (!activeVariantInfo) return;
 
-				this.#datasetContext?.destroy();
 				const variantId = UmbVariantId.Create(activeVariantInfo);
 				this.#variantId.setValue(variantId);
-
-				const validationContext = this.#workspaceContext?.getVariantValidationContext(variantId);
-				if (validationContext) {
-					validationContext.provideAt(this);
-					this.#variantVariantValidationContext = validationContext;
-				}
-
-				this.#datasetContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
 				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace-split-view:' + variantId.toString());
 			},
 			'_observeActiveVariant',
 		);
+	}
+
+	#observeVariantOption() {
+		this.observe(this.variantId, (variantId) => {
+			// TODO: move this logic to a method that creates an observable part in the workspace context, so that the split view context can just consume it. [NL]
+			// TODO: eventually consider a getSplitViewVariantOptionByIndex(index) method in the workspace context, that returns an observable part of the variant option for the given index, to enable merging the two observations. [NL]
+			this.observe(
+				this.#workspaceContext && variantId
+					? createObservablePart(this.#workspaceContext.variantOptions, (variants) =>
+							variants.find((v) => v.unique === variantId.toString()),
+						)
+					: undefined,
+				(variantOption) => {
+					this.#notFound.setValue(variantOption === undefined);
+
+					if (!variantOption || !variantId || !this.#workspaceContext) return;
+
+					// Finish setting up the split view context by providing the validation context and creating the dataset context for the active variant.
+					const validationContext = this.#workspaceContext?.getVariantValidationContext(variantId);
+					if (validationContext) {
+						validationContext.provideAt(this);
+						this.#variantVariantValidationContext = validationContext;
+					}
+					this.#datasetContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
+				},
+				'umbObserveActiveVariantById',
+			);
+		});
 	}
 
 	public switchVariant(variant: UmbVariantId) {

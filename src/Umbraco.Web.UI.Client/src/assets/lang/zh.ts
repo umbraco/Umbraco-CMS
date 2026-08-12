@@ -406,6 +406,8 @@ export default {
 		new: '新的',
 		next: '下一步',
 		no: '否',
+		noResults: '没有结果',
+		noResultsFor: (query: string) => `未找到 "${query}" 的结果。`,
 		of: '属于',
 		ok: '确定',
 		open: '打开',
@@ -859,8 +861,16 @@ export default {
 		chooseChildNode: '选择子节点',
 		compositionsDescription:
 			'从现有文档类型继承选项卡和属性。如果存在同名的选项卡, 则新选项卡将添加到当前文档类型或合并。',
+		compositionsDescriptionMediaType:
+			'从现有媒体类型继承选项卡和属性。如果存在同名的选项卡, 则新选项卡将添加到当前媒体类型或合并。',
+		compositionsDescriptionMemberType:
+			'从现有成员类型继承选项卡和属性。如果存在同名的选项卡, 则新选项卡将添加到当前成员类型或合并。',
 		compositionInUse: '此内容类型在组合中使用, 因此不能自行组成。',
+		compositionInUseMediaType: '此媒体类型在组合中使用, 因此不能自行组成。',
+		compositionInUseMemberType: '此成员类型在组合中使用, 因此不能自行组成。',
 		noAvailableCompositions: '没有可供组合使用的内容类型。',
+		noAvailableCompositionsMediaType: '没有可供组合使用的媒体类型。',
+		noAvailableCompositionsMemberType: '没有可供组合使用的成员类型。',
 		availableEditors: '可用编辑器',
 		reuse: '重用',
 		editorSettings: '编辑器设置',
@@ -1072,5 +1082,10 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: '全选',
 		deselectAllLogLevelFilters: '取消全选',
+	},
+	picker: {
+		browseTab: '浏览',
+		searchTab: '搜索',
+		selectedCount: (count: number) => `已选择 ${count} 项`,
 	},
 } as UmbLocalizationDictionary;

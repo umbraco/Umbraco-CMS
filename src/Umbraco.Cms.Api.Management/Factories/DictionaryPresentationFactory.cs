@@ -24,11 +24,11 @@ public class DictionaryPresentationFactory : IDictionaryPresentationFactory
     }
 
     /// <summary>
-    /// Asynchronously creates a <see cref="Umbraco.Cms.Api.Management.Models.DictionaryItemResponseModel" /> view model from the specified <see cref="Umbraco.Cms.Core.Models.IDictionaryItem" />.
+    /// Asynchronously creates a <see cref="DictionaryItemResponseModel" /> view model from the specified <see cref="IDictionaryItem" />.
     /// Only translations with valid language ISO codes are included in the resulting model.
     /// </summary>
     /// <param name="dictionaryItem">The dictionary item to convert into a view model.</param>
-    /// <returns>A task representing the asynchronous operation. The task result contains the created <see cref="Umbraco.Cms.Api.Management.Models.DictionaryItemResponseModel" /> with filtered translations.</returns>
+    /// <returns>A task representing the asynchronous operation. The task result contains the created <see cref="DictionaryItemResponseModel" /> with filtered translations.</returns>
     public async Task<DictionaryItemResponseModel> CreateDictionaryItemViewModelAsync(IDictionaryItem dictionaryItem)
     {
         DictionaryItemResponseModel dictionaryResponseModel = _umbracoMapper.Map<DictionaryItemResponseModel>(dictionaryItem)!;

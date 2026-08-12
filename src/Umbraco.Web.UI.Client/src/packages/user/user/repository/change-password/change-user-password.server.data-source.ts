@@ -20,9 +20,9 @@ export class UmbChangeUserPasswordServerDataSource {
 
 	/**
 	 * Change the password of a user
-	 * @param {string} id
-	 * @param {string} newPassword
-	 * @returns {*}
+	 * @param {string} id - The unique id of the user.
+	 * @param {string} newPassword - The new password to set.
+	 * @returns {*} The result of the change password operation.
 	 * @memberof UmbChangeUserPasswordServerDataSource
 	 */
 	async changePassword(id: string, newPassword: string) {

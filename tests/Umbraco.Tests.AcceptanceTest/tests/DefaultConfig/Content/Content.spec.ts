@@ -149,7 +149,7 @@ test('can publish invariant content node', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickPublishActionMenuOption();
-  await umbracoUi.content.clickConfirmToPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButtonAndWaitForContentToBePublished();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
@@ -202,7 +202,7 @@ test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickPublishActionMenuOption();
-  await umbracoUi.content.clickConfirmToPublishButton();
+  await umbracoUi.content.clickConfirmToPublishButtonAndWaitForContentToBePublished();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);

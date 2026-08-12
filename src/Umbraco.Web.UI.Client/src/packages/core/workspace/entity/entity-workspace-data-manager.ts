@@ -38,7 +38,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Gets persisted data
-	 * @returns {(ModelType | undefined)}
+	 * @returns {(ModelType | undefined)} The persisted data.
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	getPersisted() {
@@ -47,7 +47,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Sets the persisted data
-	 * @param {(ModelType | undefined)} data
+	 * @param {(ModelType | undefined)} data The data to persist.
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	setPersisted(data: ModelType | undefined) {
@@ -56,7 +56,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Updates the persisted data
-	 * @param {Partial<ModelType>} partialData
+	 * @param {Partial<ModelType>} partialData The partial data to merge into the persisted data.
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	updatePersisted(partialData: Partial<ModelType>) {
@@ -66,8 +66,8 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Creates an observable part of the persisted data
 	 * @template ReturnType
-	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction
-	 * @returns {*}
+	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction Function to map the persisted data to the observable part.
+	 * @returns {*} The mapped observable part.
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	createObservablePartOfPersisted<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
@@ -76,7 +76,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Gets the current data
-	 * @returns {(ModelType | undefined)}
+	 * @returns {(ModelType | undefined)} The current data.
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	getCurrent() {
@@ -85,7 +85,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Sets the current data
-	 * @param {(ModelType | undefined)} data
+	 * @param {(ModelType | undefined)} data The data to set as current.
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	setCurrent(data: ModelType | undefined) {
@@ -100,7 +100,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Updates the current data
-	 * @param {Partial<ModelType>} partialData
+	 * @param {Partial<ModelType>} partialData - The partial data to merge into the current data.
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	updateCurrent(partialData: Partial<ModelType>) {
@@ -116,8 +116,8 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Creates an observable part of the current data
 	 * @template ReturnType
-	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction
-	 * @returns {*}
+	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction - Maps the current data to the observed value.
+	 * @returns {*} An observable of the mapped value.
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	createObservablePartOfCurrent<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
@@ -126,7 +126,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Checks if there are unpersisted changes
-	 * @returns {*}
+	 * @returns {*} Whether the current data differs from the persisted data.
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	getHasUnpersistedChanges() {

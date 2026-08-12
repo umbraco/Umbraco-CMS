@@ -1,5 +1,5 @@
 import { UmbAuthContext } from './auth.context.js';
-import { expect } from '@open-wc/testing';
+import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -28,6 +28,20 @@ describe('UmbAuthContext', () => {
 
 		it('has an isInitialized property', () => {
 			expect(context).to.have.property('isInitialized');
+		});
+
+		// setInitialized() used to be driven from the core entry point. It now runs in the constructor,
+		// so guard the property that makes that safe: #isInitialized is a ReplaySubject(1), meaning a
+		// subscriber attaching after construction still receives the emission rather than hanging.
+		// Reading the deprecated getter logs a deprecation warning here — expected, since the test
+		// runner's origin resolves to 'unknown' rather than 'core' so the warning isn't suppressed.
+		it('emits isInitialized to a subscriber that attaches after construction', async () => {
+			let emitted = false;
+			context.isInitialized.subscribe(() => {
+				emitted = true;
+			});
+			await aTimeout(0);
+			expect(emitted).to.be.true;
 		});
 
 		it('has a getIsAuthorized method', () => {
@@ -166,6 +180,97 @@ describe('UmbAuthContext', () => {
 		it('generates correct post-logout redirect URL', () => {
 			const url = context.getPostLogoutRedirectUrl();
 			expect(url).to.contain('/umbraco/logout');
+		});
+	});
+	describe('Refresh failure handling', () => {
+		let fetchCalls: Array<string>;
+		let fetchResponder: () => Response;
+		let channel: BroadcastChannel;
+		const realFetch = window.fetch;
+
+		const invalidGrantResponse = () =>
+			new Response(JSON.stringify({ error: 'invalid_grant', error_description: 'The token is no longer valid.' }), {
+				status: 400,
+				headers: { 'Content-Type': 'application/json' },
+			});
+
+		beforeEach(() => {
+			fetchCalls = [];
+			window.fetch = ((input: RequestInfo | URL) => {
+				fetchCalls.push(input.toString());
+				return Promise.resolve(fetchResponder());
+			}) as typeof window.fetch;
+			channel = new BroadcastChannel('umb:auth');
+		});
+
+		afterEach(() => {
+			window.fetch = realFetch;
+			channel.close();
+		});
+
+		it('does not call /token again after a definitive invalid_grant failure', async () => {
+			fetchResponder = invalidGrantResponse;
+
+			expect(await context.validateToken()).to.be.false;
+			expect(await context.validateToken()).to.be.false;
+
+			expect(fetchCalls).to.have.lengthOf(1);
+		});
+
+		it('times the user out on a definitive invalid_grant failure', async () => {
+			fetchResponder = invalidGrantResponse;
+
+			// A peer tab establishes the session that is about to be rejected
+			const now = Math.floor(Date.now() / 1000);
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await aTimeout(50);
+
+			let timeOutCalls = 0;
+			context.timeOut = () => {
+				timeOutCalls++;
+			};
+
+			await context.validateToken();
+
+			expect(timeOutCalls).to.equal(1);
+		});
+
+		it('does not time the user out when there was no session to lose', async () => {
+			fetchResponder = invalidGrantResponse;
+			let timeOutCalls = 0;
+			context.timeOut = () => {
+				timeOutCalls++;
+			};
+
+			await context.setInitialState();
+
+			expect(timeOutCalls).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.false;
+		});
+
+		it('retries /token after a transient network failure', async () => {
+			fetchResponder = () => {
+				throw new TypeError('Failed to fetch');
+			};
+
+			expect(await context.validateToken()).to.be.false;
+			expect(await context.validateToken()).to.be.false;
+
+			expect(fetchCalls).to.have.lengthOf(2);
+		});
+
+		it('attempts /token again once a new session is established', async () => {
+			fetchResponder = invalidGrantResponse;
+			await context.validateToken();
+			expect(fetchCalls).to.have.lengthOf(1);
+
+			// A peer tab (or completed re-authentication) establishes a new session
+			const now = Math.floor(Date.now() / 1000);
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await aTimeout(50);
+
+			await context.validateToken();
+			expect(fetchCalls).to.have.lengthOf(2);
 		});
 	});
 });

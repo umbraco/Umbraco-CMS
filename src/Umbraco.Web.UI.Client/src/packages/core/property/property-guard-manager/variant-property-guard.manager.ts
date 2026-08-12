@@ -43,7 +43,6 @@ function findRule(
 
 /**
  * UmbVariantPropertyGuardManager is a class that manages the rules for variant properties.
- * @export
  * @class UmbVariantPropertyGuardManager
  * @augments {UmbGuardManagerBase<UmbVariantPropertyGuardRule>}
  */

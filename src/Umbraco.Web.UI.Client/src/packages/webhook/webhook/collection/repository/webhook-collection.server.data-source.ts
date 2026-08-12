@@ -24,9 +24,8 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 
 	/**
 	 * Gets the Webhook collection filtered by the given filter.
-	 * @param {UmbWebhookCollectionFilterModel} filter
-	 * @param _filter
-	 * @returns {*}
+	 * @param {UmbWebhookCollectionFilterModel} filter The filter to apply
+	 * @returns {*} The filtered webhook collection
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbWebhookCollectionFilterModel) {

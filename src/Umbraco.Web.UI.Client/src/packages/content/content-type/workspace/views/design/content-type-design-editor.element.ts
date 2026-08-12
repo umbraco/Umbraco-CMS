@@ -154,11 +154,15 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		this.#tabsStructureHelper.setContainerChildType('Tab');
 		this.#tabsStructureHelper.setIsRoot(true);
-		this.observe(this.#tabsStructureHelper.childContainers, (tabs) => {
-			this._tabs = tabs;
-			this.#sorter.setModel(tabs);
-			this.#createRoutes();
-		});
+		this.observe(
+			this.#tabsStructureHelper.childContainers,
+			(tabs) => {
+				this._tabs = tabs;
+				this.#sorter.setModel(tabs);
+				this.#createRoutes();
+			},
+			null,
+		);
 
 		this.observe(
 			this.#tabsStructureHelper.hasProperties,
@@ -166,7 +170,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				this._hasRootProperties = hasRootProperties;
 				this.#createRoutes();
 			},
-			'observeRootProperties',
+			null,
 		);
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
@@ -450,6 +454,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			isElement: ownerContentType.isElement,
 			currentPropertyAliases,
 			isNew: this.#workspaceContext.getIsNew()!,
+			entityType: this.#workspaceContext.getEntityType(),
 		};
 
 		const value = await umbOpenModal(this, UMB_COMPOSITION_PICKER_MODAL, {

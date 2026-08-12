@@ -89,10 +89,16 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		let structureItems: Array<UmbStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
-		if (unique === undefined) throw new Error('Unique is not available');
+		if (unique === undefined) {
+			if (this._host) console.warn('[UmbMenuTreeStructureWorkspaceContextBase] unique not available');
+			return;
+		}
 
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
-		if (!entityType) throw new Error('Entity type is not available');
+		if (!entityType) {
+			if (this._host) console.warn('[UmbMenuTreeStructureWorkspaceContextBase] entityType not available');
+			return;
+		}
 
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel, UmbTreeRootModel>>(
 			this,
@@ -115,6 +121,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		const isRoot = entityType === root?.entityType;
 
 		// If the entity type is different from the root entity type, then we can request the ancestors.
+		let ancestorData: Array<UmbTreeItemModel> | undefined;
 		if (!isRoot) {
 			const { data } = await treeRepository.requestTreeItemAncestors({ treeItem: { unique, entityType } });
 
@@ -128,10 +135,17 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 					};
 				});
 
-				this.#setAncestorData(data);
+				ancestorData = data;
 
 				structureItems.push(...ancestorItems);
 			}
+		}
+
+		// Guard: this context may have been destroyed while the async requests were in flight.
+		if (!this._host) return;
+
+		if (ancestorData) {
+			this.#setAncestorData(ancestorData);
 		}
 
 		this.#structure.setValue(structureItems);

@@ -29,8 +29,8 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 	/**
 	 * Creates a new Template scaffold
-	 * @param {Partial<UmbTemplateDetailModel>} [preset]
-	 * @returns { CreateTemplateRequestModel }
+	 * @param {Partial<UmbTemplateDetailModel>} [preset] - Initial data to seed the scaffold with
+	 * @returns { CreateTemplateRequestModel } The scaffolded Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbTemplateDetailModel> = {}) {
@@ -52,8 +52,8 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 	/**
 	 * Fetches a Template with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the Template
+	 * @returns {*} The Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async read(unique: string) {
@@ -80,8 +80,8 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 	/**
 	 * Inserts a new Template on the server
-	 * @param {UmbTemplateDetailModel} model
-	 * @returns {*}
+	 * @param {UmbTemplateDetailModel} model - The Template to create
+	 * @returns {*} The created Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async create(model: UmbTemplateDetailModel) {
@@ -111,9 +111,8 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 	/**
 	 * Updates a Template on the server
-	 * @param {UmbTemplateDetailModel} Template
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbTemplateDetailModel} model - The Template to update
+	 * @returns {*} The updated Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async update(model: UmbTemplateDetailModel) {
@@ -143,8 +142,8 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 	/**
 	 * Deletes a Template on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the Template
+	 * @returns {*} The result of the delete operation
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async delete(unique: string) {

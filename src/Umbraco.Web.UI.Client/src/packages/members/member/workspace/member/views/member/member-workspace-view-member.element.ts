@@ -258,7 +258,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 									<uui-toggle
 										slot="editor"
 										data-mark="toggle:two-factor"
-							label=${this.localize.term('member_2fa')}
+										label=${this.localize.term('member_2fa')}
 										?disabled=${this._isNew || !this._workspaceContext.isTwoFactorEnabled}
 										.checked=${this._workspaceContext.isTwoFactorEnabled}
 										@change=${(e: UUIBooleanInputEvent) => this.#onChange('isTwoFactorEnabled', e.target.checked)}>

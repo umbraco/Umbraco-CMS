@@ -63,7 +63,6 @@ export interface UmbFormControlMixinInterface<ValueType> extends HTMLElement {
 	get validationMessage(): string;
 	get validity(): ValidityState;
 	setCustomValidity(error?: string): void;
-	submit(): void;
 	pristine: boolean;
 }
 
@@ -92,7 +91,6 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 	get validationMessage(): string;
 	get validity(): ValidityState;
 	setCustomValidity(error?: string): void;
-	submit(): void;
 	pristine: boolean;
 }
 
@@ -146,7 +144,6 @@ export function UmbFormControlMixin<
 		public set pristine(value: boolean) {
 			if (this._pristine !== value) {
 				this._pristine = value;
-				this._runValidators();
 			}
 		}
 		public get pristine(): boolean {
@@ -155,6 +152,10 @@ export function UmbFormControlMixin<
 		private _pristine: boolean = true;
 
 		#value: ValueType | DefaultValueType = defaultValue as unknown as DefaultValueType;
+		#valueOnFocus: ValueType | DefaultValueType | undefined = undefined;
+		// A state to capture late edits to the value after focus has been lost, so we can trigger validation for late value changes. [NL]
+		#hadFocus = false;
+
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: UmbFormControlValidatorConfig[] = [];
@@ -164,11 +165,18 @@ export function UmbFormControlMixin<
 			super(...args);
 			this._internals = this.attachInternals();
 
+			this.addEventListener('focus', () => {
+				this.#valueOnFocus = this.value;
+				this.#hadFocus = false;
+			});
 			this.addEventListener('blur', () => {
-				/*if (e.composedPath().some((x) => x === this)) {
-					return;
-				}*/
-				this.checkValidity();
+				if (this.pristine) {
+					this.#hadFocus = true;
+					if (this.#valueOnFocus !== this.value) {
+						this.checkValidity();
+					}
+				}
+				this.#valueOnFocus = undefined;
 			});
 		}
 
@@ -385,7 +393,13 @@ export function UmbFormControlMixin<
 
 		override updated(changedProperties: Map<string | number | symbol, unknown>) {
 			super.updated(changedProperties);
-			this._runValidators();
+			// If still pristine and the input had focus and the value has changed, then we need to check validity, as the value might have been changed after focus was left. [NL]
+			if (this.pristine && this.#hadFocus && changedProperties.has('value')) {
+				// checkValidity will set pristine to false for it self and all connected form controls and then run validators, hence not running _runValidators() below. [NL]
+				this.checkValidity();
+			} else {
+				this._runValidators();
+			}
 		}
 
 		#onFormSubmit = () => {
@@ -405,7 +419,9 @@ export function UmbFormControlMixin<
 		}
 		public formResetCallback() {
 			this.pristine = true;
+			this.#hadFocus = false;
 			this.value = this.getInitialValue() ?? this.getDefaultValue();
+			this.#valueOnFocus = undefined;
 		}
 
 		protected getDefaultValue(): DefaultValueType {

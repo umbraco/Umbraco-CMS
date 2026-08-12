@@ -90,7 +90,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				(value) => {
 					// Workspace has changed from new to existing
 					if (value === false && this.#isNew === true) {
-						// TODO: We do not need to request here as we already know the structure and unique
 						this.#requestStructure();
 					}
 					this.#isNew = value;
@@ -144,10 +143,16 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
-		if (unique === undefined) throw new Error('Unique is not available');
+		if (unique === undefined) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] unique not available');
+			return;
+		}
 
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
-		if (!entityType) throw new Error('Entity type is not available');
+		if (!entityType) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] entityType not available');
+			return;
+		}
 
 		// TODO: introduce variant tree item model
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
@@ -185,6 +190,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			});
 
 			structureItems.push(...treeItemAncestors);
+
+			// Guard: this context may have been destroyed while the async requests were in flight
+			// (e.g. a condition such as IS_NOT_TRASHED flips before the API response arrives).
+			if (!this._host) return;
 
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);

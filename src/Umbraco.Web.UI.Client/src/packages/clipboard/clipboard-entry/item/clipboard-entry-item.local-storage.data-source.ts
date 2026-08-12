@@ -16,7 +16,7 @@ export class UmbClipboardEntryItemLocalStorageDataSource
 
 	/**
 	 * Gets items from local storage
-	 * @param {Array<string>} unique
+	 * @param {Array<string>} unique The unique ids of the clipboard entries to get.
 	 * @memberof UmbClipboardEntryItemLocalStorageDataSource
 	 */
 	async getItems(unique: Array<string>) {

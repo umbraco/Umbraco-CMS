@@ -37,7 +37,18 @@ export const HtmlDatasetAttributes = Extension.create<UmbTiptapHtmlDatasetAttrib
 				types: this.options.types,
 				attributes: {
 					dataset: {
-						parseHTML: (element) => element.dataset,
+						parseHTML: (element) => {
+							const dataset = { ...element.dataset };
+							// Umbraco stamps `data-router-slot="disabled"` onto the live anchor only, to stop the
+							// backoffice's SPA router intercepting clicks (see `link.tiptap-extension.ts`). Dropping
+							// it here keeps it out of the document, so it is never serialized back into the stored
+							// markup and existing content self-heals on re-save. Any other element or value is
+							// authored content and round-trips untouched. (#22654) [LK]
+							if (element instanceof HTMLAnchorElement && dataset.routerSlot === 'disabled') {
+								delete dataset.routerSlot;
+							}
+							return dataset;
+						},
 						renderHTML: (attributes) => {
 							const keys = attributes.dataset ? Object.keys(attributes.dataset) : [];
 							if (!keys.length) return {};

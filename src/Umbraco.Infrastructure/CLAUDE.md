@@ -227,13 +227,12 @@ internal class ContentFactory : IEntityFactory<IContent, ContentDto>
 - Converts DTO → Domain entity
 - Always `internal` (implementation detail)
 
-**Service Naming** (from Services/Implement/):
+**Service Naming** (`Services/Implement/`):
 ```csharp
-internal sealed class ContentService : RepositoryService, IContentService
+internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>, IContentSearchService
 ```
-- Pattern: `{Domain}Service : RepositoryService, I{Domain}Service`
-- Inherits `RepositoryService` for scope/repository access
-- Always `internal sealed`
+- Pattern: `{Domain}Service : I{Domain}Service` (base class varies by concern)
+- Only services with genuine Infrastructure dependencies live here (search, packaging, webhooks, log viewing); the `RepositoryService`-based domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/` — see root CLAUDE.md §4
 
 ### Key Code Patterns
 
@@ -375,7 +374,7 @@ using (ICoreScope scope = ScopeProvider.CreateCoreScope())
 - 16 service implementations
 - Services fire notifications before/after operations
 - Services manage scopes (not repositories)
-- Example: `ContentService`, `MediaService`, `UserService`
+- Example: `ContentSearchService`, `PackagingService`, `WebhookFiringService` — the Infrastructure-dependent services; the main domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/`
 
 ### Code Smells to Watch For
 
@@ -537,6 +536,17 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - Migrations run at startup (blocking)
 - Large data migrations (> 100k rows) should be chunked
 - Use `AsyncMigrationBase` for long-running operations
+
+**Schema-seeding migrations MUST assign the same fixed keys as a clean install**:
+- A migration that adds built-in schema entities (media/content/member types, property types,
+  property groups, data types, etc.) must set each entity's `Key` explicitly to the **same Guid**
+  used for that entity in `Migrations/Install/DatabaseDataCreator.cs`.
+- If you don't set `Key`, `EntityBase.Key` lazily generates a **random `Guid.NewGuid()`** — so every
+  upgraded site (and every environment) ends up with a **different** key, none of which match a clean
+  install. Umbraco Deploy / uSync key their schema artifacts by `Key`, so this shows up as spurious
+  "the key changed" schema diffs across environments (see issue #23337).
+- Keep the Guids in **one place** (a shared `Constants` value referenced by both `DatabaseDataCreator`
+  and the migration) so they cannot drift.
 
 ### Repository Edge Cases
 
@@ -783,7 +793,7 @@ dotnet pack src/Umbraco.Infrastructure -c Release
 - **Scope Provider**: `src/Umbraco.Infrastructure/Scoping/ScopeProvider.cs`
 - **Database Factory**: `src/Umbraco.Infrastructure/Persistence/UmbracoDatabaseFactory.cs`
 - **Migration Executor**: `src/Umbraco.Infrastructure/Migrations/MigrationPlanExecutor.cs`
-- **Content Service**: `src/Umbraco.Infrastructure/Services/Implement/ContentService.cs`
+- **Content Search Service**: `src/Umbraco.Infrastructure/Services/Implement/ContentSearchService.cs`
 - **User Repository**: `src/Umbraco.Infrastructure/Persistence/Repositories/Implement/UserRepository.cs`
 
 ### Critical Patterns

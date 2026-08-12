@@ -54,7 +54,7 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	/**
 	 * Append items to the store
-	 * @param packages
+	 * @param {Array<UmbPackage>} packages - The packages to append
 	 */
 	override appendItems(packages: Array<UmbPackage>) {
 		this.#packages.next(packages);

@@ -705,10 +705,14 @@ export class UmbBlockGridEntriesContext
 		const allowedBlocks = this.#allowedBlockTypes.getValue();
 		if (allowedBlocks.length === 0) return false;
 
+		// Manager may have been torn down (e.g. when navigating away) while the form-control
+		// mixin still runs validators from updated(). Treat as valid in that case.
+		if (!this._manager) return true;
+
 		const allowedKeys = allowedBlocks.map((x) => x.contentElementTypeKey);
 		// get content for each layout entry:
 		const invalidEntries = layoutEntries.filter((entry) => {
-			const contentTypeKey = this._manager!.getContentTypeKeyOfContentKey(entry.contentKey);
+			const contentTypeKey = this._manager?.getContentTypeKeyOfContentKey(entry.contentKey);
 			if (!contentTypeKey) {
 				// We could not find the content type key, so we cant determin if this is valid or not when the content is missing.
 				// This should be captured elsewhere as the Block then becomes invalid. So the unsupported Block should capture this.

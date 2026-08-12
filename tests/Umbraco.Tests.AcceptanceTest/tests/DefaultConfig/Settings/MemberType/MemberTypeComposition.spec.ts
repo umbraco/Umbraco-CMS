@@ -27,7 +27,6 @@ test('can add a composition to a member type', {tag: '@smoke'}, async ({umbracoA
 
   // Act
   await umbracoUi.memberType.goToMemberType(memberTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.memberType.clickCompositionsButton();
   await umbracoUi.memberType.clickModalMenuItemWithName(compositionMemberTypeName);
   await umbracoUi.memberType.clickSubmitButton();
@@ -46,7 +45,6 @@ test('can remove a composition from a member type', async ({umbracoApi, umbracoU
 
   // Act
   await umbracoUi.memberType.goToMemberType(memberTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.memberType.clickCompositionsButton();
   await umbracoUi.memberType.clickModalMenuItemWithName(compositionMemberTypeName);
   await umbracoUi.memberType.clickSubmitButton();

@@ -50,7 +50,6 @@ public class EmptyMediaRecycleBinController : MediaRecycleBinControllerBase
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
-    
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

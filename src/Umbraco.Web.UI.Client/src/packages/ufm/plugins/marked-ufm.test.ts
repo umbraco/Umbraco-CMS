@@ -4,6 +4,7 @@ import { UmbMarked } from '../contexts/ufm.context.js';
 import { UmbUfmContentNameComponent } from '../components/content-name/content-name.component.js';
 import { UmbUfmLabelValueComponent } from '../components/label-value/label-value.component.js';
 import { UmbUfmLocalizeComponent } from '../components/localize/localize.component.js';
+import { UmbUfmMemberNameComponent } from '../components/member-name/member-name.component.js';
 
 describe('UmbMarkedUfm', () => {
 	describe('UFM parsing', () => {
@@ -26,6 +27,11 @@ describe('UmbMarkedUfm', () => {
 				ufm: '{umbContentName: contentPicker}',
 				expected: '<ufm-content-name alias="contentPicker"></ufm-content-name>',
 			},
+			{ ufm: '{umbMemberName:memberPicker}', expected: '<ufm-member-name alias="memberPicker"></ufm-member-name>' },
+			{
+				ufm: '{umbMemberName: memberPicker}',
+				expected: '<ufm-member-name alias="memberPicker"></ufm-member-name>',
+			},
 		];
 
 		// Manually configuring the UFM components for testing.
@@ -34,6 +40,7 @@ describe('UmbMarkedUfm', () => {
 				{ alias: 'umbContentName', marker: '~', render: new UmbUfmContentNameComponent().render },
 				{ alias: 'umbValue', marker: '=', render: new UmbUfmLabelValueComponent().render },
 				{ alias: 'umbLocalize', marker: '#', render: new UmbUfmLocalizeComponent().render },
+				{ alias: 'umbMemberName', render: new UmbUfmMemberNameComponent().render },
 			]),
 		);
 

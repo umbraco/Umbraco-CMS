@@ -189,6 +189,9 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	protected override updated(): void {
+		// #main-tag is not rendered in readonly mode, and the queries can resolve to null
+		// during transient re-renders, so guard before touching the elements.
+		if (!this._mainTag || !this._widthTracker) return;
 		this._mainTag.style.width = `${this._widthTracker.offsetWidth - 4}px`;
 	}
 
@@ -375,7 +378,12 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	#renderAddButton() {
 		if (this.readonly) return nothing;
 		return html`
-			<uui-tag look="outline" id="main-tag" @click="${this.focus}" @focusout="${this.#onMainTagFocusOut}" slot="trigger">
+			<uui-tag
+				look="outline"
+				id="main-tag"
+				@click="${this.focus}"
+				@focusout="${this.#onMainTagFocusOut}"
+				slot="trigger">
 				<input
 					id="tag-input"
 					aria-label="tag input"

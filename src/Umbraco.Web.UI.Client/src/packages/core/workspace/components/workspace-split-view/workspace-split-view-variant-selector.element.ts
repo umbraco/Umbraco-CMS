@@ -7,9 +7,12 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type {
+	UmbEntityVariantModel,
+	UmbEntityVariantOptionModel,
+	UmbPublishableVariantState,
+} from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
-import type { DocumentVariantStateModel as UmbPublishableVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
 import type { UmbHint, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { createObservablePart, observeMultiple } from '@umbraco-cms/backoffice/observable-api';

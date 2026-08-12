@@ -18,8 +18,8 @@ export class UmbExtensionsElementAndApiInitializer<
 	ManifestTypes extends ManifestBase = ManifestBase,
 	ManifestTypeName extends string = string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
-	ControllerType extends
-		UmbExtensionElementAndApiInitializer<ManifestType> = UmbExtensionElementAndApiInitializer<ManifestType>,
+	ControllerType extends UmbExtensionElementAndApiInitializer<ManifestType> =
+		UmbExtensionElementAndApiInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
 > extends UmbBaseExtensionsInitializer<
 	ManifestTypes,

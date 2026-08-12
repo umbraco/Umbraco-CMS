@@ -59,7 +59,7 @@ namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto
         private int? _skipver;
         private RoslynCompiler? _roslynCompiler;
         private ModelsBuilderSettings _config;
-        private bool _disposedValue;
+        private volatile bool _disposedValue;
 
         public InMemoryModelFactory(
             Lazy<UmbracoServices> umbracoServices,
@@ -280,25 +280,34 @@ namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto
                 }
             }
 
-            // don't use an upgradeable lock here because only 1 thread at a time could enter it
-            try
+            // The factory is disposed on application shutdown (via IRegisteredObject.Stop), but in-flight
+            // requests can still reach this point. Bail out with the current models rather than touching
+            // the disposed lock. The catch below covers the small window where disposal happens after this
+            // check but before (or while) the lock is acquired.
+            if (_disposedValue)
             {
-                _locker.EnterReadLock();
-                if (_hasModels)
-                {
-                    return _infos;
-                }
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                {
-                    _locker.ExitReadLock();
-                }
+                return _infos;
             }
 
             try
             {
+                // don't use an upgradeable lock here because only 1 thread at a time could enter it
+                try
+                {
+                    _locker.EnterReadLock();
+                    if (_hasModels)
+                    {
+                        return _infos;
+                    }
+                }
+                finally
+                {
+                    if (_locker.IsReadLockHeld)
+                    {
+                        _locker.ExitReadLock();
+                    }
+                }
+
                 _locker.EnterUpgradeableReadLock();
 
                 if (_hasModels)
@@ -357,6 +366,12 @@ namespace Umbraco.Cms.DevelopmentMode.Backoffice.InMemoryAuto
                     _hasModels = true;
                 }
 
+                return _infos;
+            }
+            catch (ObjectDisposedException ex)
+            {
+                // Expected when the factory is disposed during shutdown mid-request; log so an unexpected disposal stays traceable.
+                _logger.LogDebug(ex, "EnsureModels interrupted by object disposal (assumed application shutdown); returning current models.");
                 return _infos;
             }
             finally

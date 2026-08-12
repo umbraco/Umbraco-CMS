@@ -131,12 +131,15 @@ public class PackageMigrationRunner
         => RunPackagePlansAsync(plansToRun).GetAwaiter().GetResult();
 
     /// <summary>
-    ///     Runs the all specified package migration plans and publishes a <see cref="MigrationPlansExecutedNotification" />
-    ///     if all are successful.
+    ///     Runs all the specified package migration plans and publishes a <see cref="MigrationPlansExecutedNotification" />.
     /// </summary>
+    /// <remarks>
+    ///     All plans are run to completion even if one fails, so that one package's failure does not block another's.
+    ///     A failed plan is reported via <see cref="ExecutedMigrationPlan.Successful" /> on the returned result rather
+    ///     than by throwing; callers must inspect the results to detect a failure.
+    /// </remarks>
     /// <param name="plansToRun"></param>
     /// <returns></returns>
-    /// <exception cref="Exception">If any plan fails it will throw an exception.</exception>
     public async Task<IEnumerable<ExecutedMigrationPlan>> RunPackagePlansAsync(IEnumerable<string> plansToRun)
     {
         List<ExecutedMigrationPlan> results = new();

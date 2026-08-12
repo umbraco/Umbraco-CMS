@@ -17,8 +17,8 @@ export class UmbSegmentCollectionServerDataSource
 {
 	/**
 	 * Gets the language collection filtered by the given filter.
-	 * @param {UmbSegmentCollectionFilterModel} filter
-	 * @returns {*}
+	 * @param {UmbSegmentCollectionFilterModel} filter - The filter to apply to the collection.
+	 * @returns {*} The segment collection.
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbSegmentCollectionFilterModel) {
