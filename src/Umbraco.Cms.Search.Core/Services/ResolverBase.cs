@@ -31,7 +31,7 @@ internal abstract class ResolverBase<T>
         Type typeToResolve = getTypeToResolve(indexRegistration);
         if (_serviceProvider.GetService(typeToResolve) is not T resolved)
         {
-            _logger.LogError($"Could not resolve type {{type}} as {typeof(T).Name}. Make sure the type is registered in the DI.", typeToResolve.FullName);
+            _logger.LogError("Could not resolve type {type} as {name}. Make sure the type is registered in the DI.", typeToResolve.FullName, typeof(T).Name);
             return null;
         }
 

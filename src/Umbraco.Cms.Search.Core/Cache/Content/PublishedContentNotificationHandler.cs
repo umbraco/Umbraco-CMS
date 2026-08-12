@@ -12,7 +12,7 @@ internal sealed class PublishedContentNotificationHandler : ContentNotificationH
     IDistributedCacheNotificationHandler<ContentPublishedNotification>,
     IDistributedCacheNotificationHandler<ContentUnpublishedNotification>,
     IDistributedCacheNotificationHandler<ContentMovedNotification>,
-    INotificationHandler<ContentMovedToRecycleBinNotification>
+    IDistributedCacheNotificationHandler<ContentMovedToRecycleBinNotification>
 {
     protected override Guid CacheRefresherUniqueId => PublishedContentCacheRefresher.UniqueId;
 

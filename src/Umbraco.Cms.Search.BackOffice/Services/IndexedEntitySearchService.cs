@@ -114,7 +114,7 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
             take);
 
         Guid[] resultKeys = result.Documents.Select(d => d.Id).ToArray();
-        IEntitySlim[] resultEntities = resultKeys.Any()
+        IEntitySlim[] resultEntities = resultKeys.Length > 0
             ? _entityService
                 .GetAll(objectType, resultKeys)
                 // unfortunately we can't explicitly rely on the underlying services ordering the requested
