@@ -371,6 +371,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Für Upload klicken',
+		browseFilesAction: 'Dateien durchsuchen',
+		dropFilesOr: 'Medien hierher ziehen<br />oder',
 		orClickHereToUpload: 'oder klicken Sie hier um eine Datei zu wählen',
 		disallowedFileType: 'Dieser Dateityp darf nicht hochgeladen werden',
 		invalidFileName: 'Diese Datei kann nicht hochgeladen werden wil der Dateiname ungültig ist.',

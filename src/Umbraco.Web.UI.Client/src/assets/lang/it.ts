@@ -347,6 +347,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Clicca per caricare',
+		browseFilesAction: 'Sfoglia file',
+		dropFilesOr: 'Trascina qui i file multimediali<br />o',
 		orClickHereToUpload: 'o clicca qui per scegliere i files',
 		dragFilesHereToUpload: 'Puoi trascinare i file qui per caricarli.',
 		disallowedFileType: 'Impossibile caricare questo file, non ha un tipo di file approvato',

@@ -264,6 +264,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikk for å laste opp',
+		browseFilesAction: 'Bla gjennom filer',
+		dropFilesOr: 'Dra og slipp medier her<br />eller',
 	},
 	member: {
 		createNewMember: 'Opprett et nytt medlem',

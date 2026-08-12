@@ -158,6 +158,8 @@ export default {
 	},
 	media: {
 		clickToUpload: '点击上传',
+		browseFilesAction: '浏览文件',
+		dropFilesOr: '将媒体拖放到此处<br />或',
 		orClickHereToUpload: '或单击此处选择文件',
 		maxFileSize: '最大文件大小为',
 	},

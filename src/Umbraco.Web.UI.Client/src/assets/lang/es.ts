@@ -222,6 +222,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Haz clic para subir archivos',
+		browseFilesAction: 'Explorar archivos',
+		dropFilesOr: 'Arrastra y suelta archivos multimedia aquí<br />o',
 	},
 	member: {
 		createNewMember: 'Crear nuevo miembro',

@@ -379,6 +379,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Clique para carregar',
+		browseFilesAction: 'Procurar ficheiros',
+		dropFilesOr: 'Arraste e solte ficheiros multimédia aqui<br />ou',
 		orClickHereToUpload: 'ou clique aqui para escolher ficheiros',
 		disallowedFileType: 'Não é possível carregar este ficheiro, não tem um tipo de ficheiro aprovado',
 		disallowedMediaType:

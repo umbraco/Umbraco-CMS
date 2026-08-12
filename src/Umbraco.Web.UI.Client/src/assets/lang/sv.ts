@@ -757,6 +757,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klicka för att ladda upp',
+		browseFilesAction: 'Bläddra bland filer',
+		dropFilesOr: 'Dra och släpp media här<br />eller',
 		orClickHereToUpload: 'eller klicka här för att välja filer',
 		disallowedFileType: 'Det går inte att ladda upp filen eftersom filtypen inte är godkänd',
 		disallowedFileExtension: (extension: string) =>

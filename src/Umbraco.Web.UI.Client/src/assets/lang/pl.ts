@@ -213,6 +213,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Kliknij, aby załadować plik',
+		browseFilesAction: 'Przeglądaj pliki',
+		dropFilesOr: 'Przeciągnij i upuść pliki multimedialne tutaj<br />lub',
 		orClickHereToUpload: 'lub kliknij tutaj, aby wybrać pliki',
 		disallowedFileType: 'Nie można załadować pliku, typ pliku nie jest akceptowany',
 		maxFileSize: 'Maksymalny rozmiar pliku to',
