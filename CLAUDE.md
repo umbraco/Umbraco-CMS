@@ -565,7 +565,7 @@ Labels are only added, never removed. Claude applies only labels it is confident
 
 ### TODOs
 
-Allowed, and can be specific. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
+Allowed, and can name the specific issue, implementation, or use case it concerns — the one exception to §2, since the comment is deleted once the TODO is done. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
 
 ---
 
