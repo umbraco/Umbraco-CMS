@@ -13,8 +13,9 @@ public class UmbracoPluginSettings
 {
     /// <summary>
     ///     Gets or sets an optional host-controlled cache-buster for package <c>/App_Plugins</c> assets. When set (e.g.
-    ///     to a build number or deployment id), it is appended as <c>umb__rnd</c> to every package's assets — importmap
-    ///     and extensions — forcing a re-fetch regardless of each package's own <c>version</c>. Empty by default (no effect).
+    ///     to a build number or deployment id), a short hash of it is appended as <c>umb__rnd</c> to every package's
+    ///     assets — importmap and extensions — forcing a re-fetch regardless of each package's own <c>version</c>. Only
+    ///     the hash is exposed in the asset URLs, never the configured value itself. Empty by default (no effect).
     /// </summary>
     [DefaultValue("")]
     public string Cachebuster { get; set; } = string.Empty;
