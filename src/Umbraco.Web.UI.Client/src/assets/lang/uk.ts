@@ -571,6 +571,8 @@ export default {
 		next: 'Наст.',
 		no: 'Ні',
 		noItemsInList: 'Тут поки що немає елементів',
+		noResults: 'Немає результатів',
+		noResultsFor: (query: string) => `Немає результатів за запитом "${query}".`,
 		of: 'з',
 		off: 'Вимк',
 		ok: 'Ok',
@@ -1339,6 +1341,10 @@ export default {
 		stylesheets: 'Стилі CSS',
 		templates: 'Шаблони',
 		users: 'Користувачі',
+	},
+	picker: {
+		browseTab: 'Огляд',
+		searchTab: 'Пошук',
 	},
 	update: {
 		updateAvailable: 'Доступні оновлення',

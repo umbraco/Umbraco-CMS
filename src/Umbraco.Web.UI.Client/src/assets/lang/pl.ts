@@ -504,6 +504,8 @@ export default {
 		new: 'Nowy',
 		next: 'Dalej',
 		no: 'Nie',
+		noResults: 'Brak wyników',
+		noResultsFor: (query: string) => `Brak wyników dla "${query}".`,
 		of: 'z',
 		ok: 'OK',
 		open: 'Otwórz',
@@ -1190,6 +1192,10 @@ export default {
 		templates: 'Szablony',
 		partialViews: 'Częściowe Widoki',
 		partialViewMacros: 'Pliki Makro Częściowych Widoków',
+	},
+	picker: {
+		browseTab: 'Przeglądaj',
+		searchTab: 'Szukaj',
 	},
 	update: {
 		updateAvailable: 'Aktualizacja jest gotowa',

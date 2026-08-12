@@ -907,6 +907,8 @@ export default {
 		no: 'Không',
 		nodeName: 'Tên nút',
 		notFound: 'Không tìm thấy',
+		noResults: 'Không có kết quả',
+		noResultsFor: (query: string) => `Không tìm thấy kết quả cho "${query}".`,
 		of: 'của',
 		off: 'Tắt',
 		ok: 'OK',
@@ -2831,6 +2833,8 @@ export default {
 		resetUrlLabel: 'Đặt lại',
 	},
 	picker: {
+		browseTab: 'Duyệt',
+		searchTab: 'Tìm kiếm',
 		selectedCount: (count: number) => `Đã chọn ${count} mục`,
 	},
 } as UmbLocalizationDictionary;

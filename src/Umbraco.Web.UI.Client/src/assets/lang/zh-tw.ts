@@ -403,6 +403,8 @@ export default {
 		new: '新的',
 		next: '下一步',
 		no: '否',
+		noResults: '沒有結果',
+		noResultsFor: (query: string) => `找不到 "${query}" 的結果。`,
 		of: '屬於',
 		ok: '確定',
 		open: '打開',
@@ -1070,6 +1072,8 @@ export default {
 		deselectAllLogLevelFilters: '取消全選',
 	},
 	picker: {
+		browseTab: '瀏覽',
+		searchTab: '搜尋',
 		selectedCount: (count: number) => `已選取 ${count} 個項目`,
 	},
 } as UmbLocalizationDictionary;

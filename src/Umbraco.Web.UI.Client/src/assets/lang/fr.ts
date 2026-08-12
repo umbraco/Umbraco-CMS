@@ -722,6 +722,8 @@ export default {
 		new: 'Nouveau',
 		next: 'Suivant',
 		no: 'Non',
+		noResults: 'Aucun résultat',
+		noResultsFor: (query: string) => `Aucun résultat pour "${query}".`,
 		of: 'de',
 		off: 'Inactif',
 		ok: 'OK',
@@ -1965,6 +1967,8 @@ export default {
 		searchResults: 'éléments retrouvés',
 	},
 	picker: {
+		browseTab: 'Parcourir',
+		searchTab: 'Rechercher',
 		selectedCount: (count: number) => `${count} ${count > 1 ? 'éléments sélectionnés' : 'élément sélectionné'}`,
 	},
 } as UmbLocalizationDictionary;

@@ -743,6 +743,8 @@ export default {
 		new: 'Nieuw',
 		next: 'Volgende',
 		no: 'Nee',
+		noResults: 'Geen resultaten',
+		noResultsFor: (query: string) => `Geen resultaat voor "${query}".`,
 		of: 'of',
 		off: 'Uit',
 		ok: 'OK',
@@ -2188,6 +2190,8 @@ export default {
 			'U kunt Inhoudssjablonen bewerken en verwijderen vanuit de boomstructuur\n      "inhoudssjablonen" in de sectie Instellingen. Vouw het documenttype uit waarop de Inhoudssjabloon is gebaseerd en\n      klik erop om het te bewerken of te verwijderen.\n    ',
 	},
 	picker: {
+		browseTab: 'Bladeren',
+		searchTab: 'Zoeken',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
 	},
 } as UmbLocalizationDictionary;

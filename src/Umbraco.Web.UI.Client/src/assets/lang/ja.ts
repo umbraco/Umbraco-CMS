@@ -429,6 +429,8 @@ export default {
 		new: '新規',
 		next: '次へ',
 		no: 'いいえ',
+		noResults: '結果がありません',
+		noResultsFor: (query: string) => `"${query}" の結果が見つかりません。`,
 		of: 'of',
 		ok: 'OK',
 		open: '開く',
@@ -1102,6 +1104,8 @@ export default {
 		deselectAllLogLevelFilters: 'すべての選択を解除',
 	},
 	picker: {
+		browseTab: '参照',
+		searchTab: '検索',
 		selectedCount: (count: number) => `${count}件選択済み`,
 	},
 } as UmbLocalizationDictionary;
