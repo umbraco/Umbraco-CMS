@@ -23,6 +23,46 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .Build();
         await dataTypeService.CreateAsync(decimalDataType, Constants.Security.SuperUserKey);
 
+        DataType dateOnlyDataType = new DataTypeBuilder()
+            .WithId(0)
+            .WithDatabaseType(ValueStorageType.Nvarchar)
+            .WithName("Date only")
+            .AddEditor()
+            .WithAlias(Constants.PropertyEditors.Aliases.DateOnly)
+            .Done()
+            .Build();
+        await dataTypeService.CreateAsync(dateOnlyDataType, Constants.Security.SuperUserKey);
+
+        DataType timeOnlyDataType = new DataTypeBuilder()
+            .WithId(0)
+            .WithDatabaseType(ValueStorageType.Nvarchar)
+            .WithName("Time only")
+            .AddEditor()
+            .WithAlias(Constants.PropertyEditors.Aliases.TimeOnly)
+            .Done()
+            .Build();
+        await dataTypeService.CreateAsync(timeOnlyDataType, Constants.Security.SuperUserKey);
+
+        DataType dateTimeWithTimeZoneDataType = new DataTypeBuilder()
+            .WithId(0)
+            .WithDatabaseType(ValueStorageType.Nvarchar)
+            .WithName("Date/time with time zone")
+            .AddEditor()
+            .WithAlias(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone)
+            .Done()
+            .Build();
+        await dataTypeService.CreateAsync(dateTimeWithTimeZoneDataType, Constants.Security.SuperUserKey);
+
+        DataType dateTimeUnspecifiedDataType = new DataTypeBuilder()
+            .WithId(0)
+            .WithDatabaseType(ValueStorageType.Nvarchar)
+            .WithName("Date/time unspecified")
+            .AddEditor()
+            .WithAlias(Constants.PropertyEditors.Aliases.DateTimeUnspecified)
+            .Done()
+            .Build();
+        await dataTypeService.CreateAsync(dateTimeUnspecifiedDataType, Constants.Security.SuperUserKey);
+
         DataType tagsAsCsvDataType = new DataTypeBuilder()
             .WithId(0)
             .WithDatabaseType(ValueStorageType.Nvarchar)
@@ -198,6 +238,26 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
             .WithAlias("dateAndTimeValue")
             .WithDataTypeId(Constants.DataTypes.DateTime)
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTime)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("dateOnlyValue")
+            .WithDataTypeId(dateOnlyDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateOnly)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("timeOnlyValue")
+            .WithDataTypeId(timeOnlyDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TimeOnly)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("dateTimeWithTimeZoneValue")
+            .WithDataTypeId(dateTimeWithTimeZoneDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTimeWithTimeZone)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("dateTimeUnspecifiedValue")
+            .WithDataTypeId(dateTimeUnspecifiedDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.DateTimeUnspecified)
             .Done()
             .AddPropertyType()
             .WithAlias("tagsAsJsonValue")

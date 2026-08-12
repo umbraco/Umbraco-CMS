@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Search.Core.PropertyValueHandlers;
 using Umbraco.Cms.Search.Core.PropertyValueHandlers.Collection;
@@ -29,6 +30,23 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
                     decimalValue = 56.78m,
                     dateValue = new DateTime(2001, 02, 03),
                     dateAndTimeValue = new DateTime(2004, 05, 06, 07, 08, 09),
+                    dateOnlyValue = jsonSerializer.Serialize(new DateTimeValueConverterBase.DateTimeDto
+                    {
+                        Date = new DateTimeOffset(new DateOnly(2010, 03, 15), TimeOnly.MinValue, TimeSpan.Zero),
+                    }),
+                    timeOnlyValue = jsonSerializer.Serialize(new DateTimeValueConverterBase.DateTimeDto
+                    {
+                        Date = new DateTimeOffset(DateOnly.MinValue, new TimeOnly(13, 45, 30), TimeSpan.Zero),
+                    }),
+                    dateTimeWithTimeZoneValue = jsonSerializer.Serialize(new DateTimeValueConverterBase.DateTimeDto
+                    {
+                        Date = new DateTimeOffset(new DateOnly(2012, 07, 20), new TimeOnly(9, 15, 0), TimeSpan.FromHours(2)),
+                        TimeZone = "Europe/Copenhagen",
+                    }),
+                    dateTimeUnspecifiedValue = jsonSerializer.Serialize(new DateTimeValueConverterBase.DateTimeDto
+                    {
+                        Date = new DateTimeOffset(new DateOnly(2015, 11, 05), new TimeOnly(18, 30, 0), TimeSpan.Zero),
+                    }),
                     tagsAsJsonValue = "[\"One\",\"Two\",\"Three\"]",
                     tagsAsCsvValue = "Four,Five,Six",
                     multipleTextstringsValue = "First\nSecond\nThird",
@@ -87,6 +105,18 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
 
             DateTimeOffset? dateAndTimeValue = document.Fields.FirstOrDefault(f => f.FieldName == "dateAndTimeValue")?.Value.DateTimeOffsets?.SingleOrDefault();
             Assert.That(dateAndTimeValue, Is.EqualTo(new DateTimeOffset(new DateOnly(2004, 05, 06), new TimeOnly(07, 08, 09), TimeSpan.Zero)));
+
+            DateTimeOffset? dateOnlyValue = document.Fields.FirstOrDefault(f => f.FieldName == "dateOnlyValue")?.Value.DateTimeOffsets?.SingleOrDefault();
+            Assert.That(dateOnlyValue, Is.EqualTo(new DateTimeOffset(new DateOnly(2010, 03, 15), TimeOnly.MinValue, TimeSpan.Zero)));
+
+            DateTimeOffset? timeOnlyValue = document.Fields.FirstOrDefault(f => f.FieldName == "timeOnlyValue")?.Value.DateTimeOffsets?.SingleOrDefault();
+            Assert.That(timeOnlyValue, Is.EqualTo(new DateTimeOffset(DateOnly.MinValue, new TimeOnly(13, 45, 30), TimeSpan.Zero)));
+
+            DateTimeOffset? dateTimeWithTimeZoneValue = document.Fields.FirstOrDefault(f => f.FieldName == "dateTimeWithTimeZoneValue")?.Value.DateTimeOffsets?.SingleOrDefault();
+            Assert.That(dateTimeWithTimeZoneValue, Is.EqualTo(new DateTimeOffset(new DateOnly(2012, 07, 20), new TimeOnly(9, 15, 0), TimeSpan.FromHours(2))));
+
+            DateTimeOffset? dateTimeUnspecifiedValue = document.Fields.FirstOrDefault(f => f.FieldName == "dateTimeUnspecifiedValue")?.Value.DateTimeOffsets?.SingleOrDefault();
+            Assert.That(dateTimeUnspecifiedValue, Is.EqualTo(new DateTimeOffset(new DateOnly(2015, 11, 05), new TimeOnly(18, 30, 0), TimeSpan.Zero)));
 
             var tagsAsJsonValue = document.Fields.FirstOrDefault(f => f.FieldName == "tagsAsJsonValue")?.Value.Keywords?.ToArray();
             CollectionAssert.AreEqual(tagsAsJsonValue, new[] { "One", "Two", "Three" });
