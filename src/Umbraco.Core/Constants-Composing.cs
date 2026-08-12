@@ -17,6 +17,7 @@ public static partial class Constants
         {
             "Umbraco.Core", "Umbraco.Infrastructure",
             "Umbraco.Web.Common", "Umbraco.Cms.Api.Common", "Umbraco.Cms.Api.Delivery", "Umbraco.Cms.Api.Management", "Umbraco.Web.Website",
+            "Umbraco.Cms.Search.Core", "Umbraco.Cms.Search.BackOffice", "Umbraco.Cms.Search.DeliveryApi",
         };
     }
 }
