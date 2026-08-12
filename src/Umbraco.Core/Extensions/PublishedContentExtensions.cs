@@ -441,7 +441,7 @@ public static class PublishedContentExtensions
     /// <param name="other">The potential ancestor or same content item.</param>
     /// <returns><c>true</c> if this content is a descendant of or equal to the other; otherwise, <c>false</c>.</returns>
     public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other) =>
-        content.Path.IsDescendantOrSelfOfPath(other.Path);
+        content.Path.InvariantEquals(other.Path) || content.IsDescendant(other);
 
     /// <summary>
     /// Determines whether this content item is an ancestor of another content item.
@@ -459,7 +459,7 @@ public static class PublishedContentExtensions
     /// <param name="other">The potential descendant or same content item.</param>
     /// <returns><c>true</c> if this content is an ancestor of or equal to the other; otherwise, <c>false</c>.</returns>
     public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other) =>
-        other.Path.IsDescendantOrSelfOfPath(content.Path);
+        other.Path.InvariantEquals(content.Path) || content.IsAncestor(other);
 
     #endregion
 
