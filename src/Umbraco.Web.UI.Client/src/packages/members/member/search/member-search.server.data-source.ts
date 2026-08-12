@@ -10,9 +10,10 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
  * @class UmbMemberSearchServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMemberSearchServerDataSource
-	implements UmbSearchDataSource<UmbMemberSearchItemModel, UmbMemberSearchRequestArgs>
-{
+export class UmbMemberSearchServerDataSource implements UmbSearchDataSource<
+	UmbMemberSearchItemModel,
+	UmbMemberSearchRequestArgs
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -26,8 +27,8 @@ export class UmbMemberSearchServerDataSource
 
 	/**
 	 * Get a list of versions for a data
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbMemberSearchRequestArgs} args - The arguments for the search
+	 * @returns {*} The search results.
 	 * @memberof UmbMemberSearchServerDataSource
 	 */
 	async search(args: UmbMemberSearchRequestArgs) {

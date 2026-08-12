@@ -1,5 +1,8 @@
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../../global-contexts/index.js';
-import { UMB_BULK_TRASH_WITH_RELATION_CONFIRM_MODAL, UmbBulkTrashWithRelationEntityAction } from '@umbraco-cms/backoffice/relations';
+import {
+	UMB_BULK_TRASH_WITH_RELATION_CONFIRM_MODAL,
+	UmbBulkTrashWithRelationEntityAction,
+} from '@umbraco-cms/backoffice/relations';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 
 export class UmbDocumentBulkTrashWithRelationEntityAction extends UmbBulkTrashWithRelationEntityAction {

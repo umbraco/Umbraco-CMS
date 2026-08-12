@@ -67,29 +67,49 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 			unique: MODAL_MEMORY_UNIQUE,
 		});
 
-		this.observe(this.#pickerContext.languages, (languages) => {
-			this._languages = languages;
-		});
+		this.observe(
+			this.#pickerContext.languages,
+			(languages) => {
+				this._languages = languages;
+			},
+			null,
+		);
 
-		this.observe(this.#pickerContext.culture, (culture) => {
-			this._selectedCulture = culture;
-		});
+		this.observe(
+			this.#pickerContext.culture,
+			(culture) => {
+				this._selectedCulture = culture;
+			},
+			null,
+		);
 
-		this.observe(this.#pickerContext.selection.hasSelection, (hasSelection) => {
-			this._hasSelection = hasSelection;
-		});
+		this.observe(
+			this.#pickerContext.selection.hasSelection,
+			(hasSelection) => {
+				this._hasSelection = hasSelection;
+			},
+			null,
+		);
 
 		this.observe(this.#pickerContext.search.searchable, (isSearchable) => {
 			this._isSearchable = isSearchable ?? false;
 		});
 
-		this.observe(this.#pickerContext.expansion.expansion, (expansion) => {
-			this._treeExpansion = expansion;
-		});
+		this.observe(
+			this.#pickerContext.expansion.expansion,
+			(expansion) => {
+				this._treeExpansion = expansion;
+			},
+			null,
+		);
 
-		this.observe(this.#pickerContext.interactionMemory.memory(TREE_MEMORY_UNIQUE), (memory) => {
-			this._treeInteractionMemories = memory?.memories;
-		});
+		this.observe(
+			this.#pickerContext.interactionMemory.memory(TREE_MEMORY_UNIQUE),
+			(memory) => {
+				this._treeInteractionMemories = memory?.memories;
+			},
+			null,
+		);
 	}
 
 	#onTreeExpansionChange(event: UmbExpansionChangeEvent) {

@@ -19,8 +19,8 @@ export class UmbStylesheetItemServerDataSource
 
 	/**
 	 * Fetches the items for the given uniques from the server
-	 * @param {Array<string>} uniques
-	 * @returns {*}
+	 * @param {Array<string>} uniques - The unique identifiers of the stylesheets
+	 * @returns {*} The stylesheet items
 	 * @memberof UmbStylesheetItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {

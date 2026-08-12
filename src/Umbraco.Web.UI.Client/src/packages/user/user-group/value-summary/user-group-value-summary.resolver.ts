@@ -39,4 +39,3 @@ export class UmbUserGroupValueSummaryResolver
 		return values.map((v) => v.map((r) => itemByUnique.get(r.unique)).filter(Boolean) as UmbUserGroupItemModel[]);
 	}
 }
-

@@ -41,9 +41,9 @@ const LocalizationControllerAlias = Symbol();
  * }
  * ```
  */
-export class UmbLocalizationController<LocalizationSetType extends UmbLocalizationSetBase = UmbLocalizationSet>
-	implements UmbController
-{
+export class UmbLocalizationController<
+	LocalizationSetType extends UmbLocalizationSetBase = UmbLocalizationSet,
+> implements UmbController {
 	#host;
 	#hostEl?: HTMLElement & Partial<Pick<LitElement, 'requestUpdate'>>;
 	readonly controllerAlias = LocalizationControllerAlias;
@@ -228,7 +228,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * Outputs a localized date in the specified format.
 	 * @param {Date} dateToFormat - the date to format.
 	 * @param {Intl.DateTimeFormatOptions} options - the options to use when formatting the date.
-	 * @returns {string}
+	 * @returns {string} - the formatted date.
 	 */
 	date(dateToFormat: Date | string, options?: Intl.DateTimeFormatOptions): string {
 		dateToFormat = new Date(dateToFormat);
@@ -238,7 +238,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	/**
 	 * Outputs a localized date with time using short date and medium time format.
 	 * @param {Date | string} dateToFormat - the date to format.
-	 * @returns {string}
+	 * @returns {string} - the formatted date and time.
 	 */
 	dateTime(dateToFormat: Date | string): string {
 		dateToFormat = new Date(dateToFormat);

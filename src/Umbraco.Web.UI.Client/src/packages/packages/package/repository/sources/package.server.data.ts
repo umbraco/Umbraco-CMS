@@ -31,6 +31,7 @@ export class UmbPackageServerDataSource {
 
 	/**
 	 * Get the root items from the server
+	 * @returns {*} The root items.
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getRootItems() {
@@ -39,6 +40,7 @@ export class UmbPackageServerDataSource {
 
 	/**
 	 * Get the package configuration from the server
+	 * @returns {*} The package configuration.
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getPackageConfiguration() {
@@ -47,6 +49,7 @@ export class UmbPackageServerDataSource {
 
 	/**
 	 * Get the package migrations from the server
+	 * @returns {*} The package migrations.
 	 * @memberof UmbPackageServerDataSource
 	 */
 	getPackageMigrations() {

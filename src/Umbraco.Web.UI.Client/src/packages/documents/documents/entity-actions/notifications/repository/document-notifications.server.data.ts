@@ -22,6 +22,7 @@ export class UmbDocumentNotificationsServerDataSource {
 	/**
 	 * Fetches the Culture and Hostnames for the given Document unique
 	 * @param {string} unique - The unique identifier of the Document
+	 * @returns {*} The notifications data
 	 * @memberof UmbDocumentNotificationsServerDataSource
 	 */
 	async read(unique: string) {
@@ -33,6 +34,7 @@ export class UmbDocumentNotificationsServerDataSource {
 	 * Updates Culture and Hostnames for the given Document unique
 	 * @param {string} unique - The unique identifier of the Document
 	 * @param {UpdateDocumentNotificationsRequestModel} data - The data to update
+	 * @returns {*} The result of the update request
 	 * @memberof UmbDocumentNotificationsServerDataSource
 	 */
 	async update(unique: string, data: UpdateDocumentNotificationsRequestModel) {

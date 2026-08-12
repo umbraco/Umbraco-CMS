@@ -48,7 +48,7 @@ export abstract class UmbTreeItemContextBase<
 
 	/**
 	 * Returns the manifest.
-	 * @returns {ManifestCollection}
+	 * @returns {ManifestCollection} The tree item manifest
 	 * @memberof UmbTreeItemContextBase
 	 * @deprecated Use the `.manifest` property instead.
 	 */

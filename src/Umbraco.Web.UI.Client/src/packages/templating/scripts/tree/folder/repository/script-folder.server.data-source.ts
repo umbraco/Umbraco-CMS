@@ -28,8 +28,8 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 	/**
 	 * Creates a scaffold for a Script folder
-	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbFolderModel>} [preset] - Initial data to seed the scaffold with
+	 * @returns {*} The scaffolded Script folder
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -45,8 +45,8 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 	/**
 	 * Fetches a Script folder from the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {string} unique - The unique identifier of the Script folder
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The Script folder
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -78,8 +78,8 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 	/**
 	 * Creates a Script folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {UmbFolderModel} model - The Script folder to create
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The created Script folder
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -111,8 +111,8 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 
 	/**
 	 * Deletes a Script folder on the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceErrorResponse}
+	 * @param {string} unique - The unique identifier of the Script folder
+	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
 	 * @memberof UmbScriptServerDataSource
 	 */
 	async delete(unique: string) {

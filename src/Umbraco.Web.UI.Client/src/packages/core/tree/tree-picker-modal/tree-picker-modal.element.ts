@@ -91,9 +91,13 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	constructor() {
 		super();
 		this._pickerContext.selection.setSelectable(true);
-		this.observe(this._pickerContext.selection.hasSelection, (hasSelection) => {
-			this._hasSelection = hasSelection;
-		});
+		this.observe(
+			this._pickerContext.selection.hasSelection,
+			(hasSelection) => {
+				this._hasSelection = hasSelection;
+			},
+			null,
+		);
 		this.#observePickerSelection();
 		this.#observeSearch();
 		this.#observeExpansion();

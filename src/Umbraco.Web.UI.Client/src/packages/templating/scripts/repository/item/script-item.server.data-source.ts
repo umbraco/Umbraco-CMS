@@ -16,8 +16,8 @@ export class UmbScriptItemServerDataSource extends UmbControllerBase implements 
 
 	/**
 	 * Fetches the items for the given uniques from the server
-	 * @param {Array<string>} uniques
-	 * @returns {*}
+	 * @param {Array<string>} uniques - The uniques of the scripts to fetch
+	 * @returns {*} The requested script items, or an error
 	 * @memberof UmbScriptItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {

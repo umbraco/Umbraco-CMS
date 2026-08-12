@@ -11,7 +11,7 @@ import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 export class UmbScriptDetailStore extends UmbDetailStoreBase<UmbScriptDetailModel> {
 	/**
 	 * Creates an instance of UmbScriptDetailStore.
-	 * @param {UmbControllerHostInterface} host
+	 * @param {UmbControllerHostInterface} host - The controller host for this controller to be appended to
 	 * @memberof UmbScriptDetailStore
 	 */
 	constructor(host: UmbControllerHost) {

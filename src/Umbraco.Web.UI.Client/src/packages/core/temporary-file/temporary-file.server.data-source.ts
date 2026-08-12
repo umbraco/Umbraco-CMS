@@ -22,9 +22,9 @@ export class UmbTemporaryFileServerDataSource {
 
 	/**
 	 * Uploads a temporary file to the server
-	 * @param {string} id
-	 * @param {File} file
-	 * @returns {*}
+	 * @param {string} id - The unique identifier of the temporary file
+	 * @param {File} file - The file to upload
+	 * @returns {*} The upload response
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
 	async create(
@@ -50,8 +50,8 @@ export class UmbTemporaryFileServerDataSource {
 
 	/**
 	 * Gets a temporary file from the server
-	 * @param {string} id
-	 * @returns {*}
+	 * @param {string} id - The unique identifier of the temporary file
+	 * @returns {*} The temporary file
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
 	read(id: string) {
@@ -61,8 +61,8 @@ export class UmbTemporaryFileServerDataSource {
 
 	/**
 	 * Deletes a temporary file from the server
-	 * @param {string} id
-	 * @returns {*}
+	 * @param {string} id - The unique identifier of the temporary file
+	 * @returns {*} The delete response
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
 	delete(id: string) {

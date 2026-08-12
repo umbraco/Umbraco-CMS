@@ -61,7 +61,7 @@ export class UmbLocalizationManager {
 
 	/**
 	 * Registers one or more translations
-	 * @param t
+	 * @param {UmbLocalizationSetBase} t - the localization set to register.
 	 */
 	registerLocalization(t: UmbLocalizationSetBase) {
 		const code = t.$code.toLowerCase();

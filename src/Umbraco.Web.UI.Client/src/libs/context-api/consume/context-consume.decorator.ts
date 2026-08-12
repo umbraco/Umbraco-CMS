@@ -91,11 +91,11 @@ export function consumeContext<
  * mode resolves once via `asPromise()` — that promise may reject (no provider
  * resolves before the RAF timeout, or the host disconnects); the rejection is
  * intentionally swallowed and the property is left unset.
- * @param host The UmbControllerHost to attach the consumer to.
- * @param context Context alias or token to request.
- * @param assign Callback that writes the resolved value into the decorated field.
- * @param callback Optional user callback forwarded to the consumer.
- * @param subscribe When true, subscribe to context changes; when false, resolve once.
+ * @param {any} host The UmbControllerHost to attach the consumer to.
+ * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to request.
+ * @param {(value: ResultType | undefined) => void} assign Callback that writes the resolved value into the decorated field.
+ * @param {UmbContextCallback<ResultType> | undefined} callback Optional user callback forwarded to the consumer.
+ * @param {boolean} subscribe When true, subscribe to context changes; when false, resolve once.
  */
 function setupConsumer<BaseType extends UmbContextMinimal, ResultType extends BaseType>(
 	host: any,
@@ -124,11 +124,11 @@ function setupConsumer<BaseType extends UmbContextMinimal, ResultType extends Ba
 
 /**
  * Standard decorator (Stage 3 TC39) path for `accessor` fields.
- * @param protoOrTarget
- * @param decoratorContext
- * @param context
- * @param callback
- * @param subscribe
+ * @param {any} protoOrTarget The class prototype or target being decorated.
+ * @param {ClassAccessorDecoratorContext<any, ResultType>} decoratorContext The standard decorator context.
+ * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to request.
+ * @param {UmbContextCallback<ResultType> | undefined} callback Optional user callback forwarded to the consumer.
+ * @param {boolean} subscribe When true, subscribe to context changes; when false, resolve once.
  */
 function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType extends BaseType>(
 	protoOrTarget: any,
@@ -146,23 +146,17 @@ function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType e
 	}
 
 	decoratorContext.addInitializer(function () {
-		setupConsumer(
-			this,
-			context,
-			(value) => protoOrTarget.set.call(this, value),
-			callback,
-			subscribe,
-		);
+		setupConsumer(this, context, (value) => protoOrTarget.set.call(this, value), callback, subscribe);
 	});
 }
 
 /**
  * Legacy decorator (TypeScript experimental) path for regular properties.
- * @param protoOrTarget
- * @param propertyKey
- * @param context
- * @param callback
- * @param subscribe
+ * @param {any} protoOrTarget The class prototype being decorated.
+ * @param {string} propertyKey The name of the decorated property.
+ * @param {string | UmbContextToken<BaseType, ResultType>} context Context alias or token to request.
+ * @param {UmbContextCallback<ResultType> | undefined} callback Optional user callback forwarded to the consumer.
+ * @param {boolean} subscribe When true, subscribe to context changes; when false, resolve once.
  */
 function setupLegacyDecorator<BaseType extends UmbContextMinimal, ResultType extends BaseType>(
 	protoOrTarget: any,
