@@ -944,6 +944,8 @@ export default {
 		no: 'No',
 		nodeName: 'Node Name',
 		notFound: 'Not found',
+		noResults: 'No results',
+		noResultsFor: (query: string) => `No result for "${query}".`,
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
