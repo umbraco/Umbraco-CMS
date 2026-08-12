@@ -24,7 +24,7 @@ export class UmbTemplateQueryServerDataSource {
 	}
 	/**
 	 * Fetches the query builder settings from the server
-	 * @returns {*}
+	 * @returns {*} The query builder settings
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	async getTemplateQuerySettings() {
@@ -32,8 +32,8 @@ export class UmbTemplateQueryServerDataSource {
 	}
 	/**
 	 * Executes a query builder query on the server
-	 * @param {UmbExecuteTemplateQueryRequestModel} args
-	 * @returns {*}
+	 * @param {UmbExecuteTemplateQueryRequestModel} args - The query to execute
+	 * @returns {*} The result of the query
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	async executeTemplateQuery(args: UmbExecuteTemplateQueryRequestModel) {

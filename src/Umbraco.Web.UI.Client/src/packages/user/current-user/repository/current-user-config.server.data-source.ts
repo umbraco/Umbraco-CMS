@@ -11,6 +11,7 @@ export class UmbCurrentUserConfigServerDataSource {
 
 	/**
 	 * Get the current user configuration.
+	 * @returns {*} The current user configuration, or an error
 	 * @memberof UmbCurrentUserConfigServerDataSource
 	 */
 	getCurrentUserConfig() {

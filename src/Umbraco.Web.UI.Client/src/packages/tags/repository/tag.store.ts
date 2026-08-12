@@ -26,8 +26,7 @@ export class UmbTagStore extends UmbStoreBase {
 
 	/**
 	 * Append a tag to the store
-	 * @param {TagResponseModel} TAG
-	 * @param tag
+	 * @param {TagResponseModel} tag - The tag to append.
 	 * @memberof UmbTagStore
 	 */
 	override append(tag: TagResponseModel) {
@@ -36,8 +35,8 @@ export class UmbTagStore extends UmbStoreBase {
 
 	/**
 	 * Append a tag to the store
-	 * @param {id} TagResponseModel id.
-	 * @param id
+	 * @param {TagResponseModel['id']} id - The unique identifier of the tag to fetch.
+	 * @returns {*} The tag observable part.
 	 * @memberof UmbTagStore
 	 */
 	byId(id: TagResponseModel['id']) {
@@ -69,7 +68,7 @@ export class UmbTagStore extends UmbStoreBase {
 
 	/**
 	 * Removes tag in the store with the given uniques
-	 * @param {string[]} uniques
+	 * @param {string[]} uniques - The unique identifiers of the tags to remove.
 	 * @memberof UmbTagStore
 	 */
 	remove(uniques: Array<TagResponseModel['id']>) {

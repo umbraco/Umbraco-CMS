@@ -27,12 +27,12 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
  * @template TreeRootType
  */
 export abstract class UmbTreeRepositoryBase<
-		TreeItemType extends UmbTreeItemModel,
-		TreeRootType extends UmbTreeRootModel,
-		TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
-		TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
-		TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
-	>
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+	TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+	TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
+	TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
+>
 	extends UmbRepositoryBase
 	implements
 		UmbTreeRepository<
@@ -94,8 +94,8 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Requests root items of a tree
-	 * @param args
-	 * @returns {*}
+	 * @param {TreeRootItemsRequestArgsType} args - The request arguments
+	 * @returns {*} The root items of the tree
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
@@ -122,9 +122,8 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Requests tree items of a given parent
-	 * @param {(string | null)} parentUnique
-	 * @param args
-	 * @returns {*}
+	 * @param {TreeChildrenOfRequestArgsType} args - The request arguments
+	 * @returns {*} The tree items of the given parent
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemsOf(args: TreeChildrenOfRequestArgsType) {
@@ -154,8 +153,8 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Requests ancestors of a given item
-	 * @param {UmbTreeAncestorsOfRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbTreeAncestorsOfRequestArgs} args - The request arguments
+	 * @returns {*} The ancestors of the given item
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemAncestors(args: TreeAncestorsOfRequestArgsType) {
@@ -194,7 +193,7 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Returns a promise with an observable of tree root items
-	 * @returns {*}
+	 * @returns {*} An observable of tree root items
 	 * @memberof UmbTreeRepositoryBase
 	 * @deprecated Use `requestTreeRootItems` instead. This method requires the tree store to be available, which is not always the case. It will be removed in Umbraco 18.
 	 */
@@ -206,8 +205,8 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Returns a promise with an observable of children items of a given parent
-	 * @param {(string | null)} parentUnique
-	 * @returns {*}
+	 * @param {(string | null)} parentUnique - The unique identifier of the parent
+	 * @returns {*} An observable of children items of the given parent
 	 * @memberof UmbTreeRepositoryBase
 	 * @deprecated Use `requestTreeItemsOf` instead. This method requires the tree store to be available, which is not always the case. It will be removed in Umbraco 18.
 	 */

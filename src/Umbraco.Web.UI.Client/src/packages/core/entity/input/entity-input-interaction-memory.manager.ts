@@ -36,7 +36,7 @@ export class UmbEntityInputInteractionMemoryManager extends UmbControllerBase {
 				this.#snapshot = memories;
 				this.getHostElement().dispatchEvent(new UmbInteractionMemoriesChangeEvent());
 			},
-			'_observeMemories',
+			null,
 		);
 	}
 

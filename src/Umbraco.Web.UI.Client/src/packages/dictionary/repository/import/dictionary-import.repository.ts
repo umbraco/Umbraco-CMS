@@ -15,9 +15,9 @@ export class UmbDictionaryImportRepository extends UmbRepositoryBase {
 
 	/**
 	 * @description - Import a dictionary
-	 * @param {string} temporaryFileUnique
-	 * @param {string} [parentUnique]
-	 * @returns {*}
+	 * @param {string} temporaryFileUnique - The unique identifier of the uploaded temporary file to import.
+	 * @param {string} [parentUnique] - The unique identifier of the parent to import into, if any.
+	 * @returns {*} The imported dictionary.
 	 * @memberof UmbDictionaryImportRepository
 	 */
 	async requestImport(temporaryFileUnique: string, parentUnique: string | null) {

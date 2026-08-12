@@ -21,9 +21,9 @@ export class UmbRollbackServerDataSource {
 
 	/**
 	 * Get a list of versions for a document
-	 * @param id
-	 * @param culture
-	 * @returns {*}
+	 * @param {string} id - The document unique identifier.
+	 * @param {string} [culture] - The culture to get versions for.
+	 * @returns {*} The versions for the document.
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionsByDocumentId(id: string, culture?: string) {
@@ -32,8 +32,8 @@ export class UmbRollbackServerDataSource {
 
 	/**
 	 * Get a specific version by id
-	 * @param versionId
-	 * @returns {*}
+	 * @param {string} versionId - The version unique identifier.
+	 * @returns {*} The requested version.
 	 * @memberof UmbRollbackServerDataSource
 	 */
 	getVersionById(versionId: string) {

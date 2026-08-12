@@ -1425,8 +1425,10 @@ export default {
 		tabHasNoSortOrder: 'záložka nemá žádné řazení',
 		compositionUsageHeading: 'Kde se toto složení používá?',
 		compositionUsageSpecification: 'Toto složení se v současnosti používá ve složení následujících typů obsahu:',
-		compositionUsageSpecificationMediaType: 'Toto složení se v současnosti používá ve složení následujících typů média:',
-		compositionUsageSpecificationMemberType: 'Toto složení se v současnosti používá ve složení následujících typů člena:',
+		compositionUsageSpecificationMediaType:
+			'Toto složení se v současnosti používá ve složení následujících typů média:',
+		compositionUsageSpecificationMemberType:
+			'Toto složení se v současnosti používá ve složení následujících typů člena:',
 		variantsHeading: 'Povolit různé jazyky',
 		variantsDescription: 'Povolit editorům vytvářet obsah tohoto typu v různých jazycích.',
 		allowVaryByCulture: 'Povolit různé jazyky',

@@ -68,11 +68,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 			'_observeHideTreeItemActions',
 		);
 		this.observe(this._treeContext?.isMenu, (value) => (this._isMenu = value ?? false), '_observeIsMenu');
-		this.observe(
-			this._treeContext?.startNode,
-			(value) => (this._startNode = value),
-			'_observeStartNode',
-		);
+		this.observe(this._treeContext?.startNode, (value) => (this._startNode = value), '_observeStartNode');
 		this.observe(
 			this._treeContext?.startNodes,
 			(value) => (this._startNodes = value ?? []),
@@ -104,11 +100,7 @@ export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 		if ((this._hideTreeRoot || this.#hasStartNode) && this._rootItems.length === 0) {
 			return nothing;
 		}
-		return html`
-			<uui-box>
-				${this.#renderTreeRoot()} ${this.#renderRootItems()}
-			</uui-box>
-		`;
+		return html` <uui-box> ${this.#renderTreeRoot()} ${this.#renderRootItems()} </uui-box> `;
 	}
 
 	#renderTreeRoot() {

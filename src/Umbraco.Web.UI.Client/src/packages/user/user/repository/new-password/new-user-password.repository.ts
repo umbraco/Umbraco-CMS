@@ -22,8 +22,8 @@ export class UmbNewUserPasswordRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Request a new password for a user
-	 * @param {string} userUnique
-	 * @returns {*}
+	 * @param {string} userUnique - The unique id of the user
+	 * @returns {*} The new password
 	 * @memberof UmbNewUserPasswordRepository
 	 */
 	async requestNewPassword(userUnique: string) {

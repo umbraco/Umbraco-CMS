@@ -10,9 +10,10 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
  * @class UmbRelationTypeCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
-export class UmbRelationTypeCollectionServerDataSource
-	implements UmbCollectionDataSource<UmbRelationTypeCollectionItemModel, UmbRelationTypeCollectionFilterModel>
-{
+export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionDataSource<
+	UmbRelationTypeCollectionItemModel,
+	UmbRelationTypeCollectionFilterModel
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -26,8 +27,8 @@ export class UmbRelationTypeCollectionServerDataSource
 
 	/**
 	 * Gets the relation type collection filtered by the given filter.
-	 * @param {UmbRelationTypeCollectionFilterModel} filter
-	 * @returns {*}
+	 * @param {UmbRelationTypeCollectionFilterModel} filter - The filter to apply to the collection.
+	 * @returns {*} The relation type collection.
 	 * @memberof UmbRelationTypeCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbRelationTypeCollectionFilterModel) {

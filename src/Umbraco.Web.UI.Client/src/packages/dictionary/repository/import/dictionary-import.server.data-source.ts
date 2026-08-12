@@ -12,9 +12,9 @@ export class UmbDictionaryImportServerDataSource {
 
 	/**
 	 * @description - Import a dictionary
-	 * @param {string} temporaryFileUnique
-	 * @param {string?} parentUnique
-	 * @returns {*}
+	 * @param {string} temporaryFileUnique - The unique identifier of the uploaded temporary file to import.
+	 * @param {string?} parentUnique - The unique identifier of the parent to import into, if any.
+	 * @returns {*} The imported dictionary.
 	 * @memberof UmbDictionaryImportServerDataSource
 	 */
 	async import(temporaryFileUnique: string, parentUnique: string | null) {

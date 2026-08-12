@@ -238,7 +238,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Inserts text at the current cursor position.
-	 * @param {string} text
+	 * @param {string} text The text to insert.
 	 * @memberof UmbCodeEditorElement
 	 */
 	insert(text: string) {
@@ -247,9 +247,9 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	/**
 	 * Finds all occurrence of the given string or matches the given regular expression.
-	 * @param {string} text
-	 * @param searchOptions
-	 * @returns {*}
+	 * @param {string} text The string or pattern to search for.
+	 * @param {CodeEditorSearchOptions} searchOptions The options to use when searching.
+	 * @returns {*} The ranges of the found matches.
 	 * @memberof UmbCodeEditorElement
 	 */
 	find(text: string, searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{}) {

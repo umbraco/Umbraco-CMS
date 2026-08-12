@@ -26,8 +26,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Creates a new Member Group scaffold
-	 * @param {(string | null)} parentUnique
-	 * @returns { CreateMemberGroupRequestModel }
+	 * @returns { CreateMemberGroupRequestModel } The scaffolded Member Group.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async createScaffold() {
@@ -42,8 +41,8 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Fetches a Member Group with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the Member Group to fetch.
+	 * @returns {*} The Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async read(unique: string) {
@@ -69,8 +68,8 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Inserts a new Member Group on the server
-	 * @param {UmbMemberGroupDetailModel} model
-	 * @returns {*}
+	 * @param {UmbMemberGroupDetailModel} model - The Member Group to create.
+	 * @returns {*} The created Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async create(model: UmbMemberGroupDetailModel) {
@@ -97,9 +96,8 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Updates a MemberGroup on the server
-	 * @param {UmbMemberGroupDetailModel} MemberGroup
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbMemberGroupDetailModel} model - The Member Group to update.
+	 * @returns {*} The updated Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async update(model: UmbMemberGroupDetailModel) {
@@ -128,8 +126,8 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 	/**
 	 * Deletes a Member Group on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the Member Group to delete.
+	 * @returns {*} Undefined if successful, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async delete(unique: string) {

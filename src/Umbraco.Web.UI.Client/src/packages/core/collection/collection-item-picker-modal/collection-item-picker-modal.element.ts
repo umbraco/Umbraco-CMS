@@ -23,6 +23,9 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	private _hasSelection: boolean = false;
 
 	@state()
+	private _selectionCount: number = 0;
+
+	@state()
 	private _isSearchable: boolean = false;
 
 	@state()
@@ -33,9 +36,13 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 	constructor() {
 		super();
 		this.#pickerContext.selection.setSelectable(true);
-		this.observe(this.#pickerContext.selection.hasSelection, (hasSelection) => {
-			this._hasSelection = hasSelection;
-		});
+		this.observe(
+			this.#pickerContext.selection.hasSelection,
+			(hasSelection) => {
+				this._hasSelection = hasSelection;
+			},
+			null,
+		);
 		this.#observePickerSelection();
 		this.#observeSearch();
 	}
@@ -75,6 +82,7 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 		this.observe(
 			this.#pickerContext.selection.selection,
 			(selection) => {
+				this._selectionCount = selection.length;
 				this.updateValue({ selection });
 				this.requestUpdate();
 			},
@@ -120,7 +128,8 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 				headline="${this.localize.term('general_choose')}"
 				?main-no-padding=${renderCollection}
 				class=${classMap({ 'has-search': this._isSearchable, 'is-searching': !!this._searchQuery })}>
-				${this.#renderSearch()} ${this.#renderMain(renderCollection)} ${this.#renderActions()}
+				${this.#renderSearch()} ${this.#renderMain(renderCollection)} ${this.#renderSelectionCount()}
+				${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
@@ -181,6 +190,14 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 		`;
 	}
 
+	#renderSelectionCount() {
+		if (!this._selectionConfiguration.multiple || !this._hasSelection) return nothing;
+
+		return html`
+			<div id="selection-info" slot="footer">${this.localize.term('picker_selectedCount', this._selectionCount)}</div>
+		`;
+	}
+
 	#renderActions() {
 		return html`
 			<div slot="actions">
@@ -218,6 +235,16 @@ export class UmbCollectionItemPickerModalElement extends UmbModalBaseElement<
 				#collection-menu-box {
 					display: none;
 				}
+			}
+
+			#selection-info {
+				display: flex;
+				align-items: center;
+				box-sizing: border-box;
+				width: 100%;
+				padding: var(--uui-size-space-4) var(--uui-size-space-6);
+				background-color: var(--uui-color-selected);
+				color: var(--uui-color-selected-contrast);
 			}
 		`,
 	];

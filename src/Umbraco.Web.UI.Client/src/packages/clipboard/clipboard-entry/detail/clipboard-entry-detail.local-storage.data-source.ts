@@ -12,7 +12,6 @@ import { UmbError } from '@umbraco-cms/backoffice/resources';
 
 /**
  * Manage clipboard entries in local storage
- * @export
  * @class UmbClipboardEntryDetailLocalStorageDataSource
  * @implements {UmbDetailDataSource<UmbClipboardEntryDetailModel>}
  */
@@ -24,8 +23,8 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 
 	/**
 	 * Scaffold a new clipboard entry
-	 * @param {Partial<UmbClipboardEntryDetailModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbClipboardEntryDetailModel>} [preset] Preset values for the new entry.
+	 * @returns {*} The scaffolded clipboard entry.
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
 	async createScaffold(preset: Partial<UmbClipboardEntryDetailModel> = {}) {
@@ -46,7 +45,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 
 	/**
 	 * Create a new clipboard entry in local storage
-	 * @param {UmbClipboardEntryDetailModel} model
+	 * @param {UmbClipboardEntryDetailModel} model The clipboard entry to create.
 	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
@@ -81,7 +80,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 
 	/**
 	 * Read a clipboard entry from local storage
-	 * @param {string} unique
+	 * @param {string} unique The unique id of the clipboard entry.
 	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
@@ -106,7 +105,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 
 	/**
 	 * Update a clipboard entry in local storage
-	 * @param {UmbClipboardEntryDetailModel} model
+	 * @param {UmbClipboardEntryDetailModel} model The clipboard entry to update.
 	 * @returns {*}  {Promise<UmbDataSourceResponse<UmbClipboardEntry>>}
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
@@ -146,7 +145,7 @@ export class UmbClipboardEntryDetailLocalStorageDataSource
 
 	/**
 	 * Delete a clipboard entry from local storage
-	 * @param {string} unique
+	 * @param {string} unique The unique id of the clipboard entry.
 	 * @returns {*}  {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbClipboardEntryDetailLocalStorageDataSource
 	 */
