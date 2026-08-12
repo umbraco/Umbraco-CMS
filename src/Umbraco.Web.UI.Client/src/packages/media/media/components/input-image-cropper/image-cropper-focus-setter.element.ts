@@ -36,7 +36,7 @@ import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
  * @element umb-image-cropper-focus-setter
  * @fires umb-focal-point-change - Dispatched when the focal point changes.
  *
- * @attr {boolean} hide-focal-point - Hides the focal point and disables
+ * @attr {boolean} hideFocalPoint - Hides the focal point and disables
  * interaction with it.
  * @attr {boolean} disabled - Disables focal point interaction.
  * @attr {string} src - The image source URL.
