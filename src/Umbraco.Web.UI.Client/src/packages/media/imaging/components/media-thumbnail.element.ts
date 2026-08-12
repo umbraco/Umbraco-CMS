@@ -154,7 +154,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 			this._thumbnailUrl,
 			(url) =>
 				html`<img
-					id="figure"
+					id="image"
 					part="img"
 					src=${url}
 					alt=${this.alt}
@@ -199,7 +199,7 @@ export class UmbMediaThumbnailElement extends UmbLitElement {
 				margin-bottom: 1em;
 			}
 
-			#figure {
+			#image {
 				display: block;
 				width: 100%;
 				height: 100%;
