@@ -18,6 +18,8 @@ internal sealed class LabelPropertyValueHandler : IPropertyValueHandler, ICorePr
     /// <summary>
     /// Initializes a new instance of the <see cref="LabelPropertyValueHandler"/> class.
     /// </summary>
+    /// <param name="dateTimeOffsetConverter">The converter used to normalize date-typed label values to <see cref="DateTimeOffset"/>.</param>
+    /// <param name="dataTypeConfigurationCache">The cache used to resolve the label's configured underlying value type.</param>
     public LabelPropertyValueHandler(IDateTimeOffsetConverter dateTimeOffsetConverter, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _dateTimeOffsetConverter = dateTimeOffsetConverter;

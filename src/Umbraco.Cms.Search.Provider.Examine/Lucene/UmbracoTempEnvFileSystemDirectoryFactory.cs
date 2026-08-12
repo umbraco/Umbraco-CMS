@@ -17,6 +17,10 @@ public class UmbracoTempEnvFileSystemDirectoryFactory : FileSystemDirectoryFacto
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoTempEnvFileSystemDirectoryFactory"/> class.
     /// </summary>
+    /// <param name="applicationIdentifier">Identifies the running application instance, used to compute the temp-folder path.</param>
+    /// <param name="lockFactory">The lock factory to use for the underlying file system directory.</param>
+    /// <param name="hostingEnvironment">The hosting environment, used to read the site name for the temp-folder path.</param>
+    /// <param name="indexOptions">The Lucene directory index options passed through to the base file system directory factory.</param>
     public UmbracoTempEnvFileSystemDirectoryFactory(
         IApplicationIdentifier applicationIdentifier,
         ILockFactory lockFactory,

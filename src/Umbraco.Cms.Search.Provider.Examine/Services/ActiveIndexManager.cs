@@ -27,6 +27,9 @@ internal sealed class ActiveIndexManager : IActiveIndexManager
     /// Initializes a new instance of the <see cref="ActiveIndexManager"/> class, determining the initial active slot
     /// for each registered index from whichever physical slot already has documents.
     /// </summary>
+    /// <param name="examineManager">The manager used to check each physical slot's document count.</param>
+    /// <param name="logger">The logger used to record rebuild state changes and slot selection.</param>
+    /// <param name="indexOptions">The options listing the registered content indexes to track slots for.</param>
     public ActiveIndexManager(IExamineManager examineManager, ILogger<ActiveIndexManager> logger, IOptions<IndexOptions> indexOptions)
     {
         _logger = logger;

@@ -20,6 +20,9 @@ internal sealed class DeliveryApiContentIndexer : IContentIndexer
     /// <summary>
     /// Initializes a new instance of the <see cref="DeliveryApiContentIndexer"/> class.
     /// </summary>
+    /// <param name="contentIndexHandlerCollection">The collection of Delivery API index handlers to run for each piece of content.</param>
+    /// <param name="dateTimeOffsetConverter">The converter used to normalize indexed date values to <see cref="DateTimeOffset"/>.</param>
+    /// <param name="logger">The logger used to record duplicate or unresolved field values from the index handlers.</param>
     public DeliveryApiContentIndexer(
         ContentIndexHandlerCollection contentIndexHandlerCollection,
         IDateTimeOffsetConverter dateTimeOffsetConverter,

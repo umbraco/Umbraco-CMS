@@ -19,6 +19,10 @@ internal sealed class DistributedContentIndexRefresher : IDistributedContentInde
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedContentIndexRefresher"/> class.
     /// </summary>
+    /// <param name="draftContentNotificationHandler">The handler used to broadcast draft content changes to all servers.</param>
+    /// <param name="publishedContentNotificationHandler">The handler used to broadcast published content changes to all servers.</param>
+    /// <param name="draftMediaNotificationHandler">The handler used to broadcast media changes to all servers.</param>
+    /// <param name="draftMemberNotificationHandler">The handler used to broadcast member changes to all servers.</param>
     public DistributedContentIndexRefresher(
         DraftContentNotificationHandler draftContentNotificationHandler,
         PublishedContentNotificationHandler publishedContentNotificationHandler,

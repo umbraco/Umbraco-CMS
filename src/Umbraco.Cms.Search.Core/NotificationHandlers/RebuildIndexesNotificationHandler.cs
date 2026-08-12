@@ -31,6 +31,10 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
     /// <summary>
     /// Initializes a new instance of the <see cref="RebuildIndexesNotificationHandler"/> class.
     /// </summary>
+    /// <param name="contentIndexingService">The service used to trigger full index rebuilds.</param>
+    /// <param name="contentTypeIndexingService">The service used to re-index content affected by a content/media/member type change.</param>
+    /// <param name="options">The options describing the registered content indexes.</param>
+    /// <param name="coreScopeProvider">The scope provider used to defer actions until the ambient scope completes.</param>
     public RebuildIndexesNotificationHandler(
         IContentIndexingService contentIndexingService,
         IContentTypeIndexingService contentTypeIndexingService,
@@ -46,6 +50,7 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
     /// <summary>
     /// Rebuilds every document index when a language is deleted.
     /// </summary>
+    /// <param name="notification">The notification describing the language change to react to.</param>
     public void Handle(LanguageCacheRefresherNotification notification)
     {
         LanguageCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<LanguageCacheRefresher.JsonPayload>(notification, out var origin);
@@ -66,6 +71,7 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
     /// <summary>
     /// Re-indexes content whose content type structure changed.
     /// </summary>
+    /// <param name="notification">The notification describing the content type change to react to.</param>
     public void Handle(ContentTypeCacheRefresherNotification notification)
     {
         ContentTypeCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<ContentTypeCacheRefresher.JsonPayload>(notification, out var origin);
@@ -76,6 +82,7 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
     /// <summary>
     /// Re-indexes members whose member type structure changed.
     /// </summary>
+    /// <param name="notification">The notification describing the member type change to react to.</param>
     public void Handle(MemberTypeCacheRefresherNotification notification)
     {
         MemberTypeCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<MemberTypeCacheRefresher.JsonPayload>(notification, out var origin);
@@ -86,6 +93,7 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
     /// <summary>
     /// Re-indexes media whose media type structure changed.
     /// </summary>
+    /// <param name="notification">The notification describing the media type change to react to.</param>
     public void Handle(MediaTypeCacheRefresherNotification notification)
     {
         MediaTypeCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<MediaTypeCacheRefresher.JsonPayload>(notification, out var origin);
@@ -96,6 +104,7 @@ internal sealed class RebuildIndexesNotificationHandler : IndexingNotificationHa
     /// <summary>
     /// Rebuilds the index(es) named in an explicit rebuild request.
     /// </summary>
+    /// <param name="notification">The notification describing the rebuild request to react to.</param>
     public void Handle(RebuildIndexCacheRefresherNotification notification)
     {
         RebuildIndexCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<RebuildIndexCacheRefresher.JsonPayload>(notification, out var origin);

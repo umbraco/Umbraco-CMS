@@ -24,6 +24,9 @@ public class ConfigurationEnabledDirectoryFactory : DirectoryFactoryBase
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigurationEnabledDirectoryFactory"/> class.
     /// </summary>
+    /// <param name="services">The service provider used to resolve the configured directory factory implementation.</param>
+    /// <param name="settings">The settings specifying which directory factory to use.</param>
+    /// <param name="applicationRoot">The root directory Lucene indexes are stored under.</param>
     public ConfigurationEnabledDirectoryFactory(
         IServiceProvider services,
         IOptions<ExamineSearchProviderSettings> settings,

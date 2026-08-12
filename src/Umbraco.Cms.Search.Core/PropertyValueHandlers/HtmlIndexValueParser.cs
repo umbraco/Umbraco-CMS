@@ -14,6 +14,7 @@ internal sealed partial class HtmlIndexValueParser : IHtmlIndexValueParser
     /// <summary>
     /// Initializes a new instance of the <see cref="HtmlIndexValueParser"/> class.
     /// </summary>
+    /// <param name="logger">The logger used to record parsing failures.</param>
     public HtmlIndexValueParser(ILogger<HtmlIndexValueParser> logger)
         => _logger = logger;
 

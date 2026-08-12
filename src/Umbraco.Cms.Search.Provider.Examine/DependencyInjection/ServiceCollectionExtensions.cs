@@ -20,6 +20,7 @@ internal static class ServiceCollectionExtensions
     /// Registers Examine itself, the Examine-backed <see cref="IIndexer"/>/<see cref="ISearcher"/> implementations,
     /// and the content index registrations for the built-in document, media, and member indexes.
     /// </summary>
+    /// <param name="services">The service collection to register the Examine search provider's services on.</param>
     public static void AddExamineSearchProviderServices(this IServiceCollection services)
     {
         ServicesCollectionExtensions.AddExamine(services);

@@ -18,6 +18,10 @@ internal sealed class MediaTypeCacheRefresher : PayloadCacheRefresherBase<MediaT
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaTypeCacheRefresher"/> class.
     /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The notification factory.</param>
     public MediaTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         : base(appCaches, serializer, eventAggregator, factory)
     {

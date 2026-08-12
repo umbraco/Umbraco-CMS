@@ -22,6 +22,7 @@ public class IndexDocumentRepository : IIndexDocumentRepository
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexDocumentRepository"/> class.
     /// </summary>
+    /// <param name="scopeAccessor">The accessor used to obtain the ambient database scope.</param>
     public IndexDocumentRepository(IScopeAccessor scopeAccessor)
     {
         _scopeAccessor = scopeAccessor;

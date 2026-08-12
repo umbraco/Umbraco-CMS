@@ -13,6 +13,9 @@ internal sealed class MemberTypeNotificationHandler : ContentNotificationHandler
     /// <summary>
     /// Initializes a new instance of the <see cref="MemberTypeNotificationHandler"/> class.
     /// </summary>
+    /// <param name="distributedCache">The distributed cache used to broadcast the paired cache refresher notification.</param>
+    /// <param name="originProvider">The provider of the current server origin.</param>
+    /// <param name="indexDocumentService">The service used to flush the change-detection cache for affected documents.</param>
     public MemberTypeNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,

@@ -17,6 +17,9 @@ internal sealed class ContentProtectionProvider : IContentProtectionProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentProtectionProvider"/> class.
     /// </summary>
+    /// <param name="publicAccessService">The service used to look up the public access entry for a content item's path.</param>
+    /// <param name="memberService">The service used to resolve member keys from usernames.</param>
+    /// <param name="memberGroupService">The service used to resolve member group keys from role names.</param>
     public ContentProtectionProvider(IPublicAccessService publicAccessService, IMemberService memberService, IMemberGroupService memberGroupService)
     {
         _publicAccessService = publicAccessService;

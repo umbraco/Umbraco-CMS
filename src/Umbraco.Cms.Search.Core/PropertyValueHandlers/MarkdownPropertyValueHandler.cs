@@ -14,6 +14,7 @@ internal sealed class MarkdownPropertyValueHandler : IPropertyValueHandler, ICor
     /// <summary>
     /// Initializes a new instance of the <see cref="MarkdownPropertyValueHandler"/> class.
     /// </summary>
+    /// <param name="htmlIndexValueParser">The parser used to extract indexable text from the markdown, once converted to HTML.</param>
     public MarkdownPropertyValueHandler(IHtmlIndexValueParser htmlIndexValueParser)
         => _htmlIndexValueParser = htmlIndexValueParser;
 

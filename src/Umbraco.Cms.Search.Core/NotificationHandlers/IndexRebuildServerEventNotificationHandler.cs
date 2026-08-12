@@ -17,6 +17,7 @@ internal sealed class IndexRebuildServerEventNotificationHandler :
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexRebuildServerEventNotificationHandler"/> class.
     /// </summary>
+    /// <param name="serverEventRouter">The router used to broadcast server events to the backoffice UI.</param>
     public IndexRebuildServerEventNotificationHandler(IServerEventRouter serverEventRouter)
     {
         _serverEventRouter = serverEventRouter;
@@ -25,6 +26,8 @@ internal sealed class IndexRebuildServerEventNotificationHandler :
     /// <summary>
     /// Broadcasts an "IndexRebuildStarting" server event for the index that is about to be rebuilt.
     /// </summary>
+    /// <param name="notification">The notification describing the index rebuild that is starting.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public async Task HandleAsync(IndexRebuildStartingNotification notification, CancellationToken cancellationToken)
     {
         await _serverEventRouter.BroadcastEventAsync(new ServerEvent
@@ -37,6 +40,8 @@ internal sealed class IndexRebuildServerEventNotificationHandler :
     /// <summary>
     /// Broadcasts an "IndexRebuildCompleted" server event for the index that finished rebuilding.
     /// </summary>
+    /// <param name="notification">The notification describing the index rebuild that completed.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public async Task HandleAsync(IndexRebuildCompletedNotification notification, CancellationToken cancellationToken)
     {
         await _serverEventRouter.BroadcastEventAsync(new ServerEvent

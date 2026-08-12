@@ -19,6 +19,8 @@ internal sealed class TagsPropertyValueHandler : IPropertyValueHandler, ICorePro
     /// <summary>
     /// Initializes a new instance of the <see cref="TagsPropertyValueHandler"/> class.
     /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer used to deserialize JSON-stored tag values.</param>
+    /// <param name="dataTypeConfigurationCache">The cache used to resolve the property's tag configuration (storage type and delimiter).</param>
     public TagsPropertyValueHandler(IJsonSerializer jsonSerializer, IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _jsonSerializer = jsonSerializer;

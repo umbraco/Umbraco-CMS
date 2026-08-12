@@ -14,6 +14,9 @@ internal sealed class ContentTypeNotificationHandler
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeNotificationHandler"/> class.
     /// </summary>
+    /// <param name="distributedCache">The distributed cache used to broadcast the paired cache refresher notification.</param>
+    /// <param name="originProvider">The provider of the current server origin.</param>
+    /// <param name="indexDocumentService">The service used to flush the change-detection cache for affected documents.</param>
     public ContentTypeNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,

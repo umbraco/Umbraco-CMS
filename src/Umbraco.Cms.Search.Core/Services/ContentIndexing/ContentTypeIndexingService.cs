@@ -23,6 +23,15 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeIndexingService"/> class.
     /// </summary>
+    /// <param name="contentIndexingService">The service used to queue the resulting content changes for indexing.</param>
+    /// <param name="indexDocumentService">The service used to flush stale document snapshots before re-indexing.</param>
+    /// <param name="contentTypeService">The service used to resolve document type IDs and compositions.</param>
+    /// <param name="contentService">The service used to page through documents of the given types.</param>
+    /// <param name="mediaTypeService">The service used to resolve media type IDs and compositions.</param>
+    /// <param name="mediaService">The service used to page through media of the given types.</param>
+    /// <param name="memberTypeService">The service used to resolve member type IDs and compositions.</param>
+    /// <param name="memberService">The service used to retrieve members of the given types.</param>
+    /// <param name="backgroundTaskQueue">The queue used to run the re-index work in the background.</param>
     public ContentTypeIndexingService(
         IContentIndexingService contentIndexingService,
         IIndexDocumentService indexDocumentService,

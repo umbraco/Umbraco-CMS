@@ -24,6 +24,9 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentSearchServiceBase{TContent}"/> class.
     /// </summary>
+    /// <param name="idKeyMap">The map used to resolve between numeric IDs and keys.</param>
+    /// <param name="searcher">The searcher used to query the search index.</param>
+    /// <param name="logger">The logger used to record warnings when a parent key cannot be resolved.</param>
     protected ContentSearchServiceBase(IIdKeyMap idKeyMap, ISearcher searcher, ILogger<ContentSearchServiceBase<TContent>> logger)
     {
         _idKeyMap = idKeyMap;

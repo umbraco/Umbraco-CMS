@@ -23,6 +23,10 @@ internal sealed class PublicAccessNotificationHandler : ContentNotificationHandl
     /// <summary>
     /// Initializes a new instance of the <see cref="PublicAccessNotificationHandler"/> class.
     /// </summary>
+    /// <param name="distributedCache">The distributed cache used to broadcast the paired cache refresher notification.</param>
+    /// <param name="originProvider">The provider of the current server origin.</param>
+    /// <param name="indexDocumentService">The service used to flush the change-detection cache for affected documents.</param>
+    /// <param name="idKeyMap">The map used to resolve the protected content node's key from its numeric ID.</param>
     public PublicAccessNotificationHandler(
         DistributedCache distributedCache,
         IOriginProvider originProvider,

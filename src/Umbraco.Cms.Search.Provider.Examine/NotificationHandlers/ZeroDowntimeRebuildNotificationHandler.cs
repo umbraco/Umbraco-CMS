@@ -23,6 +23,10 @@ internal sealed class ZeroDowntimeRebuildNotificationHandler :
     /// <summary>
     /// Initializes a new instance of the <see cref="ZeroDowntimeRebuildNotificationHandler"/> class.
     /// </summary>
+    /// <param name="activeIndexManager">The manager used to track and swap the active/shadow index slots.</param>
+    /// <param name="examineManager">The manager used to check the shadow index's existence and document count.</param>
+    /// <param name="indexCommitMonitor">The monitor used to wait for the shadow index's Lucene commit before swapping.</param>
+    /// <param name="logger">The logger used to record the outcome of the shadow index swap.</param>
     public ZeroDowntimeRebuildNotificationHandler(
         IActiveIndexManager activeIndexManager,
         IExamineManager examineManager,

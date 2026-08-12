@@ -16,6 +16,8 @@ internal sealed class PublicAccessIndexingNotificationHandler : IndexingNotifica
     /// <summary>
     /// Initializes a new instance of the <see cref="PublicAccessIndexingNotificationHandler"/> class.
     /// </summary>
+    /// <param name="coreScopeProvider">The scope provider used to defer actions until the ambient scope completes.</param>
+    /// <param name="contentIndexingService">The service used to re-index the affected content.</param>
     public PublicAccessIndexingNotificationHandler(ICoreScopeProvider coreScopeProvider, IContentIndexingService contentIndexingService)
         : base(coreScopeProvider)
         => _contentIndexingService = contentIndexingService;
@@ -23,6 +25,8 @@ internal sealed class PublicAccessIndexingNotificationHandler : IndexingNotifica
     /// <summary>
     /// Re-indexes the content whose public access protection changed, including descendants.
     /// </summary>
+    /// <param name="notification">The notification describing the public access change to react to.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public Task HandleAsync(PublicAccessDetailedCacheRefresherNotification notification, CancellationToken cancellationToken)
     {
         PublicAccessDetailedCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<PublicAccessDetailedCacheRefresher.JsonPayload>(notification, out var origin);

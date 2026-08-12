@@ -15,6 +15,7 @@ internal sealed class KeywordStringPropertyValueHandler : IPropertyValueHandler,
     /// <summary>
     /// Initializes a new instance of the <see cref="KeywordStringPropertyValueHandler"/> class.
     /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer used to deserialize JSON-stored multi-value selections.</param>
     public KeywordStringPropertyValueHandler(IJsonSerializer jsonSerializer)
         => _jsonSerializer = jsonSerializer;
 

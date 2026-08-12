@@ -17,6 +17,7 @@ public class UmbracoApplicationRoot : IApplicationRoot
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoApplicationRoot"/> class.
     /// </summary>
+    /// <param name="hostingEnvironment">The hosting environment used to resolve the TEMP folder path.</param>
     public UmbracoApplicationRoot(IHostingEnvironment hostingEnvironment)
         => _hostingEnvironment = hostingEnvironment;
 

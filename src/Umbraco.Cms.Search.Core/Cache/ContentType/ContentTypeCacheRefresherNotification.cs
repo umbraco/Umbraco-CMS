@@ -11,6 +11,8 @@ internal sealed class ContentTypeCacheRefresherNotification : CacheRefresherNoti
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeCacheRefresherNotification"/> class.
     /// </summary>
+    /// <param name="messageObject">The payload containing information about what to refresh.</param>
+    /// <param name="messageType">The type of cache refresh operation.</param>
     public ContentTypeCacheRefresherNotification(object messageObject, MessageType messageType)
         : base(messageObject, messageType)
     {

@@ -18,6 +18,9 @@ internal sealed class ContentIndexingDataCollectionService : IContentIndexingDat
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentIndexingDataCollectionService"/> class.
     /// </summary>
+    /// <param name="contentIndexers">The registered content indexers, each contributing a slice of the resulting index fields.</param>
+    /// <param name="logger">The logger used to record duplicate field values across indexers.</param>
+    /// <param name="indexDocumentService">The service used to look up and persist index document snapshots for change detection.</param>
     public ContentIndexingDataCollectionService(IEnumerable<IContentIndexer> contentIndexers, ILogger<ContentIndexingDataCollectionService> logger, IIndexDocumentService indexDocumentService)
     {
         _contentIndexers = contentIndexers.ToHashSet();

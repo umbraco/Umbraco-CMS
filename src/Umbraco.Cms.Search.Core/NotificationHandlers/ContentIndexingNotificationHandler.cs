@@ -24,6 +24,8 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentIndexingNotificationHandler"/> class.
     /// </summary>
+    /// <param name="coreScopeProvider">The scope provider used to defer actions until the ambient scope completes.</param>
+    /// <param name="contentIndexingService">The service used to re-index the affected content, media or members.</param>
     public ContentIndexingNotificationHandler(
         ICoreScopeProvider coreScopeProvider,
         IContentIndexingService contentIndexingService)
@@ -33,6 +35,7 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
     /// <summary>
     /// Re-indexes published content affected by the notified changes.
     /// </summary>
+    /// <param name="notification">The notification describing the published content changes to react to.</param>
     public void Handle(PublishedContentCacheRefresherNotification notification)
     {
         PublishedContentCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<PublishedContentCacheRefresher.JsonPayload>(notification, out var origin);
@@ -46,6 +49,7 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
     /// <summary>
     /// Re-indexes draft content affected by the notified changes.
     /// </summary>
+    /// <param name="notification">The notification describing the draft content changes to react to.</param>
     public void Handle(DraftContentCacheRefresherNotification notification)
     {
         DraftContentCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<DraftContentCacheRefresher.JsonPayload>(notification, out var origin);
@@ -59,6 +63,7 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
     /// <summary>
     /// Re-indexes media affected by the notified changes.
     /// </summary>
+    /// <param name="notification">The notification describing the media changes to react to.</param>
     public void Handle(DraftMediaCacheRefresherNotification notification)
     {
         DraftMediaCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<DraftMediaCacheRefresher.JsonPayload>(notification, out var origin);
@@ -73,6 +78,7 @@ internal sealed class ContentIndexingNotificationHandler : IndexingNotificationH
     /// <summary>
     /// Re-indexes members affected by the notified changes.
     /// </summary>
+    /// <param name="notification">The notification describing the member changes to react to.</param>
     public void Handle(DraftMemberCacheRefresherNotification notification)
     {
         DraftMemberCacheRefresher.JsonPayload[] payloads = GetNotificationPayloads<DraftMemberCacheRefresher.JsonPayload>(notification, out var origin);

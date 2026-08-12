@@ -34,6 +34,9 @@ public class Searcher : IExamineSearcher
     /// <summary>
     /// Initializes a new instance of the <see cref="Searcher"/> class.
     /// </summary>
+    /// <param name="examineManager">The manager used to resolve the physical index to query.</param>
+    /// <param name="searcherOptions">The options configuring search-time behavior such as facet limits and text boost factors.</param>
+    /// <param name="activeIndexManager">The manager used to resolve the currently active physical index for an index alias.</param>
     public Searcher(IExamineManager examineManager, IOptions<SearcherOptions> searcherOptions, IActiveIndexManager activeIndexManager)
     {
         _activeIndexManager = activeIndexManager;

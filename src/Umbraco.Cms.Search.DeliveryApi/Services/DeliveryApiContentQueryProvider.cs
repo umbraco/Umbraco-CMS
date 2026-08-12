@@ -36,6 +36,13 @@ internal sealed class DeliveryApiContentQueryProvider : IApiContentQueryProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="DeliveryApiContentQueryProvider"/> class.
     /// </summary>
+    /// <param name="searcher">The searcher used to execute queries against the search index.</param>
+    /// <param name="contentIndexHandlerCollection">The collection of index handlers used to resolve field types by field name.</param>
+    /// <param name="requestMemberAccessService">The service used to resolve the current request's member access for protected content.</param>
+    /// <param name="memberService">The service used to resolve member group keys for protected content access.</param>
+    /// <param name="publishedContentTypeCache">The cache used to resolve a content type key from an alias.</param>
+    /// <param name="dateTimeOffsetConverter">The converter used to normalize filter date values to <see cref="DateTimeOffset"/>.</param>
+    /// <param name="logger">The logger used to record unresolved or invalid filter/sorter field values.</param>
     public DeliveryApiContentQueryProvider(
         ISearcher searcher,
         ContentIndexHandlerCollection contentIndexHandlerCollection,

@@ -23,6 +23,12 @@ internal sealed class RichTextPropertyValueHandler : BlockEditorPropertyValueHan
     /// <summary>
     /// Initializes a new instance of the <see cref="RichTextPropertyValueHandler"/> class.
     /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer used to deserialize the rich text property's stored value.</param>
+    /// <param name="contentTypeService">The service used to resolve the embedded blocks' element types.</param>
+    /// <param name="propertyEditorCollection">The property editor collection used to resolve each embedded block property's editor.</param>
+    /// <param name="propertyValueHandlerCollection">The property value handler collection used to index each embedded block property's value.</param>
+    /// <param name="htmlIndexValueParser">The parser used to extract indexable, relevance-weighted text from the rich text markup.</param>
+    /// <param name="logger">The logger used to record diagnostic information when indexing the rich text value or its embedded blocks.</param>
     public RichTextPropertyValueHandler(
         IJsonSerializer jsonSerializer,
         IContentTypeService contentTypeService,

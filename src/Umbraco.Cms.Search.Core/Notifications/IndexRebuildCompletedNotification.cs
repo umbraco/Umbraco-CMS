@@ -14,6 +14,7 @@ public sealed class IndexRebuildCompletedNotification : INotification
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexRebuildCompletedNotification"/> class.
     /// </summary>
+    /// <param name="indexAlias">The alias of the index that was rebuilt.</param>
     public IndexRebuildCompletedNotification(string indexAlias)
     {
         IndexAlias = indexAlias;

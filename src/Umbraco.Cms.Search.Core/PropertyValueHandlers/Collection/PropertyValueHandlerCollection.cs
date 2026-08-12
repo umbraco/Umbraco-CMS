@@ -10,6 +10,7 @@ public sealed class PropertyValueHandlerCollection : BuilderCollectionBase<IProp
     /// <summary>
     /// Initializes a new instance of the <see cref="PropertyValueHandlerCollection"/> class.
     /// </summary>
+    /// <param name="items">A factory producing the registered property value handlers.</param>
     public PropertyValueHandlerCollection(Func<IEnumerable<IPropertyValueHandler>> items)
         : base(items)
     {

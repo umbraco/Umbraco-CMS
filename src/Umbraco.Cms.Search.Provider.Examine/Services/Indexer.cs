@@ -22,6 +22,9 @@ public class Indexer : IExamineIndexer
     /// <summary>
     /// Initializes a new instance of the <see cref="Indexer"/> class.
     /// </summary>
+    /// <param name="examineManager">The manager used to resolve the physical index to write to.</param>
+    /// <param name="fieldOptions">The field configuration used to determine which extra keyword fields to index.</param>
+    /// <param name="activeIndexManager">The manager used to resolve the current write target and rebuild state for an index alias.</param>
     public Indexer(IExamineManager examineManager, IOptions<FieldOptions> fieldOptions, IActiveIndexManager activeIndexManager)
     {
         _examineManager = examineManager;
@@ -137,6 +140,10 @@ public class Indexer : IExamineIndexer
     /// <summary>
     /// Merges two value collections by concatenating and removing duplicates.
     /// </summary>
+    /// <typeparam name="T">The type of the values being merged.</typeparam>
+    /// <param name="one">The first collection, or null.</param>
+    /// <param name="other">The second collection, or null.</param>
+    /// <returns>The distinct union of both collections, or null if both are null.</returns>
     protected static IEnumerable<T>? MergeValues<T>(IEnumerable<T>? one, IEnumerable<T>? other)
     {
         IEnumerable<T>? list = one;

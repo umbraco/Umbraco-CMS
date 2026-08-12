@@ -17,6 +17,7 @@ internal sealed class MultiUrlPickerPropertyValueHandler : IPropertyValueHandler
     /// <summary>
     /// Initializes a new instance of the <see cref="MultiUrlPickerPropertyValueHandler"/> class.
     /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer used to deserialize the picked links.</param>
     public MultiUrlPickerPropertyValueHandler(IJsonSerializer jsonSerializer)
         => _jsonSerializer = jsonSerializer;
 

@@ -15,6 +15,7 @@ internal abstract class IndexingNotificationHandlerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexingNotificationHandlerBase"/> class.
     /// </summary>
+    /// <param name="coreScopeProvider">The scope provider used to defer actions until the ambient scope completes.</param>
     protected IndexingNotificationHandlerBase(ICoreScopeProvider coreScopeProvider)
         => _coreScopeProvider = coreScopeProvider;
 

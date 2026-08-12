@@ -25,6 +25,12 @@ internal sealed class SearchEnabledPublishedContentQuery : PublishedContentQuery
     /// <summary>
     /// Initializes a new instance of the <see cref="SearchEnabledPublishedContentQuery"/> class.
     /// </summary>
+    /// <param name="searcherResolver">The resolver used to obtain the searcher for an index alias.</param>
+    /// <param name="variationContextAccessor">The accessor used to resolve the ambient culture when searching all cultures.</param>
+    /// <param name="publishedContent">The published content cache used to hydrate search results.</param>
+    /// <param name="publishedMediaCache">The published media cache, passed through to the base implementation.</param>
+    /// <param name="documentNavigationQueryService">The document navigation service, passed through to the base implementation.</param>
+    /// <param name="mediaNavigationQueryService">The media navigation service, passed through to the base implementation.</param>
     public SearchEnabledPublishedContentQuery(
         ISearcherResolver searcherResolver,
         IVariationContextAccessor variationContextAccessor,

@@ -32,6 +32,15 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishedContentChangeStrategy"/> class.
     /// </summary>
+    /// <param name="contentIndexingDataCollectionService">The service used to collect the index fields for a content item.</param>
+    /// <param name="contentProtectionProvider">The provider used to resolve public-access protection metadata for documents.</param>
+    /// <param name="contentService">The service used to retrieve documents and enumerate the document tree.</param>
+    /// <param name="mediaService">The service used to retrieve media and enumerate the media tree.</param>
+    /// <param name="memberService">The service used to retrieve members.</param>
+    /// <param name="eventAggregator">The event aggregator used to publish the cancelable content indexing notification.</param>
+    /// <param name="umbracoDatabaseFactory">The database factory passed to the base class for paged descendant enumeration.</param>
+    /// <param name="idKeyMap">The map passed to the base class for resolving root item keys.</param>
+    /// <param name="logger">The logger used to record unsupported index object types.</param>
     public PublishedContentChangeStrategy(
         IContentIndexingDataCollectionService contentIndexingDataCollectionService,
         IContentProtectionProvider contentProtectionProvider,

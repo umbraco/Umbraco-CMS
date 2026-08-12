@@ -15,6 +15,8 @@ internal sealed class IndexCommitMonitor : IIndexCommitMonitor
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexCommitMonitor"/> class.
     /// </summary>
+    /// <param name="examineManager">The manager used to resolve the Lucene index to wait on.</param>
+    /// <param name="logger">The logger used to record when an index cannot be accessed or fails to commit in time.</param>
     public IndexCommitMonitor(IExamineManager examineManager, ILogger<IndexCommitMonitor> logger)
     {
         _examineManager = examineManager;

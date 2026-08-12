@@ -11,6 +11,8 @@ internal sealed class PublishedContentCacheRefresherNotification : CacheRefreshe
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishedContentCacheRefresherNotification"/> class.
     /// </summary>
+    /// <param name="messageObject">The payload carried by the notification.</param>
+    /// <param name="messageType">The type of the message, determining how <paramref name="messageObject"/> is interpreted.</param>
     public PublishedContentCacheRefresherNotification(object messageObject, MessageType messageType)
         : base(messageObject, messageType)
     {

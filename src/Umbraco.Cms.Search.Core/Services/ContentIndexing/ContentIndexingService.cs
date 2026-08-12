@@ -28,6 +28,12 @@ internal sealed class ContentIndexingService : IContentIndexingService
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentIndexingService"/> class.
     /// </summary>
+    /// <param name="backgroundTaskQueue">The queue used to run indexing and rebuild work in the background.</param>
+    /// <param name="eventAggregator">The event aggregator used to publish rebuild starting/completed notifications.</param>
+    /// <param name="logger">The logger used to record unresolvable strategies/indexers.</param>
+    /// <param name="indexOptions">The registered content index configuration.</param>
+    /// <param name="serviceProvider">The service provider used to resolve the strategy and indexer types registered for each index.</param>
+    /// <param name="originProvider">The provider used to determine the current server's origin for same-origin filtering.</param>
     public ContentIndexingService(
         IBackgroundTaskQueue backgroundTaskQueue,
         IEventAggregator eventAggregator,

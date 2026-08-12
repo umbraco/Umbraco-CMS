@@ -20,6 +20,7 @@ internal sealed class MultiNodeTreePickerPropertyValueHandler : IPropertyValueHa
     /// <summary>
     /// Initializes a new instance of the <see cref="MultiNodeTreePickerPropertyValueHandler"/> class.
     /// </summary>
+    /// <param name="dataTypeConfigurationCache">The cache used to resolve the picker's configured tree source object type.</param>
     public MultiNodeTreePickerPropertyValueHandler(IDataTypeConfigurationCache dataTypeConfigurationCache)
         => _dataTypeConfigurationCache = dataTypeConfigurationCache;
 

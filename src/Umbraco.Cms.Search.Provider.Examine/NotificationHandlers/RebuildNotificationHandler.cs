@@ -25,6 +25,12 @@ public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicatio
     /// <summary>
     /// Initializes a new instance of the <see cref="RebuildNotificationHandler"/> class.
     /// </summary>
+    /// <param name="examineManager">The manager used to check whether an index's active physical index already exists.</param>
+    /// <param name="activeIndexManager">The manager used to resolve an index alias to its currently active physical index name.</param>
+    /// <param name="contentIndexingService">The service used to trigger a rebuild of a missing index.</param>
+    /// <param name="options">The options listing the registered content indexes to check on startup.</param>
+    /// <param name="logger">The logger used to record which indexes are being rebuilt.</param>
+    /// <param name="originProvider">The provider used to obtain the current server origin for the rebuild.</param>
     public RebuildNotificationHandler(
         IExamineManager examineManager,
         IActiveIndexManager activeIndexManager,

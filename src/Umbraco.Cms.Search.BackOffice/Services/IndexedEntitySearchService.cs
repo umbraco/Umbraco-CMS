@@ -28,6 +28,11 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexedEntitySearchService"/> class.
     /// </summary>
+    /// <param name="searcherResolver">The resolver used to obtain the searcher for an index alias.</param>
+    /// <param name="entityService">The service used to retrieve and hydrate matching entities.</param>
+    /// <param name="backOfficeSecurityAccessor">The accessor used to obtain the current backoffice user.</param>
+    /// <param name="appCaches">The caches used when calculating the current user's start nodes.</param>
+    /// <param name="idKeyMap">The map used to resolve between numeric IDs and keys.</param>
     public IndexedEntitySearchService(ISearcherResolver searcherResolver, IEntityService entityService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor, AppCaches appCaches, IIdKeyMap idKeyMap)
     {
         _searcherResolver = searcherResolver;

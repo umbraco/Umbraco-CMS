@@ -29,6 +29,14 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
     /// <summary>
     /// Initializes a new instance of the <see cref="DraftContentChangeStrategy"/> class.
     /// </summary>
+    /// <param name="contentIndexingDataCollectionService">The service used to collect the index fields for a content item.</param>
+    /// <param name="contentService">The service used to retrieve documents and enumerate the document tree, including the recycle bin.</param>
+    /// <param name="mediaService">The service used to retrieve media and enumerate the media tree, including the recycle bin.</param>
+    /// <param name="memberService">The service used to retrieve members.</param>
+    /// <param name="eventAggregator">The event aggregator used to publish the cancelable content indexing notification.</param>
+    /// <param name="umbracoDatabaseFactory">The database factory passed to the base class for paged descendant enumeration.</param>
+    /// <param name="idKeyMap">The map passed to the base class for resolving root item keys.</param>
+    /// <param name="logger">The logger passed to the base class for logging warnings and rebuild cancellations.</param>
     public DraftContentChangeStrategy(
         IContentIndexingDataCollectionService contentIndexingDataCollectionService,
         IContentService contentService,

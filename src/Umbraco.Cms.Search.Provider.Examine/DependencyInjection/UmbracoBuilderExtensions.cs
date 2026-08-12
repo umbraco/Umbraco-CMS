@@ -32,6 +32,8 @@ public static class UmbracoBuilderExtensions
     /// <remarks>
     /// This method is idempotent - calling it multiple times has no effect after the first call.
     /// </remarks>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <returns>The Umbraco builder.</returns>
     public static IUmbracoBuilder AddExamineSearchProvider(this IUmbracoBuilder builder)
     {
         // Idempotency check - safe to call multiple times.

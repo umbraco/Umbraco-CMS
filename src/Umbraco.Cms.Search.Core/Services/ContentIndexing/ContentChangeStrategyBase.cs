@@ -30,6 +30,9 @@ internal abstract class ContentChangeStrategyBase
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentChangeStrategyBase"/> class.
     /// </summary>
+    /// <param name="umbracoDatabaseFactory">The database factory used to build queries for paged descendant enumeration.</param>
+    /// <param name="idKeyMap">The map used to resolve a root item's key to its numeric ID.</param>
+    /// <param name="logger">The logger used to record unresolvable root IDs and rebuild cancellations.</param>
     protected ContentChangeStrategyBase(
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IIdKeyMap idKeyMap,

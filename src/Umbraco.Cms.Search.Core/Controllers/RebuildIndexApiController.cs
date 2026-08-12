@@ -16,6 +16,7 @@ public class RebuildIndexApiController : ApiControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="RebuildIndexApiController"/> class.
     /// </summary>
+    /// <param name="distributedContentIndexRebuilder">The service used to trigger the rebuild across all servers.</param>
     public RebuildIndexApiController(IDistributedContentIndexRebuilder distributedContentIndexRebuilder)
         => _distributedContentIndexRebuilder = distributedContentIndexRebuilder;
 

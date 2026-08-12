@@ -21,6 +21,8 @@ internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirec
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigureIndexOptions"/> class.
     /// </summary>
+    /// <param name="options">The configured property-to-field mappings to add Lucene field definitions for.</param>
+    /// <param name="settings">The provider settings used to determine whether a snapshot deletion policy is required.</param>
     public ConfigureIndexOptions(IOptions<FieldOptions> options, IOptions<ExamineSearchProviderSettings> settings)
     {
         _examineSearchProviderSettings = settings.Value;

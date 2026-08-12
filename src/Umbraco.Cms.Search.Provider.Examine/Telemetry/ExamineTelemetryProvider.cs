@@ -17,6 +17,7 @@ internal sealed class ExamineTelemetryProvider : IDetailedTelemetryProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="ExamineTelemetryProvider"/> class.
     /// </summary>
+    /// <param name="examineManager">The manager used to count the registered Examine indexes.</param>
     public ExamineTelemetryProvider(IExamineManager examineManager) => _examineManager = examineManager;
 
     /// <summary>

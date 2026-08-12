@@ -17,6 +17,9 @@ internal sealed class DistributedContentIndexRebuilder : IDistributedContentInde
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedContentIndexRebuilder"/> class.
     /// </summary>
+    /// <param name="rebuildIndexNotificationHandler">The handler used to broadcast the rebuild request to all servers.</param>
+    /// <param name="options">The registered content index configuration.</param>
+    /// <param name="logger">The logger used to record when no registration is found for the requested index.</param>
     public DistributedContentIndexRebuilder(
         RebuildIndexNotificationHandler rebuildIndexNotificationHandler,
         IOptions<IndexOptions> options,

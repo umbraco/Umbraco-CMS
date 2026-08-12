@@ -23,6 +23,8 @@ public class GetAllIndexesApiController : ApiControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="GetAllIndexesApiController"/> class.
     /// </summary>
+    /// <param name="indexerResolver">The resolver used to obtain the indexer for each registered index alias.</param>
+    /// <param name="options">The registered content index configuration.</param>
     public GetAllIndexesApiController(IIndexerResolver indexerResolver, IOptions<IndexOptions> options)
     {
         _indexerResolver = indexerResolver;

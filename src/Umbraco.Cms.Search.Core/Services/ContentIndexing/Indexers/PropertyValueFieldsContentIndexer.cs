@@ -22,6 +22,9 @@ internal sealed class PropertyValueFieldsContentIndexer : IContentIndexer
     /// <summary>
     /// Initializes a new instance of the <see cref="PropertyValueFieldsContentIndexer"/> class.
     /// </summary>
+    /// <param name="propertyValueHandlerCollection">The registered property value handlers, one per supported property editor.</param>
+    /// <param name="memberTypeService">The service used to determine whether a member property is sensitive and should be excluded.</param>
+    /// <param name="logger">The logger used to record property editors with no matching value handler.</param>
     public PropertyValueFieldsContentIndexer(
         PropertyValueHandlerCollection propertyValueHandlerCollection,
         IMemberTypeService memberTypeService,

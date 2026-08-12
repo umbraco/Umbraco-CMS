@@ -18,6 +18,10 @@ internal sealed class MemberTypeCacheRefresher : PayloadCacheRefresherBase<Membe
     /// <summary>
     /// Initializes a new instance of the <see cref="MemberTypeCacheRefresher"/> class.
     /// </summary>
+    /// <param name="appCaches">The application caches.</param>
+    /// <param name="serializer">The JSON serializer.</param>
+    /// <param name="eventAggregator">The event aggregator.</param>
+    /// <param name="factory">The notification factory.</param>
     public MemberTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         : base(appCaches, serializer, eventAggregator, factory)
     {

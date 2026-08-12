@@ -17,6 +17,8 @@ internal sealed class DateTimeOffsetPropertyValueHandler : IPropertyValueHandler
     /// <summary>
     /// Initializes a new instance of the <see cref="DateTimeOffsetPropertyValueHandler"/> class.
     /// </summary>
+    /// <param name="dateTimeOffsetConverter">The converter used to normalize <see cref="DateTime"/> property values to <see cref="DateTimeOffset"/>.</param>
+    /// <param name="jsonSerializer">The JSON serializer used to deserialize JSON-stored date/time values.</param>
     public DateTimeOffsetPropertyValueHandler(IDateTimeOffsetConverter dateTimeOffsetConverter, IJsonSerializer jsonSerializer)
     {
         _dateTimeOffsetConverter = dateTimeOffsetConverter;

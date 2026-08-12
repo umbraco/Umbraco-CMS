@@ -23,6 +23,10 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
     /// <summary>
     /// Initializes a new instance of the <see cref="SystemFieldsContentIndexer"/> class.
     /// </summary>
+    /// <param name="idKeyMap">The map used to resolve parent and ancestor keys from numeric IDs.</param>
+    /// <param name="tagService">The service used to retrieve tags for a content item.</param>
+    /// <param name="dateTimeOffsetConverter">The converter used to normalize indexed date values to <see cref="DateTimeOffset"/>.</param>
+    /// <param name="logger">The logger used to record unresolvable parent/ancestor keys and missing culture names.</param>
     public SystemFieldsContentIndexer(
         IIdKeyMap idKeyMap,
         ITagService tagService,

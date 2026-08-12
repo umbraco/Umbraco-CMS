@@ -12,6 +12,9 @@ internal sealed class SearcherResolver : ResolverBase<ISearcher>, ISearcherResol
     /// <summary>
     /// Initializes a new instance of the <see cref="SearcherResolver"/> class.
     /// </summary>
+    /// <param name="indexOptions">The options describing the registered index registrations.</param>
+    /// <param name="serviceProvider">The service provider used to resolve the registered searcher implementation.</param>
+    /// <param name="logger">The logger used to record resolution failures.</param>
     public SearcherResolver(IOptions<IndexOptions> indexOptions, IServiceProvider serviceProvider, ILogger<SearcherResolver> logger)
         : base(indexOptions, serviceProvider, logger)
     {

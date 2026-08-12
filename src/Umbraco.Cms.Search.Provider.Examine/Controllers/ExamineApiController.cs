@@ -22,6 +22,8 @@ public class ExamineApiController : ExamineApiControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="ExamineApiController"/> class.
     /// </summary>
+    /// <param name="examineManager">The manager used to resolve the physical Examine index for an active index name.</param>
+    /// <param name="activeIndexManager">The manager used to resolve an index alias to its currently active physical index name.</param>
     public ExamineApiController(IExamineManager examineManager, IActiveIndexManager activeIndexManager)
     {
         _examineManager = examineManager;

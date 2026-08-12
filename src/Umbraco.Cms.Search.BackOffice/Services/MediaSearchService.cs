@@ -16,6 +16,10 @@ internal sealed class MediaSearchService : ContentSearchServiceBase<IMedia>, IMe
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaSearchService"/> class.
     /// </summary>
+    /// <param name="searcher">The searcher used to query the media index.</param>
+    /// <param name="mediaService">The service used to retrieve media items and their children from the database.</param>
+    /// <param name="idKeyMap">The map used to resolve between media IDs and keys.</param>
+    /// <param name="logger">The logger used to record warnings when a parent key cannot be resolved.</param>
     public MediaSearchService(
         ISearcher searcher,
         IMediaService mediaService,

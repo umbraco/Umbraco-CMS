@@ -24,6 +24,9 @@ public class SearchApiController : ApiControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="SearchApiController"/> class.
     /// </summary>
+    /// <param name="searcherResolver">The resolver used to obtain the searcher for the requested index alias.</param>
+    /// <param name="entityService">The service used to hydrate matching results with entity name and icon.</param>
+    /// <param name="variationContextAccessor">The accessor used to set the culture context for rendering entity names.</param>
     public SearchApiController(
         ISearcherResolver searcherResolver,
         IEntityService entityService,

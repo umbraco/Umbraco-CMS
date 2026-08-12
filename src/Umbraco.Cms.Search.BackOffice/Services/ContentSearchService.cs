@@ -16,6 +16,10 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentSearchService"/> class.
     /// </summary>
+    /// <param name="searcher">The searcher used to query the content index.</param>
+    /// <param name="contentService">The service used to retrieve content items and their children from the database.</param>
+    /// <param name="idKeyMap">The map used to resolve between content IDs and keys.</param>
+    /// <param name="logger">The logger used to record warnings when a parent key cannot be resolved.</param>
     public ContentSearchService(
         ISearcher searcher,
         IContentService contentService,

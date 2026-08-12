@@ -16,6 +16,11 @@ public sealed class ContentIndexingNotification : ICancelableNotification
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentIndexingNotification"/> class.
     /// </summary>
+    /// <param name="indexAlias">The alias of the index the item is being written to.</param>
+    /// <param name="id">The key of the item being indexed.</param>
+    /// <param name="objectType">The entity type of the item being indexed.</param>
+    /// <param name="variations">The culture/segment variations the item is being indexed for.</param>
+    /// <param name="fields">The fields to be written to the index.</param>
     public ContentIndexingNotification(
         string indexAlias,
         Guid id,

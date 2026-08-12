@@ -25,7 +25,7 @@ public interface IPropertyValueHandler : IDiscoverable
     /// <param name="segment">The segment to parse.</param>
     /// <param name="published">Whether to parse the published or draft property value.</param>
     /// <param name="contentContext">The context in which the property exists.</param>
-    /// <returns></returns>
+    /// <returns>The index fields contributed by this handler for the property.</returns>
     /// <remarks>
     /// <paramref name="contentContext"/> is included solely to contextualize the property value. Do not assume that the property is part of <paramref name="contentContext"/>.
     /// For example, properties in block editors will receive the "root content" on which the block editor itself resides as <paramref name="contentContext"/>.

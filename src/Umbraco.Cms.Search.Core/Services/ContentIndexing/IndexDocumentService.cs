@@ -18,6 +18,8 @@ public class IndexDocumentService : IIndexDocumentService
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexDocumentService"/> class.
     /// </summary>
+    /// <param name="scopeProvider">The scope provider used to wrap repository operations in a scope.</param>
+    /// <param name="indexDocumentRepository">The repository used to persist and query index document snapshots.</param>
     public IndexDocumentService(ICoreScopeProvider scopeProvider, IIndexDocumentRepository indexDocumentRepository)
     {
         _scopeProvider = scopeProvider;

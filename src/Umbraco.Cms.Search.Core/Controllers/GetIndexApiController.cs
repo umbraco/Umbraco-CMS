@@ -18,6 +18,7 @@ public class GetIndexApiController : ApiControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="GetIndexApiController"/> class.
     /// </summary>
+    /// <param name="indexerResolver">The resolver used to obtain the indexer for the requested index alias.</param>
     public GetIndexApiController(IIndexerResolver indexerResolver)
         => _indexerResolver = indexerResolver;
 

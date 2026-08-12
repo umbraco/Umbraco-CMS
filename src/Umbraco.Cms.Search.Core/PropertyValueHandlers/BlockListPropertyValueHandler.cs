@@ -15,6 +15,11 @@ internal sealed class BlockListPropertyValueHandler : BlockEditorPropertyValueHa
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockListPropertyValueHandler"/> class.
     /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer used to deserialize the block property's stored value.</param>
+    /// <param name="contentTypeService">The service used to resolve the contained blocks' element types.</param>
+    /// <param name="propertyEditorCollection">The property editor collection used to resolve each contained property's editor.</param>
+    /// <param name="propertyValueHandlerCollection">The property value handler collection used to index each contained property's value.</param>
+    /// <param name="logger">The logger used to record diagnostic information when indexing blocks.</param>
     public BlockListPropertyValueHandler(
         IJsonSerializer jsonSerializer,
         IContentTypeService contentTypeService,
