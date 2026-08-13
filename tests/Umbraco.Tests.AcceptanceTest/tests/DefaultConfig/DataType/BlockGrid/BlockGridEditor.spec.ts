@@ -196,18 +196,15 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-// Still failing, and still NOT shown to be a product bug - do not treat this as one.
-// Three test-side causes have been ruled out:
-//   1. the drag used to start on the block's link, which the sorter marks draggable=false via ignorerSelector;
-//   2. it used to drop onto #add-button rather than the '#blocks' sort container;
-//   3. an empty destination container is not the problem - dropping into a group that already holds a block
-//      fails the same way.
-// The product path also looks intact: both sorters share identifier 'umb-block-type-sorter', and a cross
-// container move calls onContainerChange and onChange, the latter reaching the parent's #onChange which
-// reassigns groupKey. ('container-change' is dispatched with no listener anywhere, but onChange should suffice.)
-// Within-container sorting works - the document type reorder tests pass using the same mouse drag.
-// What remains is either a product limitation in cross-container block sorting or a gap in what the simulated
-// drag delivers; distinguishing the two needs an event-level trace, not more source reading.
+// Verified product bug: a block type card cannot be dragged at all, because its own link hijacks the drag.
+// An event trace of this drag shows dragstart firing on an A element, and the drop reaching the right place
+// (a DIV inside #blocks) - so the target is correct but the payload is not.
+// UmbSorterController marks links non-draggable through setupIgnorerElements, but that uses
+// element.querySelectorAll, which does not pierce shadow DOM. umb-block-type-card renders
+// <uui-card-block-type href=...>, whose anchor lives in that component's own shadow root, so it is never
+// marked draggable=false. The browser therefore starts a native link drag whose dataTransfer has no
+// 'text/umb-sorter-identifier#umb-block-type-sorter' entry, and #itemDraggedOver/#itemDropped ignore it.
+// This affects reordering blocks generally, not just moving them between groups.
 test.skip('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
