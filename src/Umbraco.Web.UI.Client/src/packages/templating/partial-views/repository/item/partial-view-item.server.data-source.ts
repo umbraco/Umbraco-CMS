@@ -19,8 +19,8 @@ export class UmbPartialViewItemServerDataSource
 
 	/**
 	 * Fetches the items for the given uniques from the server
-	 * @param {Array<string>} uniques
-	 * @returns {*}
+	 * @param {Array<string>} uniques - The uniques of the partial views to fetch
+	 * @returns {*} The requested partial view items, or an error
 	 * @memberof UmbPartialViewItemServerDataSource
 	 */
 	async getItems(uniques: Array<string>) {

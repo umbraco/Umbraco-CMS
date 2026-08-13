@@ -41,8 +41,8 @@ export class UmbDocumentBlueprintAuditLogRepository
 
 	/**
 	 * Request the audit log for a document blueprint.
-	 * @param {UmbAuditLogRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbAuditLogRequestArgs} args - The arguments for the audit log request.
+	 * @returns {*} The audit log.
 	 * @memberof UmbDocumentBlueprintAuditLogRepository
 	 */
 	async requestAuditLog(args: UmbAuditLogRequestArgs) {
@@ -51,8 +51,8 @@ export class UmbDocumentBlueprintAuditLogRepository
 
 	/**
 	 * Get the tag style and localization data for a given audit log type.
-	 * @param {string} logType
-	 * @returns {UmbAuditLogTagData}
+	 * @param {string} logType - The type of audit log entry.
+	 * @returns {UmbAuditLogTagData} The tag style and localization data.
 	 * @memberof UmbDocumentBlueprintAuditLogRepository
 	 */
 	getTagStyleAndText(logType: string): UmbAuditLogTagData {

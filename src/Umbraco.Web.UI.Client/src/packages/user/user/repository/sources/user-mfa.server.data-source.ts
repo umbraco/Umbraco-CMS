@@ -20,7 +20,8 @@ export class UmbUserMfaServerDataSource {
 
 	/**
 	 * Request the MFA providers for a user
-	 * @param unique The unique id of the user
+	 * @param {string} unique The unique id of the user
+	 * @returns {*} The MFA providers for the user
 	 * @memberof UmbMfaServerDataSource
 	 */
 	requestMfaProviders(unique: string) {
@@ -36,8 +37,9 @@ export class UmbUserMfaServerDataSource {
 
 	/**
 	 * Disables a MFA provider for a user
-	 * @param unique The unique id of the user
-	 * @param providerName The name of the provider
+	 * @param {string} unique The unique id of the user
+	 * @param {string} providerName The name of the provider
+	 * @returns {*} The result of disabling the MFA provider
 	 * @memberof UmbMfaServerDataSource
 	 */
 	disableMfaProvider(unique: string, providerName: string) {

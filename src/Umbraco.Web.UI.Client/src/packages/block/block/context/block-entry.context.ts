@@ -376,11 +376,15 @@ export abstract class UmbBlockEntryContext<
 				}).warn();
 			}
 			this.#labelRender = new UmbUfmVirtualRenderController(this);
-			this.observe(this.label, (label) => {
-				if (this.#labelRender) {
-					this.#labelRender.markdown = label;
-				}
-			});
+			this.observe(
+				this.label,
+				(label) => {
+					if (this.#labelRender) {
+						this.#labelRender.markdown = label;
+					}
+				},
+				null,
+			);
 			this.#watchContentForLabelRender();
 		}
 

@@ -1,8 +1,9 @@
 import type { JsLoaderPromise } from '../types/utils.js';
 
 /**
- *
- * @param property
+ * Loads a plain JS module from a manifest property.
+ * @param {string | JsLoaderPromise<JsType> | JsType} property The manifest property to load the module from.
+ * @returns {Promise<JsType | undefined>} The resolved module, if found.
  */
 export async function loadManifestPlainJs<JsType>(
 	property: string | JsLoaderPromise<JsType> | JsType,

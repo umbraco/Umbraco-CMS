@@ -30,9 +30,13 @@ export class UmbPropertyEditorUiTiptapElement extends UmbPropertyEditorUiRteElem
 	constructor() {
 		super();
 
-		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (memories) => {
-			this._interactionMemories = memories ?? [];
-		});
+		this.observe(
+			this.#interactionMemoryManager.memoriesForPropertyEditor,
+			(memories) => {
+				this._interactionMemories = memories ?? [];
+			},
+			null,
+		);
 	}
 
 	async #onInteractionMemoriesChange(event: Event) {

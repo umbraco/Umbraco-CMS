@@ -18,8 +18,8 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 export class UmbMemberServerDataSource extends UmbControllerBase implements UmbDetailDataSource<UmbMemberDetailModel> {
 	/**
 	 * Creates a new Member scaffold
-	 * @param {Partial<UmbMemberDetailModel>} [preset]
-	 * @returns { CreateMemberRequestModel }
+	 * @param {Partial<UmbMemberDetailModel>} [preset] - The preset data to populate the scaffold with.
+	 * @returns { CreateMemberRequestModel } The member scaffold.
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async createScaffold(preset: UmbDeepPartialObject<UmbMemberDetailModel> = {}) {
@@ -72,8 +72,8 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 
 	/**
 	 * Fetches a Member with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the member to fetch.
+	 * @returns {*} The member.
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async read(unique: string) {
@@ -134,8 +134,8 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 
 	/**
 	 * Inserts a new Member on the server
-	 * @param {UmbMemberDetailModel} model
-	 * @returns {*}
+	 * @param {UmbMemberDetailModel} model - The member to create.
+	 * @returns {*} The created member.
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async create(model: UmbMemberDetailModel) {
@@ -170,9 +170,8 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 
 	/**
 	 * Updates a Member on the server
-	 * @param {UmbMemberDetailModel} Member
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbMemberDetailModel} model - The member to update.
+	 * @returns {*} The updated member.
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async update(model: UmbMemberDetailModel) {
@@ -209,8 +208,8 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 
 	/**
 	 * Deletes a Member on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the member to delete.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async delete(unique: string) {

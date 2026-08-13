@@ -24,9 +24,8 @@ export class UmbDocumentTypeDetailServerDataSource
 
 	/**
 	 * Creates a new Document Type scaffold
-	 * @param {(string | null)} parentUnique
-	 * @param preset
-	 * @returns { CreateDocumentTypeRequestModel }
+	 * @param {Partial<UmbDocumentTypeDetailModel>} preset - The preset data to populate the scaffold with.
+	 * @returns { CreateDocumentTypeRequestModel } The document type scaffold.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbDocumentTypeDetailModel> = {}) {
@@ -62,8 +61,8 @@ export class UmbDocumentTypeDetailServerDataSource
 
 	/**
 	 * Fetches a Document Type with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the document type to fetch.
+	 * @returns {*} The document type.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async read(unique: string) {
@@ -77,7 +76,7 @@ export class UmbDocumentTypeDetailServerDataSource
 	/**
 	 * Fetches multiple Document Types by their unique IDs from the server
 	 * @param {Array<string>} uniques - The unique IDs of the document types to fetch
-	 * @returns {*}
+	 * @returns {*} The document types.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async readMany(uniques: Array<string>) {
@@ -95,9 +94,9 @@ export class UmbDocumentTypeDetailServerDataSource
 
 	/**
 	 * Inserts a new Document Type on the server
-	 * @param {UmbDocumentTypeDetailModel} model
-	 * @param parentUnique
-	 * @returns {*}
+	 * @param {UmbDocumentTypeDetailModel} model - The document type to create.
+	 * @param {(string | null)} parentUnique - The unique identifier of the parent document type.
+	 * @returns {*} The created document type.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async create(model: UmbDocumentTypeDetailModel, parentUnique: string | null = null) {
@@ -158,9 +157,8 @@ export class UmbDocumentTypeDetailServerDataSource
 
 	/**
 	 * Updates a DocumentType on the server
-	 * @param {UmbDocumentTypeDetailModel} DocumentType
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbDocumentTypeDetailModel} model - The document type to update.
+	 * @returns {*} The updated document type.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async update(model: UmbDocumentTypeDetailModel) {
@@ -226,8 +224,8 @@ export class UmbDocumentTypeDetailServerDataSource
 
 	/**
 	 * Deletes a Document Type on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the document type to delete.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async delete(unique: string) {
