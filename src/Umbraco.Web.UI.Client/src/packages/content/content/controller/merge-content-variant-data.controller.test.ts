@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 import { UmbMergeContentVariantDataController } from './merge-content-variant-data.controller.js';
-import type { UmbContentLikeDetailModel } from '../types.js';
+import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -15,20 +15,19 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 type TestPropertyValueNestedType = {
-	nestedValue: UmbPropertyValueData;
+	nestedValue: UmbPotentialContentValueModel;
 };
 
-export class TestPropertyValueResolver
-	implements
-		UmbPropertyValueResolver<
-			UmbPropertyValueData<TestPropertyValueNestedType>,
-			UmbPropertyValueData,
-			UmbVariantDataModel
-		>
-{
+export class TestPropertyValueResolver implements UmbPropertyValueResolver<
+	UmbPropertyValueData<TestPropertyValueNestedType>,
+	UmbPotentialContentValueModel,
+	UmbVariantDataModel
+> {
 	async processValues(
 		property: UmbPropertyValueData<TestPropertyValueNestedType>,
-		valuesCallback: (values: Array<UmbPropertyValueData>) => Promise<Array<UmbPropertyValueData> | undefined>,
+		valuesCallback: (
+			values: Array<UmbPotentialContentValueModel>,
+		) => Promise<Array<UmbPotentialContentValueModel> | undefined>,
 	) {
 		if (property.value) {
 			const processedValues = await valuesCallback([property.value.nestedValue]);
@@ -46,23 +45,24 @@ export class TestPropertyValueResolver
 }
 
 type TestBlockValueType = {
-	contentData: Array<{ key: string; values: Array<UmbPropertyValueData> }>;
+	contentData: Array<{ key: string; values: Array<UmbPotentialContentValueModel> }>;
 };
 
 /**
  * Mirrors UmbBlockValueResolver._processValueBlockData: the values callback is invoked
  * once per contentData entry, in array order.
  */
-export class TestBlockValueResolver
-	implements
-		UmbPropertyValueResolver<UmbPropertyValueData<TestBlockValueType>, UmbPropertyValueData, UmbVariantDataModel>
-{
+export class TestBlockValueResolver implements UmbPropertyValueResolver<
+	UmbPropertyValueData<TestBlockValueType>,
+	UmbPotentialContentValueModel,
+	UmbVariantDataModel
+> {
 	async processValues(
 		property: UmbPropertyValueData<TestBlockValueType>,
 		valuesCallback: (
-			values: Array<UmbPropertyValueData>,
+			values: Array<UmbPotentialContentValueModel>,
 			groupIdentifier?: string,
-		) => Promise<Array<UmbPropertyValueData> | undefined>,
+		) => Promise<Array<UmbPotentialContentValueModel> | undefined>,
 	) {
 		if (property.value) {
 			const contentData = await Promise.all(
@@ -88,7 +88,7 @@ const blockValue = (contentData: TestBlockValueType['contentData']) => ({
 	value: { contentData },
 });
 
-const innerValue = (culture: string | null, value: string): UmbPropertyValueData => ({
+const innerValue = (culture: string | null, value: string): UmbPotentialContentValueModel => ({
 	editorAlias: 'some-editor',
 	alias: 'text',
 	culture,
