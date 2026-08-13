@@ -4,7 +4,7 @@ import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { filter, firstValueFrom, of } from '@umbraco-cms/backoffice/external/rxjs';
+import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';

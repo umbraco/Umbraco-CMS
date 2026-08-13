@@ -48,7 +48,10 @@ const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
 	const { data, ...rest } = await StaticFileService.getTreeStaticFileRoot({
 		query: { skip, take },
 	});
-	return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+	return {
+		data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+		...rest,
+	};
 };
 
 const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
@@ -62,7 +65,10 @@ const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 		const { data, ...rest } = await StaticFileService.getTreeStaticFileChildren({
 			query: { parentPath, skip, take },
 		});
-		return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+		return {
+			data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+			...rest,
+		};
 	}
 };
 

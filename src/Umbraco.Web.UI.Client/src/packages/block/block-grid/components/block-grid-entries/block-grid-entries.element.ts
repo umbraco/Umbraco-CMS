@@ -402,10 +402,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 					this._layoutEntries,
 					(layout) => layout.key,
 					(layout, index) =>
-						html`<umb-block-grid-entry
-							class="umb-block-grid__layout-item"
-							index=${index}
-							.layout=${layout}>
+						html`<umb-block-grid-entry class="umb-block-grid__layout-item" index=${index} .layout=${layout}>
 						</umb-block-grid-entry> `,
 				)}
 			</div>

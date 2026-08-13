@@ -138,8 +138,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		// Otherwise, show the timeout overlay.
 		if (this.#host.keepUserLoggedIn) {
 			await this.#tryKeepAlive();
-		}
-		else {
+		} else {
 			await this.#openTimeoutModal(secondsRemaining);
 		}
 	}

@@ -2,6 +2,7 @@ import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import { UmbAuthSessionTimeoutController } from './controllers/auth-session-timeout.controller.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { ManifestAuthProvider } from './auth-provider.extension.js';
+import { isReturnableRoute } from './returnable-route.function.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbApiInterceptorController, UMB_AUTH_SIGNALER_CONTEXT } from '@umbraco-cms/backoffice/resources';
@@ -10,9 +11,8 @@ import { ReplaySubject, Subject, distinctUntilChanged, auditTime, map } from '@u
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
-import { isReturnableRoute } from './returnable-route.function.js';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in a @deprecated JSDoc tag
+
 import type { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export interface UmbAuthSession {
@@ -184,6 +184,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @param {string} identityProvider The provider to use for login. Default is 'Umbraco'.
 	 * @param {boolean} redirect If true, the user will be redirected to the login page.
 	 * @param {string} usernameHint The username hint to use for login.
+	 * @param _usernameHint
 	 * @param {ManifestAuthProvider} manifest The manifest for the registered provider.
 	 */
 	async makeAuthorizationRequest(
