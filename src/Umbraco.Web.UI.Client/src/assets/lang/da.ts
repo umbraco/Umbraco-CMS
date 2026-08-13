@@ -2475,13 +2475,13 @@ export default {
 		labelUsedByItems: 'Refereret af',
 		labelDependsOnThis: 'Følgende elementer er afhængige af dette',
 		labelUsedItems: 'Elementer i brug',
-		labelUsedDescendants: 'Efterkommere i brug',
+		labelUsedDescendants: 'Underliggende elementer i brug',
 		labelDependentDescendants: 'Følgende underliggende elementer har afhængigheder',
 		deleteWarning:
-			'Der refereres til dette element eller dets efterfølgere. Sletning kan medføre ødelagte links på dit websted.',
+			'Der refereres til dette element eller dets underliggende elementer. Sletning kan medføre ødelagte links på dit websted.',
 		unpublishWarning:
 			'Der refereres til dette element eller dets underliggende elementer. Hvis det afpubliceres, kan det føre til døde links på dit websted. Foretag venligst de nødvendige tiltag.',
-		deleteDisabledWarning: 'Der refereres til dette element eller dets efterfølgere. Derfor er sletning blevet deaktiveret.',
+		deleteDisabledWarning: 'Der refereres til dette element eller dets underliggende elementer. Derfor er sletning blevet deaktiveret.',
 		listViewDialogWarning: 'Følgende elementer, som du forsøger at %0%, refereres til af andet indhold.',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...og en mere';
