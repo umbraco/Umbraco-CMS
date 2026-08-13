@@ -4072,6 +4072,7 @@ rawData.push({
 	description: null,
 	icon: 'icon-document',
 	allowedAsRoot: true,
+	allowedInLibrary: false,
 	variesByCulture: false,
 	variesBySegment: false,
 	isElement: false,
@@ -4095,6 +4096,7 @@ rawData.push({
 		keepLatestVersionPerDayForDays: null,
 	},
 	flags: [],
+	noAccess: false,
 });
 
 export const data: Array<UmbMockDocumentTypeModel> = rawData.map((dt) => ({
