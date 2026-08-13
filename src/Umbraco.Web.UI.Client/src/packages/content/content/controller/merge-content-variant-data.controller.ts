@@ -21,7 +21,7 @@ function defaultCompareVariantMethod(a: UmbEntityVariantModel, b: UmbEntityVaria
  * @returns {boolean} - true if the two models are equally unique.
  */
 function defaultCompareVariantDataMethod(a: UmbVariantDataModel, b: UmbVariantDataModel) {
-	return a.culture === b.culture && a.segment === b.segment;
+	return a.culture === b.culture;
 }
 
 export class UmbMergeContentVariantDataController extends UmbControllerBase {

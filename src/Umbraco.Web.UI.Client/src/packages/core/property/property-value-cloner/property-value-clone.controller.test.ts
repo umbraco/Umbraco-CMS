@@ -23,14 +23,11 @@ type TestPropertyValueNestedType = TestPropertyValueWithId & {
 	nestedValue?: UmbPropertyValueData<TestPropertyValueWithId>;
 };
 
-export class TestPropertyValueResolver
-	implements
-		UmbPropertyValueResolver<
-			UmbPropertyValueData<TestPropertyValueNestedType>,
-			UmbPropertyValueData,
-			UmbVariantDataModel
-		>
-{
+export class TestPropertyValueResolver implements UmbPropertyValueResolver<
+	UmbPropertyValueData<TestPropertyValueNestedType>,
+	UmbPropertyValueData,
+	UmbVariantDataModel
+> {
 	async processValues(
 		property: UmbPropertyValueData<TestPropertyValueNestedType>,
 		valuesCallback: (values: Array<UmbPropertyValueData>) => Promise<Array<UmbPropertyValueData> | undefined>,
@@ -51,7 +48,7 @@ export class TestPropertyValueResolver
 
 	async processVariants(
 		property: UmbPropertyValueData<TestPropertyValueNestedType>,
-		variantsCallback: (values: Array<UmbVariantDataModel>) => Promise<Array<UmbVariantDataModel> | undefined>,
+		variantsCallback: (variants: Array<UmbVariantDataModel>) => Promise<Array<UmbVariantDataModel> | undefined>,
 	) {
 		return property;
 	}
