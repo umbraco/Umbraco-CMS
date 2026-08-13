@@ -98,6 +98,41 @@ public static class Constants
     }
 
     /// <summary>
+    /// The names of fields written only to member index documents (both content-based members and
+    /// external members), all prefixed with <c>Umb_</c>.
+    /// </summary>
+    public static class MemberFieldNames
+    {
+        private const string FieldPrefix = "Umb_";
+
+        /// <summary>
+        /// The field name for the member's email address.
+        /// </summary>
+        public const string Email = $"{FieldPrefix}Email";
+
+        /// <summary>
+        /// The field name for the member's username.
+        /// </summary>
+        public const string UserName = $"{FieldPrefix}UserName";
+
+        /// <summary>
+        /// The field name indicating whether the member is approved.
+        /// </summary>
+        public const string IsApproved = $"{FieldPrefix}IsApproved";
+
+        /// <summary>
+        /// The field name indicating whether the member is locked out.
+        /// </summary>
+        public const string IsLockedOut = $"{FieldPrefix}IsLockedOut";
+
+        /// <summary>
+        /// The field name indicating whether the member is a lightweight external member
+        /// (as opposed to a content-based member).
+        /// </summary>
+        public const string IsExternalMember = $"{FieldPrefix}IsExternalMember";
+    }
+
+    /// <summary>
     /// API-related constants.
     /// </summary>
     public static class Api

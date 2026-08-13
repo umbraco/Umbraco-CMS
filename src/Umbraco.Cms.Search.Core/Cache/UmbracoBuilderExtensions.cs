@@ -72,6 +72,8 @@ public static class UmbracoBuilderExtensions
 
         builder.AddNotificationHandler<MemberSavedNotification, DraftMemberNotificationHandler>();
         builder.AddNotificationHandler<MemberDeletedNotification, DraftMemberNotificationHandler>();
+        builder.AddNotificationHandler<ExternalMemberSavedNotification, DraftMemberNotificationHandler>();
+        builder.AddNotificationHandler<ExternalMemberDeletedNotification, DraftMemberNotificationHandler>();
 
         builder.AddNotificationHandler<ContentTypeChangedNotification, ContentTypeNotificationHandler>();
         builder.AddNotificationHandler<MediaTypeChangedNotification, MediaTypeNotificationHandler>();

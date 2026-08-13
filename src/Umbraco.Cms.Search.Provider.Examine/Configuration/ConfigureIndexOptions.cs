@@ -43,6 +43,7 @@ internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirec
         options.UseTaxonomyIndex = false;
         AddFields(options, ExamineSystemFieldsOptions(), (field, _) => field.PropertyName);
         AddFields(options, CoreSystemFieldsOptions(), (field, fieldValues) => FieldNameHelper.FieldName(field.PropertyName, fieldValues));
+        AddFields(options, MemberFieldsOptions(), (field, fieldValues) => FieldNameHelper.FieldName(field.PropertyName, fieldValues));
         AddFields(options, _fieldOptions.Fields, (field, fieldValues) => FieldNameHelper.FieldName(field.PropertyName, fieldValues));
 
         if (_examineSearchProviderSettings.LuceneDirectoryFactory == LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory)
@@ -141,6 +142,19 @@ internal sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirec
             // the name keyword bucket enables exact name matching (e.g. Delivery API "name:" Is-filters)
             new() { PropertyName = CoreConstants.FieldNames.Name, FieldValues = FieldValues.Keywords },
             new() { PropertyName = CoreConstants.FieldNames.Tags, FieldValues = FieldValues.Keywords },
+        ];
+
+    // fields written only to member index documents (both content-based and external members)
+    private FieldOptions.Field[] MemberFieldsOptions()
+        =>
+        [
+            new() { PropertyName = CoreConstants.MemberFieldNames.Email, FieldValues = FieldValues.TextsR2 },
+            new() { PropertyName = CoreConstants.MemberFieldNames.Email, FieldValues = FieldValues.Keywords, Sortable = true },
+            new() { PropertyName = CoreConstants.MemberFieldNames.UserName, FieldValues = FieldValues.TextsR2 },
+            new() { PropertyName = CoreConstants.MemberFieldNames.UserName, FieldValues = FieldValues.Keywords, Sortable = true },
+            new() { PropertyName = CoreConstants.MemberFieldNames.IsApproved, FieldValues = FieldValues.Integers },
+            new() { PropertyName = CoreConstants.MemberFieldNames.IsLockedOut, FieldValues = FieldValues.Integers },
+            new() { PropertyName = CoreConstants.MemberFieldNames.IsExternalMember, FieldValues = FieldValues.Keywords },
         ];
 
     private FieldOptions.Field[] ExamineSystemFieldsOptions()

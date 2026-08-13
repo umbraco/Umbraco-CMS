@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Search.Core.Cache.Member;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
@@ -65,6 +66,42 @@ internal sealed class DraftMemberNotificationHandlerTests
         var memberKey = Guid.NewGuid();
         IMember member = Mock.Of<IMember>(x => x.Key == memberKey);
         var notification = new MemberSavedNotification(member, new EventMessages());
+
+        _handler.Handle(notification);
+
+        _indexDocumentServiceMock.Verify(x => x.DeleteAsync(It.Is<Guid[]>(ids => ids.Length == 1 && ids[0] == memberKey), false), Times.Once);
+    }
+
+    [Test]
+    public void Handle_ExternalMember_WhenIndexableFieldsChangedIsExplicitlyFalse_SkipsReindex()
+    {
+        var externalMember = new ExternalMemberIdentity { Key = Guid.NewGuid() };
+        var notification = new ExternalMemberSavedNotification(externalMember, new EventMessages());
+        notification.State[Constants.Conventions.Member.IndexableFieldsChangedStateKey] = false;
+
+        _handler.Handle(notification);
+
+        _indexDocumentServiceMock.Verify(x => x.DeleteAsync(It.IsAny<Guid[]>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
+    public void Handle_ExternalMember_WhenIndexableFieldsChangedStateIsNotSet_ReindexesByDefault()
+    {
+        var memberKey = Guid.NewGuid();
+        var externalMember = new ExternalMemberIdentity { Key = memberKey };
+        var notification = new ExternalMemberSavedNotification(externalMember, new EventMessages());
+
+        _handler.Handle(notification);
+
+        _indexDocumentServiceMock.Verify(x => x.DeleteAsync(It.Is<Guid[]>(ids => ids.Length == 1 && ids[0] == memberKey), false), Times.Once);
+    }
+
+    [Test]
+    public void Handle_ExternalMemberDeleted_FlushesDocumentIndexCache()
+    {
+        var memberKey = Guid.NewGuid();
+        var externalMember = new ExternalMemberIdentity { Key = memberKey };
+        var notification = new ExternalMemberDeletedNotification(externalMember, new EventMessages());
 
         _handler.Handle(notification);
 
