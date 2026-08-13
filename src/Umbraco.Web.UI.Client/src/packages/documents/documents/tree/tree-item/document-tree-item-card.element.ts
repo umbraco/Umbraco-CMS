@@ -132,7 +132,7 @@ export class UmbDocumentTreeItemCardElement extends UmbLitElement {
 	}
 
 	#renderState() {
-		if (!this._state) return nothing;
+		if (this._state === undefined) return nothing;
 		const { color, label } = getDocumentVariantStateTagConfig(this._state, this.localize);
 		return html`<uui-tag slot="tag" color=${color} look="secondary">${label}</uui-tag>`;
 	}

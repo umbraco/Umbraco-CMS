@@ -65,7 +65,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	private _name?: string;
 
 	@state()
-	private _state?: string;
+	private _state?: UmbDocumentVariantState | null;
 
 	@state()
 	private _createDate?: Date;
@@ -87,7 +87,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 		});
 
 		this.#resolver.observe(this.#resolver.name, (name) => (this._name = name || ''));
-		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state || ''));
+		this.#resolver.observe(this.#resolver.state, (state) => (this._state = state));
 		this.#resolver.observe(this.#resolver.createDate, (createDate) => (this._createDate = createDate));
 		this.#resolver.observe(this.#resolver.updateDate, (updateDate) => (this._updateDate = updateDate));
 	}
@@ -172,7 +172,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	}
 
 	#renderState() {
-		if (!this._state) return nothing;
+		if (this._state === undefined) return nothing;
 		const { color, label } = getDocumentVariantStateTagConfig(this._state, this.localize);
 		return html`<uui-tag slot="tag" id="state" color=${color} look="secondary">${label}</uui-tag>`;
 	}
