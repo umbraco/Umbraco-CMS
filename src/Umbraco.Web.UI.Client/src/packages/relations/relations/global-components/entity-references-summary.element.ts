@@ -126,13 +126,17 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 
 	async #loadReferencedElementsWithPendingChangesTotal() {
 		if (!this.includePendingChanges) return;
+		this._totalReferencedElementsWithPendingChanges = await this.#fetchReferencedElementsWithPendingChangesTotal();
+	}
+
+	async #fetchReferencedElementsWithPendingChangesTotal(): Promise<number> {
 		if (!this.#referenceRepository) {
 			throw new Error('Failed to create reference repository.');
 		}
 
 		// If the repository does not have the method, this entity type hasn't opted in to publish-awareness of
 		// its own referenced elements — nothing to report.
-		if (!this.#referenceRepository.requestReferencedElementsWithPendingChanges) return;
+		if (!this.#referenceRepository.requestReferencedElementsWithPendingChanges) return 0;
 
 		if (!this.config?.unique) {
 			throw new Error('Missing unique in config.');
@@ -143,7 +147,7 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 			0,
 			1,
 		);
-		this._totalReferencedElementsWithPendingChanges = data?.total ?? 0;
+		return data?.total ?? 0;
 	}
 
 	#onClickViewAll(event: Event) {

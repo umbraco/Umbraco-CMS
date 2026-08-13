@@ -136,24 +136,30 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 		const repository = await this.#getRepository();
 
 		if (this.#source === 'referencedElementsWithPendingChanges') {
-			// The repository not supporting this lookup at all is not a failure — it just means this entity type
-			// hasn't opted in, so there's nothing to count.
-			if (!repository.requestReferencedElementsWithPendingChanges) return 0;
-
-			const { data, error } = await repository.requestReferencedElementsWithPendingChanges(unique, 0, 1);
-			if (error) {
-				// A 404 means the backend doesn't implement this lookup (yet) rather than something having gone
-				// wrong — treat it the same as the repository not supporting the method at all, so an
-				// incomplete/older backend doesn't force the publish confirmation modal open on every publish.
-				if ((error as { status?: number }).status === 404) return 0;
-				throw error;
-			}
-			return data?.total ?? 0;
+			return this.#requestReferencedElementsWithPendingChangesTotal(repository, unique);
 		}
 
 		const { data, error } = await repository.requestReferencedBy(unique, 0, 1);
 		if (error) throw error;
 		return data?.total ?? 0;
+	}
+
+	async #requestReferencedElementsWithPendingChangesTotal(
+		repository: UmbEntityReferenceRepository,
+		unique: string,
+	): Promise<number> {
+		// The repository not supporting this lookup at all is not a failure — it just means this entity type
+		// hasn't opted in, so there's nothing to count.
+		if (!repository.requestReferencedElementsWithPendingChanges) return 0;
+
+		const { data, error } = await repository.requestReferencedElementsWithPendingChanges(unique, 0, 1);
+		if (!error) return data?.total ?? 0;
+
+		// A 404 means the backend doesn't implement this lookup (yet) rather than something having gone
+		// wrong — treat it the same as the repository not supporting the method at all, so an
+		// incomplete/older backend doesn't force the publish confirmation modal open on every publish.
+		if ((error as { status?: number }).status === 404) return 0;
+		throw error;
 	}
 
 	async #getRepository(): Promise<UmbEntityReferenceRepository> {

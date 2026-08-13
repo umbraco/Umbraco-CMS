@@ -66,7 +66,7 @@ describe('UmbEntityReferencesSummaryElement', () => {
 		document.body.appendChild(element);
 		await aTimeout(0);
 
-		expect(element.shadowRoot?.querySelector('p'), 'summary line').to.equal(null);
+		expect(element.shadowRoot?.querySelector('p'), 'summary line').to.be.null;
 	});
 
 	it('renders the combined referenced-by and descendant totals once references exist', async () => {

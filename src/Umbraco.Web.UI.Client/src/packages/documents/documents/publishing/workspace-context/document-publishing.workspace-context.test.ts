@@ -284,68 +284,71 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 			return opened;
 		}
 
+		let restores: Array<() => void> = [];
+
 		beforeEach(async () => {
 			await context.load(INVARIANT_DOCUMENT_ID);
 			await aTimeout(0);
 		});
 
+		afterEach(() => {
+			restores.forEach((restore) => restore());
+			restores = [];
+		});
+
 		it('publishes immediately, with no modal, when nothing references this document and no referenced element has pending changes', async () => {
 			let published = false;
 			const originalUpdateAndPublish = UmbDocumentPublishingServerDataSource.prototype.updateAndPublish;
+			restores.push(() => {
+				UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = originalUpdateAndPublish;
+			});
 			UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = async function (...args) {
 				published = true;
 				return originalUpdateAndPublish.apply(this, args as never);
 			};
 
-			try {
-				const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
-				expect(opened, 'modal opened').to.be.false;
-				expect(published, 'publish went through').to.be.true;
-			} finally {
-				UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = originalUpdateAndPublish;
-			}
+			const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+			expect(opened, 'modal opened').to.be.false;
+			expect(published, 'publish went through').to.be.true;
 		});
 
 		it('opens the modal when something references this document', async () => {
 			const original = UmbDocumentReferenceRepository.prototype.requestReferencedBy;
+			restores.push(() => {
+				UmbDocumentReferenceRepository.prototype.requestReferencedBy = original;
+			});
 			UmbDocumentReferenceRepository.prototype.requestReferencedBy = async () => ({
 				data: { items: [], total: 1 },
 			});
 
-			try {
-				const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
-				expect(opened, 'modal opened').to.be.true;
-			} finally {
-				UmbDocumentReferenceRepository.prototype.requestReferencedBy = original;
-			}
+			const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+			expect(opened, 'modal opened').to.be.true;
 		});
 
 		it('opens the modal when this document references an element that is not fully published', async () => {
 			const original = UmbDocumentReferenceRepository.prototype.requestReferencedElementsWithPendingChanges;
+			restores.push(() => {
+				UmbDocumentReferenceRepository.prototype.requestReferencedElementsWithPendingChanges = original;
+			});
 			UmbDocumentReferenceRepository.prototype.requestReferencedElementsWithPendingChanges = async () => ({
 				data: { items: [], total: 1 },
 			});
 
-			try {
-				const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
-				expect(opened, 'modal opened').to.be.true;
-			} finally {
-				UmbDocumentReferenceRepository.prototype.requestReferencedElementsWithPendingChanges = original;
-			}
+			const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+			expect(opened, 'modal opened').to.be.true;
 		});
 
 		it('opens the modal rather than risk publishing silently when a reference count lookup fails', async () => {
 			const original = UmbDocumentReferenceRepository.prototype.requestReferencedBy;
+			restores.push(() => {
+				UmbDocumentReferenceRepository.prototype.requestReferencedBy = original;
+			});
 			UmbDocumentReferenceRepository.prototype.requestReferencedBy = async () => {
 				throw new Error('Simulated network error');
 			};
 
-			try {
-				const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
-				expect(opened, 'modal opened').to.be.true;
-			} finally {
-				UmbDocumentReferenceRepository.prototype.requestReferencedBy = original;
-			}
+			const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+			expect(opened, 'modal opened').to.be.true;
 		});
 	});
 });

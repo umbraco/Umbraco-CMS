@@ -164,9 +164,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const unique = this.#documentWorkspaceContext.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
-		const entityType = this.#documentWorkspaceContext.getEntityType();
-		if (!entityType) throw new Error('Entity type is missing');
-
 		const { options, selected } = await this.#determineVariantOptions();
 
 		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
@@ -210,34 +207,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			variantIds,
 			async () => {
 				try {
-					if (!this.#documentWorkspaceContext) {
-						throw new Error('Document workspace context is missing');
-					}
-
-					// Save the document before scheduling
-					await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
-
-					// Schedule the document
-					const { error } = await this.#publishingRepository.publish(unique, variants);
-					if (error) {
-						throw error;
-					}
-
-					const notification = {
-						data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') },
-					};
-					this.#notificationContext?.peek('positive', notification);
-
-					// reload the document so all states are updated after the publish operation
-					// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
-					await this.#documentWorkspaceContext.reload();
-					this.#loadAndProcessLastPublished();
-					this.referenceCount.clear();
-					this.referencedElementsWithPendingChangesCount.clear();
-
-					// request reload of this entity
-					const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
-					this.#eventContext?.dispatchEvent(structureEvent);
+					await this.#performSchedule(variantIds, variants, saveData);
 				} catch (error) {
 					// Notify only on the publish path. The validation-failure path below already
 					// notifies, so a shared top-level .catch would fire a second toast. [JOV]
@@ -259,6 +229,47 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				return Promise.reject(reason);
 			},
 		);
+	}
+
+	async #performSchedule(
+		variantIds: Array<UmbVariantId>,
+		variants: Array<UmbDocumentVariantPublishModel>,
+		saveData: UmbDocumentDetailModel,
+	): Promise<void> {
+		if (!this.#documentWorkspaceContext) {
+			throw new Error('Document workspace context is missing');
+		}
+
+		const unique = this.#documentWorkspaceContext.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		const entityType = this.#documentWorkspaceContext.getEntityType();
+		if (!entityType) throw new Error('Entity type is missing');
+
+		// Save the document before scheduling
+		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+
+		// Schedule the document
+		const { error } = await this.#publishingRepository.publish(unique, variants);
+		if (error) {
+			throw error;
+		}
+
+		const notification = {
+			data: { message: this.#localize.term('speechBubbles_editContentScheduledSavedText') },
+		};
+		this.#notificationContext?.peek('positive', notification);
+
+		// reload the document so all states are updated after the publish operation
+		// TODO: It seems wrong to make a full reload, In this case I think we can just update the variants status? [NL]
+		await this.#documentWorkspaceContext.reload();
+		this.#loadAndProcessLastPublished();
+		this.referenceCount.clear();
+		this.referencedElementsWithPendingChangesCount.clear();
+
+		// request reload of this entity
+		const structureEvent = new UmbRequestReloadStructureForEntityEvent({ entityType, unique });
+		this.#eventContext?.dispatchEvent(structureEvent);
 	}
 
 	/**
@@ -711,8 +722,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				}
 
 				this.#currentUnique = unique;
-				this.referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
-				this.referencedElementsWithPendingChangesCount.setUnique(unique ?? undefined).catch(() => undefined);
+				this.#syncReferenceCounts(unique);
 
 				if (isNew === false && unique) {
 					this.#loadAndProcessLastPublished().catch(() => undefined);
@@ -756,6 +766,11 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			},
 			'umbVariesByCultureObserver',
 		);
+	}
+
+	#syncReferenceCounts(unique: UmbEntityUnique | undefined) {
+		this.referenceCount.setUnique(unique ?? undefined).catch(() => undefined);
+		this.referencedElementsWithPendingChangesCount.setUnique(unique ?? undefined).catch(() => undefined);
 	}
 
 	#hasPublishedVariant() {

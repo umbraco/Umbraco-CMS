@@ -14,6 +14,9 @@ export type UmbEntityReferenceListSource =
 	| 'descendantsWithReferences'
 	| 'referencedElementsWithPendingChanges';
 
+// Properties that require re-running #init() when they change — see updated() below.
+const REPOSITORY_PROPERTIES = ['referenceRepositoryAlias', 'itemRepositoryAlias', 'source'] as const;
+
 /**
  * Presentational, paged list of the items referencing (or, in `descendantsWithReferences` mode, the descendants
  * referenced by) a given entity. Used by the entity references workspace info app and the entity references modal.
@@ -82,11 +85,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		// Runs on the first update too — every reactive property counts as "changed" then. Re-running #init()
 		// when these change later covers consumers (e.g. the workspace info app) whose extension-provided
 		// referenceRepositoryAlias can arrive or change after this element's first render.
-		if (
-			changedProperties.has('referenceRepositoryAlias') ||
-			changedProperties.has('itemRepositoryAlias') ||
-			changedProperties.has('source')
-		) {
+		if (REPOSITORY_PROPERTIES.some((prop) => changedProperties.has(prop))) {
 			this.#init();
 		}
 	}

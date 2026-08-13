@@ -81,7 +81,7 @@ describe('UmbEntityReferenceCountManager', () => {
 	});
 
 	it('has no total until a unique is set', () => {
-		expect(manager.getTotal()).to.equal(undefined);
+		expect(manager.getTotal()).to.be.undefined;
 	});
 
 	it('loads the total once a unique is set', async () => {
@@ -111,7 +111,7 @@ describe('UmbEntityReferenceCountManager', () => {
 		UmbTestReferenceRepository.responseQueue.push({ total: 3 });
 		await manager.setUnique('elm-1');
 		await manager.setUnique(undefined);
-		expect(manager.getTotal()).to.equal(undefined);
+		expect(manager.getTotal()).to.be.undefined;
 	});
 
 	describe('getTotalAsync', () => {
@@ -166,7 +166,7 @@ describe('UmbEntityReferenceCountManager', () => {
 				caught = error;
 			}
 
-			expect(caught).to.exist;
+			expect(caught).to.be.instanceOf(Error);
 		});
 	});
 
@@ -239,7 +239,7 @@ describe('UmbEntityReferenceCountManager', () => {
 				caught = error;
 			}
 
-			expect(caught).to.exist;
+			expect(caught).to.be.instanceOf(Error);
 		});
 	});
 
@@ -254,7 +254,7 @@ describe('UmbEntityReferenceCountManager', () => {
 		it('setUnique does not issue a request', async () => {
 			await manager.setUnique('elm-1');
 			expect(UmbTestReferenceRepository.callCount).to.equal(0);
-			expect(manager.getTotal()).to.equal(undefined);
+			expect(manager.getTotal()).to.be.undefined;
 		});
 
 		it('getTotalAsync still resolves the real total on demand', async () => {
@@ -274,7 +274,7 @@ describe('UmbEntityReferenceCountManager', () => {
 				await manager.getTotalAsync();
 
 				manager.clear();
-				expect(manager.getTotal()).to.equal(undefined);
+				expect(manager.getTotal()).to.be.undefined;
 
 				UmbTestReferenceRepository.responseQueue.push({ total: 4 });
 				const total = await manager.getTotalAsync();
