@@ -1139,9 +1139,49 @@ export class DataTypeUiHelper extends UiBaseLocators {
     return this.page.getByRole('link', {name: name});
   }
 
+  // The group name is the value of a textbox, not text content, so hasText cannot be used to find it.
+  private async getGroupWithName(name: string) {
+    const groups = this.page.locator('.group');
+    await expect(groups.first()).toBeVisible({timeout: ConstantHelper.timeout.medium});
+    const groupCount = await groups.count();
+
+    for (let i = 0; i < groupCount; i++) {
+      const group = groups.nth(i);
+      if (await group.getByRole('textbox').inputValue() === name) {
+        return group;
+      }
+    }
+
+    throw new Error(`Could not find a block grid group named '${name}'`);
+  }
+
+  async clickDeleteGroupButtonWithName(name: string) {
+    const group = await this.getGroupWithName(name);
+    // The trash uui-icon inside the button intercepts pointer events, so the click has to be forced.
+    await this.click(group.getByLabel('Delete'), {force: true});
+  }
+
+  // The sortable item is the card itself; the sorter marks links as non-draggable, so a block's link
+  // cannot be used as a drag handle.
+  async getBlockCardInGroupWithName(groupName: string, blockName: string) {
+    const group = await this.getGroupWithName(groupName);
+    const card = group.locator('umb-block-type-card').filter({hasText: blockName});
+    await this.isVisible(card);
+    return card;
+  }
+
+  async getBlocksContainerInGroupWithName(groupName: string) {
+    const group = await this.getGroupWithName(groupName);
+    const blocks = group.locator('#blocks');
+    await this.isVisible(blocks);
+    return blocks;
+  }
+
   async getAddButtonInGroupWithName(name: string) {
-    await this.isVisible(this.page.locator('.group').filter({hasText: name}).locator('#add-button'));
-    return this.page.locator('.group').filter({hasText: name}).locator('#add-button');
+    const group = await this.getGroupWithName(name);
+    const addButton = group.locator('#add-button');
+    await this.isVisible(addButton);
+    return addButton;
   }
 
   async clickRemoveStylesheetButton(stylesheetName: string) {

@@ -968,6 +968,16 @@ export class DataTypeApiHelper {
     );
   }
 
+  async doesBlockGridContainGroupWithName(blockGridName: string, groupName: string) {
+    const blockEditor = await this.getByName(blockGridName);
+    const blockGroupsValue = blockEditor.values.find(value => value.alias === 'blockGroups');
+    if (!blockGroupsValue || blockGroupsValue.value.length === 0) {
+      return false;
+    }
+
+    return blockGroupsValue.value.some(blockGroup => blockGroup.name === groupName);
+  }
+
   async doesBlockGridContainCreateButtonLabel(blockGridName: string, label: string) {
     const blockEditor = await this.getByName(blockGridName);
     const createLabelValue = blockEditor.values.find(value => value.alias === 'createLabel');

@@ -178,6 +178,8 @@ export class UiBaseLocators extends BasePage {
   // View Options
   public readonly gridBtn: Locator;
   public readonly listBtn: Locator;
+  public readonly tableBtn: Locator;
+  public readonly cardsBtn: Locator;
   public readonly viewBundleBtn: Locator;
 
   // Media
@@ -506,6 +508,8 @@ export class UiBaseLocators extends BasePage {
     // View Options
     this.gridBtn = page.getByLabel("Grid");
     this.listBtn = page.getByLabel("List");
+    this.tableBtn = page.getByLabel("Table");
+    this.cardsBtn = page.getByLabel("Cards");
     this.viewBundleBtn = page.locator(
       "umb-collection-view-bundle uui-button svg",
     );
@@ -1647,6 +1651,16 @@ export class UiBaseLocators extends BasePage {
   async changeToListView() {
     await this.click(this.viewBundleBtn);
     await this.click(this.listBtn);
+  }
+
+  async changeToTableView() {
+    await this.click(this.viewBundleBtn);
+    await this.click(this.tableBtn);
+  }
+
+  async changeToCardsView() {
+    await this.click(this.viewBundleBtn);
+    await this.click(this.cardsBtn);
   }
 
   async isViewBundleButtonVisible(isVisible: boolean = true) {

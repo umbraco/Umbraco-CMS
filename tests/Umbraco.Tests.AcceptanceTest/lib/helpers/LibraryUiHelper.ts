@@ -56,6 +56,7 @@ export class LibraryUiHelper extends UiBaseLocators {
   private readonly sliderInput: Locator;
   private readonly tabItems: Locator;
   private readonly elementWorkspace: Locator;
+  private readonly elementFolderWorkspace: Locator;
   private readonly selectAVariantBtn: Locator;
   private readonly variantAddModeBtn: Locator;
   private readonly cultureVariant: Locator;
@@ -232,6 +233,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.sliderInput = page.locator('umb-property-editor-ui-slider #input');
     this.tabItems = page.locator('uui-tab');
     this.elementWorkspace = page.locator('umb-element-workspace-editor');
+    this.elementFolderWorkspace = page.locator('umb-element-folder-workspace-editor');
     this.selectAVariantBtn = page.getByRole('button', {name: 'Open version selector'});
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
     this.cultureVariant = page.locator('.variant.culture-variant');
@@ -1132,6 +1134,11 @@ export class LibraryUiHelper extends UiBaseLocators {
 
   async doesElementWorkspaceHaveText(text: string) {
     await this.containsText(this.elementWorkspace, text);
+  }
+
+  // An element folder opens umb-element-folder-workspace-editor, not umb-element-workspace-editor.
+  async doesElementFolderWorkspaceHaveText(text: string) {
+    await this.containsText(this.elementFolderWorkspace, text);
   }
 
   async clickDuplicateToButton() {
