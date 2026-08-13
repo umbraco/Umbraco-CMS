@@ -32,7 +32,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	private _defaultView?: string;
 
 	@state()
-	private _routes: Array<UmbRoute> = [];
+	private _routes?: Array<UmbRoute>;
 
 	@state()
 	private _hintMap: Map<string, UmbVariantHint> = new Map();
@@ -171,22 +171,21 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this._routes.length > 0
-			? html`
-					<umb-body-layout main-no-padding>
-						${this.#renderDashboards()} ${this.#renderViews()}
-						<umb-router-slot
-							.routes=${this._routes}
-							@init=${(event: UmbRouterSlotInitEvent) => {
-								this._routerPath = event.target.absoluteRouterPath;
-							}}
-							@change=${(event: UmbRouterSlotChangeEvent) => {
-								this._activePath = event.target.localActiveViewPath;
-							}}>
-						</umb-router-slot>
-					</umb-body-layout>
-				`
-			: nothing;
+		return html`
+			<umb-body-layout main-no-padding>
+				${this.#renderDashboards()} ${this.#renderViews()}
+				<umb-router-slot
+					.routes=${this._routes}
+					@init=${(event: UmbRouterSlotInitEvent) => {
+						this._routerPath = event.target.absoluteRouterPath;
+					}}
+					@change=${(event: UmbRouterSlotChangeEvent) => {
+						this._activePath = event.target.localActiveViewPath;
+					}}>
+					<umb-view-loader></umb-view-loader>
+				</umb-router-slot>
+			</umb-body-layout>
+		`;
 	}
 
 	#getDashboardName(dashboard: ManifestDashboard) {
