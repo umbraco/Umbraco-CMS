@@ -91,9 +91,13 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 			null,
 		);
 
-		this.observe(this.#pickerContext.search.searchable, (isSearchable) => {
-			this._isSearchable = isSearchable ?? false;
-		});
+		this.observe(
+			this.#pickerContext.search.searchable,
+			(isSearchable) => {
+				this._isSearchable = isSearchable ?? false;
+			},
+			null,
+		);
 
 		this.observe(
 			this.#pickerContext.expansion.expansion,
