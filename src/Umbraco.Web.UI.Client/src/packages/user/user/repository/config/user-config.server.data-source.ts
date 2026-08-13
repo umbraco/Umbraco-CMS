@@ -11,6 +11,7 @@ export class UmbUserConfigServerDataSource {
 
 	/**
 	 * Get the user configuration.
+	 * @returns {*} The user configuration.
 	 * @memberof UmbUserConfigServerDataSource
 	 */
 	getUserConfig() {
@@ -19,6 +20,7 @@ export class UmbUserConfigServerDataSource {
 
 	/**
 	 * Get the current user configuration.
+	 * @returns {*} The current user configuration.
 	 * @memberof UmbUserConfigServerDataSource
 	 */
 	getCurrentUserConfig() {

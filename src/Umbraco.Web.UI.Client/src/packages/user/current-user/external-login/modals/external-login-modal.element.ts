@@ -1,6 +1,7 @@
 import { UmbCurrentUserRepository } from '../../repository/index.js';
 import type { UmbCurrentUserExternalLoginProviderModel } from '../../types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbConfirmModal, type UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -100,9 +101,10 @@ export class UmbCurrentUserExternalLoginModalElement extends UmbLitElement {
 
 	/**
 	 * Render a provider with a toggle to enable/disable it
-	 * @param item
+	 * @param {UmbExternalLoginProviderOption} item The provider to render
+	 * @returns {TemplateResult} The rendered provider
 	 */
-	#renderProvider(item: UmbExternalLoginProviderOption) {
+	#renderProvider(item: UmbExternalLoginProviderOption): TemplateResult {
 		return html`
 			<uui-box>
 				<div class="header" slot="header">

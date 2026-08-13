@@ -28,8 +28,8 @@ import type { UmbSorterConfig, UmbSorterResolvePlacementArgs } from '@umbraco-cm
 
 /**
  * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
- * @param args
- * @returns { null | true }
+ * @param {UmbSorterResolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>} args - the placement arguments to resolve.
+ * @returns { null | true } - null if the item should not move, true if it should be placed vertically.
  */
 function resolvePlacementAsBlockGrid(
 	args: UmbSorterResolvePlacementArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>,
@@ -406,8 +406,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 							class="umb-block-grid__layout-item"
 							index=${index}
 							.layout=${layout}>
-						</umb-block-grid-entry>
-					`,
+						</umb-block-grid-entry> `,
 				)}
 			</div>
 			${when(this._allowedBlockTypes && this._allowedBlockTypes.length > 0, () => this.#renderCreateButtonGroup())}

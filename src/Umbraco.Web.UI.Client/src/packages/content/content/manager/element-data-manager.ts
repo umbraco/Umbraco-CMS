@@ -4,9 +4,10 @@ import { UmbVariantId, umbVariantObjectCompare } from '@umbraco-cms/backoffice/v
 import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@umbraco-cms/backoffice/workspace';
 
 /**
- *
- * @param a
- * @param b
+ * Compares two element values by alias and variant.
+ * @param {any} a The first value to compare.
+ * @param {any} b The second value to compare.
+ * @returns {boolean} True if the values have the same alias and variant.
  */
 function valueObjectCompare(a: any, b: any) {
 	return a.alias === b.alias && umbVariantObjectCompare(a, b);

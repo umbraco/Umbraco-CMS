@@ -8,7 +8,7 @@ console.log(chalk.green('Generating OpenAPI client...'));
 const swaggerUrl = process.argv[2];
 const outputDir = process.argv[3];
 
-if (swaggerUrl === undefined || outputDir === undefined) {
+if (!swaggerUrl || !outputDir) {
   console.error(chalk.red(`ERROR: Missing required arguments`));
   console.error(`Usage: node generate-openapi.js ${chalk.yellow('<swagger-url>')} ${chalk.yellow('<output-dir>')}`);
   console.error(

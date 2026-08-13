@@ -214,8 +214,8 @@ export class UmbSearchIndexSearchBoxElement extends UmbLitElement {
     }
 
     if (page) {
-      const pageNumber = parseInt(page, 10);
-      if (!isNaN(pageNumber) && pageNumber >= 1) {
+      const pageNumber = Number.parseInt(page, 10);
+      if (!Number.isNaN(pageNumber) && pageNumber >= 1) {
         this.#initialPage = pageNumber;
       }
     }

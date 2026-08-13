@@ -28,7 +28,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	/**
 	 * Creates an instance of UmbRecycleBinRepositoryBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @param {UmbRecycleBinDataSourceConstructor} recycleBinSource
+	 * @param {UmbRecycleBinDataSourceConstructor} recycleBinSource - The data source constructor for the recycle bin
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	constructor(host: UmbControllerHost, recycleBinSource: UmbRecycleBinDataSourceConstructor) {
@@ -42,8 +42,8 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 	/**
 	 * Requests to trash an item.
-	 * @param {UmbRecycleBinTrashRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbRecycleBinTrashRequestArgs} args - The item to trash
+	 * @returns {*} The result of the trash request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestTrash(args: UmbRecycleBinTrashRequestArgs) {
@@ -52,8 +52,8 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 	/**
 	 * Requests to restore an item.
-	 * @param {UmbRecycleBinRestoreRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbRecycleBinRestoreRequestArgs} args - The item to restore
+	 * @returns {*} The result of the restore request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestRestore(args: UmbRecycleBinRestoreRequestArgs) {
@@ -71,7 +71,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 	/**
 	 * Requests to empty the recycle bin.
-	 * @returns {*}
+	 * @returns {*} The result of the empty request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestEmpty() {
@@ -80,8 +80,8 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 
 	/**
 	 * Requests the original parent of an item.
-	 * @param {UmbRecycleBinOriginalParentRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbRecycleBinOriginalParentRequestArgs} args - The item to find the original parent for
+	 * @returns {*} The original parent of the item
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
 	async requestOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {

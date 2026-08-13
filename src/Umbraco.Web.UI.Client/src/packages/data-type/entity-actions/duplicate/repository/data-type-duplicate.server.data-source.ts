@@ -21,8 +21,8 @@ export class UmbDuplicateDataTypeServerDataSource implements UmbDuplicateToDataS
 
 	/**
 	 * Duplicate an item for the given unique to the destination unique
-	 * @param {UmbDuplicateToRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbDuplicateToRequestArgs} args - The unique and destination to duplicate to.
+	 * @returns {*} The result of the duplicate request.
 	 * @memberof UmbDuplicateDataTypeServerDataSource
 	 */
 	async duplicateTo(args: UmbDuplicateToRequestArgs) {

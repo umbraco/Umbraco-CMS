@@ -48,10 +48,14 @@ export class UmbCurrentUserContext extends UmbContextBase {
 			this.#addActionEventListeners();
 		});
 
-		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
-			if (!currentLanguageIsoCode) return;
-			umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
-		});
+		this.observe(
+			this.languageIsoCode,
+			(currentLanguageIsoCode) => {
+				if (!currentLanguageIsoCode) return;
+				umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
+			},
+			null,
+		);
 	}
 
 	#loadPromise?: Promise<void>;
@@ -106,8 +110,8 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	/**
 	 * Checks if a user is the current user.
-	 * @param userUnique The user id to check
-	 * @returns True if the user is the current user, otherwise false
+	 * @param {string} userUnique The user id to check
+	 * @returns {Promise<boolean>} True if the user is the current user, otherwise false
 	 */
 	async isUserCurrentUser(userUnique: string): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);
@@ -116,7 +120,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	/**
 	 * Checks if the current user is an admin.
-	 * @returns True if the current user is an admin, otherwise false
+	 * @returns {Promise<boolean>} True if the current user is an admin, otherwise false
 	 */
 	async isCurrentUserAdmin(): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);

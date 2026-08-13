@@ -378,7 +378,12 @@ export class UmbTagsInputElement extends UUIFormControlWithBasicsMixin(UmbLitEle
 	#renderAddButton() {
 		if (this.readonly) return nothing;
 		return html`
-			<uui-tag look="outline" id="main-tag" @click="${this.focus}" @focusout="${this.#onMainTagFocusOut}" slot="trigger">
+			<uui-tag
+				look="outline"
+				id="main-tag"
+				@click="${this.focus}"
+				@focusout="${this.#onMainTagFocusOut}"
+				slot="trigger">
 				<input
 					id="tag-input"
 					aria-label="tag input"

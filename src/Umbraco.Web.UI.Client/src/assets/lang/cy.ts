@@ -345,6 +345,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Cliciwch i lanlwytho',
+		browseFilesAction: 'Pori ffeiliau',
+		dropFilesOr: 'Llusgwch a gollwng cyfryngau yma<br />neu',
 		orClickHereToUpload: 'neu cliciwch yma i ddewis ffeiliau',
 		disallowedFileType: "Ni ellir lanlwytho'r ffeil yma, nid yw math y ffeil yn wedi'i gymeradwyo",
 		maxFileSize: 'Maint ffeil uchaf',
@@ -777,6 +779,8 @@ export default {
 		new: 'Newydd',
 		next: 'Nesaf',
 		no: 'Na',
+		noResults: 'Ni ddarganfuwyd unrhyw ganlyniadau',
+		noResultsFor: (query: string) => `Ni ddarganfuwyd unrhyw ganlyniad ar gyfer "${query}".`,
 		of: 'o',
 		off: 'I ffwrdd',
 		ok: 'Iawn',
@@ -1814,6 +1818,10 @@ export default {
 		templatingGroup: 'Templedi',
 		thirdPartyGroup: 'Trydydd parti',
 		webhooks: 'Bachau gwe',
+	},
+	picker: {
+		browseTab: 'Pori',
+		searchTab: 'Chwilio',
 	},
 	update: {
 		updateAvailable: 'Diweddariad newydd yn barod',

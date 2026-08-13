@@ -36,7 +36,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	 * Checks if the user is authorized; if not, opens the auth modal over the (empty) shell.
 	 * Session verification is handled by setInitialState() (the current-user/configuration
 	 * cookie probe) before the router evaluates guards.
-	 * @returns {Promise<boolean>} True if the user is authorized, false if not (and the auth modal is opened).
+	 * @returns {Promise<boolean>} True if the user is authorized.
 	 */
 	async isAuthorized(): Promise<boolean> {
 		await this.#retrievedContext.catch(() => undefined);
@@ -80,8 +80,8 @@ export class UmbAppAuthController extends UmbControllerBase {
 	 * Cookie auth: authentication happens in the auth modal (login providers render inline over the
 	 * current view). A real navigation to the server /umbraco/login is only used by the modal's own
 	 * local-login action.
-	 * @param {UmbUserLoginState} userLoginState The state of the user login flow that triggered the modal.
-	 * @returns {Promise<void>} Resolves when the modal is closed (success or cancel).
+	 * @param {UmbUserLoginState} userLoginState The reason the authorization flow is being started.
+	 * @returns {Promise<boolean>} True if the user is authorized.
 	 */
 	async #openAuthModal(userLoginState: UmbUserLoginState) {
 		if (!this.#authContext) {

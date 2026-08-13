@@ -21,10 +21,8 @@ export class UmbMoveMediaServerDataSource implements UmbMoveDataSource {
 
 	/**
 	 * Move an item for the given id to the target unique
-	 * @param {string} unique
-	 * @param {(string | null)} targetUnique
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbMoveToRequestArgs} args - The move request arguments
+	 * @returns {*} A promise that resolves once the media has been moved
 	 * @memberof UmbMoveMediaServerDataSource
 	 */
 	async moveTo(args: UmbMoveToRequestArgs) {
