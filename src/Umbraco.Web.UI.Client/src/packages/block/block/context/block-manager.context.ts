@@ -97,10 +97,7 @@ export abstract class UmbBlockManagerContext<
 	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
 	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
 
-	readonly #exposes = new UmbArrayState(
-		<Array<UmbBlockExposeModel>>[],
-		(x) => x.contentKey + '_' + x.culture + '_' + x.segment,
-	);
+	readonly #exposes = new UmbArrayState(<Array<UmbBlockExposeModel>>[], (x) => x.contentKey + ':' + x.culture);
 	public readonly exposes = this.#exposes.asObservable();
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
@@ -347,10 +344,7 @@ export abstract class UmbBlockManagerContext<
 	 */
 	externalContentStateOf(key: string) {
 		return mergeObservables(
-			[
-				this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)),
-				this.variantId,
-			],
+			[this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)), this.variantId],
 			([entry, variantId]) => {
 				if (!entry?.variants.length) return null;
 				if (!variantId) return entry.variants[0]?.state ?? null;
@@ -422,7 +416,7 @@ export abstract class UmbBlockManagerContext<
 				const varyBySegment = contentStructure.getVariesBySegment();
 				const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
 
-				return exposes.find((x) => blockVariantId.compare(x));
+				return exposes.find((x) => blockVariantId.culture === x.culture);
 			},
 		);
 	}
@@ -445,11 +439,10 @@ export abstract class UmbBlockManagerContext<
 			throw new Error(`Cannot lookup expose of block, missing content structure for ${contentTypeKey}`);
 		}
 		const varyByCulture = contentStructure.getVariesByCulture();
-		const varyBySegment = contentStructure.getVariesBySegment();
-		const blockVariantId = variantId.toVariant(varyByCulture, varyBySegment);
+		const blockVariantId = variantId.toVariant(varyByCulture);
 
 		return this.#exposes.asObservablePart((exposes) => {
-			return exposes.some((x) => x.contentKey === contentKey && blockVariantId.compare(x));
+			return exposes.some((x) => x.contentKey === contentKey && blockVariantId.culture === x.culture);
 		});
 	}
 
@@ -501,7 +494,7 @@ export abstract class UmbBlockManagerContext<
 	removeCurrentExpose(contentKey: string) {
 		const variantId = this.getVariantId();
 		if (!variantId) return;
-		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));
+		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.culture === x.culture));
 	}
 
 	/**

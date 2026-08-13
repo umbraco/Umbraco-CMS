@@ -52,7 +52,7 @@ export abstract class UmbBlockValueResolver<ValueType> implements UmbPropertyVal
 	}
 
 	compareVariants(a: UmbBlockExposeModel, b: UmbBlockExposeModel) {
-		return a.contentKey === b.contentKey && a.culture === b.culture && a.segment === b.segment;
+		return a.contentKey === b.contentKey && a.culture === b.culture;
 	}
 
 	destroy(): void {}
