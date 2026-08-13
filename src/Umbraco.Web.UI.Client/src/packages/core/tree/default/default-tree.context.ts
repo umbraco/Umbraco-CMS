@@ -94,14 +94,18 @@ export class UmbDefaultTreeContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_CONTEXT);
-		this.#treeItemChildrenManager.setTakeSize(50);
+		this.#treeItemChildrenManager.setTakeSize(100);
 
 		// Auto-enable selectOnly when a selection exists and it was not explicitly set.
-		this.observe(this.selection.selection, (selection) => {
-			if (this.#selectOnlyConfig === undefined) {
-				this.#selectOnly.setValue((selection?.length ?? 0) > 0);
-			}
-		});
+		this.observe(
+			this.selection.selection,
+			(selection) => {
+				if (this.#selectOnlyConfig === undefined) {
+					this.#selectOnly.setValue((selection?.length ?? 0) > 0);
+				}
+			},
+			null,
+		);
 	}
 
 	// TODO: find a generic way to do this
@@ -114,7 +118,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Sets the manifest
-	 * @param {ManifestTree} manifest
+	 * @param {ManifestTree} manifest - The tree manifest
 	 * @memberof UmbDefaultTreeContext
 	 */
 	public set manifest(manifest: ManifestTree | undefined) {
@@ -131,7 +135,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Returns the manifest.
-	 * @returns {ManifestTree}
+	 * @returns {ManifestTree} The tree manifest
 	 * @memberof UmbDefaultTreeContext
 	 * @deprecated Use the `.manifest` property instead.
 	 */
@@ -173,7 +177,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Reloads the tree
-	 * @param pageNumber
+	 * @param {number} pageNumber - The page number to load
 	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
@@ -183,14 +187,14 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Load previous items of the tree item
-	 * @memberof UmbTreeItemContextBase
+	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
 	public loadPrevItems = (): Promise<void> => this.#treeItemChildrenManager.loadPrevChildren();
 
 	/**
 	 * Load next items of the tree item
-	 * @memberof UmbTreeItemContextBase
+	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
 	public loadNextItems = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();
@@ -281,7 +285,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Gets the hideTreeRoot config
-	 * @returns {boolean}
+	 * @returns {boolean} - Whether the tree root is hidden
 	 * @memberof UmbDefaultTreeContext
 	 */
 	getHideTreeRoot(): boolean {
@@ -290,7 +294,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Sets the startNode config
-	 * @param {UmbTreeStartNode} startNode
+	 * @param {UmbTreeStartNode} startNode - The start node
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
@@ -336,7 +340,7 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Updates the requestArgs config and reloads the tree.
-	 * @param args
+	 * @param {Partial<RequestArgsType>} args - The request args to merge in
 	 */
 	public updateAdditionalRequestArgs(args: Partial<RequestArgsType>) {
 		this.#treeItemChildrenManager.setAdditionalRequestArgs(args);

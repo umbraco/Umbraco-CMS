@@ -39,7 +39,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	// modal portal, not as descendants of this element, so context is the only channel that reaches
 	// them; upwards it is a property and an `interaction-memories-change` event.
 	readonly #interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
-	readonly #interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(this, this.#interactionMemoryScope.memory);
+	readonly #interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(
+		this,
+		this.#interactionMemoryScope.memory,
+	);
 
 	/**
 	 * The memories held by the modals opened from this input, e.g. the last-used folder in a media

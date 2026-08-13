@@ -243,7 +243,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	/**
 	 * Get the alias of this property.
-	 * @returns {*}  {(string | undefined)}
+	 * @returns {string | undefined} The alias of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public getAlias(): string | undefined {
@@ -270,7 +270,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	/**
 	 * Set the description of this property.
-	 * @param {(string | undefined)} description
+	 * @param {(string | undefined)} description - The description of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public setDescription(description: string | undefined): void {
@@ -279,7 +279,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	/**
 	 * Get the description of this property.
-	 * @returns {*}  {(string | undefined)}
+	 * @returns {string | undefined} The description of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public getDescription(): string | undefined {

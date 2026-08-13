@@ -6,7 +6,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Document Culture and Hostnames that fetches data from the server
  * @class UmbDocumentCultureAndHostnamesServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentCultureAndHostnamesServerDataSource {
 	#host: UmbControllerHost;
@@ -22,7 +21,7 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 
 	/**
 	 * Fetches the Culture and Hostnames for the given Document unique
-	 * @param {string} unique
+	 * @param {string} unique - The unique identifier of the Document
 	 * @memberof UmbDocumentCultureAndHostnamesServerDataSource
 	 */
 	async read(unique: string) {
@@ -32,8 +31,8 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 
 	/**
 	 * Updates Culture and Hostnames for the given Document unique
-	 * @param {string} unique
-	 * @param {UpdateDomainsRequestModel} data
+	 * @param {string} unique - The unique identifier of the Document
+	 * @param {UpdateDomainsRequestModel} data - The culture and hostnames data to update
 	 * @memberof UmbDocumentCultureAndHostnamesServerDataSource
 	 */
 	async update(unique: string, data: UpdateDomainsRequestModel) {

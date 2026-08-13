@@ -3,6 +3,7 @@ import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMemberCollectionFilterModel } from '../types.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { MemberResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel, MemberService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -28,11 +29,13 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 
 	/**
 	 * Gets the member collection filtered by the given filter.
-	 * @param {UmbMemberCollectionFilterModel} filter
-	 * @returns {*}
+	 * @param {UmbMemberCollectionFilterModel} filter - The filter to apply to the collection.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberDetailModel>>>} The member collection.
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbMemberCollectionFilterModel) {
+	async getCollection(
+		filter: UmbMemberCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberDetailModel>>> {
 		const query = {
 			memberTypeId: filter.memberTypeId,
 			filter: filter.filter,

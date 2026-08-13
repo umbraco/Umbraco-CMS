@@ -33,6 +33,7 @@ export class UmbAppAuthController extends UmbControllerBase {
 	 * Checks if the user is authorized.
 	 * If not, the authorization flow is started.
 	 * Session verification is handled by setInitialState() before the router evaluates guards.
+	 * @returns {Promise<boolean>} True if the user is authorized.
 	 */
 	async isAuthorized(): Promise<boolean> {
 		await this.#retrievedModal.catch(() => undefined);
@@ -51,7 +52,8 @@ export class UmbAppAuthController extends UmbControllerBase {
 	/**
 	 * Starts the authorization flow.
 	 * It will check which providers are available and either redirect directly to the provider or show a provider selection screen.
-	 * @param userLoginState
+	 * @param {UmbUserLoginState} userLoginState The reason the authorization flow is being started.
+	 * @returns {Promise<boolean>} True if the user is authorized.
 	 */
 	async makeAuthorizationRequest(userLoginState: UmbUserLoginState = 'loggingIn'): Promise<boolean> {
 		await this.#retrievedModal.catch(() => undefined);

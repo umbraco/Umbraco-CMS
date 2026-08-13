@@ -1,9 +1,9 @@
+import { UmbMemberGroupItemRepository } from '../../../repository/item/index.js';
+import type { UmbMemberGroupItemModel } from '../../../repository/item/types.js';
 import type { UmbValueSummaryResolveResult, UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbMemberGroupItemRepository } from '../../../repository/item/index.js';
-import type { UmbMemberGroupItemModel } from '../../../repository/item/types.js';
 
 export class UmbMemberGroupPickerValueSummaryResolver
 	extends UmbControllerBase

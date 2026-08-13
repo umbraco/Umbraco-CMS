@@ -396,6 +396,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klik for at uploade',
+		browseFilesAction: 'Gennemse filer',
+		dropFilesOr: 'Træk og slip medier her<br />eller',
 		orClickHereToUpload: 'eller klik her for at vælge filer',
 		disallowedFileType: 'Kan ikke uploade denne fil, den har ikke en godkendt filtype',
 		disallowedMediaType: "Kan ikke uploade denne fil, mediatypen med alias '%0%' er ikke tilladt her",
@@ -915,6 +917,8 @@ export default {
 		new: 'Ny',
 		next: 'Næste',
 		no: 'Nej',
+		noResults: 'Ingen resultater',
+		noResultsFor: (query: string) => `Intet resultat for "${query}".`,
 		of: 'af',
 		off: 'Fra',
 		ok: 'OK',
@@ -2977,6 +2981,8 @@ export default {
 		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
 	},
 	picker: {
+		browseTab: 'Gennemse',
+		searchTab: 'Søg',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
 	},
 } as UmbLocalizationDictionary;

@@ -1,8 +1,5 @@
 import type { UmbBlockListValueModel } from '../types.js';
-import {
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
-} from '../constants.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS } from '../constants.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
 import { UMB_BLOCK_LIST_ENTRIES_CONTEXT } from './block-list-entries.context-token.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';

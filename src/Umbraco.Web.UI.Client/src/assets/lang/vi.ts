@@ -390,6 +390,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Nhấp để tải lên',
+		browseFilesAction: 'Duyệt tệp',
+		dropFilesOr: 'Kéo và thả tệp phương tiện vào đây<br />hoặc',
 		orClickHereToUpload: 'hoặc nhấp vào đây để chọn tệp',
 		disallowedFileType: 'Không thể tải lên tệp này, nó không có loại tệp được phê duyệt',
 		disallowedMediaType: "Không thể tải lên tệp này, loại phương tiện có bí danh '%0%' không được phép ở đây",
@@ -537,7 +539,8 @@ export default {
 		confirmremoveusageof: 'Bạn có chắc chắn muốn xóa việc sử dụng <strong>%0%</strong> không?',
 		confirmlogout: 'Bạn có chắc chắn muốn đăng xuất?',
 		confirmSure: 'Bạn có chắc chắn?',
-		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
 		confirmTrash: (name: string) => `Bạn có chắc chắn muốn di chuyển <strong>${name}</strong> vào Thùng rác?`,
 		cannotBulkTrashWhenReferenced: (total: number) =>
 			`<strong>${total} ${total === 1 ? 'mục' : 'các mục'}</strong> đã chọn không thể được chuyển vào Thùng rác vì ít nhất một mục được tham chiếu bởi nội dung khác.`,
@@ -906,6 +909,8 @@ export default {
 		no: 'Không',
 		nodeName: 'Tên nút',
 		notFound: 'Không tìm thấy',
+		noResults: 'Không có kết quả',
+		noResultsFor: (query: string) => `Không tìm thấy kết quả cho "${query}".`,
 		of: 'của',
 		off: 'Tắt',
 		ok: 'OK',
@@ -1743,8 +1748,10 @@ export default {
 		compositionsDescriptionMemberType:
 			'Kế thừa các tab và thuộc tính từ một loại thành viên hiện có. Các tab mới sẽ được thêm vào loại thành viên hiện tại hoặc được hợp nhất nếu một tab có tên giống hệt tồn tại.',
 		compositionInUse: 'Loại nội dung này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
-		compositionInUseMediaType: 'Loại phương tiện này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
-		compositionInUseMemberType: 'Loại thành viên này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMediaType:
+			'Loại phương tiện này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMemberType:
+			'Loại thành viên này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
 		noAvailableCompositions: 'Không có loại nội dung nào có sẵn để sử dụng làm thành phần.',
 		noAvailableCompositionsMediaType: 'Không có loại phương tiện nào có sẵn để sử dụng làm thành phần.',
 		noAvailableCompositionsMemberType: 'Không có loại thành viên nào có sẵn để sử dụng làm thành phần.',
@@ -2829,6 +2836,8 @@ export default {
 		resetUrlLabel: 'Đặt lại',
 	},
 	picker: {
+		browseTab: 'Duyệt',
+		searchTab: 'Tìm kiếm',
 		selectedCount: (count: number) => `Đã chọn ${count} mục`,
 	},
 } as UmbLocalizationDictionary;
