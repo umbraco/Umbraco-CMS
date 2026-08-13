@@ -249,13 +249,6 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     int Count(string? documentTypeAlias = null);
 
     /// <summary>
-    ///     Counts published documents of a given document type.
-    /// </summary>
-    /// <param name="documentTypeAlias">The document type alias, or null for all types.</param>
-    /// <returns>The published document count.</returns>
-    int CountPublished(string? documentTypeAlias = null);
-
-    /// <summary>
     ///     Counts child documents of a given parent, of a given document type.
     /// </summary>
     /// <param name="parentId">The parent identifier.</param>

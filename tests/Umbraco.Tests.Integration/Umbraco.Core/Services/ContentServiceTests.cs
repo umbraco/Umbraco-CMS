@@ -559,6 +559,22 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task CountPublishedAsync_ReturnsOnlyPublishedNonTrashedCount()
+    {
+        // Arrange - nothing is published by default in UmbracoIntegrationTestWithContent's fixture
+        Assert.AreEqual(0, await ContentService.CountPublishedAsync(null, CancellationToken.None));
+
+        // Act
+        ContentService.Publish(Textpage, ["*"]);
+        ContentService.Publish(Subpage, ["*"]);
+
+        // Assert
+        Assert.AreEqual(2, await ContentService.CountPublishedAsync(null, CancellationToken.None));
+        Assert.AreEqual(2, await ContentService.CountPublishedAsync("umbTextpage", CancellationToken.None));
+        Assert.AreEqual(0, await ContentService.CountPublishedAsync("someOtherAliasThatDoesNotExist", CancellationToken.None));
+    }
+
+    [Test]
     public void GetAncestors_Returns_Empty_List_When_Path_Is_Null()
     {
         // Arrange

@@ -280,17 +280,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     #region Count
 
-    /// <summary>
-    /// Gets the count of published <see cref="IContent"/> items.
-    /// </summary>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of published content items.</returns>
-    public int CountPublished(string? contentTypeAlias = null)
+    /// <inheritdoc/>
+    public async Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            return _contentRepository.CountPublished(contentTypeAlias);
+            return await _asyncContentRepository.CountPublishedAsync(contentTypeAlias, cancellationToken);
         }
     }
 

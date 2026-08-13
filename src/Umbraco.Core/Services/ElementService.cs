@@ -59,6 +59,10 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     public Task<IElement?> GetByIdAsync(Guid key, CancellationToken cancellationToken) => Task.FromResult(GetById(key));
 
     /// <inheritdoc />
+    // See GetByIdAsync above - same bridge, same reason.
+    public Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken) => Task.FromResult(CountPublished(contentTypeAlias));
+
+    /// <inheritdoc />
     Attempt<OperationResult?> IAsyncContentServiceBase<IElement>.Save(IEnumerable<IElement> contents, int userId) =>
         Attempt.Succeed(Save(contents, userId));
 

@@ -17,4 +17,11 @@ namespace Umbraco.Cms.Core.Services;
 public interface IAsyncPublishableContentService<TContent> : IAsyncContentServiceBase<TContent>
     where TContent : class, IContentBase
 {
+    /// <summary>
+    ///     Counts published content items, optionally filtered by content type alias.
+    /// </summary>
+    /// <param name="contentTypeAlias">The content type alias to filter by, or <c>null</c> for all types.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The count of published content items matching the filter.</returns>
+    Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken);
 }
