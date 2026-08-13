@@ -1,5 +1,5 @@
 import { UmbDictionaryExportServerDataSource } from './dictionary-export.server.data-source.js';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDictionaryExportRepository extends UmbRepositoryBase {
@@ -14,10 +14,10 @@ export class UmbDictionaryExportRepository extends UmbRepositoryBase {
 	 * @description - Export a Dictionary, optionally including child items.
 	 * @param {string} unique - The unique identifier of the dictionary to export.
 	 * @param {boolean} [includeChildren] - Whether to include child items in the export.
-	 * @returns {*} The exported dictionary.
+	 * @returns {Promise<UmbRepositoryResponse<Blob | File>>} The exported dictionary.
 	 * @memberof UmbDictionaryExportRepository
 	 */
-	async requestExport(unique: string, includeChildren = false) {
+	async requestExport(unique: string, includeChildren = false): Promise<UmbRepositoryResponse<Blob | File>> {
 		if (!unique) {
 			throw new Error('Unique is missing');
 		}

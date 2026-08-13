@@ -69,11 +69,7 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 		this.addValidator(
 			'customError',
 			() =>
-				this.localize.term(
-					'user_languageNotFoundFallback',
-					this.#invalidCulture ?? '',
-					this.#invalidBaseCulture ?? '',
-				),
+				this.localize.term('user_languageNotFoundFallback', this.#invalidCulture ?? '', this.#invalidBaseCulture ?? ''),
 			() => !!this.#invalidCulture && !!this.#invalidBaseCulture,
 		);
 	}

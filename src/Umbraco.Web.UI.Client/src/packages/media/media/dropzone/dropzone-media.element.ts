@@ -1,7 +1,8 @@
 import { UmbMediaDropzoneManager } from './media-dropzone.manager.js';
 import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbInputDropzoneElement, UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
-import type { UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
+
+import type { UmbDropzoneChangeEvent, UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
 import {
 	UUIBlinkAnimationValue,
 	UUIBlinkKeyframes,

@@ -20,6 +20,8 @@ import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/ext
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
+import type { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+
 /**
  * The multiplier for the token expiry time.
  * In Umbraco, access_tokens live for a quarter of the time of the refresh_token.
@@ -108,7 +110,7 @@ export class UmbAuthContext extends UmbContextBase {
 		return this.#isInitializedObservable;
 	}
 
-	/** Internal, non-warning view of {@link isInitialized} for use inside this class. */
+	/** Internal, non-warning view of {@link UmbAuthContext#isInitialized} for use inside this class. */
 	readonly #isInitializedObservable = this.#isInitialized.asObservable();
 
 	/**

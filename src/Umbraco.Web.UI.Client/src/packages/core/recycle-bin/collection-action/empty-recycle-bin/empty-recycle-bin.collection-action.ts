@@ -13,7 +13,6 @@ import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
  * @augments {UmbCollectionActionBase}
  */
 export class UmbEmptyRecycleBinCollectionAction extends UmbCollectionActionBase {
-
 	/**
 	 * The manifest for this action. Assigned by `umb-extension-with-api-slot` after construction.
 	 */

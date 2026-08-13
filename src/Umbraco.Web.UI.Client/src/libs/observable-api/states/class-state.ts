@@ -9,6 +9,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
  * @class UmbClassState
  * @augments {UmbBasicState<T>}
  * @description - This state can hold class instance which has a equal method to compare in coming instances for changes.
+ * @template {UmbClassStateData | undefined} T
  */
 export class UmbClassState<T extends UmbClassStateData | undefined> extends UmbBasicState<T> {
 	constructor(initialData: T) {

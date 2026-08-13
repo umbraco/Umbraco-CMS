@@ -1,5 +1,6 @@
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
-import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+
+import type { UUIButtonElement, UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * Represents an authentication provider that can be used to authenticate users.

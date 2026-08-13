@@ -5,6 +5,10 @@ import type {
 	UmbPropertyTypeContainerModel,
 	UmbPropertyTypeModel,
 } from '../types.js';
+
+import type { UmbContentTypePropertyStructureHelper } from './content-type-property-structure-helper.class.js';
+
+import type { UmbContentTypeContainerStructureHelper } from './content-type-container-structure-helper.class.js';
 import {
 	UmbRepositoryDetailsManager,
 	type UmbDetailRepository,
