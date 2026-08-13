@@ -2,6 +2,7 @@ import type { CssLoaderExports, CssLoaderProperty } from '../types/utils.js';
 
 /**
  * Loads plain CSS from a manifest's `css` property.
+ * @template {string} CssType
  * @param {CssLoaderProperty<CssType>} property The manifest property to load the CSS from.
  * @returns {Promise<CssType | undefined>} The resolved CSS string, if found.
  */

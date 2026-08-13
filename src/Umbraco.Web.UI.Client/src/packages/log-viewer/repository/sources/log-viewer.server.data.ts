@@ -3,17 +3,21 @@ import type { UmbLogMessagesDataSource, UmbLogSearchDataSource } from './index.j
 import {
 	LogLevelModel,
 	type DirectionModel,
+	type PagedLoggerResponseModel,
+	type PagedLogMessageResponseModel,
+	type PagedLogTemplateResponseModel,
+	type PagedSavedLogSearchResponseModel,
 	type SavedLogSearchResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { LogViewerService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceErrorResponse, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the log saved searches
  * @class UmbLogSearchesServerDataSource
- * @implements {TemplateDetailDataSource}
+ * @implements {UmbLogSearchDataSource}
  */
 export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	#host: UmbControllerHost;
@@ -30,16 +34,22 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	/**
 	 * Grabs all the log viewer saved searches from the server
 	 * @param {{ skip?: number; take?: number }} query - Pagination options.
-	 * @returns {*} The saved searches.
+	 * @returns {Promise<UmbDataSourceResponse<PagedSavedLogSearchResponseModel>>} The saved searches.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
-	async getAllSavedSearches({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
+	async getAllSavedSearches({
+		skip = 0,
+		take = 100,
+	}: {
+		skip?: number;
+		take?: number;
+	}): Promise<UmbDataSourceResponse<PagedSavedLogSearchResponseModel>> {
 		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearch({ query: { skip, take } }));
 	}
 	/**
 	 * Get a log viewer saved search by name from the server
 	 * @param {{ name: string }} path - The name of the saved search.
-	 * @returns {*} The saved search.
+	 * @returns {Promise<UmbDataSourceResponse<SavedLogSearchResponseModel>>} The saved search.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getSavedSearchByName({ name }: { name: string }) {
@@ -49,16 +59,16 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	/**
 	 *	Post a new log viewer saved search to the server
 	 * @param {SavedLogSearchResponseModel} request - The saved search to create.
-	 * @returns {*} The created saved search.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The created saved search.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
-	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel) {
+	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel): Promise<UmbDataSourceErrorResponse> {
 		return await tryExecute(this.#host, LogViewerService.postLogViewerSavedSearch({ body: { name, query } }));
 	}
 	/**
 	 * Remove a log viewer saved search by name from the server
 	 * @param {{ name: string }} path - The name of the saved search to remove.
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async deleteSavedSearchByName({ name }: { name: string }) {
@@ -85,17 +95,23 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	/**
 	 * Grabs all the loggers from the server
 	 * @param {{ skip?: number; take?: number }} query - Pagination options.
-	 * @returns {*} The loggers.
+	 * @returns {Promise<UmbDataSourceResponse<PagedLoggerResponseModel>>} The loggers.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
-	async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
+	async getLogViewerLevel({
+		skip = 0,
+		take = 100,
+	}: {
+		skip?: number;
+		take?: number;
+	}): Promise<UmbDataSourceResponse<PagedLoggerResponseModel>> {
 		return tryExecute(this.#host, LogViewerService.getLogViewerLevel({ query: { skip, take } }));
 	}
 
 	/**
 	 * Grabs all the number of different log messages from the server
 	 * @param {{ startDate?: string; endDate?: string }} query - The date range to count log messages for.
-	 * @returns {*} The log level counts.
+	 * @returns {Promise<UmbDataSourceResponse<UmbLogLevelCounts>>} The log level counts.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevelCount({
@@ -149,7 +165,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	 * 		startDate?: string;
 	 * 		endDate?: string;
 	 * 	}} query - Filtering and pagination options.
-	 * @returns {*} The log messages.
+	 * @returns {Promise<UmbDataSourceResponse<PagedLogMessageResponseModel>>} The log messages.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLogs({
@@ -168,7 +184,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 		logLevel?: Array<LogLevelModel>;
 		startDate?: string;
 		endDate?: string;
-	}) {
+	}): Promise<UmbDataSourceResponse<PagedLogMessageResponseModel>> {
 		return tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLog({
@@ -192,7 +208,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	 * 		startDate?: string;
 	 * 		endDate?: string;
 	 * 	}} query - Filtering and pagination options.
-	 * @returns {*} The log message templates.
+	 * @returns {Promise<UmbDataSourceResponse<PagedLogTemplateResponseModel>>} The log message templates.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerMessageTemplate({
@@ -205,7 +221,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 		take?: number;
 		startDate?: string;
 		endDate?: string;
-	}) {
+	}): Promise<UmbDataSourceResponse<PagedLogTemplateResponseModel>> {
 		return tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerMessageTemplate({

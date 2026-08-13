@@ -4,7 +4,7 @@ import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { filter, firstValueFrom, of } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
@@ -87,6 +87,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	async #doLoad(): Promise<void> {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
+		// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
 		if (asObservable) {
 			await this.observe(
 				asObservable(),
@@ -95,7 +96,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 				},
 				'observeUser',
 			)
-				.asPromise()
+				?.asPromise()
 				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
 				.catch(() => undefined);
 		}

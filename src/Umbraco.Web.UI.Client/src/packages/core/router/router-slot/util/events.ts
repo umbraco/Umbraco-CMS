@@ -3,8 +3,9 @@ import type { EventListenerSubscription, GlobalRouterEvent, IRoutingInfo } from 
 
 /**
  * Dispatches a did change route event.
+ * @template D
  * @param {HTMLElement} $elem - The element to dispatch the event on.
- * @param {IRoute} detail - The routing info to dispatch.
+ * @param {IRoutingInfo<D>} detail - The routing info to dispatch.
  */
 export function dispatchRouteChangeEvent<D = any>($elem: HTMLElement, detail: IRoutingInfo<D>) {
 	$elem.dispatchEvent(new CustomEvent('changestate', { detail }));
@@ -12,6 +13,7 @@ export function dispatchRouteChangeEvent<D = any>($elem: HTMLElement, detail: IR
 
 /**
  * Dispatches an event on the window object.
+ * @template D
  * @param {GlobalRouterEvent} name - The name of the event to dispatch.
  * @param {IRoutingInfo<D>} [detail] - The routing info to dispatch.
  */
@@ -21,6 +23,8 @@ export function dispatchGlobalRouterEvent<D = any>(name: GlobalRouterEvent, deta
 
 /**
  * Adds an event listener (or more) to an element and returns a function to unsubscribe.
+ * @template {Event} T
+ * @template {string} eventType
  * @param {EventTarget} $elem - The element to add the listener(s) to.
  * @param {eventType[] | eventType} type - The event type(s) to listen for.
  * @param {(e: T) => void} listener - The listener callback.

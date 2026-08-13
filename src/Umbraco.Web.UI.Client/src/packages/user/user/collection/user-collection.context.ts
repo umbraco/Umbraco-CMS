@@ -88,7 +88,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the state filter for the collection and refreshes the collection.
-	 * @param {Array<UmbUserStateFilterModel>} selection - The selected user states to filter by.
+	 * @param {Array<UmbUserStateFilterType>} selection - The selected user states to filter by.
 	 * @memberof UmbUserCollectionContext
 	 */
 	setStateFilter(selection: Array<UmbUserStateFilterType>) {
@@ -97,7 +97,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the order by filter for the collection and refreshes the collection.
-	 * @param {UmbUserOrderByModel} orderBy - The property to order the collection by.
+	 * @param {UmbUserOrderByType} orderBy - The property to order the collection by.
 	 * @memberof UmbUserCollectionContext
 	 */
 	setOrderByFilter(orderBy: UmbUserOrderByType) {
@@ -115,7 +115,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the order direction filter for the collection and refreshes the collection.
-	 * @param {any} orderDirection - The direction to order the collection by.
+	 * @param {UmbDirectionType} orderDirection - The direction to order the collection by.
 	 * @memberof UmbUserCollectionContext
 	 */
 	setOrderDirectionFilter(orderDirection: UmbDirectionType) {
