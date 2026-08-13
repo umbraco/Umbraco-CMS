@@ -432,7 +432,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
                     Values = [],
                 }
             ],
-            Expose = [new(contentElementKey, null, null)],
+            Expose = [new(contentElementKey, null)],
         };
         var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
 
