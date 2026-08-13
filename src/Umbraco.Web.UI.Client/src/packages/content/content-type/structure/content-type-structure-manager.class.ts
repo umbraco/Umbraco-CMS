@@ -6,8 +6,9 @@ import type {
 	UmbPropertyTypeModel,
 } from '../types.js';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in JSDoc below
 import type { UmbContentTypePropertyStructureHelper } from './content-type-property-structure-helper.class.js';
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in JSDoc below
 import type { UmbContentTypeContainerStructureHelper } from './content-type-container-structure-helper.class.js';
 import {
 	UmbRepositoryDetailsManager,
