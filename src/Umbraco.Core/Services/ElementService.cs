@@ -68,6 +68,11 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         Task.FromResult(GetContentSchedulesByKeys(keys));
 
     /// <inheritdoc />
+    // See GetByIdAsync above - same bridge, same reason.
+    public Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken) =>
+        Task.FromResult(GetContentScheduleByContentId(contentId));
+
+    /// <inheritdoc />
     Attempt<OperationResult?> IAsyncContentServiceBase<IElement>.Save(IEnumerable<IElement> contents, int userId) =>
         Attempt.Succeed(Save(contents, userId));
 

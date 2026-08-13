@@ -248,7 +248,7 @@ internal class HasDocumentScheduleFlagProviderTests
             x => x.GetContentSchedulesByKeysAsync(It.Is<Guid[]>(k => k.Length == 2 && k.Contains(key1) && k.Contains(key2)), It.IsAny<CancellationToken>()),
             Times.Once);
         _contentServiceMock.Verify(
-            x => x.GetContentScheduleByContentId(It.IsAny<Guid>()),
+            x => x.GetContentScheduleByContentIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 

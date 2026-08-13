@@ -43,7 +43,7 @@ public class ContentQueryService : IContentQueryService
                 .ContentNotFound);
         }
 
-        ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(id);
+        ContentScheduleCollection schedules = await _contentService.GetContentScheduleByContentIdAsync(id, CancellationToken.None);
 
         return Attempt<ContentScheduleQueryResult?, ContentQueryOperationStatus>
             .Succeed(

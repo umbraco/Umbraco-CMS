@@ -71,7 +71,7 @@ internal sealed partial class ContentServiceTests
         Assert.IsNotEmpty(docResults, "Document scheduled publishing should process at least one document");
 
         // Verify the element schedule is still intact after document scheduled publishing ran
-        var elementSchedulesAfterDocPublish = ElementServiceForScheduling.GetContentScheduleByContentId(element.Key);
+        var elementSchedulesAfterDocPublish = await ElementServiceForScheduling.GetContentScheduleByContentIdAsync(element.Key, CancellationToken.None);
         Assert.AreEqual(
             1,
             elementSchedulesAfterDocPublish.FullSchedule.Count,
@@ -141,7 +141,7 @@ internal sealed partial class ContentServiceTests
         Assert.IsNotEmpty(docResults, "Document scheduled publishing should process at least one document");
 
         // Verify the element expiration schedule is still intact
-        var elementSchedulesAfterDocUnpublish = ElementServiceForScheduling.GetContentScheduleByContentId(element.Key);
+        var elementSchedulesAfterDocUnpublish = await ElementServiceForScheduling.GetContentScheduleByContentIdAsync(element.Key, CancellationToken.None);
         Assert.AreEqual(
             1,
             elementSchedulesAfterDocUnpublish.FullSchedule.Count,

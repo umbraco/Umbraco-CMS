@@ -70,7 +70,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(elementResults[0].Success, $"Element scheduled publish should succeed, got: {elementResults[0].Result}");
 
         // Verify the document schedule is still intact after element scheduled publishing ran
-        var docSchedulesAfterElementPublish = ContentServiceForScheduling.GetContentScheduleByContentId(document.Key);
+        var docSchedulesAfterElementPublish = await ContentServiceForScheduling.GetContentScheduleByContentIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual(
             1,
             docSchedulesAfterElementPublish.FullSchedule.Count,
@@ -141,7 +141,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(elementResults[0].Success, $"Element scheduled unpublish should succeed, got: {elementResults[0].Result}");
 
         // Verify the document expiration schedule is still intact
-        var docSchedulesAfterElementUnpublish = ContentServiceForScheduling.GetContentScheduleByContentId(document.Key);
+        var docSchedulesAfterElementUnpublish = await ContentServiceForScheduling.GetContentScheduleByContentIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual(
             1,
             docSchedulesAfterElementUnpublish.FullSchedule.Count,

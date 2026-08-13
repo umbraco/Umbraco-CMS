@@ -399,15 +399,11 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
+    public async Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = _idKeyMap.GetIdForKeyAsync(contentId, ContentObjectType).GetAwaiter().GetResult();
-        if (idAttempt.Success is false)
-        {
-            return new ContentScheduleCollection();
-        }
-
-        return GetContentScheduleByContentId(idAttempt.Result);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+        return await _asyncContentRepository.GetContentScheduleAsync(contentId, cancellationToken);
     }
 
     /// <inheritdoc />

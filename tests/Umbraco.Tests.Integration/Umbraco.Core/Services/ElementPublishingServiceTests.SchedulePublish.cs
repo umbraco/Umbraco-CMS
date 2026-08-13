@@ -36,7 +36,7 @@ public partial class ElementPublishingServiceTests
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ElementService.GetContentScheduleByContentId(element.Key);
+        var schedules = await ElementService.GetContentScheduleByContentIdAsync(element.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -67,7 +67,7 @@ public partial class ElementPublishingServiceTests
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ElementService.GetContentScheduleByContentId(element.Key);
+        var schedules = await ElementService.GetContentScheduleByContentIdAsync(element.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
         {
@@ -102,7 +102,7 @@ public partial class ElementPublishingServiceTests
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ElementService.GetContentScheduleByContentId(element.Key);
+        var schedules = await ElementService.GetContentScheduleByContentIdAsync(element.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
         {

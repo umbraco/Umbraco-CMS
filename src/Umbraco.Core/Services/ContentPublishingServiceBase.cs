@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Services;
 
 internal abstract class ContentPublishingServiceBase<TContent, TContentService>
     where TContent : class, IPublishableContentBase
-    where TContentService : IPublishableContentService<TContent>, IAsyncContentServiceBase<TContent>
+    where TContentService : IPublishableContentService<TContent>, IAsyncPublishableContentService<TContent>
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly TContentService _contentService;
@@ -63,7 +63,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
         var culturesToPublishImmediately =
             culturesToPublishOrSchedule.Where(culture => culture.Schedule is null).Select(c => c.Culture ?? Constants.System.InvariantCulture).ToHashSet();
 
-        ContentScheduleCollection schedules = _contentService.GetContentScheduleByContentId(key);
+        ContentScheduleCollection schedules = await _contentService.GetContentScheduleByContentIdAsync(key, CancellationToken.None);
 
         foreach (CulturePublishScheduleModel cultureToSchedule in culturesToPublishOrSchedule.Where(c => c.Schedule is not null))
         {

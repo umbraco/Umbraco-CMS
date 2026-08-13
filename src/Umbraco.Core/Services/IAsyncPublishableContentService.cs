@@ -34,4 +34,12 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A dictionary with a content key and an IEnumerable of matching ContentSchedules.</returns>
     Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetContentSchedulesByKeysAsync(Guid[] keys, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets publish/unpublish schedule for a content node.
+    /// </summary>
+    /// <param name="contentId">The unique identifier of the content to load schedule for.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
+    Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken);
 }

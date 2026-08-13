@@ -73,7 +73,7 @@ public class ByKeyElementController : ElementControllerBase
             return ContentEditingOperationStatusResult(ContentEditingOperationStatus.NotFound);
         }
 
-        ContentScheduleCollection contentScheduleCollection = _elementService.GetContentScheduleByContentId(id);
+        ContentScheduleCollection contentScheduleCollection = await _elementService.GetContentScheduleByContentIdAsync(id, cancellationToken);
 
         ElementResponseModel model = _elementPresentationFactory.CreateResponseModel(element, contentScheduleCollection);
         return Ok(model);

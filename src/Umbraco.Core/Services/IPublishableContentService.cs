@@ -63,13 +63,6 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     ContentScheduleCollection GetContentScheduleByContentId(int contentId);
 
     /// <summary>
-    ///     Gets publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="contentId">The unique identifier of the content to load schedule for.</param>
-    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
-    ContentScheduleCollection GetContentScheduleByContentId(Guid contentId);
-
-    /// <summary>
     ///     Persists publish/unpublish schedule for a content node.
     /// </summary>
     /// <param name="content">The content to persist the schedule for.</param>
