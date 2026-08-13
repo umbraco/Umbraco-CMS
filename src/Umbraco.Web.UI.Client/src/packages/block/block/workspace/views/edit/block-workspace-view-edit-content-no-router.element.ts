@@ -11,6 +11,7 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { UmbViewController } from '@umbraco-cms/backoffice/view';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Gets the view alias for a given tab. This is used to create a unique view context for each tab in the block workspace.
@@ -49,6 +50,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	private _hintMap: Map<string | null, UmbVariantHint> = new Map();
 
 	#tabViewContexts: Array<UmbViewController> = [];
+	#hintObservers: Array<UmbObserverController> = [];
 
 	constructor() {
 		super();
@@ -74,13 +76,32 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		);
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
-			this._activeTabKey = undefined;
+			this.#resetViewContexts();
 			this.#blockWorkspace = context;
 			this.#blockManager = context?.content;
 			// block manager does not need to be setup this in file as that it being done by the implementation of this element.
 			this.#tabsStructureHelper.setStructureManager(context?.content.structure);
 			this.#observeRootGroups();
 		});
+	}
+
+	/**
+	 * Destroys all view contexts and the state derived from them, so they can be re-established
+	 * against the block manager of a newly consumed workspace context.
+	 */
+	#resetViewContexts() {
+		this.#tabViewContexts.forEach((context) => context.destroy());
+		this.#tabViewContexts = [];
+		this.#currentProvidedView = undefined;
+
+		this.#hintObservers.forEach((observer) => observer.destroy());
+		this.#hintObservers = [];
+		this._hintMap = new Map();
+
+		this._tabs = undefined;
+		this._hasRootGroups = undefined;
+		this._hasRootProperties = undefined;
+		this._activeTabKey = undefined;
 	}
 
 	async #observeRootGroups() {
@@ -109,11 +130,20 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 		// remove any view contexts that are no longer needed
 		this.#tabViewContexts = this.#tabViewContexts.filter((context) => {
-			if (context.viewAlias === null) {
-				return this._hasRootGroups || this._hasRootProperties;
-			} else {
-				return this._tabs?.some((tab) => getViewAliasForTab(tab) === context.viewAlias);
+			const stillNeeded =
+				context.viewAlias === null
+					? this._hasRootGroups || this._hasRootProperties
+					: this._tabs?.some((tab) => getViewAliasForTab(tab) === context.viewAlias);
+
+			if (!stillNeeded) {
+				if (this.#currentProvidedView === context) {
+					this.#currentProvidedView = undefined;
+					this._activeTabKey = undefined;
+				}
+				context.destroy();
 			}
+
+			return stillNeeded;
 		});
 
 		// Create view contexts for root groups/properties
@@ -127,7 +157,27 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			this.#createViewContext(viewAlias, tab.name ?? '');
 		});
 
+		this.#observeHints();
 		this.#checkDefaultTabName();
+	}
+
+	#observeHints() {
+		this.#hintObservers.forEach((observer) => observer.destroy());
+		this._hintMap = new Map();
+		this.#hintObservers = this.#tabViewContexts.map((context) =>
+			this.observe(
+				context.firstHintOfVariant,
+				(hint) => {
+					if (hint) {
+						this._hintMap.set(context.viewAlias, hint);
+					} else {
+						this._hintMap.delete(context.viewAlias);
+					}
+					this.requestUpdate('_hintMap');
+				},
+				'umbObserveHint_' + context.viewAlias,
+			),
+		);
 	}
 
 	#createViewContext(viewAlias: string | null, tabName: string) {
@@ -152,19 +202,6 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 			view.setTitle(tabName);
 			view.inheritFrom(this.#blockManager.view);
-
-			this.observe(
-				view.firstHintOfVariant,
-				(hint) => {
-					if (hint) {
-						this._hintMap.set(viewAlias, hint);
-					} else {
-						this._hintMap.delete(viewAlias);
-					}
-					this.requestUpdate('_hintMap');
-				},
-				'umbObserveState_' + viewAlias,
-			);
 		}
 	}
 
