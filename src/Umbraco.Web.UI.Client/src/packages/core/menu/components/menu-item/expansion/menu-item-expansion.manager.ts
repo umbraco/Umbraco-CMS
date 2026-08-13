@@ -60,7 +60,7 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 	 * Checks if an entry is expanded
 	 * @param {UmbMenuItemExpansionEntryModel} entry The entry to check
 	 * @returns {Observable<boolean>} True if the entry is expanded
-	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
+	 * @memberof UmbMenuItemExpansionManager
 	 */
 	isExpanded(entry: UmbMenuItemExpansionEntryModel): Observable<boolean> {
 		return this.#manager.isExpanded(entry);
@@ -69,7 +69,7 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 	/**
 	 * Sets the expansion state
 	 * @param {UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel> | undefined} expansion The expansion state
-	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
+	 * @memberof UmbMenuItemExpansionManager
 	 * @returns {void}
 	 */
 	setExpansion(expansion: UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>): void {
@@ -79,7 +79,7 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 
 	/**
 	 * Gets the expansion state
-	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
+	 * @memberof UmbMenuItemExpansionManager
 	 * @returns {UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel>} The expansion state
 	 */
 	getExpansion(): UmbEntityExpansionModel<UmbMenuItemExpansionEntryModel> {
@@ -89,7 +89,7 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 	/**
 	 * Opens a menu item
 	 * @param {UmbMenuItemExpansionEntryModel} entry The item to open
-	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
+	 * @memberof UmbMenuItemExpansionManager
 	 * @returns {Promise<void>}
 	 */
 	public async expandItem(entry: UmbMenuItemExpansionEntryModel): Promise<void> {
@@ -111,7 +111,7 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 	/**
 	 * Closes a menu item
 	 * @param {UmbMenuItemExpansionEntryModel} entry The item to close
-	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
+	 * @memberof UmbMenuItemExpansionManager
 	 * @returns {Promise<void>}
 	 */
 	public async collapseItem(entry: UmbMenuItemExpansionEntryModel): Promise<void> {
@@ -121,7 +121,7 @@ export class UmbMenuItemExpansionManager extends UmbControllerBase {
 
 	/**
 	 * Closes all menu items
-	 * @memberof UmbSectionSidebarMenuSectionExpansionManager
+	 * @memberof UmbMenuItemExpansionManager
 	 * @returns {Promise<void>}
 	 */
 	public async collapseAll(): Promise<void> {

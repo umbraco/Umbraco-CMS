@@ -24,7 +24,7 @@ import {
  * @slot actions - Slot for actions in the footer
  * @slot default - slot for main content
  * @class UmbBodyLayout
- * @augments {UmbLitElement}
+ * @augments {LitElement}
  */
 @customElement('umb-body-layout')
 export class UmbBodyLayoutElement extends LitElement {

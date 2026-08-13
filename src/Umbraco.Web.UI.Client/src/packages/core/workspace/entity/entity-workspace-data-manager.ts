@@ -1,6 +1,7 @@
 import type { UmbWorkspaceDataManager } from '../data-manager/workspace-data-manager.interface.js';
 import { jsonStringComparison, UmbObjectState, type MappingFunction } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * Manages the workspace data for an entity.
@@ -39,7 +40,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Gets persisted data
 	 * @returns {(ModelType | undefined)} The persisted data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	getPersisted() {
 		return this._persisted.getValue();
@@ -48,7 +49,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Sets the persisted data
 	 * @param {(ModelType | undefined)} data The data to persist.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	setPersisted(data: ModelType | undefined) {
 		this._persisted.setValue(data);
@@ -57,7 +58,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Updates the persisted data
 	 * @param {Partial<ModelType>} partialData The partial data to merge into the persisted data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	updatePersisted(partialData: Partial<ModelType>) {
 		this._persisted.update(partialData);
@@ -67,17 +68,19 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * Creates an observable part of the persisted data
 	 * @template ReturnType
 	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction Function to map the persisted data to the observable part.
-	 * @returns {*} The mapped observable part.
+	 * @returns {Observable<ReturnType>} The mapped observable part.
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
-	createObservablePartOfPersisted<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
+	createObservablePartOfPersisted<ReturnType>(
+		mappingFunction: MappingFunction<ModelType | undefined, ReturnType>,
+	): Observable<ReturnType> {
 		return this._persisted.asObservablePart(mappingFunction);
 	}
 
 	/**
 	 * Gets the current data
 	 * @returns {(ModelType | undefined)} The current data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	getCurrent() {
 		return this._current.getValue();
@@ -86,7 +89,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Sets the current data
 	 * @param {(ModelType | undefined)} data The data to set as current.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	setCurrent(data: ModelType | undefined) {
 		if (data) {
@@ -101,7 +104,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	/**
 	 * Updates the current data
 	 * @param {Partial<ModelType>} partialData - The partial data to merge into the current data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	updateCurrent(partialData: Partial<ModelType>) {
 		if (partialData) {
@@ -117,17 +120,19 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * Creates an observable part of the current data
 	 * @template ReturnType
 	 * @param {(MappingFunction<ModelType | undefined, ReturnType>)} mappingFunction - Maps the current data to the observed value.
-	 * @returns {*} An observable of the mapped value.
+	 * @returns {Observable<ReturnType>} An observable of the mapped value.
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
-	createObservablePartOfCurrent<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
+	createObservablePartOfCurrent<ReturnType>(
+		mappingFunction: MappingFunction<ModelType | undefined, ReturnType>,
+	): Observable<ReturnType> {
 		return this._current.asObservablePart(mappingFunction);
 	}
 
 	/**
 	 * Checks if there are unpersisted changes
-	 * @returns {*} Whether the current data differs from the persisted data.
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @returns {boolean} Whether the current data differs from the persisted data.
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	getHasUnpersistedChanges() {
 		const persisted = this._persisted.getValue();
@@ -142,7 +147,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Resets the current data to the persisted data
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	resetCurrent() {
 		this._current.setValue(this._persisted.getValue());
@@ -150,7 +155,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 
 	/**
 	 * Clears the data
-	 * @memberof UmbSubmittableWorkspaceDataManager
+	 * @memberof UmbEntityWorkspaceDataManager
 	 */
 	clear() {
 		this._persisted.setValue(undefined);

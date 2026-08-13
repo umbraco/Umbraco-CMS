@@ -50,6 +50,11 @@ export default [
 			'no-var': 'error',
 			'import-x/namespace': 'off',
 			'import-x/no-unresolved': 'off',
+			// Off: this codebase deliberately gives many classes/elements both a named export and a
+			// `export default` (the default is required for manifest-driven dynamic `js: () => import(...)`
+			// loading). The rule then flags every plain `import Foo from './foo.js'` of that class elsewhere,
+			// forcing `import { Foo } from './foo.js'` for no behavioural benefit.
+			'import-x/no-named-as-default': 'off',
 			// Off: false-positives on barrel files that reach the same underlying binding via two `export *`
 			// paths (e.g. an index.ts re-exporting both a submodule barrel and that submodule's constants
 			// directly) — harmless per the ES module spec, but the rule doesn't resolve to the original
@@ -62,8 +67,7 @@ export default [
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/no-unsafe-localize': 'error',
 			'local-rules/no-unknown-localization-key': 'error',
-			// TODO: change to 'error' when the ~130 current violations are cleaned up. [NL]
-			'local-rules/enforce-null-observe-alias-in-constructor': 'warn',
+			'local-rules/enforce-null-observe-alias-in-constructor': 'error',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{

@@ -3,7 +3,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * @class UmbUserGroupCollectionServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentPermissionServerDataSource {
 	#host: UmbControllerHost;

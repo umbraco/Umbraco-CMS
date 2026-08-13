@@ -1,7 +1,11 @@
 import type { UmbTemplateDetailModel } from '../../types.js';
 import { UMB_TEMPLATE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateTemplateRequestModel,
 	UpdateTemplateRequestModel,
@@ -13,7 +17,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Template that fetches data from the server
  * @class UmbTemplateServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTemplateDetailModel> {
 	#host: UmbControllerHost;
@@ -53,10 +57,10 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Fetches a Template with the given id from the server
 	 * @param {string} unique - The unique identifier of the Template
-	 * @returns {*} The Template
+	 * @returns {Promise<UmbDataSourceResponse<UmbTemplateDetailModel>>} The Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbTemplateDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this.#host, TemplateService.getTemplateById({ path: { id: unique } }));
@@ -81,10 +85,10 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Inserts a new Template on the server
 	 * @param {UmbTemplateDetailModel} model - The Template to create
-	 * @returns {*} The created Template
+	 * @returns {Promise<UmbDataSourceResponse<UmbTemplateDetailModel>>} The created Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async create(model: UmbTemplateDetailModel) {
+	async create(model: UmbTemplateDetailModel): Promise<UmbDataSourceResponse<UmbTemplateDetailModel>> {
 		if (!model) throw new Error('Template is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -112,10 +116,10 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Updates a Template on the server
 	 * @param {UmbTemplateDetailModel} model - The Template to update
-	 * @returns {*} The updated Template
+	 * @returns {Promise<UmbDataSourceResponse<UmbTemplateDetailModel>>} The updated Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async update(model: UmbTemplateDetailModel) {
+	async update(model: UmbTemplateDetailModel): Promise<UmbDataSourceResponse<UmbTemplateDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -143,10 +147,10 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	/**
 	 * Deletes a Template on the server
 	 * @param {string} unique - The unique identifier of the Template
-	 * @returns {*} The result of the delete operation
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(
