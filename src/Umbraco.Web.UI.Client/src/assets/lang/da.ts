@@ -1319,7 +1319,7 @@ export default {
 		packageMigrationsConfirmText: 'Vil du køre de afventende pakkemigreringer?',
 		packageMigrationsComplete: 'Pakkemigreringer er gennemført.',
 		packageMigrationsNonePending: 'Alle pakkemigreringer er gennemført uden problemer.',
-		verifiedToWorkOnUmbracoCloud: 'Bekræftet til at fungere på Umbraco Cloud',
+		verifiedToWorkOnUmbracoCloud: 'Verificeret til at fungere på Umbraco Cloud',
 	},
 	paste: {
 		doNothing: 'Indsæt med fuld formatering (anbefales ikke)',
