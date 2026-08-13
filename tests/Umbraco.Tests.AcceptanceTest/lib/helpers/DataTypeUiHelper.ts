@@ -1173,7 +1173,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   // cannot be used as a drag handle.
   async getBlockCardInGroupWithName(groupName: string, blockName: string) {
     const group = await this.getGroupWithName(groupName);
-    const card = group.locator('umb-block-type-card').filter({hasText: blockName});
+    // Exact match: block names are often prefixes of one another, which would break strict mode.
+    const card = group.locator('umb-block-type-card').filter({has: this.page.getByText(blockName, {exact: true})});
     await this.isVisible(card);
     return card;
   }

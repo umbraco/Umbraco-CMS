@@ -70,8 +70,7 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
 });
 
-// Passes, but vacuously: it only asserts absence from the Library tree, which the test user cannot see anyway.
-test.skip('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
+test('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithLibrarySection(userGroupName);
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -82,5 +81,7 @@ test.skip('cannot see any element when no element start nodes specified', async 
   await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
+  // Positive precondition: the section must actually render, otherwise the absence check below is vacuous.
+  await umbracoUi.library.isSectionWithNameVisible('Library');
   await umbracoUi.library.isElementInTreeVisible(rootFolderName, false);
 });

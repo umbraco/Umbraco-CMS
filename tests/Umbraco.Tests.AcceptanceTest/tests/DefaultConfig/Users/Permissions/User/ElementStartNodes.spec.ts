@@ -97,9 +97,7 @@ test.skip('see no-access view when deep-linking to restricted element', async ({
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 
-// Passes, but vacuously: it only asserts the element is absent from the Library tree, and the Library tab
-// does not render for this user at all (see the two tests above). Needs a positive precondition first.
-test.skip('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
+test('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -109,5 +107,7 @@ test.skip('cannot see any element when no element start nodes specified', async 
   await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
+  // Positive precondition: the section must actually render, otherwise the absence check below is vacuous.
+  await umbracoUi.library.isSectionWithNameVisible('Library');
   await umbracoUi.library.isElementInTreeVisible(rootFolderName, false);
 });

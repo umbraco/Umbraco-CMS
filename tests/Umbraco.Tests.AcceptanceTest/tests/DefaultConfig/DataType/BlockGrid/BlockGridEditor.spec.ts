@@ -196,14 +196,18 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-// Still failing, but NOT yet shown to be a product bug - do not treat this as one.
-// Two real test defects were fixed here: it used to drag from the block's link (the sorter sets draggable=false
-// on links via its default ignorerSelector) and drop onto #add-button (not the '#blocks' sort container).
-// With a card as the handle and '#blocks' as the target the card still does not move, but the product path
-// looks intact: the block sorters share identifier 'umb-block-type-sorter', and a cross-container move calls
-// both onContainerChange and onChange, the latter reaching the parent's #onChange which reassigns groupKey.
-// ('container-change' is dispatched with no listener anywhere, but onChange alone should be enough.)
-// Next step is to confirm whether the drag actually lands in the destination container before blaming the product.
+// Still failing, and still NOT shown to be a product bug - do not treat this as one.
+// Three test-side causes have been ruled out:
+//   1. the drag used to start on the block's link, which the sorter marks draggable=false via ignorerSelector;
+//   2. it used to drop onto #add-button rather than the '#blocks' sort container;
+//   3. an empty destination container is not the problem - dropping into a group that already holds a block
+//      fails the same way.
+// The product path also looks intact: both sorters share identifier 'umb-block-type-sorter', and a cross
+// container move calls onContainerChange and onChange, the latter reaching the parent's #onChange which
+// reassigns groupKey. ('container-change' is dispatched with no listener anywhere, but onChange should suffice.)
+// Within-container sorting works - the document type reorder tests pass using the same mouse drag.
+// What remains is either a product limitation in cross-container block sorting or a gap in what the simulated
+// drag delivers; distinguishing the two needs an event-level trace, not more source reading.
 test.skip('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
