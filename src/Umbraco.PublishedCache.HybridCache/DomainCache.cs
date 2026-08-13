@@ -20,8 +20,8 @@ public class DomainCache : IDomainCache
     ///     The default culture, once resolved at a runtime level where it can be trusted.
     /// </summary>
     /// <remarks>
-    ///     Volatile because this singleton is read concurrently by request threads without a lock, so that a resolved
-    ///     value becomes visible promptly.
+    ///     Volatile because this singleton is read concurrently by request threads without a lock: it prevents the JIT
+    ///     caching the field in a register, so every read observes the value once it has been resolved.
     /// </remarks>
     private volatile string? _defaultCulture;
 
