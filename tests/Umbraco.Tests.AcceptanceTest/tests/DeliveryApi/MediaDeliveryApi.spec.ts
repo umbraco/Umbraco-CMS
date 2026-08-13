@@ -182,20 +182,24 @@ test('can fetch a media item by its path', async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(rootArticleName);  
 });
 
-// Verified still failing, and needs redesigning. Two problems independent of
-// https://github.com/umbraco/Umbraco-CMS/issues/20024:
-// 1. getMediaItemWithPath concatenates the path straight into the URL, so '#' becomes a fragment and '?' a query string.
-// 2. The path is derived as '/' + name.toLowerCase() + '/', but Umbraco slugifies names into URL segments,
-//    so the derived path never matches for a name like this. Read the real path off the created item instead.
+// Rewritten to read the real slugified path off the created item and encode each segment, which addresses both
+// original defects (the derived name-based path, and '#'/'?' being parsed as fragment/query).
+// Left skipped because it could not be verified here: the Media Delivery API is not enabled on this instance and
+// every test in this file returns 401, so re-run this file with the Delivery API enabled before un-skipping.
 test.skip('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Image';
   // Create an image item at root level and its name has special characters
-  await umbracoApi.media.createDefaultMediaWithImage(specialCharacterImageName);
-  const mediaPath = '/' + specialCharacterImageName.toLowerCase() + '/';
+  const mediaId = await umbracoApi.media.createDefaultMediaWithImage(specialCharacterImageName);
+  // Umbraco slugifies the name into the URL segment, so the path has to be read off the item rather than
+  // derived from the name.
+  const mediaItemById = await umbracoApi.mediaDeliveryApi.getMediaItemWithId(mediaId);
+  const mediaPath = (await mediaItemById.json()).path;
+  // Each segment is encoded so '#' and '?' cannot be read as a fragment or a query string.
+  const encodedMediaPath = mediaPath.split('/').map(encodeURIComponent).join('/');
 
   // Act
-  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(mediaPath);
+  const mediaItem = await umbracoApi.mediaDeliveryApi.getMediaItemWithPath(encodedMediaPath);
 
   // Assert
   expect(mediaItem.status()).toBe(200);

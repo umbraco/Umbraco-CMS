@@ -90,6 +90,11 @@ export class LogViewerUiHelper extends UiBaseLocators {
     await this.containsText(this.firstLogLevelMessage, message, 10000);
   }
 
+  async getFirstLogMessage() {
+    await this.waitForVisible(this.firstLogLevelMessage);
+    return await this.firstLogLevelMessage.innerText();
+  }
+
   async clickSavedSearchByName(name: string) {
     await this.clickSavedSearchesButton();
     // Click the item's search button (the <li> also holds a delete button); clicking the button is what
