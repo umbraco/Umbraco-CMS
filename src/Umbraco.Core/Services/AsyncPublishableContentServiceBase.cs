@@ -389,16 +389,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    public ContentScheduleCollection GetContentScheduleByContentId(int contentId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetContentSchedule(contentId);
-        }
-    }
-
-    /// <inheritdoc />
     public async Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);

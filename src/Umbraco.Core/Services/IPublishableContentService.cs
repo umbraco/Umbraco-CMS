@@ -56,13 +56,6 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Gets publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="contentId">The identifier of the content to load schedule for.</param>
-    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
-    ContentScheduleCollection GetContentScheduleByContentId(int contentId);
-
-    /// <summary>
     ///     Persists publish/unpublish schedule for a content node.
     /// </summary>
     /// <param name="content">The content to persist the schedule for.</param>

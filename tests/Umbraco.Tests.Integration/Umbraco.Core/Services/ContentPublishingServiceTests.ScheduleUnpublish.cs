@@ -29,7 +29,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        var schedules = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
@@ -66,7 +66,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        var schedules = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
@@ -107,7 +107,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        var schedules = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
@@ -156,7 +156,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 
         Assert.IsTrue(scheduleAttempt.Success);
 
-        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        var schedules = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.Multiple(() =>
@@ -209,7 +209,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         Assert.IsFalse(scheduleAttempt.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, scheduleAttempt.Status);
 
-        var schedules = ContentService.GetContentScheduleByContentId(content.Id);
+        var schedules = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
         content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.Multiple(() =>

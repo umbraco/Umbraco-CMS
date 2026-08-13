@@ -410,7 +410,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Remove_Scheduled_Publishing_Date()
+    public async Task Remove_Scheduled_Publishing_Date()
     {
         // Arrange
 
@@ -421,7 +421,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
         Assert.AreEqual(1, contentSchedule.FullSchedule.Count);
 
-        contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
+        contentSchedule = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
         var sched = contentSchedule.FullSchedule;
         Assert.AreEqual(1, sched.Count);
         Assert.AreEqual(1, sched.Count(x => x.Culture == Constants.System.InvariantCulture));
@@ -429,7 +429,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
         // Assert
-        contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
+        contentSchedule = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
         sched = contentSchedule.FullSchedule;
         Assert.AreEqual(0, sched.Count);
         Assert.IsTrue(ContentService.Publish(content, content.AvailableCultures.ToArray()).Success);

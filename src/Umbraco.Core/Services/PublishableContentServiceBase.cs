@@ -384,16 +384,6 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     }
 
     /// <inheritdoc />
-    public ContentScheduleCollection GetContentScheduleByContentId(int contentId)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetContentSchedule(contentId);
-        }
-    }
-
-    /// <inheritdoc />
     public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
     {
         Attempt<int> idAttempt = _idKeyMap.GetIdForKeyAsync(contentId, ContentObjectType).GetAwaiter().GetResult();
@@ -402,7 +392,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             return new ContentScheduleCollection();
         }
 
-        return GetContentScheduleByContentId(idAttempt.Result);
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            scope.ReadLock(ReadLockIds);
+            return _contentRepository.GetContentSchedule(idAttempt.Result);
+        }
     }
 
     /// <inheritdoc />
