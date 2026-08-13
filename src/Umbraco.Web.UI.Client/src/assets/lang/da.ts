@@ -2858,12 +2858,12 @@ export default {
 		watchVideos: 'Se videoerne',
 	},
 	startupDashboard: {
-		fallbackHeadline: 'Velkommen til Det Venlige CMS',
+		fallbackHeadline: 'Velkommen til det venlige CMS',
 		fallbackDescription:
 			"Tak, fordi du har valgt Umbraco – vi tror på, at dette kan blive begyndelsen på noget\n      fantastisk. Selvom det måske kan virke overvældende i starten, har vi gjort meget for at gøre indlæringskurven så jævn og hurtig som muligt.",
 	},
 	welcomeDashboard: {
-		ourUmbracoHeadline: 'Our Umbraco - Det Venligste Fællesskab',
+		ourUmbracoHeadline: 'Our Umbraco - det venligste fællesskab',
 		ourUmbracoDescription:
 			'Our Umbraco, den officielle fællesskabsplatform, er dit komplette sted for alt, hvad der vedrører Umbraco. Uanset om du har brug for svar på spørgsmål, spændende tilføjelser eller vejledninger til at udføre noget i Umbraco, er verdens bedste og venligste fællesskab kun et klik væk.',
 		ourUmbracoButton: 'Besøg Our Umbraco',
