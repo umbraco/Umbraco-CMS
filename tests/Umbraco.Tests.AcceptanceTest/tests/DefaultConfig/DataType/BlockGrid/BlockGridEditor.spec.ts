@@ -385,9 +385,23 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
   expect(await umbracoApi.dataType.doesBlockGridContainGridColumns(blockGridEditorName, gridColumns)).toBeTruthy();
 });
 
-// TODO: wait until fixed by frontend, currently you are able to insert multiple stylesheets
-test.skip('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
-  // TODO: Implement it later
+test('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stylesheetName = 'TestStylesheet.css';
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.chooseLayoutStylesheetWithName(stylesheetName);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockGridContainLayoutStylesheet(blockGridEditorName, stylesheetName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
 
 test('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {

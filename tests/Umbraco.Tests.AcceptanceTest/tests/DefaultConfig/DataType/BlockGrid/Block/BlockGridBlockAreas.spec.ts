@@ -55,7 +55,13 @@ test('can add an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbraco
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
-// TODO: There are currently issues when trying to select the locator.
+// Investigated: writable, but only as a pixel drag, so it is left unwritten deliberately.
+// The handle is umb-block-scale-handler inside umb-block-grid-area-config-entry; it resizes on mousedown and
+// block-grid-scale-manager.controller.ts derives the new span from the pointer X relative to
+// .umb-block-grid__area-container, so a drag to the container edge clamps to areaGridColumns.
+// The handle also renders its own '{columnSpan}x{rowSpan}' text, which is the natural assertion target, and an
+// API assertion would need a new doesBlockEditorBlockContainAreaWithColumnSpan helper.
+// Decide whether a pixel-precision drag is acceptable here before writing it - the suite has no other one.
 test.skip('can resize an area for a block', async ({umbracoApi, umbracoUi}) => {
 // Arrange
   const areaAlias = 'TestArea';

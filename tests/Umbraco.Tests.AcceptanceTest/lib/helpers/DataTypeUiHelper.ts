@@ -953,6 +953,14 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.click(this.hideContentEditorBlockGridBtn);
   }
 
+  async chooseLayoutStylesheetWithName(name: string) {
+    await this.click(this.page.getByTestId('property:layoutStylesheet').locator('#btn-add'));
+    await this.openCaretButtonForName('wwwroot');
+    await this.openCaretButtonForName('css');
+    await this.clickTreeItemWithName(name, this.sidebarModal);
+    await this.clickChooseModalButton();
+  }
+
   async chooseBlockCustomStylesheetWithName(name: string) {
     await this.click(this.chooseCustomStylesheetBtn);
     await this.openCaretButtonForName('wwwroot');
