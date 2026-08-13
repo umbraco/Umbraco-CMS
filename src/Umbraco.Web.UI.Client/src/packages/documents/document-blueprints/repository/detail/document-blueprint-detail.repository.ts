@@ -16,10 +16,10 @@ export class UmbDocumentBlueprintDetailRepository extends UmbDetailRepositoryBas
 	/**
 	 * Gets an existing document blueprint by its unique identifier for scaffolding purposes, i.e. to create a new document based on an existing blueprint.
 	 * @param {string} unique - The unique identifier of the document blueprint.
-	 * @returns {UmbRepositoryResponse<UmbDocumentBlueprintDetailModel>} - The document blueprint data.
+	 * @returns {Promise<UmbRepositoryResponse<UmbDocumentBlueprintDetailModel>>} - The document blueprint data.
 	 * @memberof UmbDocumentBlueprintDetailRepository
 	 */
-	scaffoldByUnique(unique: string) {
+	scaffoldByUnique(unique: string): Promise<UmbRepositoryResponse<UmbDocumentBlueprintDetailModel>> {
 		return this.detailDataSource.scaffoldByUnique(unique);
 	}
 }

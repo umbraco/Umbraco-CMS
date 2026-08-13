@@ -46,7 +46,9 @@ export class UmbDocumentBlueprintAuditLogRepository
 	 * @returns {Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentBlueprintAuditLogModel>>>} The audit log.
 	 * @memberof UmbDocumentBlueprintAuditLogRepository
 	 */
-	async requestAuditLog(args: UmbAuditLogRequestArgs) {
+	async requestAuditLog(
+		args: UmbAuditLogRequestArgs,
+	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentBlueprintAuditLogModel>>> {
 		return this.#dataSource.getAuditLog(args);
 	}
 

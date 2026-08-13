@@ -26,7 +26,7 @@ export class UmbDuplicateMemberTypeServerDataSource implements UmbDuplicateToDat
 	 * @returns {UmbDataSourceErrorResponse} The unique identifier of the duplicated Member Type, or an error
 	 * @memberof UmbDuplicateMemberTypeServerDataSource
 	 */
-	async duplicateTo(args: UmbDuplicateToRequestArgs) {
+	async duplicateTo(args: UmbDuplicateToRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

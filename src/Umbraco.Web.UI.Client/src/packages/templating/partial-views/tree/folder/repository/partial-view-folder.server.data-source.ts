@@ -36,7 +36,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The scaffolded Partial View folder
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
-	async createScaffold(preset?: Partial<UmbFolderModel>) {
+	async createScaffold(preset?: Partial<UmbFolderModel>): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		const scaffold: UmbFolderModel = {
 			entityType: UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -120,7 +120,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbDetailDataSource
 	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
 	 * @memberof UmbPartialViewFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);

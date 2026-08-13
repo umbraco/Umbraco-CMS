@@ -29,7 +29,9 @@ export class UmbDocumentAuditLogServerDataSource implements UmbAuditLogDataSourc
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentAuditLogModel>>>} The audit log data
 	 * @memberof UmbDocumentAuditLogServerDataSource
 	 */
-	async getAuditLog(args: UmbAuditLogRequestArgs) {
+	async getAuditLog(
+		args: UmbAuditLogRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentAuditLogModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.getDocumentByIdAuditLog({

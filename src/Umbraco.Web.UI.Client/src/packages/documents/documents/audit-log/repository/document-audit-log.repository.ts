@@ -38,7 +38,9 @@ export class UmbDocumentAuditLogRepository
 	 * @returns {Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentAuditLogModel>>>} The audit log data
 	 * @memberof UmbDocumentAuditLogRepository
 	 */
-	async requestAuditLog(args: UmbAuditLogRequestArgs) {
+	async requestAuditLog(
+		args: UmbAuditLogRequestArgs,
+	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentAuditLogModel>>> {
 		return this.#dataSource.getAuditLog(args);
 	}
 

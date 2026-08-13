@@ -16,7 +16,7 @@ export class UmbUserConfigServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<UmbUserConfigurationModel>>} The user configuration.
 	 * @memberof UmbUserConfigServerDataSource
 	 */
-	getUserConfig() {
+	getUserConfig(): Promise<UmbDataSourceResponse<UmbUserConfigurationModel>> {
 		return tryExecute(this.#host, UserService.getUserConfiguration());
 	}
 
@@ -25,7 +25,7 @@ export class UmbUserConfigServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<UmbCurrentUserConfigurationModel>>} The current user configuration.
 	 * @memberof UmbUserConfigServerDataSource
 	 */
-	getCurrentUserConfig() {
+	getCurrentUserConfig(): Promise<UmbDataSourceResponse<UmbCurrentUserConfigurationModel>> {
 		return tryExecute(this.#host, UserService.getUserCurrentConfiguration());
 	}
 }

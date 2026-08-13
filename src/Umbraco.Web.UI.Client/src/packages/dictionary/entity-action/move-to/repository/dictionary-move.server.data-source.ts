@@ -26,7 +26,7 @@ export class UmbMoveDictionaryServerDataSource implements UmbMoveDataSource {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbMoveDictionaryServerDataSource
 	 */
-	async moveTo(args: UmbMoveToRequestArgs) {
+	async moveTo(args: UmbMoveToRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

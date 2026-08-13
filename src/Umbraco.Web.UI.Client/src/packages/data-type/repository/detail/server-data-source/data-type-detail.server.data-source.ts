@@ -52,7 +52,7 @@ export class UmbDataTypeServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>>} The data type.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await this.#detailRequestManager.read(unique);
@@ -66,7 +66,7 @@ export class UmbDataTypeServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbDataTypeDetailModel>>>} The data types.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async readMany(uniques: Array<string>) {
+	async readMany(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbDataTypeDetailModel>>> {
 		if (!uniques || uniques.length === 0) {
 			return { data: [] };
 		}
@@ -86,7 +86,10 @@ export class UmbDataTypeServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>>} The created data type.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async create(model: UmbDataTypeDetailModel, parentUnique: string | null = null) {
+	async create(
+		model: UmbDataTypeDetailModel,
+		parentUnique: string | null = null,
+	): Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>> {
 		if (!model) throw new Error('Data Type is missing');
 		if (!model.unique) throw new Error('Data Type unique is missing');
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
@@ -124,7 +127,7 @@ export class UmbDataTypeServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>>} The updated data type.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async update(model: UmbDataTypeDetailModel) {
+	async update(model: UmbDataTypeDetailModel): Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 		if (!model.editorUiAlias) throw new Error('Property Editor UI Alias is missing');
@@ -159,7 +162,7 @@ export class UmbDataTypeServerDataSource
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#detailRequestManager.delete(unique);
 	}

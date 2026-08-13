@@ -29,7 +29,7 @@ export class UmbTemplateSearchServerDataSource implements UmbSearchDataSource<Um
 	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbTemplateSearchItemModel>>} The search results
 	 * @memberof UmbTemplateSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(args: UmbSearchRequestArgs): Promise<UmbDataSourceResponse<UmbPagedModel<UmbTemplateSearchItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			TemplateService.getItemTemplateSearch({

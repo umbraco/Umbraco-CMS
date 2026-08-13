@@ -22,7 +22,9 @@ export class UmbSegmentCollectionServerDataSource
 	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbSegmentCollectionItemModel>>} The segment collection.
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbSegmentCollectionFilterModel) {
+	async getCollection(
+		filter: UmbSegmentCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbSegmentCollectionItemModel>>> {
 		const { data, error } = await tryExecute(
 			this,
 			SegmentService.getSegment({ query: { skip: filter.skip, take: filter.take } }),

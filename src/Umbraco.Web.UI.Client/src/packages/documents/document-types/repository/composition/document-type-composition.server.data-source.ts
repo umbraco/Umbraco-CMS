@@ -37,7 +37,7 @@ export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTyp
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionReferenceModel>>>} The compositions referencing the document type.
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
-	async getReferences(unique: string) {
+	async getReferences(unique: string): Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionReferenceModel>>> {
 		const response = await tryExecute(
 			this.#host,
 			DocumentTypeService.getDocumentTypeByIdCompositionReferences({ path: { id: unique } }),
@@ -59,7 +59,9 @@ export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTyp
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionCompatibleModel>>>} The compatible compositions for the document type.
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
-	async availableCompositions(args: UmbDocumentTypeAvailableCompositionRequestModel) {
+	async availableCompositions(
+		args: UmbDocumentTypeAvailableCompositionRequestModel,
+	): Promise<UmbDataSourceResponse<Array<UmbDocumentTypeCompositionCompatibleModel>>> {
 		const body: DocumentTypeCompositionRequestModel = {
 			id: args.unique,
 			isElement: args.isElement,

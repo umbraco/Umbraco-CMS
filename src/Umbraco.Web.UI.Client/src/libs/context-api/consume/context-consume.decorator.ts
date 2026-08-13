@@ -101,7 +101,7 @@ export function consumeContext<
  * @param {boolean} subscribe When true, subscribe to context changes; when false, resolve once.
  */
 function setupConsumer<BaseType extends UmbContextMinimal, ResultType extends BaseType>(
-	host: any,
+	host: UmbControllerHost,
 	context: string | UmbContextToken<BaseType, ResultType>,
 	assign: (value: ResultType | undefined) => void,
 	callback: UmbContextCallback<ResultType> | undefined,

@@ -30,7 +30,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<UmbUserDetailModel>>} The invited user.
 	 * @memberof UmbInviteUserServerDataSource
 	 */
-	async invite(request: UmbInviteUserRequestModel) {
+	async invite(request: UmbInviteUserRequestModel): Promise<UmbDataSourceResponse<UmbUserDetailModel>> {
 		if (!request) throw new Error('Request Data is missing');
 
 		const body = {
@@ -63,7 +63,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the resend invite operation.
 	 * @memberof UmbInviteUserServerDataSource
 	 */
-	async resendInvite(request: UmbResendUserInviteRequestModel) {
+	async resendInvite(request: UmbResendUserInviteRequestModel): Promise<UmbDataSourceErrorResponse> {
 		if (!request.user.unique) throw new Error('User unique is missing');
 		if (!request) throw new Error('Request data is missing');
 

@@ -28,7 +28,9 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 	 * @returns {Promise<UmbDataSourceResponse<{ items: Array<UmbWebhookDeliveryCollectionItemModel>; total: number }>>} The filtered webhook delivery collection
 	 * @memberof UmbWebhookDeliveryCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbWebhookDeliveryCollectionFilterModel) {
+	async getCollection(
+		filter: UmbWebhookDeliveryCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<{ items: Array<UmbWebhookDeliveryCollectionItemModel>; total: number }>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			WebhookService.getWebhookByIdLogs({

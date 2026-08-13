@@ -33,7 +33,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The scaffolded Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
-	async createScaffold(preset?: Partial<UmbFolderModel>) {
+	async createScaffold(preset?: Partial<UmbFolderModel>): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		const scaffold: UmbFolderModel = {
 			entityType: UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -50,7 +50,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(
@@ -79,7 +79,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The created Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
-	async create(model: UmbFolderModel, parentUnique: string | null) {
+	async create(model: UmbFolderModel, parentUnique: string | null): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!model) throw new Error('Data is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
@@ -110,7 +110,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The updated Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
-	async update(model: UmbFolderModel) {
+	async update(model: UmbFolderModel): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!model) throw new Error('Data is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Folder name is missing');
@@ -136,7 +136,7 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 	 * @returns {Promise<UmbDataSourceErrorResponse>} A promise that resolves once the Media Type folder has been deleted
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(
 			this.#host,

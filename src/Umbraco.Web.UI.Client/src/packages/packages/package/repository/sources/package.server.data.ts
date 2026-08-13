@@ -38,7 +38,7 @@ export class UmbPackageServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<Array<ManifestResponseModel>>>} The root items.
 	 * @memberof UmbPackageServerDataSource
 	 */
-	getRootItems() {
+	getRootItems(): Promise<UmbDataSourceResponse<Array<ManifestResponseModel>>> {
 		return tryExecute(this._host, ManifestService.getManifestManifest());
 	}
 
@@ -47,7 +47,7 @@ export class UmbPackageServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<PackageConfigurationResponseModel>>} The package configuration.
 	 * @memberof UmbPackageServerDataSource
 	 */
-	getPackageConfiguration() {
+	getPackageConfiguration(): Promise<UmbDataSourceResponse<PackageConfigurationResponseModel>> {
 		return tryExecute(this._host, PackageService.getPackageConfiguration());
 	}
 
@@ -56,7 +56,7 @@ export class UmbPackageServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<PagedPackageMigrationStatusResponseModel>>} The package migrations.
 	 * @memberof UmbPackageServerDataSource
 	 */
-	getPackageMigrations() {
+	getPackageMigrations(): Promise<UmbDataSourceResponse<PagedPackageMigrationStatusResponseModel>> {
 		return tryExecute(this._host, PackageService.getPackageMigrationStatus({ query: { skip: 0, take: 9999 } }));
 	}
 

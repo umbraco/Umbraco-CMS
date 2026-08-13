@@ -25,7 +25,7 @@ export class UmbExportMemberTypeServerDataSource {
 	 * @returns {UmbDataSourceResponse<Blob | File>} The exported Member Type file, or an error
 	 * @memberof UmbExportMemberTypeServerDataSource
 	 */
-	async export(unique: string) {
+	async export(unique: string): Promise<UmbDataSourceResponse<Blob | File>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(this.#host, MemberTypeService.getMemberTypeByIdExport({ path: { id: unique } }));

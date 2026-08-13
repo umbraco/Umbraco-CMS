@@ -33,7 +33,9 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberDetailModel>>>} The member collection.
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbMemberCollectionFilterModel) {
+	async getCollection(
+		filter: UmbMemberCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbMemberDetailModel>>> {
 		const query = {
 			memberTypeId: filter.memberTypeId,
 			filter: filter.filter,

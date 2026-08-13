@@ -28,7 +28,7 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 	 * TODO: Consider if this binding and events integration is the right for communicating back the modal handler. Or if we should go with some Context API. like a Modal Context API.
 	 * @returns {TemplateResult | string} The rendered workspace element, or an empty string when there is no data.
 	 */
-	override render() {
+	override render(): TemplateResult | string {
 		return this.data
 			? html`<umb-workspace .entityType=${this.data.entityType} ${umbDestroyOnDisconnect()}></umb-workspace>`
 			: '';

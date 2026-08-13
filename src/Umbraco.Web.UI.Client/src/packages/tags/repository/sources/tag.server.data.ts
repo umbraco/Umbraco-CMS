@@ -43,7 +43,7 @@ export class UmbTagServerDataSource {
 		take: number;
 		tagGroup?: string;
 		culture?: string;
-	}) {
+	}): Promise<UmbDataSourceResponse<PagedTagResponseModel>> {
 		return tryExecute(this.#host, TagService.getTag({ query: { query, skip, take, tagGroup, culture } }));
 	}
 }

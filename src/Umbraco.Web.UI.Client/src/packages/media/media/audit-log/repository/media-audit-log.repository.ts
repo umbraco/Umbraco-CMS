@@ -37,7 +37,9 @@ export class UmbMediaAuditLogRepository
 	 * @returns {UmbRepositoryResponse<UmbPagedModel<UmbMediaAuditLogModel>>} The audit log for the media
 	 * @memberof UmbMediaAuditLogRepository
 	 */
-	async requestAuditLog(args: UmbAuditLogRequestArgs) {
+	async requestAuditLog(
+		args: UmbAuditLogRequestArgs,
+	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbMediaAuditLogModel>>> {
 		return this.#dataSource.getAuditLog(args);
 	}
 

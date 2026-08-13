@@ -34,7 +34,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentRedirectStatusModel>>} The current tracker status.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
-	async getStatus() {
+	async getStatus(): Promise<UmbDataSourceResponse<UmbDocumentRedirectStatusModel>> {
 		const { data, error } = await tryExecute(this.#host, RedirectManagementService.getRedirectManagementStatus());
 
 		if (error || !data) {
@@ -57,7 +57,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 *   `Umbraco:CMS:WebRouting:DisableRedirectUrlTracking` configuration key instead.
 	 *   Scheduled for removal in Umbraco 19.
 	 */
-	async setStatus(enabled: boolean) {
+	async setStatus(enabled: boolean): Promise<UmbDataSourceErrorResponse> {
 		const status = enabled ? RedirectStatusModel.ENABLED : RedirectStatusModel.DISABLED;
 		const { error } = await tryExecute(
 			this.#host,
@@ -72,7 +72,9 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>>} The redirects pointing to the document.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
-	async getByDocumentUnique(unique: string) {
+	async getByDocumentUnique(
+		unique: string,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			RedirectManagementService.getRedirectManagementById({ path: { id: unique } }),
@@ -96,7 +98,9 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>>} The requested page of redirects.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
-	async filter(args: UmbDocumentRedirectFilterArgs) {
+	async filter(
+		args: UmbDocumentRedirectFilterArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			RedirectManagementService.getRedirectManagement({
@@ -122,7 +126,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		const { error } = await tryExecute(
 			this.#host,
 			RedirectManagementService.deleteRedirectManagementById({ path: { id: unique } }),

@@ -37,7 +37,13 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<PagedSavedLogSearchResponseModel>>} The saved searches.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
-	async getAllSavedSearches({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
+	async getAllSavedSearches({
+		skip = 0,
+		take = 100,
+	}: {
+		skip?: number;
+		take?: number;
+	}): Promise<UmbDataSourceResponse<PagedSavedLogSearchResponseModel>> {
 		return await tryExecute(this.#host, LogViewerService.getLogViewerSavedSearch({ query: { skip, take } }));
 	}
 	/**
@@ -56,7 +62,7 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The created saved search.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
-	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel) {
+	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel): Promise<UmbDataSourceErrorResponse> {
 		return await tryExecute(this.#host, LogViewerService.postLogViewerSavedSearch({ body: { name, query } }));
 	}
 	/**
@@ -92,7 +98,13 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	 * @returns {Promise<UmbDataSourceResponse<PagedLoggerResponseModel>>} The loggers.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
-	async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
+	async getLogViewerLevel({
+		skip = 0,
+		take = 100,
+	}: {
+		skip?: number;
+		take?: number;
+	}): Promise<UmbDataSourceResponse<PagedLoggerResponseModel>> {
 		return tryExecute(this.#host, LogViewerService.getLogViewerLevel({ query: { skip, take } }));
 	}
 
@@ -172,7 +184,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 		logLevel?: Array<LogLevelModel>;
 		startDate?: string;
 		endDate?: string;
-	}) {
+	}): Promise<UmbDataSourceResponse<PagedLogMessageResponseModel>> {
 		return tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerLog({
@@ -209,7 +221,7 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 		take?: number;
 		startDate?: string;
 		endDate?: string;
-	}) {
+	}): Promise<UmbDataSourceResponse<PagedLogTemplateResponseModel>> {
 		return tryExecute(
 			this.#host,
 			LogViewerService.getLogViewerMessageTemplate({

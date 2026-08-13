@@ -71,7 +71,7 @@ export class UmbDocumentServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentDetailModel>>} The requested document.
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbDocumentDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this, DocumentService.getDocumentById({ path: { id: unique } }));
@@ -179,7 +179,7 @@ export class UmbDocumentServerDataSource
 	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(this, DocumentService.deleteDocumentById({ path: { id: unique } }));
 	}

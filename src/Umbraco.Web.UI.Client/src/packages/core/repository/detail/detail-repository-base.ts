@@ -128,7 +128,7 @@ export abstract class UmbDetailRepositoryBase<
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the delete request
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbRepositoryErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
@@ -147,7 +147,7 @@ export abstract class UmbDetailRepositoryBase<
 	 * @returns {Promise<Observable<DetailModelType | undefined>>} An observable of the detail data
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async byUnique(unique: string) {
+	async byUnique(unique: string): Promise<Observable<DetailModelType | undefined>> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 		return this.#detailStore!.byUnique(unique);

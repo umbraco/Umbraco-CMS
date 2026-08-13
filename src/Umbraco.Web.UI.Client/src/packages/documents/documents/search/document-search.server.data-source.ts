@@ -60,7 +60,9 @@ export class UmbDocumentSearchServerDataSource implements UmbSearchDataSource<
 	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbDocumentSearchItemModel>>} The search results
 	 * @memberof UmbDocumentSearchServerDataSource
 	 */
-	async search(args: UmbDocumentSearchRequestArgs) {
+	async search(
+		args: UmbDocumentSearchRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDocumentSearchItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentService.getItemDocumentSearch({

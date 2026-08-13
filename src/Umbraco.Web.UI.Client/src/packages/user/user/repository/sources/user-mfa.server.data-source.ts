@@ -26,7 +26,7 @@ export class UmbUserMfaServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<Array<UserTwoFactorProviderModel>>>} The MFA providers for the user
 	 * @memberof UmbMfaServerDataSource
 	 */
-	requestMfaProviders(unique: string) {
+	requestMfaProviders(unique: string): Promise<UmbDataSourceResponse<Array<UserTwoFactorProviderModel>>> {
 		if (!unique) throw new Error('User id is missing');
 
 		return tryExecute(
@@ -44,7 +44,7 @@ export class UmbUserMfaServerDataSource {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of disabling the MFA provider
 	 * @memberof UmbMfaServerDataSource
 	 */
-	disableMfaProvider(unique: string, providerName: string) {
+	disableMfaProvider(unique: string, providerName: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('User id is missing');
 		if (!providerName) throw new Error('Provider is missing');
 

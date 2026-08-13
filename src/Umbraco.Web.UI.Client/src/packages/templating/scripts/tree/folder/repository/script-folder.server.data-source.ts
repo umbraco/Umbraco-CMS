@@ -36,7 +36,7 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The scaffolded Script folder
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
-	async createScaffold(preset?: Partial<UmbFolderModel>) {
+	async createScaffold(preset?: Partial<UmbFolderModel>): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		const scaffold: UmbFolderModel = {
 			entityType: UMB_SCRIPT_FOLDER_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -119,7 +119,7 @@ export class UmbScriptFolderServerDataSource implements UmbDetailDataSource<UmbF
 	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);

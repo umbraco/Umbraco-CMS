@@ -17,7 +17,7 @@ export class UmbDictionaryExportServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<Blob | File>>} The exported dictionary.
 	 * @memberof UmbDictionaryExportServerDataSource
 	 */
-	async export(unique: string, includeChildren: boolean) {
+	async export(unique: string, includeChildren: boolean): Promise<UmbDataSourceResponse<Blob | File>> {
 		return await tryExecute(
 			this.#host,
 			DictionaryService.getDictionaryByIdExport({ path: { id: unique }, query: { includeChildren } }),

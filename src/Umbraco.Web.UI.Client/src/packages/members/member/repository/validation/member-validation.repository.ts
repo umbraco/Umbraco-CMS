@@ -25,7 +25,7 @@ export class UmbMemberValidationRepository
 	 * @param {string | null} [parentUnique] - The parent unique
 	 * @returns {Promise<UmbRepositoryResponse<string>>} The validation result.
 	 */
-	async validateCreate(model: DetailModelType, parentUnique: string | null) {
+	async validateCreate(model: DetailModelType, parentUnique: string | null): Promise<UmbRepositoryResponse<string>> {
 		if (!model) throw new Error('Data is missing');
 
 		return this.#validationDataSource.validateCreate(model, parentUnique);
@@ -37,7 +37,7 @@ export class UmbMemberValidationRepository
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
 	 * @returns {Promise<UmbRepositoryResponse<string>>} The validation result.
 	 */
-	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>) {
+	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>): Promise<UmbRepositoryResponse<string>> {
 		if (!model) throw new Error('Data is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 

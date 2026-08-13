@@ -22,7 +22,8 @@ export abstract class UmbDetailStoreBase<T extends UmbEntityModel>
 	 * @memberof UmbDetailStoreBase
 	 */
 	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string) {
-		super(host, storeAlias, new UmbArrayState<T>([], (x) => x.unique));
+		const alias: UmbContextToken<UmbContextMinimal> | string = storeAlias;
+		super(host, alias, new UmbArrayState<T>([], (x) => x.unique));
 	}
 
 	/**

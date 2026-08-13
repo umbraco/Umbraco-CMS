@@ -61,7 +61,7 @@ export class UmbMemberTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>>} The Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await this.#detailRequestManager.read(unique);
@@ -75,7 +75,7 @@ export class UmbMemberTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMemberTypeDetailModel>>>} The Member Types, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async readMany(uniques: Array<string>) {
+	async readMany(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbMemberTypeDetailModel>>> {
 		if (!uniques || uniques.length === 0) {
 			return { data: [] };
 		}
@@ -94,7 +94,10 @@ export class UmbMemberTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>>} The created Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async create(model: UmbMemberTypeDetailModel, parentUnique: string | null = null) {
+	async create(
+		model: UmbMemberTypeDetailModel,
+		parentUnique: string | null = null,
+	): Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>> {
 		if (!model) throw new Error('Member Type is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -146,7 +149,7 @@ export class UmbMemberTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>>} The updated Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async update(model: UmbMemberTypeDetailModel) {
+	async update(model: UmbMemberTypeDetailModel): Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -196,7 +199,7 @@ export class UmbMemberTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#detailRequestManager.delete(unique);
 	}

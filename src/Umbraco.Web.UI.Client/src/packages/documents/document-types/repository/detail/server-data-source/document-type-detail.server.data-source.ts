@@ -68,7 +68,7 @@ export class UmbDocumentTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentTypeDetailModel>>} The document type.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbDocumentTypeDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await this.#detailRequestManager.read(unique);
@@ -82,7 +82,7 @@ export class UmbDocumentTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbDocumentTypeDetailModel>>>} The document types.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async readMany(uniques: Array<string>) {
+	async readMany(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbDocumentTypeDetailModel>>> {
 		if (!uniques || uniques.length === 0) {
 			return { data: [] };
 		}
@@ -102,7 +102,10 @@ export class UmbDocumentTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentTypeDetailModel>>} The created document type.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async create(model: UmbDocumentTypeDetailModel, parentUnique: string | null = null) {
+	async create(
+		model: UmbDocumentTypeDetailModel,
+		parentUnique: string | null = null,
+	): Promise<UmbDataSourceResponse<UmbDocumentTypeDetailModel>> {
 		if (!model) throw new Error('Document Type is missing');
 		if (!model.unique) throw new Error('Document Type unique is missing');
 
@@ -163,7 +166,7 @@ export class UmbDocumentTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentTypeDetailModel>>} The updated document type.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async update(model: UmbDocumentTypeDetailModel) {
+	async update(model: UmbDocumentTypeDetailModel): Promise<UmbDataSourceResponse<UmbDocumentTypeDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -229,7 +232,7 @@ export class UmbDocumentTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#detailRequestManager.delete(unique);
 	}

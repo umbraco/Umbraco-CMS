@@ -60,7 +60,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	 * @returns {Promise<UmbDataSourceResponse<UmbTemplateDetailModel>>} The Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbTemplateDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this.#host, TemplateService.getTemplateById({ path: { id: unique } }));
@@ -88,7 +88,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	 * @returns {Promise<UmbDataSourceResponse<UmbTemplateDetailModel>>} The created Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async create(model: UmbTemplateDetailModel) {
+	async create(model: UmbTemplateDetailModel): Promise<UmbDataSourceResponse<UmbTemplateDetailModel>> {
 		if (!model) throw new Error('Template is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -119,7 +119,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	 * @returns {Promise<UmbDataSourceResponse<UmbTemplateDetailModel>>} The updated Template
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async update(model: UmbTemplateDetailModel) {
+	async update(model: UmbTemplateDetailModel): Promise<UmbDataSourceResponse<UmbTemplateDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -150,7 +150,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

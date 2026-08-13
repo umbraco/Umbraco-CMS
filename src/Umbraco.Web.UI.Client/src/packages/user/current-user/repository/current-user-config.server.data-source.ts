@@ -16,7 +16,7 @@ export class UmbCurrentUserConfigServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<CurrentUserConfigurationResponseModel>>} The current user configuration, or an error
 	 * @memberof UmbCurrentUserConfigServerDataSource
 	 */
-	getCurrentUserConfig() {
+	getCurrentUserConfig(): Promise<UmbDataSourceResponse<CurrentUserConfigurationResponseModel>> {
 		return tryExecute(this.#host, UserService.getUserCurrentConfiguration());
 	}
 }

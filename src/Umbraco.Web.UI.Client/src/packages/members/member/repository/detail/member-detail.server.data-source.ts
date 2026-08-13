@@ -80,7 +80,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	 * @returns {Promise<UmbDataSourceResponse<UmbMemberDetailModel>>} The member.
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMemberDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this, MemberService.getMemberById({ path: { id: unique } }));
@@ -142,7 +142,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	 * @returns {Promise<UmbDataSourceResponse<UmbMemberDetailModel>>} The created member.
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async create(model: UmbMemberDetailModel) {
+	async create(model: UmbMemberDetailModel): Promise<UmbDataSourceResponse<UmbMemberDetailModel>> {
 		if (!model) throw new Error('Member is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -178,7 +178,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	 * @returns {Promise<UmbDataSourceResponse<UmbMemberDetailModel>>} The updated member.
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async update(model: UmbMemberDetailModel) {
+	async update(model: UmbMemberDetailModel): Promise<UmbDataSourceResponse<UmbMemberDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -216,7 +216,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbMemberServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

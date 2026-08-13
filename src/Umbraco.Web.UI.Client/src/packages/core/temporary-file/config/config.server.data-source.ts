@@ -15,7 +15,9 @@ export class UmbTemporaryFileConfigServerDataSource {
 	 * Get the temporary file configuration.
 	 * @returns {Promise<UmbApiResponse<TemporaryFileConfigurationResponseModel>>} The temporary file configuration
 	 */
-	getConfig() {
+	getConfig(): Promise<
+		UmbApiResponse<{ data: TemporaryFileConfigurationResponseModel; request: Request; response: Response }>
+	> {
 		return tryExecute(this.#host, TemporaryFileService.getTemporaryFileConfiguration(), { disableNotifications: true });
 	}
 }

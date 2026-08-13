@@ -17,7 +17,7 @@ export class UmbDictionaryExportRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbRepositoryResponse<Blob | File>>} The exported dictionary.
 	 * @memberof UmbDictionaryExportRepository
 	 */
-	async requestExport(unique: string, includeChildren = false) {
+	async requestExport(unique: string, includeChildren = false): Promise<UmbRepositoryResponse<Blob | File>> {
 		if (!unique) {
 			throw new Error('Unique is missing');
 		}

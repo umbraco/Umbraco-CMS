@@ -56,7 +56,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	 * @returns {Promise<UmbDataSourceResponse<UmbLanguageDetailModel>>} The language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbLanguageDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(
@@ -87,7 +87,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	 * @returns {Promise<UmbDataSourceResponse<UmbLanguageDetailModel>>} The created language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async create(model: UmbLanguageDetailModel) {
+	async create(model: UmbLanguageDetailModel): Promise<UmbDataSourceResponse<UmbLanguageDetailModel>> {
 		if (!model) throw new Error('Language is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -119,7 +119,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	 * @returns {Promise<UmbDataSourceResponse<UmbLanguageDetailModel>>} The updated language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async update(model: UmbLanguageDetailModel) {
+	async update(model: UmbLanguageDetailModel): Promise<UmbDataSourceResponse<UmbLanguageDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -151,7 +151,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

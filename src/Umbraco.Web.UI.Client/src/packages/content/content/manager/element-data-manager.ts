@@ -9,7 +9,7 @@ import { UmbEntityWorkspaceDataManager, type UmbWorkspaceDataManager } from '@um
  * @param {UmbElementValueModel} b The second value to compare.
  * @returns {boolean} True if the values have the same alias and variant.
  */
-function valueObjectCompare(a: any, b: any) {
+function valueObjectCompare(a: UmbElementValueModel, b: UmbElementValueModel): boolean {
 	return a.alias === b.alias && umbVariantObjectCompare(a, b);
 }
 

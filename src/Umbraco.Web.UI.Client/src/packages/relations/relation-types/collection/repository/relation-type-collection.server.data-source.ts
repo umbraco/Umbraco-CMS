@@ -32,7 +32,9 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbRelationTypeCollectionItemModel>>>} The relation type collection.
 	 * @memberof UmbRelationTypeCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbRelationTypeCollectionFilterModel) {
+	async getCollection(
+		filter: UmbRelationTypeCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbRelationTypeCollectionItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			RelationTypeService.getRelationType({

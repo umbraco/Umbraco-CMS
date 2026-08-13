@@ -34,7 +34,7 @@ export class UmbMediaTypeCompositionServerDataSource implements UmbContentTypeCo
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMediaTypeCompositionReferenceModel>>>} The compatible compositions
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
-	async getReferences(unique: string) {
+	async getReferences(unique: string): Promise<UmbDataSourceResponse<Array<UmbMediaTypeCompositionReferenceModel>>> {
 		const response = await tryExecute(
 			this.#host,
 			MediaTypeService.getMediaTypeByIdCompositionReferences({ path: { id: unique } }),
@@ -56,7 +56,9 @@ export class UmbMediaTypeCompositionServerDataSource implements UmbContentTypeCo
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMediaTypeCompositionCompatibleModel>>>} The available compositions
 	 * @memberof UmbMediaTypeCompositionServerDataSource
 	 */
-	async availableCompositions(args: UmbMediaTypeAvailableCompositionRequestModel) {
+	async availableCompositions(
+		args: UmbMediaTypeAvailableCompositionRequestModel,
+	): Promise<UmbDataSourceResponse<Array<UmbMediaTypeCompositionCompatibleModel>>> {
 		const body: MediaTypeCompositionRequestModel = {
 			id: args.unique,
 			currentCompositeIds: args.currentCompositeUniques,

@@ -22,7 +22,10 @@ export class UmbDocumentUrlRepository extends UmbItemRepositoryBase<UmbDocumentU
 	 * @returns {UmbRepositoryResponseWithAsObservable<Array<UmbDocumentUrlsModel> | undefined>} The requested url data.
 	 * @memberof UmbDocumentUrlRepository
 	 */
-	async requestUrls(uniques: Array<string>, culture?: string) {
+	async requestUrls(
+		uniques: Array<string>,
+		culture?: string,
+	): Promise<UmbRepositoryResponseWithAsObservable<Array<UmbDocumentUrlsModel> | undefined>> {
 		if (!uniques) throw new Error('Uniques are missing');
 
 		await this._init;

@@ -29,7 +29,9 @@ export class UmbDictionarySearchServerDataSource implements UmbSearchDataSource<
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDictionarySearchItemModel>>>} The search results.
 	 * @memberof UmbDictionarySearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(
+		args: UmbSearchRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDictionarySearchItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			DictionaryService.getDictionary({

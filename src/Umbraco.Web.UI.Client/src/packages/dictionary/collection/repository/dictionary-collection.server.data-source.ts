@@ -29,7 +29,9 @@ export class UmbDictionaryCollectionServerDataSource implements UmbCollectionDat
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDictionaryCollectionModel>>>} The dictionary collection.
 	 * @memberof UmbDictionaryCollectionServerDataSource
 	 */
-	async getCollection(query: UmbDictionaryCollectionFilterModel) {
+	async getCollection(
+		query: UmbDictionaryCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDictionaryCollectionModel>>> {
 		const { data, error } = await tryExecute(this.#host, DictionaryService.getDictionary({ query }));
 
 		if (data) {

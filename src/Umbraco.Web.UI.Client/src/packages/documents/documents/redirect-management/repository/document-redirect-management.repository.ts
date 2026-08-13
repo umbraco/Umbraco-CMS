@@ -26,7 +26,7 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	 * @returns {Promise<UmbRepositoryResponse<UmbDocumentRedirectStatusModel>>} The current tracker status.
 	 * @memberof UmbDocumentRedirectManagementRepository
 	 */
-	async requestStatus() {
+	async requestStatus(): Promise<UmbRepositoryResponse<UmbDocumentRedirectStatusModel>> {
 		return this.#dataSource.getStatus();
 	}
 
@@ -39,7 +39,7 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	 *   `Umbraco:CMS:WebRouting:DisableRedirectUrlTracking` configuration key instead.
 	 *   Scheduled for removal in Umbraco 19.
 	 */
-	async setStatus(enabled: boolean) {
+	async setStatus(enabled: boolean): Promise<UmbRepositoryErrorResponse> {
 		new UmbDeprecation({
 			deprecated: 'UmbDocumentRedirectManagementRepository.setStatus()',
 			removeInVersion: '19.0.0',
@@ -56,7 +56,9 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	 * @returns {Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>>} The redirects pointing to the document.
 	 * @memberof UmbDocumentRedirectManagementRepository
 	 */
-	async requestByDocumentUnique(unique: string) {
+	async requestByDocumentUnique(
+		unique: string,
+	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>> {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#dataSource.getByDocumentUnique(unique);
 	}
@@ -67,7 +69,9 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	 * @returns {Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>>} The requested page of redirects.
 	 * @memberof UmbDocumentRedirectManagementRepository
 	 */
-	async requestRedirects(args: UmbDocumentRedirectFilterArgs = {}) {
+	async requestRedirects(
+		args: UmbDocumentRedirectFilterArgs = {},
+	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentRedirectUrlModel>>> {
 		return this.#dataSource.filter(args);
 	}
 
@@ -77,7 +81,7 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	 * @returns {Promise<UmbRepositoryErrorResponse>} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentRedirectManagementRepository
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbRepositoryErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#dataSource.delete(unique);
 	}

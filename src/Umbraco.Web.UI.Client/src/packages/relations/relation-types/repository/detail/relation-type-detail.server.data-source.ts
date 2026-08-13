@@ -28,7 +28,7 @@ export class UmbRelationTypeDetailServerDataSource implements UmbReadDetailDataS
 	 * @returns {Promise<UmbDataSourceResponse<UmbRelationTypeDetailModel>>} The relation type detail.
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbRelationTypeDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(

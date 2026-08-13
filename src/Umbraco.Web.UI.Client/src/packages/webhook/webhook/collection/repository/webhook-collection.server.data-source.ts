@@ -12,7 +12,10 @@ import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection
  * @class UmbWebhookCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
-export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectionServerDataSource {
+export class UmbWebhookCollectionServerDataSource implements UmbCollectionDataSource<
+	UmbWebhookDetailModel,
+	UmbWebhookCollectionFilterModel
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -30,7 +33,9 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 	 * @returns {Promise<UmbDataSourceResponse<{ items: Array<UmbWebhookDetailModel>; total: number }>>} The filtered webhook collection
 	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbWebhookCollectionFilterModel) {
+	async getCollection(
+		filter: UmbWebhookCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<{ items: Array<UmbWebhookDetailModel>; total: number }>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			WebhookService.getWebhook({ query: { skip: filter.skip, take: filter.take } }),

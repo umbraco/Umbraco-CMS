@@ -37,7 +37,7 @@ export class UmbMemberTypeCompositionServerDataSource implements UmbContentTypeC
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionReferenceModel>>>} The composition references, or an error
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
-	async getReferences(unique: string) {
+	async getReferences(unique: string): Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionReferenceModel>>> {
 		const response = await tryExecute(
 			this.#host,
 			MemberTypeService.getMemberTypeByIdCompositionReferences({ path: { id: unique } }),
@@ -59,7 +59,9 @@ export class UmbMemberTypeCompositionServerDataSource implements UmbContentTypeC
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionCompatibleModel>>>} The compatible compositions, or an error
 	 * @memberof UmbMemberTypeCompositionServerDataSource
 	 */
-	async availableCompositions(args: UmbMemberTypeAvailableCompositionRequestModel) {
+	async availableCompositions(
+		args: UmbMemberTypeAvailableCompositionRequestModel,
+	): Promise<UmbDataSourceResponse<Array<UmbMemberTypeCompositionCompatibleModel>>> {
 		const body: MemberTypeCompositionRequestModel = {
 			id: args.unique,
 			currentCompositeIds: args.currentCompositeUniques,

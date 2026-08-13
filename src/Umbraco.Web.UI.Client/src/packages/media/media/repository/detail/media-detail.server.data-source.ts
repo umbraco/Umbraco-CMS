@@ -70,7 +70,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	 * @returns {Promise<UmbDataSourceResponse<UmbMediaDetailModel>>} The media
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMediaDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this, MediaService.getMediaById({ path: { id: unique } }));
@@ -115,7 +115,11 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	 * @returns {Promise<UmbDataSourceResponse<UmbMediaDetailModel>>} The created media
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async create(model: UmbMediaDetailModel, parentUnique: string | null = null, disableNotifications = false) {
+	async create(
+		model: UmbMediaDetailModel,
+		parentUnique: string | null = null,
+		disableNotifications = false,
+	): Promise<UmbDataSourceResponse<UmbMediaDetailModel>> {
 		if (!model) throw new Error('Media is missing');
 		if (!model.unique) throw new Error('Media unique is missing');
 
@@ -153,7 +157,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	 * @returns {Promise<UmbDataSourceResponse<UmbMediaDetailModel>>} The updated media
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async update(model: UmbMediaDetailModel) {
+	async update(model: UmbMediaDetailModel): Promise<UmbDataSourceResponse<UmbMediaDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -183,7 +187,7 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	 * @returns {Promise<UmbDataSourceErrorResponse>} A promise that resolves once the media has been deleted
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(this, MediaService.deleteMediaById({ path: { id: unique } }));

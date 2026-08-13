@@ -21,7 +21,8 @@ export abstract class UmbItemStoreBase<T extends { unique: string }>
 	 * @memberof UmbItemStoreBase
 	 */
 	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string) {
-		super(host, storeAlias, new UmbArrayState<T>([], (x) => x.unique));
+		const alias: UmbContextToken<UmbContextMinimal> | string = storeAlias;
+		super(host, alias, new UmbArrayState<T>([], (x) => x.unique));
 	}
 
 	items(uniques: Array<string>) {

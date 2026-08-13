@@ -18,7 +18,7 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the invite operation.
 	 * @memberof UmbInviteUserRepository
 	 */
-	async invite(request: UmbInviteUserRequestModel) {
+	async invite(request: UmbInviteUserRequestModel): Promise<UmbRepositoryErrorResponse> {
 		if (!request) throw new Error('Request data is missing');
 		await this.init;
 
@@ -40,7 +40,7 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the resend invite operation.
 	 * @memberof UmbInviteUserRepository
 	 */
-	async resendInvite(request: UmbResendUserInviteRequestModel) {
+	async resendInvite(request: UmbResendUserInviteRequestModel): Promise<UmbRepositoryErrorResponse> {
 		if (!request.user.unique) throw new Error('User unique is missing');
 		if (!request) throw new Error('data is missing');
 		await this.init;

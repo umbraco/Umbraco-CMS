@@ -27,7 +27,7 @@ export class UmbRenamePartialViewServerDataSource {
 	 * @returns {UmbDataSourceResponse<UmbPartialViewDetailModel>} The renamed partial view, or an error
 	 * @memberof UmbRenamePartialViewServerDataSource
 	 */
-	async rename(unique: string, name: string) {
+	async rename(unique: string, name: string): Promise<UmbDataSourceResponse<UmbPartialViewDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 		if (!name) throw new Error('Name is missing');
 

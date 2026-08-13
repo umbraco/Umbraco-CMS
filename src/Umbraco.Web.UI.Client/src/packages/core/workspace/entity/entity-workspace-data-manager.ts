@@ -71,7 +71,9 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @returns {Observable<ReturnType>} The mapped observable part.
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
-	createObservablePartOfPersisted<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
+	createObservablePartOfPersisted<ReturnType>(
+		mappingFunction: MappingFunction<ModelType | undefined, ReturnType>,
+	): Observable<ReturnType> {
 		return this._persisted.asObservablePart(mappingFunction);
 	}
 
@@ -121,7 +123,9 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @returns {Observable<ReturnType>} An observable of the mapped value.
 	 * @memberof UmbEntityWorkspaceDataManager
 	 */
-	createObservablePartOfCurrent<ReturnType>(mappingFunction: MappingFunction<ModelType | undefined, ReturnType>) {
+	createObservablePartOfCurrent<ReturnType>(
+		mappingFunction: MappingFunction<ModelType | undefined, ReturnType>,
+	): Observable<ReturnType> {
 		return this._current.asObservablePart(mappingFunction);
 	}
 

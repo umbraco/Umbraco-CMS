@@ -40,7 +40,9 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbDataTypeItemModel>>>} The filtered data-type collection.
 	 * @memberof UmbDataTypeCollectionServerDataSource
 	 */
-	async getCollection(query: UmbDataTypeCollectionFilterModel) {
+	async getCollection(
+		query: UmbDataTypeCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbDataTypeItemModel>>> {
 		const { data, error } = await tryExecute(this.#host, DataTypeService.getFilterDataType({ query }));
 
 		if (error) {

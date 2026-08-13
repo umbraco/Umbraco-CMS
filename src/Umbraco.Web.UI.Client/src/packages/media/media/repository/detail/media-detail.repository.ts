@@ -17,7 +17,10 @@ export class UmbMediaDetailRepository extends UmbDetailRepositoryBase<UmbMediaDe
 	 * @param {string | null} parentUnique - The unique ID of the parent media item
 	 * @returns {UmbRepositoryResponse<UmbMediaDetailModel>} The created media item
 	 */
-	async createSilently(model: UmbMediaDetailModel, parentUnique: string | null) {
+	async createSilently(
+		model: UmbMediaDetailModel,
+		parentUnique: string | null,
+	): Promise<UmbRepositoryResponse<UmbMediaDetailModel>> {
 		if (!model) throw new Error('Data is missing');
 		return (this.detailDataSource as UmbMediaServerDataSource).create(model, parentUnique, true);
 	}

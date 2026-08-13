@@ -24,7 +24,10 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<ItemType>>>} The allowed children of the content type.
 	 * @memberof UmbContentTypeStructureRepositoryBase
 	 */
-	requestAllowedChildrenOf(unique: string | null, parentContentUnique: string | null) {
+	requestAllowedChildrenOf(
+		unique: string | null,
+		parentContentUnique: string | null,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<ItemType>>> {
 		return this._dataSource.getAllowedChildrenOf(unique, parentContentUnique);
 	}
 }

@@ -78,7 +78,11 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the publish request
 	 * @memberof UmbDocumentPublishingRepository
 	 */
-	async publishWithDescendants(id: string, variantIds: Array<UmbVariantId>, includeUnpublishedDescendants: boolean) {
+	async publishWithDescendants(
+		id: string,
+		variantIds: Array<UmbVariantId>,
+		includeUnpublishedDescendants: boolean,
+	): Promise<UmbRepositoryErrorResponse> {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
 

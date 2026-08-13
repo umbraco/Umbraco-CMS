@@ -26,7 +26,7 @@ export class UmbChangeUserPasswordServerDataSource {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the change password operation.
 	 * @memberof UmbChangeUserPasswordServerDataSource
 	 */
-	async changePassword(id: string, newPassword: string) {
+	async changePassword(id: string, newPassword: string): Promise<UmbDataSourceErrorResponse> {
 		if (!id) throw new Error('User Id is missing');
 
 		return tryExecute(

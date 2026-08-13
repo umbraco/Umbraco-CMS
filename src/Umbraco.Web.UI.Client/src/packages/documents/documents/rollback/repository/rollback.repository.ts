@@ -80,7 +80,10 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 	 * @returns {UmbRepositoryResponse<PagedDocumentVersionItemResponseModel>} The versions for the document.
 	 * @deprecated Use {@link requestVersionsByEntityId} instead. Scheduled for removal in Umbraco 19.
 	 */
-	async requestVersionsByDocumentId(id: string, culture?: string) {
+	async requestVersionsByDocumentId(
+		id: string,
+		culture?: string,
+	): Promise<UmbRepositoryResponse<PagedDocumentVersionItemResponseModel>> {
 		return await this.#dataSource.getVersionsByDocumentId(id, culture);
 	}
 }

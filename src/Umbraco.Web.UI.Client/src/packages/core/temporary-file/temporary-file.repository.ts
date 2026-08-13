@@ -31,7 +31,12 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The upload response
 	 * @memberof UmbTemporaryFileRepository
 	 */
-	upload(id: string, file: File, onProgress?: (progress: ProgressEvent) => void, abortSignal?: AbortSignal) {
+	upload(
+		id: string,
+		file: File,
+		onProgress?: (progress: ProgressEvent) => void,
+		abortSignal?: AbortSignal,
+	): Promise<UmbRepositoryResponse<unknown>> {
 		return this.#source.create(id, file, onProgress, abortSignal);
 	}
 
@@ -41,7 +46,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The delete response
 	 * @memberof UmbTemporaryFileRepository
 	 */
-	delete(id: string) {
+	delete(id: string): Promise<UmbRepositoryErrorResponse> {
 		return this.#source.delete(id);
 	}
 
@@ -51,7 +56,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbRepositoryResponse<TemporaryFileResponseModel>>} The temporary file
 	 * @memberof UmbTemporaryFileRepository
 	 */
-	requestById(id: string) {
+	requestById(id: string): Promise<UmbRepositoryResponse<TemporaryFileResponseModel>> {
 		return this.#source.read(id);
 	}
 }

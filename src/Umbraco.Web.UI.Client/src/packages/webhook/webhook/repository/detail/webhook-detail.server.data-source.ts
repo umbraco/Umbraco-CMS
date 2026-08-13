@@ -60,7 +60,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	 * @returns {Promise<UmbDataSourceResponse<UmbWebhookDetailModel>>} The Webhook
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbWebhookDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this.#host, WebhookService.getWebhookById({ path: { id: unique } }));
@@ -91,7 +91,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	 * @returns {Promise<UmbDataSourceResponse<UmbWebhookDetailModel>>} The created Webhook
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
-	async create(model: UmbWebhookDetailModel) {
+	async create(model: UmbWebhookDetailModel): Promise<UmbDataSourceResponse<UmbWebhookDetailModel>> {
 		if (!model) throw new Error('Webhook is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -126,7 +126,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	 * @returns {Promise<UmbDataSourceResponse<UmbWebhookDetailModel>>} The updated Webhook
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
-	async update(model: UmbWebhookDetailModel) {
+	async update(model: UmbWebhookDetailModel): Promise<UmbDataSourceResponse<UmbWebhookDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -161,7 +161,7 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the deletion
 	 * @memberof UmbWebhookDetailServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

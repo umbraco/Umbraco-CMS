@@ -30,7 +30,10 @@ export class UmbRollbackServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<PagedDocumentVersionItemResponseModel>>} The versions for the document.
 	 * @memberof UmbRollbackServerDataSource
 	 */
-	getVersionsByDocumentId(id: string, culture?: string) {
+	getVersionsByDocumentId(
+		id: string,
+		culture?: string,
+	): Promise<UmbDataSourceResponse<PagedDocumentVersionItemResponseModel>> {
 		return tryExecute(this.#host, DocumentVersionService.getDocumentVersion({ query: { documentId: id, culture } }));
 	}
 
@@ -40,7 +43,7 @@ export class UmbRollbackServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<DocumentVersionResponseModel>>} The requested version.
 	 * @memberof UmbRollbackServerDataSource
 	 */
-	getVersionById(versionId: string) {
+	getVersionById(versionId: string): Promise<UmbDataSourceResponse<DocumentVersionResponseModel>> {
 		return tryExecute(this.#host, DocumentVersionService.getDocumentVersionById({ path: { id: versionId } }));
 	}
 

@@ -26,7 +26,7 @@ export class UmbUserSetGroupsServerDataSource {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of setting the groups
 	 * @memberof UmbUserSetGroupsServerDataSource
 	 */
-	async setGroups(userIds: string[], userGroupIds: string[]) {
+	async setGroups(userIds: string[], userGroupIds: string[]): Promise<UmbDataSourceErrorResponse> {
 		if (!userIds) throw new Error('User ids are missing');
 		if (!userGroupIds) throw new Error('User group ids are missing');
 

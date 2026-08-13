@@ -36,7 +36,9 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	 * @returns {Promise<UmbDataSourceResponse<{ items: Array<UmbUserDetailModel>; total: number }>>} The filtered user collection.
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbUserCollectionFilterModel) {
+	async getCollection(
+		filter: UmbUserCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<{ items: Array<UmbUserDetailModel>; total: number }>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.getFilterUser({

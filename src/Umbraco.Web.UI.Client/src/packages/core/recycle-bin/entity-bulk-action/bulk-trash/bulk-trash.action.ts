@@ -24,7 +24,7 @@ export class UmbTrashEntityBulkAction<
 	 * @deprecated this has been turned into a private property and cannot be used from v.18. Will be removed in v.18
 	 * @returns {Array<UmbEntityModel>} The items to be trashed
 	 */
-	protected get _items() {
+	protected get _items(): Array<UmbEntityModel> {
 		return this.#items;
 	}
 	/**

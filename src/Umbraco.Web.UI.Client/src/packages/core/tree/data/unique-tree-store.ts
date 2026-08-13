@@ -29,7 +29,7 @@ export class UmbUniqueTreeStore extends UmbStoreBase<UmbTreeItemModel> implement
 	 * @returns {Observable<Array<UmbTreeItemModel>>} An observable of the children
 	 * @memberof UmbUniqueTreeStore
 	 */
-	childrenOf(parentUnique: string | null) {
+	childrenOf(parentUnique: string | null): Observable<Array<UmbTreeItemModel>> {
 		return this._data.asObservablePart((items) => items.filter((item) => item.parent.unique === parentUnique));
 	}
 }

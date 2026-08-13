@@ -101,7 +101,9 @@ export abstract class UmbTreeRepositoryBase<
 	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, Array<TreeItemType>>>} The root items of the tree
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
+	async requestTreeRootItems(
+		args: TreeRootItemsRequestArgsType,
+	): Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, Array<TreeItemType>>> {
 		await this._init;
 
 		const { data, error } = await this._treeSource.getRootItems(args);
@@ -129,7 +131,9 @@ export abstract class UmbTreeRepositoryBase<
 	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, Array<TreeItemType>>>} The tree items of the given parent
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemsOf(args: TreeChildrenOfRequestArgsType) {
+	async requestTreeItemsOf(
+		args: TreeChildrenOfRequestArgsType,
+	): Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, Array<TreeItemType>>> {
 		if (!args.parent) throw new Error('Parent is missing');
 		if (args.parent.unique === undefined) throw new Error('Parent unique is missing');
 		if (args.parent.entityType === null) throw new Error('Parent entity type is missing');
@@ -177,7 +181,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @memberof UmbTreeRepositoryBase
 	 * @deprecated Use `requestTreeRootItems` instead. This method requires the tree store to be available, which is not always the case. It will be removed in Umbraco 18.
 	 */
-	async rootTreeItems() {
+	async rootTreeItems(): Promise<Observable<Array<TreeItemType>>> {
 		await this._init;
 
 		return this._treeStore?.rootItems ?? of([]);
@@ -190,7 +194,7 @@ export abstract class UmbTreeRepositoryBase<
 	 * @memberof UmbTreeRepositoryBase
 	 * @deprecated Use `requestTreeItemsOf` instead. This method requires the tree store to be available, which is not always the case. It will be removed in Umbraco 18.
 	 */
-	async treeItemsOf(parentUnique: string | null) {
+	async treeItemsOf(parentUnique: string | null): Promise<Observable<Array<TreeItemType>>> {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 		await this._init;
 

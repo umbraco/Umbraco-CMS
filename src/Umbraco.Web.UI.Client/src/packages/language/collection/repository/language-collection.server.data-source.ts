@@ -30,7 +30,9 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbLanguageCollectionItemModel>>} The language collection.
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbLanguageCollectionFilterModel) {
+	async getCollection(
+		filter: UmbLanguageCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbLanguageCollectionItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			LanguageService.getLanguage({ query: { skip: filter.skip, take: filter.take } }),

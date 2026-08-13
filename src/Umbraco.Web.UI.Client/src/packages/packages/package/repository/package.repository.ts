@@ -191,7 +191,7 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	 * @returns {Promise<Observable<Array<UmbPackage>>>} The root items observable.
 	 * @memberof UmbPackageRepository
 	 */
-	async rootItems() {
+	async rootItems(): Promise<Observable<Array<UmbPackage>>> {
 		await this.#init;
 		return this.#packageStore!.rootItems;
 	}
@@ -201,7 +201,7 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	 * @returns {Promise<Observable<Array<ManifestBase>>>} The extensions observable.
 	 * @memberof UmbPackageRepository
 	 */
-	async extensions() {
+	async extensions(): Promise<Observable<Array<ManifestBase>>> {
 		await this.#init;
 		return this.#packageStore!.extensions;
 	}
@@ -211,7 +211,7 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	 * @returns {Promise<Observable<Array<PackageMigrationStatusResponseModel>>>} The migrations observable.
 	 * @memberof UmbPackageRepository
 	 */
-	async migrations() {
+	async migrations(): Promise<Observable<Array<PackageMigrationStatusResponseModel>>> {
 		await this.#init;
 		return this.#packageStore!.migrations;
 	}

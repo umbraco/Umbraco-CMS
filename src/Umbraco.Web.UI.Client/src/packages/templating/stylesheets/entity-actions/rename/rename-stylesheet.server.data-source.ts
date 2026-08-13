@@ -27,7 +27,7 @@ export class UmbRenameStylesheetServerDataSource {
 	 * @returns {UmbDataSourceResponse<UmbStylesheetDetailModel>} The renamed Stylesheet
 	 * @memberof UmbRenameStylesheetServerDataSource
 	 */
-	async rename(unique: string, name: string) {
+	async rename(unique: string, name: string): Promise<UmbDataSourceResponse<UmbStylesheetDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 		if (!name) throw new Error('Name is missing');
 

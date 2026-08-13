@@ -53,7 +53,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	 * @returns {Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>>} The dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this.#host, DictionaryService.getDictionaryById({ path: { id: unique } }));
@@ -80,7 +80,10 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	 * @returns {Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>>} The created dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
-	async create(model: UmbDictionaryDetailModel, parentUnique: string | null) {
+	async create(
+		model: UmbDictionaryDetailModel,
+		parentUnique: string | null,
+	): Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>> {
 		if (!model) throw new Error('Dictionary is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -111,7 +114,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	 * @returns {Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>>} The updated dictionary.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
-	async update(model: UmbDictionaryDetailModel) {
+	async update(model: UmbDictionaryDetailModel): Promise<UmbDataSourceResponse<UmbDictionaryDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -141,7 +144,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDictionaryServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

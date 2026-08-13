@@ -20,7 +20,7 @@ export class UmbScriptItemServerDataSource extends UmbControllerBase implements 
 	 * @returns {UmbDataSourceResponse<Array<UmbScriptItemModel>>} The requested script items, or an error
 	 * @memberof UmbScriptItemServerDataSource
 	 */
-	async getItems(uniques: Array<string>) {
+	async getItems(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbScriptItemModel>>> {
 		if (!uniques) throw new Error('Uniques are missing');
 
 		const paths = uniques

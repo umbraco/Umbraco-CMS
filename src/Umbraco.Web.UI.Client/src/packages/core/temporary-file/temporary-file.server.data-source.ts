@@ -54,7 +54,7 @@ export class UmbTemporaryFileServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<TemporaryFileResponseModel>>} The temporary file
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
-	read(id: string) {
+	read(id: string): Promise<UmbDataSourceResponse<TemporaryFileResponseModel>> {
 		if (!id) throw new Error('Id is missing');
 		return tryExecute(this.#host, TemporaryFileService.getTemporaryFileById({ path: { id } }));
 	}
@@ -65,7 +65,7 @@ export class UmbTemporaryFileServerDataSource {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The delete response
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
-	delete(id: string) {
+	delete(id: string): Promise<UmbDataSourceErrorResponse> {
 		if (!id) throw new Error('Id is missing');
 		return tryExecute(this.#host, TemporaryFileService.deleteTemporaryFileById({ path: { id } }));
 	}

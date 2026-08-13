@@ -37,7 +37,9 @@ export class UmbUserClientCredentialRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbRepositoryResponse<UmbUserClientCredentialModel>>} The created client credential.
 	 * @memberof UmbUserClientCredentialRepository
 	 */
-	async requestCreate(args: UmbCreateUserClientCredentialRequestArgs) {
+	async requestCreate(
+		args: UmbCreateUserClientCredentialRequestArgs,
+	): Promise<UmbRepositoryResponse<UmbUserClientCredentialModel>> {
 		return this.#source.create(args);
 	}
 
@@ -47,7 +49,9 @@ export class UmbUserClientCredentialRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbRepositoryResponse<Array<UmbUserClientCredentialModel>>>} The client credentials for the user.
 	 * @memberof UmbUserClientCredentialRepository
 	 */
-	async requestClientCredentials(args: UmbUserClientCredentialRequestArgs) {
+	async requestClientCredentials(
+		args: UmbUserClientCredentialRequestArgs,
+	): Promise<UmbRepositoryResponse<Array<UmbUserClientCredentialModel>>> {
 		return this.#source.read(args);
 	}
 
@@ -57,7 +61,7 @@ export class UmbUserClientCredentialRepository extends UmbRepositoryBase {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbUserClientCredentialRepository
 	 */
-	async requestDelete(args: UmbDeleteUserClientCredentialRequestArgs) {
+	async requestDelete(args: UmbDeleteUserClientCredentialRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		return this.#source.delete(args);
 	}
 }

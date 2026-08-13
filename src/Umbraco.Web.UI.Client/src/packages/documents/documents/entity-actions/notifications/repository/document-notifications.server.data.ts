@@ -29,7 +29,7 @@ export class UmbDocumentNotificationsServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<Array<DocumentNotificationResponseModel>>>} The notifications data
 	 * @memberof UmbDocumentNotificationsServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<Array<DocumentNotificationResponseModel>>> {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(this.#host, DocumentService.getDocumentByIdNotifications({ path: { id: unique } }));
 	}
@@ -41,7 +41,7 @@ export class UmbDocumentNotificationsServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<unknown>>} The result of the update request
 	 * @memberof UmbDocumentNotificationsServerDataSource
 	 */
-	async update(unique: string, data: UpdateDocumentNotificationsRequestModel) {
+	async update(unique: string, data: UpdateDocumentNotificationsRequestModel): Promise<UmbDataSourceResponse<unknown>> {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(this.#host, DocumentService.putDocumentByIdNotifications({ path: { id: unique }, body: data }));
 	}

@@ -61,7 +61,7 @@ export class UmbMediaTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>>} The media type
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await this.#detailRequestManager.read(unique);
@@ -75,7 +75,7 @@ export class UmbMediaTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMediaTypeDetailModel>>>} The media types
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async readMany(uniques: Array<string>) {
+	async readMany(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbMediaTypeDetailModel>>> {
 		if (!uniques || uniques.length === 0) {
 			return { data: [] };
 		}
@@ -95,7 +95,10 @@ export class UmbMediaTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>>} The created media type
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async create(model: UmbMediaTypeDetailModel, parentUnique: string | null = null) {
+	async create(
+		model: UmbMediaTypeDetailModel,
+		parentUnique: string | null = null,
+	): Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>> {
 		if (!model) throw new Error('Media Type is missing');
 		if (!model.unique) throw new Error('Media Type unique is missing');
 
@@ -153,7 +156,7 @@ export class UmbMediaTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>>} The updated media type
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async update(model: UmbMediaTypeDetailModel) {
+	async update(model: UmbMediaTypeDetailModel): Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -208,7 +211,7 @@ export class UmbMediaTypeDetailServerDataSource
 	 * @returns {Promise<UmbDataSourceErrorResponse>} A promise that resolves once the media type has been deleted
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#detailRequestManager.delete(unique);
 	}

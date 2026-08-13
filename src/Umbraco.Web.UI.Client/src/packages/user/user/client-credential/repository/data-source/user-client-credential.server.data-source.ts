@@ -28,7 +28,9 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	 * @returns {Promise<UmbDataSourceResponse<UmbUserClientCredentialModel>>} The created client credential.
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
-	async create(args: UmbCreateUserClientCredentialRequestArgs) {
+	async create(
+		args: UmbCreateUserClientCredentialRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbUserClientCredentialModel>> {
 		const { error } = await tryExecute(
 			this.#host,
 			UserService.postUserByIdClientCredentials({
@@ -53,7 +55,9 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	 * @returns {Promise<UmbDataSourceResponse<Array<UmbUserClientCredentialModel>>>} The client credentials for the user.
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
-	async read(args: UmbUserClientCredentialRequestArgs) {
+	async read(
+		args: UmbUserClientCredentialRequestArgs,
+	): Promise<UmbDataSourceResponse<Array<UmbUserClientCredentialModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			UserService.getUserByIdClientCredentials({
@@ -78,7 +82,7 @@ export class UmbUserClientCredentialServerDataSource implements UmbUserClientCre
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbUserClientCredentialServerDataSource
 	 */
-	delete(args: UmbDeleteUserClientCredentialRequestArgs) {
+	delete(args: UmbDeleteUserClientCredentialRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		return tryExecute(
 			this.#host,
 			UserService.deleteUserByIdClientCredentialsByClientId({

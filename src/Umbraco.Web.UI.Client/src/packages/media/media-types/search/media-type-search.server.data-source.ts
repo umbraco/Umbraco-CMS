@@ -29,7 +29,7 @@ export class UmbMediaTypeSearchServerDataSource implements UmbSearchDataSource<U
 	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbMediaTypeSearchItemModel>>} The search results
 	 * @memberof UmbMediaTypeSearchServerDataSource
 	 */
-	async search(args: UmbSearchRequestArgs) {
+	async search(args: UmbSearchRequestArgs): Promise<UmbDataSourceResponse<UmbPagedModel<UmbMediaTypeSearchItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaTypeService.getItemMediaTypeSearch({

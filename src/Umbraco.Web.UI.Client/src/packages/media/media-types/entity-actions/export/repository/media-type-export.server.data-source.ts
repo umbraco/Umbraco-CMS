@@ -25,7 +25,7 @@ export class UmbExportMediaTypeServerDataSource {
 	 * @returns {UmbDataSourceResponse<Blob | File>} The result of the export operation.
 	 * @memberof UmbExportMediaTypeServerDataSource
 	 */
-	async export(unique: string) {
+	async export(unique: string): Promise<UmbDataSourceResponse<Blob | File>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(this.#host, MediaTypeService.getMediaTypeByIdExport({ path: { id: unique } }));

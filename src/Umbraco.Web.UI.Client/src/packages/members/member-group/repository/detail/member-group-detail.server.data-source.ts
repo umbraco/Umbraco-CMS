@@ -49,7 +49,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	 * @returns {Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>>} The Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(
@@ -76,7 +76,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	 * @returns {Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>>} The created Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
-	async create(model: UmbMemberGroupDetailModel) {
+	async create(model: UmbMemberGroupDetailModel): Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>> {
 		if (!model) throw new Error('Member Group is missing');
 
 		const body: CreateMemberGroupRequestModel = {
@@ -104,7 +104,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	 * @returns {Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>>} The updated Member Group, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
-	async update(model: UmbMemberGroupDetailModel) {
+	async update(model: UmbMemberGroupDetailModel): Promise<UmbDataSourceResponse<UmbMemberGroupDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -134,7 +134,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if successful, or an error.
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

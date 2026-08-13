@@ -197,7 +197,7 @@ export class UmbDocumentPublishingServerDataSource {
 			}
 
 			if (data.isComplete) {
-				return { error: null };
+				return { error: undefined };
 			}
 		}
 	}

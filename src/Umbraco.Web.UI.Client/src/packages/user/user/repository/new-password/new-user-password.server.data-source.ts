@@ -26,7 +26,7 @@ export class UmbNewUserPasswordServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<ResetPasswordUserResponseModel>>} The new password
 	 * @memberof UmbNewUserPasswordServerDataSource
 	 */
-	async newPassword(unique: string) {
+	async newPassword(unique: string): Promise<UmbDataSourceResponse<ResetPasswordUserResponseModel>> {
 		if (!unique) throw new Error('User unique is missing');
 
 		return tryExecute(

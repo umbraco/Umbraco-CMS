@@ -41,7 +41,7 @@ export interface UmbTryExecuteOptions {
 }
 
 export type UmbApiWithErrorResponse = {
-	error?: UmbApiError | UmbCancelError;
+	error?: UmbError | UmbApiError | UmbCancelError;
 };
 
 /**

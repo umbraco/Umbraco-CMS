@@ -253,7 +253,10 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	 * @returns {(UmbCodeEditorRange[] | undefined)} The ranges of the found matches.
 	 * @memberof UmbCodeEditorElement
 	 */
-	find(text: string, searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{}) {
+	find(
+		text: string,
+		searchOptions: CodeEditorSearchOptions = <CodeEditorSearchOptions>{},
+	): UmbCodeEditorRange[] | undefined {
 		return this.#editor?.find(text, searchOptions);
 	}
 

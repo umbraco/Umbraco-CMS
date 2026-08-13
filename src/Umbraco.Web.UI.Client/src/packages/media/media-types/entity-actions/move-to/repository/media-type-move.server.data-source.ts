@@ -26,7 +26,7 @@ export class UmbMoveMediaTypeServerDataSource implements UmbMoveDataSource {
 	 * @returns {UmbDataSourceErrorResponse} A promise that resolves once the media type has been moved
 	 * @memberof UmbMoveMediaTypeServerDataSource
 	 */
-	async moveTo(args: UmbMoveToRequestArgs) {
+	async moveTo(args: UmbMoveToRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

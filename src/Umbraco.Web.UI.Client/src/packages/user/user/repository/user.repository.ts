@@ -29,7 +29,14 @@ export class UmbUserRepository extends UmbUserRepositoryBase {
 	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UserTwoFactorProviderModel> | undefined, Array<UserTwoFactorProviderModel>>>} The MFA providers for the user
 	 * @memberof UmbUserRepository
 	 */
-	async requestMfaProviders(unique: string) {
+	async requestMfaProviders(
+		unique: string,
+	): Promise<
+		UmbRepositoryResponseWithAsObservable<
+			Array<UserTwoFactorProviderModel> | undefined,
+			Array<UserTwoFactorProviderModel>
+		>
+	> {
 		const { data, error } = await this.#userMfaSource.requestMfaProviders(unique);
 		return { data, error, asObservable: () => of(data ?? []) };
 	}
@@ -42,8 +49,12 @@ export class UmbUserRepository extends UmbUserRepositoryBase {
 	 * @returns {Promise<UmbRepositoryResponse<unknown>>} The result of disabling the MFA provider
 	 * @memberof UmbUserRepository
 	 */
-	async disableMfaProvider(unique: string, providerName: string, displayName?: string) {
-		const { data, error } = await this.#userMfaSource.disableMfaProvider(unique, providerName);
+	async disableMfaProvider(
+		unique: string,
+		providerName: string,
+		displayName?: string,
+	): Promise<UmbRepositoryResponse<unknown>> {
+		const { error } = await this.#userMfaSource.disableMfaProvider(unique, providerName);
 
 		const localize = new UmbLocalizationController(this._host);
 
@@ -60,6 +71,6 @@ export class UmbUserRepository extends UmbUserRepositoryBase {
 			this.notificationContext?.peek('warning', notification);
 		}
 
-		return { data, error };
+		return { error };
 	}
 }

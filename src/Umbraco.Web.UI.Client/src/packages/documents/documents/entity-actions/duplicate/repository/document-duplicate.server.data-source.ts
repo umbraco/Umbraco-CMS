@@ -26,7 +26,7 @@ export class UmbDuplicateDocumentServerDataSource {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the duplicate request
 	 * @memberof UmbDuplicateDocumentServerDataSource
 	 */
-	async duplicate(args: UmbDuplicateDocumentRequestArgs) {
+	async duplicate(args: UmbDuplicateDocumentRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

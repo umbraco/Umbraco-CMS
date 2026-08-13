@@ -47,7 +47,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the trash request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
-	async requestTrash(args: UmbRecycleBinTrashRequestArgs) {
+	async requestTrash(args: UmbRecycleBinTrashRequestArgs): Promise<UmbRepositoryErrorResponse> {
 		return this.#recycleBinSource.trash(args);
 	}
 
@@ -57,7 +57,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the restore request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
-	async requestRestore(args: UmbRecycleBinRestoreRequestArgs) {
+	async requestRestore(args: UmbRecycleBinRestoreRequestArgs): Promise<UmbRepositoryErrorResponse> {
 		const { error } = await this.#recycleBinSource.restore(args);
 
 		if (!error) {
@@ -75,7 +75,7 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	 * @returns {Promise<UmbRepositoryErrorResponse>} The result of the empty request
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
-	async requestEmpty() {
+	async requestEmpty(): Promise<UmbRepositoryErrorResponse> {
 		return this.#recycleBinSource.empty();
 	}
 
@@ -85,7 +85,9 @@ export abstract class UmbRecycleBinRepositoryBase extends UmbRepositoryBase impl
 	 * @returns {Promise<UmbRepositoryResponse<{ unique: string } | null>>} The original parent of the item
 	 * @memberof UmbRecycleBinRepositoryBase
 	 */
-	async requestOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {
-		return this.#recycleBinSource.getOriginalParent(args);
+	async requestOriginalParent(
+		args: UmbRecycleBinOriginalParentRequestArgs,
+	): Promise<UmbRepositoryResponse<{ unique: string } | null>> {
+		return this.#recycleBinSource.getOriginalParent(args) as Promise<UmbRepositoryResponse<{ unique: string } | null>>;
 	}
 }

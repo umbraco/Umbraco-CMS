@@ -1,7 +1,7 @@
 import { MediaTypeService, type ImportMediaTypeRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Media Type Import Server Data Source
@@ -22,10 +22,10 @@ export class UmbMediaTypeImportServerDataSource {
 	/**
 	 * Import an item for the given id to the destination unique
 	 * @param {temporaryUnique} temporaryUnique - The unique ID of the temporary file to import
-	 * @returns {UmbDataSourceErrorResponse} The imported media type
+	 * @returns {Promise<UmbDataSourceResponse<unknown>>} The imported media type
 	 * @memberof UmbMediaTypeImportServerDataSource
 	 */
-	async import(temporaryUnique: string) {
+	async import(temporaryUnique: string): Promise<UmbDataSourceResponse<unknown>> {
 		if (!temporaryUnique) throw new Error('Unique is missing');
 
 		const body: ImportMediaTypeRequestModel = {

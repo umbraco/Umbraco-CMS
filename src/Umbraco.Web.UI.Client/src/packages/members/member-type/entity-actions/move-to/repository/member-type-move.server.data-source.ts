@@ -26,7 +26,7 @@ export class UmbMoveMemberTypeServerDataSource implements UmbMoveDataSource {
 	 * @returns {UmbDataSourceErrorResponse} An error, if the move failed
 	 * @memberof UmbMoveMemberTypeServerDataSource
 	 */
-	async moveTo(args: UmbMoveToRequestArgs) {
+	async moveTo(args: UmbMoveToRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

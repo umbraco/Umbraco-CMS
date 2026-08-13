@@ -184,7 +184,7 @@ export class UmbDocumentBlueprintServerDataSource implements UmbDetailDataSource
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(this.#host, DocumentBlueprintService.deleteDocumentBlueprintById({ path: { id: unique } }));

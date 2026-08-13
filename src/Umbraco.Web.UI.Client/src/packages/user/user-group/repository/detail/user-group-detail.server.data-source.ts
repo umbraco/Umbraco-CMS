@@ -61,7 +61,7 @@ export class UmbUserGroupServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>>} The User Group.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this, UserGroupService.getUserGroupById({ path: { id: unique } }));
@@ -115,7 +115,7 @@ export class UmbUserGroupServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>>} The created User Group.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
-	async create(model: UmbUserGroupDetailModel) {
+	async create(model: UmbUserGroupDetailModel): Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>> {
 		if (!model) throw new Error('User Group is missing');
 
 		const permissionDataPromises = model.permissions.map(async (item) => {
@@ -165,7 +165,7 @@ export class UmbUserGroupServerDataSource
 	 * @returns {Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>>} The updated User Group.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
-	async update(model: UmbUserGroupDetailModel) {
+	async update(model: UmbUserGroupDetailModel): Promise<UmbDataSourceResponse<UmbUserGroupDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		const permissionDataPromises = model.permissions.map(async (item) => {
@@ -216,7 +216,7 @@ export class UmbUserGroupServerDataSource
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbUserGroupServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(

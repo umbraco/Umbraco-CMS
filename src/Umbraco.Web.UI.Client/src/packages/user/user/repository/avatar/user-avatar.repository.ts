@@ -16,7 +16,7 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the upload operation.
 	 * @memberof UmbUserAvatarRepository
 	 */
-	async uploadAvatar(userUnique: string, file: File) {
+	async uploadAvatar(userUnique: string, file: File): Promise<UmbDataSourceErrorResponse> {
 		if (!userUnique) throw new Error('Id is missing');
 		await this.init;
 
@@ -55,7 +55,7 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbUserAvatarRepository
 	 */
-	async deleteAvatar(userUnique: string) {
+	async deleteAvatar(userUnique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!userUnique) throw new Error('Id is missing');
 		await this.init;
 

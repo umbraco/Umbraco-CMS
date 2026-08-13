@@ -25,7 +25,7 @@ export class UmbExportDocumentTypeServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<Blob | File>>} The exported item.
 	 * @memberof UmbExportDocumentTypeServerDataSource
 	 */
-	async export(unique: string) {
+	async export(unique: string): Promise<UmbDataSourceResponse<Blob | File>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(this.#host, DocumentTypeService.getDocumentTypeByIdExport({ path: { id: unique } }));

@@ -29,7 +29,9 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbMediaAuditLogModel>>} The audit log for the media
 	 * @memberof UmbMediaAuditLogServerDataSource
 	 */
-	async getAuditLog(args: UmbAuditLogRequestArgs) {
+	async getAuditLog(
+		args: UmbAuditLogRequestArgs,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbMediaAuditLogModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			MediaService.getMediaByIdAuditLog({

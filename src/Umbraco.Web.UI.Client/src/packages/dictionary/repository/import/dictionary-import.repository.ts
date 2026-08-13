@@ -22,10 +22,15 @@ export class UmbDictionaryImportRepository extends UmbRepositoryBase {
 	 * @description - Import a dictionary
 	 * @param {string} temporaryFileUnique - The unique identifier of the uploaded temporary file to import.
 	 * @param {string} [parentUnique] - The unique identifier of the parent to import into, if any.
-	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbDictionaryDetailModel | undefined> | UmbDataSourceResponse<string>>} The imported dictionary.
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbDictionaryDetailModel | undefined> | UmbDataSourceResponse<unknown>>} The imported dictionary.
 	 * @memberof UmbDictionaryImportRepository
 	 */
-	async requestImport(temporaryFileUnique: string, parentUnique: string | null) {
+	async requestImport(
+		temporaryFileUnique: string,
+		parentUnique: string | null,
+	): Promise<
+		UmbRepositoryResponseWithAsObservable<UmbDictionaryDetailModel | undefined> | UmbDataSourceResponse<unknown>
+	> {
 		if (!temporaryFileUnique) throw new Error('Temporary file unique is missing');
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 

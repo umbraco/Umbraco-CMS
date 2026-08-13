@@ -32,7 +32,7 @@ export class UmbTemplateQueryServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<TemplateQuerySettingsResponseModel>>} The query builder settings
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
-	async getTemplateQuerySettings() {
+	async getTemplateQuerySettings(): Promise<UmbDataSourceResponse<TemplateQuerySettingsResponseModel>> {
 		return tryExecute(this.#host, TemplateService.getTemplateQuerySettings());
 	}
 	/**
@@ -41,7 +41,9 @@ export class UmbTemplateQueryServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<TemplateQueryResultResponseModel>>} The result of the query
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
-	async executeTemplateQuery(args: UmbExecuteTemplateQueryRequestModel) {
+	async executeTemplateQuery(
+		args: UmbExecuteTemplateQueryRequestModel,
+	): Promise<UmbDataSourceResponse<TemplateQueryResultResponseModel>> {
 		const body: TemplateQueryExecuteModel = {
 			rootDocument: args.rootDocument ? { id: args.rootDocument.unique } : null,
 			documentTypeAlias: args.documentTypeAlias,

@@ -84,7 +84,7 @@ export class UmbStoreBase<StoreItemType = any> extends UmbContextBase implements
 	 * @returns {Observable<Array<StoreItemType>>} An observable of the entire store
 	 * @memberof UmbStoreBase
 	 */
-	all() {
+	all(): Observable<Array<StoreItemType>> {
 		return this._data.asObservable();
 	}
 }

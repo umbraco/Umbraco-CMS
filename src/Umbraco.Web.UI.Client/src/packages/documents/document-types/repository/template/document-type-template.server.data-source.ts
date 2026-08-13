@@ -26,7 +26,7 @@ export class UmbDocumentTypeTemplateServerDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<string>>} The unique identifier of the created template.
 	 * @memberof UmbDocumentTypeTemplateServerDataSource
 	 */
-	async createTemplate(unique: string, model: UmbDocumentTypeTemplateModel) {
+	async createTemplate(unique: string, model: UmbDocumentTypeTemplateModel): Promise<UmbDataSourceResponse<string>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			DocumentTypeService.postDocumentTypeByIdTemplate({

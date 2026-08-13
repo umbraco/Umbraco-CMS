@@ -40,7 +40,7 @@ export class UmbTagStore extends UmbStoreBase {
 	 * @returns {Observable<TagResponseModel | undefined>} The tag observable part.
 	 * @memberof UmbTagStore
 	 */
-	byId(id: TagResponseModel['id']) {
+	byId(id: TagResponseModel['id']): Observable<TagResponseModel | undefined> {
 		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 

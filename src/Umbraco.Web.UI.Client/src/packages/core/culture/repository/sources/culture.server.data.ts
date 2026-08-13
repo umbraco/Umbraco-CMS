@@ -29,7 +29,13 @@ export class UmbCultureServerDataSource implements UmbCultureDataSource {
 	 * @returns {Promise<UmbDataSourceResponse<PagedCultureReponseModel>>} The paginated list of cultures.
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async getCollection({ skip, take }: { skip: number; take: number }) {
+	async getCollection({
+		skip,
+		take,
+	}: {
+		skip: number;
+		take: number;
+	}): Promise<UmbDataSourceResponse<PagedCultureReponseModel>> {
 		return tryExecute(this.#host, CultureService.getCulture({ query: { skip, take } }));
 	}
 }

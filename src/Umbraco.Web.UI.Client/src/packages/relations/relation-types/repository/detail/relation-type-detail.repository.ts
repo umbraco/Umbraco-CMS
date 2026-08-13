@@ -35,7 +35,11 @@ export class UmbRelationTypeDetailRepository
 	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbRelationTypeDetailModel, UmbRelationTypeDetailModel | undefined>>} The relation type detail.
 	 * @memberof UmbRelationTypeDetailRepository
 	 */
-	async requestByUnique(unique: string) {
+	async requestByUnique(
+		unique: string,
+	): Promise<
+		UmbRepositoryResponseWithAsObservable<UmbRelationTypeDetailModel, UmbRelationTypeDetailModel | undefined>
+	> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
@@ -54,7 +58,7 @@ export class UmbRelationTypeDetailRepository
 	 * @returns {Promise<Observable<UmbRelationTypeDetailModel | undefined>>} An observable of the relation type detail.
 	 * @memberof UmbRelationTypeDetailRepository
 	 */
-	async byUnique(unique: string) {
+	async byUnique(unique: string): Promise<Observable<UmbRelationTypeDetailModel | undefined>> {
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 		return this.#detailStore!.byUnique(unique);

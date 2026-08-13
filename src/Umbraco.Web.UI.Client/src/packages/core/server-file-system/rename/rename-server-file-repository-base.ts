@@ -29,7 +29,7 @@ export abstract class UmbRenameServerFileRepositoryBase<
 	 * @returns {Promise<UmbRepositoryResponse<DetailModelType>>} The renamed detail data
 	 * @memberof UmbRenameServerFileRepositoryBase
 	 */
-	async rename(unique: string, name: string) {
+	async rename(unique: string, name: string): Promise<UmbRepositoryResponse<DetailModelType>> {
 		if (!unique) throw new Error('Unique is missing');
 		if (!name) throw new Error('Name is missing');
 

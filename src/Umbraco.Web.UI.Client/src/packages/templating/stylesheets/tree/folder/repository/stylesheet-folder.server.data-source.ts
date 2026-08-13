@@ -47,7 +47,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The Stylesheet folder
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
@@ -114,7 +114,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);

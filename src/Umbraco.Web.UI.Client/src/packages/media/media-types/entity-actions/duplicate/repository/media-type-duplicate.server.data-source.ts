@@ -26,7 +26,7 @@ export class UmbDuplicateMediaTypeServerDataSource implements UmbDuplicateToData
 	 * @returns {UmbDataSourceErrorResponse} The result of the duplicate operation.
 	 * @memberof UmbDuplicateMediaTypeServerDataSource
 	 */
-	async duplicateTo(args: UmbDuplicateToRequestArgs) {
+	async duplicateTo(args: UmbDuplicateToRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

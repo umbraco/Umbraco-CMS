@@ -33,7 +33,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The document blueprint folder scaffold.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async createScaffold(preset?: Partial<UmbFolderModel>) {
+	async createScaffold(preset?: Partial<UmbFolderModel>): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		const scaffold: UmbFolderModel = {
 			entityType: UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -50,7 +50,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The document blueprint folder.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(
@@ -79,7 +79,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The created document blueprint folder.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async create(model: UmbFolderModel, parentUnique: string | null) {
+	async create(model: UmbFolderModel, parentUnique: string | null): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!model) throw new Error('Model is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
@@ -110,7 +110,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The updated document blueprint folder.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async update(model: UmbFolderModel) {
+	async update(model: UmbFolderModel): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!model) throw new Error('Model is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Folder name is missing');
@@ -136,7 +136,7 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(
 			this.#host,

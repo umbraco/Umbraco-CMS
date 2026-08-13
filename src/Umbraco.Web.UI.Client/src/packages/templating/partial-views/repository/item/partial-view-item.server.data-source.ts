@@ -23,7 +23,7 @@ export class UmbPartialViewItemServerDataSource
 	 * @returns {UmbDataSourceResponse<Array<UmbPartialViewItemModel>>} The requested partial view items, or an error
 	 * @memberof UmbPartialViewItemServerDataSource
 	 */
-	async getItems(uniques: Array<string>) {
+	async getItems(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbPartialViewItemModel>>> {
 		if (!uniques) throw new Error('Uniques are missing');
 
 		const paths = uniques

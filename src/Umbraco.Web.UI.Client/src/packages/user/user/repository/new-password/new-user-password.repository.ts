@@ -28,7 +28,7 @@ export class UmbNewUserPasswordRepository extends UmbUserRepositoryBase {
 	 * @returns {Promise<UmbRepositoryResponse<ResetPasswordUserResponseModel>>} The new password
 	 * @memberof UmbNewUserPasswordRepository
 	 */
-	async requestNewPassword(userUnique: string) {
+	async requestNewPassword(userUnique: string): Promise<UmbRepositoryResponse<ResetPasswordUserResponseModel>> {
 		if (!userUnique) throw new Error('User unique is missing');
 		await this.init;
 		return this.dataSource.newPassword(userUnique);

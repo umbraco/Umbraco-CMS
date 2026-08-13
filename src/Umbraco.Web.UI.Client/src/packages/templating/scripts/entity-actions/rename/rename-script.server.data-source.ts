@@ -27,7 +27,7 @@ export class UmbRenameScriptServerDataSource {
 	 * @returns {UmbDataSourceResponse<UmbScriptDetailModel>} The renamed script, or an error
 	 * @memberof UmbRenameScriptServerDataSource
 	 */
-	async rename(unique: string, name: string) {
+	async rename(unique: string, name: string): Promise<UmbDataSourceResponse<UmbScriptDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 		if (!name) throw new Error('Name is missing');
 

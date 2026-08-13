@@ -64,7 +64,7 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 	 * @returns {Promise<UmbRepositoryResponse<UmbUserDetailModel>>} The created user details
 	 * @memberof UmbUserDetailRepository
 	 */
-	override async create(model: UmbUserDetailModel) {
+	override async create(model: UmbUserDetailModel): Promise<UmbRepositoryResponse<UmbUserDetailModel>> {
 		return super.create(model, null);
 	}
 
@@ -74,7 +74,7 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 	 * @returns {Promise<UmbDataSourceResponse<UmbUserStartNodesModel>>} The calculated start nodes for the user
 	 * @memberof UmbUserDetailRepository
 	 */
-	requestCalculateStartNodes(unique: string) {
+	requestCalculateStartNodes(unique: string): Promise<UmbDataSourceResponse<UmbUserStartNodesModel>> {
 		return this.detailDataSource.calculateStartNodes(unique);
 	}
 }
