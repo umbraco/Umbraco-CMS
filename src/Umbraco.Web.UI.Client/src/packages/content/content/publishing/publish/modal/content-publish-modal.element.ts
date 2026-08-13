@@ -5,6 +5,7 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbConfirmActionModalEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
@@ -141,6 +142,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	}
 
 	static override readonly styles = [
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

@@ -5,6 +5,7 @@ import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-reg
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type {
 	UmbConfirmActionModalEntityReferencesConfig,
@@ -209,6 +210,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	}
 
 	static override readonly styles = [
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

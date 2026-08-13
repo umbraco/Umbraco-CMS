@@ -1,6 +1,6 @@
 import type { UmbEntityReferencesModalData, UmbEntityReferencesModalValue } from './types.js';
 import type { UmbEntityReferenceListElement } from '../../global-components/entity-reference-list.element.js';
-import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -37,9 +37,10 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 	}
 
 	override render() {
-		if (!this.data) return nothing;
+		const data = this.data;
+		if (!data) return nothing;
 
-		const headline = this.data.headline ?? this.localize.term('references_labelUsedByItems');
+		const headline = data.headline ?? this.localize.term('references_labelUsedByItems');
 
 		return html`
 			<uui-dialog-layout headline=${headline}>
@@ -47,8 +48,8 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 					<p><umb-localize key="references_labelDependsOnThis"></umb-localize></p>
 					<umb-entity-reference-list
 						readonly
-						.unique=${this.data.unique}
-						.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
+						.unique=${data.unique}
+						.referenceRepositoryAlias=${data.referenceRepositoryAlias}
 						source="referencedBy"
 						@change=${this.#onReferencedByChange}></umb-entity-reference-list>
 				</div>
@@ -56,21 +57,26 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 					<p><umb-localize key="references_labelDependentDescendants"></umb-localize></p>
 					<umb-entity-reference-list
 						readonly
-						.unique=${this.data.unique}
-						.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
-						.itemRepositoryAlias=${this.data.itemRepositoryAlias}
+						.unique=${data.unique}
+						.referenceRepositoryAlias=${data.referenceRepositoryAlias}
+						.itemRepositoryAlias=${data.itemRepositoryAlias}
 						source="descendantsWithReferences"
 						@change=${this.#onDescendantsChange}></umb-entity-reference-list>
 				</div>
-				<div ?hidden=${!this.data.includeReferencedElementsWithPendingChanges || !this._pendingChangesTotal}>
-					<p><umb-localize key="references_labelElementsWithPendingChanges"></umb-localize></p>
-					<umb-entity-reference-list
-						readonly
-						.unique=${this.data.unique}
-						.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
-						source="referencedElementsWithPendingChanges"
-						@change=${this.#onPendingChangesChange}></umb-entity-reference-list>
-				</div>
+				${when(
+					data.includeReferencedElementsWithPendingChanges,
+					() => html`
+						<div ?hidden=${!this._pendingChangesTotal}>
+							<p><umb-localize key="references_labelElementsWithPendingChanges"></umb-localize></p>
+							<umb-entity-reference-list
+								readonly
+								.unique=${data.unique}
+								.referenceRepositoryAlias=${data.referenceRepositoryAlias}
+								source="referencedElementsWithPendingChanges"
+								@change=${this.#onPendingChangesChange}></umb-entity-reference-list>
+						</div>
+					`,
+				)}
 
 				<div slot="actions">
 					<uui-button
@@ -88,10 +94,6 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 				display: block;
 				min-width: 460px;
 				max-width: 90vw;
-			}
-
-			h5 {
-				margin-bottom: var(--uui-size-3);
 			}
 		`,
 	];

@@ -367,6 +367,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 	 */
 	async #needsPublishConfirmationModal(options: Array<UmbElementVariantOptionModel>): Promise<boolean> {
 		if (options.length > 1) return true;
+		// An element that has never been saved has no server-side references in either direction yet.
+		if (this.#elementWorkspaceContext?.getIsNew()) return false;
 		try {
 			const [referencedBy, elementsWithPendingChanges] = await Promise.all([
 				this.referenceCount.getTotalAsync(),

@@ -57,14 +57,6 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 	}
 
 	/**
-	 * Checks if the items are referenced by other items
-	 * @param {Array<string>} uniques - The unique identifiers of the items to fetch
-	 * @param {number} skip - The number of items to skip
-	 * @param {number} take - The number of items to take
-	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>>} - Items that are referenced by other items
-	 * @memberof UmbElementReferenceServerDataSource
-	 */
-	/**
 	 * Fetches the elements directly referenced by the given unique that are not fully published.
 	 * @param {string} unique - The unique identifier of the referencing document or element.
 	 * @param {number} skip - The number of items to skip.
@@ -96,6 +88,14 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 		return { data, error };
 	}
 
+	/**
+	 * Checks if the items are referenced by other items
+	 * @param {Array<string>} uniques - The unique identifiers of the items to fetch
+	 * @param {number} skip - The number of items to skip
+	 * @param {number} take - The number of items to take
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>>} - Items that are referenced by other items
+	 * @memberof UmbElementReferenceServerDataSource
+	 */
 	async getAreReferenced(
 		uniques: Array<string>,
 		skip: number = 0,

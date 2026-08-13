@@ -14,7 +14,7 @@ const TEST_REPOSITORY_ALIAS = 'Umb.Test.EntityReferenceCountManager.Repository';
 interface UmbTestReferenceResponse {
 	total: number;
 	delayMs?: number;
-	error?: Error;
+	error?: Error & { status?: number };
 }
 
 /**
@@ -170,6 +170,32 @@ describe('UmbEntityReferenceCountManager', () => {
 		});
 	});
 
+	describe('clear', () => {
+		// clear() bumps the reload token to invalidate any reload already in flight, but a subsequent getTotalAsync
+		// call must not ride along on that now-invalidated reload (which resolves without ever setting a total) —
+		// it needs to issue a fresh request of its own, or it would silently misreport the count as 0. Uses a
+		// `prefetch: false` manager so setUnique itself doesn't consume a queued response, isolating the race.
+		it('a reload invalidated by clear() does not block the next getTotalAsync call from issuing a fresh request', async () => {
+			const lazyManager = new UmbEntityReferenceCountManager(hostElement, {
+				referenceRepositoryAlias: TEST_REPOSITORY_ALIAS,
+				prefetch: false,
+			});
+			await lazyManager.setUnique('elm-1');
+
+			UmbTestReferenceRepository.responseQueue.push({ total: 1, delayMs: 20 });
+			const staleRequest = lazyManager.getTotalAsync(); // kicks off a reload that won't resolve for 20ms
+
+			lazyManager.clear(); // invalidate it before it resolves
+
+			UmbTestReferenceRepository.responseQueue.push({ total: 5 });
+			const total = await lazyManager.getTotalAsync();
+
+			expect(total, 'must issue a fresh request rather than await the invalidated one').to.equal(5);
+
+			await staleRequest;
+		});
+	});
+
 	describe('source: referencedElementsWithPendingChanges', () => {
 		beforeEach(() => {
 			manager = new UmbEntityReferenceCountManager(hostElement, {
@@ -188,6 +214,32 @@ describe('UmbEntityReferenceCountManager', () => {
 			UmbTestReferenceRepository.supportsPendingChanges = false;
 			await manager.setUnique('elm-1');
 			expect(manager.getTotal()).to.equal(0);
+		});
+
+		// The backend endpoint for this lookup may not exist yet on an older/incomplete install. A 404 there
+		// means "not implemented", not "something is wrong" — it must not force the publish confirmation modal
+		// open (which is what an uncaught error would do at the workspace-context call site).
+		it('reports zero, not an error, when the request 404s', async () => {
+			const notFound = Object.assign(new Error('Not Found'), { status: 404 });
+			UmbTestReferenceRepository.responseQueue.push({ total: 0, error: notFound });
+
+			await manager.setUnique('elm-1');
+
+			expect(manager.getTotal()).to.equal(0);
+		});
+
+		it('still rejects on errors other than a 404', async () => {
+			const serverError = Object.assign(new Error('Internal Server Error'), { status: 500 });
+			UmbTestReferenceRepository.responseQueue.push({ total: 0, error: serverError });
+
+			let caught: unknown;
+			try {
+				await manager.setUnique('elm-1');
+			} catch (error) {
+				caught = error;
+			}
+
+			expect(caught).to.exist;
 		});
 	});
 

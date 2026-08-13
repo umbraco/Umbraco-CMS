@@ -76,13 +76,26 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		return this._total;
 	}
 
-	protected override firstUpdated(_changedProperties: PropertyValues): void {
-		super.firstUpdated(_changedProperties);
-		this.#init();
+	protected override updated(changedProperties: PropertyValues): void {
+		super.updated(changedProperties);
+
+		// Runs on the first update too — every reactive property counts as "changed" then. Re-running #init()
+		// when these change later covers consumers (e.g. the workspace info app) whose extension-provided
+		// referenceRepositoryAlias can arrive or change after this element's first render.
+		if (
+			changedProperties.has('referenceRepositoryAlias') ||
+			changedProperties.has('itemRepositoryAlias') ||
+			changedProperties.has('source')
+		) {
+			this.#init();
+		}
 	}
 
 	async #init() {
-		if (!this.referenceRepositoryAlias) throw new Error('referenceRepositoryAlias is required');
+		// Not an error: with re-init reacting to property changes (see `updated()`), this runs on the very first
+		// update too, where an extension-provided alias (e.g. from a workspace info app's manifest) may not have
+		// arrived yet. It re-runs once the alias is actually set.
+		if (!this.referenceRepositoryAlias) return;
 
 		this.#referenceRepository = await createExtensionApiByAlias<UmbEntityReferenceRepository>(
 			this,
