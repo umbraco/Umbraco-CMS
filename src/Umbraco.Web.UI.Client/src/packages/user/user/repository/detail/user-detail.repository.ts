@@ -31,7 +31,7 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 	/**
 	 * Requests multiple user details by their unique IDs
 	 * @param {Array<string>} uniques - The unique IDs of the users to fetch
-	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbUserDetailModel> | undefined>>}
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<Array<UmbUserDetailModel> | undefined>>} The requested user details
 	 * @memberof UmbUserDetailRepository
 	 */
 	async requestByUniques(
@@ -58,8 +58,8 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 
 	/**
 	 * Creates a new User detail
-	 * @param {UmbUserDetailModel} model
-	 * @returns {*}
+	 * @param {UmbUserDetailModel} model - The user model to create
+	 * @returns {*} The created user details
 	 * @memberof UmbUserDetailRepository
 	 */
 	override async create(model: UmbUserDetailModel) {
@@ -68,8 +68,8 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 
 	/**
 	 * Requests the detail for the given unique
-	 * @param unique
-	 * @returns {*}
+	 * @param {string} unique - The unique id of the user
+	 * @returns {*} The calculated start nodes for the user
 	 * @memberof UmbUserDetailRepository
 	 */
 	requestCalculateStartNodes(unique: string) {

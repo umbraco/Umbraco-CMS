@@ -288,7 +288,8 @@ export default {
 		compositionUsageHeading: 'Где используется эта композиция?',
 		compositionUsageSpecification: 'Эта композиция сейчас используется при создании следующих типов документов:',
 		compositionUsageSpecificationMediaType: 'Эта композиция сейчас используется при создании следующих типов медиа:',
-		compositionUsageSpecificationMemberType: 'Эта композиция сейчас используется при создании следующих типов участников:',
+		compositionUsageSpecificationMemberType:
+			'Эта композиция сейчас используется при создании следующих типов участников:',
 		noAvailableCompositions: 'В настоящее время нет типов документов, допустимых для построения композиции.',
 		noAvailableCompositionsMediaType: 'В настоящее время нет типов медиа, допустимых для построения композиции.',
 		noAvailableCompositionsMemberType: 'В настоящее время нет типов участников, допустимых для построения композиции.',
@@ -572,6 +573,8 @@ export default {
 		next: 'След',
 		no: 'Нет',
 		noItemsInList: 'Здесь пока нет элементов',
+		noResults: 'Нет результатов',
+		noResultsFor: (query: string) => `Нет результатов по запросу "${query}".`,
 		of: 'из',
 		off: 'Выкл',
 		ok: 'Ok',
@@ -834,6 +837,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Нажмите, чтобы загрузить',
+		browseFilesAction: 'Обзор файлов',
+		dropFilesOr: 'Перетащите медиафайлы сюда<br />или',
 		disallowedFileType: 'Невозможна загрузка этого файла, этот тип файлов не разрешен для загрузки',
 		orClickHereToUpload: 'или нажмите сюда, чтобы выбрать файлы',
 		maxFileSize: 'Максимально допустимый размер файла: ',
@@ -1327,6 +1332,10 @@ export default {
 		stylesheets: 'Стили CSS',
 		templates: 'Шаблоны',
 		users: 'Пользователи',
+	},
+	picker: {
+		browseTab: 'Обзор',
+		searchTab: 'Поиск',
 	},
 	update: {
 		updateAvailable: 'Доступны обновления',

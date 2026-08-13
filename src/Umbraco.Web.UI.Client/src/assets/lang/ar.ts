@@ -329,6 +329,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'انقر لتحميل',
+		browseFilesAction: 'تصفح الملفات',
+		dropFilesOr: 'اسحب الوسائط وأسقطها هنا<br />أو',
 		orClickHereToUpload: 'أو انقر هنا لاختيار الملفات',
 		disallowedFileType: 'لا يمكن تحميل هذا الملف، فهو لا يحتوي على نوع ملف معتمد',
 		disallowedMediaType: "لا يمكن تحميل هذا الملف، نوع الوسائط باللقب '%0%' غير مسموح به هنا",

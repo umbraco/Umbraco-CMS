@@ -33,8 +33,8 @@ export class UmbDocumentAuditLogRepository
 
 	/**
 	 * Request the audit log for a document
-	 * @param {UmbAuditLogRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbAuditLogRequestArgs} args - The request arguments
+	 * @returns {*} The audit log data
 	 * @memberof UmbDocumentAuditLogRepository
 	 */
 	async requestAuditLog(args: UmbAuditLogRequestArgs) {
@@ -43,8 +43,8 @@ export class UmbDocumentAuditLogRepository
 
 	/**
 	 * Get the tag style and localization data for a given audit log type
-	 * @param {string} logType
-	 * @returns {UmbAuditLogTagData}
+	 * @param {string} logType - The audit log type
+	 * @returns {UmbAuditLogTagData} The tag style and localization data
 	 * @memberof UmbDocumentAuditLogRepository
 	 */
 	getTagStyleAndText(logType: string): UmbAuditLogTagData {

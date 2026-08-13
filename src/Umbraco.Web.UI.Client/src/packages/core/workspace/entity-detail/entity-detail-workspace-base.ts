@@ -332,7 +332,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Deletes the entity.
-	 * @param unique The unique identifier of the entity to delete.
+	 * @param {string} unique The unique identifier of the entity to delete.
 	 */
 	async delete(unique: string) {
 		await this.#init;

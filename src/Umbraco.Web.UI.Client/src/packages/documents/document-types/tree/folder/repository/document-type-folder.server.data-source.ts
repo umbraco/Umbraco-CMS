@@ -25,8 +25,8 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 
 	/**
 	 * Creates a scaffold for a Document Type folder
-	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbFolderModel>} [preset] - The preset data to populate the scaffold with.
+	 * @returns {*} The document type folder scaffold.
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -42,8 +42,8 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 
 	/**
 	 * Fetches a Document Type folder from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the folder to fetch.
+	 * @returns {*} The document type folder.
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -71,8 +71,8 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 
 	/**
 	 * Creates a Document Type folder on the server
-	 * @param {UmbCreateFolderModel} model
-	 * @returns {*}
+	 * @param {UmbCreateFolderModel} model - The folder to create.
+	 * @returns {*} The created document type folder.
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -102,8 +102,8 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 
 	/**
 	 * Updates a Document Type folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {*}
+	 * @param {UmbFolderModel} model - The folder to update.
+	 * @returns {*} The updated document type folder.
 	 * @memberof UmbDocumentTypeFolderServerDataSource
 	 */
 	async update(model: UmbFolderModel) {
@@ -127,8 +127,8 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbDetailDataSourc
 
 	/**
 	 * Deletes a Document Type folder on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the folder to delete.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
 	async delete(unique: string) {

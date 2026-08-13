@@ -22,7 +22,7 @@ export class UmbSortChildrenOfDocumentServerDataSource implements UmbSortChildre
 
 	/**
 	 * Creates the Public Access for the given Document unique
-	 * @param {UmbSortChildrenOfArgs} args
+	 * @param {UmbSortChildrenOfArgs} args - The sort request arguments
 	 * @memberof UmbSortChildrenOfDocumentServerDataSource
 	 */
 	async sortChildrenOf(args: UmbSortChildrenOfArgs) {

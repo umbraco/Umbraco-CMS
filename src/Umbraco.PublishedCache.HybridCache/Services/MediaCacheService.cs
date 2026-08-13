@@ -172,6 +172,12 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             return null;
         }
 
+        // The node carries both identifiers, so the id/key map can be warmed without a lookup of its own.
+        // Unlike the content itself the mapping is permanent, so this is done regardless of snapshotIsCurrent.
+        // Deliberately outside the read-through branch above, so that backing store hits populate the map too.
+        _idKeyMap.PopulateCache(contentCacheNode.Id, contentCacheNode.Key, UmbracoObjectTypes.Media);
+
+
         IPublishedContent? result = _publishedContentFactory.ToIPublishedMedia(contentCacheNode).CreateModel(_publishedModelFactory);
 
         // Only populate the L0 cache when our snapshot is still current; otherwise a concurrent
@@ -272,11 +278,19 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-            IEnumerable<ContentCacheNode> cacheNodes = await _databaseCacheRepository.GetMediaSourcesAsync(uncachedKeys);
+            // Materialized because the repository defers deserialization of each node until it is enumerated,
+            // and the sequence is walked more than once below.
+            var cacheNodes = (await _databaseCacheRepository.GetMediaSourcesAsync(uncachedKeys)).ToList();
 
             scope.Complete();
 
-            _logger.LogDebug("Media nodes to cache {NodeCount}", cacheNodes.Count());
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Media nodes to cache {NodeCount}", cacheNodes.Count);
+            }
+
+            // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
+            var idKeyPairs = new List<(int Id, Guid Key)>(cacheNodes.Count);
 
             foreach (ContentCacheNode cacheNode in cacheNodes)
             {
@@ -286,7 +300,11 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
                     GetSeedEntryOptions(),
                     GenerateTags(cacheNode),
                     cancellationToken: cancellationToken);
+
+                idKeyPairs.Add((cacheNode.Id, cacheNode.Key));
             }
+
+            _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Media);
         }
 
 #if DEBUG
@@ -381,6 +399,14 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             .Select(x => _publishedContentFactory.ToIPublishedContent(x, x.IsDraft).CreateModel(_publishedModelFactory))
             .WhereNotNull();
     }
+
+    /// <summary>
+    ///     Discards the memoized seed keys so that they are recalculated on the next seeding run.
+    /// </summary>
+    /// <remarks>
+    ///     Internal for test purposes, so that media created after the keys were first resolved is seeded.
+    /// </remarks>
+    internal void ResetSeedKeys() => _seedKeys = null;
 
     private HybridCacheEntryOptions GetEntryOptions(Guid key)
     {

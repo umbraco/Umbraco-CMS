@@ -49,6 +49,8 @@ src/
 
 *Note: The extension-first mindset is the guiding principle, and the frontend fully embraces this by treating all features as manifest-registered, replaceable extensions.*
 
+Extension-first also constrains how shared code is written: it must serve any implementation of an extension point, not only the one that prompted the change. See [General-Purpose by Default](../../../CLAUDE.md#2-general-purpose-by-default).
+
 ---
 
 ## Developer Roles & Import Boundaries

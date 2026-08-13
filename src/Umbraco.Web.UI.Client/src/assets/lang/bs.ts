@@ -334,6 +334,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Kliknite za učitavanje',
+		browseFilesAction: 'Pregledaj datoteke',
+		dropFilesOr: 'Povucite i ispustite medije ovdje<br />ili',
 		orClickHereToUpload: 'ili kliknite ovdje da odaberete fajlove',
 		disallowedFileType: 'Nije moguće učitati ovu datoteku, ona nema odobreni tip datoteke',
 		disallowedMediaType: "Nije moguće učitati ovu datoteku, tip medija sa pseudonimom '%0%' nije dozvoljen ovdje",
@@ -742,6 +744,8 @@ export default {
 		next: 'Sljedeći',
 		no: 'Ne',
 		nodeName: 'Ime čvora',
+		noResults: 'Nema rezultata',
+		noResultsFor: (query: string) => `Nema rezultata za "${query}".`,
 		of: 'od',
 		off: 'Isključeno',
 		ok: 'OK',
@@ -1487,8 +1491,10 @@ export default {
 		tabHasNoSortOrder: 'kartica nema redoslijed sortiranja',
 		compositionUsageHeading: 'Gdje se koristi ovaj sastav?',
 		compositionUsageSpecification: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa sadržaja:\n    ',
-		compositionUsageSpecificationMediaType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa medija:\n    ',
-		compositionUsageSpecificationMemberType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa člana:\n    ',
+		compositionUsageSpecificationMediaType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa medija:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      tipa člana:\n    ',
 		variantsHeading: 'Dozvoli varijacije',
 		cultureVariantHeading: 'Dozvolite varirati u zavisnosti od kulture',
 		segmentVariantHeading: 'Dozvoli segmentaciju',
@@ -1644,6 +1650,10 @@ export default {
 		settingsGroup: 'Postavke',
 		templatingGroup: 'Predložak',
 		thirdPartyGroup: 'Treća strana',
+	},
+	picker: {
+		browseTab: 'Pregledaj',
+		searchTab: 'Pretraži',
 	},
 	update: {
 		updateAvailable: 'Novo ažuriranje spremno',

@@ -9,7 +9,7 @@ const autoScrollSpeed = 16;
  *
  * @param {Element} el - The element to check for ability to scroll
  * @param {boolean} includeSelf - If true, the element itself will be included in the check
- * @returns {Element | null}
+ * @returns {Element | null} The closest scrollable parent element, or null if none is found
  */
 function getParentScrollElement(el: Element, includeSelf: boolean) {
 	if (!el || !el.getBoundingClientRect) return null;

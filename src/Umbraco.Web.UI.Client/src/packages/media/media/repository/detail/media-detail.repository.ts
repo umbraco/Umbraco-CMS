@@ -13,6 +13,9 @@ export class UmbMediaDetailRepository extends UmbDetailRepositoryBase<UmbMediaDe
 	/**
 	 * Creates a media item without showing automatic error notifications.
 	 * Error handling is left to the caller (e.g. the dropzone manager).
+	 * @param {UmbMediaDetailModel} model - The media item to create
+	 * @param {string | null} parentUnique - The unique ID of the parent media item
+	 * @returns {*} The created media item
 	 */
 	async createSilently(model: UmbMediaDetailModel, parentUnique: string | null) {
 		if (!model) throw new Error('Data is missing');

@@ -25,8 +25,8 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 
 	/**
 	 * Creates a scaffold for a Media Type folder
-	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbFolderModel>} [preset] - The preset to use for the scaffold
+	 * @returns {*} The scaffolded Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -42,8 +42,8 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 
 	/**
 	 * Fetches a Media Type folder from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique ID of the Media Type folder
+	 * @returns {*} The Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -71,8 +71,8 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 
 	/**
 	 * Creates a Media Type folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {*}
+	 * @param {UmbFolderModel} model - The Media Type folder to create
+	 * @returns {*} The created Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -102,8 +102,8 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 
 	/**
 	 * Updates a Media Type folder on the server
-	 * @param {UmbUpdateFolderModel} model
-	 * @returns {*}
+	 * @param {UmbUpdateFolderModel} model - The Media Type folder to update
+	 * @returns {*} The updated Media Type folder
 	 * @memberof UmbMediaTypeFolderServerDataSource
 	 */
 	async update(model: UmbFolderModel) {
@@ -128,8 +128,8 @@ export class UmbMediaTypeFolderServerDataSource implements UmbDetailDataSource<U
 
 	/**
 	 * Deletes a Media Type folder on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique ID of the Media Type folder
+	 * @returns {*} A promise that resolves once the Media Type folder has been deleted
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	async delete(unique: string) {

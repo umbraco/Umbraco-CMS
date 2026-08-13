@@ -1,6 +1,6 @@
-import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbValueSummaryResolver } from './value-summary-resolver.interface.js';
 import type { UmbValueSummaryResolverLoaderProperty } from './value-summary.extension.js';
+import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @internal

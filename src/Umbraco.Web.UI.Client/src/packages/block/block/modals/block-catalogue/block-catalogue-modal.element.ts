@@ -93,9 +93,13 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			this._manager = manager;
 		});
 
-		this.observe(this.#itemManager.items, async (items) => {
-			this.#observeBlockTypes(items);
-		});
+		this.observe(
+			this.#itemManager.items,
+			async (items) => {
+				this.#observeBlockTypes(items);
+			},
+			null,
+		);
 
 		this.#pickerContext.search.updateConfig({ providerAlias: 'Umb.SearchProvider.Element' });
 		this.#pickerContext.selection.setMultiple(false);

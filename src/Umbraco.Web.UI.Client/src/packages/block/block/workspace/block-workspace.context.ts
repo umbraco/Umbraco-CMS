@@ -176,7 +176,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			async ([contentValues, settingsValues]) => {
 				this.#renderLabel(contentValues, settingsValues);
 			},
-			'observeContentForLabelRender',
+			null,
 		);
 
 		this.routes.setRoutes([

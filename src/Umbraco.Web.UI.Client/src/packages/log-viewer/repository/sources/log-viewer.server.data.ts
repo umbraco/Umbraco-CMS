@@ -29,8 +29,8 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 
 	/**
 	 * Grabs all the log viewer saved searches from the server
-	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
-	 * @returns {*}
+	 * @param {{ skip?: number; take?: number }} query - Pagination options.
+	 * @returns {*} The saved searches.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getAllSavedSearches({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
@@ -38,8 +38,8 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	}
 	/**
 	 * Get a log viewer saved search by name from the server
-	 * @param {{ name: string }} { name }
-	 * @returns {*}
+	 * @param {{ name: string }} path - The name of the saved search.
+	 * @returns {*} The saved search.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async getSavedSearchByName({ name }: { name: string }) {
@@ -48,8 +48,8 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 
 	/**
 	 *	Post a new log viewer saved search to the server
-	 * @param {{ body?: SavedLogSearch }} { body }
-	 * @returns {*}
+	 * @param {SavedLogSearchResponseModel} request - The saved search to create.
+	 * @returns {*} The created saved search.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel) {
@@ -57,8 +57,8 @@ export class UmbLogSearchesServerDataSource implements UmbLogSearchDataSource {
 	}
 	/**
 	 * Remove a log viewer saved search by name from the server
-	 * @param {{ name: string }} { name }
-	 * @returns {*}
+	 * @param {{ name: string }} path - The name of the saved search to remove.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbLogSearchesServerDataSource
 	 */
 	async deleteSavedSearchByName({ name }: { name: string }) {
@@ -84,8 +84,8 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 
 	/**
 	 * Grabs all the loggers from the server
-	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
-	 * @returns {*}
+	 * @param {{ skip?: number; take?: number }} query - Pagination options.
+	 * @returns {*} The loggers.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevel({ skip = 0, take = 100 }: { skip?: number; take?: number }) {
@@ -94,8 +94,8 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 
 	/**
 	 * Grabs all the number of different log messages from the server
-	 * @param {{ skip?: number; take?: number }} { skip = 0, take = 100 }
-	 * @returns {*}
+	 * @param {{ startDate?: string; endDate?: string }} query - The date range to count log messages for.
+	 * @returns {*} The log level counts.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLevelCount({
@@ -148,16 +148,8 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	 * 		logLevel?: Array<LogLevelModel>;
 	 * 		startDate?: string;
 	 * 		endDate?: string;
-	 * 	}} {
-	 * 		skip = 0,
-	 * 		take = 100,
-	 * 		orderDirection,
-	 * 		filterExpression,
-	 * 		logLevel,
-	 * 		startDate,
-	 * 		endDate,
-	 * 	}
-	 * @returns {*}
+	 * 	}} query - Filtering and pagination options.
+	 * @returns {*} The log messages.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerLogs({
@@ -199,13 +191,8 @@ export class UmbLogMessagesServerDataSource implements UmbLogMessagesDataSource 
 	 * 		take?: number;
 	 * 		startDate?: string;
 	 * 		endDate?: string;
-	 * 	}} {
-	 * 		skip,
-	 * 		take = 100,
-	 * 		startDate,
-	 * 		endDate,
-	 * 	}
-	 * @returns {*}
+	 * 	}} query - Filtering and pagination options.
+	 * @returns {*} The log message templates.
 	 * @memberof UmbLogMessagesServerDataSource
 	 */
 	async getLogViewerMessageTemplate({

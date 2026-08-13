@@ -223,7 +223,7 @@ internal class ContentFactory : IEntityFactory<IContent, ContentDto>
 internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>, IContentSearchService
 ```
 - Pattern: `{Domain}Service : I{Domain}Service` (base class varies by concern)
-- Only services with genuine Infrastructure dependencies live here (search, packaging, webhooks, log viewing); the `RepositoryService`-based domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/` — see root CLAUDE.md §4
+- Only services with genuine Infrastructure dependencies live here (search, packaging, webhooks, log viewing); the `RepositoryService`-based domain services (`ContentService`, `MediaService`, …) live in `Umbraco.Core/Services/` — see root CLAUDE.md §5
 
 ### Key Code Patterns
 
