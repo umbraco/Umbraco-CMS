@@ -12,7 +12,7 @@ import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffic
 
 /**
  * A repository for Packages which mimics a tree store.
-
+ 
  */
 export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	#init!: Promise<void>;

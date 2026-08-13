@@ -80,7 +80,7 @@ public class CreateAndPublishDocumentControllerTests : ManagementApiUserGroupTes
             Values = [],
             Variants =
             [
-                new() { Culture = null, Segment = null, Name = "The en-US name", },
+                new() { Culture = null, Name = "The en-US name", },
             ],
             CulturesToPublish = Array.Empty<string>(),
         };

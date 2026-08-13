@@ -286,8 +286,7 @@ export default {
 		lockoutWillOccur: 'Você está inativo e logout irá ocorrer automaticamente em',
 		renewSession: 'Renovar agora para salvar seu trabalho',
 	},
-	login: {
-	},
+	login: {},
 	main: {
 		dashboard: 'Painel',
 		sections: 'Seções',
