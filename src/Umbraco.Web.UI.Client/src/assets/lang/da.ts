@@ -169,7 +169,7 @@ export default {
 		schedulePublish: 'Planlæg',
 		saveAndPreview: 'Forhåndsvisning',
 		showPageDisabled: 'Forhåndsvisning er deaktiveret fordi der ikke er nogen skabelon tildelt',
-		styleChoose: 'Vælg formattering',
+		styleChoose: 'Vælg formatering',
 		styleShow: 'Vis koder',
 		tableInsert: 'Indsæt tabel',
 		generateModelsAndClose: 'Generer modeller og luk',
@@ -798,7 +798,7 @@ export default {
 			'Du er ved at gøre billedet større end originalen. Det vil forringe\n      kvaliteten af billedet. Ønsker du at fortsætte?\n    ',
 		startNodeDoesNotExists: 'Startnode er slettet, kontakt systemadministrator',
 		stylesMustMarkBeforeSelect: 'Du skal markere noget indhold, før du kan ændre stylen',
-		stylesNoStylesOnPage: 'Der er ingen aktive styles eller formatteringer på denne side',
+		stylesNoStylesOnPage: 'Der er ingen aktive styles eller formateringer på denne side',
 		tableColMergeLeft: 'Du skal stå til venstre for de 2 celler du ønsker at samle!',
 		tableSplitNotSplittable: 'Du kan ikke opdele en celle, som ikke allerede er delt.',
 		propertyHasErrors: 'Denne egenskab er ugyldig',
@@ -1322,11 +1322,11 @@ export default {
 		verifiedToWorkOnUmbracoCloud: 'Bekræftet til at fungere på Umbraco Cloud',
 	},
 	paste: {
-		doNothing: 'Indsæt med fuld formattering (anbefales ikke)',
+		doNothing: 'Indsæt med fuld formatering (anbefales ikke)',
 		errorMessage:
-			'Den tekst du er ved at indsætte indeholder specialtegn eller formattering. Dette kan\n      skyldes at du kopierer fra f.eks. Microsoft Word. Umbraco kan fjerne denne specialformattering automatisk så\n      indholdet er mere velegnet til visning på en webside.\n    ',
-		removeAll: 'Indsæt som ren tekst, dvs. fjern al formattering',
-		removeSpecialFormattering: 'Indsæt, men fjern formattering som ikke bør være på en webside (anbefales)\n    ',
+			'Den tekst du er ved at indsætte indeholder specialtegn eller formatering. Dette kan\n      skyldes at du kopierer fra f.eks. Microsoft Word. Umbraco kan fjerne denne specialformatering automatisk så\n      indholdet er mere velegnet til visning på en webside.\n    ',
+		removeAll: 'Indsæt som ren tekst, dvs. fjern al formatering',
+		removeSpecialFormattering: 'Indsæt, men fjern formatering som ikke bør være på en webside (anbefales)\n    ',
 	},
 	publicAccess: {
 		paGroups: 'Gruppebaseret beskyttelse',
