@@ -38,7 +38,7 @@ internal sealed class SearchEnabledPublishedContentQuery : PublishedContentQuery
         IPublishedMediaCache publishedMediaCache,
         IDocumentNavigationQueryService documentNavigationQueryService,
         IMediaNavigationQueryService mediaNavigationQueryService)
-        : base(variationContextAccessor, publishedContent, publishedMediaCache, documentNavigationQueryService, mediaNavigationQueryService)
+        : base(publishedContent, publishedMediaCache, documentNavigationQueryService, mediaNavigationQueryService)
     {
         _searcherResolver = searcherResolver;
         _variationContextAccessor = variationContextAccessor;

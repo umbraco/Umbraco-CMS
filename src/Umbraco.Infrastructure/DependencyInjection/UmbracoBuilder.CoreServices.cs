@@ -202,15 +202,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>(sp =>
             new PublishedContentQueryAccessor(sp.GetRequiredService<IScopedServiceProvider>()));
         builder.Services.AddScoped<IPublishedContentQuery>(factory =>
-        {
-            IUmbracoContextAccessor umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
-            return new PublishedContentQuery(
-                factory.GetRequiredService<IVariationContextAccessor>(),
+            new PublishedContentQuery(
                 factory.GetRequiredService<IPublishedContentCache>(),
                 factory.GetRequiredService<IPublishedMediaCache>(),
                 factory.GetRequiredService<IDocumentNavigationQueryService>(),
-                factory.GetRequiredService<IMediaNavigationQueryService>());
-        });
+                factory.GetRequiredService<IMediaNavigationQueryService>()));
 
         // register accessors for cultures
         builder.Services.AddSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();

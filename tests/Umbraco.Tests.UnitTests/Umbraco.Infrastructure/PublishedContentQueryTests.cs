@@ -16,7 +16,6 @@ internal sealed class PublishedContentQueryTests
     private PublishedContentQuery CreatePublishedContentQuery(
         IPublishedContentCache? contentCache = null,
         IPublishedMediaCache? mediaCache = null,
-        IVariationContextAccessor? variationContextAccessor = null,
         IDocumentNavigationQueryService? documentNavigationQueryService = null,
         IMediaNavigationQueryService? mediaNavigationQueryService = null)
     {
@@ -30,19 +29,10 @@ internal sealed class PublishedContentQueryTests
         }
 
         mediaCache ??= Mock.Of<IPublishedMediaCache>();
-
-        if (variationContextAccessor is null)
-        {
-            var variationContextAccessorMock = new Mock<IVariationContextAccessor>();
-            variationContextAccessorMock.SetupProperty(x => x.VariationContext, new VariationContext());
-            variationContextAccessor = variationContextAccessorMock.Object;
-        }
-
         documentNavigationQueryService ??= Mock.Of<IDocumentNavigationQueryService>();
         mediaNavigationQueryService ??= Mock.Of<IMediaNavigationQueryService>();
 
         return new PublishedContentQuery(
-            variationContextAccessor,
             contentCache,
             mediaCache,
             documentNavigationQueryService,
@@ -81,17 +71,6 @@ internal sealed class PublishedContentQueryTests
         mediaCache.Setup(x => x.GetById(false, It.IsAny<Guid>()))
             .Returns((bool _, Guid key) => mediaByGuid.TryGetValue(key, out IPublishedContent? content) ? content : null);
         return mediaCache;
-    }
-
-    [Test]
-    public void Constructor_WithNullVariationContextAccessor_Throws()
-    {
-        Assert.Throws<ArgumentNullException>(() => new PublishedContentQuery(
-            null!,
-            Mock.Of<IPublishedContentCache>(),
-            Mock.Of<IPublishedMediaCache>(),
-            Mock.Of<IDocumentNavigationQueryService>(),
-            Mock.Of<IMediaNavigationQueryService>()));
     }
 
     [Test]

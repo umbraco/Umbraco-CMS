@@ -128,7 +128,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
         var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
             _contentSettings.Error404Collection.ToArray(),
             _entityService,
-            new PublishedContentQuery(_variationContextAccessor, umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService, _mediaNavigationQueryService),
+            new PublishedContentQuery(umbracoContext.Content!, umbracoContext.Media, _documentNavigationQueryService, _mediaNavigationQueryService),
             errorCulture,
             domainContentId);
 
