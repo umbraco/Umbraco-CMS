@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -580,30 +579,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                 .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
             return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
         }
-    }
-
-    /// <inheritdoc/>
-    [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
-    public IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys)
-    {
-        if (keys.Length == 0)
-        {
-            return ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
-        }
-
-        IDictionary<Guid, IEnumerable<ContentSchedule>> guidKeyedResults = GetContentSchedulesByKeys(keys);
-
-        var intKeyedResults = new Dictionary<int, IEnumerable<ContentSchedule>>(guidKeyedResults.Count);
-        foreach (KeyValuePair<Guid, IEnumerable<ContentSchedule>> entry in guidKeyedResults)
-        {
-            Attempt<int> contentId = _idKeyMap.GetIdForKeyAsync(entry.Key, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-            if (contentId.Success)
-            {
-                intKeyedResults[contentId.Result] = entry.Value;
-            }
-        }
-
-        return intKeyedResults;
     }
 
     /// <summary>

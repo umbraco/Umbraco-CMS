@@ -23,12 +23,12 @@ internal abstract class HasScheduleFlagProviderBase : IFlagProvider
         where TItem : IHasFlags;
 
     /// <inheritdoc/>
-    public Task PopulateFlagsAsync<TItem>(IEnumerable<TItem> items)
+    public async Task PopulateFlagsAsync<TItem>(IEnumerable<TItem> items)
         where TItem : IHasFlags
     {
         TItem[] itemsArray = items.ToArray();
         Guid[] keys = itemsArray.Select(i => i.Id).ToArray();
-        IDictionary<Guid, IEnumerable<ContentSchedule>> schedulesByKey = GetSchedulesByKeys(keys);
+        IDictionary<Guid, IEnumerable<ContentSchedule>> schedulesByKey = await GetSchedulesByKeysAsync(keys);
 
         foreach (TItem item in itemsArray)
         {
@@ -48,11 +48,9 @@ internal abstract class HasScheduleFlagProviderBase : IFlagProvider
 
             PopulateItemFlags(item, releaseSchedules);
         }
-
-        return Task.CompletedTask;
     }
 
-    protected abstract IDictionary<Guid, IEnumerable<ContentSchedule>> GetSchedulesByKeys(Guid[] keys);
+    protected abstract Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetSchedulesByKeysAsync(Guid[] keys);
 
     protected abstract void PopulateItemFlags<TItem>(TItem item, ContentSchedule[] releaseSchedules)
         where TItem : IHasFlags;

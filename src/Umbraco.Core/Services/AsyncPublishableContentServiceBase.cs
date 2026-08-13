@@ -411,41 +411,16 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    public IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys)
+    public async Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetContentSchedulesByKeysAsync(Guid[] keys, CancellationToken cancellationToken)
     {
         if (keys.Length == 0)
         {
             return ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
         }
 
-        Dictionary<int, Guid> intToKeyMap = new(keys.Length);
-        foreach (Guid key in keys)
-        {
-            Attempt<int> contentId = _idKeyMap.GetIdForKeyAsync(key, ContentObjectType).GetAwaiter().GetResult();
-            if (contentId.Success is false)
-            {
-                continue;
-            }
-
-            intToKeyMap[contentId.Result] = key;
-        }
-
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(ReadLockIds);
-
-        IDictionary<int, IEnumerable<ContentSchedule>> intKeyedResults =
-            _contentRepository.GetContentSchedulesByIds(intToKeyMap.Keys.ToArray());
-
-        var guidKeyedResults = new Dictionary<Guid, IEnumerable<ContentSchedule>>(intKeyedResults.Count);
-        foreach (KeyValuePair<int, IEnumerable<ContentSchedule>> entry in intKeyedResults)
-        {
-            if (intToKeyMap.TryGetValue(entry.Key, out Guid guidKey))
-            {
-                guidKeyedResults[guidKey] = entry.Value;
-            }
-        }
-
-        return guidKeyedResults;
+        return await _asyncContentRepository.GetContentSchedulesByKeysAsync(keys, cancellationToken);
     }
 
     /// <inheritdoc />

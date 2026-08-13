@@ -25,8 +25,8 @@ internal class HasElementScheduleFlagProvider : HasScheduleFlagProviderBase
         typeof(TItem) == typeof(ElementItemResponseModel);
 
     /// <inheritdoc/>
-    protected override IDictionary<Guid, IEnumerable<ContentSchedule>> GetSchedulesByKeys(Guid[] keys)
-        => _elementService.GetContentSchedulesByKeys(keys);
+    protected override Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetSchedulesByKeysAsync(Guid[] keys)
+        => _elementService.GetContentSchedulesByKeysAsync(keys, CancellationToken.None);
 
     /// <inheritdoc/>
     protected override void PopulateItemFlags<TItem>(TItem item, ContentSchedule[] releaseSchedules)

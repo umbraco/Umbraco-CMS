@@ -803,8 +803,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    [Obsolete("As this is testing an obsolete method, it will be removed when that the method is deleted. Scheduled for removal in Umbraco 19.")]
-    public void Can_Get_Content_Schedules_By_Ids()
+    public async Task Can_Get_Content_Schedules_By_Keys()
     {
         // Arrange
         var root = ContentService.GetById(Textpage.Id);
@@ -815,29 +814,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // Act
-#pragma warning disable CS0618 // Type or member is obsolete
-        var keys = ContentService.GetContentSchedulesByIds([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        // Assert
-        Assert.AreEqual(1, keys.Count);
-        Assert.AreEqual(keys[0].Key, Subpage.Id);
-        Assert.AreEqual(keys[0].Value.First().Id, contentSchedule.FullSchedule.First().Id);
-    }
-
-    [Test]
-    public void Can_Get_Content_Schedules_By_Keys()
-    {
-        // Arrange
-        var root = ContentService.GetById(Textpage.Id);
-        ContentService.Publish(root!, root!.AvailableCultures.ToArray());
-        var content = ContentService.GetById(Subpage.Id);
-        var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
-        ContentService.PersistContentSchedule(content!, contentSchedule);
-        ContentService.Publish(content, content.AvailableCultures.ToArray());
-
-        // Act
-        var results = ContentService.GetContentSchedulesByKeys([Textpage.Key, Subpage.Key, Subpage2.Key]).ToList();
+        var results = (await ContentService.GetContentSchedulesByKeysAsync([Textpage.Key, Subpage.Key, Subpage2.Key], CancellationToken.None)).ToList();
 
         // Assert
         Assert.AreEqual(1, results.Count);

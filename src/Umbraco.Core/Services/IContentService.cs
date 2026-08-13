@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -270,14 +269,6 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="id">The document identifier.</param>
     /// <returns><c>true</c> if the document has children; otherwise, <c>false</c>.</returns>
     bool HasChildren(int id);
-
-    /// <summary>
-    ///     Gets a dictionary of content Ids and their matching content schedules.
-    /// </summary>
-    /// <param name="keys">The content keys.</param>
-    /// <returns>A dictionary with a node Id and an IEnumerable of matching ContentSchedules.</returns>
-    [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
-    IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
 
     #endregion
 
