@@ -2420,7 +2420,7 @@ export default {
 		createDescription: 'Opret ny node under %0%',
 		protectDescription: 'Opsæt offentlig adgang på %0%',
 		rightsDescription: 'Opsæt rettigheder på %0%',
-		sortDescription: 'Juster soteringsrækkefølgen for %0%',
+		sortDescription: 'Juster sorteringsrækkefølgen for %0%',
 		createblueprintDescription: 'Opret indholdsskabelon baseret på %0%',
 		openContextMenu: 'Åbn kontekstmenu for',
 		currentLanguage: 'Aktivt sprog',
