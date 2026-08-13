@@ -1368,9 +1368,9 @@ export default {
 		publishAll: 'Publicér alle undersider',
 		publishHelp:
 			'Klik <em>ok</em> for at udgive <strong>%0%</strong> og derved gøre indholdet offentligt tilgængeligt..<br/><br /> Du kan udgive denne side og dens undersider ved at klikke <em>Udgiv alle undersider</em> forneden',
-		contentPublishedFailedByParent: '\n      %0% can not be published, because a parent page is not published.\n    ',
+		contentPublishedFailedByParent: '\n      %0% kan ikke udgives, fordi en overordnet side ikke er udgivet.\n    ',
 		contentPublishedFailedReqCultureValidationError:
-			"Validation failed for required language '%0%'. This\n      language was saved but not published.\n    ",
+			"Validering mislykkedes for obligatorisk sprog '%0%'. Dette\n      sprog blev gemt, men ikke udgivet.\n    ",
 	},
 	colorpicker: {
 		noColors: 'Du har ikke konfigureret nogen godkendte farver',
