@@ -7,7 +7,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Imaging Service that resizes a media item from the server
  * @class UmbImagingServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbImagingServerDataSource {
 	#host: UmbControllerHost;

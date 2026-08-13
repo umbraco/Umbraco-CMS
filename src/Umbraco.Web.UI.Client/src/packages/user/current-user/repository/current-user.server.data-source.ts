@@ -1,8 +1,13 @@
 import type { UmbCurrentUserModel } from '../types.js';
-import type { SetAvatarRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type {
+	SetAvatarRequestModel,
+	UserExternalLoginProviderModel,
+	UserTwoFactorProviderModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceErrorResponse, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -14,10 +19,10 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Get the current user
-	 * @returns {*} The current user data or an error
+	 * @returns {Promise<UmbDataSourceResponse<UmbCurrentUserModel>>} The current user data or an error
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
-	async getCurrentUser() {
+	async getCurrentUser(): Promise<UmbDataSourceResponse<UmbCurrentUserModel>> {
 		const { data, error } = await tryExecute(this, UserService.getUserCurrent());
 
 		if (data) {
@@ -72,19 +77,19 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Get the current user's external login providers
-	 * @returns {*} The external login providers data or an error
+	 * @returns {Promise<UmbDataSourceResponse<Array<UserExternalLoginProviderModel>>>} The external login providers data or an error
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
-	async getExternalLoginProviders() {
+	async getExternalLoginProviders(): Promise<UmbDataSourceResponse<Array<UserExternalLoginProviderModel>>> {
 		return tryExecute(this, UserService.getUserCurrentLoginProviders());
 	}
 
 	/**
 	 * Get the current user's available MFA login providers
-	 * @returns {*} The MFA login providers data or an error
+	 * @returns {Promise<UmbDataSourceResponse<Array<UserTwoFactorProviderModel>>>} The MFA login providers data or an error
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
-	async getMfaLoginProviders() {
+	async getMfaLoginProviders(): Promise<UmbDataSourceResponse<Array<UserTwoFactorProviderModel>>> {
 		const { data, error } = await tryExecute(this, UserService.getUserCurrent2Fa());
 
 		if (data) {
@@ -99,9 +104,9 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * @param {string} providerName The name of the provider to enable
 	 * @param {string} code The activation code of the provider to enable
 	 * @param {string} secret The secret used to verify the provider's activation code
-	 * @returns {*} An error if the provider could not be enabled
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the provider could not be enabled
 	 */
-	async enableMfaProvider(providerName: string, code: string, secret: string) {
+	async enableMfaProvider(providerName: string, code: string, secret: string): Promise<UmbDataSourceErrorResponse> {
 		const { error } = await tryExecute(
 			this,
 			UserService.postUserCurrent2FaByProviderName({ path: { providerName }, body: { code, secret } }),
@@ -118,9 +123,9 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * Disable an MFA provider
 	 * @param {string} providerName The name of the provider to disable
 	 * @param {string} code The activation code of the provider to disable
-	 * @returns {*} An error if the provider could not be disabled
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the provider could not be disabled
 	 */
-	async disableMfaProvider(providerName: string, code: string) {
+	async disableMfaProvider(providerName: string, code: string): Promise<UmbDataSourceErrorResponse> {
 		const { error } = await tryExecute(
 			this,
 			UserService.deleteUserCurrent2FaByProviderName({ path: { providerName }, query: { code } }),
@@ -137,9 +142,9 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	 * Change the password for current user
 	 * @param {string} newPassword The new password
 	 * @param {string} oldPassword The old password
-	 * @returns {*} The result of the change password request
+	 * @returns {Promise<UmbDataSourceResponse<unknown>>} The result of the change password request
 	 */
-	async changePassword(newPassword: string, oldPassword: string) {
+	async changePassword(newPassword: string, oldPassword: string): Promise<UmbDataSourceResponse<unknown>> {
 		return tryExecute(
 			this,
 			UserService.postUserCurrentChangePassword({
@@ -155,9 +160,9 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	/**
 	 * Upload an avatar for the current user using a temporary file unique
 	 * @param {string} fileUnique The unique of the temporary file to use as avatar
-	 * @returns {*} An error if the avatar upload failed
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the avatar upload failed
 	 */
-	async uploadCurrentUserAvatar(fileUnique: string) {
+	async uploadCurrentUserAvatar(fileUnique: string): Promise<UmbDataSourceErrorResponse> {
 		const body: SetAvatarRequestModel = {
 			file: {
 				id: fileUnique,
@@ -169,18 +174,18 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Delete the current user's avatar
-	 * @returns {*} An error if the avatar deletion failed
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the avatar deletion failed
 	 */
-	async deleteCurrentUserAvatar() {
+	async deleteCurrentUserAvatar(): Promise<UmbDataSourceErrorResponse> {
 		return tryExecute(this, UserService.deleteUserCurrentAvatar());
 	}
 
 	/**
 	 * Update the current user's profile
 	 * @param {string} languageIsoCode The ISO code of the language to set for the current user
-	 * @returns {*} An error if the profile update failed
+	 * @returns {Promise<UmbDataSourceErrorResponse>} An error if the profile update failed
 	 */
-	async updateCurrentUserProfile(languageIsoCode: string) {
+	async updateCurrentUserProfile(languageIsoCode: string): Promise<UmbDataSourceErrorResponse> {
 		return tryExecute(
 			this,
 			UserService.putUserCurrentProfile({

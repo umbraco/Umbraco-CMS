@@ -6,6 +6,8 @@ import { distinctUntilChanged, map, shareReplay } from '@umbraco-cms/backoffice/
 
 /**
  * @function createObservablePart
+ * @template R
+ * @template T
  * @param {Observable<T>} source - RxJS Subject to use for this Observable.
  * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
  * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to compare two results. Should return true when data is the same (unchanged), preventing unnecessary emissions.
