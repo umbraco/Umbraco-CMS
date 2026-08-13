@@ -60,7 +60,7 @@ public class GetHelpController : HelpControllerBase
         string? tree,
         int skip = 0,
         int take = 100,
-        string? baseUrl = "https://forum.umbraco.com")
+        string? baseUrl = "https://docs.umbraco.com")
     {
         if (IsAllowedUrl(baseUrl) is false)
         {
