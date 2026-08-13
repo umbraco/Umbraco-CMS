@@ -13,8 +13,6 @@ import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/ext
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
-import type { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-
 export interface UmbAuthSession {
 	/**
 	 * @deprecated Cookie auth has a single, server-owned expiry, so this is now identical to
@@ -386,7 +384,7 @@ export class UmbAuthContext extends UmbContextBase {
 
 	/**
 	 * Get the server url to the Management API.
-	 * @deprecated Consume {@link UMB_SERVER_CONTEXT} and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 21.
+	 * @deprecated Consume UMB_SERVER_CONTEXT and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 21.
 	 * @memberof UmbAuthContext
 	 * @example <caption>Using the server url</caption>
 	 * ```js
@@ -401,7 +399,7 @@ export class UmbAuthContext extends UmbContextBase {
 	 * 		headers: { Authorization: `Bearer ${await config.token()}` },
 	 * 	});
 	 * ```
-	 * @deprecated Consume {@link UMB_SERVER_CONTEXT} and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 19.
+	 * @deprecated Consume UMB_SERVER_CONTEXT and use its `getServerUrl()` — the canonical source for the server URL. Scheduled for removal in Umbraco 19.
 	 * @returns {string} The server url to the Management API
 	 */
 	getServerUrl() {
