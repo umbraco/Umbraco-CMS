@@ -571,6 +571,8 @@ export default {
 		next: 'Наст.',
 		no: 'Ні',
 		noItemsInList: 'Тут поки що немає елементів',
+		noResults: 'Немає результатів',
+		noResultsFor: (query: string) => `Немає результатів за запитом "${query}".`,
 		of: 'з',
 		off: 'Вимк',
 		ok: 'Ok',
@@ -838,6 +840,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Натисніть, щоб завантажити',
+		browseFilesAction: 'Огляд файлів',
+		dropFilesOr: 'Перетягніть медіафайли сюди<br />або',
 		disallowedFileType: 'Неможливе завантаження цього файлу, цей тип файлів не дозволяється для завантаження',
 		orClickHereToUpload: 'або натисніть тут, щоб вибрати файли',
 		maxFileSize: 'Максимально допустимий розмір файлу: ',
@@ -1339,6 +1343,10 @@ export default {
 		stylesheets: 'Стилі CSS',
 		templates: 'Шаблони',
 		users: 'Користувачі',
+	},
+	picker: {
+		browseTab: 'Огляд',
+		searchTab: 'Пошук',
 	},
 	update: {
 		updateAvailable: 'Доступні оновлення',

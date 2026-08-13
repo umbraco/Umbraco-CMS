@@ -379,6 +379,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Clique para carregar',
+		browseFilesAction: 'Procurar ficheiros',
+		dropFilesOr: 'Arraste e solte ficheiros multimédia aqui<br />ou',
 		orClickHereToUpload: 'ou clique aqui para escolher ficheiros',
 		disallowedFileType: 'Não é possível carregar este ficheiro, não tem um tipo de ficheiro aprovado',
 		disallowedMediaType:
@@ -901,6 +903,8 @@ export default {
 		no: 'Não',
 		nodeName: 'Nome do Nó',
 		notFound: 'Não encontrado',
+		noResults: 'Sem resultados',
+		noResultsFor: (query: string) => `Nenhum resultado para "${query}".`,
 		of: 'de',
 		off: 'Desligado',
 		ok: 'OK',
@@ -2866,6 +2870,8 @@ export default {
 		invalidTimeZone: 'O fuso horário selecionado não é válido',
 	},
 	picker: {
+		browseTab: 'Procurar',
+		searchTab: 'Pesquisar',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
 	},
 } as UmbLocalizationDictionary;

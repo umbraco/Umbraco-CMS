@@ -347,6 +347,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Clicca per caricare',
+		browseFilesAction: 'Sfoglia file',
+		dropFilesOr: 'Trascina qui i file multimediali<br />o',
 		orClickHereToUpload: 'o clicca qui per scegliere i files',
 		dragFilesHereToUpload: 'Puoi trascinare i file qui per caricarli.',
 		disallowedFileType: 'Impossibile caricare questo file, non ha un tipo di file approvato',
@@ -783,6 +785,8 @@ export default {
 		new: 'Nuovo',
 		next: 'Successivo',
 		no: 'No',
+		noResults: 'Nessun risultato',
+		noResultsFor: (query: string) => `Nessun risultato per "${query}".`,
 		of: 'di',
 		off: 'Off',
 		ok: 'Ok',
@@ -2306,6 +2310,8 @@ export default {
 		searchResults: 'oggetti trovati',
 	},
 	picker: {
+		browseTab: 'Sfoglia',
+		searchTab: 'Cerca',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento selezionato' : 'elementi selezionati'}`,
 	},
 } as UmbLocalizationDictionary;
