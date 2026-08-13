@@ -86,7 +86,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 					this.#activeOrderByOption.setValue(option.unique);
 				}
 			},
-			'umbUserCollectionActiveOrderByOptionObserver',
+			null,
 		);
 	}
 

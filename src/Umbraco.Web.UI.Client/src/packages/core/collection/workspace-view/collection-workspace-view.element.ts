@@ -31,7 +31,7 @@ export class UmbCollectionWorkspaceViewElement extends UmbLitElement {
 			(memories) => {
 				this._collectionInteractionMemories = memories;
 			},
-			'umbCollectionInteractionMemoryObserver',
+			null,
 		);
 	}
 

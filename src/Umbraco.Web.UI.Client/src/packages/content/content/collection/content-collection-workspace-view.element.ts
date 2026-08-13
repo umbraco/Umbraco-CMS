@@ -50,7 +50,7 @@ export class UmbContentCollectionWorkspaceViewElement extends UmbLitElement impl
 			(memories) => {
 				this._collectionInteractionMemories = memories;
 			},
-			'umbCollectionInteractionMemoryObserver',
+			null,
 		);
 	}
 
