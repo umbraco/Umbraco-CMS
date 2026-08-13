@@ -187,14 +187,14 @@ export class UmbDefaultTreeContext<
 
 	/**
 	 * Load previous items of the tree item
-	 * @memberof UmbTreeItemContextBase
+	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
 	public loadPrevItems = (): Promise<void> => this.#treeItemChildrenManager.loadPrevChildren();
 
 	/**
 	 * Load next items of the tree item
-	 * @memberof UmbTreeItemContextBase
+	 * @memberof UmbDefaultTreeContext
 	 * @returns {Promise<void>}
 	 */
 	public loadNextItems = (): Promise<void> => this.#treeItemChildrenManager.loadNextChildren();

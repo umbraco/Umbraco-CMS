@@ -2,6 +2,7 @@ import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbDuplicateToDataSource, UmbDuplicateToRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * Duplicate Document Server Data Source
@@ -22,10 +23,10 @@ export class UmbDuplicateDataTypeServerDataSource implements UmbDuplicateToDataS
 	/**
 	 * Duplicate an item for the given unique to the destination unique
 	 * @param {UmbDuplicateToRequestArgs} args - The unique and destination to duplicate to.
-	 * @returns {*} The result of the duplicate request.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the duplicate request.
 	 * @memberof UmbDuplicateDataTypeServerDataSource
 	 */
-	async duplicateTo(args: UmbDuplicateToRequestArgs) {
+	async duplicateTo(args: UmbDuplicateToRequestArgs): Promise<UmbDataSourceErrorResponse> {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (args.destination.unique === undefined) throw new Error('Destination unique is missing');
 

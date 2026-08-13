@@ -336,7 +336,7 @@ export abstract class UmbBlockEntryContext<
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
 	/**
-	 * @deprecated Use {@link _settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
+	 * @deprecated Use {@link UmbBlockEntryContext#_settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
 	 */
 	// eslint-disable-next-line
 	private readonly settingsDataContentTypeKey = this._settingsDataContentTypeKey;
