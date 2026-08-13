@@ -1,6 +1,6 @@
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
-import type { UUIButtonElement, UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * Represents an authentication provider that can be used to authenticate users.
@@ -27,7 +27,7 @@ export interface MetaAuthProvider {
 
 	/**
 	 * The default view of the provider that is shown to the user.
-	 * If no element is provided, then the button will be rendered as a {@link UUIButtonElement} using these options.
+	 * If no element is provided, then the button will be rendered as a button using these options.
 	 */
 	defaultView?: {
 		/**
