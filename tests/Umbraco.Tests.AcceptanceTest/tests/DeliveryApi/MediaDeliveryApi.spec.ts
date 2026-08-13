@@ -182,11 +182,7 @@ test('can fetch a media item by its path', async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(rootArticleName);  
 });
 
-// Rewritten to read the real slugified path off the created item and encode each segment, which addresses both
-// original defects (the derived name-based path, and '#'/'?' being parsed as fragment/query).
-// Left skipped because it could not be verified here: the Media Delivery API is not enabled on this instance and
-// every test in this file returns 401, so re-run this file with the Delivery API enabled before un-skipping.
-test.skip('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
+test('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Image';
   // Create an image item at root level and its name has special characters

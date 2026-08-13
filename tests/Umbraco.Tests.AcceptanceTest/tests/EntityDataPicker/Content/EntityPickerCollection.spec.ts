@@ -95,11 +95,7 @@ test('can not create content with an entity picker using the collection data sou
   await umbracoUi.content.isChooseButtonVisible(false);
 });
 
-// Unverified: https://github.com/umbraco/Umbraco-CMS/issues/22121
-// The expected message was corrected to match umb-input-entity-data, but this could not be confirmed locally —
-// the whole entityDataPicker project needs the picker data-source extension registered, without which every
-// test in this file renders "The configured property editor UI could not be found."
-test.skip('can not create content with an entity picker using the collection data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
+test('can not create content with an entity picker using the collection data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeWithMinAndMaxValues(dataTypeName, collectionDataSourceAlias, 2, 5);
