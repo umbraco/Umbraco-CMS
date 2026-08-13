@@ -124,6 +124,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: INVARIANT_DOCUMENT_TYPE_ID,
