@@ -319,6 +319,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Yüklemek için tıklayın',
+		browseFilesAction: 'Dosyalara göz at',
+		dropFilesOr: 'Medyayı buraya sürükleyip bırakın<br />veya',
 		orClickHereToUpload: 'veya dosyaları seçmek için burayı tıklayın',
 		disallowedFileType: 'Bu dosya yüklenemiyor, onaylanmış bir dosya türüne sahip değil',
 		maxFileSize: 'Maksimum dosya boyutu',
@@ -713,6 +715,8 @@ export default {
 		new: 'Yeni',
 		next: 'Sonraki',
 		no: 'Hayır',
+		noResults: 'Sonuç yok',
+		noResultsFor: (query: string) => `"${query}" için sonuç bulunamadı.`,
 		of: 'arasında',
 		off: 'Kapalı',
 		ok: 'Tamam',
@@ -1420,8 +1424,10 @@ export default {
 		tabHasNoSortOrder: 'sekmesinde sıralama düzeni yok',
 		compositionUsageHeading: 'Bu beste nerede kullanılıyor?',
 		compositionUsageSpecification: 'Bu beste şu anda aşağıdaki içerik türlerinin oluşturulmasında kullanılmaktadır:',
-		compositionUsageSpecificationMediaType: 'Bu beste şu anda aşağıdaki medya türlerinin oluşturulmasında kullanılmaktadır:',
-		compositionUsageSpecificationMemberType: 'Bu beste şu anda aşağıdaki üye türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMediaType:
+			'Bu beste şu anda aşağıdaki medya türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMemberType:
+			'Bu beste şu anda aşağıdaki üye türlerinin oluşturulmasında kullanılmaktadır:',
 		cultureVariantHeading: 'Kültüre göre değişikliklere izin ver',
 		segmentVariantHeading: 'Segmentasyona izin ver',
 		cultureVariantLabel: 'Kültüre göre değişiklik yapın',
@@ -1987,6 +1993,8 @@ export default {
 			'Ayarlar bölümündeki "İçerik Şablonları" ağacından İçerik Şablonlarını düzenleyebilir ve silebilirsiniz. İçerik Şablonunun dayandığı Belge Türünü genişletin ve düzenlemek veya silmek için tıklayın.',
 	},
 	picker: {
+		browseTab: 'Gözat',
+		searchTab: 'Ara',
 		selectedCount: (count: number) => `${count} öğe seçildi`,
 	},
 } as UmbLocalizationDictionary;

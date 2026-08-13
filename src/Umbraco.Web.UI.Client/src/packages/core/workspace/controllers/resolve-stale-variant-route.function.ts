@@ -68,6 +68,9 @@ export function resolveStaleVariantRoute(args: UmbStaleVariantRouteResolverArgs)
 
 /**
  * Separates the variant part of a workspace path from any trailing path (e.g. /view/info).
+ * @param {string} currentPath - the current location pathname.
+ * @param {string} workspaceRoute - the absolute router path of the workspace, without a trailing slash.
+ * @returns {{ variantPart: string; pathSuffix: string } | null} the split parts, or null if the path is not under the workspace route.
  */
 function parseVariantPath(
 	currentPath: string,
@@ -88,6 +91,10 @@ function parseVariantPath(
 
 /**
  * Prefers the same culture without a segment, then the app culture, then invariant, then the first option.
+ * @param {Array<UmbStaleVariantRouteResolverVariant>} variants - the available variant options.
+ * @param {UmbVariantId} variantId - the variant that no longer exists.
+ * @param {string} [appCulture] - the culture currently selected in the app language switcher.
+ * @returns {UmbStaleVariantRouteResolverVariant} the best matching fallback variant.
  */
 function findFallbackVariant(
 	variants: Array<UmbStaleVariantRouteResolverVariant>,

@@ -140,9 +140,9 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		let newValue = draftValue;
 
 		if (api.processValues) {
-			// Gather the the inner-values of the persisted value, grouped by the optionally returned identifier.
-			// The identifier is used for inner-value matching when processing the inner-values of the draft values.
-			// The identifier is provided by the resolver, the resolver knows what identifies a set of values.
+			// A resolver may emit several groups of inner values.
+			// Pair each draft group with its persisted group by the
+			// identifier the resolver supplies, not by call order.
 			const persistedInnerValues = new Map<string, Array<UmbPotentialContentValueModel>>();
 			let persistedFallbackIndex = 0;
 
