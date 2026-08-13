@@ -45,6 +45,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'tabName', value: 'Children' },
 			{ alias: 'showContentFirst', value: true },
 		],
+		noAccess: false,
 	},
 	{
 		id: 'variant-documents-textstring-data-type-id',
