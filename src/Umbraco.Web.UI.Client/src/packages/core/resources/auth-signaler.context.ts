@@ -23,7 +23,10 @@ export class UmbAuthSignalerContext extends UmbContextBase {
 		super(host, UMB_AUTH_SIGNALER_CONTEXT);
 	}
 
-	/** Called by the auth context to keep authorization state in sync. */
+	/**
+	 * Called by the auth context to keep authorization state in sync.
+	 * @param {boolean} value - Whether the user is authorized.
+	 */
 	setAuthorized(value: boolean) {
 		this.#isAuthorized.setValue(value);
 	}

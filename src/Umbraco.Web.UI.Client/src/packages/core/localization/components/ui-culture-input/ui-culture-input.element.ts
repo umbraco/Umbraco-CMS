@@ -57,7 +57,7 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 
 				this._options = distinct.sort((a, b) => a.name.localeCompare(b.name));
 			},
-			'umbObserveLocalizationManifests',
+			null,
 		);
 
 		this.addValidator(

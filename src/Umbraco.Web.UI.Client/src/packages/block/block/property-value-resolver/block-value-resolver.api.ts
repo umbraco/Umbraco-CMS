@@ -7,9 +7,11 @@ export type UmbBlockValuesCallback = (
 	groupIdentifier?: string,
 ) => Promise<Array<UmbBlockDataValueModel> | undefined>;
 
-export abstract class UmbBlockValueResolver<ValueType>
-	implements UmbPropertyValueResolver<UmbElementValueModel<ValueType>, UmbBlockDataValueModel, UmbBlockExposeModel>
-{
+export abstract class UmbBlockValueResolver<ValueType> implements UmbPropertyValueResolver<
+	UmbElementValueModel<ValueType>,
+	UmbBlockDataValueModel,
+	UmbBlockExposeModel
+> {
 	abstract processValues(
 		property: UmbElementValueModel<ValueType>,
 		valuesCallback: UmbBlockValuesCallback,

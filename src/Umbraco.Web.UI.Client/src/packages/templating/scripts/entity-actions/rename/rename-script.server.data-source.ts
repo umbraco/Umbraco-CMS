@@ -20,9 +20,9 @@ export class UmbRenameScriptServerDataSource {
 
 	/**
 	 * Rename Script
-	 * @param {string} unique
-	 * @param {string} name
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the script to rename
+	 * @param {string} name - The new name for the script
+	 * @returns {*} The renamed script, or an error
 	 * @memberof UmbRenameScriptServerDataSource
 	 */
 	async rename(unique: string, name: string) {

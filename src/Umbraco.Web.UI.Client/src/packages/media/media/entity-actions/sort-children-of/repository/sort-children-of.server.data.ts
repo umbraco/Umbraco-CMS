@@ -22,7 +22,7 @@ export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOf
 
 	/**
 	 * Creates the Public Access for the given Media unique
-	 * @param {UmbSortChildrenOfArgs} args
+	 * @param {UmbSortChildrenOfArgs} args - The sorting request arguments
 	 * @memberof UmbSortChildrenOfMediaServerDataSource
 	 */
 	async sortChildrenOf(args: UmbSortChildrenOfArgs) {

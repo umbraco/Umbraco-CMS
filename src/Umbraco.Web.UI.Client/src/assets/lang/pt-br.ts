@@ -183,6 +183,8 @@ export default {
 		logoff: 'Sair',
 		logout: 'Logout',
 		next: 'Próximo',
+		noResults: 'Nenhum resultado',
+		noResultsFor: (query: string) => `Nenhum resultado para "${query}".`,
 		password: 'Senha',
 		pleasewait: 'Um momento por favor...',
 		previous: 'Prévio',
@@ -547,6 +549,8 @@ export default {
 		selectAllLogLevelFilters: 'Selecionar tudo',
 	},
 	picker: {
+		browseTab: 'Procurar',
+		searchTab: 'Pesquisar',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
 	},
 } as UmbLocalizationDictionary;

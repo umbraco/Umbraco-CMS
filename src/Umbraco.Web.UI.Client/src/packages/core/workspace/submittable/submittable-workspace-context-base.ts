@@ -25,7 +25,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	/**
 	 * Appends a validation context to the workspace.
-	 * @param context
+	 * @param {UmbValidationController} context - The validation context to append.
 	 */
 	addValidationContext(context: UmbValidationController) {
 		this.#validationContexts.push(context);
@@ -81,7 +81,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	/**
 	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
-	 * @returns Promise that resolves to void when the validation is complete.
+	 * @returns {Promise<Array<void>>} Promise that resolves to void when the validation is complete.
 	 */
 	public async validate(): Promise<Array<void>> {
 		return await Promise.all(this.#validationContexts.map((context) => context.validate()));

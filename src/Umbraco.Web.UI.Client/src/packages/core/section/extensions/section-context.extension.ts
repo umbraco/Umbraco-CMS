@@ -1,8 +1,7 @@
 import type { ManifestApi, ManifestWithDynamicConditions, UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSectionContext<MetaType extends MetaSectionContext = MetaSectionContext>
-	extends ManifestWithDynamicConditions<UmbExtensionConditionConfig>,
-		ManifestApi<UmbApi> {
+	extends ManifestWithDynamicConditions<UmbExtensionConditionConfig>, ManifestApi<UmbApi> {
 	type: 'sectionContext';
 	meta: MetaType;
 }

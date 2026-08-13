@@ -22,11 +22,11 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 
 	/**
 	 * Uploads a temporary file
-	 * @param {string} id
-	 * @param {File} file
-	 * @param onProgress
-	 * @param abortSignal
-	 * @returns {*}
+	 * @param {string} id - The unique identifier of the temporary file
+	 * @param {File} file - The file to upload
+	 * @param {(progress: ProgressEvent) => void} [onProgress] - Callback invoked with upload progress
+	 * @param {AbortSignal} [abortSignal] - Signal to abort the upload
+	 * @returns {*} The upload response
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	upload(id: string, file: File, onProgress?: (progress: ProgressEvent) => void, abortSignal?: AbortSignal) {
@@ -35,8 +35,8 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 
 	/**
 	 * Deletes a temporary file
-	 * @param {string} id
-	 * @returns {*}
+	 * @param {string} id - The unique identifier of the temporary file
+	 * @returns {*} The delete response
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	delete(id: string) {
@@ -45,8 +45,8 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 
 	/**
 	 * Gets a temporary file
-	 * @param {string} id
-	 * @returns {*}
+	 * @param {string} id - The unique identifier of the temporary file
+	 * @returns {*} The temporary file
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	requestById(id: string) {

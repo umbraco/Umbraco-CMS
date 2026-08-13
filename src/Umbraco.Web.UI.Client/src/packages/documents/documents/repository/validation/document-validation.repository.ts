@@ -21,9 +21,9 @@ export class UmbDocumentValidationRepository
 
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
-	 * @param {DetailModelType} model
-	 * @param {string | null} [parentUnique]
-	 * @returns {*}
+	 * @param {DetailModelType} model - The document data to validate.
+	 * @param {string | null} [parentUnique] - The unique identifier of the parent document.
+	 * @returns {*} The validation result.
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async validateCreate(model: DetailModelType, parentUnique: string | null) {
@@ -34,9 +34,9 @@ export class UmbDocumentValidationRepository
 
 	/**
 	 * Saves the given data
-	 * @param {DetailModelType} model
-	 * @param variantIds
-	 * @returns {*}
+	 * @param {DetailModelType} model - The document data to validate.
+	 * @param {Array<UmbVariantId>} variantIds - The variants to validate.
+	 * @returns {*} The validation result.
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async validateSave(model: DetailModelType, variantIds: Array<UmbVariantId>) {

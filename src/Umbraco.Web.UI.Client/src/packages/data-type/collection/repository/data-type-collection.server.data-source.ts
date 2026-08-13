@@ -21,7 +21,7 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 	/**
 	 * Creates an instance of UmbDataTypeCollectionServerDataSource.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @DataTypeof UmbDataTypeCollectionServerDataSource
+	 * @memberof UmbDataTypeCollectionServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -35,9 +35,9 @@ export class UmbDataTypeCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Gets the DataType collection filtered by the given filter.
-	 * @param {UmbDataTypeCollectionFilterModel} query
-	 * @returns {*}
-	 * @DataTypeof UmbDataTypeCollectionServerDataSource
+	 * @param {UmbDataTypeCollectionFilterModel} query - The filter to apply to the collection.
+	 * @returns {*} The filtered data-type collection.
+	 * @memberof UmbDataTypeCollectionServerDataSource
 	 */
 	async getCollection(query: UmbDataTypeCollectionFilterModel) {
 		const { data, error } = await tryExecute(this.#host, DataTypeService.getFilterDataType({ query }));
