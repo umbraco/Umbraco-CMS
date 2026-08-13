@@ -1,6 +1,5 @@
 import { UmbDocumentVariantState } from '../variant-state.js';
 import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
-import { UmbDocumentVariantState } from '../variant-state.js';
 import type { UmbDocumentSearchItemModel } from './types.js';
 import {
 	classMap,
