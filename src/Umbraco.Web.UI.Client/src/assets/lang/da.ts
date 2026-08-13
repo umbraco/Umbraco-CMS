@@ -2905,7 +2905,7 @@ export default {
 		minimapConfigDescription: 'Vis en minimap i editorvinduet.',
 		wordWrapConfigLabel: 'Tekstombrydning',
 		wordWrapConfigDescription:
-			'Slå ordbrydning til eller fra, så tekst automatisk brydes ved vinduets kant i stedet for at skabe en horisontal scrollbar.',
+			'Slå tekstombrydning til eller fra, så tekst automatisk brydes ved vinduets kant i stedet for at skabe en horisontal scrollbar.',
 	},
 	rte: {
 		config_blocks: 'Tilgængelige blokke',
