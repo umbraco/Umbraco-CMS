@@ -128,7 +128,7 @@ export default [
 			// import-x/named is off in the plugin's own typescript preset (spread above), but that preset's
 			// `rules` is a sibling key here and gets overwritten by this literal — restate it explicitly.
 			// TS type-checking already covers "does this import exist"; the rule's own resolution is prone
-			// to false negatives on deep/cyclic re-export barrels, which this codebase has plenty of.
+			// to false negatives on deep/cyclic re-export barrels.
 			'import-x/named': 'off',
 			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
 			'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
