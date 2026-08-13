@@ -52,8 +52,20 @@ internal sealed class DraftMemberNotificationHandler : ContentNotificationHandle
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Skips re-indexing when the originating save explicitly signalled that no indexable field changed
+    /// (e.g. a login-only update that only touches <c>LastLoginDate</c>/<c>SecurityStamp</c>), via
+    /// <see cref="Umbraco.Cms.Core.Constants.Conventions.Member.IndexableFieldsChangedStateKey"/>.
+    /// </remarks>
     public void Handle(MemberSavedNotification notification)
-        => Refresh(notification.SavedEntities);
+    {
+        if (IndexableFieldsChanged(notification.State) is false)
+        {
+            return;
+        }
+
+        Refresh(notification.SavedEntities);
+    }
 
     /// <inheritdoc />
     public void Handle(MemberDeletedNotification notification)
@@ -75,4 +87,17 @@ internal sealed class DraftMemberNotificationHandler : ContentNotificationHandle
 
     private void FlushDocumentIndexCache(IEnumerable<IMember> entities)
         => FlushDocumentIndexCache(entities.Select(x => x.Key).ToArray(), false);
+
+    // Default to true for backward compatibility — any save that doesn't explicitly signal
+    // "nothing indexable changed" is treated as potentially indexable.
+    private static bool IndexableFieldsChanged(IDictionary<string, object?> state)
+    {
+        if (state.TryGetValue(Umbraco.Cms.Core.Constants.Conventions.Member.IndexableFieldsChangedStateKey, out object? value)
+            && value is bool flag)
+        {
+            return flag;
+        }
+
+        return true;
+    }
 }
