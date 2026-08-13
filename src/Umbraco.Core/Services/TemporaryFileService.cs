@@ -107,7 +107,7 @@ internal sealed class TemporaryFileService : ITemporaryFileService
     /// <returns><c>true</c> if the file extension is allowed; otherwise, <c>false</c>.</returns>
     private bool IsAllowedFileExtension(string fileName)
     {
-        var extension = Path.GetExtension(fileName)[1..];
+        var extension = fileName.GetFileExtension().TrimStart(Constants.CharArrays.Period);
         return _contentSettings.IsFileAllowedForUpload(extension);
     }
 
@@ -117,7 +117,7 @@ internal sealed class TemporaryFileService : ITemporaryFileService
     /// <param name="fileName">The file name to validate.</param>
     /// <returns><c>true</c> if the file name is valid; otherwise, <c>false</c>.</returns>
     private static bool IsValidFileName(string fileName) =>
-        !string.IsNullOrEmpty(fileName) && fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+        !string.IsNullOrEmpty(fileName) && fileName.IndexOfAny(Constants.CharSearchValues.InvalidFileNameChars) < 0;
 
     /// <inheritdoc />
     public async Task<Attempt<TemporaryFileModel?, TemporaryFileOperationStatus>> DeleteAsync(Guid key)

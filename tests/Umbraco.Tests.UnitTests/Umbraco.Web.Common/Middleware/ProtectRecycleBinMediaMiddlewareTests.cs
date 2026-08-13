@@ -70,12 +70,12 @@ public class ProtectRecycleBinMediaMiddlewareTests
 
     private void SetupAuthenticationSuccess(ClaimsPrincipal principal) =>
         _authServiceMock
-            .Setup(x => x.AuthenticateAsync(It.IsAny<HttpContext>(), Constants.Security.BackOfficeExposedAuthenticationType))
+            .Setup(x => x.AuthenticateAsync(It.IsAny<HttpContext>(), Constants.Security.BackOfficeAuthenticationType))
             .ReturnsAsync(AuthenticateResult.Success(new AuthenticationTicket(principal, "TestScheme")));
 
     private void SetupAuthenticationFailure() =>
         _authServiceMock
-            .Setup(x => x.AuthenticateAsync(It.IsAny<HttpContext>(), Constants.Security.BackOfficeExposedAuthenticationType))
+            .Setup(x => x.AuthenticateAsync(It.IsAny<HttpContext>(), Constants.Security.BackOfficeAuthenticationType))
             .ReturnsAsync(AuthenticateResult.Fail("Authentication failed"));
 
     private static Mock<IUser> CreateUserMock(params string[] allowedSections)

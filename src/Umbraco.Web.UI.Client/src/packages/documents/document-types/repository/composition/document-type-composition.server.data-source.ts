@@ -15,14 +15,11 @@ import type { UmbContentTypeCompositionDataSource } from '@umbraco-cms/backoffic
  * A data source for the Document Type Composition that fetches data from the server
  * @class UmbDocumentTypeCompositionServerDataSource
  */
-export class UmbDocumentTypeCompositionServerDataSource
-	implements
-		UmbContentTypeCompositionDataSource<
-			UmbDocumentTypeCompositionReferenceModel,
-			UmbDocumentTypeCompositionCompatibleModel,
-			UmbDocumentTypeAvailableCompositionRequestModel
-		>
-{
+export class UmbDocumentTypeCompositionServerDataSource implements UmbContentTypeCompositionDataSource<
+	UmbDocumentTypeCompositionReferenceModel,
+	UmbDocumentTypeCompositionCompatibleModel,
+	UmbDocumentTypeAvailableCompositionRequestModel
+> {
 	#host: UmbControllerHost;
 
 	/**
@@ -35,8 +32,8 @@ export class UmbDocumentTypeCompositionServerDataSource
 	}
 	/**
 	 * Fetches the compatible compositions for a document type from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the document type.
+	 * @returns {*} The compositions referencing the document type.
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
@@ -57,9 +54,8 @@ export class UmbDocumentTypeCompositionServerDataSource
 	}
 	/**
 	 * Updates the compositions for a document type on the server
-	 * @param {DocumentTypeCompositionRequestModel} body
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbDocumentTypeAvailableCompositionRequestModel} args - The arguments to determine the available compositions.
+	 * @returns {*} The compatible compositions for the document type.
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
 	async availableCompositions(args: UmbDocumentTypeAvailableCompositionRequestModel) {

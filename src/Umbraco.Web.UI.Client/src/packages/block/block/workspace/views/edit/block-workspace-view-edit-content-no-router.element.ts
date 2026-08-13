@@ -13,8 +13,8 @@ import { UmbViewController } from '@umbraco-cms/backoffice/view';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 
 /**
- * @internal only for use inside this class.
  * Gets the view alias for a given tab. This is used to create a unique view context for each tab in the block workspace.
+ * @internal
  * @param {UmbPropertyTypeContainerMergedModel} tab - The tab to get the view alias for.
  * @returns {string} The view alias for the tab.
  */
@@ -55,10 +55,14 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 		this.#tabsStructureHelper.setIsRoot(true);
 		this.#tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this.#tabsStructureHelper.childContainers, (tabs) => {
-			this._tabs = tabs;
-			this.#setupViewContexts();
-		});
+		this.observe(
+			this.#tabsStructureHelper.childContainers,
+			(tabs) => {
+				this._tabs = tabs;
+				this.#setupViewContexts();
+			},
+			null,
+		);
 
 		this.observe(
 			this.#tabsStructureHelper.hasProperties,
@@ -66,7 +70,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				this._hasRootProperties = hasRootProperties;
 				this.#setupViewContexts();
 			},
-			'observeRootProperties',
+			null,
 		);
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {

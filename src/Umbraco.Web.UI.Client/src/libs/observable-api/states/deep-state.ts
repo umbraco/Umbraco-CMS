@@ -26,7 +26,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	 * @function createObservablePart
 	 * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
 	 * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to compare two results. Should return true when data is the same (unchanged), preventing unnecessary emissions.
-	 * @returns {Observable<R>}
+	 * @returns {Observable<R>} The derived Observable.
 	 * @description - Creates an Observable from this State.
 	 */
 	override asObservablePart<ReturnType>(

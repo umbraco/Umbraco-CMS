@@ -71,6 +71,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Gets the user group user permissions.
+	 * @returns {Array<UmbUserPermissionModel>} The user group user permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getPermissions() {
@@ -79,7 +80,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Sets the user group user permissions.
-	 * @param {Array<UmbUserPermissionModel>} permissions
+	 * @param {Array<UmbUserPermissionModel>} permissions - The user group user permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setPermissions(permissions: Array<UmbUserPermissionModel>) {
@@ -88,6 +89,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Gets the user group fallback permissions.
+	 * @returns {Array<string>} The user group fallback permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getFallbackPermissions() {
@@ -96,7 +98,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Sets the user group fallback permissions.
-	 * @param {Array<string>} fallbackPermissions
+	 * @param {Array<string>} fallbackPermissions - The user group fallback permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setFallbackPermissions(fallbackPermissions: Array<string>) {

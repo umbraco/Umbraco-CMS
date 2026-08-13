@@ -74,7 +74,6 @@ test('can create element with multiple culture variants', async ({umbracoApi, um
   await umbracoUi.library.enterTextstring(englishText);
   await umbracoUi.library.clickSaveButton();
   const elementId = await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeCreated();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // This wait is needed to ensure the element is created before adding a variant
   // Add Danish variant using variant selector
   await umbracoUi.library.clickSelectVariantButton();
   await umbracoUi.library.clickVariantAddModeButtonForLanguageName(danishLanguage);
@@ -118,7 +117,6 @@ test('can create element with invariant and variant properties', async ({umbraco
   await umbracoUi.library.enterPropertyValue(invariantPropertyName, invariantText);
   await umbracoUi.library.clickSaveButton();
   await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeCreated();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   // Add Danish variant
   await umbracoUi.library.clickSelectVariantButton();
   await umbracoUi.library.clickVariantAddModeButtonForLanguageName(danishLanguage);
@@ -151,11 +149,11 @@ test('can publish single culture variant only', async ({umbracoApi, umbracoUi}) 
     true
   );
   await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
-    variantElementTypeId, 
-    elementNameEnglish, 
-    elementNameDanish, 
-    variantPropertyName, 
-    englishText, 
+    variantElementTypeId,
+    elementNameEnglish,
+    elementNameDanish,
+    variantPropertyName,
+    englishText,
     danishText
   );
   await umbracoUi.goToBackOffice();
@@ -186,11 +184,11 @@ test('can publish all cultures at once', async ({umbracoApi, umbracoUi}) => {
     true
   );
   await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
-    variantElementTypeId, 
-    elementNameEnglish, 
-    elementNameDanish, 
-    variantPropertyName, 
-    englishText, 
+    variantElementTypeId,
+    elementNameEnglish,
+    elementNameDanish,
+    variantPropertyName,
+    englishText,
     danishText
   );
   await umbracoUi.goToBackOffice();
@@ -222,11 +220,11 @@ test('can edit variant property for specific culture only', async ({umbracoApi, 
     true
   );
   await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
-    variantElementTypeId, 
-    elementNameEnglish, 
-    elementNameDanish, 
-    variantPropertyName, 
-    englishText, 
+    variantElementTypeId,
+    elementNameEnglish,
+    elementNameDanish,
+    variantPropertyName,
+    englishText,
     danishText
   );
   await umbracoUi.goToBackOffice();
@@ -258,11 +256,11 @@ test('can edit element name for specific culture only', async ({umbracoApi, umbr
     true
   );
   await umbracoApi.element.createDefaultElementWithEnglishAndDanishVariants(
-    variantElementTypeId, 
-    elementNameEnglish, 
-    elementNameDanish, 
-    variantPropertyName, 
-    englishText, 
+    variantElementTypeId,
+    elementNameEnglish,
+    elementNameDanish,
+    variantPropertyName,
+    englishText,
     danishText
   );
   await umbracoUi.goToBackOffice();

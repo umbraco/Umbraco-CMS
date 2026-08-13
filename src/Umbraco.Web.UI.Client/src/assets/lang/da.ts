@@ -12,6 +12,9 @@ import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localiza
 
 export default {
 	actions: {
+		copyInProgress: 'Kopierer - vent venligst...',
+		deleteInProgress: 'Sletter - vent venligst...',
+		moveInProgress: 'Flytter - vent venligst...',
 		assigndomain: 'Tilføj domæne',
 		auditTrail: 'Revisionsspor',
 		browse: 'Gennemse elementer',
@@ -353,6 +356,8 @@ export default {
 		variantUnpublishNotAllowed: 'Unpublish is not allowed',
 		saveModalTitle: 'Gem',
 		saveAndPublishModalTitle: 'Gem og udgiv',
+		saveAndPublishDescendantsModalTitle: 'Gem og udgiv med undersider',
+		saveAndScheduleModalTitle: 'Gem og planlæg udgivelse',
 		publishModalTitle: 'Udgiv',
 		selectAllVariants: 'Vælg alle varianter',
 		scheduledPendingChanges: 'Denne tidsplan har ændringer, der træder i kraft, når du klikker på "%0%".',
@@ -391,6 +396,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klik for at uploade',
+		browseFilesAction: 'Gennemse filer',
+		dropFilesOr: 'Træk og slip medier her<br />eller',
 		orClickHereToUpload: 'eller klik her for at vælge filer',
 		disallowedFileType: 'Kan ikke uploade denne fil, den har ikke en godkendt filtype',
 		disallowedMediaType: "Kan ikke uploade denne fil, mediatypen med alias '%0%' er ikke tilladt her",
@@ -832,6 +839,7 @@ export default {
 		by: 'af',
 		cancel: 'Fortryd',
 		cellMargin: 'Celle margen',
+		changeView: 'Skift visning',
 		choose: 'Vælg',
 		clear: 'Ryd',
 		close: 'Luk',
@@ -909,6 +917,8 @@ export default {
 		new: 'Ny',
 		next: 'Næste',
 		no: 'Nej',
+		noResults: 'Ingen resultater',
+		noResultsFor: (query: string) => `Intet resultat for "${query}".`,
 		of: 'af',
 		off: 'Fra',
 		ok: 'OK',
@@ -962,6 +972,7 @@ export default {
 		username: 'Brugernavn',
 		value: 'Værdi',
 		view: 'Vis',
+		weight: 'Vægt',
 		welcome: 'Velkommen...',
 		width: 'Bredde',
 		yes: 'Ja',
@@ -1340,6 +1351,9 @@ export default {
 		paMembers: 'Adgang til enkelte medlemmer',
 		paMembersHelp: 'Hvis du ønsker at give adgang til enkelte medlemmer',
 	},
+	unpublish: {
+		inProgress: 'Afpublicerer - vent venligst...',
+	},
 	publish: {
 		invalidPublishBranchPermissions: 'Utilstrækkelige bruger adgang til a udgive alle under dokumenter',
 		contentPublishedFailedAwaitingRelease: 'Udgivelsen kunne ikke udgives da publiceringsdato er sat',
@@ -1514,6 +1528,8 @@ export default {
 		sortEmptyState: 'Denne node har ingen under noder at sortere',
 	},
 	speechBubbles: {
+		editMultiContentPublishedPartialText: '%0% af %1% dokumenter udgivet.',
+		editMultiContentUnpublishedPartialText: '%0% af %1% dokumenter afpubliceret.',
 		validationFailedHeader: 'Validering',
 		validationFailedMessage: 'Valideringsfejl skal rettes før elementet kan gemmes',
 		operationFailedHeader: 'Fejlet',
@@ -1849,7 +1865,8 @@ export default {
 		compositionUsageHeading: 'Hvor er denne komposition brugt?',
 		compositionUsageSpecification: 'Denne komposition brugt i kompositionen af de følgende indholdstyper:\n    ',
 		compositionUsageSpecificationMediaType: 'Denne komposition brugt i kompositionen af de følgende medietyper:\n    ',
-		compositionUsageSpecificationMemberType: 'Denne komposition brugt i kompositionen af de følgende medlemstyper:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Denne komposition brugt i kompositionen af de følgende medlemstyper:\n    ',
 		variantsHeading: 'Tillad variationer',
 		cultureVariantHeading: 'Tillad sprogvariation',
 		segmentVariantHeading: 'Tillad segmentering',
@@ -2569,7 +2586,7 @@ export default {
 		labelEditorSize: 'Rederings lagets størrelse',
 		addCustomView: 'Tilføj speciel visning',
 		addSettingsElementType: 'Tilføj indstillinger',
-		confirmDeleteBlockTitle: 'Slet %0',
+		confirmDeleteBlockTitle: 'Slet %0%?',
 		confirmDeleteBlockMessage: 'Er du sikker på at du vil slette indholdet <strong>%0%</strong>?',
 		confirmDeleteBlockTypeTitle: 'Slet konfiguration for blokken?',
 		confirmDeleteBlockTypeMessage: 'Er du sikker på at du vil slette konfigurationen <strong>%0%</strong>?',
@@ -2963,5 +2980,10 @@ export default {
 		selectLanguageDefault: 'Auto (besøgendes sprog)',
 		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
 		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
+	},
+	picker: {
+		browseTab: 'Gennemse',
+		searchTab: 'Søg',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
 	},
 } as UmbLocalizationDictionary;

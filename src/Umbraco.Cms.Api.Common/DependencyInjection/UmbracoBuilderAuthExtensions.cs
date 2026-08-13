@@ -9,7 +9,6 @@ using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
 
@@ -126,31 +125,6 @@ public static class UmbracoBuilderAuthExtensions
                 {
                     configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
                 });
-
-                options.AddEventHandler<OpenIddictServerEvents.ApplyTokenResponseContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse<OpenIddictServerEvents.ApplyTokenResponseContext>.Descriptor.Order - 1);
-                });
-                options.AddEventHandler<OpenIddictServerEvents.ApplyAuthorizationResponseContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessQueryResponse.Descriptor.Order - 1);
-                });
-                options.AddEventHandler<OpenIddictServerEvents.ExtractTokenRequestContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractTokenRequestContext>.Descriptor.Order + 1);
-                });
-                options.AddEventHandler<OpenIddictServerEvents.ExtractRevocationRequestContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        .SetOrder(OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest<OpenIddictServerEvents.ExtractRevocationRequestContext>.Descriptor.Order + 1);
-                });
             })
 
             // Register the OpenIddict validation components.
@@ -175,19 +149,9 @@ public static class UmbracoBuilderAuthExtensions
                 {
                     configuration.UseSingletonHandler<ProcessRequestContextHandler>().SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ResolveRequestUri.Descriptor.Order - 1);
                 });
-
-                options.AddEventHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>(configuration =>
-                {
-                    configuration
-                        .UseSingletonHandler<HideBackOfficeTokensHandler>()
-                        // IMPORTANT: the handler must be AFTER the built-in query string handler, because the client-side SignalR library sometimes appends access tokens to the query string.
-                        .SetOrder(OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromQueryString.Descriptor.Order + 1);
-                });
             });
 
         builder.Services.AddSingleton<IDistributedBackgroundJob, OpenIddictCleanupJob>();
         builder.Services.ConfigureOptions<ConfigureOpenIddict>();
-
-        builder.AddNotificationHandler<UserLogoutSuccessNotification, HideBackOfficeTokensHandler>();
     }
 }

@@ -80,6 +80,11 @@
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Keep the local appsettings.json override out of publish output -->
+    <Content Update="appsettings.Local.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
   <!--#if (ModelsBuilderMode == "InMemoryAuto" || (DevelopmentMode == "BackofficeDevelopment" && ModelsBuilderMode == "Default")) -->
   <PropertyGroup>
     <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->

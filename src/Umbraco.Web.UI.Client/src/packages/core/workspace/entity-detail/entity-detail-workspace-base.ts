@@ -110,6 +110,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.addValidationContext(this.validationContext);
 		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
+		window.addEventListener('beforeunload', this.#onBeforeUnload);
 		this.#observeRepository(args.detailRepositoryAlias);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
@@ -331,7 +332,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Deletes the entity.
-	 * @param unique The unique identifier of the entity to delete.
+	 * @param {string} unique The unique identifier of the entity to delete.
 	 */
 	async delete(unique: string) {
 		await this.#init;
@@ -437,6 +438,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return true;
 	};
 
+	#onBeforeUnload = (e: BeforeUnloadEvent) => {
+		if (this.getHasUnpersistedChanges()) {
+			e.preventDefault();
+			e.returnValue = '';
+		}
+	};
+
 	/**
 	 * Check if there are unpersisted changes.
 	 * @returns { boolean } true if there are unpersisted changes.
@@ -502,6 +510,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	public override destroy(): void {
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
+		window.removeEventListener('beforeunload', this.#onBeforeUnload);
 		this.#eventContext?.removeEventListener(
 			UmbEntityUpdatedEvent.TYPE,
 			this.#onEntityUpdatedEvent as unknown as EventListener,

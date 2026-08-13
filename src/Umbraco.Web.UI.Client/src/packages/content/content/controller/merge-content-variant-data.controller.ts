@@ -140,22 +140,28 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 		let newValue = draftValue;
 
 		if (api.processValues) {
-			// The a property values resolver resolves one value, we need to gather the persisted inner values first, and store them here:
-			const persistedValuesHolder: Array<Array<UmbPotentialContentValueModel>> = [];
+			// A resolver may emit several groups of inner values.
+			// Pair each draft group with its persisted group by the
+			// identifier the resolver supplies, not by call order.
+			const persistedValuesHolder = new Map<string, Array<UmbPotentialContentValueModel>>();
+			let persistedIndex = 0;
 
 			if (persistedValue) {
-				await api.processValues(persistedValue, async (values) => {
-					persistedValuesHolder.push(values as unknown as Array<UmbPotentialContentValueModel>);
+				await api.processValues(persistedValue, async (values, groupIdentifier) => {
+					persistedValuesHolder.set(
+						groupIdentifier ?? `index:${persistedIndex++}`,
+						values as unknown as Array<UmbPotentialContentValueModel>,
+					);
 					return undefined;
 				});
 			}
 
 			let valuesIndex = 0;
 			newValue =
-				(await api.processValues(newValue, async (values) => {
-					// got some values (content and/or settings):
-					// but how to get the persisted and the draft of this.....
-					const persistedValues = persistedValuesHolder[valuesIndex++];
+				(await api.processValues(newValue, async (values, groupIdentifier) => {
+					// Resolvers that do not supply an identifier only ever emit a single group, so falling
+					// back to call order keeps them working unchanged.
+					const persistedValues = persistedValuesHolder.get(groupIdentifier ?? `index:${valuesIndex++}`);
 
 					return await this.#processValues(persistedValues, values, variantsToStore);
 				})) ?? newValue;

@@ -1,20 +1,17 @@
+import { UmbDocumentConfigurationRepository } from '../configuration/index.js';
+import type { UmbDocumentConfigurationModel } from '../configuration/types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import { DocumentService, type DocumentConfigurationResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
-// TODO: Turn this into a Repository with a Store that holds the cache [NL]
 /**
  * A context for fetching and caching the document configuration.
  * @internal
  */
 export class UmbDocumentConfigurationContext extends UmbContextBase implements UmbApi {
-	/**
-	 * The cached document configuration.
-	 */
-	static #documentConfiguration: Promise<DocumentConfigurationResponseModel | null>;
+	readonly #repository = new UmbDocumentConfigurationRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_CONFIGURATION_CONTEXT);
@@ -22,20 +19,26 @@ export class UmbDocumentConfigurationContext extends UmbContextBase implements U
 
 	/**
 	 * Get the document configuration from the server, or return the cached configuration if it has already been fetched.
-	 * @returns A promise that resolves to the document configuration, or null if the configuration could not be fetched.
+	 * @returns {Promise<UmbDocumentConfigurationModel | null>} A promise that resolves to the document configuration, or null if the configuration could not be fetched.
 	 */
-	getDocumentConfiguration(): Promise<DocumentConfigurationResponseModel | null> {
-		return (UmbDocumentConfigurationContext.#documentConfiguration ??= this.fetchDocumentConfiguration());
+	async getDocumentConfiguration(): Promise<UmbDocumentConfigurationModel | null> {
+		const { data } = await this.#repository.requestConfiguration();
+
+		return data ?? null;
 	}
 
 	/**
-	 * Fetch the document configuration from the server.
-	 * @returns A promise that resolves to the document configuration, or null if the configuration could not be fetched.
+	 * @deprecated Deprecated since v17. Use `getDocumentConfiguration()` instead. Will be removed in v19.
+	 * @returns {Promise<UmbDocumentConfigurationModel | null>} A promise that resolves to the document configuration, or null if the configuration could not be fetched.
 	 */
-	async fetchDocumentConfiguration() {
-		const { data } = await tryExecute(this, DocumentService.getDocumentConfiguration());
+	fetchDocumentConfiguration(): Promise<UmbDocumentConfigurationModel | null> {
+		new UmbDeprecation({
+			deprecated: 'UmbDocumentConfigurationContext.fetchDocumentConfiguration()',
+			removeInVersion: '19.0.0',
+			solution: 'Use getDocumentConfiguration() instead.',
+		}).warn();
 
-		return data ?? null;
+		return this.getDocumentConfiguration();
 	}
 }
 

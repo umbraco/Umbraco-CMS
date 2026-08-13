@@ -258,7 +258,7 @@ public class ThrottlingCondition
         {
             Match match = _sqlErrorCodeRegEx.Match(error.Message);
 
-            if (match.Success && int.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int reasonCode))
+            if (match.Success && int.TryParse(match.Groups[1].ValueSpan, NumberStyles.Integer, CultureInfo.InvariantCulture, out int reasonCode))
             {
                 return FromReasonCode(reasonCode);
             }

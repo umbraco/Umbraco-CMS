@@ -3,21 +3,17 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Mime;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using OpenIddict.Abstractions;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Controllers.Security;
-using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -35,8 +31,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     where T : ManagementApiControllerBase
 {
-    private static readonly Dictionary<string, string> _tokenCache = new();
-    private static readonly SHA256 _sha256 = SHA256.Create();
+    private static readonly Dictionary<string, string> _authCookieCache = new();
 
     protected JsonSerializerOptions JsonSerializerOptions
     {
@@ -66,7 +61,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         TestContext.Out.Write($"Start test {GetNextTestCount()}: {TestContext.CurrentContext.Test.FullName}");
 
     [OneTimeTearDown]
-    public void ClearCache() => _tokenCache.Clear();
+    public void ClearCache() => _authCookieCache.Clear();
 
     protected override void CustomTestAuthSetup(IServiceCollection services)
     {
@@ -74,7 +69,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     }
 
     protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin) =>
-        await AuthenticateClientAsync(client,
+        await AuthenticateClientAsync(
+            client,
             async userService =>
             {
                 IUser user;
@@ -135,13 +131,12 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     protected async Task AuthenticateClientAsync(HttpClient client, Func<IUserService, Task<(IUser User, string Password)>> createUser, string cacheKey = null)
     {
         // Check cache first
-        if (!string.IsNullOrEmpty(cacheKey) && _tokenCache.TryGetValue(cacheKey, out var cachedToken))
+        if (!string.IsNullOrEmpty(cacheKey) && _authCookieCache.TryGetValue(cacheKey, out var cachedCookie))
         {
-            SetTokenCookie(client, cachedToken);
+            SetAuthCookie(client, cachedCookie);
             return;
         }
 
-        OpenIddictApplicationDescriptor backofficeOpenIddictApplicationDescriptor;
         var scopeProvider = GetRequiredService<ICoreScopeProvider>();
 
         string username;
@@ -160,7 +155,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
             var token = await userManager.GeneratePasswordResetTokenAsync(userCreationResult.User);
 
-            var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
+            var changePasswordAttempt = await userService.ChangePasswordAsync(
+                userKey,
                 new ChangeUserPasswordModel
                 {
                     NewPassword = password, ResetPasswordToken = token.Result.ToUrlBase64(), UserKey = userKey,
@@ -168,11 +164,6 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
             Assert.IsTrue(changePasswordAttempt.Success);
 
-            var backOfficeApplicationManager =
-                serviceScope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>() as
-                    BackOfficeApplicationManager;
-            backofficeOpenIddictApplicationDescriptor =
-                backOfficeApplicationManager.BackofficeOpenIddictApplicationDescriptor(client.BaseAddress);
             scope.Complete();
         }
 
@@ -184,52 +175,44 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
         Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
 
-        const string codeVerifier = "12345"; // Just a dummy value we use in tests
-        var codeChallenge = Convert.ToBase64String(_sha256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
-            .TrimEnd("=");
-
-        var authorizationUrl = GetManagementApiUrl<BackOfficeController>(x => x.Authorize(CancellationToken.None)) + $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallenge}";
-        var authorizeResponse = await client.GetAsync(authorizationUrl);
-
-        Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
-
-        var tokenResponse = await client.PostAsync("/umbraco/management/api/v1/security/back-office/token",
-            new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["grant_type"] = "authorization_code",
-                ["code_verifier"] = codeVerifier,
-                ["client_id"] = backofficeOpenIddictApplicationDescriptor.ClientId,
-                ["code"] = HttpUtility.ParseQueryString(authorizeResponse.Headers.Location.Query).Get("code"),
-                ["redirect_uri"] =
-                    backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault().AbsoluteUri,
-            }));
-
-        CookieContainer cookies = new CookieContainer();
-        foreach (var cookieHeader in tokenResponse.Headers.GetValues("Set-Cookie"))
-        {
-            cookies.SetCookies(tokenResponse.RequestMessage!.RequestUri!, cookieHeader);
-        }
-
-        string cookieTokenValue = cookies.GetCookies(tokenResponse.RequestMessage!.RequestUri!).FirstOrDefault(c => c.Name == "__Host-umbAccessToken")!.Value;
-
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "[redacted]");
-
-        // Cache the token if cache key provided
+        // The login response sets the authentication cookie, and WebApplicationFactoryClientOptions
+        // handles cookies by default, so this client is already authenticated. Nothing further is
+        // needed: back office auth is cookie-only, with no token to exchange for.
         if (!string.IsNullOrEmpty(cacheKey))
         {
-            _tokenCache[cacheKey] = cookieTokenValue;
+            _authCookieCache[cacheKey] = ReadAuthCookie(loginResponse);
         }
     }
 
-    private void SetTokenCookie(HttpClient client, string token)
+    // The cookie is the whole session, so replaying it authenticates a fresh client without repeating
+    // the user creation and password sign-in that produced it.
+    private string ReadAuthCookie(HttpResponseMessage loginResponse)
     {
+        var cookieName = GetRequiredService<IOptions<SecuritySettings>>().Value.AuthCookieName;
+
+        var cookies = new CookieContainer();
+        foreach (var cookieHeader in loginResponse.Headers.GetValues("Set-Cookie"))
+        {
+            cookies.SetCookies(loginResponse.RequestMessage!.RequestUri!, cookieHeader);
+        }
+
+        Cookie authCookie = cookies.GetCookies(loginResponse.RequestMessage!.RequestUri!)
+            .FirstOrDefault(c => c.Name == cookieName)
+            ?? throw new InvalidOperationException(
+                $"The login response did not set the '{cookieName}' authentication cookie.");
+
+        return authCookie.Value;
+    }
+
+    private void SetAuthCookie(HttpClient client, string authCookieValue)
+    {
+        var cookieName = GetRequiredService<IOptions<SecuritySettings>>().Value.AuthCookieName;
+
         if (client.DefaultRequestHeaders.Contains("Cookie"))
         {
             client.DefaultRequestHeaders.Remove("Cookie");
         }
 
-        client.DefaultRequestHeaders.Add("Cookie", $"__Host-umbAccessToken={token}");
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", "[redacted]");
+        client.DefaultRequestHeaders.Add("Cookie", $"{cookieName}={authCookieValue}");
     }
 }

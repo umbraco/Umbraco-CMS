@@ -25,8 +25,8 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Creates a scaffold for a Member Type folder
-	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbFolderModel>} [preset] - The preset data to populate the scaffold with.
+	 * @returns {*} The member type folder scaffold.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -42,8 +42,8 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Fetches a Member Type folder from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the folder to fetch.
+	 * @returns {*} The member type folder.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -71,8 +71,8 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Creates a Member Type folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {*}
+	 * @param {UmbFolderModel} model - The member type folder to create.
+	 * @returns {*} The created member type folder.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -102,8 +102,8 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Updates a Member Type folder on the server
-	 * @param {UmbUpdateFolderModel} model
-	 * @returns {*}
+	 * @param {UmbUpdateFolderModel} model - The member type folder to update.
+	 * @returns {*} The updated member type folder.
 	 * @memberof UmbMemberTypeFolderServerDataSource
 	 */
 	async update(model: UmbFolderModel) {
@@ -128,8 +128,8 @@ export class UmbMemberTypeFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Deletes a Member Type folder on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the folder to delete.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
 	async delete(unique: string) {

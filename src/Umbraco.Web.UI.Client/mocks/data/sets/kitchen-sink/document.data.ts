@@ -1,4 +1,5 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
+import { data as pageTree } from './page-tree.data.js';
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
@@ -2185,8 +2186,22 @@ const rawData = [
 				culture: null,
 				segment: null,
 				value: {
-					markup:
-						'<p>Yikes so many buttons!</p><ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul><p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="/umbraco/backoffice/assets/umb-pattern-blue.png" alt="" width="284" height="284"></p><p>&nbsp;</p>',
+					markup: `<p>Yikes so many buttons!</p>
+<ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul>
+<p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="/umbraco/backoffice/assets/umb-pattern-blue.png" alt="" width="284" height="284"></p>
+<p>&nbsp;</p>
+<div style="border: 5px solid #123456; padding: 1em;">
+  <p><strong>Example Section A</strong></p>
+  <p><a href="https://example.com/item-a" title="Example A">ITEM A</a></p>
+  <ul>
+    <li>Example list item</li>
+  </ul>
+</div>
+<p>&nbsp;</p>
+<div style="border: 5px solid #654321; padding: 1em;">
+  <p><strong>Example Section B</strong></p>
+  <p><a href="https://example.com/item-b" title="Example B">ITEM B</a></p>
+</div>`,
 					blocks: {
 						contentData: [],
 						settingsData: [],
@@ -2595,4 +2610,5 @@ export const data: Array<UmbMockDocumentModel> = [
 		values: allDataTypesValues,
 		flags: [],
 	},
+	...pageTree,
 ];

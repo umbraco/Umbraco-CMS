@@ -1,3 +1,4 @@
+import { attachLinkInterceptor } from '../utils/index.js';
 import { UmbPreviewRepository } from '../repository/index.js';
 import { UMB_PREVIEW_CONTEXT } from './preview.context-token.js';
 import { HubConnectionBuilder, HttpTransportType } from '@umbraco-cms/backoffice/external/signalr';
@@ -222,6 +223,7 @@ export class UmbPreviewContext extends UmbContextBase {
 
 	iframeLoaded(iframe: HTMLIFrameElement) {
 		if (!iframe) return;
+		attachLinkInterceptor(iframe);
 		this.#iframeReady.setValue(true);
 		this.#setupScaling();
 	}

@@ -49,6 +49,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 			}
 
 			// Apply overrides:
+			let hasOverrideChange = false;
 			contexts.forEach((context) => {
 				const override = overrides.find((x) => x.alias === context.manifest.alias);
 				if (override) {
@@ -61,6 +62,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 							...(override as ManifestWorkspaceView),
 							meta: { ...context.manifest.meta, ...override.meta },
 						};
+						hasOverrideChange = true;
 					}
 				}
 			});
@@ -69,13 +71,14 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 			contexts.sort((a, b): number => (b.manifest.weight || 0) - (a.manifest.weight || 0));
 
 			this.#contexts = contexts;
-			return contexts;
+			// Return a new array reference when overrides changed, so distinctUntilChanged can detect it:
+			return hasOverrideChange || hasDiff ? [...contexts] : contexts;
 		},
 		// Custom memoize method, to check context instance and manifest instance:
 		(previousValue: Array<UmbWorkspaceViewContext>, currentValue: Array<UmbWorkspaceViewContext>): boolean => {
 			return (
 				previousValue === currentValue &&
-				currentValue.some(
+				currentValue.every(
 					(x) => x.manifest === previousValue.find((y) => y.manifest.alias === x.manifest.alias)?.manifest,
 				)
 			);

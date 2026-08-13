@@ -422,7 +422,7 @@ type ReadonlyContent = Readonly<UmbContentModel>;
 
 ### Comments and Documentation
 
-> See the [project-wide Code Comment Policy](../../../CLAUDE.md#8-code-comment-policy) for the full rules. The summary below applies them to TypeScript / Lit code.
+> See the [project-wide Code Comment Policy](../../../CLAUDE.md#9-code-comment-policy) for the full rules, and [General-Purpose by Default](../../../CLAUDE.md#2-general-purpose-by-default) for the design principle behind them. The summary below applies them to TypeScript / Lit code.
 
 **Default to no comment.** Well-named functions, methods, and variables are the primary documentation. A line calling `resetState()` does not need `// Reset state` above it. A method named `validateInput` does not need `// Validate input` above it.
 
@@ -431,7 +431,7 @@ type ReadonlyContent = Readonly<UmbContentModel>;
 - Narrating a sequence of calls. The order is already in the code.
 - Pointing at the current task, fix, callers, or PR (`// Used by X`, `// Added for the Y flow`, `// Fix for issue Z`). That metadata belongs in the commit message and PR description, not in source — it rots.
 
-**When a comment IS justified** — only when removing it would leave a future reader confused:
+**When a comment IS justified** — only when removing it would leave a future reader confused. State the rule at the altitude of the code it's in: generic and shared code describes its contract, never a specific extension's implementation of it.
 - A non-obvious **WHY**: a hidden constraint, ordering requirement, or business rule that is not visible from the code.
 - A **workaround** for a specific bug or browser quirk. Anchor it to an issue (`(#21996)`) so it can be deleted when the upstream fix lands.
 - A subtle **invariant** the type system does not enforce.

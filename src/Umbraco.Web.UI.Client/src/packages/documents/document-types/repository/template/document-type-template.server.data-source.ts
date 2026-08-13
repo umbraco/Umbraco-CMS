@@ -20,9 +20,9 @@ export class UmbDocumentTypeTemplateServerDataSource {
 	}
 	/**
 	 * Creates a template for a document type on the server
-	 * @param {string} unique
-	 * @param model
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the document type.
+	 * @param {UmbDocumentTypeTemplateModel} model - The template to create.
+	 * @returns {*} The unique identifier of the created template.
 	 * @memberof UmbDocumentTypeTemplateServerDataSource
 	 */
 	async createTemplate(unique: string, model: UmbDocumentTypeTemplateModel) {

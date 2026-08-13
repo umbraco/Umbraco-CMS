@@ -48,10 +48,14 @@ export class UmbCurrentUserContext extends UmbContextBase {
 			this.#addActionEventListeners();
 		});
 
-		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
-			if (!currentLanguageIsoCode) return;
-			umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
-		});
+		this.observe(
+			this.languageIsoCode,
+			(currentLanguageIsoCode) => {
+				if (!currentLanguageIsoCode) return;
+				umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
+			},
+			null,
+		);
 	}
 
 	#loadPromise?: Promise<void>;
@@ -65,6 +69,21 @@ export class UmbCurrentUserContext extends UmbContextBase {
 			this.#loadPromise = this.#doLoad();
 		}
 		return this.#loadPromise;
+	}
+
+	/**
+	 * Invalidates the loaded current user, so that the next call to {@link load} fetches it from the server again.
+	 * Call this when the loaded user can no longer be trusted, e.g. when authorization is lost — a subsequent
+	 * sign-in may be for a different user.
+	 * @remarks The `#currentUser` state is deliberately NOT cleared here. The backoffice stays mounted behind
+	 * the login overlay during a session timeout, and several consumers observe the unfiltered observable
+	 * parts (e.g. recycle-bin conditions, sensitive-data property gating, language read-only checks) without
+	 * guarding against `undefined` — clearing would tear down or read-only-flip open workspaces mid-edit for
+	 * the common case of the same user signing back in. Consumers of the filtered {@link currentUser}
+	 * observable hold their last value until the fresh user has been fetched and then re-evaluate.
+	 */
+	public invalidate(): void {
+		this.#loadPromise = undefined;
 	}
 
 	async #doLoad(): Promise<void> {
@@ -85,14 +104,14 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	}
 
 	#loadDebounced = debounce(() => {
-		this.#loadPromise = undefined;
+		this.invalidate();
 		this.load();
 	}, 100);
 
 	/**
 	 * Checks if a user is the current user.
-	 * @param userUnique The user id to check
-	 * @returns True if the user is the current user, otherwise false
+	 * @param {string} userUnique The user id to check
+	 * @returns {Promise<boolean>} True if the user is the current user, otherwise false
 	 */
 	async isUserCurrentUser(userUnique: string): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);
@@ -101,7 +120,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	/**
 	 * Checks if the current user is an admin.
-	 * @returns True if the current user is an admin, otherwise false
+	 * @returns {Promise<boolean>} True if the current user is an admin, otherwise false
 	 */
 	async isCurrentUserAdmin(): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);

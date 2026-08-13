@@ -72,7 +72,12 @@ export class UmbDocumentRollbackRepository extends UmbControllerBase implements 
 		return await this.#dataSource.rollback(versionId, culture);
 	}
 
-	/** @deprecated Use {@link requestVersionsByEntityId} instead. Scheduled for removal in Umbraco 19. */
+	/**
+	 * @param {string} id - The document unique identifier.
+	 * @param {string} [culture] - The culture to get versions for.
+	 * @returns {*} The versions for the document.
+	 * @deprecated Use {@link requestVersionsByEntityId} instead. Scheduled for removal in Umbraco 19.
+	 */
 	async requestVersionsByDocumentId(id: string, culture?: string) {
 		return await this.#dataSource.getVersionsByDocumentId(id, culture);
 	}

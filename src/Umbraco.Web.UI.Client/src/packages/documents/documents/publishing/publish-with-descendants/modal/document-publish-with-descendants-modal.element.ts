@@ -97,7 +97,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('buttons_publishDescendants')}>
+		return html`<uui-dialog-layout headline=${this.localize.term('content_saveAndPublishDescendantsModalTitle')}>
 			<p id="subtitle">
 				${this._options.length === 1
 					? html`<umb-localize

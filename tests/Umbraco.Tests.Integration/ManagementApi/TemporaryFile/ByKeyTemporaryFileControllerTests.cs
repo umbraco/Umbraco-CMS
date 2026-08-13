@@ -14,7 +14,7 @@ public class ByKeyTemporaryFileControllerTests : ManagementApiUserGroupTestBase<
     private Guid _key;
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         _key = Guid.NewGuid();
         await TemporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = _key, FileName = "File.png" });
