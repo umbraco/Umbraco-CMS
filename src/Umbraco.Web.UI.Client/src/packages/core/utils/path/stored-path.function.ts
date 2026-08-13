@@ -5,7 +5,8 @@ export const UMB_STORAGE_REDIRECT_URL = 'umb:auth:redirect';
 
 /**
  * Retrieve the stored path from the session storage.
- * @remark This is used to redirect the user to the correct page after login.
+ * @remarks This is used to redirect the user to the correct page after login.
+ * @returns {URL | null} The stored path, or null if none is stored.
  */
 export function retrieveStoredPath(): URL | null {
 	let currentRoute = '';
@@ -20,9 +21,9 @@ export function retrieveStoredPath(): URL | null {
 
 /**
  * Store the path in the session storage.
- * @param path
- * @remark This is used to redirect the user to the correct page after login.
- * @remark The path must be a local path, otherwise it is not stored.
+ * @param {string} path - The path to store.
+ * @remarks This is used to redirect the user to the correct page after login.
+ * The path must be a local path, otherwise it is not stored.
  */
 export function setStoredPath(path: string): void {
 	const url = new URL(path, window.location.origin);

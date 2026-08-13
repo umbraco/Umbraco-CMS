@@ -67,7 +67,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	/**
 	 * Called when the API is changed.
 	 * @protected
-	 * @param {(ManifestType['API_TYPE'] | undefined)} api
+	 * @param {(ManifestType['API_TYPE'] | undefined)} api - The new API instance
 	 * @memberof UmbExtensionElementAndApiSlotElementBase
 	 */
 	protected apiChanged(api: ManifestType['API_TYPE'] | undefined) {
@@ -77,7 +77,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	/**
 	 * Called when the element is changed.
 	 * @protected
-	 * @param {(ManifestType['ELEMENT_TYPE'] | undefined)} element
+	 * @param {(ManifestType['ELEMENT_TYPE'] | undefined)} element - The new element instance
 	 * @memberof UmbExtensionElementAndApiSlotElementBase
 	 */
 	protected elementChanged(element: ManifestType['ELEMENT_TYPE'] | undefined) {
@@ -87,7 +87,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 
 	/**
 	 * Render the element.
-	 * @returns {*}
+	 * @returns {(ManifestType['ELEMENT_TYPE'] | undefined)} The rendered element
 	 * @memberof UmbExtensionElementAndApiSlotElementBase
 	 */
 	override render() {
@@ -96,6 +96,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 
 	/**
 	 * Disable the Shadow DOM for this element. This is needed because this is a wrapper element and should not stop the event propagation.
+	 * @returns {HTMLElement} This element as its own render root
 	 */
 	protected override createRenderRoot() {
 		return this;

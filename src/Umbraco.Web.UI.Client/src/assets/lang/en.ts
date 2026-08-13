@@ -408,6 +408,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Click to upload',
+		browseFilesAction: 'Browse files',
+		dropFilesOr: 'Drag and drop media here<br />or',
 		orClickHereToUpload: 'or click here to choose files',
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
 		disallowedFileExtension: (extension: string) =>
@@ -944,6 +946,8 @@ export default {
 		no: 'No',
 		nodeName: 'Node Name',
 		notFound: 'Not found',
+		noResults: 'No results',
+		noResultsFor: (query: string) => `No result for "${query}".`,
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
@@ -2094,6 +2098,8 @@ export default {
 		noItems: 'No items',
 	},
 	picker: {
+		browseTab: 'Browse',
+		searchTab: 'Search',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} selected`,
 	},
 	update: {

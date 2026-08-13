@@ -12,6 +12,7 @@ import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import { UmbValueSummaryCoordinatorContext } from '@umbraco-cms/backoffice/value-summary';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -40,10 +41,24 @@ import { UmbModalRouteRegistrationController, type UmbModalRouteBuilder } from '
 
 const LOCAL_STORAGE_KEY = 'umb-collection-view';
 
+const FILTER_MEMORY_UNIQUE = 'UmbCollectionFilter';
+const ORDER_MEMORY_UNIQUE = 'UmbCollectionOrder';
+const PAGINATION_MEMORY_UNIQUE = 'UmbCollectionPagination';
+
+/**
+ * The parts of a collection filter that are remembered in the interaction memory.
+ */
+type UmbCollectionMemorizedFilter = {
+	filter?: string;
+	orderBy?: string;
+	orderDirection?: string;
+	skip?: number;
+};
+
 export class UmbDefaultCollectionContext<
-		CollectionItemType extends { entityType: string; unique: string } = any,
-		FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
-	>
+	CollectionItemType extends { entityType: string; unique: string } = any,
+	FilterModelType extends UmbCollectionFilterModel = UmbCollectionFilterModel,
+>
 	extends UmbContextBase
 	implements UmbCollectionContext, UmbApi
 {
@@ -78,12 +93,14 @@ export class UmbDefaultCollectionContext<
 
 	public readonly pagination = new UmbPaginationManager();
 	public readonly selection = new UmbCollectionSelectionManager(this);
-	public readonly view = new UmbCollectionViewManager(this);
+	public readonly interactionMemory = new UmbInteractionMemoryManager(this);
+	public readonly view = new UmbCollectionViewManager(this, { interactionMemoryManager: this.interactionMemory });
 	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
 	public readonly valueSummaryCoordinator = new UmbValueSummaryCoordinatorContext(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
+	#pageNumberToRestore?: number;
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -107,6 +124,7 @@ export class UmbDefaultCollectionContext<
 
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 		this.#listenToEntityEvents();
+		this.#observeInteractionMemory();
 
 		// The parent entity context is used to get the parent entity for the collection items
 		// All items in the collection are children of the current entity context
@@ -223,6 +241,8 @@ export class UmbDefaultCollectionContext<
 		this.#configureViews();
 
 		this._configured = true;
+
+		this.#applyInteractionMemory();
 	}
 
 	#checkIfInitialized() {
@@ -249,13 +269,16 @@ export class UmbDefaultCollectionContext<
 
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
-		const skipFilter = { skip: target.getSkip() } as Partial<FilterModelType>;
-		this.setFilter(skipFilter);
+		const skip = target.getSkip();
+		// The page can be corrected by the pagination manager itself, ex. when the total amount of items shrinks.
+		// Only request the collection again when this actually moves us somewhere else.
+		if (this.#getFilterValue().skip === skip) return;
+		this.setFilter({ skip } as Partial<FilterModelType>);
 	};
 
 	/**
 	 * Sets the configuration for the collection.
-	 * @param {UmbCollectionConfiguration} config
+	 * @param {UmbCollectionConfiguration} config The collection configuration.
 	 * @memberof UmbCollectionContext
 	 */
 	public setConfig(config: UmbCollectionConfiguration) {
@@ -313,8 +336,7 @@ export class UmbDefaultCollectionContext<
 
 		if (data) {
 			this._items.setValue(data.items);
-			this._totalItems.setValue(data.total);
-			this.pagination.setTotalItems(data.total);
+			this._setTotalItems(data.total);
 		}
 
 		this._loading.setValue(false);
@@ -322,7 +344,7 @@ export class UmbDefaultCollectionContext<
 
 	/**
 	 * Sets the filter for the collection and refreshes the collection.
-	 * @param {Partial<FilterModelType>} filter
+	 * @param {Partial<FilterModelType>} filter The filter to merge into the current filter.
 	 * @memberof UmbCollectionContext
 	 */
 	public setFilter(filter: Partial<FilterModelType>) {
@@ -334,16 +356,181 @@ export class UmbDefaultCollectionContext<
 		this._filter.setValue({ ...this._filter.getValue(), ...filter });
 	}
 
+	/**
+	 * Returns the current filter of the collection.
+	 * @returns {(FilterModelType | object)} The current filter.
+	 * @memberof UmbCollectionContext
+	 */
+	public getFilter(): FilterModelType | object {
+		return this._filter.getValue();
+	}
+
+	#getFilterValue(): UmbCollectionMemorizedFilter {
+		return this._filter.getValue() as UmbCollectionMemorizedFilter;
+	}
+
+	// TODO: The filter, order and pagination memories below would ideally live in the managers owning that state, like
+	// the view manager does with its own. That requires a filter manager first, so we move them over time. [MR]
+	#observeInteractionMemory() {
+		this.observe(this.filter, () => this.#writeInteractionMemory(), 'umbCollectionInteractionMemoryWriteObserver');
+
+		this.observe(
+			this.interactionMemory.memories,
+			() => this.#applyInteractionMemory(),
+			'umbCollectionInteractionMemoryObserver',
+		);
+	}
+
+	/**
+	 * Sets the total amount of items of the collection and moves the pagination to the remembered page.
+	 * @param {number} totalItems - The total amount of items in the collection.
+	 * @memberof UmbCollectionContext
+	 */
+	protected _setTotalItems(totalItems: number) {
+		this._totalItems.setValue(totalItems);
+		this.pagination.setTotalItems(totalItems);
+
+		// The remembered page can only be given to the pagination manager once it knows the amount of pages, as it
+		// corrects a page beyond the last one.
+		if (this.#pageNumberToRestore === undefined) return;
+		const pageNumber = this.#pageNumberToRestore;
+		this.#pageNumberToRestore = undefined;
+		this.pagination.setCurrentPageNumber(pageNumber);
+	}
+
+	/**
+	 * Writes the parts of the filter that are worth remembering to the interaction memory.
+	 * Only deviations from the configured defaults are remembered, so a collection without memories behaves as configured.
+	 */
+	#writeInteractionMemory() {
+		if (!this._configured) return;
+
+		const filter = this.#getFilterValue();
+
+		if (filter.filter) {
+			this.interactionMemory.setMemory({
+				unique: FILTER_MEMORY_UNIQUE,
+				value: { filter: filter.filter },
+			});
+		} else {
+			this.interactionMemory.deleteMemory(FILTER_MEMORY_UNIQUE);
+		}
+
+		const configuredOrder = this.#getConfiguredOrder();
+		const isConfiguredOrder =
+			filter.orderBy === configuredOrder.orderBy && filter.orderDirection === configuredOrder.orderDirection;
+
+		if (filter.orderBy && !isConfiguredOrder) {
+			this.interactionMemory.setMemory({
+				unique: ORDER_MEMORY_UNIQUE,
+				value: { orderBy: filter.orderBy, orderDirection: filter.orderDirection },
+			});
+		} else {
+			this.interactionMemory.deleteMemory(ORDER_MEMORY_UNIQUE);
+		}
+
+		const pageNumber = this.#getPageNumberOfSkip(filter.skip);
+
+		if (pageNumber > 1) {
+			this.interactionMemory.setMemory({
+				unique: PAGINATION_MEMORY_UNIQUE,
+				value: { pageNumber },
+			});
+		} else {
+			this.interactionMemory.deleteMemory(PAGINATION_MEMORY_UNIQUE);
+		}
+	}
+
+	/**
+	 * Folds the interaction memory into the filter. Values already present in the filter are left alone, which is
+	 * what makes this safe to run again when memories arrive after the collection has been configured.
+	 */
+	#applyInteractionMemory() {
+		if (!this._configured) return;
+
+		const filter = this.#getFilterValue();
+		const filterMemory = this.interactionMemory.getMemory(FILTER_MEMORY_UNIQUE)?.value;
+		const orderMemory = this.interactionMemory.getMemory(ORDER_MEMORY_UNIQUE)?.value;
+		const paginationMemory = this.interactionMemory.getMemory(PAGINATION_MEMORY_UNIQUE)?.value;
+
+		const memorized: UmbCollectionMemorizedFilter = {};
+
+		if (filterMemory?.filter !== undefined && filterMemory.filter !== filter.filter) {
+			memorized.filter = filterMemory.filter;
+		}
+
+		if (orderMemory?.orderBy !== undefined && orderMemory.orderBy !== filter.orderBy) {
+			memorized.orderBy = orderMemory.orderBy;
+		}
+
+		if (orderMemory?.orderDirection !== undefined && orderMemory.orderDirection !== filter.orderDirection) {
+			memorized.orderDirection = orderMemory.orderDirection;
+		}
+
+		const pageNumber = paginationMemory?.pageNumber;
+
+		if (pageNumber !== undefined && pageNumber !== this.#getPageNumberOfSkip(filter.skip)) {
+			this.#pageNumberToRestore = pageNumber;
+			memorized.skip = (pageNumber - 1) * this.pagination.getPageSize();
+		}
+
+		if (Object.keys(memorized).length === 0) return;
+
+		this.setFilter(memorized as Partial<FilterModelType>);
+	}
+
+	/**
+	 * The ordering the collection has when nothing has been remembered. It can come from the default filter of a
+	 * specialized collection context as well as from the configuration.
+	 * @returns {Pick<UmbCollectionMemorizedFilter, 'orderBy' | 'orderDirection'>} The configured ordering.
+	 */
+	#getConfiguredOrder(): Pick<UmbCollectionMemorizedFilter, 'orderBy' | 'orderDirection'> {
+		const defaults = { ...this.#defaultFilter, ...this.#config } as UmbCollectionMemorizedFilter;
+		return { orderBy: defaults.orderBy, orderDirection: defaults.orderDirection };
+	}
+
+	#getPageNumberOfSkip(skip: number | undefined): number {
+		const pageSize = this.pagination.getPageSize();
+		if (!skip || !pageSize) return 1;
+		return Math.floor(skip / pageSize) + 1;
+	}
+
+	/**
+	 * Returns the alias of the view the collection was last left in.
+	 * @param {(string | undefined)} unique - The unique of the entity holding the collection.
+	 * @returns {(string | undefined)} The alias of the last selected view.
+	 * @deprecated Deprecated since v17. The current view is remembered in the interaction memory of the collection,
+	 * see the `UmbCollectionCurrentView` memory on `.interactionMemory`. Scheduled for removal in Umbraco 19.
+	 */
 	public getLastSelectedView(unique: string | undefined): string | undefined {
-		if (!unique) return;
+		new UmbDeprecation({
+			deprecated: 'UmbDefaultCollectionContext.getLastSelectedView()',
+			removeInVersion: '19.0.0',
+			solution: 'Read the UmbCollectionCurrentView memory from the interactionMemory of the collection instead.',
+		}).warn();
+
+		if (!unique) return undefined;
 
 		const layouts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? '{}') ?? {};
-		if (!layouts) return;
+		if (!layouts) return undefined;
 
 		return layouts[unique];
 	}
 
+	/**
+	 * Stores the alias of the view the collection was last left in.
+	 * @param {(string | undefined)} unique - The unique of the entity holding the collection.
+	 * @param {string} viewAlias - The alias of the view.
+	 * @deprecated Deprecated since v17. The current view is remembered in the interaction memory of the collection,
+	 * see the `UmbCollectionCurrentView` memory on `.interactionMemory`. Scheduled for removal in Umbraco 19.
+	 */
 	public setLastSelectedView(unique: string | undefined, viewAlias: string) {
+		new UmbDeprecation({
+			deprecated: 'UmbDefaultCollectionContext.setLastSelectedView()',
+			removeInVersion: '19.0.0',
+			solution: 'The current view is remembered by the collection view manager, no call is needed.',
+		}).warn();
+
 		if (!unique) return;
 
 		const layouts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) ?? '{}') ?? {};
