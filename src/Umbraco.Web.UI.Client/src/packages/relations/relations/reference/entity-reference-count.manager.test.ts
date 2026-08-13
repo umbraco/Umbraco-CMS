@@ -267,6 +267,24 @@ describe('UmbEntityReferenceCountManager', () => {
 			expect(UmbTestReferenceRepository.callCount).to.equal(1);
 		});
 
+		// Same race as the clear() test below, but triggered by switching unique instead: a reload for the
+		// previous unique must not still be ridden along on by a getTotalAsync call for the new one.
+		it('a reload invalidated by switching unique does not block the next getTotalAsync call from issuing a fresh request', async () => {
+			await manager.setUnique('elm-1');
+
+			UmbTestReferenceRepository.responseQueue.push({ total: 1, delayMs: 20 });
+			const staleRequest = manager.getTotalAsync(); // kicks off a reload for elm-1 that won't resolve for 20ms
+
+			await manager.setUnique('elm-2'); // invalidate it before it resolves
+
+			UmbTestReferenceRepository.responseQueue.push({ total: 5 });
+			const total = await manager.getTotalAsync();
+
+			expect(total, 'must issue a fresh request rather than await the invalidated one').to.equal(5);
+
+			await staleRequest;
+		});
+
 		describe('clear', () => {
 			it('drops the cached total so the next getTotalAsync call re-fetches it', async () => {
 				await manager.setUnique('elm-1');

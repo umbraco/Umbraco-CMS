@@ -172,6 +172,25 @@ describe('UmbEntityReferenceListElement', () => {
 
 			expect(element.getTotal()).to.equal(5);
 		});
+
+		it('clears the previous total immediately when the unique changes, before the new fetch resolves', async () => {
+			UmbTestReferenceRepository.referencedByItems = makeItems(2);
+			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
+			element.unique = 'elm-1';
+			document.body.appendChild(element);
+			await aTimeout(0);
+			expect(element.getTotal()).to.equal(2);
+
+			UmbTestReferenceRepository.referencedByItems = makeItems(5);
+			element.unique = 'elm-2';
+
+			// Before the new fetch has had a chance to resolve, elm-1's stale total must already be gone —
+			// not still showing until the new data arrives.
+			expect(element.getTotal(), "stale total from the previous entity mustn't still be showing").to.equal(0);
+
+			await aTimeout(0);
+			expect(element.getTotal()).to.equal(5);
+		});
 	});
 
 	describe('descendantsWithReferences source', () => {

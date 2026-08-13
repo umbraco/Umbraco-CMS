@@ -126,4 +126,36 @@ describe('UmbEntityReferencesSummaryElement', () => {
 
 		expect(changeCount).to.equal(1);
 	});
+
+	it('still dispatches a change event when one of the totals fails to load', async () => {
+		UmbTestReferenceRepository.descendantsTotal = 4;
+
+		class UmbTestReferenceRepositoryWithFailingReferencedBy extends UmbTestReferenceRepository {
+			override async requestReferencedBy(): Promise<never> {
+				throw new Error('Simulated network error');
+			}
+		}
+
+		const alias = 'Umb.Test.EntityReferencesSummary.Repository.FailingReferencedBy';
+		const manifest: ManifestApi<UmbTestReferenceRepositoryWithFailingReferencedBy> = {
+			type: 'my-test-type',
+			alias,
+			name: 'Test Entity Reference Repository With Failing requestReferencedBy',
+			api: UmbTestReferenceRepositoryWithFailingReferencedBy,
+		};
+		umbExtensionsRegistry.register(manifest);
+
+		try {
+			let changeCount = 0;
+			element.addEventListener('change', () => changeCount++);
+			element.config = { unique: 'elm-1', referenceRepositoryAlias: alias, itemRepositoryAlias: 'n/a' };
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(changeCount, 'change event must still fire even though one loader rejected').to.equal(1);
+			expect(element.getTotalDescendantsWithReferences(), 'other loaders must still have completed').to.equal(4);
+		} finally {
+			umbExtensionsRegistry.unregister(alias);
+		}
+	});
 });

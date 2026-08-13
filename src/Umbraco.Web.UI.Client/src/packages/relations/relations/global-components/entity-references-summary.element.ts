@@ -86,12 +86,19 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 			this.config.referenceRepositoryAlias,
 		);
 
-		await Promise.all([
-			this.#loadReferencedByTotal(),
-			this.#loadDescendantsWithReferencesTotal(),
-			this.#loadReferencedElementsWithPendingChangesTotal(),
-		]);
-		this.dispatchEvent(new UmbChangeEvent());
+		try {
+			await Promise.all([
+				this.#loadReferencedByTotal(),
+				this.#loadDescendantsWithReferencesTotal(),
+				this.#loadReferencedElementsWithPendingChangesTotal(),
+			]);
+		} catch {
+			// One of the totals failed to load — whichever others succeeded keep their value, and we still
+			// dispatch below regardless. Consumers (e.g. the unpublish modal drives its submit button off
+			// this event) must not be left waiting for a change that would otherwise never come.
+		} finally {
+			this.dispatchEvent(new UmbChangeEvent());
+		}
 	}
 
 	async #loadReferencedByTotal() {

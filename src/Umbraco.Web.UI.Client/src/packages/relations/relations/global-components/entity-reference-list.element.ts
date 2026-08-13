@@ -30,12 +30,12 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		this.#unique = value;
 		if (value === oldValue) return;
 		this._currentPage = 1;
+		// Clear before fetching, not just when there's no new value — otherwise the previous entity's
+		// items/total stay on screen (and visible to @change consumers) until the new fetch resolves.
+		this._items = [];
+		this._total = 0;
 
-		if (!value) {
-			this._items = [];
-			this._total = 0;
-			return;
-		}
+		if (!value) return;
 
 		this.#getReferences();
 	}

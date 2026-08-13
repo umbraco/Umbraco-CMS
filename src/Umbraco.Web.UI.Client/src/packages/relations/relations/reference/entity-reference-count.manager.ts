@@ -81,8 +81,7 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 		this.#unique = unique;
 
 		if (!this.#prefetch) {
-			++this.#reloadToken; // invalidate any reload already in flight for the previous unique
-			this.#total.setValue(undefined);
+			this.#invalidate();
 			return;
 		}
 
@@ -96,7 +95,18 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	 * @returns {void}
 	 */
 	clear(): void {
-		++this.#reloadToken; // invalidate any reload already in flight
+		this.#invalidate();
+	}
+
+	/**
+	 * Invalidate any reload already in flight and drop the cached total, without touching {@link #unique}.
+	 * Shared by {@link clear} and the lazy branch of {@link setUnique} so the two can't drift apart — leaving
+	 * `#pendingReload` set here would let a subsequent {@link getTotalAsync} call ride along on a reload for a
+	 * unique this manager no longer cares about, and read its (irrelevant) result as the answer.
+	 * @returns {void}
+	 */
+	#invalidate(): void {
+		++this.#reloadToken;
 		this.#pendingReload = undefined;
 		this.#total.setValue(undefined);
 	}
