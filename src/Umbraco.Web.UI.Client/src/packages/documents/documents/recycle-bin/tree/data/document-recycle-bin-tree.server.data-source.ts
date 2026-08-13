@@ -15,7 +15,7 @@ import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/ut
 /**
  * A data source for the Document Recycle Bin tree that fetches data from the server
  * @class UmbDocumentRecycleBinTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbDocumentRecycleBinTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	DocumentRecycleBinItemResponseModel,

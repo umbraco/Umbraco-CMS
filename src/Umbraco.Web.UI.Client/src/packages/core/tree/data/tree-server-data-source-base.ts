@@ -79,7 +79,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	/**
 	 * Fetches the root items for the tree from the server
 	 * @param {UmbTreeRootItemsRequestArgs} args - The arguments for the request
-	 * @returns {*} The mapped root items
+	 * @returns {Promise<UmbDataSourceResponse<UmbTargetPagedModel<ClientTreeItemType>>>} The mapped root items
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getRootItems(args: TreeRootItemsRequestArgsType) {
@@ -103,7 +103,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	/**
 	 * Fetches the children of a given parent unique from the server
 	 * @param {UmbTreeChildrenOfRequestArgs} args - The arguments for the request
-	 * @returns {*} The mapped child items
+	 * @returns {Promise<UmbDataSourceResponse<UmbTargetPagedModel<ClientTreeItemType>>>} The mapped child items
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getChildrenOf(args: TreeChildrenOfRequestArgsType) {
@@ -129,7 +129,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	/**
 	 * Fetches the ancestors of a given item from the server
 	 * @param {UmbTreeAncestorsOfRequestArgs} args - The arguments for the request
-	 * @returns {*} The mapped ancestor items
+	 * @returns {Promise<UmbDataSourceResponse<Array<ClientTreeItemType>>>} The mapped ancestor items
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
 	async getAncestorsOf(args: TreeAncestorsOfRequestArgsType) {

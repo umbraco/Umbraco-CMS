@@ -21,7 +21,6 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 /**
  * A server data source for Document publishing
  * @class UmbDocumentPublishingServerDataSource
- * @implements {DocumentTreeDataSource}
  */
 export class UmbDocumentPublishingServerDataSource {
 	#host: UmbControllerHost;
@@ -40,7 +39,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
 	 * @param {string | null} parentUnique - The unique of the parent to create under
-	 * @returns {*} The result of the create and publish request
+	 * @returns {Promise<UmbDataSourceResponse>} The result of the create and publish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async createAndPublish(
@@ -66,7 +65,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Updates and publishes a Document on the server in a single operation
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after updating
-	 * @returns {*} The result of the update and publish request
+	 * @returns {Promise<UmbDataSourceResponse>} The result of the update and publish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async updateAndPublish(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
@@ -100,7 +99,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Publish one or more variants of a Document
 	 * @param {string} unique - The unique of the Document
 	 * @param {Array<UmbDocumentVariantPublishModel>} variants - The variants to publish
-	 * @returns {*} The result of the publish request
+	 * @returns {Promise<UmbDataSourceResponse>} The result of the publish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
@@ -127,7 +126,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Unpublish one or more variants of a Document
 	 * @param {string} unique - The unique of the Document
 	 * @param {Array<UmbVariantId>} variantIds - The variants to unpublish
-	 * @returns {*} The result of the unpublish request
+	 * @returns {Promise<UmbDataSourceResponse>} The result of the unpublish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async unpublish(unique: string, variantIds: Array<UmbVariantId>) {
@@ -198,7 +197,7 @@ export class UmbDocumentPublishingServerDataSource {
 			}
 
 			if (data.isComplete) {
-				return { error: null };
+				return { error: undefined };
 			}
 		}
 	}

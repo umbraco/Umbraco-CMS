@@ -2,7 +2,11 @@ import type { UmbMediaTypeDetailModel } from '../../types.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbManagementApiMediaTypeDetailDataRequestManager } from './server-data-source/media-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateMediaTypeRequestModel,
 	MediaTypeResponseModel,
@@ -14,7 +18,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 /**
  * A data source for the Media Type that fetches data from the server
  * @class UmbMediaTypeDetailServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbMediaTypeDetailServerDataSource
 	extends UmbControllerBase
@@ -54,10 +58,10 @@ export class UmbMediaTypeDetailServerDataSource
 	/**
 	 * Fetches a Media Type with the given id from the server
 	 * @param {string} unique - The unique ID of the media type
-	 * @returns {*} The media type
+	 * @returns {Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>>} The media type
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await this.#detailRequestManager.read(unique);
@@ -68,10 +72,10 @@ export class UmbMediaTypeDetailServerDataSource
 	/**
 	 * Fetches multiple Media Types by their unique IDs from the server
 	 * @param {Array<string>} uniques - The unique IDs of the media types to fetch
-	 * @returns {*} The media types
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMediaTypeDetailModel>>>} The media types
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async readMany(uniques: Array<string>) {
+	async readMany(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbMediaTypeDetailModel>>> {
 		if (!uniques || uniques.length === 0) {
 			return { data: [] };
 		}
@@ -88,10 +92,13 @@ export class UmbMediaTypeDetailServerDataSource
 	 * Inserts a new Media Type on the server
 	 * @param {UmbMediaTypeDetailModel} model - The media type to create
 	 * @param {string | null} parentUnique - The unique ID of the parent media type
-	 * @returns {*} The created media type
+	 * @returns {Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>>} The created media type
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async create(model: UmbMediaTypeDetailModel, parentUnique: string | null = null) {
+	async create(
+		model: UmbMediaTypeDetailModel,
+		parentUnique: string | null = null,
+	): Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>> {
 		if (!model) throw new Error('Media Type is missing');
 		if (!model.unique) throw new Error('Media Type unique is missing');
 
@@ -147,10 +154,10 @@ export class UmbMediaTypeDetailServerDataSource
 	/**
 	 * Updates a MediaType on the server
 	 * @param {UmbMediaTypeDetailModel} model - The media type to update
-	 * @returns {*} The updated media type
+	 * @returns {Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>>} The updated media type
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async update(model: UmbMediaTypeDetailModel) {
+	async update(model: UmbMediaTypeDetailModel): Promise<UmbDataSourceResponse<UmbMediaTypeDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -203,10 +210,10 @@ export class UmbMediaTypeDetailServerDataSource
 	/**
 	 * Deletes a Media Type on the server
 	 * @param {string} unique - The unique ID of the media type
-	 * @returns {*} A promise that resolves once the media type has been deleted
+	 * @returns {Promise<UmbDataSourceErrorResponse>} A promise that resolves once the media type has been deleted
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#detailRequestManager.delete(unique);
 	}

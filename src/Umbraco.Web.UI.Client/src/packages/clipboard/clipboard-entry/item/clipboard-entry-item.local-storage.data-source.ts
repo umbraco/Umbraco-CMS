@@ -6,7 +6,7 @@ import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 /**
  * A local storage data source for Clipboard Entry items
  * @class UmbClipboardEntryItemServerDataSource
- * @implements {UmbItemServerDataSourceBase}
+ * @implements {UmbItemDataSource}
  */
 export class UmbClipboardEntryItemLocalStorageDataSource
 	extends UmbControllerBase

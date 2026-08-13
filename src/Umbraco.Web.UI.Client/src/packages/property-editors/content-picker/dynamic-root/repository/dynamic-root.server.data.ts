@@ -17,7 +17,7 @@ export class UmbContentPickerDynamicRootServerDataSource {
 	/**
 	 * Get dynamic root
 	 * @param {DynamicRootRequestModel} args - The dynamic root request arguments.
-	 * @returns {*}  {(Promise<DynamicRootResponseModel | undefined>)}
+	 * @returns {Promise<DynamicRootResponseModel | undefined>} The dynamic root response.
 	 * @memberof UmbContentPickerDynamicRootServerDataSource
 	 */
 	async getRoot(args: DynamicRootRequestModel): Promise<DynamicRootResponseModel | undefined> {

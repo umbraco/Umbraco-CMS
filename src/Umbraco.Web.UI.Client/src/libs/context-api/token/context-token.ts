@@ -17,7 +17,7 @@ export class UmbContextToken<
 	/**
 	 * Get the type of the token
 	 * @public
-	 * @type      {T}
+	 * @type      {ResultType}
 	 * @memberof UmbContextToken
 	 * @example   `typeof MyToken.TYPE`
 	 * @returns   undefined
