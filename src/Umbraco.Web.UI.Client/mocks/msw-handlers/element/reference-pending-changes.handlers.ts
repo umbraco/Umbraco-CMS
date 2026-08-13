@@ -3,9 +3,9 @@ import { umbElementMockDb } from '../../db/element.db.js';
 import { umbMockManager } from '../../mock-manager.js';
 import { UMB_SLUG } from './slug.js';
 import type {
-	PagedReferencedElementWithPendingChangesResponseModel,
-	ReferencedElementWithPendingChangesResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+	UmbPagedReferencedElementWithPendingChangesServerModel,
+	UmbReferencedElementWithPendingChangesServerModel,
+} from '@umbraco-cms/backoffice/relations';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const referencePendingChangesHandlers = [
@@ -30,15 +30,15 @@ export const referencePendingChangesHandlers = [
 		// referenced id that isn't (or is no longer) present in the active data set is dropped rather than
 		// serialized as a broken `element: undefined`.
 		const items = entries
-			.map((entry): ReferencedElementWithPendingChangesResponseModel | undefined => {
+			.map((entry): UmbReferencedElementWithPendingChangesServerModel | undefined => {
 				const element = umbElementMockDb.item.getItems([entry.id])[0];
 				const state = element?.variants[0]?.state;
 				if (!element || !state) return undefined;
 				return { element, state, isScheduled: entry.isScheduled };
 			})
-			.filter((item): item is ReferencedElementWithPendingChangesResponseModel => item !== undefined);
+			.filter((item): item is UmbReferencedElementWithPendingChangesServerModel => item !== undefined);
 
-		const response: PagedReferencedElementWithPendingChangesResponseModel = {
+		const response: UmbPagedReferencedElementWithPendingChangesServerModel = {
 			total: items.length,
 			items: items.slice(skip, skip + take),
 		};

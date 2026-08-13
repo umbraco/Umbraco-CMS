@@ -10,7 +10,10 @@ export const data: Record<string, Array<UmbMockReferencedElementModel>> = {
 		{ id: 'library-element-four-id', isScheduled: false },
 	],
 	// Block List document
-	'39842212-489e-46ec-a63b-6eeff36c7156': [{ id: 'library-element-three-id', isScheduled: true }],
+	'39842212-489e-46ec-a63b-6eeff36c7156': [
+		{ id: 'library-element-three-id', isScheduled: true },
+		{ id: 'library-element-four-id', isScheduled: false },
+	],
 	// Element Two (Library) references Element Three — the element→element case
 	'library-element-two-id': [{ id: 'library-element-three-id', isScheduled: true }],
 };

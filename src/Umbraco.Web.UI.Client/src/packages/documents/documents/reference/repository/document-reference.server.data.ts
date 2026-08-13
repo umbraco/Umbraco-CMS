@@ -1,6 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { DocumentService, PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { ReferencedElementWithPendingChangesResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService, PublishableVariantStateModel, client } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -8,6 +7,8 @@ import type {
 	UmbEntityReferenceDataSource,
 	UmbReferenceItemModel,
 	UmbReferencedElementWithPendingChangesModel,
+	UmbReferencedElementWithPendingChangesServerModel,
+	UmbPagedReferencedElementWithPendingChangesServerModel,
 } from '@umbraco-cms/backoffice/relations';
 import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
@@ -137,9 +138,16 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 		skip = 0,
 		take = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferencedElementWithPendingChangesModel>>> {
+		// No backend exists for this endpoint yet — the C# team is designing/implementing it separately, so it
+		// isn't in the generated client. Called directly against the raw client (the same way every generated
+		// service method ultimately does) rather than waiting for a generated wrapper that doesn't exist.
 		const { data, error } = await tryExecute(
 			this,
-			DocumentService.getDocumentByIdReferencedElementsWithPendingChanges({ path: { id: unique }, query: { skip, take } }),
+			client.get<UmbPagedReferencedElementWithPendingChangesServerModel, unknown, true>({
+				url: '/umbraco/management/api/v1/document/{id}/referenced-elements-with-pending-changes',
+				path: { id: unique },
+				query: { skip, take },
+			}),
 		);
 
 		if (data) {
@@ -159,7 +167,7 @@ const ELEMENT_ENTITY_TYPE = 'element';
 // render as Elements (not Documents) even though this endpoint hangs off /document/{id} — it lists the elements
 // the document references, not the document itself.
 function mapReferencedElementWithPendingChanges(
-	item: ReferencedElementWithPendingChangesResponseModel,
+	item: UmbReferencedElementWithPendingChangesServerModel,
 ): UmbReferencedElementWithPendingChangesModel {
 	const { element } = item;
 	return {

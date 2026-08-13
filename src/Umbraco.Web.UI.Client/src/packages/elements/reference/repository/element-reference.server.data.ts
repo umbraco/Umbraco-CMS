@@ -1,6 +1,5 @@
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
-import { ElementService, PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { ReferencedElementWithPendingChangesResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { ElementService, PublishableVariantStateModel, client } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
@@ -9,6 +8,8 @@ import type {
 	UmbEntityReferenceDataSource,
 	UmbReferenceItemModel,
 	UmbReferencedElementWithPendingChangesModel,
+	UmbReferencedElementWithPendingChangesServerModel,
+	UmbPagedReferencedElementWithPendingChangesServerModel,
 } from '@umbraco-cms/backoffice/relations';
 import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
@@ -81,9 +82,16 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 		skip = 0,
 		take = 20,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferencedElementWithPendingChangesModel>>> {
+		// No backend exists for this endpoint yet — the C# team is designing/implementing it separately, so it
+		// isn't in the generated client. Called directly against the raw client (the same way every generated
+		// service method ultimately does) rather than waiting for a generated wrapper that doesn't exist.
 		const { data, error } = await tryExecute(
 			this,
-			ElementService.getElementByIdReferencedElementsWithPendingChanges({ path: { id: unique }, query: { skip, take } }),
+			client.get<UmbPagedReferencedElementWithPendingChangesServerModel, unknown, true>({
+				url: '/umbraco/management/api/v1/element/{id}/referenced-elements-with-pending-changes',
+				path: { id: unique },
+				query: { skip, take },
+			}),
 		);
 
 		if (data) {
@@ -123,7 +131,7 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 // Kept local to this data source rather than shared with element-item.server.data-source.ts's mapper, to avoid
 // coupling the two on a shape that happens to look similar today.
 function mapReferencedElementWithPendingChanges(
-	item: ReferencedElementWithPendingChangesResponseModel,
+	item: UmbReferencedElementWithPendingChangesServerModel,
 ): UmbReferencedElementWithPendingChangesModel {
 	const { element } = item;
 	return {
