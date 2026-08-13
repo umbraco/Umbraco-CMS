@@ -101,7 +101,7 @@ export const data: Array<UmbMockElementModel> = [
 				updateDate: '2024-01-15T10:00:00.000Z',
 				publishDate: null,
 				id: 'library-element-three',
-				flags: [],
+				flags: [{ alias: 'Umb.ScheduledForPublish' }],
 			},
 		],
 		values: [
@@ -139,7 +139,7 @@ export const data: Array<UmbMockElementModel> = [
 				updateDate: '2024-01-15T10:00:00.000Z',
 				publishDate: '2024-01-15T10:00:00.000Z',
 				id: 'library-element-four',
-				flags: [],
+				flags: [{ alias: 'Umb.PendingChanges' }],
 			},
 		],
 		values: [

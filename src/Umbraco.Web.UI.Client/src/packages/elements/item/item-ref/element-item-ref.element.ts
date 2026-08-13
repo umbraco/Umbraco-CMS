@@ -8,6 +8,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/rou
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UUISelectableEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
 
 @customElement('umb-element-item-ref')
 export class UmbElementItemRefElement extends UmbLitElement {
@@ -55,6 +56,9 @@ export class UmbElementItemRefElement extends UmbLitElement {
 	private _isDraft = false;
 
 	@state()
+	private _flags: Array<UmbEntityFlag> = [];
+
+	@state()
 	private _editPath = '';
 
 	constructor() {
@@ -74,6 +78,7 @@ export class UmbElementItemRefElement extends UmbLitElement {
 		this.#item.observe(this.#item.icon, (icon) => (this._icon = icon ?? ''));
 		this.#item.observe(this.#item.isTrashed, (isTrashed) => (this._isTrashed = isTrashed ?? false));
 		this.#item.observe(this.#item.isDraft, (isDraft) => (this._isDraft = isDraft ?? false));
+		this.#item.observe(this.#item.flags, (flags) => (this._flags = flags ?? []));
 	}
 
 	#getHref() {
@@ -115,7 +120,11 @@ export class UmbElementItemRefElement extends UmbLitElement {
 
 	#renderIcon() {
 		if (!this._icon) return nothing;
-		return html`<umb-icon slot="icon" name=${this._icon}></umb-icon>`;
+		return html`
+			<umb-entity-sign-bundle slot="icon" .entityType=${UMB_ELEMENT_ENTITY_TYPE} .entityFlags=${this._flags}>
+				<umb-icon name=${this._icon}></umb-icon>
+			</umb-entity-sign-bundle>
+		`;
 	}
 
 	#renderIsTrashed() {
