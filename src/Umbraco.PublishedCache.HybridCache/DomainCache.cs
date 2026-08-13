@@ -16,27 +16,21 @@ public class DomainCache : IDomainCache
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
     private readonly IRuntimeState _runtimeState;
 
-#pragma warning disable IDE0032 // Use auto property - does not apply here: _defaultCulture conditionally caches the
-                                // result of the computed DefaultCulture getter rather than acting as its backing
-                                // field, so it cannot be folded into an auto-property.
-    private string? _defaultCulture;
-#pragma warning restore IDE0032 // Use auto property
+    /// <summary>
+    ///     The default culture, once resolved at a runtime level where it can be trusted.
+    /// </summary>
+    /// <remarks>
+    ///     Volatile because this singleton is read concurrently by request threads without a lock, so that a resolved
+    ///     value becomes visible promptly.
+    /// </remarks>
+    private volatile string? _defaultCulture;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DomainCache" /> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public DomainCache(IDefaultCultureAccessor defaultCultureAccessor, IDomainCacheService domainCacheService)
-        : this(
-            defaultCultureAccessor,
-            domainCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DomainCache" /> class.
-    /// </summary>
+    /// <param name="defaultCultureAccessor">The accessor used to resolve the site's default culture.</param>
+    /// <param name="domainCacheService">The service providing the configured domains.</param>
+    /// <param name="runtimeState">The runtime state, used to determine when the default culture can be trusted.</param>
     public DomainCache(
         IDefaultCultureAccessor defaultCultureAccessor,
         IDomainCacheService domainCacheService,
@@ -45,6 +39,20 @@ public class DomainCache : IDomainCache
         _defaultCultureAccessor = defaultCultureAccessor;
         _domainCacheService = domainCacheService;
         _runtimeState = runtimeState;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DomainCache" /> class.
+    /// </summary>
+    /// <param name="defaultCultureAccessor">The accessor used to resolve the site's default culture.</param>
+    /// <param name="domainCacheService">The service providing the configured domains.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public DomainCache(IDefaultCultureAccessor defaultCultureAccessor, IDomainCacheService domainCacheService)
+        : this(
+            defaultCultureAccessor,
+            domainCacheService,
+            StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
+    {
     }
 
     /// <inheritdoc />
