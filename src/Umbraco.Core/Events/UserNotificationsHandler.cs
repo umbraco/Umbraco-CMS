@@ -55,7 +55,7 @@ public sealed class UserNotificationsHandler :
     /// <inheritdoc />
     public void Handle(AssignedUserGroupPermissionsNotification notification)
     {
-        IContent[]? entities = _contentService.GetByIds(notification.EntityPermissions.Select(e => e.EntityId)).ToArray();
+        IContent[]? entities = _contentService.GetByIdsAsync(ResolveKeys(notification.EntityPermissions.Select(e => e.EntityId)), CancellationToken.None).GetAwaiter().GetResult().ToArray();
         if (entities?.Any() == false)
         {
             return;
@@ -160,7 +160,7 @@ public sealed class UserNotificationsHandler :
     /// <inheritdoc />
     public void Handle(PublicAccessEntrySavedNotification notification)
     {
-        IContent[] entities = _contentService.GetByIds(notification.SavedEntities.Select(e => e.ProtectedNodeId)).ToArray();
+        IContent[] entities = _contentService.GetByIdsAsync(ResolveKeys(notification.SavedEntities.Select(e => e.ProtectedNodeId)), CancellationToken.None).GetAwaiter().GetResult().ToArray();
         if (entities.Any() == false)
         {
             return;
@@ -168,6 +168,12 @@ public sealed class UserNotificationsHandler :
 
         _notifier.Notify(_actions.GetAction<ActionProtect>(), entities);
     }
+
+    private Guid[] ResolveKeys(IEnumerable<int> ids) =>
+        ids.Select(id => _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult())
+            .Where(attempt => attempt.Success)
+            .Select(attempt => attempt.Result)
+            .ToArray();
 
     /// <summary>
     ///     This class is used to send the notifications

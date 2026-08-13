@@ -459,7 +459,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public void Get_By_Ids_Sorted()
+    public async Task Get_By_Ids_Sorted()
     {
         // Arrange
         // Act
@@ -469,7 +469,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             results.Add(ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage", -1));
         }
 
-        var sortedGet = ContentService.GetByIds(new[] { results[10].Id, results[5].Id, results[12].Id })
+        var sortedGet = (await ContentService.GetByIdsAsync(new[] { results[10].Key, results[5].Key, results[12].Key }, CancellationToken.None))
             .ToArray();
 
         // Assert

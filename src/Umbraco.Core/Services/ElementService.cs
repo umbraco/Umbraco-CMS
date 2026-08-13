@@ -60,6 +60,10 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
 
     /// <inheritdoc />
     // See GetByIdAsync above - same bridge, same reason.
+    public Task<IEnumerable<IElement>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken) => Task.FromResult(GetByIds(ids));
+
+    /// <inheritdoc />
+    // See GetByIdAsync above - same bridge, same reason.
     public Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken) => Task.FromResult(CountPublished(contentTypeAlias));
 
     /// <inheritdoc />

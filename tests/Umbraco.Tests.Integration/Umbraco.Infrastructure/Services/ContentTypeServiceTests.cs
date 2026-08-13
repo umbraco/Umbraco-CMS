@@ -101,7 +101,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         IContentType[] contentTypes = { contentType1, contentType2, contentType3 };
         var parentId = -1;
 
-        var ids = new List<int>();
+        var keys = new List<Guid>();
 
         for (var i = 0; i < 2; i++)
         {
@@ -114,14 +114,14 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
                 ContentService.Publish(contentItem, new[] { "*" });
                 parentId = contentItem.Id;
 
-                ids.Add(contentItem.Id);
+                keys.Add(contentItem.Key);
             }
         }
 
         // delete the first content type, all other content of different content types should be in the recycle bin
         await ContentTypeService.DeleteAsync(contentTypes[0], Constants.Security.SuperUserKey);
 
-        var found = ContentService.GetByIds(ids);
+        var found = await ContentService.GetByIdsAsync(keys, CancellationToken.None);
 
         Assert.AreEqual(4, found.Count());
         foreach (var content in found)

@@ -28,6 +28,14 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     Task<int> CountPublishedAsync(string? contentTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Gets content items by their unique identifiers.
+    /// </summary>
+    /// <param name="ids">The unique identifiers of the content items.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The content items, in the order requested.</returns>
+    Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a dictionary of content keys and their matching content schedules.
     /// </summary>
     /// <param name="keys">The content keys.</param>

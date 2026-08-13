@@ -1556,6 +1556,12 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return parentKeyAttempt.Success;
     }
 
+    private Guid[] ResolveKeys(IEnumerable<int> ids) =>
+        ids.Select(id => _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult())
+            .Where(attempt => attempt.Success)
+            .Select(attempt => attempt.Result)
+            .ToArray();
+
     /// <summary>
     ///     Sends an <see cref="IContent" /> to Publication, which executes handlers and events for the 'Send to Publication'
     ///     action.
@@ -1646,8 +1652,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             // Reload within the lock so sorting operates on fully-loaded entities. Callers may pass
             // partially-loaded content (e.g. loaded with loadTemplates: false or without property data),
             // and saving those directly would wipe the template and property data (#23120).
-            // GetByIds returns items in the requested order, preserving the caller's ordering that drives the sort.
-            IContent[] reloaded = GetByIds(itemsA.Select(x => x.Id).ToArray()).ToArray();
+            // GetByIdsAsync returns items in the requested order, preserving the caller's ordering that drives the sort.
+            IContent[] reloaded = GetByIdsAsync(itemsA.Select(x => x.Key).ToArray(), CancellationToken.None).GetAwaiter().GetResult().ToArray();
 
             OperationResult ret = Sort(scope, reloaded, userId, evtMsgs);
             scope.Complete();
@@ -1679,7 +1685,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
-            IContent[] itemsA = GetByIds(idsA).ToArray();
+            IContent[] itemsA = GetByIdsAsync(ResolveKeys(idsA), CancellationToken.None).GetAwaiter().GetResult().ToArray();
 
             OperationResult ret = Sort(scope, itemsA, userId, evtMsgs);
             scope.Complete();
@@ -1706,7 +1712,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
         if (parentId == Constants.System.Root)
         {
-            IContent[] roots = GetByIds(orderedChildIds).ToArray();
+            IContent[] roots = GetByIdsAsync(ResolveKeys(orderedChildIds), CancellationToken.None).GetAwaiter().GetResult().ToArray();
             scope.Notifications.Publish(new ContentTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
         }
         else

@@ -341,16 +341,20 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
     #region Get, Has, Is
 
-    /// <summary>
-    ///     Gets an <see cref="TContent" /> object by Id
-    /// </summary>
-    /// <param name="ids">Ids of the Content to retrieve</param>
-    /// <returns>
-    ///     <see cref="TContent" />
-    /// </returns>
-    public IEnumerable<TContent> GetByIds(IEnumerable<int> ids)
+    /// <inheritdoc/>
+    public async Task<TContent?> GetByIdAsync(Guid key, CancellationToken cancellationToken)
     {
-        var idsA = ids.ToArray();
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            scope.ReadLock(ReadLockIds);
+            return await _asyncContentRepository.GetAsync(key, cancellationToken);
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<TContent>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken)
+    {
+        Guid[] idsA = ids.ToArray();
         if (idsA.Length == 0)
         {
             return Enumerable.Empty<TContent>();
@@ -359,19 +363,9 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            IEnumerable<TContent> items = _contentRepository.GetMany(idsA);
-            var index = items.ToDictionary(x => x.Id, x => x);
+            IEnumerable<TContent> items = await _asyncContentRepository.GetManyAsync(idsA, cancellationToken);
+            var index = items.ToDictionary(x => x.Key, x => x);
             return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
-        }
-    }
-
-    /// <inheritdoc/>
-    public async Task<TContent?> GetByIdAsync(Guid key, CancellationToken cancellationToken)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return await _asyncContentRepository.GetAsync(key, cancellationToken);
         }
     }
 

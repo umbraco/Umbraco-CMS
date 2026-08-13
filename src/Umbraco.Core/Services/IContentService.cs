@@ -92,13 +92,6 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     #region Get, Count Documents
 
     /// <summary>
-    ///     Gets documents.
-    /// </summary>
-    /// <param name="ids">The identifiers of the documents.</param>
-    /// <returns>The documents.</returns>
-    IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
-
-    /// <summary>
     ///     Gets documents at a given level.
     /// </summary>
     /// <param name="level">The level.</param>
