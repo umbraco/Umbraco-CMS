@@ -42,7 +42,7 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	/**
 	 * Connects to the server.
-	 * @returns {*} This server connection instance
+	 * @returns {Promise<UmbServerConnection>} This server connection instance
 	 * @memberof UmbServerConnection
 	 */
 	async connect() {
@@ -60,7 +60,7 @@ export class UmbServerConnection extends UmbControllerBase {
 
 	/**
 	 * Gets the URL of the server.
-	 * @returns {*} The server URL
+	 * @returns {string} The server URL
 	 * @memberof UmbServerConnection
 	 */
 	getUrl() {

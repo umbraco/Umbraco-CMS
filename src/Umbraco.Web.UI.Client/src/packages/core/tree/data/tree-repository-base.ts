@@ -6,7 +6,12 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from './types.js';
-import { UmbRepositoryBase, type UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
+import {
+	UmbRepositoryBase,
+	type UmbRepositoryResponse,
+	type UmbRepositoryResponseWithAsObservable,
+	type UmbTargetPagedModel,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
@@ -53,7 +58,7 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Request the tree root item
-	 * @returns {*}
+	 * @returns {Promise<UmbRepositoryResponse<TreeRootType>>}
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	abstract requestTreeRoot(): Promise<UmbRepositoryResponse<TreeRootType>>;
@@ -61,10 +66,12 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Requests root items of a tree
 	 * @param {TreeRootItemsRequestArgsType} args - The request arguments
-	 * @returns {*} The root items of the tree
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, Array<TreeItemType>>>} The root items of the tree
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
+	async requestTreeRootItems(
+		args: TreeRootItemsRequestArgsType,
+	): Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, Array<TreeItemType>>> {
 		const { data, error } = await this._treeSource.getRootItems(args);
 		return { data, error, asObservable: () => undefined };
 	}
@@ -72,10 +79,12 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Requests tree items of a given parent
 	 * @param {TreeChildrenOfRequestArgsType} args - The request arguments
-	 * @returns {*} The tree items of the given parent
+	 * @returns {Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, Array<TreeItemType>>>} The tree items of the given parent
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemsOf(args: TreeChildrenOfRequestArgsType) {
+	async requestTreeItemsOf(
+		args: TreeChildrenOfRequestArgsType,
+	): Promise<UmbRepositoryResponseWithAsObservable<UmbTargetPagedModel<TreeItemType>, Array<TreeItemType>>> {
 		if (!args.parent) throw new Error('Parent is missing');
 		if (args.parent.unique === undefined) throw new Error('Parent unique is missing');
 		if (args.parent.entityType === null) throw new Error('Parent entity type is missing');
@@ -87,7 +96,7 @@ export abstract class UmbTreeRepositoryBase<
 	/**
 	 * Requests ancestors of a given item
 	 * @param {UmbTreeAncestorsOfRequestArgs} args - The request arguments
-	 * @returns {*} The ancestors of the given item
+	 * @returns {Promise<UmbRepositoryResponse<Array<TreeItemType>>>} The ancestors of the given item
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemAncestors(args: TreeAncestorsOfRequestArgsType) {

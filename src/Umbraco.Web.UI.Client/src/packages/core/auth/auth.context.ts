@@ -12,6 +12,8 @@ import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/ext
 import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isReturnableRoute } from './returnable-route.function.js';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in a @deprecated JSDoc tag
+import type { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export interface UmbAuthSession {
 	/**
@@ -78,7 +80,7 @@ export class UmbAuthContext extends UmbContextBase {
 		return this.#isInitializedObservable;
 	}
 
-	/** Internal, non-warning view of {@link isInitialized} for use inside this class. */
+	/** Internal, non-warning view of {@link UmbAuthContext#isInitialized} for use inside this class. */
 	readonly #isInitializedObservable = this.#isInitialized.asObservable();
 
 	/**

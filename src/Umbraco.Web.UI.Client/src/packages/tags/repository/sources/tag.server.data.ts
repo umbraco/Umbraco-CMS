@@ -1,11 +1,12 @@
+import type { PagedTagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { TagService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for the Tag that fetches data from the server
  * @class UmbTagServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbTagServerDataSource {
 	#host: UmbControllerHost;
@@ -27,7 +28,7 @@ export class UmbTagServerDataSource {
 	 * @param {number} root0.take - The number of tags to take.
 	 * @param {string} [root0.tagGroup] - The tag group to filter by.
 	 * @param {string} [root0.culture] - The culture to filter by.
-	 * @returns {*} The list of tags.
+	 * @returns {Promise<UmbDataSourceResponse<PagedTagResponseModel>>} The list of tags.
 	 * @memberof UmbTagServerDataSource
 	 */
 	async getCollection({
@@ -42,7 +43,7 @@ export class UmbTagServerDataSource {
 		take: number;
 		tagGroup?: string;
 		culture?: string;
-	}) {
+	}): Promise<UmbDataSourceResponse<PagedTagResponseModel>> {
 		return tryExecute(this.#host, TagService.getTag({ query: { query, skip, take, tagGroup, culture } }));
 	}
 }

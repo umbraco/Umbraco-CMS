@@ -239,7 +239,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 
 /**
  * @class UmbSorterController
- * @implements {UmbControllerInterface}
+ * @augments {UmbControllerBase}
  * @description This controller can make user able to sort items.
  * @example
  *
@@ -338,7 +338,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	/**
 	 * Enables the sorter, this will allow sorting to happen.
-	 * @returns {*}  {void}
+	 * @returns {void}
 	 * @memberof UmbSorterController
 	 */
 	enable(): void {
@@ -351,7 +351,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	/**
 	 * Disables the sorter, this will prevent any sorting to happen.
-	 * @returns {*}  {void}
+	 * @returns {void}
 	 * @memberof UmbSorterController
 	 */
 	disable(): void {
