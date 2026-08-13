@@ -108,7 +108,6 @@ export class UmbElementItemRefElement extends UmbLitElement {
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}>
 				<slot name="actions" slot="actions"></slot>
-				<slot name="tag" slot="tag"></slot>
 				${this.#renderIcon()}${this.#renderIsDraft()} ${this.#renderIsTrashed()}
 			</uui-ref-node>
 		`;

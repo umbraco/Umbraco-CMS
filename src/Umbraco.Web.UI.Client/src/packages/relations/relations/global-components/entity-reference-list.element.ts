@@ -1,9 +1,5 @@
-import type {
-	UmbEntityReferenceRepository,
-	UmbReferenceItemModel,
-	UmbReferencedElementWithPendingChangesModel,
-} from '../reference/types.js';
-import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../reference/types.js';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -67,7 +63,7 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 	private _total = 0;
 
 	@state()
-	private _items?: Array<UmbReferenceItemModel | UmbEntityModel | UmbReferencedElementWithPendingChangesModel>;
+	private _items?: Array<UmbReferenceItemModel | UmbEntityModel>;
 
 	#referenceRepository?: UmbEntityReferenceRepository;
 	#itemRepository?: UmbItemRepository<any>;
@@ -198,34 +194,9 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) => html`
-						<umb-entity-item-ref .item=${item} ?readonly=${this.readonly}>
-							${this.#renderPendingChangesTags(item)}
-						</umb-entity-item-ref>
-					`,
+					(item) => html`<umb-entity-item-ref .item=${item} ?readonly=${this.readonly}></umb-entity-item-ref>`,
 				)}
 			</uui-ref-list>
-		`;
-	}
-
-	#renderPendingChangesTags(item: UmbReferenceItemModel | UmbEntityModel | UmbReferencedElementWithPendingChangesModel) {
-		if (this.source !== 'referencedElementsWithPendingChanges') return nothing;
-		const pendingChangesItem = item as UmbReferencedElementWithPendingChangesModel;
-
-		return html`
-			<uui-tag slot="tag" size="s" look="secondary" color="default">
-				${this.localize.term(
-					pendingChangesItem.state === 'draft' ? 'references_tagDraft' : 'references_tagPendingChanges',
-				)}
-			</uui-tag>
-			${when(
-				pendingChangesItem.isScheduled,
-				() => html`
-					<uui-tag slot="tag" size="s" look="secondary" color="default">
-						${this.localize.term('references_tagScheduled')}
-					</uui-tag>
-				`,
-			)}
 		`;
 	}
 

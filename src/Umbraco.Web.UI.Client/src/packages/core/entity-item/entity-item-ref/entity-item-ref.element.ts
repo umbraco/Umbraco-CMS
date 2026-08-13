@@ -187,12 +187,6 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 				slotElement.setAttribute('slot', 'actions');
 				component.appendChild(slotElement);
 
-				// Proxy the tag slot to the component
-				const tagSlotElement = document.createElement('slot');
-				tagSlotElement.name = 'tag';
-				tagSlotElement.setAttribute('slot', 'tag');
-				component.appendChild(tagSlotElement);
-
 				this._component = component;
 			},
 			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
@@ -220,7 +214,6 @@ export class UmbEntityItemRefElement extends UmbLitElement {
 					.disabled=${this.disabled}>
 					<uui-icon slot="icon" name="icon-alert" style="color: var(--uui-color-danger);"></uui-icon>
 					<slot name="actions"></slot>
-					<slot name="tag"></slot>
 				</uui-ref-node>
 			`;
 		}

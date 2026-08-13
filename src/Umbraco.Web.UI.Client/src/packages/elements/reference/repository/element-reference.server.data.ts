@@ -1,16 +1,11 @@
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
-import { ElementService, PublishableVariantStateModel, client } from '@umbraco-cms/backoffice/external/backend-api';
+import { ElementService, client } from '@umbraco-cms/backoffice/external/backend-api';
+import type { ElementItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import type {
-	UmbEntityReferenceDataSource,
-	UmbReferenceItemModel,
-	UmbReferencedElementWithPendingChangesModel,
-	UmbReferencedElementWithPendingChangesServerModel,
-	UmbPagedReferencedElementWithPendingChangesServerModel,
-} from '@umbraco-cms/backoffice/relations';
+import type { UmbEntityReferenceDataSource, UmbReferenceItemModel } from '@umbraco-cms/backoffice/relations';
 import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 /**
@@ -74,20 +69,20 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 	 * @param {string} unique - The unique identifier of the referencing document or element.
 	 * @param {number} skip - The number of items to skip.
 	 * @param {number} take - The maximum number of items to return.
-	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferencedElementWithPendingChangesModel>>>} - Referenced elements that are not fully published.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>>} - Referenced elements that are not fully published.
 	 * @memberof UmbElementReferenceServerDataSource
 	 */
 	async getReferencedElementsWithPendingChanges(
 		unique: string,
 		skip = 0,
 		take = 20,
-	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferencedElementWithPendingChangesModel>>> {
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
 		// No backend exists for this endpoint yet — the C# team is designing/implementing it separately, so it
 		// isn't in the generated client. Called directly against the raw client (the same way every generated
 		// service method ultimately does) rather than waiting for a generated wrapper that doesn't exist.
 		const { data, error } = await tryExecute(
 			this,
-			client.get<UmbPagedReferencedElementWithPendingChangesServerModel, unknown, true>({
+			client.get<UmbPagedModel<ElementItemResponseModel>, unknown, true>({
 				url: '/umbraco/management/api/v1/element/{id}/referenced-elements-with-pending-changes',
 				path: { id: unique },
 				query: { skip, take },
@@ -95,7 +90,7 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 		);
 
 		if (data) {
-			return { data: { items: data.items.map(mapReferencedElementWithPendingChanges), total: data.total } };
+			return { data: { items: data.items.map(mapReferencedElement), total: data.total } };
 		}
 
 		return { data, error };
@@ -126,14 +121,10 @@ export class UmbElementReferenceServerDataSource extends UmbControllerBase imple
 	}
 }
 
-// Maps the server's { element, state, isScheduled } shape into a flat, element-item-shaped row that
-// <umb-element-item-ref> can render directly, plus the two aggregate fields it doesn't otherwise carry.
-// Kept local to this data source rather than shared with element-item.server.data-source.ts's mapper, to avoid
-// coupling the two on a shape that happens to look similar today.
-function mapReferencedElementWithPendingChanges(
-	item: UmbReferencedElementWithPendingChangesServerModel,
-): UmbReferencedElementWithPendingChangesModel {
-	const { element } = item;
+// Maps the server's element item shape into the element-item-shaped row <umb-element-item-ref> renders directly.
+// Kept local to this data source rather than shared with element-item.server.data-source.ts's identical mapper,
+// to avoid coupling the two on a shape that happens to match today.
+function mapReferencedElement(element: ElementItemResponseModel): UmbReferenceItemModel {
 	return {
 		documentType: {
 			unique: element.documentType.id,
@@ -152,7 +143,5 @@ function mapReferencedElementWithPendingChanges(
 			flags: variant.flags,
 		})),
 		flags: element.flags,
-		state: item.state === PublishableVariantStateModel.DRAFT ? 'draft' : 'publishedPendingChanges',
-		isScheduled: item.isScheduled,
-	} as UmbReferencedElementWithPendingChangesModel;
+	} as UmbReferenceItemModel;
 }

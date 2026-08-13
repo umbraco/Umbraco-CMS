@@ -192,15 +192,6 @@ export type UmbMockTrackedReferenceItemModel =
 	| IReferenceResponseModelMediaReferenceResponseModel
 	| IReferenceResponseModelMemberReferenceResponseModel;
 
-/**
- * A direct reference (via an Element Picker property, or as embedded reusable block content) from a document or
- * element to an element, for the `referenced-elements-with-pending-changes` mock. `state` is deliberately not
- * carried here — the handler derives it from the referenced element's own mock data, so it can't drift.
- */
-export interface UmbMockReferencedElementModel {
-	id: string;
-	isScheduled: boolean;
-}
 
 // ============================================================================
 // Log Levels Type (matches the structure in log-viewer.data.ts)
@@ -274,9 +265,9 @@ export interface UmbMockDataSet {
 	// Tracked references
 	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;
 
-	// Referenced elements with pending changes — direct outbound references to elements that are not
-	// fully published, keyed by the referencing document/element's id.
-	referencedElementsWithPendingChanges?: Record<string, Array<UmbMockReferencedElementModel>>;
+	// Referenced elements with pending changes — ids of directly-referenced elements that are not fully
+	// published, keyed by the referencing document/element's id.
+	referencedElementsWithPendingChanges?: Record<string, Array<string>>;
 
 	// News
 	news?: Array<NewsDashboardItemResponseModel>;

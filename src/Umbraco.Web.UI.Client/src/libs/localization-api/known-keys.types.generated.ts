@@ -1888,9 +1888,6 @@ declare global {
 		references_labelUsedItems: string;
 		references_listViewDialogWarning: string;
 		references_tabName: string;
-		references_tagDraft: string;
-		references_tagPendingChanges: string;
-		references_tagScheduled: string;
 		references_unpublishWarning: string;
 		references_usedByProperties: string;
 		relatedlinks_caption: string;
