@@ -40,7 +40,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
 	 * @param {string | null} parentUnique - The unique of the parent to create under
-	 * @returns {*}
+	 * @returns {*} The result of the create and publish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async createAndPublish(
@@ -66,7 +66,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * Updates and publishes a Document on the server in a single operation
 	 * @param {UmbDocumentDetailModel} model - Document Model
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after updating
-	 * @returns {*}
+	 * @returns {*} The result of the update and publish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async updateAndPublish(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
@@ -98,10 +98,9 @@ export class UmbDocumentPublishingServerDataSource {
 
 	/**
 	 * Publish one or more variants of a Document
-	 * @param {string} unique
-	 * @param {Array<UmbVariantId>} variantIds
-	 * @param variants
-	 * @returns {*}
+	 * @param {string} unique - The unique of the Document
+	 * @param {Array<UmbDocumentVariantPublishModel>} variants - The variants to publish
+	 * @returns {*} The result of the publish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
@@ -126,9 +125,9 @@ export class UmbDocumentPublishingServerDataSource {
 
 	/**
 	 * Unpublish one or more variants of a Document
-	 * @param {string} unique
-	 * @param {Array<UmbVariantId>} variantIds
-	 * @returns {*}
+	 * @param {string} unique - The unique of the Document
+	 * @param {Array<UmbVariantId>} variantIds - The variants to unpublish
+	 * @returns {*} The result of the unpublish request
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async unpublish(unique: string, variantIds: Array<UmbVariantId>) {
@@ -156,9 +155,9 @@ export class UmbDocumentPublishingServerDataSource {
 
 	/**
 	 * Publish variants of a document and all its descendants
-	 * @param unique
-	 * @param variantIds
-	 * @param includeUnpublishedDescendants
+	 * @param {string} unique - The unique of the Document
+	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
+	 * @param {boolean} includeUnpublishedDescendants - Whether to include unpublished descendants
 	 * @memberof UmbDocumentPublishingServerDataSource
 	 */
 	async publishWithDescendants(

@@ -1,9 +1,9 @@
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { MappingFunction } from '../types/mapping-function.type.js';
 import type { MemoizationFunction } from '../types/memoization-function.type.js';
 import type { UmbClassStateData } from '../utils/class-equal-memoization.function.js';
 import { createObservablePart } from '../utils/create-observable-part.function.js';
 import { UmbBasicState } from './basic-state.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @class UmbClassState

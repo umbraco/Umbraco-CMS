@@ -25,8 +25,8 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Gets the language collection filtered by the given filter.
-	 * @param {UmbLanguageCollectionFilterModel} filter
-	 * @returns {*}
+	 * @param {UmbLanguageCollectionFilterModel} filter The filter to apply to the collection.
+	 * @returns {*} The language collection.
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbLanguageCollectionFilterModel) {

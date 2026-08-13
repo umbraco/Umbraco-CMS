@@ -3,11 +3,37 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 public partial class ElementEditingServiceTests
 {
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableDeleteWhenReferenced))]
+    public async Task Cannot_Delete_When_Element_Is_Referenced_By_External_Block_Content_And_Configured_To_Disable_When_Referenced()
+    {
+        var elementType = await CreateInvariantElementType();
+        var referencingElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
+        var referencedElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
+
+        // Embedding an element as external block content records this relation, which must protect it from deletion.
+        RelationService.Relate(
+            referencingElement.Id,
+            referencedElement.Id,
+            Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias);
+
+        var result = await ElementEditingService.DeleteAsync(referencedElement.Key, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.CannotDeleteWhenReferenced, result.Status);
+        });
+
+        var element = await ElementEditingService.GetAsync(referencedElement.Key);
+        Assert.IsNotNull(element);
+    }
+
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Delete_FromOutsideOfRecycleBin(bool variant)

@@ -137,6 +137,11 @@ export class DocumentTypeBuilder {
     return this;
   }
 
+  withFolderId(folderId: string) {
+    this.folderId = folderId;
+    return this;
+  }
+
   withAllowedInLibrary(allowedInLibrary: boolean) {
     this.allowedInLibrary = allowedInLibrary;
     return this;

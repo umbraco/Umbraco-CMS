@@ -357,6 +357,14 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         var changes = new List<ContentTypeChange<TItem>>();
 
+        // Track which types genuinely need a raw cmsContentNu rebuild vs. which only had a property removed.
+        // A type can appear via more than one path (e.g. a batch save touching a composition, where the same
+        // type is both saved directly and returned by GetComposedOf as a different instance), so we key these
+        // by Id — not entity reference — and resolve the RawDataUnaffected flag once at the end: it is only
+        // safe when *nothing* required a rebuild for that Id.
+        var rebuildRequiredIds = new HashSet<int>();
+        var rawDataUnaffectedCandidateIds = new HashSet<int>();
+
         foreach (TItem contentType in contentTypes)
         {
             var dirty = (IRememberBeingDirty)contentType;
@@ -445,14 +453,39 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 hasAnyChange = true;
             }
 
+            // compositions added? Constructive in itself, but relevant to the raw-data check below: adding a
+            // composition can reintroduce a just-removed property alias behind a different property type.
+            var hasAnyCompositionBeenAdded = dirty.WasPropertyDirty("HasCompositionTypeBeenAdded");
+
             // main impact on properties? Propagate RefreshMain to composed types.
             var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
                                                                        || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
+
+            // A property removal is the only structural change that leaves the stored cmsContentNu blob valid:
+            // the removed alias simply stops resolving against the content type, so its orphaned value is never
+            // read. This holds only when nothing else in the same change alters the stored data or reintroduces
+            // the alias (an added composition can), so any other structural cause — or a composition addition —
+            // disqualifies it. Tracked by Id and resolved after the loop, so a rebuild required via any path wins.
+            var rawDataUnaffected = hasAnyPropertyBeenRemoved
+                && hasAliasChanged is false
+                && hasAnyPropertyChangedAlias is false
+                && hasContentTypeVariationChanged is false
+                && hasAnyPropertyVariationChanged is false
+                && hasAnyCompositionBeenRemoved is false
+                && hasAnyCompositionBeenAdded is false;
+
+            if (hasAliasChanged || hasPropertyMainImpact)
+            {
+                (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(contentType.Id);
+            }
+
             if (hasPropertyMainImpact)
             {
                 foreach (TItem c in GetComposedOf(contentType.Id))
                 {
+                    // Composing types inherit the same property change, so they share its rebuild requirement.
                     AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
+                    (rawDataUnaffected ? rawDataUnaffectedCandidateIds : rebuildRequiredIds).Add(c.Id);
                 }
             }
 
@@ -466,8 +499,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 hasAnyChange = true;
             }
 
-            // compositions added?
-            var hasAnyCompositionBeenAdded = dirty.WasPropertyDirty("HasCompositionTypeBeenAdded");
             if (hasAnyCompositionBeenAdded)
             {
                 AddChange(changes, contentType, ContentTypeChangeTypes.CompositionAdded);
@@ -479,6 +510,20 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             if (!hasAnyChange)
             {
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
+            }
+        }
+
+        // Flag the raw data as unaffected only for types that were never independently marked as needing a
+        // rebuild. RawDataUnaffected supplements RefreshMain, so only apply it to entries that already carry
+        // RefreshMain — a batch save can emit a separate RefreshOther-only entry for the same Id, which must
+        // not be flagged.
+        foreach (ContentTypeChange<TItem> change in changes)
+        {
+            if (change.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain)
+                && rawDataUnaffectedCandidateIds.Contains(change.Item.Id)
+                && rebuildRequiredIds.Contains(change.Item.Id) is false)
+            {
+                change.ChangeTypes |= ContentTypeChangeTypes.RawDataUnaffected;
             }
         }
 
@@ -1223,6 +1268,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     /// <inheritdoc />
     public async Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(int skip, int take)
+        => await GetAllAllowedInLibraryAsync(null, skip, take);
+
+    /// <inheritdoc />
+    public async Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(Guid? parentKey, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(ReadLockIds);
@@ -1232,7 +1281,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
-            contentTypes = await filter.FilterAllowedInLibraryAsync(contentTypes);
+            contentTypes = await filter.FilterAllowedInLibraryAsync(contentTypes, parentKey);
         }
 
         contentTypes = contentTypes.ToArray();

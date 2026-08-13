@@ -1,6 +1,6 @@
 # Umbraco.Cms.Imaging.ImageSharp
 
-Image processing library using **ImageSharp 3.x** and **ImageSharp.Web** for on-the-fly image manipulation, resizing, cropping, and caching.
+Image processing library using **ImageSharp 4.x** and **ImageSharp.Web** for on-the-fly image manipulation, resizing, cropping, and caching.
 
 ---
 
@@ -37,10 +37,10 @@ Umbraco.Cms.Imaging.ImageSharp/
 ### Relationship to ImageSharp2
 
 Two imaging packages exist:
-- **Umbraco.Cms.Imaging.ImageSharp** (this package) - Uses ImageSharp 3.x (default)
-- **Umbraco.Cms.Imaging.ImageSharp2** - Uses ImageSharp 2.x for backwards compatibility
+- **Umbraco.Cms.Imaging.ImageSharp** (this package) - Uses ImageSharp 4.x (default)
+- **Umbraco.Cms.Imaging.ImageSharp2** - Uses ImageSharp 2.x for backwards compatibility, and as the option free of ImageSharp's changed license requirements from 3+
 
-**Key difference**: ImageSharp 3.x WebP encoder defaults to Lossless (10x larger files), so this package explicitly sets `WebpFileFormatType.Lossy` at `ConfigureImageSharpMiddlewareOptions.cs:108-115`.
+**Key difference**: ImageSharp 3.x+ WebP encoder defaults to Lossless (10x larger files), so this package explicitly sets `WebpFileFormatType.Lossy` at `ConfigureImageSharpMiddlewareOptions.cs:108-115`.
 
 ---
 
@@ -128,13 +128,13 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
 }
 ```
 
-### Security: Size Limits Without HMAC
+### Security: Max Dimension Limits
 
-When HMAC is not configured, `ConfigureImageSharpMiddlewareOptions.cs:46-83` enforces max dimensions:
+`ConfigureImageSharpMiddlewareOptions.cs` enforces max dimensions on every request, **regardless of whether HMAC is configured**:
 - Width/height requests exceeding `MaxWidth`/`MaxHeight` are **stripped** from the query
 - This prevents DoS via excessive image generation
 
-When HMAC **is** configured, size validation is skipped (trusted requests).
+HMAC and the size limits do two separate jobs: HMAC controls *who* may request processing, while `MaxWidth`/`MaxHeight` control *how large* the output may be. The dimension ceiling therefore still applies to validly-signed requests — for legitimate (server-generated) URLs it is a no-op, and it remains a useful backstop if the HMAC secret key ever leaks.
 
 ### Cache Busting
 
@@ -156,9 +156,9 @@ Query parameters `rnd` or `v` trigger immutable cache headers (`ConfigureImageSh
 
 ## 5. Edge Cases
 
-### WebP Encoding Change (ImageSharp 3.x)
+### WebP Encoding Change (ImageSharp 3.x+)
 
-`ConfigureImageSharpMiddlewareOptions.cs:108-115` - ImageSharp 3.x defaults WebP to Lossless for PNGs, creating ~10x larger files. This is overridden:
+`ConfigureImageSharpMiddlewareOptions.cs:108-115` - ImageSharp 3.x+ defaults WebP to Lossless for PNGs, creating ~10x larger files. This is overridden:
 ```csharp
 options.Configuration.ImageFormatsManager.SetEncoder(
     WebpFormat.Instance,

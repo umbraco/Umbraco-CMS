@@ -355,6 +355,33 @@ public interface IContentService : IPublishableContentService<IContent>
     OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Moves a document under a new parent, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="content">The document to move.</param>
+    /// <param name="parentId">The identifier of the new parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the document along with it. When restoring a document out of the recycle
+    ///     bin this can be set to <c>false</c> to restore only the document itself, leaving its descendants in the
+    ///     recycle bin as top-level bin items.
+    /// </param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+    OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+    {
+        // Only the whole-tree move can be satisfied by delegating to the existing method; there is no way to honour
+        // includeDescendants: false without the concrete implementation, so fail fast rather than silently move
+        // the descendants after all.
+        if (includeDescendants is false)
+        {
+            throw new NotImplementedException("This IContentService implementation does not support moving without descendants. Override the Move overload that takes an includeDescendants parameter to support it.");
+        }
+
+        return Move(content, parentId, userId);
+    }
+
+    /// <summary>
     ///     Copies a document.
     /// </summary>
     /// <param name="content">The document to copy.</param>
@@ -450,44 +477,6 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <param name="cultures">The cultures to publish.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
     PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Saves and publishes a document in a single scope.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         For invariant content types, <paramref name="culturesToPublish" /> must be empty; the document is
-    ///         saved and the invariant culture is published.
-    ///     </para>
-    ///     <para>
-    ///         For variant content types, only the cultures listed in <paramref name="culturesToPublish" /> are
-    ///         published. Wildcards (<c>"*"</c>), nulls, whitespace and duplicate entries are not accepted. Passing
-    ///         an empty array saves the document without publishing any culture.
-    ///     </para>
-    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
-    ///     <para>
-    ///         The save and publish run in the same scope. If publishing fails for a business reason (for example,
-    ///         invalid content or an expired schedule) the save still takes effect; both are skipped only when a
-    ///         saving notification handler cancels the operation.
-    ///     </para>
-    /// </remarks>
-    /// <param name="content">The document to publish.</param>
-    /// <param name="culturesToPublish">The cultures to publish, or an empty array for invariant content.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    // TODO (V19): Remove the default implementation when the method is no longer new.
-    PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
-    {
-        OperationResult saveResult = Save(content, userId);
-        if (saveResult.Success)
-        {
-            return Publish(content, culturesToPublish, userId);
-        }
-
-        PublishResultType resultType = saveResult.Result == OperationResultType.FailedCancelledByEvent
-            ? PublishResultType.FailedPublishCancelledByEvent
-            : PublishResultType.FailedPublish;
-        return new PublishResult(resultType, saveResult.EventMessages, content);
-    }
 
     /// <summary>
     ///     Publishes a document branch.

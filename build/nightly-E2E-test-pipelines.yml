@@ -346,6 +346,10 @@ stages:
       UMBRACO__CMS__GLOBAL__USEHTTPS: true
       UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
+      # Back-office auth is cookie-only. Sliding the session on every request keeps the shared
+      # admin cookie alive for the length of a shard, so tests never have to re-authenticate
+      # mid-run just to dodge the session expiring.
+      UMBRACO__CMS__SECURITY__KEEPUSERLOGGEDIN: true
       ASPNETCORE_URLS: https://localhost:44331
     jobs:
       # E2E Tests

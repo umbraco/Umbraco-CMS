@@ -18,7 +18,7 @@ export class UmbUrlPickerMonacoMarkdownEditorAction extends UmbControllerBase {
 	}
 
 	getLabel() {
-		return this.#localize.term('general_insertLink');
+		return this.#localize.term('defaultdialogs_insertlink');
 	}
 
 	getKeybindings() {

@@ -4,7 +4,10 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Relations;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -13,9 +16,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
 internal class BlockListWithReusableContentTest : BlockEditorWithReusableContentTestBase
 {
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder
+            .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>();
+    }
+
     public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
         => builder.Services.Configure<ContentSettings>(config =>
             config.AllowEditInvariantFromNonDefault = true);
+
+    public static void ConfigureIndexExternalBlockElementsTrue(IUmbracoBuilder builder)
+        => builder.Services.Configure<IndexingSettings>(config =>
+            config.IndexExternalBlockElements = true);
 
     [Test]
     public async Task Can_Handle_Reusable_Element()
@@ -788,6 +803,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
     [TestCase(true)]
     [TestCase(false)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureIndexExternalBlockElementsTrue))]
     public async Task Can_Include_Invariant_Reusable_Elements_In_Search_Indexing(bool published)
     {
         var elementType = await CreateElementType(ContentVariation.Nothing);
@@ -832,25 +848,35 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType },
-            });
+            }).ToList();
 
-        Assert.AreEqual(1, indexValues.Count());
+        if (published)
+        {
+            var indexValue = indexValues.FirstOrDefault(v => v.Culture is null && v.FieldName == "blocks");
+            Assert.IsNotNull(indexValue);
+            Assert.AreEqual(1, indexValue!.Values.Count());
 
-        var indexValue = indexValues.FirstOrDefault(v => v.Culture is null);
-        Assert.IsNotNull(indexValue);
-        Assert.AreEqual(1, indexValue.Values.Count());
+            var indexedValue = indexValue.Values.First() as string;
+            Assert.IsNotNull(indexedValue);
 
-        var indexedValue = indexValue.Values.First() as string;
-        Assert.IsNotNull(indexedValue);
-
-        var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-        Assert.AreEqual(2, values.Length);
-        Assert.Contains("The reusable invariant text", values);
-        Assert.Contains("The reusable variant text", values);
+            var values = indexedValue!.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            Assert.AreEqual(2, values.Length);
+            Assert.Contains("The reusable invariant text", values);
+            Assert.Contains("The reusable variant text", values);
+        }
+        else
+        {
+            // External element content is only flattened into the published value set (external index), not the
+            // draft value set (internal/back-office index).
+            var allText = string.Join(Environment.NewLine, indexValues.SelectMany(v => v.Values).OfType<string>());
+            Assert.IsFalse(allText.Contains("The reusable invariant text"), "External element content must not be indexed in the draft value set.");
+            Assert.IsFalse(allText.Contains("The reusable variant text"), "External element content must not be indexed in the draft value set.");
+        }
     }
 
     [TestCase(true)]
     [TestCase(false)]
+    [ConfigureBuilder(ActionName = nameof(ConfigureIndexExternalBlockElementsTrue))]
     public async Task Can_Include_Variant_Reusable_Elements_In_Search_Indexing(bool published)
     {
         var elementType = await CreateElementType(ContentVariation.Culture);
@@ -895,25 +921,128 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
             contentTypeDictionary: new Dictionary<Guid, IContentType>
             {
                 { elementType.Key, elementType }, { contentType.Key, contentType },
-            });
+            }).ToList();
 
-        Assert.AreEqual(2, indexValues.Count());
-
-        AssertIndexValues("en-US", "The reusable English text");
-        AssertIndexValues("da-DK", "The reusable Danish text");
+        if (published)
+        {
+            AssertIndexValues("en-US", "The reusable English text");
+            AssertIndexValues("da-DK", "The reusable Danish text");
+        }
+        else
+        {
+            // External element content is only flattened into the published value set (external index), not the
+            // draft value set (internal/back-office index).
+            var allText = string.Join(Environment.NewLine, indexValues.SelectMany(v => v.Values).OfType<string>());
+            Assert.IsFalse(allText.Contains("The reusable English text"), "External element content must not be indexed in the draft value set.");
+            Assert.IsFalse(allText.Contains("The reusable Danish text"), "External element content must not be indexed in the draft value set.");
+            Assert.IsFalse(allText.Contains("The reusable invariant text"), "External element content must not be indexed in the draft value set.");
+        }
 
         void AssertIndexValues(string culture, string variantText)
         {
-            var indexValue = indexValues.FirstOrDefault(v => v.Culture == culture);
+            var indexValue = indexValues.FirstOrDefault(v => v.Culture == culture && v.FieldName == "blocks");
             Assert.IsNotNull(indexValue);
-            Assert.AreEqual(1, indexValue.Values.Count());
+            Assert.AreEqual(1, indexValue!.Values.Count());
             var indexedValue = indexValue.Values.First() as string;
             Assert.IsNotNull(indexedValue);
-            var values = indexedValue.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            var values = indexedValue!.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             Assert.AreEqual(2, values.Length);
             Assert.Contains(variantText, values);
             Assert.Contains("The reusable invariant text", values);
         }
+    }
+
+    [Test]
+    public async Task Does_Not_Index_Shared_Element_Content_When_Opt_In_Disabled()
+    {
+        var elementType = await CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
+
+        var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
+
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    [
+                        new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }
+                    ]
+                },
+            },
+            ContentData = [],
+            SettingsData = [],
+            Expose = [],
+        };
+
+        var content = new ContentBuilder().WithContentType(contentType).WithName("Page").Build();
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, ["*"]);
+
+        var editor = blockListDataType.Editor!;
+        var indexValues = editor.PropertyIndexValueFactory.GetIndexValues(
+            content.Properties["blocks"]!,
+            culture: null,
+            segment: null,
+            published: true,
+            availableCultures: ["en-US"],
+            contentTypeDictionary: new Dictionary<Guid, IContentType>
+            {
+                { elementType.Key, elementType }, { contentType.Key, contentType },
+            }).ToList();
+
+        // Element content must NOT be indexed when opt-in is disabled.
+        var allText = string.Join(
+            Environment.NewLine,
+            indexValues.SelectMany(v => v.Values).OfType<string>());
+        Assert.IsFalse(allText.Contains("The reusable invariant text"), "Shared-element content must not be indexed when the opt-in is disabled.");
+        Assert.IsFalse(allText.Contains("The reusable variant text"), "Shared-element content must not be indexed when the opt-in is disabled.");
+    }
+
+    [Test]
+    public async Task External_Block_Content_Creates_ExternalBlockElement_Relation()
+    {
+        var elementType = await CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
+
+        var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
+
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList,
+                    [new BlockListLayoutItem { ContentKey = reusableElementKey, IsExternalContent = true }]
+                },
+            },
+            ContentData = [],
+            SettingsData = [],
+            Expose = [],
+        };
+
+        var content = new ContentBuilder().WithContentType(contentType).WithName("Page").Build();
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, ["*"]);
+
+        var relationService = GetRequiredService<IRelationService>();
+
+        // The document (parent) must be related to the element (child) via the external-block-element relation type.
+        var externalBlockRelations = relationService
+            .GetByParent(content, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias)
+            .ToArray();
+        Assert.AreEqual(1, externalBlockRelations.Length, "Expected exactly one umbExternalBlockElement relation from the document to the element.");
+
+        // And it must NOT be related via the generic umbElement relation type.
+        var elementRelations = relationService
+            .GetByParent(content, Constants.Conventions.RelationTypes.RelatedElementAlias)
+            .ToArray();
+        Assert.AreEqual(0, elementRelations.Length, "External block content must not create a generic umbElement relation.");
     }
 
     private async Task<IDataType> CreateBlockListDataType(IContentType elementType)

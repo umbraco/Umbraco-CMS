@@ -11,7 +11,7 @@ public class ByNameSavedSearchLogViewerControllerTests : ManagementApiUserGroupT
     private ILogViewerService LogViewerService => GetRequiredService<ILogViewerService>();
 
     [SetUp]
-    public async Task Setup()
+    public new async Task Setup()
     {
         await LogViewerService.AddSavedLogQueryAsync("Find All", "SELECT * FROM LogEntries");
     }

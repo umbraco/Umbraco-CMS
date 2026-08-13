@@ -192,11 +192,9 @@ public class OEmbedServiceTests
         await service.GetMarkupAsync(new Uri("https://example.com/video/123"), 1920, 1080, CancellationToken.None);
 
         // Assert
-        providerMock.Verify(p => p.GetMarkupAsync(
-            "https://example.com/video/123",
-            1920,
-            1080,
-            It.IsAny<CancellationToken>()), Times.Once);
+        providerMock.Verify(
+            p => p.GetMarkupAsync( "https://example.com/video/123", 1920, 1080, It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     private static OEmbedService CreateService(params IEmbedProvider[] providers)

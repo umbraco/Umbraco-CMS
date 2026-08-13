@@ -17,8 +17,8 @@ import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice
 export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDetailDataSource<UmbMediaDetailModel> {
 	/**
 	 * Creates a new Media scaffold
-	 * @param {UmbDeepPartialObject<UmbMediaDetailModel>} [preset]
-	 * @returns { UmbMediaDetailModel }
+	 * @param {UmbDeepPartialObject<UmbMediaDetailModel>} [preset] - The preset to use for the scaffold
+	 * @returns { UmbMediaDetailModel } The scaffolded Media
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async createScaffold(preset: UmbDeepPartialObject<UmbMediaDetailModel> = {}) {
@@ -61,8 +61,8 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 
 	/**
 	 * Fetches a Media with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique ID of the media
+	 * @returns {*} The media
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async read(unique: string) {
@@ -104,9 +104,9 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 
 	/**
 	 * Inserts a new Media on the server
-	 * @param {UmbMediaDetailModel} model
-	 * @param parentUnique
-	 * @returns {*}
+	 * @param {UmbMediaDetailModel} model - The media to create
+	 * @param {string | null} parentUnique - The unique ID of the parent media
+	 * @returns {*} The created media
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async create(model: UmbMediaDetailModel, parentUnique: string | null = null, disableNotifications = false) {
@@ -142,9 +142,8 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 
 	/**
 	 * Updates a Media on the server
-	 * @param {UmbMediaDetailModel} Media
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbMediaDetailModel} model - The media to update
+	 * @returns {*} The updated media
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async update(model: UmbMediaDetailModel) {
@@ -173,8 +172,8 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 
 	/**
 	 * Deletes a Media on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique ID of the media
+	 * @returns {*} A promise that resolves once the media has been deleted
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async delete(unique: string) {

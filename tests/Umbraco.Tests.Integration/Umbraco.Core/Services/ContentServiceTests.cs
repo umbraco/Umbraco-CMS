@@ -41,13 +41,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithContent
 {
     [SetUp]
-    public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
+    public new void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
     [TearDown]
     public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
     // TODO: Add test to verify there is only ONE newest document/content in {Constants.DatabaseSchema.Tables.Document} table after updating.
     // TODO: Add test to delete specific version (with and without deleting prior versions) and versions by date.
-
 
     private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
 
@@ -587,9 +586,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Assert
         Assert.That(content, Is.Not.Null);
         Assert.That(content.HasIdentity, Is.False);
-        Assert.That(content.CreatorId,
-            Is.EqualTo(Constants.Security
-                .SuperUserId)); // Default to -1 aka SuperUser (unknown) since we didn't explicitly set this in the Create call
+        Assert.That(
+            content.CreatorId,
+            Is.EqualTo(Constants.Security.SuperUserId)); // Default to -1 aka SuperUser (unknown) since we didn't explicitly set this in the Create call
     }
 
     [Test]
@@ -963,7 +962,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishResultType.SuccessUnpublishLastCulture, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
-        Assert.AreEqual(PublishedState.Unpublished,
+        Assert.AreEqual(
+            PublishedState.Unpublished,
             content.PublishedState); // the last culture was unpublished so the document should also reflect this
 
         // re-get
@@ -1521,7 +1521,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var parent = ContentService.GetById(Textpage.Id);
         Assert.IsNotNull(parent);
         var parentPublished =
-            ContentService.Publish(parent,
+            ContentService.Publish(
+                parent,
                 parent.AvailableCultures.ToArray(),
                 userId: Constants.Security
                     .SuperUserId); // Publish root Home node to enable publishing of 'Subpage.Id'
@@ -1566,7 +1567,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var parent = ContentService.GetById(Textpage.Id);
         Assert.IsNotNull(parent);
         var parentPublished =
-            ContentService.Publish(parent,
+            ContentService.Publish(
+                parent,
                 parent.AvailableCultures.ToArray(),
                 userId: Constants.Security
                     .SuperUserId); // Publish root Home node to enable publishing of 'Subpage.Id'
@@ -1616,7 +1618,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         content.Properties[0].SetValue("Foo", string.Empty);
         contentService.Save(content);
-        contentService.PersistContentSchedule(content,
+        contentService.PersistContentSchedule(
+            content,
             ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
 
         // Act
@@ -1668,7 +1671,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         contentService.Save(content);
         contentService.Publish(content, Array.Empty<string>());
 
-        contentService.PersistContentSchedule(content,
+        contentService.PersistContentSchedule(
+            content,
             ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null));
         contentService.Save(content);
 
@@ -2227,7 +2231,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Ensure that the published content version has the correct property value and is marked as published
         var publishedContentVersion = publishedDescendants.First(x => x.VersionId == publishedVersion);
         Assert.That(publishedContentVersion.Published, Is.True);
-        Assert.That(publishedContentVersion.Properties["title"].GetValue(published: true),
+        Assert.That(
+            publishedContentVersion.Properties["title"].GetValue(published: true),
             Contains.Substring("Published"));
 
         // and has the correct draft properties
@@ -2959,7 +2964,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         Assert.IsTrue(content.Published);
         Assert.IsFalse(content.Edited);
-        Assert.AreEqual("Francis Doe",
+        Assert.AreEqual(
+            "Francis Doe",
             ContentService.GetById(content.Id).GetValue<string>("author")); // version2 author is Francis
 
         Assert.AreEqual("Text Page 2 Updated", content.Name);
@@ -2985,7 +2991,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         Assert.IsTrue(content.Published);
         Assert.IsFalse(content.Edited);
-        Assert.AreEqual("Jane Doe",
+        Assert.AreEqual(
+            "Jane Doe",
             ContentService.GetById(content.Id).GetValue<string>("author")); // version3 author is Jane
 
         Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
@@ -3006,7 +3013,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsNotNull(rollback);
         Assert.IsTrue(rollback.Published);
         Assert.IsTrue(rollback.Edited);
-        Assert.AreEqual("Francis Doe",
+        Assert.AreEqual(
+            "Francis Doe",
             ContentService.GetById(content.Id).GetValue<string>("author")); // author is now Francis again
         Assert.AreEqual(version3, rollback.VersionId); // same version but with edits
 
@@ -3341,22 +3349,25 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // SD: This is failing because the 'content' call to GetValue<DateTime> always has empty milliseconds
         // MCH: I'm guessing this is an issue because of the format the date is actually stored as, right? Cause we don't do any formatting when saving or loading
-        Assert.That(sut.GetValue<DateTime>("dateTime").ToString("G"),
+        Assert.That(
+            sut.GetValue<DateTime>("dateTime").ToString("G"),
             Is.EqualTo(content.GetValue<DateTime>("dateTime").ToString("G")));
         Assert.That(sut.GetValue<string>("colorPicker"), Is.EqualTo("black"));
         Assert.That(sut.GetValue<string>("ddlMultiple"), Is.EqualTo("1234,1235"));
         Assert.That(sut.GetValue<string>("rbList"), Is.EqualTo("random"));
-        Assert.That(sut.GetValue<DateTime>("date").ToString("G"),
+        Assert.That(
+            sut.GetValue<DateTime>("date").ToString("G"),
             Is.EqualTo(content.GetValue<DateTime>("date").ToString("G")));
         Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
         Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
-        Assert.That(sut.GetValue<Udi>("contentPicker"),
-            Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document,
-                new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
-        Assert.That(sut.GetValue<Udi>("memberPicker"),
-            Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member,
-                new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
-        Assert.That(sut.GetValue<string>("multiUrlPicker"),
+        Assert.That(
+            sut.GetValue<Udi>("contentPicker"),
+            Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
+        Assert.That(
+            sut.GetValue<Udi>("memberPicker"),
+            Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
+        Assert.That(
+            sut.GetValue<string>("multiUrlPicker"),
             Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
         Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
         Assert.That(
@@ -3824,12 +3835,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             child.SetCultureName("child", langUk.IsoCode);
             ContentService.Save(child);
 
-            Assert.AreEqual("child" + (i == 0 ? string.Empty : " (" + i + ")"),
+            Assert.AreEqual(
+                "child" + (i == 0 ? string.Empty : " (" + i + ")"),
                 child.GetCultureName(langUk.IsoCode));
 
             // Save it again to ensure that the unique check is not performed again against it's own name
             ContentService.Save(child);
-            Assert.AreEqual("child" + (i == 0 ? string.Empty : " (" + i + ")"),
+            Assert.AreEqual(
+                "child" + (i == 0 ? string.Empty : " (" + i + ")"),
                 child.GetCultureName(langUk.IsoCode));
         }
     }

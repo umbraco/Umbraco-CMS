@@ -12,6 +12,9 @@ import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localiza
 
 export default {
 	actions: {
+		copyInProgress: 'Kopierer - vennligst vent...',
+		deleteInProgress: 'Sletter - vennligst vent...',
+		moveInProgress: 'Flytter - vennligst vent...',
 		assigndomain: 'Angi domene',
 		auditTrail: 'Revisjoner',
 		browse: 'Bla gjennom',
@@ -224,6 +227,8 @@ export default {
 		routeError: 'Dette dokumentet er publisert, men URL-en kolliderer med innhold %0%',
 		routeErrorCannotRoute: 'Dette dokumentet er publisert, men URL-en kan ikke rutes',
 		saveModalTitle: 'Lagre',
+		saveAndPublishDescendantsModalTitle: 'Lagre og publiser med undersider',
+		saveAndScheduleModalTitle: 'Lagre og planlegg publisering',
 		schedulePublishHelp: 'Velg dato og tid for å publisere og/eller avpublisere innholdselementet.',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Hva betyr dette?</a>',
@@ -259,6 +264,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikk for å laste opp',
+		browseFilesAction: 'Bla gjennom filer',
+		dropFilesOr: 'Dra og slipp medier her<br />eller',
 	},
 	member: {
 		createNewMember: 'Opprett et nytt medlem',
@@ -529,6 +536,8 @@ export default {
 		no: 'Nei',
 		noItemsInList: 'Ingen elementer er lagt til',
 		nodeName: 'Nodenavn',
+		noResults: 'Ingen resultater',
+		noResultsFor: (query: string) => `Ingen resultater for "${query}".`,
 		of: 'av',
 		off: 'Av',
 		ok: 'OK',
@@ -829,6 +838,9 @@ export default {
 		paSimple: 'Enkelt: Beskytt ved hjelp av brukernavn og passord',
 		paSimpleHelp: 'Om du ønsker å bruke enkel autentisering via ett enkelt brukernavn og passord',
 	},
+	unpublish: {
+		inProgress: 'Avpubliserer - vennligst vent...',
+	},
 	publish: {
 		contentPublishedFailedAwaitingRelease: '%0% kunne ikke publiseres fordi den har planlagt utgivelsesdato.',
 		contentPublishedFailedInvalid: '%0% ble ikke publisert. Ett eller flere felter ble ikke godkjent av validering.',
@@ -906,6 +918,8 @@ export default {
 		sortPleaseWait: 'Vennligst vent. Elementene blir sortert, dette kan ta litt tid.',
 	},
 	speechBubbles: {
+		editMultiContentPublishedPartialText: '%0% av %1% dokumenter publisert.',
+		editMultiContentUnpublishedPartialText: '%0% av %1% dokumenter avpublisert.',
 		operationFailedHeader: 'En feil oppsto',
 		invalidUserPermissionsText: 'Utilstrekkelige brukertillatelser, kunne ikke fullføre operasjonen',
 		operationCancelledHeader: 'Avbrutt',
@@ -1317,5 +1331,10 @@ export default {
 		tabClipboard: 'Utklippstavle',
 		tabCreateEmpty: 'Opprett tomt',
 		thumbnail: 'Miniatyrbilde',
+	},
+	picker: {
+		browseTab: 'Bla gjennom',
+		searchTab: 'Søk',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
 	},
 } as UmbLocalizationDictionary;

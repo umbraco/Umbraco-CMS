@@ -21,7 +21,8 @@ export interface UmbCurrentUserAction<ArgsMetaType = never> extends UmbAction<Um
 }
 
 export interface ManifestCurrentUserAction<MetaType extends MetaCurrentUserAction = MetaCurrentUserAction>
-	extends ManifestElementAndApi<UmbControllerHostElement, UmbCurrentUserAction<MetaType>>,
+	extends
+		ManifestElementAndApi<UmbControllerHostElement, UmbCurrentUserAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'currentUserAction';
 	meta: MetaType;
@@ -40,19 +41,13 @@ export interface ManifestCurrentUserActionDefaultKind<
 export interface MetaCurrentUserActionDefaultKind extends MetaCurrentUserAction {
 	/**
 	 * An icon to represent the action to be performed
-	 * @examples [
-	 *   "icon-box",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-box", "icon-grid"]
 	 */
 	icon?: string;
 
 	/**
 	 * The friendly name of the action to perform
-	 * @examples [
-	 *   "Create",
-	 *   "Create Content Template"
-	 * ]
+	 * @examples ["Create", "Create Content Template"]
 	 */
 	label: string;
 }

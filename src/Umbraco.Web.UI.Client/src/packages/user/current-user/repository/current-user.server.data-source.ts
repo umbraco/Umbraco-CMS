@@ -14,7 +14,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Get the current user
-	 * @returns {*}
+	 * @returns {*} The current user data or an error
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getCurrentUser() {
@@ -66,6 +66,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Get the current user's external login providers
+	 * @returns {*} The external login providers data or an error
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getExternalLoginProviders() {
@@ -74,6 +75,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Get the current user's available MFA login providers
+	 * @returns {*} The MFA login providers data or an error
 	 * @memberof UmbCurrentUserServerDataSource
 	 */
 	async getMfaLoginProviders() {
@@ -88,9 +90,10 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Enable an MFA provider
-	 * @param providerName
-	 * @param code
-	 * @param secret
+	 * @param {string} providerName The name of the provider to enable
+	 * @param {string} code The activation code of the provider to enable
+	 * @param {string} secret The secret used to verify the provider's activation code
+	 * @returns {*} An error if the provider could not be enabled
 	 */
 	async enableMfaProvider(providerName: string, code: string, secret: string) {
 		const { error } = await tryExecute(
@@ -107,8 +110,9 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Disable an MFA provider
-	 * @param providerName
-	 * @param code
+	 * @param {string} providerName The name of the provider to disable
+	 * @param {string} code The activation code of the provider to disable
+	 * @returns {*} An error if the provider could not be disabled
 	 */
 	async disableMfaProvider(providerName: string, code: string) {
 		const { error } = await tryExecute(
@@ -125,11 +129,9 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Change the password for current user
-	 * @param id
-	 * @param newPassword
-	 * @param oldPassword
-	 * @param isCurrentUser
-	 * @returns
+	 * @param {string} newPassword The new password
+	 * @param {string} oldPassword The old password
+	 * @returns {*} The result of the change password request
 	 */
 	async changePassword(newPassword: string, oldPassword: string) {
 		return tryExecute(
@@ -146,7 +148,8 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Upload an avatar for the current user using a temporary file unique
-	 * @param {string} fileUnique
+	 * @param {string} fileUnique The unique of the temporary file to use as avatar
+	 * @returns {*} An error if the avatar upload failed
 	 */
 	async uploadCurrentUserAvatar(fileUnique: string) {
 		const body: SetAvatarRequestModel = {
@@ -160,6 +163,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Delete the current user's avatar
+	 * @returns {*} An error if the avatar deletion failed
 	 */
 	async deleteCurrentUserAvatar() {
 		return tryExecute(this, UserService.deleteUserCurrentAvatar());
@@ -167,7 +171,8 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 
 	/**
 	 * Update the current user's profile
-	 * @param languageIsoCode
+	 * @param {string} languageIsoCode The ISO code of the language to set for the current user
+	 * @returns {*} An error if the profile update failed
 	 */
 	async updateCurrentUserProfile(languageIsoCode: string) {
 		return tryExecute(

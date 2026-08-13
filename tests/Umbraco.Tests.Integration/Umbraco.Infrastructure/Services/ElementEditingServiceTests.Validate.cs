@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -234,6 +235,23 @@ public partial class ElementEditingServiceTests
         var result = await ElementEditingService.ValidateUpdateAsync(element.Key, validateModel, englishEditor.Key);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureContentTypeFilterToDisallowElementInFolders))]
+    public async Task Will_Fail_Validate_Create_When_Disallowed_By_Content_Type_Filter()
+    {
+        var elementType = await CreateInvariantElementType();
+
+        var containerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey);
+
+        var createModel = CreateElementModel(elementType.Key, containerKey);
+
+        var result = await ElementEditingService.ValidateCreateAsync(createModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.NotAllowed, result.Status);
     }
 
     [Test]

@@ -6,7 +6,9 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 export interface ManifestWorkspaceAction<
 	MetaType extends MetaWorkspaceAction = MetaWorkspaceAction,
 	ApiType extends UmbWorkspaceAction<MetaType> = UmbWorkspaceAction<MetaType>,
-> extends ManifestElementAndApi<UmbControllerHostElement, ApiType>,
+>
+	extends
+		ManifestElementAndApi<UmbControllerHostElement, ApiType>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'workspaceAction';
 	meta: MetaType;
@@ -15,8 +17,10 @@ export interface ManifestWorkspaceAction<
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MetaWorkspaceAction {}
 
-export interface ManifestWorkspaceActionDefaultKind
-	extends ManifestWorkspaceAction<MetaWorkspaceActionDefaultKind, UmbWorkspaceActionDefaultKind> {
+export interface ManifestWorkspaceActionDefaultKind extends ManifestWorkspaceAction<
+	MetaWorkspaceActionDefaultKind,
+	UmbWorkspaceActionDefaultKind
+> {
 	type: 'workspaceAction';
 	kind: 'default';
 }

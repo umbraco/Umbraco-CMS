@@ -17,53 +17,46 @@ test.afterEach(async ({umbracoApi}) => {
 });
 
 test('can create a document type using create options', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoUi.documentType.clickDocumentTypesMenu();
-
   // Act
-  await umbracoUi.documentType.clickCreateActionWithOptionName('Document Type');
+  await umbracoUi.documentType.clickActionsMenuAtRoot();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateDocumentTypeButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
   await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
-  // Check if the created document type is displayed in the collection view and has correct icon
-  await umbracoUi.documentType.clickDocumentTypesMenu();
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveName(documentTypeName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(documentTypeName, 'icon-document');
+  // Check the created document type is displayed in the tree
+  await umbracoUi.documentType.reloadDocumentTypeTree()
+  await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
 });
 
 test('can create a document type with a template using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
-  await umbracoUi.documentType.clickDocumentTypesMenu();
 
   // Act
-  await umbracoUi.documentType.clickCreateActionWithOptionName('Document Type with Template');
+  await umbracoUi.documentType.clickActionsMenuAtRoot();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateDocumentTypeWithTemplateButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
   const {documentTypeId, templateId} = await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeAndTemplateToBeCreated();
 
   // Assert
-  // Checks if both the success notification for document Types and the template are visible
   // Checks if the documentType contains the template
   const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
   expect(documentTypeData.allowedTemplates[0].id).toEqual(templateId);
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
-  // Check if the created document type is displayed in the collection view and has correct icon
-  await umbracoUi.documentType.clickDocumentTypesMenu();
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveName(documentTypeName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(documentTypeName, 'icon-document-html');
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
 });
 
 test('can create a element type using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoUi.documentType.clickDocumentTypesMenu();
-
   // Act
-  await umbracoUi.documentType.clickCreateActionWithOptionName('Element Type');
+  await umbracoUi.documentType.clickActionsMenuAtRoot();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateElementTypeButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
   await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
 
@@ -72,56 +65,56 @@ test('can create a element type using create options', {tag: '@release'}, async 
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.isElement).toBeTruthy();
-  // Check if the created document type is displayed in the collection view and has correct icon
-  await umbracoUi.documentType.clickDocumentTypesMenu();
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveName(documentTypeName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(documentTypeName, 'icon-plugin');
+  // Check the created element type is displayed in the tree
+  await umbracoUi.documentType.reloadDocumentTypeTree();
+  await umbracoUi.documentType.isDocumentTreeItemVisible(documentTypeName);
 });
 
 test('can create a document type folder using create options', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoUi.documentType.clickDocumentTypesMenu();
-
   // Act
-  await umbracoUi.documentType.clickCreateActionWithOptionName('Folder');
+  await umbracoUi.documentType.clickActionsMenuAtRoot();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
-  // Check if the created document type folder is displayed in the collection view and has correct icon
-  await umbracoUi.documentType.clickDocumentTypesMenu();
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveName(documentFolderName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(documentFolderName, 'icon-folder');
+  expect(await umbracoApi.documentType.doesNameExist(documentFolderName)).toBeTruthy();
+  // Check the created folder is displayed in the tree
+  await umbracoUi.documentType.reloadDocumentTypeTree();
+  await umbracoUi.documentType.isDocumentTreeItemVisible(documentFolderName);
 });
 
 test('can create a document type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.documentType.createFolder(documentFolderName);
+  const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
   await umbracoUi.documentType.reloadDocumentTypeTree();
-  await umbracoUi.documentType.goToDocumentType(documentFolderName);
 
   // Act
-  await umbracoUi.documentType.clickCreateActionWithOptionName('Document Type');
+  await umbracoUi.documentType.clickActionsMenuForDocumentType(documentFolderName);
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateDocumentTypeButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
   await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
-  // Check if the created document type is displayed in the collection view and has correct icon
-  await umbracoUi.documentType.goToDocumentType(documentFolderName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveName(documentTypeName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(documentTypeName, 'icon-document');
+  // Verify the document type is inside the parent folder
+  const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+  expect(parentFolderChildren).toHaveLength(1);
+  expect(parentFolderChildren[0].name).toBe(documentTypeName);
 });
 
 test('can create a document type with a template in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
-  await umbracoApi.documentType.createFolder(documentFolderName);
+  const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
   await umbracoUi.documentType.reloadDocumentTypeTree();
-  await umbracoUi.documentType.goToDocumentType(documentFolderName);
 
   // Act
-  await umbracoUi.documentType.clickCreateActionWithOptionName('Document Type with Template');
+  await umbracoUi.documentType.clickActionsMenuForDocumentType(documentFolderName);
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateDocumentTypeWithTemplateButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
   const {documentTypeId, templateId} = await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeAndTemplateToBeCreated();
 
@@ -130,10 +123,10 @@ test('can create a document type with a template in a folder using create option
   const documentTypeData = await umbracoApi.documentType.get(documentTypeId);
   expect(documentTypeData.allowedTemplates[0].id).toEqual(templateId);
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
-  // Check if the created document type is displayed in the collection view and has correct icon
-  await umbracoUi.documentType.goToDocumentType(documentFolderName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveName(documentTypeName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(documentTypeName, 'icon-document-html');
+  // Verify the document type is inside the parent folder
+  const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+  expect(parentFolderChildren).toHaveLength(1);
+  expect(parentFolderChildren[0].name).toBe(documentTypeName);
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(documentTypeName);
@@ -141,12 +134,13 @@ test('can create a document type with a template in a folder using create option
 
 test('can create a element type in a folder using create options', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.documentType.createFolder(documentFolderName);
+  const parentFolderId = await umbracoApi.documentType.createFolder(documentFolderName);
   await umbracoUi.documentType.reloadDocumentTypeTree();
-  await umbracoUi.documentType.goToDocumentType(documentFolderName);
 
   // Act
-  await umbracoUi.documentType.clickCreateActionWithOptionName('Element Type');
+  await umbracoUi.documentType.clickActionsMenuForDocumentType(documentFolderName);
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateElementTypeButton();
   await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
   await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeCreated();
 
@@ -155,10 +149,10 @@ test('can create a element type in a folder using create options', async ({umbra
   // Checks if the isElement is true
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.isElement).toBeTruthy();
-  // Check if the created document type is displayed in the collection view and has correct icon
-  await umbracoUi.documentType.goToDocumentType(documentFolderName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveName(documentTypeName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(documentTypeName, 'icon-plugin');
+  // Verify the element type is inside the parent folder
+  const parentFolderChildren = await umbracoApi.documentType.getChildren(parentFolderId);
+  expect(parentFolderChildren).toHaveLength(1);
+  expect(parentFolderChildren[0].name).toBe(documentTypeName);
 });
 
 test('can create a document type folder in a folder using create options', async ({umbracoApi, umbracoUi}) => {
@@ -167,19 +161,17 @@ test('can create a document type folder in a folder using create options', async
   await umbracoApi.documentType.ensureNameNotExists(childFolderName);
   await umbracoApi.documentType.createFolder(documentFolderName);
   await umbracoUi.documentType.reloadDocumentTypeTree();
-  await umbracoUi.documentType.goToDocumentType(documentFolderName);
 
   // Act
-  await umbracoUi.documentType.clickCreateActionWithOptionName('Folder');
+  await umbracoUi.documentType.clickActionsMenuForDocumentType(documentFolderName);
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(childFolderName);
   await umbracoUi.documentType.clickCreateFolderButton();
 
   // Assert
   const folder = await umbracoApi.documentType.getByName(childFolderName);
   expect(folder.name).toBe(childFolderName);
-  // Check if the created document type folder is displayed in the collection view and has correct icon
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveName(childFolderName);
-  await umbracoUi.documentType.doesCollectionTreeItemTableRowHaveIcon(childFolderName, 'icon-folder');
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(childFolderName);

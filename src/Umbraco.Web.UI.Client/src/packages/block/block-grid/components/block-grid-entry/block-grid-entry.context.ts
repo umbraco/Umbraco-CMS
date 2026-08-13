@@ -52,7 +52,10 @@ export class UmbBlockGridEntryContext
 		return [x.rowMinSpan ?? 1, x.rowMaxSpan ?? 1];
 	}
 
-	readonly inlineEditingMode = this._blockType.asObservablePart((x) => x?.inlineEditing === true);
+	readonly inlineEditingMode = mergeObservables(
+		[this._blockType.asObservablePart((x) => x?.inlineEditing === true), this.isExternalContent],
+		([inlineEditing, isExternalContent]) => inlineEditing === true && !isExternalContent,
+	);
 
 	#relevantColumnSpanOptions = new UmbArrayState<number>([], (x) => x);
 	readonly relevantColumnSpanOptions = this.#relevantColumnSpanOptions.asObservable();
@@ -83,6 +86,12 @@ export class UmbBlockGridEntryContext
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
 	}
 
+	protected override _needsLegacyLabelRenderer(): boolean {
+		// Block Grid entry element owns the canonical `<umb-ufm-render>` (via its child
+		// views) and pushes resolved text via `setName()`. No hidden virtual renderer needed.
+		return false;
+	}
+
 	layoutsOfArea(areaKey: string) {
 		return this._layout.asObservablePart((x) => x?.areas?.find((x) => x.key === areaKey)?.items);
 	}
@@ -107,7 +116,7 @@ export class UmbBlockGridEntryContext
 
 	/**
 	 * Set the column span of this entry.
-	 * @param columnSpan {number} The new column span.
+	 * @param {number} columnSpan The new column span.
 	 */
 	setColumnSpan(columnSpan: number) {
 		if (!this._entries) return;
@@ -133,7 +142,7 @@ export class UmbBlockGridEntryContext
 
 	/**
 	 * Set the row span of this entry.
-	 * @param rowSpan {number} The new row span.
+	 * @param {number} rowSpan The new row span.
 	 */
 	setRowSpan(rowSpan: number) {
 		const minMax = this.getMinMaxRowSpan();
