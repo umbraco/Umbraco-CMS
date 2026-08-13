@@ -348,7 +348,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * Peeks a single-message notification, when a notification context is available.
 	 * @param {UmbNotificationColor} color - The notification color/severity.
 	 * @param {string} messageKey - The localization key for the message.
-	 * @param {...any} args - Arguments to interpolate into the localized message.
+	 * @param {...string} args - Arguments to interpolate into the localized message.
 	 */
 	#notify(color: UmbNotificationColor, messageKey: string, ...args: Array<string>): void {
 		this.#notificationContext?.peek(color, { data: { message: this.#localize.term(messageKey, ...args) } });

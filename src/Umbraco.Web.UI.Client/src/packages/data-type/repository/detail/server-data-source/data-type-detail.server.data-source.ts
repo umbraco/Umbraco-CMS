@@ -2,7 +2,11 @@ import type { UmbDataTypeDetailModel, UmbDataTypePropertyValueModel } from '../.
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../../entity.js';
 import { UmbManagementApiDataTypeDetailDataRequestManager } from './data-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDataTypeRequestModel,
 	DataTypeResponseModel,
@@ -13,7 +17,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 /**
  * A data source for the Data Type that fetches data from the server
  * @class UmbDataTypeServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbDataTypeDetailModel>}
  */
 export class UmbDataTypeServerDataSource
 	extends UmbControllerBase
@@ -45,10 +49,10 @@ export class UmbDataTypeServerDataSource
 	/**
 	 * Fetches a Data Type with the given id from the server
 	 * @param {string} unique - The unique identifier of the data type to fetch.
-	 * @returns {*} The data type.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>>} The data type.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await this.#detailRequestManager.read(unique);
@@ -59,10 +63,10 @@ export class UmbDataTypeServerDataSource
 	/**
 	 * Fetches multiple Data Types by their unique IDs from the server
 	 * @param {Array<string>} uniques - The unique IDs of the data types to fetch
-	 * @returns {*} The data types.
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbDataTypeDetailModel>>>} The data types.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async readMany(uniques: Array<string>) {
+	async readMany(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbDataTypeDetailModel>>> {
 		if (!uniques || uniques.length === 0) {
 			return { data: [] };
 		}
@@ -79,10 +83,13 @@ export class UmbDataTypeServerDataSource
 	 * Inserts a new Data Type on the server
 	 * @param {UmbDataTypeDetailModel} model - The data type to create.
 	 * @param {string | null} parentUnique - The unique identifier of the parent, if any.
-	 * @returns {*} The created data type.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>>} The created data type.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async create(model: UmbDataTypeDetailModel, parentUnique: string | null = null) {
+	async create(
+		model: UmbDataTypeDetailModel,
+		parentUnique: string | null = null,
+	): Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>> {
 		if (!model) throw new Error('Data Type is missing');
 		if (!model.unique) throw new Error('Data Type unique is missing');
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
@@ -117,10 +124,10 @@ export class UmbDataTypeServerDataSource
 	/**
 	 * Updates a DataType on the server
 	 * @param {UmbDataTypeDetailModel} model - The data type to update.
-	 * @returns {*} The updated data type.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>>} The updated data type.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async update(model: UmbDataTypeDetailModel) {
+	async update(model: UmbDataTypeDetailModel): Promise<UmbDataSourceResponse<UmbDataTypeDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 		if (!model.editorUiAlias) throw new Error('Property Editor UI Alias is missing');
@@ -152,10 +159,10 @@ export class UmbDataTypeServerDataSource
 	/**
 	 * Deletes a Data Type on the server
 	 * @param {string} unique - The unique identifier of the data type to delete.
-	 * @returns {*} The result of the delete operation.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#detailRequestManager.delete(unique);
 	}
