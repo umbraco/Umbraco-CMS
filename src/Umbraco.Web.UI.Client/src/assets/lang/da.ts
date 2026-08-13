@@ -2858,7 +2858,7 @@ export default {
 		watchVideos: 'Se videoerne',
 	},
 	startupDashboard: {
-		fallbackHeadline: 'Velkommmen til Umbraco',
+		fallbackHeadline: 'Velkommen til Umbraco',
 		fallbackDescription:
 			"Tak, fordi du har valgt Umbraco – vi tror på, at dette kan blive begyndelsen på noget\n      fantastisk. Selvom det måske kan virke overvældende i starten, har vi gjort meget for at gøre indlæringskurven så jævn og hurtig som muligt.",
 	},
