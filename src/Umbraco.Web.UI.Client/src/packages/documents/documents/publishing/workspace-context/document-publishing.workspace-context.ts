@@ -806,7 +806,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const publishedData = this.#publishedDocumentData;
 		if (!persistedData || !publishedData) return;
 
-		this.publishedPendingChanges.process({ persistedData, publishedData });
+		this.publishedPendingChanges.process({ persistedData, publishedData }).catch(() => undefined);
 	}
 
 	#clear() {
