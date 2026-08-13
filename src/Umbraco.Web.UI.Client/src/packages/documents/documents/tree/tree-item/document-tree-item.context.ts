@@ -74,13 +74,21 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.observe(this.isTrashed, (isTrashed) => {
-			this.#isTrashedContext.setIsTrashed(isTrashed);
-		});
+		this.observe(
+			this.isTrashed,
+			(isTrashed) => {
+				this.#isTrashedContext.setIsTrashed(isTrashed);
+			},
+			null,
+		);
 
-		this.observe(this.ancestors, (ancestors) => {
-			this.#ancestorsContext.setAncestors(ancestors);
-		});
+		this.observe(
+			this.ancestors,
+			(ancestors) => {
+				this.#ancestorsContext.setAncestors(ancestors);
+			},
+			null,
+		);
 	}
 
 	public override setTreeItem(treeItem: UmbDocumentTreeItemModel | undefined) {

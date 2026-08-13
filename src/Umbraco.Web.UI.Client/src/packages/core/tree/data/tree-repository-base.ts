@@ -21,12 +21,12 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
  * @template TreeRootType
  */
 export abstract class UmbTreeRepositoryBase<
-		TreeItemType extends UmbTreeItemModel,
-		TreeRootType extends UmbTreeRootModel,
-		TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
-		TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
-		TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
-	>
+	TreeItemType extends UmbTreeItemModel,
+	TreeRootType extends UmbTreeRootModel,
+	TreeRootItemsRequestArgsType extends UmbTreeRootItemsRequestArgs = UmbTreeRootItemsRequestArgs,
+	TreeChildrenOfRequestArgsType extends UmbTreeChildrenOfRequestArgs = UmbTreeChildrenOfRequestArgs,
+	TreeAncestorsOfRequestArgsType extends UmbTreeAncestorsOfRequestArgs = UmbTreeAncestorsOfRequestArgs,
+>
 	extends UmbRepositoryBase
 	implements
 		UmbTreeRepository<
@@ -60,8 +60,8 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Requests root items of a tree
-	 * @param args
-	 * @returns {*}
+	 * @param {TreeRootItemsRequestArgsType} args - The request arguments
+	 * @returns {*} The root items of the tree
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeRootItems(args: TreeRootItemsRequestArgsType) {
@@ -71,9 +71,8 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Requests tree items of a given parent
-	 * @param {(string | null)} parentUnique
-	 * @param args
-	 * @returns {*}
+	 * @param {TreeChildrenOfRequestArgsType} args - The request arguments
+	 * @returns {*} The tree items of the given parent
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemsOf(args: TreeChildrenOfRequestArgsType) {
@@ -87,8 +86,8 @@ export abstract class UmbTreeRepositoryBase<
 
 	/**
 	 * Requests ancestors of a given item
-	 * @param {UmbTreeAncestorsOfRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbTreeAncestorsOfRequestArgs} args - The request arguments
+	 * @returns {*} The ancestors of the given item
 	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeItemAncestors(args: TreeAncestorsOfRequestArgsType) {

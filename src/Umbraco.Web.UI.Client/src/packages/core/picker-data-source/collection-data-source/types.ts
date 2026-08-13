@@ -15,9 +15,7 @@ export interface UmbPickerCollectionDataSourceFeatures {
 }
 
 export interface UmbPickerCollectionDataSource<CollectionItemType extends UmbItemModel = UmbItemModel>
-	extends UmbPickerDataSource,
-		UmbCollectionRepository<CollectionItemType>,
-		UmbApi {
+	extends UmbPickerDataSource, UmbCollectionRepository<CollectionItemType>, UmbApi {
 	collectionPickableFilter?: (item: CollectionItemType) => boolean;
 	/** Feature toggles for the collection data source. Each feature is individually observable. */
 	features?: UmbPickerCollectionDataSourceFeatures;

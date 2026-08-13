@@ -1,5 +1,5 @@
-import { UmbShortcutController } from '@umbraco-cms/backoffice/shortcut';
 import { UMB_VIEW_CONTEXT } from './view.context-token.js';
+import { UmbShortcutController } from '@umbraco-cms/backoffice/shortcut';
 import { UmbClassState, UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbHintController } from '@umbraco-cms/backoffice/hint';
@@ -228,8 +228,9 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	/**
-	 * @internal
 	 * Notify that a view context has been activated.
+	 * @internal
+	 * @returns {boolean} true if the view is (or becomes) active.
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_requestActivate(): boolean {
@@ -268,8 +269,8 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	/**
-	 * @internal
 	 * Notify that a view context has been activated.
+	 * @internal
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_activate() {
@@ -282,9 +283,9 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	/**
-	 * @internal
 	 * Deactivate the view context.
 	 * We cannot conclude that this means the parent should be activated, it can be because of a child being activated.
+	 * @internal
 	 */
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	public _internal_deactivate() {

@@ -25,8 +25,8 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 
 	/**
 	 * Creates a scaffold for a Document Blueprint folder
-	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbFolderModel>} [preset] - The preset data to populate the scaffold with.
+	 * @returns {*} The document blueprint folder scaffold.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -42,8 +42,8 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 
 	/**
 	 * Fetches a Document Blueprint folder from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the folder to fetch.
+	 * @returns {*} The document blueprint folder.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -71,8 +71,8 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 
 	/**
 	 * Creates a Document Blueprint folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {*}
+	 * @param {UmbFolderModel} model - The document blueprint folder to create.
+	 * @returns {*} The created document blueprint folder.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -102,8 +102,8 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 
 	/**
 	 * Updates a Document Blueprint folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {*}
+	 * @param {UmbFolderModel} model - The document blueprint folder to update.
+	 * @returns {*} The updated document blueprint folder.
 	 * @memberof UmbDocumentBlueprintFolderServerDataSource
 	 */
 	async update(model: UmbFolderModel) {
@@ -128,8 +128,8 @@ export class UmbDocumentBlueprintFolderServerDataSource implements UmbDetailData
 
 	/**
 	 * Deletes a Document Blueprint folder on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the folder to delete.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbDocumentBlueprintServerDataSource
 	 */
 	async delete(unique: string) {

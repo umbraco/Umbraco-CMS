@@ -39,8 +39,8 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Fetches a Stylesheet folder from the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {string} unique - The unique identifier of the Stylesheet folder
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The Stylesheet folder
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -72,8 +72,8 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Creates a Stylesheet folder on the server
-	 * @param {UmbCreateFolderModel} model
-	 * @returns {UmbDataSourceResponse<UmbFolderModel>}
+	 * @param {UmbCreateFolderModel} model - The Stylesheet folder to create
+	 * @returns {UmbDataSourceResponse<UmbFolderModel>} The created Stylesheet folder
 	 * @memberof UmbStylesheetFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -106,8 +106,8 @@ export class UmbStylesheetFolderServerDataSource implements UmbDetailDataSource<
 
 	/**
 	 * Deletes a Stylesheet folder on the server
-	 * @param {string} unique
-	 * @returns {UmbDataSourceErrorResponse}
+	 * @param {string} unique - The unique identifier of the Stylesheet folder
+	 * @returns {UmbDataSourceErrorResponse} The result of the delete operation
 	 * @memberof UmbStylesheetServerDataSource
 	 */
 	async delete(unique: string) {

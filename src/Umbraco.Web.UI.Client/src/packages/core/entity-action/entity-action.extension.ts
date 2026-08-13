@@ -7,7 +7,8 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * For example for content you may wish to create a new document etc
  */
 export interface ManifestEntityAction<MetaType extends MetaEntityAction = MetaEntityAction>
-	extends ManifestElementAndApi<UmbEntityActionElement, UmbEntityAction<MetaType>>,
+	extends
+		ManifestElementAndApi<UmbEntityActionElement, UmbEntityAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'entityAction';
 	forEntityTypes: Array<string>;

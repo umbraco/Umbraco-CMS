@@ -24,9 +24,8 @@ export class UmbDataTypeServerDataSource
 
 	/**
 	 * Creates a new Data Type scaffold
-	 * @param {(string | null)} parentUnique
-	 * @param preset
-	 * @returns { CreateDataTypeRequestModel }
+	 * @param {Partial<UmbDataTypeDetailModel>} preset - The preset data to populate the scaffold with.
+	 * @returns { CreateDataTypeRequestModel } The data type scaffold.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbDataTypeDetailModel> = {}) {
@@ -45,8 +44,8 @@ export class UmbDataTypeServerDataSource
 
 	/**
 	 * Fetches a Data Type with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the data type to fetch.
+	 * @returns {*} The data type.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async read(unique: string) {
@@ -60,7 +59,7 @@ export class UmbDataTypeServerDataSource
 	/**
 	 * Fetches multiple Data Types by their unique IDs from the server
 	 * @param {Array<string>} uniques - The unique IDs of the data types to fetch
-	 * @returns {*}
+	 * @returns {*} The data types.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async readMany(uniques: Array<string>) {
@@ -78,9 +77,9 @@ export class UmbDataTypeServerDataSource
 
 	/**
 	 * Inserts a new Data Type on the server
-	 * @param {UmbDataTypeDetailModel} model
-	 * @param parentUnique
-	 * @returns {*}
+	 * @param {UmbDataTypeDetailModel} model - The data type to create.
+	 * @param {string | null} parentUnique - The unique identifier of the parent, if any.
+	 * @returns {*} The created data type.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async create(model: UmbDataTypeDetailModel, parentUnique: string | null = null) {
@@ -117,9 +116,8 @@ export class UmbDataTypeServerDataSource
 
 	/**
 	 * Updates a DataType on the server
-	 * @param {UmbDataTypeDetailModel} DataType
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbDataTypeDetailModel} model - The data type to update.
+	 * @returns {*} The updated data type.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async update(model: UmbDataTypeDetailModel) {
@@ -153,8 +151,8 @@ export class UmbDataTypeServerDataSource
 
 	/**
 	 * Deletes a Data Type on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the data type to delete.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async delete(unique: string) {

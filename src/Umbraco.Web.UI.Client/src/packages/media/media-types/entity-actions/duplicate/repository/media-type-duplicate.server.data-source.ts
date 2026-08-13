@@ -21,8 +21,8 @@ export class UmbDuplicateMediaTypeServerDataSource implements UmbDuplicateToData
 
 	/**
 	 * Duplicate an item for the given unique to the destination unique
-	 * @param {UmbDuplicateToRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbDuplicateToRequestArgs} args The unique and destination unique of the item to duplicate.
+	 * @returns {*} The result of the duplicate operation.
 	 * @memberof UmbDuplicateMediaTypeServerDataSource
 	 */
 	async duplicateTo(args: UmbDuplicateToRequestArgs) {

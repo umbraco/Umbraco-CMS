@@ -87,9 +87,13 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			unique: MODAL_MEMORY_UNIQUE,
 		});
 
-		this.observe(this.#interactionMemory.memory(MEDIA_MEMORY_UNIQUE), (memory) => {
-			this._mediaInteractionMemories = memory?.memories ?? [];
-		});
+		this.observe(
+			this.#interactionMemory.memory(MEDIA_MEMORY_UNIQUE),
+			(memory) => {
+				this._mediaInteractionMemories = memory?.memories ?? [];
+			},
+			null,
+		);
 	}
 
 	#onMediaInteractionMemoriesChange(event: Event) {
