@@ -32,7 +32,11 @@ public abstract class TestBase : UmbracoIntegrationTest
     protected static readonly Guid RootKey = Guid.Parse("D9EBF985-C65C-4341-955F-FFADA160F6D9");
     protected static readonly Guid ChildKey = Guid.Parse("C84E91B2-3351-4BA9-9906-09C2260D77EC");
     protected static readonly Guid GrandchildKey = Guid.Parse("201858C2-5AC2-4505-AC2E-E4BF38F39AC4");
-    private bool _indexingComplete;
+    // How long to wait, after the most recent commit, without seeing another one before
+    // considering indexing settled. A single batch of updates can trigger more than one
+    // underlying Lucene commit, so waiting for just the first one is not sufficient.
+    private static readonly TimeSpan _indexingQuietPeriod = TimeSpan.FromMilliseconds(500);
+    private long _lastCommitTimestamp = -1;
 
     protected DateTime CurrentDateTime { get; set; }
 
@@ -95,28 +99,36 @@ public abstract class TestBase : UmbracoIntegrationTest
         var index = (LuceneIndex)GetRequiredService<IExamineManager>().GetIndex(physicalName);
         index.IndexCommitted += IndexCommited;
 
-        await indexUpdatingAction();
-
-        var stopWatch = Stopwatch.StartNew();
-
-        while (_indexingComplete is false)
+        try
         {
-            if (stopWatch.ElapsedMilliseconds > TimeSpan.FromSeconds(30).TotalMilliseconds)
+            await indexUpdatingAction();
+
+            var stopWatch = Stopwatch.StartNew();
+
+            // Wait for at least one commit, then keep waiting until no further commit has
+            // been observed for a quiet period, since a single batch of updates can trigger
+            // more than one underlying Lucene commit.
+            long lastCommitTimestamp;
+            while ((lastCommitTimestamp = Interlocked.Read(ref _lastCommitTimestamp)) < 0
+                   || Stopwatch.GetElapsedTime(lastCommitTimestamp) < _indexingQuietPeriod)
             {
-                throw new TimeoutException("Indexing timed out");
+                if (stopWatch.Elapsed > TimeSpan.FromSeconds(30))
+                {
+                    throw new TimeoutException("Indexing timed out");
+                }
+
+                await Task.Delay(50);
             }
-
-            await Task.Delay(250);
         }
-
-        _indexingComplete = false;
-        index.IndexCommitted -= IndexCommited;
+        finally
+        {
+            Interlocked.Exchange(ref _lastCommitTimestamp, -1);
+            index.IndexCommitted -= IndexCommited;
+        }
     }
 
     private void IndexCommited(object? sender, EventArgs e)
-    {
-        _indexingComplete = true;
-    }
+        => Interlocked.Exchange(ref _lastCommitTimestamp, Stopwatch.GetTimestamp());
 
     protected string GetIndexAlias(bool publish) => publish ? Cms.Core.Constants.IndexAliases.PublishedContent : Cms.Core.Constants.IndexAliases.DraftContent;
 }
