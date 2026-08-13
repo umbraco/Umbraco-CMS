@@ -660,7 +660,7 @@ export default {
 		importDictionaryItemHelp:
 			'\n      For at importere et ordbogselement skal du finde ".udt"-filen på din computer ved at klikke på knappen\n      "Importér" (du bliver bedt om at bekræfte i næste trin)\n    ',
 		itemDoesNotExists: 'Ordbogselementet findes ikke.',
-		parentDoesNotExists: 'Overordnet element findes ikke',
+		parentDoesNotExists: 'Overordnet element findes ikke.',
 		noItemsInFile: 'Der er ingen ordbogselementer i denne fil.',
 		noItemsFound: 'Der blev ikke fundet nogen ordbogselementer.',
 		createNew: 'Opret ordbogselement',
