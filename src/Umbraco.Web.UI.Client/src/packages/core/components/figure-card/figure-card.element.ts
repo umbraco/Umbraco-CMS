@@ -27,6 +27,16 @@ export class UmbFigureCardElement extends UUICardElement {
 	@property({ type: String })
 	description?: string;
 
+	/**
+	 * Set to true to indicate this item is a collection. A collection takes precedence over
+	 * `hasChildren`: the card shows the collection indicator instead of the children indicator.
+	 * @type {boolean}
+	 * @attr is-collection
+	 * @default false
+	 */
+	@property({ type: Boolean, reflect: true, attribute: 'is-collection' })
+	isCollection = false;
+
 	@property({ type: String, attribute: 'background-color' })
 	public get backgroundColor(): string | undefined {
 		return undefined;
@@ -86,7 +96,7 @@ export class UmbFigureCardElement extends UUICardElement {
 		return html`
       <div id="content">
         <span id="name-part">
-          ${this.#renderChildrenIndicator()}
+          ${this.#renderIndicator()}
           <span title="${this.name}" id="name">${this.name}</span>
         </span>
         <small title="${ifDefined(this.description)}">${this.description}<slot name="description"></slot></small>
@@ -94,9 +104,14 @@ export class UmbFigureCardElement extends UUICardElement {
     `;
 	}
 
-	#renderChildrenIndicator() {
-		if (!this.hasChildren) return nothing;
-		return html`<uui-symbol-expand id="has-children" aria-hidden="true"></uui-symbol-expand>`;
+	#renderIndicator() {
+		if (this.isCollection) {
+			return html`<umb-icon id="is-collection" name="icon-list" aria-hidden="true"></umb-icon>`;
+		}
+		if (this.hasChildren) {
+			return html`<uui-symbol-expand id="has-children" aria-hidden="true"></uui-symbol-expand>`;
+		}
+		return nothing;
 	}
 
 	static override styles = [
@@ -189,8 +204,14 @@ export class UmbFigureCardElement extends UUICardElement {
 				gap: var(--uui-size-space-1);
 			}
 
-			#has-children {
+			#has-children,
+			#is-collection {
 				flex: none;
+			}
+
+			/* Sized to match the width uui-symbol-expand renders at, so both indicators take up the same room. */
+			#is-collection {
+				font-size: 12px;
 			}
 
 			:host([image]:not([image=''])) #open-part {
