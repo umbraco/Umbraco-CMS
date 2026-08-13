@@ -12,10 +12,6 @@ describe('UmbFigureCardElement', () => {
 		return element.shadowRoot!.querySelector('#has-children');
 	}
 
-	function collectionIndicator(): Element | null {
-		return element.shadowRoot!.querySelector('#is-collection');
-	}
-
 	it('is defined with its own instance', () => {
 		expect(element).to.be.instanceOf(UmbFigureCardElement);
 	});
@@ -43,32 +39,5 @@ describe('UmbFigureCardElement', () => {
 		await element.updateComplete;
 
 		expect(childrenIndicator()!.getAttribute('aria-hidden')).to.equal('true');
-	});
-
-	it('renders no collection indicator by default', () => {
-		expect(collectionIndicator()).to.be.null;
-	});
-
-	it('renders a collection indicator when it is a collection', async () => {
-		element.isCollection = true;
-		await element.updateComplete;
-
-		expect(collectionIndicator()).to.exist;
-	});
-
-	it('renders the collection indicator instead of the children indicator when it is a collection with children', async () => {
-		element.hasChildren = true;
-		element.isCollection = true;
-		await element.updateComplete;
-
-		expect(collectionIndicator()).to.exist;
-		expect(childrenIndicator()).to.be.null;
-	});
-
-	it('hides the collection indicator from assistive technology', async () => {
-		element.isCollection = true;
-		await element.updateComplete;
-
-		expect(collectionIndicator()!.getAttribute('aria-hidden')).to.equal('true');
 	});
 });

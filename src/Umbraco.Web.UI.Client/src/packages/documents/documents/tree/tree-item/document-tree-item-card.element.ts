@@ -66,9 +66,6 @@ export class UmbDocumentTreeItemCardElement extends UmbLitElement {
 	private _hasChildren = false;
 
 	@state()
-	private _hasCollection = false;
-
-	@state()
 	private _noAccess = false;
 
 	@state()
@@ -82,7 +79,6 @@ export class UmbDocumentTreeItemCardElement extends UmbLitElement {
 		this.observe(this.#item.name, (name) => (this._name = name ?? ''), '_observeName');
 		this.observe(this.#item.icon, (icon) => (this._icon = icon), '_observeIcon');
 		this.observe(this.#item.state, (state) => (this._state = state), '_observeState');
-		this.observe(this.#item.hasCollection, (has) => (this._hasCollection = has), '_observeHasCollection');
 	}
 
 	#onSelected(e: CustomEvent) {
@@ -120,7 +116,6 @@ export class UmbDocumentTreeItemCardElement extends UmbLitElement {
 				?selected=${this._isSelected}
 				?active=${this._isActive}
 				?has-children=${this._hasChildren}
-				?is-collection=${this._hasCollection}
 				?disabled=${this._noAccess}
 				background-color="var(--uui-color-surface)"
 				@selected=${this.#onSelected}

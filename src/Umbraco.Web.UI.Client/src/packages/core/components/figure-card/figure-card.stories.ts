@@ -16,7 +16,6 @@ const meta: Meta<UmbFigureCardElement> = {
 		selected: false,
 		disabled: false,
 		hasChildren: false,
-		isCollection: false,
 		backgroundColor: undefined,
 	},
 	argTypes: {
@@ -31,7 +30,6 @@ const meta: Meta<UmbFigureCardElement> = {
 			?selected=${args.selected}
 			?disabled=${args.disabled}
 			?has-children=${args.hasChildren}
-			?is-collection=${args.isCollection}
 			background-color=${args.backgroundColor}
 			description=${args.description}>
 			<uui-icon name="icon-wand"></uui-icon>
