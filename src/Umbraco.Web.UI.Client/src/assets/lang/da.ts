@@ -2480,9 +2480,9 @@ export default {
 		deleteWarning:
 			'Der refereres til dette element eller dets efterfølgere. Sletning kan medføre ødelagte links på dit websted.',
 		unpublishWarning:
-			'This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
-		deleteDisabledWarning: 'This item or its descendants is being referenced. Therefore, deletion has been disabled.',
-		listViewDialogWarning: 'The following items you are trying to %0% are referenced by other content.',
+			'Der refereres til dette element eller dets underliggende elementer. Hvis det afpubliceres, kan det føre til døde links på dit websted. Foretag venligst de nødvendige tiltag.',
+		deleteDisabledWarning: 'Der refereres til dette element eller dets efterfølgere. Derfor er sletning blevet deaktiveret.',
+		listViewDialogWarning: 'Følgende elementer, som du forsøger at %0%, refereres til af andet indhold.',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...og en mere';
 			return `...og ${count} andre`;
@@ -2490,7 +2490,7 @@ export default {
 	},
 	logViewer: {
 		deleteSavedSearch: 'Slet gemte søgning',
-		logLevels: 'Log type',
+		logLevels: 'Logtype',
 		selectAllLogLevelFilters: 'Vælg alle',
 		deselectAllLogLevelFilters: 'Fravælg alle',
 		savedSearches: 'Gemte søgninger',
