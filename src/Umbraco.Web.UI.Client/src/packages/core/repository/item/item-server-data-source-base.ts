@@ -12,7 +12,7 @@ export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType 
 /**
  * A data source base for items that fetches items from the server
  * @class UmbItemServerDataSourceBase
- * @implements {DocumentTreeDataSource}
+ * @implements {UmbItemDataSource}
  */
 export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType extends { unique: string }>
 	extends UmbControllerBase
@@ -36,7 +36,7 @@ export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType
 	/**
 	 * Fetches the items for the given uniques from the server
 	 * @param {Array<string>} uniques - The uniques of the items to fetch
-	 * @returns {*} The mapped items
+	 * @returns {Promise<UmbDataSourceResponse<Array<ClientItemType>>>} The mapped items
 	 * @memberof UmbItemServerDataSourceBase
 	 */
 	async getItems(uniques: Array<string>) {

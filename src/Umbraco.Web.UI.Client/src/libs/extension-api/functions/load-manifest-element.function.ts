@@ -9,6 +9,7 @@ import type {
 
 /**
  * Loads the element class constructor from a manifest's `element`/`js` property.
+ * @template {HTMLElement} ElementType
  * @param {ElementLoaderProperty<ElementType> | ElementAndApiLoaderProperty<ElementType>} property The manifest property to load the element from.
  * @returns {Promise<ClassConstructor<ElementType> | undefined>} The resolved element class constructor, if found.
  */

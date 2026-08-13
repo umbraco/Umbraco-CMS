@@ -101,7 +101,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	/**
 	 * Gets the unique identifier of the content type.
 	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentWorkspaceContext
+	 * @memberof UmbDocumentBlueprintWorkspaceContext
 	 */
 	getContentTypeUnique(): string | undefined {
 		return this.getData()?.documentType.unique;
