@@ -196,7 +196,15 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-test.fixme('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+// Still failing, but NOT yet shown to be a product bug - do not treat this as one.
+// Two real test defects were fixed here: it used to drag from the block's link (the sorter sets draggable=false
+// on links via its default ignorerSelector) and drop onto #add-button (not the '#blocks' sort container).
+// With a card as the handle and '#blocks' as the target the card still does not move, but the product path
+// looks intact: the block sorters share identifier 'umb-block-type-sorter', and a cross-container move calls
+// both onContainerChange and onChange, the latter reaching the parent's #onChange which reassigns groupKey.
+// ('container-change' is dispatched with no listener anywhere, but onChange alone should be enough.)
+// Next step is to confirm whether the drag actually lands in the destination container before blaming the product.
+test.skip('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'MoveToHereGroup';
@@ -209,10 +217,9 @@ test.fixme('can move a block from a group to another group in a block grid edito
   await umbracoUi.dataType.clickAddGroupButton();
   await umbracoUi.dataType.enterGroupName(secondGroupName, 1);
   // Drag and Drop
-  const dragFromLocator = await umbracoUi.dataType.getLinkWithName(elementTypeName);
-  const dragToLocator = await umbracoUi.dataType.getAddButtonInGroupWithName(secondGroupName);
-  // TODO: This needs to be fixed
-  await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 10);
+  const dragFromLocator = await umbracoUi.dataType.getBlockCardInGroupWithName(groupName, elementTypeName);
+  const dragToLocator = await umbracoUi.dataType.getBlocksContainerInGroupWithName(secondGroupName);
+  await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 10);
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
@@ -220,16 +227,24 @@ test.fixme('can move a block from a group to another group in a block grid edito
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, groupName, [elementTypeId])).toBeFalsy();
 });
 
-test.fixme('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockGridContainGroupWithName(blockGridEditorName, groupName)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  // TODO: Implement it later
+  await umbracoUi.dataType.clickDeleteGroupButtonWithName(groupName);
+  await umbracoUi.dataType.clickConfirmToDeleteButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockGridContainGroupWithName(blockGridEditorName, groupName)).toBeFalsy();
+  // Deleting a group moves its blocks out of the group rather than deleting them
+  expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
 });
 
 test('can add a min and max amount to a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {

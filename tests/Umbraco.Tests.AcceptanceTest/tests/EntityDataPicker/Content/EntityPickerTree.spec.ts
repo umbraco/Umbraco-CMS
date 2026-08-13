@@ -95,7 +95,10 @@ test('can not create content with an entity picker using the tree data source th
   await umbracoUi.content.isChooseButtonVisible(false);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
+// Unverified: https://github.com/umbraco/Umbraco-CMS/issues/22121
+// The expected message was corrected to match umb-input-entity-data, but this could not be confirmed locally —
+// the whole entityDataPicker project needs the picker data-source extension registered, without which every
+// test in this file renders "The configured property editor UI could not be found."
 test.skip('can not create content with an entity picker using the tree data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
@@ -107,7 +110,7 @@ test.skip('can not create content with an entity picker using the tree data sour
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.chooseTreeMenuItemWithName('Example 1');
-  await umbracoUi.content.isTextWithExactNameVisible('This field need more items');
+  await umbracoUi.content.isTextWithExactNameVisible('This field needs more items');
   await umbracoUi.content.clickSaveAndPublishButton();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
   await umbracoUi.content.chooseTreeMenuItemWithName('Example 5', ['Example Folder 1']);

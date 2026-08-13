@@ -13,6 +13,7 @@ const firstPropertyName = ['Textstring', 'text-box'];
 const secondPropertyName = ['True/false', 'toggle'];
 let documentTypeId = null;
 let firstDocumentId = null;
+let secondDocumentId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -22,7 +23,7 @@ test.beforeEach(async ({umbracoApi}) => {
   const secondPropertyData = await umbracoApi.dataType.getByName(secondPropertyName[0]);
   documentTypeId = await umbracoApi.documentType.createDocumentTypeWithTwoPropertyEditors(documentTypeName, firstPropertyName[0], firstPropertyData.id, secondPropertyName[0], secondPropertyData.id);
   firstDocumentId = await umbracoApi.document.createDefaultDocument(firstDocumentName, documentTypeId);
-  await umbracoApi.document.createDefaultDocument(secondDocumentName, documentTypeId);
+  secondDocumentId = await umbracoApi.document.createDefaultDocument(secondDocumentName, documentTypeId);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -34,7 +35,10 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+// Blocked only by the shared forbidden-workspace gap (https://github.com/umbraco/Umbraco-CMS/issues/20505):
+// everything up to the last two lines passes, so the granular read-UI permission itself works. Deep-linking to
+// the document outside the permission renders an empty umb-document-workspace-editor instead of Access denied.
+// The navigation defect is fixed here - the second document is absent from the tree, so it must be deep-linked.
 test.skip('can only see property values for specific document with read UI enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], true, false);
@@ -49,7 +53,8 @@ test.skip('can only see property values for specific document with read UI enabl
   await umbracoUi.content.goToContentWithName(firstDocumentName);
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(firstPropertyName[1]);
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly(secondPropertyName[1]);
-  await umbracoUi.content.goToContentWithName(secondDocumentName);
+  // The second document is outside the granular permission, so it is absent from the tree and must be deep-linked.
+  await umbracoUi.content.goToWorkspacePath(`/workspace/document/edit/${secondDocumentId}`);
   await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
 });
 

@@ -143,7 +143,11 @@ test('can update a specific element with update permission enabled', async ({umb
   await umbracoApi.element.ensureNameNotExists(newElementName);
 });
 
-// Currently only have success notification but no actual duplication happening
+// Verified product bug, isolated to granular permissions: the duplicate reports success but never happens.
+// The success notification assertion passes and the source element still exists, but the duplicate does not.
+// The same UI flow succeeds in DefaultPermissionsInElement 'can duplicate ...', which grants duplicate through
+// the fallback permission instead, so both the flow and the ' (1)' naming convention are correct.
+// Not yet checked: the HTTP status of the duplicate call, which would confirm whether the server no-ops or 403s.
 test.skip('can duplicate a specific element with duplicate permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicatedElementName = firstElementName + ' (1)';

@@ -141,7 +141,7 @@ test('can create content with block grid area with row span', async ({umbracoApi
 });
 
 // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const minAllowed = 2;
@@ -175,7 +175,7 @@ test.skip('can create content with block grid area with min allowed', async ({um
 });
 
 // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const maxAllowed = 0;
@@ -230,7 +230,7 @@ test('can create content with a block grid area with specified allowance', async
 });
 
 // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('can create content with a block grid area with specified allowance with min allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with a block grid area with specified allowance with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const minAllowed = 2;
@@ -259,7 +259,7 @@ test.skip('can create content with a block grid area with specified allowance wi
 });
 
 // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121 
-test.skip('can create content with a block grid area with specified allowance with max allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with a block grid area with specified allowance with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const maxAllowed = 1;

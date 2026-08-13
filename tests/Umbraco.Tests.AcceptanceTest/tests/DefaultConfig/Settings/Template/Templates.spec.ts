@@ -168,7 +168,7 @@ test('can use query builder with Order By statement for a template', async ({umb
 });
 
 // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22000
-test.skip('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
+test('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';

@@ -104,7 +104,11 @@ test('can remove an image from the image media picker', async ({umbracoApi, umbr
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-// TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
+// Verified still failing on both Save and Save-and-publish, and it looks like a product issue rather than a
+// test one, though the cause is not pinned down. The data type builder does write validationLimit {min,max}
+// correctly, property-editor-ui-media-picker registers umb-input-rich-media via addFormControlElement, and that
+// input has a rangeUnderflow validator - yet no validation message or danger toast appears with min = 1 and an
+// empty value. Worth tracing why the validator never surfaces before filing it.
 test.skip('image count can not be less than min amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -125,7 +129,9 @@ test.skip('image count can not be less than min amount set in image media picker
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-// TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
+// Verified still failing, and needs redesigning rather than retuning: it configures max = 0 and expects picking
+// one image to fail, but umb-input-media guards the rangeOverflow validator with `!!this.max`, so 0 reads as
+// 'no maximum' and the validator never fires.
 test.skip('image count can not be more than max amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
@@ -232,7 +238,7 @@ test('can reset focal point in a image from the image media picker', async ({umb
 });
 
 // TODO: Remove skip when the front-end is ready as currently the crop is not being selected.
-test.skip('can add an image from the image media picker with a image crop', async ({umbracoApi, umbracoUi}) => {
+test('can add an image from the image media picker with a image crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const cropLabel = 'TestCrop';
   const cropWidth = 100;

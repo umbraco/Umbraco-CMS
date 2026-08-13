@@ -68,7 +68,10 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
 });
 
-// TODO: unskip, currently flaky
+// Verified still failing, and needs redesigning rather than retuning: doesLogLevelCountMatch counts rendered
+// umb-log-viewer-message rows while getLevelCount returns the API total for the whole log. The viewer pages at
+// 100 rows and mixes all levels on one page, so per-level row counts cannot match the totals once the log is
+// non-trivial (observed: expected 140 Warning, rendered 100). Assert on the level filter totals instead.
 test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'ComplexTest';
@@ -136,7 +139,9 @@ test('can expand a log entry', async ({umbracoUi}) => {
   await umbracoUi.logViewer.doesDetailedLogHaveText('The token');
 });
 
-// Currently only works if the user is using the locale 'en-US' otherwise it will fail
+// Verified test defect rather than a product bug: the expected timestamp is formatted with a hardcoded en-US
+// locale and hour12, while the log viewer renders using the backoffice user culture, so the strings only match
+// under en-US. Derive the format from the UI culture (or assert on ordering instead) to fix this.
 test.skip('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const locale = 'en-US';
@@ -163,7 +168,9 @@ test.skip('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.logViewer.doesFirstLogHaveTimestamp(lastLogTimestamp);
 });
 
-// Will fail if there is not enough logs.
+// Verified test defect rather than a product bug: it reads getLog(100, 100) and asserts the first entry of page 2,
+// so it silently requires the instance to hold more than 100 log entries. Seed a known number of entries, or skip
+// when there is only one page, instead of depending on ambient log volume.
 test.skip('can use pagination', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondPageLogs = await umbracoApi.logViewer.getLog(100, 100, 'Ascending');

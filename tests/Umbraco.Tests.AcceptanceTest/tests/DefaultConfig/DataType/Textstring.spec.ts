@@ -30,8 +30,9 @@ test('can update maximum allowed characters value', async ({umbracoApi, umbracoU
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
 
-// Remove .skip when the front-end is ready. The "Input type" should be removed.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/19340
+// Verified still failing (https://github.com/umbraco/Umbraco-CMS/issues/19340): text-box/manifests.ts still
+// injects the Input type setting into the Textstring UI, alongside Autocomplete and Placeholder. Note that
+// ConstantHelper.textstringSettings also needs updating when this is fixed - it still expects a single setting.
 test.skip('the default configuration is correct', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.dataType.goToDataType(dataTypeName);

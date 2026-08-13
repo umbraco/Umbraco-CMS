@@ -182,8 +182,11 @@ test('can fetch a media item by its path', async ({umbracoApi}) => {
   await umbracoApi.media.ensureNameNotExists(rootArticleName);  
 });
 
-// Skip this because it will return 404 error if the path includes # or ?
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/20024
+// Verified still failing, and needs redesigning. Two problems independent of
+// https://github.com/umbraco/Umbraco-CMS/issues/20024:
+// 1. getMediaItemWithPath concatenates the path straight into the URL, so '#' becomes a fragment and '?' a query string.
+// 2. The path is derived as '/' + name.toLowerCase() + '/', but Umbraco slugifies names into URL segments,
+//    so the derived path never matches for a name like this. Read the real path off the created item instead.
 test.skip('can fetch a media item by its path with special characters', async ({umbracoApi}) => {
   // Arrange
   const mediaTypeName = 'Image';

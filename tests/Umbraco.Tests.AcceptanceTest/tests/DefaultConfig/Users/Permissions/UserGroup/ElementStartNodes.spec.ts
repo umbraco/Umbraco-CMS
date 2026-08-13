@@ -48,7 +48,9 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Skip this test since currently the front-end does not support adding a specific element as start nodes
+// Verified still failing: this passes a plain element as the start node, but UserGroupPresentationFactory
+// resolves element start nodes as UmbracoObjectTypes.ElementContainer, so the key never resolves and
+// POST /umbraco/management/api/v1/user-group returns 404 during arrange. Only element folders are supported.
 test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithElementStartNode(userGroupName, childElementOneId);
@@ -68,7 +70,7 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
 });
 
-// Currently the front-end does not support adding a specific element as start nodes
+// Passes, but vacuously: it only asserts absence from the Library tree, which the test user cannot see anyway.
 test.skip('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithLibrarySection(userGroupName);

@@ -49,7 +49,11 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Currently the front-end does not support adding a specific element as start nodes
+// Verified still failing, and it is a feature gap rather than a UI bug: this sets a plain element
+// (childElementOneId) as the start node, but UserPresentationFactory resolves element start nodes as
+// UmbracoObjectTypes.ElementContainer, so only element folders resolve. The user is left with no valid start
+// node and no root access, so the Library tab never renders at all. The sibling test above passes because it
+// uses rootFolderId. Supporting a specific element as a start node is the thing that does not exist yet.
 test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
@@ -75,7 +79,9 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
 });
 
-// Currently the front-end does not support adding a specific element as start nodes
+// Verified still failing for the same reason as the test above: a plain element is used as the start node,
+// which UserPresentationFactory cannot resolve (it expects UmbracoObjectTypes.ElementContainer), so the user
+// has no element access and the Library tab never renders.
 test.skip('see no-access view when deep-linking to restricted element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
@@ -91,7 +97,8 @@ test.skip('see no-access view when deep-linking to restricted element', async ({
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 
-// Currently the front-end does not support adding a specific element as start nodes
+// Passes, but vacuously: it only asserts the element is absent from the Library tree, and the Library tab
+// does not render for this user at all (see the two tests above). Needs a positive precondition first.
 test.skip('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);

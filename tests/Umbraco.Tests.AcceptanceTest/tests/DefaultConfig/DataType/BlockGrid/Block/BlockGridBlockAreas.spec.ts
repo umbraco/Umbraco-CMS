@@ -251,7 +251,9 @@ test('can remove max allowed for an area in a block', async ({umbracoApi, umbrac
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeFalsy();
 });
 
-// TODO: Remove skip when the front-end is ready. Currently there is no frontend validation for min and max values
+// Verified product gap, same family as https://github.com/umbraco/Umbraco-CMS/issues/17509: the area config
+// editor has no min/max validation at all, so the save succeeds. min/max is only enforced at content time in
+// block-grid-entries.context.ts, which is too late to stop a misconfigured area being saved.
 test.skip('min can not be more than max an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';
