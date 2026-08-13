@@ -90,23 +90,6 @@ public class DomainService : AsyncRepositoryService, IDomainService
     }
 
     /// <inheritdoc />
-    // TODO: Remove this method once any usages has been migrated to the key alternative method.
-    public async Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(int contentId, bool includeWildcards)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        IContent? content = _contentService.GetById(contentId);
-        if (content == null)
-        {
-            return Enumerable.Empty<IDomain>();
-        }
-
-        IEnumerable<IDomain> domains = await _domainRepository.GetAssignedDomainsAsync(content.Key, includeWildcards);
-        scope.Complete();
-
-        return domains;
-    }
-
-    /// <inheritdoc />
     public async Task<IEnumerable<IDomain>> GetAllAsync(bool includeWildcards)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();

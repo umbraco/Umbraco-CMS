@@ -495,7 +495,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(out var repositoryType);
 
-            var content = ContentService.GetById(_subpage.Id);
+            var content = await ContentService.GetByIdAsync(_subpage.Key, CancellationToken.None);
             ContentService.Delete(content, -1);
 
             // Act

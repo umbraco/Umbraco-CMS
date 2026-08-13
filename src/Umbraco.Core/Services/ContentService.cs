@@ -241,7 +241,12 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             throw new ArgumentException("Content type must be specified", nameof(contentType));
         }
 
-        IContent? parent = parentId > 0 ? GetById(parentId) : null;
+        IContent? parent = null;
+        if (parentId > 0 && TryGetParentKey(parentId, out Guid? parentKey))
+        {
+            parent = GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult();
+        }
+
         if (parentId > 0 && parent is null)
         {
             throw new ArgumentException("No content with that id.", nameof(parentId));
@@ -305,7 +310,12 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                 // causes rollback
                 throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
-            IContent? parent = parentId > 0 ? GetById(parentId) : null; // + locks
+            IContent? parent = null;
+            if (parentId > 0 && TryGetParentKey(parentId, out Guid? parentKey))
+            {
+                parent = GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult(); // + locks
+            }
+
             if (parentId > 0 && parent == null)
             {
                 throw new ArgumentException("No content with that id.", nameof(parentId)); // causes rollback
@@ -388,7 +398,10 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     public IEnumerable<IContent> GetAncestors(int id)
     {
         // intentionally not locking
-        IContent? content = GetById(id);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+        IContent? content = keyAttempt.Success
+            ? GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+            : null;
         if (content is null)
         {
             return Enumerable.Empty<IContent>();
@@ -533,7 +546,10 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     public IContent? GetParent(int id)
     {
         // intentionally not locking
-        IContent? content = GetById(id);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+        IContent? content = keyAttempt.Success
+            ? GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+            : null;
         return GetParent(content);
     }
 
@@ -600,7 +616,9 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
 
         // not trashed and has a parent: publishable if the parent is path-published
-        IContent? parent = GetById(content.ParentId);
+        IContent? parent = TryGetParentKey(content.ParentId, out Guid? parentKey)
+            ? GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult()
+            : null;
         return parent == null || IsPathPublished(parent);
     }
 
@@ -1095,13 +1113,15 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            IContent? parent = parentId == Constants.System.Root ? null : GetById(parentId);
+            TryGetParentKey(parentId, out Guid? parentKey);
+            IContent? parent = parentId == Constants.System.Root
+                ? null
+                : parentKey.HasValue ? GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult() : null;
             if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
             {
                 throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
             }
 
-            TryGetParentKey(parentId, out Guid? parentKey);
             var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentKey);
 
             var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
@@ -1691,7 +1711,9 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
         else
         {
-            IContent? parent = GetById(parentId);
+            IContent? parent = TryGetParentKey(parentId, out Guid? parentKey)
+                ? GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult()
+                : null;
             if (parent is not null)
             {
                 scope.Notifications.Publish(new ContentTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));

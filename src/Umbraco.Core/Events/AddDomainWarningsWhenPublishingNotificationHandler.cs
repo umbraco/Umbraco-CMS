@@ -17,6 +17,7 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationA
     private readonly IContentService _contentService;
     private readonly IDomainService _domainService;
     private readonly IEventMessagesFactory _eventMessagesFactory;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly ILogger<AddDomainWarningsWhenPublishingNotificationHandler> _logger;
 
     /// <summary>
@@ -27,18 +28,21 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationA
     /// <param name="domainService">The domain service.</param>
     /// <param name="eventMessagesFactory">The event messages factory.</param>
     /// <param name="logger">The logger.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public AddDomainWarningsWhenPublishingNotificationHandler(
         IOptions<ContentSettings> contentSettings,
         IContentService contentService,
         IDomainService domainService,
         IEventMessagesFactory eventMessagesFactory,
-        ILogger<AddDomainWarningsWhenPublishingNotificationHandler> logger)
+        ILogger<AddDomainWarningsWhenPublishingNotificationHandler> logger,
+        IIdKeyMap idKeyMap)
     {
         _contentSettings = contentSettings;
         _contentService = contentService;
         _domainService = domainService;
         _eventMessagesFactory = eventMessagesFactory;
         _logger = logger;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -54,7 +58,7 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationA
         foreach (IContent content in notification.PublishedEntities)
         {
 
-            var publishedCultures = GetPublishedCulturesFromAncestors(content).ToList();
+            var publishedCultures = (await GetPublishedCulturesFromAncestorsAsync(content, cancellationToken)).ToList();
             // If only a single culture is published we shouldn't have any routing issues
             if (publishedCultures.Count < 2)
             {
@@ -110,12 +114,13 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationA
     ///     Gets all published cultures from the content and its ancestors.
     /// </summary>
     /// <param name="content">The content to check.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An enumerable of published culture codes.</returns>
-    private IEnumerable<string> GetPublishedCulturesFromAncestors(IContent? content)
+    private async Task<IEnumerable<string>> GetPublishedCulturesFromAncestorsAsync(IContent? content, CancellationToken cancellationToken)
     {
         if (content?.ParentId is not -1 && content?.HasIdentity is false)
         {
-            content = _contentService.GetById(content.ParentId);
+            content = await GetByIdAsync(content.ParentId, cancellationToken);
         }
 
         if (content?.ParentId == -1)
@@ -132,11 +137,17 @@ public class AddDomainWarningsWhenPublishingNotificationHandler : INotificationA
         {
             foreach (var id in ancestorIds)
             {
-                IEnumerable<string>? cultures = _contentService.GetById(id)?.PublishedCultures;
-                publishedCultures.UnionWith(cultures ?? Enumerable.Empty<string>());
+                IContent? ancestor = await GetByIdAsync(id, cancellationToken);
+                publishedCultures.UnionWith(ancestor?.PublishedCultures ?? Enumerable.Empty<string>());
             }
         }
 
         return publishedCultures;
+    }
+
+    private async Task<IContent?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document);
+        return keyAttempt.Success ? await _contentService.GetByIdAsync(keyAttempt.Result, cancellationToken) : null;
     }
 }

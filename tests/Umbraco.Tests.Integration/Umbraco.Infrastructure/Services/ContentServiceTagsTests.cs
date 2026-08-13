@@ -73,7 +73,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
-        content1 = ContentService.GetById(content1.Id);
+        content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
 
         var enTags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
@@ -136,7 +136,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Save(content1);
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
-        content1 = ContentService.GetById(content1.Id);
+        content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
 
         var frTags = content1.Properties["tags"]
             .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "fr-FR").ToArray();
@@ -200,7 +200,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // no changes
-        content1 = ContentService.GetById(content1.Id);
+        content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
 
         var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
@@ -225,7 +225,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // changes
-        content1 = ContentService.GetById(content1.Id);
+        content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
 
         // property value has been moved from invariant to en-US
         tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
@@ -299,7 +299,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // changes
-        content1 = ContentService.GetById(content1.Id);
+        content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
 
         // property value has been moved from en-US to invariant, fr-FR tags are gone
         Assert.IsEmpty(content1.Properties["tags"]
@@ -448,7 +448,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // changes
-        content1 = ContentService.GetById(content1.Id);
+        content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
 
         // property value has been moved from en-US to invariant, fr-FR tags are gone
         Assert.IsEmpty(content1.Properties["tags"]
@@ -1115,7 +1115,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // Act
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
 
@@ -1168,7 +1168,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // Act
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
 

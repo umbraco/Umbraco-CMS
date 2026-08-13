@@ -197,7 +197,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(1, found.Length);
 
         // ensures it's not found by normal content
-        var contentFound = ContentService.GetById(found[0].Id);
+        var contentFound = await ContentService.GetByIdAsync(found[0].Key, CancellationToken.None);
         Assert.IsNull(contentFound);
     }
 
@@ -654,11 +654,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Get_Content_By_Id()
+    public async Task Can_Get_Content_By_Id()
     {
         // Arrange
         // Act
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Assert
         Assert.That(content, Is.Not.Null);
@@ -692,14 +692,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public void Can_Get_All_Versions_Of_Content()
+    public async Task Can_Get_All_Versions_Of_Content()
     {
-        var parent = ContentService.GetById(Textpage.Id);
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsFalse(parent.Published);
         ContentService.Save(parent); // publishing parent, so Text Page 2 can be updated.
         ContentService.Publish(parent, parent.AvailableCultures.ToArray());
 
-        var content = ContentService.GetById(Subpage.Id);
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.IsFalse(content.Published);
         var versions = ContentService.GetVersions(Subpage.Id).ToList();
         Assert.AreEqual(1, versions.Count);
@@ -723,7 +723,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var version3 = content.VersionId;
         Console.WriteLine($"3 e={content.VersionId} p={content.PublishedVersionId}");
 
-        var content1 = ContentService.GetById(content.Id);
+        var content1 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual("Bob Hope", content1.GetValue("author"));
         Assert.AreEqual("Bob Hope", content1.GetValue("author", published: true));
 
@@ -731,7 +731,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetValue("author", "John Farr");
         ContentService.Save(content); // no new version
 
-        content1 = ContentService.GetById(content.Id);
+        content1 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual("John Farr", content1.GetValue("author"));
         Assert.AreEqual("Bob Hope", content1.GetValue("author", published: true));
 
@@ -782,12 +782,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public void Can_Get_Content_For_Expiration()
+    public async Task Can_Get_Content_For_Expiration()
     {
         // Arrange
-        var root = ContentService.GetById(Textpage.Id);
+        var root = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         ContentService.Publish(root!, root!.AvailableCultures.ToArray());
-        var content = ContentService.GetById(Subpage.Id);
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddSeconds(1));
         ContentService.PersistContentSchedule(content!, contentSchedule);
         ContentService.Publish(content, content.AvailableCultures.ToArray());
@@ -806,9 +806,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task Can_Get_Content_Schedules_By_Keys()
     {
         // Arrange
-        var root = ContentService.GetById(Textpage.Id);
+        var root = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         ContentService.Publish(root!, root!.AvailableCultures.ToArray());
-        var content = ContentService.GetById(Subpage.Id);
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddDays(1), null);
         ContentService.PersistContentSchedule(content!, contentSchedule);
         ContentService.Publish(content, content.AvailableCultures.ToArray());
@@ -850,10 +850,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Unpublish_Content()
+    public async Task Can_Unpublish_Content()
     {
         // Arrange
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(content);
         var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: -1);
 
@@ -878,7 +878,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsTrue(saved.Success);
         Assert.IsTrue(published.Success);
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
@@ -891,7 +891,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
     }
@@ -907,7 +907,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         var unpublished = ContentService.Unpublish(content, langUk.IsoCode); // first culture
         Assert.IsTrue(unpublished.Success);
@@ -915,7 +915,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
 
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         unpublished = ContentService.Unpublish(content, langFr.IsoCode); // last culture
         Assert.IsTrue(unpublished.Success);
@@ -923,14 +923,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
 
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         published = ContentService.Publish(content, new[] { langUk.IsoCode });
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
 
-        content = ContentService.GetById(content.Id); // reget
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None); // reget
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
@@ -950,7 +950,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
@@ -963,7 +963,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishedState.Published, content.PublishedState); // still published
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
@@ -977,7 +977,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             content.PublishedState); // the last culture was unpublished so the document should also reflect this
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(PublishedState.Unpublished, content.PublishedState); // just double checking
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
@@ -1015,7 +1015,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         var unpublished = ContentService.Unpublish(content, langUk.IsoCode); // unpublish mandatory lang
         Assert.IsTrue(unpublished.Success);
@@ -1039,14 +1039,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         var unpublished = ContentService.Unpublish(content, langUk.IsoCode);
         Assert.IsTrue(unpublished.Success);
         Assert.AreEqual(PublishResultType.SuccessUnpublishCulture, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
 
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         // Change some data since Unpublish should always Save
         content.SetCultureName("content-en-updated", langUk.IsoCode);
@@ -1056,7 +1056,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishResultType.SuccessUnpublishAlready, unpublished.Result);
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
 
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         // ensure that even though the culture was already unpublished that the data was still persisted
         Assert.AreEqual("content-en-updated", content.GetCultureName(langUk.IsoCode));
@@ -1076,7 +1076,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         // Change some data since SaveAndPublish should always Save
         content.SetCultureName("content-en-updated", langUk.IsoCode);
@@ -1087,7 +1087,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(PublishResultType.FailedPublishNothingToPublish, published.Result);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         // ensure that even though nothing was published that the data was still persisted
         Assert.AreEqual("content-en-updated", content.GetCultureName(langUk.IsoCode));
@@ -1128,7 +1128,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(ContentService.Publish(content, new[] { langGb.IsoCode, langFr.IsoCode }).Success);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
         Assert.IsTrue(content.IsCulturePublished(langGb.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
@@ -1140,7 +1140,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(content);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual(PublishedState.Published, content.PublishedState);
         Assert.IsTrue(content.IsCulturePublished(langGb.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
@@ -1163,7 +1163,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual("Published languages: fr-FR", lastLog.Comment);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         content.SetCultureName("content-en", langUk.IsoCode);
         ContentService.Save(content);
         published = ContentService.Publish(content, new[] { langUk.IsoCode });
@@ -1202,7 +1202,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(published.Success);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var unpublished = ContentService.Unpublish(content, langFr.IsoCode);
 
         // audit log will only show that french was unpublished
@@ -1210,7 +1210,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual("Unpublished languages: fr-FR", lastLog.Comment);
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         content.SetCultureName("content-en", langGb.IsoCode);
         unpublished = ContentService.Unpublish(content, langGb.IsoCode);
 
@@ -1221,10 +1221,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Publish_Content_1()
+    public async Task Can_Publish_Content_1()
     {
         // Arrange
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(content);
 
         // Act
@@ -1236,10 +1236,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Publish_Content_2()
+    public async Task Can_Publish_Content_2()
     {
         // Arrange
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(content);
 
         // Act
@@ -1267,7 +1267,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Publish_Content_WithEvents()
+    public async Task Can_Publish_Content_WithEvents()
     {
         var savingWasCalled = false;
         var publishingWasCalled = false;
@@ -1278,7 +1278,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             var entity = notification.SavedEntities.First();
             Assert.AreEqual("foo", entity.Name);
 
-            var e = ContentService.GetById(entity.Id);
+            var e = ContentService.GetByIdAsync(entity.Key, CancellationToken.None).GetAwaiter().GetResult();
             Assert.AreEqual("Textpage", e.Name);
 
             savingWasCalled = true;
@@ -1295,7 +1295,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         try
         {
-            var content = ContentService.GetById(Textpage.Id);
+            var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
             Assert.AreEqual("Textpage", content.Name);
 
             content.Name = "foo";
@@ -1306,7 +1306,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             Assert.That(published.Success, Is.True);
             Assert.That(content.Published, Is.True);
 
-            var e = ContentService.GetById(content.Id);
+            var e = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
             Assert.AreEqual("foo", e.Name);
 
             Assert.IsTrue(savingWasCalled);
@@ -1369,7 +1369,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var parentId = Textpage.Id;
 
-        var parent = ContentService.GetById(parentId);
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         ContentService.Save(parent);
         var parentPublished = ContentService.Publish(parent, parent.AvailableCultures.ToArray());
@@ -1429,7 +1429,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.PublishCulture(CultureImpact.Explicit(langFr.IsoCode, langFr.IsDefault), DateTime.UtcNow, PropertyEditorCollection);
         var result = ContentService.CommitDocumentChanges(content);
         Assert.IsTrue(result.Success);
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsFalse(content.IsCulturePublished(langDa.IsoCode));
 
@@ -1440,7 +1440,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(result.Success);
         Assert.AreEqual(PublishResultType.SuccessMixedCulture, result.Result);
 
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langDa.IsoCode));
     }
@@ -1469,11 +1469,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Publish_Content_Children()
+    public async Task Can_Publish_Content_Children()
     {
         var parentId = Textpage.Id;
 
-        var parent = ContentService.GetById(parentId);
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         Console.WriteLine(" " + parent.Id);
         const int pageSize = 500;
@@ -1521,14 +1521,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Cannot_Publish_Expired_Content()
+    public async Task Cannot_Publish_Expired_Content()
     {
         // Arrange
-        var content = ContentService.GetById(Subpage.Id); // This Content expired 5min ago
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None); // This Content expired 5min ago
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddMinutes(-5));
         ContentService.Save(content, contentSchedule: contentSchedule);
 
-        var parent = ContentService.GetById(Textpage.Id);
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(parent);
         var parentPublished =
             ContentService.Publish(
@@ -1567,14 +1567,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Cannot_Publish_Content_Awaiting_Release()
+    public async Task Cannot_Publish_Content_Awaiting_Release()
     {
         // Arrange
-        var content = ContentService.GetById(Subpage.Id);
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null);
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
-        var parent = ContentService.GetById(Textpage.Id);
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(parent);
         var parentPublished =
             ContentService.Publish(
@@ -1737,10 +1737,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Cannot_Publish_Trashed_Content()
+    public async Task Cannot_Publish_Trashed_Content()
     {
         // Arrange
-        var content = ContentService.GetById(Trashed.Id);
+        var content = await ContentService.GetByIdAsync(Trashed.Key, CancellationToken.None);
         Assert.IsNotNull(content);
 
         // Act
@@ -1822,7 +1822,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_SaveAndPublish_Invariant_Content_Without_Prior_Save()
+    public async Task Can_SaveAndPublish_Invariant_Content_Without_Prior_Save()
     {
         var content = ContentService.Create("Unsaved Content", -1, "umbTextpage");
         content.SetValue("author", "Test Author");
@@ -1835,7 +1835,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.That(content.Published, Is.True);
 
         // re-get to verify persistence
-        var retrieved = ContentService.GetById(content.Id);
+        var retrieved = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsNotNull(retrieved);
         Assert.AreEqual("Test Author", retrieved.GetValue<string>("author"));
         Assert.IsTrue(retrieved.Published);
@@ -1843,9 +1843,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [TestCase(Constants.Security.SuperUserId)]
     [TestCase(-1)]
-    public void Can_SaveAndPublish_With_Different_User_Ids(int userId)
+    public async Task Can_SaveAndPublish_With_Different_User_Ids(int userId)
     {
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(content);
 
         var result = ContentService.SaveAndPublish(content, [], userId);
@@ -1866,7 +1866,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
         // re-get and verify
-        content = ContentService.GetById(content.Id)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
     }
@@ -1883,7 +1883,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
 
         // re-get and verify
-        content = ContentService.GetById(content.Id)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
         Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
     }
@@ -1912,7 +1912,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void SaveAndPublish_Fires_Notifications()
+    public async Task SaveAndPublish_Fires_Notifications()
     {
         var savingWasCalled = false;
         var publishingWasCalled = false;
@@ -1936,7 +1936,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         try
         {
-            var content = ContentService.GetById(Textpage.Id);
+            var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
             Assert.IsNotNull(content);
             content.Name = contentName;
 
@@ -2025,7 +2025,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(published.Success);
 
         // re-get
-        content = ContentService.GetById(content.Id)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
 
         // Change some data
         content.SetCultureName("content-en-updated", langUk.IsoCode);
@@ -2034,14 +2034,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var result = ContentService.SaveAndPublish(content, Array.Empty<string>());
 
         // re-get and verify data was saved even though nothing was published
-        content = ContentService.GetById(content.Id)!;
+        content = (await ContentService.GetByIdAsync(content.Key, CancellationToken.None))!;
         Assert.AreEqual("content-en-updated", content.GetCultureName(langUk.IsoCode));
     }
 
     [Test]
-    public void Cannot_SaveAndPublish_Trashed_Content()
+    public async Task Cannot_SaveAndPublish_Trashed_Content()
     {
-        var content = ContentService.GetById(Trashed.Id);
+        var content = await ContentService.GetByIdAsync(Trashed.Key, CancellationToken.None);
         Assert.IsNotNull(content);
 
         var result = ContentService.SaveAndPublish(content, Array.Empty<string>());
@@ -2052,14 +2052,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Cannot_SaveAndPublish_Expired_Content()
+    public async Task Cannot_SaveAndPublish_Expired_Content()
     {
-        var content = ContentService.GetById(Subpage.Id);
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.IsNotNull(content);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddMinutes(-5));
         ContentService.Save(content, contentSchedule: contentSchedule);
 
-        var parent = ContentService.GetById(Textpage.Id);
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(parent);
         ContentService.SaveAndPublish(parent, Array.Empty<string>());
 
@@ -2090,14 +2090,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Cannot_SaveAndPublish_Content_Awaiting_Release()
+    public async Task Cannot_SaveAndPublish_Content_Awaiting_Release()
     {
-        var content = ContentService.GetById(Subpage.Id);
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.IsNotNull(content);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddHours(2), null);
         ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
-        var parent = ContentService.GetById(Textpage.Id);
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(parent);
         ContentService.SaveAndPublish(parent, Array.Empty<string>());
 
@@ -2141,7 +2141,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parentId = Textpage.Id;
-        var parent = ContentService.GetById(parentId);
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsNotNull(parent);
         ContentService.SaveAndPublish(parent, Array.Empty<string>());
 
@@ -2210,13 +2210,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public void Can_Get_Published_Descendant_Versions()
+    public async Task Can_Get_Published_Descendant_Versions()
     {
         // Arrange
-        var root = ContentService.GetById(Textpage.Id)!;
+        var root = (await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None))!;
         var rootPublished = ContentService.Publish(root, root.AvailableCultures.ToArray());
 
-        var content = ContentService.GetById(Subpage.Id);
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Published");
         ContentService.Save(content);
         var contentPublished = ContentService.Publish(content, content.AvailableCultures.ToArray());
@@ -2249,7 +2249,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.That(publishedContentVersion.Properties["title"].GetValue(), Contains.Substring("Saved"));
 
         // Ensure that the latest version of the content is ok
-        var currentContent = ContentService.GetById(Subpage.Id);
+        var currentContent = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.That(currentContent.Published, Is.True);
         Assert.That(currentContent.Properties["title"].GetValue(published: true), Contains.Substring("Published"));
         Assert.That(currentContent.Properties["title"].GetValue(), Contains.Substring("Saved"));
@@ -2285,7 +2285,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         content.SetValue("title", "another title of mine"); // Change a value
         content.SetValue("bodyText", null); // Clear a value
         content.SetValue("author", "new author"); // Add a value
@@ -2293,7 +2293,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Publish(content, content.AvailableCultures.ToArray());
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual("another title of mine", content.GetValue("title"));
         Assert.IsNull(content.GetValue("bodyText"));
         Assert.AreEqual("new author", content.GetValue("author"));
@@ -2304,13 +2304,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(content); // new non-published version
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         content.SetValue("title", null); // Clear a value
         content.SetValue("bodyText", null); // Clear a value
         ContentService.Save(content); // saving non-published version
 
         // re-get
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsNull(content.GetValue("title")); // Test clearing the value worked with the non-published version
         Assert.IsNull(content.GetValue("bodyText"));
         Assert.AreEqual("new author text", content.GetValue("author"));
@@ -2371,24 +2371,24 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Delete_Content()
+    public async Task Can_Delete_Content()
     {
         // Arrange
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Act
         ContentService.Delete(content);
-        var deleted = ContentService.GetById(Textpage.Id);
+        var deleted = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Assert
         Assert.That(deleted, Is.Null);
     }
 
     [Test]
-    public void Can_Move_Content_To_RecycleBin()
+    public async Task Can_Move_Content_To_RecycleBin()
     {
         // Arrange
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Act
         ContentService.MoveToRecycleBin(content);
@@ -2407,7 +2407,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var subsubpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 3", Subpage.Id);
         ContentService.Save(subsubpage);
 
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         const int pageSize = 500;
         var page = 0;
         var total = long.MaxValue;
@@ -2656,10 +2656,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Move_Content()
+    public async Task Can_Move_Content()
     {
         // Arrange
-        var content = ContentService.GetById(Trashed.Id);
+        var content = await ContentService.GetByIdAsync(Trashed.Key, CancellationToken.None);
 
         // Act - moving out of recycle bin
         ContentService.Move(content, Textpage.Id);
@@ -2671,14 +2671,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Copy_Content()
+    public async Task Can_Copy_Content()
     {
         // Arrange
-        var temp = ContentService.GetById(Subpage.Id);
+        var temp = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
 
         // Act
         var copy = ContentService.Copy(temp, temp.ParentId, false);
-        var content = ContentService.GetById(Subpage.Id);
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
 
         // Assert
         Assert.That(copy, Is.Not.Null);
@@ -2705,7 +2705,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(ContentService.Publish(content, [langFr.IsoCode, langUk.IsoCode]).Success);
 
         // re-get to ensure we copy from the persisted state
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         // Act
         var copy = ContentService.Copy(content, content.ParentId, false);
@@ -2738,7 +2738,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(ContentService.Publish(child, [langFr.IsoCode, langUk.IsoCode]).Success);
 
         // re-get to ensure we copy from the persisted state
-        parent = ContentService.GetById(parent.Id);
+        parent = await ContentService.GetByIdAsync(parent.Key, CancellationToken.None);
 
         // Act: copy the branch (recursive)
         var copy = ContentService.Copy(parent, parent.ParentId, false, recursive: true);
@@ -2836,16 +2836,16 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Copy_Recursive()
+    public async Task Can_Copy_Recursive()
     {
         // Arrange
-        var temp = ContentService.GetById(Textpage.Id);
+        var temp = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act
         var copy = ContentService.Copy(temp, temp.ParentId, false, true);
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Assert
         Assert.That(copy, Is.Not.Null);
@@ -2853,7 +2853,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreNotSame(content, copy);
         Assert.AreEqual(3, ContentService.CountChildren(copy.Id));
 
-        var child = ContentService.GetById(Subpage.Id);
+        var child = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total, propertyAliases: null, filter: null, ordering: null).First();
         Assert.AreEqual(childCopy.Name, child.Name);
         Assert.AreNotEqual(childCopy.Id, child.Id);
@@ -2861,16 +2861,16 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Copy_NonRecursive()
+    public async Task Can_Copy_NonRecursive()
     {
         // Arrange
-        var temp = ContentService.GetById(Textpage.Id);
+        var temp = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.AreEqual("Textpage", temp.Name);
         Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
 
         // Act
         var copy = ContentService.Copy(temp, temp.ParentId, false, false);
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Assert
         Assert.That(copy, Is.Not.Null);
@@ -2912,7 +2912,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(0, contentTags.Length);
 
         // reloading the content yields the same result
-        content = (Content)ContentService.GetById(content.Id);
+        content = (Content)await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
         contentTags = TagService.GetTagsForEntity(content.Id).ToArray();
         Assert.AreEqual(0, contentTags.Length);
@@ -2945,15 +2945,15 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Rollback_Version_On_Content()
+    public async Task Can_Rollback_Version_On_Content()
     {
         // Arrange
-        var parent = ContentService.GetById(Textpage.Id);
+        var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.IsFalse(parent.Published);
         ContentService.Save(parent);
         ContentService.Publish(parent, parent.AvailableCultures.ToArray()); // publishing parent, so Text Page 2 can be updated.
 
-        var content = ContentService.GetById(Subpage.Id);
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.IsFalse(content.Published);
 
         var versions = ContentService.GetVersions(Subpage.Id).ToList();
@@ -2976,7 +2976,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.Edited);
         Assert.AreEqual(
             "Francis Doe",
-            ContentService.GetById(content.Id).GetValue<string>("author")); // version2 author is Francis
+            (await ContentService.GetByIdAsync(content.Key, CancellationToken.None)).GetValue<string>("author")); // version2 author is Francis
 
         Assert.AreEqual("Text Page 2 Updated", content.Name);
         Assert.AreEqual("Text Page 2 Updated", content.PublishName);
@@ -3003,7 +3003,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.Edited);
         Assert.AreEqual(
             "Jane Doe",
-            ContentService.GetById(content.Id).GetValue<string>("author")); // version3 author is Jane
+            (await ContentService.GetByIdAsync(content.Key, CancellationToken.None)).GetValue<string>("author")); // version3 author is Jane
 
         Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
         Assert.AreEqual("Text Page 2 ReReUpdated", content.PublishName);
@@ -3014,7 +3014,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // version3, third and current published version
 
         // rollback all values to version1
-        var rollback = ContentService.GetById(Subpage.Id);
+        var rollback = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var rollto = ContentService.GetVersion(version1);
         rollback.CopyFrom(rollto);
         rollback.Name = rollto.Name; // must do it explicitly
@@ -3025,7 +3025,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(rollback.Edited);
         Assert.AreEqual(
             "Francis Doe",
-            ContentService.GetById(content.Id).GetValue<string>("author")); // author is now Francis again
+            (await ContentService.GetByIdAsync(content.Key, CancellationToken.None)).GetValue<string>("author")); // author is now Francis again
         Assert.AreEqual(version3, rollback.VersionId); // same version but with edits
 
         // props and name have rolled back
@@ -3038,7 +3038,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // rollback all values to current version
         // special because... current has edits... this really is equivalent to rolling back to version2
-        var rollback2 = ContentService.GetById(Subpage.Id);
+        var rollback2 = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var rollto2 = ContentService.GetVersion(version3);
         rollback2.CopyFrom(rollto2);
         rollback2.Name = rollto2.PublishName; // must do it explicitely AND must pick the publish one!
@@ -3051,7 +3051,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual("Text Page 2 ReReUpdated", rollback2.Name);
 
         // test rollback to self, again
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
         Assert.AreEqual("Jane Doe", content.GetValue<string>("author"));
         ContentService.Save(content);
@@ -3305,7 +3305,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task Can_Save_Lazy_Content()
     {
         var contentType = await ContentTypeService.GetAsync("umbTextpage");
-        var root = ContentService.GetById(Textpage.Id);
+        var root = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         var c = new Lazy<IContent>(() =>
             ContentBuilder.CreateSimpleContent(contentType, "Hierarchy Simple Text Page", root.Id));
@@ -3346,7 +3346,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var id = content.Id;
 
         // Act
-        var sut = ContentService.GetById(id);
+        var sut = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         // Arrange
         Assert.That(sut.GetValue<bool>("isTrue"), Is.True);
@@ -3387,15 +3387,15 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public void Can_Delete_Previous_Versions_Not_Latest()
+    public async Task Can_Delete_Previous_Versions_Not_Latest()
     {
         // Arrange
-        var content = ContentService.GetById(Trashed.Id);
+        var content = await ContentService.GetByIdAsync(Trashed.Key, CancellationToken.None);
         var version = content.VersionId;
 
         // Act
         ContentService.DeleteVersion(Trashed.Id, version, true);
-        var sut = ContentService.GetById(Trashed.Id);
+        var sut = await ContentService.GetByIdAsync(Trashed.Key, CancellationToken.None);
 
         // Assert
         Assert.That(sut.VersionId, Is.EqualTo(version));
@@ -3665,7 +3665,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
@@ -3677,7 +3677,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
@@ -3693,7 +3693,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.Published);
         Assert.IsFalse(content.Edited);
 
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsTrue(content.Published);
         Assert.IsFalse(content.Edited);
 
@@ -3716,7 +3716,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var vpk = ((Content)content).VersionId;
         var ppk = ((Content)content).PublishedVersionId;
 
-        content = ContentService.GetById(content.Id);
+        content = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
@@ -4118,7 +4118,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // content has been saved,
         // it has names, but no publishNames, and no published cultures
-        var content2 = ContentService.GetById(content.Id);
+        var content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.AreEqual("name-fr", content2.Name); // got the default culture name when saved
         Assert.AreEqual("name-fr", content2.GetCultureName(langFr.IsoCode));
@@ -4171,7 +4171,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // both FR and UK have been published,
         // and content has been published,
         // it has names, publishNames, and published cultures
-        content2 = ContentService.GetById(content.Id);
+        content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.AreEqual("name-fr", content2.Name); // got the default culture name when saved
         Assert.AreEqual("name-fr", content2.GetCultureName(langFr.IsoCode));
@@ -4249,7 +4249,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Publish(content, new []{ "*" });
 
         // now it has publish name for invariant neutral
-        content2 = ContentService.GetById(content.Id);
+        content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.AreEqual("name-fr", content2.PublishName);
 
@@ -4263,7 +4263,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // content has been saved,
         // it has updated names, unchanged publishNames, and published cultures
-        content2 = ContentService.GetById(content.Id);
+        content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
         Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
@@ -4331,7 +4331,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // content has been published,
         // the french culture is gone
         // (only if french is not mandatory, else everything would be gone!)
-        content2 = ContentService.GetById(content.Id);
+        content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
         Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
@@ -4402,7 +4402,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // its exact previous state, properties and names etc. retain their published
         // values even though the content is not published - hence many things being
         // non-null or true below - always check against content.Published to be sure
-        content2 = ContentService.GetById(content.Id);
+        content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         Assert.IsFalse(content2.Published);
 
@@ -4449,7 +4449,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Act
         ContentService.Publish(content, new[] { langUk.IsoCode });
 
-        content2 = ContentService.GetById(content.Id);
+        content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         // no change
         AssertPerCulture(
@@ -4506,7 +4506,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetCultureName("name-uk3", langUk.IsoCode);
         ContentService.Save(content);
 
-        content2 = ContentService.GetById(content.Id);
+        content2 = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
 
         // note that the 'edited' flags only change once saved - not immediately
         // but they change, on what's being saved, and when getting it back
@@ -4606,7 +4606,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     private async Task<IEnumerable<IContent>> CreateContentHierarchy()
     {
         var contentType = await ContentTypeService.GetAsync("umbTextpage");
-        var root = ContentService.GetById(Textpage.Id);
+        var root = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         var list = new List<IContent>();
 
@@ -4763,10 +4763,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Cannot_Change_Key_Of_Persisted_Content()
+    public async Task Cannot_Change_Key_Of_Persisted_Content()
     {
         // Arrange - get a persisted content item
-        var content = ContentService.GetById(Textpage.Id);
+        var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.That(content, Is.Not.Null);
 
         var originalKey = content!.Key;

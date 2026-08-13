@@ -29,6 +29,7 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser();
 
         var contentService = new Mock<IContentService>();
+        var idKeyMap = new Mock<IIdKeyMap>();
         var mediaService = new Mock<IMediaService>();
         var entityService = new Mock<IEntityService>();
 
@@ -36,7 +37,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
@@ -50,6 +52,7 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateAdminUser();
 
         var contentService = new Mock<IContentService>();
+        var idKeyMap = new Mock<IIdKeyMap>();
         var mediaService = new Mock<IMediaService>();
         var entityService = new Mock<IEntityService>();
 
@@ -57,7 +60,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
@@ -71,6 +75,7 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser();
 
         var contentService = new Mock<IContentService>();
+        var idKeyMap = new Mock<IIdKeyMap>();
         var mediaService = new Mock<IMediaService>();
         var entityService = new Mock<IEntityService>();
 
@@ -78,7 +83,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "FunGroup" });
 
@@ -92,6 +98,7 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser();
 
         var contentService = new Mock<IContentService>();
+        var idKeyMap = new Mock<IIdKeyMap>();
         var mediaService = new Mock<IMediaService>();
         var entityService = new Mock<IEntityService>();
 
@@ -99,7 +106,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "test" });
 
@@ -123,6 +131,7 @@ public class UserEditorAuthorizationHelperTests
         IUser savingUser = null; // This means it is a new created user
 
         var contentService = new Mock<IContentService>();
+        var idKeyMap = new Mock<IIdKeyMap>();
         var mediaService = new Mock<IMediaService>();
         var entityService = new Mock<IEntityService>();
 
@@ -130,7 +139,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { groupToAdd });
 
@@ -149,8 +159,11 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser(startContentIds: new[] { 1234 });
 
         var contentService = new Mock<IContentService>();
-        contentService.Setup(x => x.GetById(It.IsAny<int>()))
-            .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
+        var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync((int id, UmbracoObjectTypes _) => Attempt.Succeed(KeyForId(id)));
+        contentService.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid key, CancellationToken _) => Mock.Of<IContent>(content => content.Path == nodePaths[IdForKey(key)]));
         var mediaService = new Mock<IMediaService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
@@ -161,7 +174,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         // adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
         var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234, 5555 }, new int[0], new string[0]);
@@ -181,8 +195,11 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser(startContentIds: new[] { 1234, 4567 });
 
         var contentService = new Mock<IContentService>();
-        contentService.Setup(x => x.GetById(It.IsAny<int>()))
-            .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
+        var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync((int id, UmbracoObjectTypes _) => Attempt.Succeed(KeyForId(id)));
+        contentService.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid key, CancellationToken _) => Mock.Of<IContent>(content => content.Path == nodePaths[IdForKey(key)]));
         var mediaService = new Mock<IMediaService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
@@ -193,7 +210,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         // removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
         var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
@@ -213,8 +231,11 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser();
 
         var contentService = new Mock<IContentService>();
-        contentService.Setup(x => x.GetById(It.IsAny<int>()))
-            .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
+        var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync((int id, UmbracoObjectTypes _) => Attempt.Succeed(KeyForId(id)));
+        contentService.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid key, CancellationToken _) => Mock.Of<IContent>(content => content.Path == nodePaths[IdForKey(key)]));
         var mediaService = new Mock<IMediaService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
@@ -225,7 +246,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         // adding 1234 but currentUser doesn't have access to it ... nope
         var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
@@ -245,8 +267,11 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser();
 
         var contentService = new Mock<IContentService>();
-        contentService.Setup(x => x.GetById(It.IsAny<int>()))
-            .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
+        var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync((int id, UmbracoObjectTypes _) => Attempt.Succeed(KeyForId(id)));
+        contentService.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Guid key, CancellationToken _) => Mock.Of<IContent>(content => content.Path == nodePaths[IdForKey(key)]));
         var mediaService = new Mock<IMediaService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
@@ -257,7 +282,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         // adding 5555 which currentUser has access to since it's a child of 9876 ... ok
         var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 5555 }, new int[0], new string[0]);
@@ -277,6 +303,7 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser();
 
         var contentService = new Mock<IContentService>();
+        var idKeyMap = new Mock<IIdKeyMap>();
         var mediaService = new Mock<IMediaService>();
         mediaService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
@@ -289,7 +316,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         // adding 1234 but currentUser doesn't have access to it ... nope
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
@@ -309,6 +337,7 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser();
 
         var contentService = new Mock<IContentService>();
+        var idKeyMap = new Mock<IIdKeyMap>();
         var mediaService = new Mock<IMediaService>();
         mediaService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
@@ -321,7 +350,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         // adding 5555 which currentUser has access to since it's a child of 9876 ... ok
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 5555 }, new string[0]);
@@ -341,6 +371,7 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser(startMediaIds: new[] { 1234 });
 
         var contentService = new Mock<IContentService>();
+        var idKeyMap = new Mock<IIdKeyMap>();
         var mediaService = new Mock<IMediaService>();
         mediaService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
@@ -353,7 +384,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         // adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234, 5555 }, new string[0]);
@@ -373,6 +405,7 @@ public class UserEditorAuthorizationHelperTests
         var savingUser = CreateUser(startMediaIds: new[] { 1234, 4567 });
 
         var contentService = new Mock<IContentService>();
+        var idKeyMap = new Mock<IIdKeyMap>();
         var mediaService = new Mock<IMediaService>();
         mediaService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
@@ -385,7 +418,8 @@ public class UserEditorAuthorizationHelperTests
             contentService.Object,
             mediaService.Object,
             entityService.Object,
-            AppCaches.Disabled);
+            AppCaches.Disabled,
+            idKeyMap.Object);
 
         // removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
         var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
@@ -409,6 +443,13 @@ public class UserEditorAuthorizationHelperTests
 
         return builder.Build();
     }
+
+    // Deterministic int <-> Guid mapping so a mocked IIdKeyMap.GetKeyForIdAsync(id) and the
+    // matching IContentService.GetByIdAsync(key) setup agree on which node a key represents,
+    // without needing a shared lookup dictionary.
+    private static Guid KeyForId(int id) => new(id, 0, 0, new byte[8]);
+
+    private static int IdForKey(Guid key) => BitConverter.ToInt32(key.ToByteArray(), 0);
 
     private static IUser CreateAdminUser() =>
         new UserBuilder()

@@ -233,7 +233,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         foreach (var item in notification.MoveInfoCollection)
         {
             // if this item doesn't exist then Fail!
-            var exists = ContentService.GetById(item.Entity.Id);
+            var exists = ContentService.GetByIdAsync(item.Entity.Key, CancellationToken.None).GetAwaiter().GetResult();
             if (exists == null)
             {
                 Assert.Fail("The item doesn't exist");
@@ -260,7 +260,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
 
         // re-load it from the db
-        contentItem = ContentService.GetById(contentItem.Id);
+        contentItem = await ContentService.GetByIdAsync(contentItem.Key, CancellationToken.None);
 
         Assert.AreEqual(initProps - 1, contentItem.Properties.Count);
     }
@@ -501,7 +501,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         Assert.AreNotEqual(0, childContentType.Id);
         Assert.IsNotNull(contentType.Id);
         Assert.AreNotEqual(0, contentType.Id);
-        var deletedContent = ContentService.GetById(content.Id);
+        var deletedContent = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
         var deletedChildContentType = await ContentTypeService.GetAsync(childContentType.Id);
         var deletedContentType = await ContentTypeService.GetAsync(contentType.Id);
 
@@ -2211,7 +2211,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         basePage.MovePropertyType("title", null);
         await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
 
-        contentItem = ContentService.GetById(contentItem.Id);
+        contentItem = await ContentService.GetByIdAsync(contentItem.Key, CancellationToken.None);
 
         Assert.AreEqual("The title", contentItem.GetValue<string>("title"));
     }

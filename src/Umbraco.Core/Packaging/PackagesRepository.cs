@@ -682,7 +682,10 @@ public class PackagesRepository : ICreatedPackagesRepository
             if (contentNodeId > 0)
             {
                 // load content from umbraco.
-                IContent? content = _contentService.GetById(contentNodeId);
+                Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(contentNodeId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+                IContent? content = keyAttempt.Success
+                    ? _contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+                    : null;
                 if (content != null)
                 {
                     XElement contentXml = definition.ContentLoadChildNodes

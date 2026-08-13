@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Linq;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -143,7 +144,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         doc.SetValue("title", "hello world");
         ContentService.Save(doc);
 
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("Hello1", doc.Name);
         Assert.AreEqual("hello world", doc.GetValue("title"));
@@ -155,7 +156,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(doc);
         contentType.Variations = to;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("Hello2", doc.GetCultureName("en-US"));
         Assert.AreEqual("hello world", doc.GetValue("title")); // We are not checking against en-US here because properties will remain invariant
@@ -167,7 +168,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(doc);
         contentType.Variations = from;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("Hello3", doc.Name);
         Assert.AreEqual("hello world", doc.GetValue("title"));
@@ -195,7 +196,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         doc.SetValue("title", "hello world", "en-US");
         ContentService.Save(doc);
 
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
         Assert.AreEqual("Hello1", doc.GetCultureName("en-US"));
         Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
         Assert.IsTrue(doc.Edited);
@@ -206,7 +207,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(doc);
         contentType.Variations = changeContentTypeVariationTo;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("Hello2", doc.Name);
         Assert.AreEqual("hello world", doc.GetValue("title"));
@@ -218,7 +219,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(doc);
         contentType.Variations = startingContentTypeVariation;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         // at this stage all property types were switched to invariant so even though the variant value
         // exists it will not be returned because the property type is invariant,
@@ -232,7 +233,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // we can now switch the property type to be variant and the value can be returned again
         contentType.PropertyTypes.First().Variations = startingContentTypeVariation;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("Hello3", doc.GetCultureName("en-US"));
         Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
@@ -292,14 +293,14 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         }
 
         ContentService.Save(doc);
-        doc = ContentService.GetById(doc.Id);
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None);
 
         AssertAll();
 
         // Change variation
         contentType.Variations = contentTypeVariationTo;
         ContentService.Save(doc);
-        doc = ContentService.GetById(doc.Id);
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None);
 
         AssertAll();
 
@@ -375,7 +376,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         doc.SetValue("title", "hello world");
         ContentService.Save(doc);
 
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
         Assert.AreEqual("hello world", doc.GetValue("title"));
         Assert.IsTrue(doc.IsCultureEdited("en-US")); // invariant prop changes show up on default lang
         Assert.IsTrue(doc.Edited);
@@ -383,7 +384,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // change the property type to be variant
         contentType.PropertyTypes.First().Variations = variant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
         Assert.IsTrue(doc.IsCultureEdited("en-US"));
@@ -392,7 +393,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // change back property type to be invariant
         contentType.PropertyTypes.First().Variations = invariant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title"));
         Assert.IsTrue(doc.IsCultureEdited("en-US")); // invariant prop changes show up on default lang
@@ -425,14 +426,14 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // change the property type to be invariant
         contentType.PropertyTypes.First().Variations = invariant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title"));
 
         // change back property type to be variant
         contentType.PropertyTypes.First().Variations = variant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
     }
@@ -474,8 +475,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // change the property type to be invariant
         contentType.PropertyTypes.First().Variations = invariant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
-        doc2 = ContentService.GetById(doc2.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
+        doc2 = await ContentService.GetByIdAsync(doc2.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title"));
         Assert.AreEqual("hello world", doc2.GetValue("title"));
@@ -483,8 +484,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // change back property type to be variant
         contentType.PropertyTypes.First().Variations = variant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
-        doc2 = ContentService.GetById(doc2.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
+        doc2 = await ContentService.GetByIdAsync(doc2.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
         Assert.AreEqual("hello world", doc2.GetValue("title", "en-US"));
@@ -525,8 +526,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // change the content type to be invariant
         contentType.Variations = invariant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
-        doc2 = ContentService.GetById(doc2.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
+        doc2 = await ContentService.GetByIdAsync(doc2.Key, CancellationToken.None); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title"));
         Assert.AreEqual("hello world", doc2.GetValue("title"));
@@ -534,8 +535,8 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // change back content type to be variant
         contentType.Variations = variant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        doc = ContentService.GetById(doc.Id); // re-get
-        doc2 = ContentService.GetById(doc2.Id); // re-get
+        doc = await ContentService.GetByIdAsync(doc.Key, CancellationToken.None); // re-get
+        doc2 = await ContentService.GetByIdAsync(doc2.Key, CancellationToken.None); // re-get
 
         // this will be null because the doc type was changed back to variant but it's property types don't get changed back
         Assert.IsNull(doc.GetValue("title", "en-US"));
@@ -566,7 +567,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetValue("value2", "v2");
         ContentService.Save(document);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -583,7 +584,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.Variations = ContentVariation.Nothing;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.IsNull(document.GetCultureName("en"));
         Assert.IsNull(document.GetCultureName("fr"));
@@ -601,7 +602,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -619,7 +620,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -661,7 +662,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetValue("value2", "v2");
         ContentService.Save(document);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1", document.Name);
         Assert.IsNull(document.GetCultureName("en"));
         Assert.IsNull(document.GetCultureName("fr"));
@@ -679,7 +680,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1", document.GetCultureName("en"));
         Assert.IsNull(document.GetCultureName("fr"));
         Assert.IsNull(document.GetValue("value1", "en"));
@@ -696,7 +697,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1", document.GetCultureName("en"));
         Assert.IsNull(document.GetCultureName("fr"));
         Assert.AreEqual("v1", document.GetValue("value1", "en"));
@@ -712,7 +713,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.Variations = ContentVariation.Nothing;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1", document.Name);
         Assert.IsNull(document.GetCultureName("en"));
         Assert.IsNull(document.GetCultureName("fr"));
@@ -751,7 +752,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetValue("value2", "v2");
         ContentService.Save(document);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -768,7 +769,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Nothing;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -786,7 +787,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -803,7 +804,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "value2").Variations = ContentVariation.Culture;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -845,7 +846,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, document.AvailableCultures.ToArray()); // all values are published which means the document is not 'edited'
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsFalse(document.IsCultureEdited("en"));
         Assert.IsFalse(document.IsCultureEdited("fr"));
         Assert.IsFalse(document.Edited);
@@ -860,7 +861,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "fr"); // change the property culture value, so now this culture will be edited
         ContentService.Save(document);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -880,7 +881,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = invariant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey); // This is going to have to re-normalize the "Edited" flag
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsTrue(
             document.IsCultureEdited(
                 "en")); // This will remain true because there is now a pending change for the invariant property data which is flagged under the default lang
@@ -894,7 +895,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, document.AvailableCultures.ToArray());
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -920,7 +921,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = variant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("v1inv", document.GetValue("value1", "en")); // The invariant property value gets copied over to the default language
         Assert.AreEqual("v1inv", document.GetValue("value1", "en", published: true));
         Assert.AreEqual("v1fr", document.GetValue("value1", "fr")); // values are still retained
@@ -939,7 +940,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, document.AvailableCultures.ToArray());
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -978,7 +979,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document); // all values are published which means the document is not 'edited'
         ContentService.Publish(document, document.AvailableCultures.ToArray());
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsFalse(document.IsCultureEdited("en"));
         Assert.IsFalse(document.IsCultureEdited("fr"));
         Assert.IsFalse(document.Edited);
@@ -986,7 +987,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetValue("value1", "v1en"); // change the property value, so now the invariant (default) culture will be edited
         ContentService.Save(document);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -1002,7 +1003,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = variant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey); // This is going to have to re-normalize the "Edited" flag
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsTrue(document.IsCultureEdited("en")); // Remains true
         Assert.IsFalse(document.IsCultureEdited("fr")); // False because no french property has ever been edited
         Assert.IsTrue(document.Edited);
@@ -1012,7 +1013,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, document.AvailableCultures.ToArray());
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1en", document.Name);
         Assert.AreEqual("doc1en", document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
@@ -1028,7 +1029,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = invariant;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("v1en2", document.GetValue("value1")); // The variant property value gets copied over to the invariant
         Assert.AreEqual("v1en2", document.GetValue("value1", published: true));
         Assert.IsNull(document.GetValue("value1", "fr")); // The values are there but the business logic returns null
@@ -1361,7 +1362,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, new[] { "fr" }); // Only publish in French
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en")); // No English version exists
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.AreEqual("hello world", document.GetValue("title"));
@@ -1372,7 +1373,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         // The invariant value should be migrated to the default language
@@ -1410,7 +1411,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, new[] { "fr" }); // Only publish in French
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en")); // No English version exists
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.AreEqual("bonjour monde", document.GetValue("title", "fr"));
@@ -1422,7 +1423,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         // The variant value from the default language should be used (which was null/empty),
@@ -1456,7 +1457,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, new[] { "fr" }); // Only publish in French
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.AreEqual("hello world", document.GetValue("title"));
@@ -1465,7 +1466,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Culture;
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("hello world", document.GetValue("title", "en")); // Migrated to default language
 
@@ -1474,7 +1475,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("hello world", document.GetValue("title"));
     }
@@ -1506,7 +1507,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, Array.Empty<string>());
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1", document.Name);
         Assert.AreEqual("hello world", document.GetValue("title"));
 
@@ -1517,7 +1518,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should be accessible in the default language
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("doc1", document.GetCultureName("en"));
         Assert.AreEqual("hello world", document.GetValue("title"));
@@ -1556,7 +1557,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, new[] { "fr" }); // Only publish in French
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en")); // No English version exists
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.AreEqual("hello world", document.GetValue("title"));
@@ -1567,7 +1568,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         // The invariant value should be migrated to the default language
@@ -1606,7 +1607,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, new[] { "fr" }); // Only publish in French
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en")); // No English version exists
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.AreEqual("bonjour monde", document.GetValue("title", "fr"));
@@ -1618,7 +1619,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         // The variant value from the default language should be used (which was null/empty),
@@ -1653,7 +1654,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, new[] { "fr" }); // Only publish in French
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNull(document.GetCultureName("en"));
         Assert.AreEqual("doc1fr", document.GetCultureName("fr"));
         Assert.AreEqual("hello world", document.GetValue("title"));
@@ -1662,7 +1663,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Culture;
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("hello world", document.GetValue("title", "en")); // Migrated to default language
 
@@ -1671,7 +1672,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("hello world", document.GetValue("title"));
     }
@@ -1704,7 +1705,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         ContentService.Save(document);
         ContentService.Publish(document, Array.Empty<string>());
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.AreEqual("doc1", document.Name);
         Assert.AreEqual("hello world", document.GetValue("title"));
 
@@ -1715,7 +1716,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should be accessible in the default language
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         Assert.IsNotNull(document);
         Assert.AreEqual("doc1", document.GetCultureName("en"));
         Assert.AreEqual("hello world", document.GetValue("title"));

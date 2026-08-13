@@ -30,6 +30,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
     private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
+    private readonly IIdKeyMap _idKeyMap;
 
 
     /// <summary>
@@ -46,6 +47,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
     /// <param name="deliveryApiContentIndexHelper">Provides helper methods for content indexing specific to the Delivery API.</param>
     /// <param name="backgroundTaskQueue">Queue for scheduling background indexing tasks.</param>
     /// <param name="deliveryApiCompositeIdHandler">Handles composite IDs for Delivery API content indexing.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public DeliveryApiIndexingHandler(
         ExamineIndexingMainDomHandler mainDomHandler,
         IExamineManager examineManager,
@@ -57,7 +59,8 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
         IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
         IBackgroundTaskQueue backgroundTaskQueue,
-        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler)
+        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler,
+        IIdKeyMap idKeyMap)
     {
         _mainDomHandler = mainDomHandler;
         _examineManager = examineManager;
@@ -69,6 +72,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
         _backgroundTaskQueue = backgroundTaskQueue;
         _deliveryApiCompositeIdHandler = deliveryApiCompositeIdHandler;
+        _idKeyMap = idKeyMap;
 
         _enabled = new Lazy<bool>(IsEnabled);
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
@@ -87,7 +91,8 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
             _contentService,
             _deliveryApiContentIndexValueSetBuilder,
             _deliveryApiContentIndexHelper,
-            _backgroundTaskQueue);
+            _backgroundTaskQueue,
+            _idKeyMap);
         Execute(deferred);
     }
 
@@ -100,7 +105,8 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
             _deliveryApiContentIndexValueSetBuilder,
             _contentService,
             _backgroundTaskQueue,
-            _deliveryApiCompositeIdHandler);
+            _deliveryApiCompositeIdHandler,
+            _idKeyMap);
         Execute(deferred);
     }
 
@@ -114,7 +120,8 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
             _deliveryApiContentIndexValueSetBuilder,
             _deliveryApiContentIndexHelper,
             _deliveryApiSettings,
-            _backgroundTaskQueue);
+            _backgroundTaskQueue,
+            _idKeyMap);
         Execute(deferred);
     }
 

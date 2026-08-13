@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -17,6 +18,7 @@ public sealed class ContentIndexingNotificationHandler :
     INotificationHandler<PublicAccessCacheRefresherNotification>
 {
     private readonly IContentService _contentService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
     /// <summary>
@@ -24,13 +26,16 @@ public sealed class ContentIndexingNotificationHandler :
     /// </summary>
     /// <param name="umbracoIndexingHandler">An instance responsible for handling Umbraco indexing operations.</param>
     /// <param name="contentService">The service used to manage and interact with content items.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public ContentIndexingNotificationHandler(
         IUmbracoIndexingHandler umbracoIndexingHandler,
-        IContentService contentService)
+        IContentService contentService,
+        IIdKeyMap idKeyMap)
     {
         _umbracoIndexingHandler =
             umbracoIndexingHandler ?? throw new ArgumentNullException(nameof(umbracoIndexingHandler));
         _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+        _idKeyMap = idKeyMap ?? throw new ArgumentNullException(nameof(idKeyMap));
     }
 
     /// <summary>
@@ -95,7 +100,10 @@ public sealed class ContentIndexingNotificationHandler :
 
                 // don't try to be too clever - refresh entirely
                 // there has to be race conditions in there ;-(
-                IContent? content = _contentService.GetById(payload.Id);
+                Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+                IContent? content = keyAttempt.Success
+                    ? _contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+                    : null;
                 if (content == null)
                 {
                     // gone fishing, remove entirely from all indexes (with descendants)

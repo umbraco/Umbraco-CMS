@@ -84,7 +84,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Save(document);
 
         // re-get - dirty properties need resetting
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         // properties: title, bodyText, keywords, description
         document.SetValue("title", "title-en", "en-US");
@@ -261,7 +261,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         Assert.IsFalse(document.IsCulturePublished("en-US"));
 
         // re-get - dirty properties need resetting
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         var publishingWasCalled = false;
         var publishedWasCalled = false;
@@ -317,7 +317,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             ContentNotificationHandler.TreeChange = null;
         }
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         // ensure it works and does not throw
         Assert.IsTrue(document.IsCulturePublished("fr-FR"));
@@ -621,7 +621,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         Assert.IsTrue(document.IsCulturePublished("en-US"));
 
         // re-get - dirty properties need resetting
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         document.UnpublishCulture("fr-FR");
 
@@ -687,7 +687,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             ContentNotificationHandler.TreeChange = null;
         }
 
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         Assert.IsFalse(document.IsCulturePublished("fr-FR"));
         Assert.IsTrue(document.IsCulturePublished("en-US"));
@@ -741,7 +741,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Save(document);
 
         // re-get - dirty properties need resetting
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         // only change the en-US culture
         document.SetValue("title", "title-en", "en-US");
@@ -821,7 +821,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Save(document);
 
         // re-get - dirty properties need resetting
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         var publishedWasCalled = false;
 
@@ -899,7 +899,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Publish(document, document.AvailableCultures.ToArray());
 
         // re-get - dirty properties need resetting
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         document.UnpublishCulture("fr-FR");
 
         var publishedWasCalled = false;
@@ -989,7 +989,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Save(document);
 
         // re-get so nothing is dirty, then re-save without changes
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         var savedWasCalled = false;
 
@@ -1034,7 +1034,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Publish(document, document.AvailableCultures.ToArray());
 
         // re-get - dirty properties need resetting
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 
@@ -1106,13 +1106,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Read_Empty_Saved_Cultures_For_No_Op_Invariant_Re_Save()
+    public async Task Can_Read_Empty_Saved_Cultures_For_No_Op_Invariant_Re_Save()
     {
         IContent document = new Content("content", -1, _contentType);
         ContentService.Save(document);
 
         // re-get so nothing is dirty, then re-save without changes
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         var savedWasCalled = false;
 
@@ -1137,13 +1137,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Read_Star_Marker_Saved_Cultures_For_Changed_Invariant_Save()
+    public async Task Can_Read_Star_Marker_Saved_Cultures_For_Changed_Invariant_Save()
     {
         IContent document = new Content("content", -1, _contentType);
         ContentService.Save(document);
 
         // re-get so nothing is dirty, then make a genuine change before re-saving
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
         document.SetValue("title", "changed");
 
         var savedWasCalled = false;
@@ -1170,7 +1170,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Can_Read_Per_Document_Published_Cultures_For_Branch_Publish()
+    public async Task Can_Read_Per_Document_Published_Cultures_For_Branch_Publish()
     {
         IContent root = new Content("root", -1, _contentType);
         ContentService.Save(root);
@@ -1181,7 +1181,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Publish(child, ["*"]);
 
         // re-get - dirty properties need resetting
-        root = ContentService.GetById(root.Id);
+        root = await ContentService.GetByIdAsync(root.Key, CancellationToken.None);
 
         var publishedWasCalled = false;
 
@@ -1232,7 +1232,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Publish(child, ["en-US"]);
 
         // re-get - dirty properties need resetting
-        root = ContentService.GetById(root.Id);
+        root = await ContentService.GetByIdAsync(root.Key, CancellationToken.None);
 
         var publishedWasCalled = false;
 
@@ -1262,14 +1262,14 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Read_Unpublished_Cultures_When_Deleting_Invariant()
+    public async Task Can_Read_Unpublished_Cultures_When_Deleting_Invariant()
     {
         IContent document = new Content("content", -1, _contentType);
         ContentService.Save(document);
         ContentService.Publish(document, ["*"]);
 
         // re-get - dirty properties need resetting
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 
@@ -1316,7 +1316,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         ContentService.Publish(document, document.AvailableCultures.ToArray());
 
         // re-get - dirty properties need resetting
-        document = ContentService.GetById(document.Id);
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
 
         var unpublishedWasCalled = false;
 

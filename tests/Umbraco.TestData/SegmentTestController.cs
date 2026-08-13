@@ -25,6 +25,7 @@ namespace Umbraco.TestData;
 public class SegmentTestController : SurfaceController
 {
     private readonly IOptions<TestDataSettings> _testDataSettings;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SegmentTestController"/> class.
@@ -36,6 +37,7 @@ public class SegmentTestController : SurfaceController
     /// <param name="profilingLogger">The profiling logger.</param>
     /// <param name="publishedUrlProvider">The published URL provider.</param>
     /// <param name="testDataSettings">The test data settings.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public SegmentTestController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,
@@ -43,9 +45,13 @@ public class SegmentTestController : SurfaceController
         AppCaches appCaches,
         IProfilingLogger profilingLogger,
         IPublishedUrlProvider publishedUrlProvider,
-        IOptions<TestDataSettings> testDataSettings)
-        : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider) =>
+        IOptions<TestDataSettings> testDataSettings,
+        IIdKeyMap idKeyMap)
+        : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
+    {
         _testDataSettings = testDataSettings;
+        _idKeyMap = idKeyMap;
+    }
 
     /// <summary>
     /// Enables segment variation on a document type and a specific property type.
@@ -134,9 +140,10 @@ public class SegmentTestController : SurfaceController
     /// <param name="segment">The segment identifier.</param>
     /// <param name="culture">The culture code (optional, required if the content varies by culture).</param>
     /// <returns>A text response indicating the result of the operation.</returns>
-    public ActionResult AddSegmentData(int contentId, string propertyAlias, string value, string segment, string? culture = null)
+    public async Task<ActionResult> AddSegmentData(int contentId, string propertyAlias, string value, string segment, string? culture = null)
     {
-        var content = Services.ContentService.GetById(contentId);
+        Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(contentId, UmbracoObjectTypes.Document);
+        var content = keyAttempt.Success ? await Services.ContentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None) : null;
         if (content == null)
         {
             return Content($"No content found by id {contentId}");

@@ -2,7 +2,9 @@
 // See LICENSE for more details.
 
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -14,8 +16,6 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ContentServiceExtensions
 {
-    #region RTE Anchor values
-
     private static readonly Regex AnchorRegex = new(@"<a id=\\*""(.*?)\\*"">", RegexOptions.Compiled);
     private static readonly string[] _propertyTypesWithRte = new[] { Constants.PropertyEditors.Aliases.RichText, Constants.PropertyEditors.Aliases.BlockList, Constants.PropertyEditors.Aliases.BlockGrid };
 
@@ -85,7 +85,11 @@ public static class ContentServiceExtensions
 
         culture = culture is not "*" ? culture : null;
 
-        IContent? content = contentService.GetById(id);
+        IIdKeyMap idKeyMap = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>();
+        Attempt<Guid> keyAttempt = idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+        IContent? content = keyAttempt.Success
+            ? contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+            : null;
 
         if (content is null)
         {
@@ -123,6 +127,4 @@ public static class ContentServiceExtensions
 
         return result;
     }
-
-    #endregion
 }

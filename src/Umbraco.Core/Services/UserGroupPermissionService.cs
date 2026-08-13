@@ -15,6 +15,7 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     private readonly IMediaService _mediaService;
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserGroupPermissionService" /> class.
@@ -23,16 +24,19 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// <param name="mediaService">The media service.</param>
     /// <param name="entityService">The entity service.</param>
     /// <param name="appCaches">The application caches.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public UserGroupPermissionService(
         IContentService contentService,
         IMediaService mediaService,
         IEntityService entityService,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        IIdKeyMap idKeyMap)
     {
         _contentService = contentService;
         _mediaService = mediaService;
         _entityService = entityService;
         _appCaches = appCaches;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc/>
@@ -143,7 +147,10 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
             return true;
         }
 
-        IContent? content = _contentService.GetById(userGroup.StartContentId.Value);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(userGroup.StartContentId.Value, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+        IContent? content = keyAttempt.Success
+            ? _contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+            : null;
 
         if (content is null)
         {

@@ -255,7 +255,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(ContentService.Unpublish(source).Success);
 
         // Save a draft that re-points the picker to target B.
-        IContent draft = ContentService.GetById(source.Id)!;
+        IContent draft = (await ContentService.GetByIdAsync(source.Key, CancellationToken.None))!;
         draft.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetB.Key).ToString());
         ContentService.Save(draft);
 
@@ -271,7 +271,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
         // Save a draft that re-points the picker to target B, without publishing. The document remains published, so both the
         // live (published A) and draft (edited B) references are legitimately tracked.
-        IContent draft = ContentService.GetById(source.Id)!;
+        IContent draft = (await ContentService.GetByIdAsync(source.Key, CancellationToken.None))!;
         draft.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetB.Key).ToString());
         ContentService.Save(draft);
         Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id, targetB.Id }));
@@ -324,7 +324,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         ContentTypeOperationStatus status = await ContentTypeService.DeleteAsync(sourceType.Key, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentTypeOperationStatus.Success, status);
 
-        Assert.IsNull(ContentService.GetById(source.Id));
+        Assert.IsNull(await ContentService.GetByIdAsync(source.Key, CancellationToken.None));
         Assert.IsEmpty(await RelationService.GetByChildIdAsync(target.Id));
     }
 

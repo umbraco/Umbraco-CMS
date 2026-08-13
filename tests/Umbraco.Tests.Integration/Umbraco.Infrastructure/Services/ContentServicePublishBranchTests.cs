@@ -150,7 +150,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
             PublishResultType.SuccessPublishAlready, // was masked
             PublishResultType.SuccessPublish);
 
-        ii21 = ContentService.GetById(ii21.Id);
+        ii21 = await ContentService.GetByIdAsync(ii21.Key, CancellationToken.None);
         Assert.IsTrue(ii21.Published);
     }
 
@@ -607,7 +607,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
     }
 
     private void Reload(ref IContent document)
-        => document = ContentService.GetById(document.Id);
+        => document = ContentService.GetByIdAsync(document.Key, CancellationToken.None).GetAwaiter().GetResult();
 
     private async Task<(IContentType IContentType, IContentType VContentType)> CreateTypes()
     {

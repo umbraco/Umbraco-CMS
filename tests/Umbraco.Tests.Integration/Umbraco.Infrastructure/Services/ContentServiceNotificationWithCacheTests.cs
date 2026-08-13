@@ -78,13 +78,11 @@ internal sealed class ContentServiceNotificationWithCacheTests : UmbracoIntegrat
             savingWasCalled = true;
 
             var saved = notification.SavedEntities.First();
-            var documentById = ContentService.GetById(saved.Id)!;
             var documentByKey = ContentService.GetByIdAsync(saved.Key, CancellationToken.None).GetAwaiter().GetResult()!;
 
             Assert.Multiple(() =>
             {
                 Assert.AreEqual("Updated name", saved.Name);
-                Assert.AreEqual("Initial name", documentById.Name);
                 Assert.AreEqual("Initial name", documentByKey.Name);
             });
         };
@@ -94,13 +92,11 @@ internal sealed class ContentServiceNotificationWithCacheTests : UmbracoIntegrat
             savedWasCalled = true;
 
             var saved = notification.SavedEntities.First();
-            var documentById = ContentService.GetById(saved.Id)!;
             var documentByKey = ContentService.GetByIdAsync(saved.Key, CancellationToken.None).GetAwaiter().GetResult()!;
 
             Assert.Multiple(() =>
             {
                 Assert.AreEqual("Updated name", saved.Name);
-                Assert.AreEqual("Updated name", documentById.Name);
                 Assert.AreEqual("Updated name", documentByKey.Name);
             });
         };

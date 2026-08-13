@@ -1087,7 +1087,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             await repository.SaveAsync(docType, CancellationToken.None);
 
             // Re fetch renewedContent and make sure that the culture has been set.
-            var renewedContent = ContentService.GetById(content.Id);
+            var renewedContent = await ContentService.GetByIdAsync(content.Key, CancellationToken.None);
             var hasCulture = renewedContent.Properties["title"].Values.First().Culture != null;
             Assert.That(hasCulture, Is.True);
         }

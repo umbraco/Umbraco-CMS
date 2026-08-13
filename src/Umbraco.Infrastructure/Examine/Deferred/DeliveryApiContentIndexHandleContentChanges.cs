@@ -1,4 +1,5 @@
 using Examine;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -15,6 +16,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
     private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
     private readonly IDeliveryApiContentIndexHelper _deliveryApiContentIndexHelper;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeliveryApiContentIndexHandleContentChanges"/> class.
@@ -25,13 +27,15 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
     /// <param name="deliveryApiContentIndexValueSetBuilder">Builds value sets for indexing Delivery API content.</param>
     /// <param name="deliveryApiContentIndexHelper">Provides helper methods for Delivery API content indexing.</param>
     /// <param name="backgroundTaskQueue">A queue for scheduling background tasks related to content indexing.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public DeliveryApiContentIndexHandleContentChanges(
         IList<KeyValuePair<int, TreeChangeTypes>> changes,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
         IContentService contentService,
         IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
         IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
-        IBackgroundTaskQueue backgroundTaskQueue)
+        IBackgroundTaskQueue backgroundTaskQueue,
+        IIdKeyMap idKeyMap)
     {
         _changes = changes;
         _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
@@ -39,6 +43,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         _backgroundTaskQueue = backgroundTaskQueue;
         _deliveryApiContentIndexValueSetBuilder = deliveryApiContentIndexValueSetBuilder;
         _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
+        _idKeyMap = idKeyMap;
     }
 
     /// <summary>
@@ -47,7 +52,7 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
     /// ensuring the index reflects the latest content state. Content removals and reindexing are handled
     /// based on the type of change detected for each content item.
     /// </summary>
-    public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
+    public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
     {
         IIndex index = _deliveryApiIndexingHandler.GetIndex()
                        ?? throw new InvalidOperationException("Could not obtain the delivery API content index");
@@ -64,7 +69,10 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
             }
             else if (reindex)
             {
-                IContent? content = _contentService.GetById(contentId);
+                Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(contentId, UmbracoObjectTypes.Document);
+                IContent? content = keyAttempt.Success
+                    ? await _contentService.GetByIdAsync(keyAttempt.Result, cancellationToken)
+                    : null;
                 if (content == null || content.Trashed)
                 {
                     pendingRemovals.Add(contentId);
@@ -91,8 +99,6 @@ internal sealed class DeliveryApiContentIndexHandleContentChanges : DeliveryApiC
         }
 
         RemoveFromIndex(pendingRemovals, index);
-
-        return Task.CompletedTask;
     });
 
     private ReIndexResult Reindex(IContent content, IIndex index)

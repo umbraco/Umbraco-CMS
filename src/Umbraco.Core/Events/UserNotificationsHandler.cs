@@ -34,6 +34,7 @@ public sealed class UserNotificationsHandler :
 {
     private readonly ActionCollection _actions;
     private readonly IContentService _contentService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly Notifier _notifier;
 
     /// <summary>
@@ -42,11 +43,13 @@ public sealed class UserNotificationsHandler :
     /// <param name="notifier">The notifier service.</param>
     /// <param name="actions">The action collection.</param>
     /// <param name="contentService">The content service.</param>
-    public UserNotificationsHandler(Notifier notifier, ActionCollection actions, IContentService contentService)
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
+    public UserNotificationsHandler(Notifier notifier, ActionCollection actions, IContentService contentService, IIdKeyMap idKeyMap)
     {
         _notifier = notifier;
         _actions = actions;
         _contentService = contentService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -138,7 +141,10 @@ public sealed class UserNotificationsHandler :
             return;
         }
 
-        IContent? parent = _contentService.GetById(parentId[0]);
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(parentId[0], UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+        IContent? parent = parentKeyAttempt.Success
+            ? _contentService.GetByIdAsync(parentKeyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+            : null;
         if (parent == null)
         {
             return; // this shouldn't happen

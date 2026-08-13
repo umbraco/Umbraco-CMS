@@ -1,5 +1,6 @@
 using Examine;
 using Examine.Search;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
@@ -17,6 +18,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
     private readonly DeliveryApiSettings _deliveryApiSettings;
     private readonly IContentService _contentService;
     private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeliveryApiContentIndexHandlePublicAccessChanges"/> class,
@@ -29,6 +31,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
     /// <param name="deliveryApiContentIndexHelper">Helper providing utility methods for Delivery API content indexing.</param>
     /// <param name="deliveryApiSettings">Configuration settings for the Delivery API.</param>
     /// <param name="backgroundTaskQueue">Queue for scheduling background tasks related to indexing operations.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public DeliveryApiContentIndexHandlePublicAccessChanges(
         IPublicAccessService publicAccessService,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
@@ -36,7 +39,8 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
         IDeliveryApiContentIndexHelper deliveryApiContentIndexHelper,
         DeliveryApiSettings deliveryApiSettings,
-        IBackgroundTaskQueue backgroundTaskQueue)
+        IBackgroundTaskQueue backgroundTaskQueue,
+        IIdKeyMap idKeyMap)
     {
         _publicAccessService = publicAccessService;
         _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
@@ -45,6 +49,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
         _deliveryApiSettings = deliveryApiSettings;
         _backgroundTaskQueue = backgroundTaskQueue;
+        _idKeyMap = idKeyMap;
     }
 
     /// <summary>
@@ -59,7 +64,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
     /// effort to handle public access changes. instead we have to grab all protected content definitions
     /// and handle every last one with every notification.
     /// </remarks>
-    public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(async _ =>
+    public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
     {
         IIndex index = _deliveryApiIndexingHandler.GetIndex() ??
                        throw new InvalidOperationException("Could not obtain the delivery API content index");
@@ -70,7 +75,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
             return;
         }
 
-        await EnsureProtectedContentIsUpToDateInIndexAsync(index);
+        await EnsureProtectedContentIsUpToDateInIndexAsync(index, cancellationToken);
     });
 
     private async Task EnsureProtectedContentIsRemovedFromIndexAsync(IIndex index)
@@ -91,14 +96,14 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         RemoveFromIndex(indexIds, index);
     }
 
-    private async Task EnsureProtectedContentIsUpToDateInIndexAsync(IIndex index)
+    private async Task EnsureProtectedContentIsUpToDateInIndexAsync(IIndex index, CancellationToken cancellationToken)
     {
         // first we need to re-index all the content items that are currently known to be protected in the index,
         // as their protection might have been revoked or altered.
         var protectedContentIdsInIndex = FindContentIdsForProtectedContent(index);
         foreach (var contentId in protectedContentIdsInIndex)
         {
-            UpdateIndex(contentId, index);
+            await UpdateIndexAsync(contentId, index, cancellationToken);
         }
 
         // then we have to re-index any protected content items that were not part of the first operation.
@@ -110,13 +115,13 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
 
         foreach (var contentId in unhandledProtectedContentIds)
         {
-            UpdateIndexWithDescendants(contentId, index);
+            await UpdateIndexWithDescendantsAsync(contentId, index, cancellationToken);
         }
     }
 
-    private void UpdateIndexWithDescendants(int contentId, IIndex index)
+    private async Task UpdateIndexWithDescendantsAsync(int contentId, IIndex index, CancellationToken cancellationToken)
     {
-        if (UpdateIndex(contentId, index))
+        if (await UpdateIndexAsync(contentId, index, cancellationToken))
         {
             _deliveryApiContentIndexHelper.EnumerateApplicableDescendantsForContentIndex(
                 contentId,
@@ -130,9 +135,10 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         }
     }
 
-    private bool UpdateIndex(int contentId, IIndex index)
+    private async Task<bool> UpdateIndexAsync(int contentId, IIndex index, CancellationToken cancellationToken)
     {
-        IContent? content = _contentService.GetById(contentId);
+        Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(contentId, UmbracoObjectTypes.Document);
+        IContent? content = keyAttempt.Success ? await _contentService.GetByIdAsync(keyAttempt.Result, cancellationToken) : null;
         return content is not null && UpdateIndex(content, index);
     }
 

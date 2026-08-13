@@ -19,6 +19,7 @@ public class UserEditorAuthorizationHelper
     private readonly AppCaches _appCaches;
     private readonly IContentService _contentService;
     private readonly IEntityService _entityService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly IMediaService _mediaService;
 
     /// <summary>
@@ -28,12 +29,14 @@ public class UserEditorAuthorizationHelper
     /// <param name="mediaService">The media service.</param>
     /// <param name="entityService">The entity service.</param>
     /// <param name="appCaches">The application caches.</param>
-    public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
+    public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IEntityService entityService, AppCaches appCaches, IIdKeyMap idKeyMap)
     {
         _contentService = contentService;
         _mediaService = mediaService;
         _entityService = entityService;
         _appCaches = appCaches;
+        _idKeyMap = idKeyMap;
     }
 
     /// <summary>
@@ -142,7 +145,10 @@ public class UserEditorAuthorizationHelper
                 }
                 else
                 {
-                    IContent? content = _contentService.GetById(contentId);
+                    Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(contentId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+                    IContent? content = keyAttempt.Success
+                        ? _contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+                        : null;
                     if (content == null)
                     {
                         continue;

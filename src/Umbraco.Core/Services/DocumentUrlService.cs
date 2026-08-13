@@ -530,15 +530,14 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <inheritdoc/>
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
     {
-        var id = (await _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Document)).Result;
-        IContent? item = _contentService.GetById(id);
+        IContent? item = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (item is null)
         {
             _logger.LogDebug("Skipping URL segment rebuild for document with key {DocumentKey} was not found.", key);
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(item.Id, 0, int.MaxValue, out _);
 
         await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
         {
@@ -563,17 +562,14 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
     /// <inheritdoc/>
     public async Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key)
     {
-        Attempt<int> attempt = await _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Document);
-        var id = attempt.Result;
-
-        IContent? item = _contentService.GetById(id);
+        IContent? item = await _contentService.GetByIdAsync(key, CancellationToken.None);
         if (item is null)
         {
             _logger.LogDebug("Skipping URL segment cache update for document with key {DocumentKey} — document not found.", key);
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(item.Id, 0, int.MaxValue, out _);
         await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendants) { item }, skipDatabaseWrite: true);
     }
 

@@ -1,5 +1,6 @@
 using Examine;
 using Examine.Search;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
@@ -19,6 +20,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
     private readonly IContentService _contentService;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeliveryApiContentIndexHandleContentTypeChanges"/> class, responsible for handling content type changes and updating the Delivery API content index accordingly.
@@ -29,13 +31,15 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
     /// <param name="contentService">The service used to access and manage content items.</param>
     /// <param name="backgroundTaskQueue">The queue for scheduling background tasks related to indexing.</param>
     /// <param name="deliveryApiCompositeIdHandler">The handler for managing composite IDs within the Delivery API.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public DeliveryApiContentIndexHandleContentTypeChanges(
         IList<KeyValuePair<int, ContentTypeChangeTypes>> changes,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,
         IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
         IContentService contentService,
         IBackgroundTaskQueue backgroundTaskQueue,
-        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler)
+        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler,
+        IIdKeyMap idKeyMap)
     {
         _changes = changes;
         _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
@@ -43,6 +47,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         _contentService = contentService;
         _backgroundTaskQueue = backgroundTaskQueue;
         _deliveryApiCompositeIdHandler = deliveryApiCompositeIdHandler;
+        _idKeyMap = idKeyMap;
     }
 
     /// <summary>
@@ -50,7 +55,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
     /// This method queues a background work item that examines tracked content type changes, determines which content types require updates,
     /// and updates the index accordingly. Content type deletions are handled separately by content cache refresh notifications.
     /// </summary>
-    public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
+    public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
     {
         var updatedContentTypeIds = new List<int>();
 
@@ -71,18 +76,16 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
 
         if (updatedContentTypeIds.Any() is false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         IIndex index = _deliveryApiIndexingHandler.GetIndex() ??
                        throw new InvalidOperationException("Could not obtain the delivery API content index");
 
-        HandleUpdatedContentTypes(updatedContentTypeIds, index);
-
-        return Task.CompletedTask;
+        await HandleUpdatedContentTypesAsync(updatedContentTypeIds, index, cancellationToken);
     });
 
-    private void HandleUpdatedContentTypes(IEnumerable<int> updatedContentTypesIds, IIndex index)
+    private async Task HandleUpdatedContentTypesAsync(IEnumerable<int> updatedContentTypesIds, IIndex index, CancellationToken cancellationToken)
     {
         foreach (var contentTypeId in updatedContentTypesIds)
         {
@@ -114,7 +117,10 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
 
             foreach (KeyValuePair<int, string[]> indexIdsByContentId in indexIdsByContentIds)
             {
-                IContent? content = _contentService.GetById(indexIdsByContentId.Key);
+                Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(indexIdsByContentId.Key, UmbracoObjectTypes.Document);
+                IContent? content = keyAttempt.Success
+                    ? await _contentService.GetByIdAsync(keyAttempt.Result, cancellationToken)
+                    : null;
                 if (content == null)
                 {
                     // this should not happen if the rest of the indexing works as intended, but for good measure

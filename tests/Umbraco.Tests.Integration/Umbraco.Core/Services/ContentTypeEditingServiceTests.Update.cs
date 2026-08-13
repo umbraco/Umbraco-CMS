@@ -670,7 +670,7 @@ internal sealed partial class ContentTypeEditingServiceTests
 
             Assert.AreEqual(0, updateAttempt.Result.NoGroupPropertyTypes.Count());
 
-            var updatedContent = ContentService.GetById(content.Id);
+            var updatedContent = ContentService.GetByIdAsync(content.Key, CancellationToken.None).GetAwaiter().GetResult();
             foreach (var property in properties)
             {
                 Assert.AreEqual(property.Name, updatedContent?.Properties[property.Alias]?.GetValue());

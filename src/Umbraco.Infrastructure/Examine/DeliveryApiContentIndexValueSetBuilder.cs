@@ -23,6 +23,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     private readonly IMemberService _memberService;
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly IIdKeyMap _idKeyMap;
     private DeliveryApiSettings _deliveryApiSettings;
 
     /// <summary>
@@ -37,6 +38,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     /// <param name="memberService">Service for managing members.</param>
     /// <param name="deliveryApiCompositeIdHandler">Handler for composite IDs in the Delivery API.</param>
     /// <param name="coreScopeProvider">Provider for managing core data scopes.</param>
+    /// <param name="idKeyMap">The id-key map used to resolve content ids to keys.</param>
     public DeliveryApiContentIndexValueSetBuilder(
         ContentIndexHandlerCollection contentIndexHandlerCollection,
         IContentService contentService,
@@ -46,7 +48,8 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
         IMemberService memberService,
         IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler,
-        ICoreScopeProvider coreScopeProvider)
+        ICoreScopeProvider coreScopeProvider,
+        IIdKeyMap idKeyMap)
     {
         _contentIndexHandlerCollection = contentIndexHandlerCollection;
         _publicAccessService = publicAccessService;
@@ -56,6 +59,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         _deliveryApiCompositeIdHandler = deliveryApiCompositeIdHandler;
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
+        _idKeyMap = idKeyMap;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
@@ -125,7 +129,10 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         // now iterate all ancestors and make sure all cultures are published all the way up the tree
         foreach (var ancestorId in content.GetAncestorIds() ?? Array.Empty<int>())
         {
-            IContent? ancestor = _contentService.GetById(ancestorId);
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(ancestorId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+            IContent? ancestor = keyAttempt.Success
+                ? _contentService.GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+                : null;
             if (ancestor is null || ancestor.Published is false)
             {
                 // no published ancestor => don't index anything

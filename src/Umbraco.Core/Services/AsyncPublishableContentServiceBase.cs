@@ -225,7 +225,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         // Get the current copy of the node
-        TContent? content = GetById(id);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
+        TContent? content = keyAttempt.Success
+            ? GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+            : null;
 
         // Get the version
         TContent? version = GetVersion(versionId);
@@ -337,22 +340,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     #endregion
 
     #region Get, Has, Is
-
-    /// <summary>
-    ///     Gets an <see cref="TContent" /> object by Id
-    /// </summary>
-    /// <param name="id">Id of the Content to retrieve</param>
-    /// <returns>
-    ///     <see cref="TContent" />
-    /// </returns>
-    public TContent? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.Get(id);
-        }
-    }
 
     /// <summary>
     ///     Gets an <see cref="TContent" /> object by Id
@@ -620,7 +607,10 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return null;
         }
 
-        return GetById(content.ParentId);
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, ContentObjectType).GetAwaiter().GetResult();
+        return parentKeyAttempt.Success
+            ? GetByIdAsync(parentKeyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+            : null;
     }
 
     #endregion
@@ -1468,7 +1458,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 culturesPublishing = GetCulturesPublishing(content);
             }
 
-            TContent? newest = GetById(content.Id); // ensure we have the newest version - in scope
+            TContent? newest = GetByIdAsync(content.Key, CancellationToken.None).GetAwaiter().GetResult(); // ensure we have the newest version - in scope
             if (content.VersionId != newest?.VersionId)
             {
                 return new PublishResult(PublishResultType.FailedPublishConcurrencyViolation, eventMessages, content);

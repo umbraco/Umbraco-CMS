@@ -59,7 +59,7 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
     private IContentType _contentType;
 
     [Test]
-    public void TagApiConsistencyTest()
+    public async Task TagApiConsistencyTest()
     {
         IContent content1 = ContentBuilder.CreateSimpleContent(_contentType, "Tagged content 1");
         content1.AssignTags(
@@ -87,7 +87,7 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
         ContentService.Publish(content1, Array.Empty<string>());
 
         // get it back
-        content1 = ContentService.GetById(content1.Id);
+        content1 = await ContentService.GetByIdAsync(content1.Key, CancellationToken.None);
         var tagsValue = content1.GetValue("tags").ToString();
         var tagsValues = JsonSerializer.Deserialize<string[]>(tagsValue);
         Assert.AreEqual(3, tagsValues.Length);
