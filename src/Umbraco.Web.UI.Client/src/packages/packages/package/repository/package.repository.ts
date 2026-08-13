@@ -98,8 +98,8 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Request the root items from the Data Source
-	 * @param store
-	 * @memberOf UmbPackageRepository
+	 * @param {UmbPackageStore} store - The store to append the root items to
+	 * @memberof UmbPackageRepository
 	 */
 	async requestRootItems(store: UmbPackageStore) {
 		if (store.isPackagesLoaded) {
@@ -156,8 +156,8 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Request the package migrations from the Data Source
-	 * @param store
-	 * @memberOf UmbPackageRepository
+	 * @param {UmbPackageStore} store - The store to append the migrations to
+	 * @memberof UmbPackageRepository
 	 */
 	async requestPackageMigrations(store: UmbPackageStore) {
 		const { data: migrations } = await this.#packageSource.getPackageMigrations();
@@ -187,7 +187,8 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Observable of root items
-	 * @memberOf UmbPackageRepository
+	 * @returns {*} The root items observable.
+	 * @memberof UmbPackageRepository
 	 */
 	async rootItems() {
 		await this.#init;
@@ -196,7 +197,8 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Observable of extensions
-	 * @memberOf UmbPackageRepository
+	 * @returns {*} The extensions observable.
+	 * @memberof UmbPackageRepository
 	 */
 	async extensions() {
 		await this.#init;
@@ -205,7 +207,8 @@ export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 
 	/**
 	 * Observable of migrations
-	 * @memberOf UmbPackageRepository
+	 * @returns {*} The migrations observable.
+	 * @memberof UmbPackageRepository
 	 */
 	async migrations() {
 		await this.#init;

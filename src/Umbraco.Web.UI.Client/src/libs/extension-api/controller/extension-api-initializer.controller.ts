@@ -28,7 +28,7 @@ export class UmbExtensionApiInitializer<
 	/**
 	 * The api that is created for this extension.
 	 * @readonly
-	 * @type {(class | undefined)}
+	 * @type {ExtensionApiInterface | undefined}
 	 */
 	public get api() {
 		return this.#api;

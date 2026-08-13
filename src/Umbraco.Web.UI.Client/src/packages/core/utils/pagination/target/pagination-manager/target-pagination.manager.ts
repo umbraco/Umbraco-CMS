@@ -78,7 +78,7 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Gets the number of items per page
-	 * @returns {number}
+	 * @returns {number} The number of items per page
 	 * @memberof UmbPaginationManager
 	 */
 	public getTakeSize(): number {
@@ -87,7 +87,7 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Sets the number of items per page and recalculates the total number of pages
-	 * @param {number} pageSize
+	 * @param {number} pageSize - The number of items per page
 	 * @memberof UmbPaginationManager
 	 */
 	public setTakeSize(pageSize: number) {
@@ -133,7 +133,7 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Removes an item from the current items
-	 * @param {UmbEntityModel} entity
+	 * @param {UmbEntityModel} entity - The entity to remove
 	 * @memberof UmbTargetPaginationManager
 	 */
 	public removeFromCurrentItems(entity: UmbEntityModel) {
@@ -142,7 +142,7 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Gets the total number of items
-	 * @returns {number}
+	 * @returns {number} The total number of items
 	 * @memberof UmbPaginationManager
 	 */
 	public getTotalItems(): number {
@@ -151,7 +151,7 @@ export class UmbTargetPaginationManager<
 
 	/**
 	 * Sets the total number of items and recalculates the total number of pages
-	 * @param {number} totalItems
+	 * @param {number} totalItems - The total number of items
 	 * @memberof UmbPaginationManager
 	 */
 	public setTotalItems(totalItems: number) {

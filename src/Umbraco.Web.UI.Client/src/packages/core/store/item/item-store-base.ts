@@ -17,7 +17,7 @@ export abstract class UmbItemStoreBase<T extends { unique: string }>
 	/**
 	 * Creates an instance of UmbItemStoreBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @param storeAlias
+	 * @param {UmbContextToken<any> | string} storeAlias - The alias of the store
 	 * @memberof UmbItemStoreBase
 	 */
 	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string) {

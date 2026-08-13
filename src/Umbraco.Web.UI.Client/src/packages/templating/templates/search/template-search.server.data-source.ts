@@ -24,8 +24,8 @@ export class UmbTemplateSearchServerDataSource implements UmbSearchDataSource<Um
 
 	/**
 	 * Get a list of versions for a data
-	 * @param args
-	 * @returns {*}
+	 * @param {UmbSearchRequestArgs} args - The search arguments
+	 * @returns {*} The search results
 	 * @memberof UmbTemplateSearchServerDataSource
 	 */
 	async search(args: UmbSearchRequestArgs) {

@@ -5,10 +5,19 @@ import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 import type { ManifestTree } from '../extensions/types.js';
 import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
-import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	query,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
@@ -42,13 +51,19 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	private _hasSelection: boolean = false;
 
 	@state()
+	private _selectionCount: number = 0;
+
+	@state()
 	private _createPath?: string;
 
 	@state()
 	private _createLabel?: string;
 
 	@state()
-	private _searchQuery?: string;
+	private _isSearchable: boolean = false;
+
+	@state()
+	private _activeTab: 'browse' | 'search' = 'browse';
 
 	@state()
 	private _treeExpansion: UmbEntityExpansionModel = [];
@@ -62,7 +77,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _breadcrumb: Array<UmbTreeBreadcrumbItem> = [];
 
-	#treeAlias?: string;
+	@query('umb-picker-search-field')
+	private _searchField?: UmbPickerSearchFieldElement;
+
+	@state()
+	private _treeAlias?: string;
 	private _initialStartNode?: UmbTreeStartNode;
 	private _repository?: UmbTreeRepository;
 	private _breadcrumbLoaded = false;
@@ -73,9 +92,13 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	constructor() {
 		super();
 		this._pickerContext.selection.setSelectable(true);
-		this.observe(this._pickerContext.selection.hasSelection, (hasSelection) => {
-			this._hasSelection = hasSelection;
-		});
+		this.observe(
+			this._pickerContext.selection.hasSelection,
+			(hasSelection) => {
+				this._hasSelection = hasSelection;
+			},
+			null,
+		);
 		this.#observePickerSelection();
 		this.#observeSearch();
 		this.#observeExpansion();
@@ -113,8 +136,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				multiple,
 			};
 
-			if (this.data?.treeAlias && this.data.treeAlias !== this.#treeAlias) {
-				this.#treeAlias = this.data.treeAlias;
+			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
+				this._treeAlias = this.data.treeAlias;
 				this._initialStartNode = this.data.startNode;
 				this._currentLocation = this.data.startNode;
 				this._breadcrumb = [];
@@ -272,6 +295,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.observe(
 			this._pickerContext.selection.selection,
 			(selection) => {
+				this._selectionCount = selection.length;
 				this.updateValue({ selection });
 				this.requestUpdate();
 			},
@@ -281,11 +305,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#observeSearch() {
 		this.observe(
-			this._pickerContext.search.query,
-			(query) => {
-				this._searchQuery = query?.query;
+			this._pickerContext.search.searchable,
+			(isSearchable) => {
+				this._isSearchable = isSearchable ?? false;
 			},
-			'umbPickerSearchQueryObserver',
+			'umbPickerSearchableObserver',
 		);
 	}
 
@@ -376,29 +400,66 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#searchSelectableFilter = () => true;
 
+	async #setActiveTab(tab: 'browse' | 'search') {
+		if (this._activeTab === tab) return;
+		this._activeTab = tab;
+
+		if (tab === 'search') {
+			await this.updateComplete;
+			this._searchField?.focus();
+		}
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.string(this.data?.headline ?? '#general_choose')}>
-				${this.#renderSearch()} ${this.#renderTree()} ${this.#renderActions()}
+				${this.#renderTabs()}
+				<div id="browse" ?hidden=${this._activeTab !== 'browse'}>${this.#renderTree()}</div>
+				<div id="search" ?hidden=${this._activeTab !== 'search'}>${this.#renderSearch()}</div>
+				${this.#renderSelectionCount()} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
 
+	#renderTabs() {
+		if (!this._isSearchable) return nothing;
+
+		return html`
+			<uui-tab-group slot="navigation">
+				${this.#renderTab('browse', 'picker_browseTab', 'icon-list')}
+				${this.#renderTab('search', 'picker_searchTab', 'icon-search')}
+			</uui-tab-group>
+		`;
+	}
+
+	// The label is passed as both property and child text: `uui-tab` renders its `label` in the default
+	// slot, which the whitespace of a multi-line template would otherwise occupy.
+	#renderTab(tab: 'browse' | 'search', labelKey: string, icon: string) {
+		const label = this.localize.term(labelKey);
+
+		return html`<uui-tab
+			label=${label}
+			?active=${this._activeTab === tab}
+			@click=${() => this.#setActiveTab(tab)}
+			data-mark="picker:tab:${tab}">
+			<umb-icon slot="icon" name=${icon}></umb-icon>
+			${label}
+		</uui-tab>`;
+	}
+
 	#renderSearch() {
+		if (!this._isSearchable) return nothing;
+
 		const selectableFilter =
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
 		return html`
-			<umb-picker-search-field></umb-picker-search-field>
+			<umb-picker-search-field .alias=${this._treeAlias}></umb-picker-search-field>
 			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
 		`;
 	}
 
 	#renderTree() {
-		if (this._searchQuery) {
-			return nothing;
-		}
-
 		return html`
 			${this.#renderBreadcrumb()}
 			<umb-tree
@@ -445,6 +506,14 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		`;
 	}
 
+	#renderSelectionCount() {
+		if (!this._selectionConfiguration.multiple || !this._hasSelection) return nothing;
+
+		return html`
+			<div id="selection-info" slot="footer">${this.localize.term('picker_selectedCount', this._selectionCount)}</div>
+		`;
+	}
+
 	#renderActions() {
 		return html`
 			<div slot="actions">
@@ -466,6 +535,12 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	static override styles = css`
+		uui-tab-group {
+			--uui-tab-divider: var(--uui-color-border);
+			border-left: 1px solid var(--uui-color-border);
+			border-right: 1px solid var(--uui-color-border);
+		}
+
 		#breadcrumb {
 			margin-bottom: var(--uui-size-space-4);
 		}
@@ -477,6 +552,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		uui-breadcrumb-item:not([last-item]) {
 			cursor: pointer;
+		}
+
+		#selection-info {
+			display: flex;
+			align-items: center;
+			box-sizing: border-box;
+			width: 100%;
+			padding: var(--uui-size-space-4) var(--uui-size-space-6);
+			background-color: var(--uui-color-selected);
+			color: var(--uui-color-selected-contrast);
 		}
 	`;
 }

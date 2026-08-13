@@ -25,8 +25,8 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 
 	/**
 	 * Creates a scaffold for a Data Type folder
-	 * @param {Partial<UmbFolderModel>} [preset]
-	 * @returns {*}
+	 * @param {Partial<UmbFolderModel>} [preset] - The preset data to populate the scaffold with.
+	 * @returns {*} The data type folder scaffold.
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async createScaffold(preset?: Partial<UmbFolderModel>) {
@@ -42,8 +42,8 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 
 	/**
 	 * Fetches a Data Type folder from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the folder to fetch.
+	 * @returns {*} The data type folder.
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -71,8 +71,8 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 
 	/**
 	 * Creates a Data Type folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {*}
+	 * @param {UmbFolderModel} model - The data type folder to create.
+	 * @returns {*} The created data type folder.
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async create(model: UmbFolderModel, parentUnique: string | null) {
@@ -102,8 +102,8 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 
 	/**
 	 * Updates a Data Type folder on the server
-	 * @param {UmbFolderModel} model
-	 * @returns {*}
+	 * @param {UmbFolderModel} model - The data type folder to update.
+	 * @returns {*} The updated data type folder.
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async update(model: UmbFolderModel) {
@@ -128,8 +128,8 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 
 	/**
 	 * Deletes a Data Type folder on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the folder to delete.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async delete(unique: string) {

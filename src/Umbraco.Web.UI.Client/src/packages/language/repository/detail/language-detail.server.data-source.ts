@@ -28,8 +28,8 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Creates a new Language scaffold
-	 * @param {Partial<UmbLanguageDetailModel>} [preset]
-	 * @returns { CreateLanguageRequestModel }
+	 * @param {Partial<UmbLanguageDetailModel>} [preset] Initial values for the scaffold.
+	 * @returns { CreateLanguageRequestModel } The language scaffold.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbLanguageDetailModel> = {}) {
@@ -48,8 +48,8 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Fetches a Language with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique The iso code of the language to fetch.
+	 * @returns {*} The language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async read(unique: string) {
@@ -79,8 +79,8 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Inserts a new Language on the server
-	 * @param {UmbLanguageDetailModel} model
-	 * @returns {*}
+	 * @param {UmbLanguageDetailModel} model The language to create.
+	 * @returns {*} The created language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async create(model: UmbLanguageDetailModel) {
@@ -111,9 +111,8 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Updates a Language on the server
-	 * @param {UmbLanguageDetailModel} Language
-	 * @param model
-	 * @returns {*}
+	 * @param {UmbLanguageDetailModel} model The language to update.
+	 * @returns {*} The updated language.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async update(model: UmbLanguageDetailModel) {
@@ -144,8 +143,8 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 	/**
 	 * Deletes a Language on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique The iso code of the language to delete.
+	 * @returns {*} The result of the delete operation.
 	 * @memberof UmbLanguageServerDataSource
 	 */
 	async delete(unique: string) {

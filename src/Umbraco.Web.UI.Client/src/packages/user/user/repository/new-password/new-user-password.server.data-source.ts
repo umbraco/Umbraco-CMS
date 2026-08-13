@@ -20,8 +20,8 @@ export class UmbNewUserPasswordServerDataSource {
 
 	/**
 	 * Generate a new password for a user
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The unique id of the user
+	 * @returns {*} The new password
 	 * @memberof UmbNewUserPasswordServerDataSource
 	 */
 	async newPassword(unique: string) {

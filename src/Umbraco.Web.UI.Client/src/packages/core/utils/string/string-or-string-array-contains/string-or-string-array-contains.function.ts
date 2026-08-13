@@ -1,7 +1,7 @@
 /**
  * @description Check if a string or array of strings contains a specific string
- * @param value The string or array of strings to search in
- * @param search The string to search for
+ * @param {string | Array<string>} value The string or array of strings to search in
+ * @param {string} search The string to search for
  * @returns {boolean} Whether the string or array of strings contains the search string
  */
 export function stringOrStringArrayContains(value: string | Array<string>, search: string): boolean {
@@ -10,8 +10,8 @@ export function stringOrStringArrayContains(value: string | Array<string>, searc
 
 /**
  * Check if a string or array of strings intersects with another array of strings
- * @param value The string or array of strings to search in
- * @param search The array of strings to search for
+ * @param {string | Array<string>} value The string or array of strings to search in
+ * @param {Array<string>} search The array of strings to search for
  * @returns {boolean} Whether the string or array of strings intersects with the search array
  */
 export function stringOrStringArrayIntersects(value: string | Array<string>, search: Array<string>): boolean {

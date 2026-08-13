@@ -86,5 +86,11 @@
     <Compile Update="Umbraco.Core\Factories\MachineIdentityProviderTests.AzureWebsiteInstanceId.cs">
       <DependentUpon>MachineIdentityProviderTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Web.Common\Views\UmbracoViewPageTests.PreviewBadge.cs">
+      <DependentUpon>UmbracoViewPageTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Web.Common\Views\UmbracoViewPageTests.RenderModel.cs">
+      <DependentUpon>UmbracoViewPageTests.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

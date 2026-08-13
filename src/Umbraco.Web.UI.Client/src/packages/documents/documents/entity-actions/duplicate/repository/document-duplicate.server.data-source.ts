@@ -21,8 +21,8 @@ export class UmbDuplicateDocumentServerDataSource {
 
 	/**
 	 * Duplicate an item for the given id to the destination unique
-	 * @param {UmbDuplicateDocumentRequestArgs} args
-	 * @returns {*}
+	 * @param {UmbDuplicateDocumentRequestArgs} args - The duplicate request arguments
+	 * @returns {*} The result of the duplicate request
 	 * @memberof UmbDuplicateDocumentServerDataSource
 	 */
 	async duplicate(args: UmbDuplicateDocumentRequestArgs) {

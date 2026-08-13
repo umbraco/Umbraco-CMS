@@ -15,8 +15,7 @@ export interface UmbRenameServerFileDataSource<DetailType extends UmbEntityModel
 	rename(unique: string, name: string): Promise<UmbDataSourceResponse<DetailType>>;
 }
 
-export interface ManifestEntityActionRenameServerFileKind
-	extends ManifestEntityAction<MetaEntityActionRenameServerFileKind> {
+export interface ManifestEntityActionRenameServerFileKind extends ManifestEntityAction<MetaEntityActionRenameServerFileKind> {
 	type: 'entityAction';
 	kind: 'renameServerFile';
 }
