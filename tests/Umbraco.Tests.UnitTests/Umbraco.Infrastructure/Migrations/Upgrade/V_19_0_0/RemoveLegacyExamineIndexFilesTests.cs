@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
@@ -36,7 +37,7 @@ public class RemoveLegacyExamineIndexFilesTests
     [Test]
     public async Task Removes_Existing_Examine_Index_Folder()
     {
-        var indexFolder = Path.Combine(_examineIndexesPath, "Umb_PublishedContent");
+        var indexFolder = Path.Combine(_examineIndexesPath, "InternalIndex");
         Directory.CreateDirectory(indexFolder);
         File.WriteAllText(Path.Combine(indexFolder, "segments.gen"), "test");
         File.WriteAllText(Path.Combine(indexFolder, "_0.cfs"), "test");
@@ -66,6 +67,40 @@ public class RemoveLegacyExamineIndexFilesTests
 
         Assert.That(Directory.Exists(_examineIndexesPath), Is.False);
         Assert.That(Directory.Exists(untouchedFolder), Is.True);
+    }
+
+    [TestCase(Constants.IndexAliases.PublishedContent)]
+    [TestCase(Constants.IndexAliases.DraftContent)]
+    [TestCase(Constants.IndexAliases.DraftMedia)]
+    [TestCase(Constants.IndexAliases.DraftMembers)]
+    public async Task Does_Not_Delete_Folders_Matching_Current_Index_Aliases(string indexAlias)
+    {
+        var currentIndexFolder = Path.Combine(_examineIndexesPath, indexAlias);
+        Directory.CreateDirectory(currentIndexFolder);
+        File.WriteAllText(Path.Combine(currentIndexFolder, "segments.gen"), "test");
+
+        await RunMigration();
+
+        Assert.That(Directory.Exists(_examineIndexesPath), Is.True);
+        Assert.That(Directory.Exists(currentIndexFolder), Is.True);
+        Assert.That(File.Exists(Path.Combine(currentIndexFolder, "segments.gen")), Is.True);
+    }
+
+    [Test]
+    public async Task Deletes_Legacy_Folders_While_Leaving_Current_Index_Folders_In_Place()
+    {
+        var legacyFolder = Path.Combine(_examineIndexesPath, "InternalIndex");
+        Directory.CreateDirectory(legacyFolder);
+        File.WriteAllText(Path.Combine(legacyFolder, "segments.gen"), "test");
+
+        var currentIndexFolder = Path.Combine(_examineIndexesPath, Constants.IndexAliases.PublishedContent);
+        Directory.CreateDirectory(currentIndexFolder);
+        File.WriteAllText(Path.Combine(currentIndexFolder, "segments.gen"), "test");
+
+        await RunMigration();
+
+        Assert.That(Directory.Exists(legacyFolder), Is.False);
+        Assert.That(Directory.Exists(currentIndexFolder), Is.True);
     }
 
     private async Task RunMigration()

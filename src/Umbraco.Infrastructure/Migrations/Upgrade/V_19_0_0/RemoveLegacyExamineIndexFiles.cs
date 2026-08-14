@@ -16,9 +16,20 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 /// <c>ExternalIndex</c>) are never read again by anything and pile up forever, since nothing else cleans them
 /// up. Individual files or folders that cannot be deleted (e.g. because they're locked) are skipped rather than
 /// failing the migration; anything left behind is safe to delete manually.
+/// Folders whose name matches one of the current search abstraction index aliases
+/// (<see cref="Core.Constants.IndexAliases"/>) are left untouched, since the Examine search provider still uses
+/// those names for its active indexes.
 /// </remarks>
 public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
 {
+    private static readonly HashSet<string> CurrentIndexNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        Core.Constants.IndexAliases.PublishedContent,
+        Core.Constants.IndexAliases.DraftContent,
+        Core.Constants.IndexAliases.DraftMedia,
+        Core.Constants.IndexAliases.DraftMembers,
+    };
+
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILogger<RemoveLegacyExamineIndexFiles> _logger;
 
@@ -59,10 +70,17 @@ public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
         }
 
         var hadFailures = false;
+        var hadCurrentIndexes = false;
 
         // Each index is a folder of files directly under the root - one level deep, no further nesting.
         foreach (DirectoryInfo indexFolder in root.GetDirectories())
         {
+            if (CurrentIndexNames.Contains(indexFolder.Name))
+            {
+                hadCurrentIndexes = true;
+                continue;
+            }
+
             foreach (FileInfo file in indexFolder.GetFiles())
             {
                 try
@@ -80,13 +98,20 @@ public class RemoveLegacyExamineIndexFiles : UnscopedMigrationBase
             TryDeleteEmptyDirectory(indexFolder, ref hadFailures);
         }
 
-        TryDeleteEmptyDirectory(root, ref hadFailures);
+        if (hadCurrentIndexes is false)
+        {
+            TryDeleteEmptyDirectory(root, ref hadFailures);
+        }
 
         if (hadFailures)
         {
             _logger.LogWarning(
                 "Could not fully remove the legacy Examine index folder at {Path}. Umbraco no longer reads these files - they can be safely deleted manually.",
                 path);
+        }
+        else if (hadCurrentIndexes)
+        {
+            _logger.LogInformation("Removed legacy Examine index folders at {Path}, leaving active indexes in place.", path);
         }
         else
         {
