@@ -1,5 +1,5 @@
 import { Link } from '../../externals.js';
-import { umbIsLocalLinkHref } from './link-attributes.js';
+import { isLocalLinkHref } from './link-attributes.function.js';
 
 export const UmbLink = Link.extend({
 	name: 'umbLink',
@@ -18,7 +18,7 @@ export const UmbLink = Link.extend({
 			type: {
 				default: null,
 				renderHTML: (attributes) =>
-					attributes.type && umbIsLocalLinkHref(attributes.href) ? { type: attributes.type } : {},
+					attributes.type && isLocalLinkHref(attributes.href) ? { type: attributes.type } : {},
 			},
 		};
 	},

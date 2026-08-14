@@ -1,7 +1,7 @@
 import type { Editor } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import { UmbLink } from './link.tiptap-extension.js';
-import { umbLinkFromAttributes } from './link-attributes.js';
+import { linkFromAttributes } from './link-attributes.function.js';
 import { UMB_LINK_PICKER_MODAL } from '@umbraco-cms/backoffice/multi-url-picker';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
@@ -10,7 +10,7 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override async execute(editor?: Editor) {
 		const attrs = editor?.getAttributes(UmbLink.name) ?? {};
-		const link = umbLinkFromAttributes(attrs);
+		const link = linkFromAttributes(attrs);
 		const data = { config: {}, index: null, isNew: link?.url === undefined };
 		const value = { link };
 

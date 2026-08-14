@@ -15,15 +15,15 @@ export type UmbLinkAttributes = {
 // The stored form of a local link, as recognised by the server when it resolves one to a URL: the leading
 // slash is optional and the braces may be URL-encoded. Anchored, so a URL that merely contains the token
 // somewhere in its path or query string is not taken for a local link.
-const UMB_LOCAL_LINK_HREF_PATTERN = /^\/?(?:\{|%7B)localLink:/i;
+const LOCAL_LINK_HREF_PATTERN = /^\/?(?:\{|%7B)localLink:/i;
 
 /**
  * Determines whether an href addresses an entity in this Umbraco installation rather than an arbitrary URL.
  * @param {string | null | undefined} href - The href to test
  * @returns {boolean} True when the href is a local link
  */
-export function umbIsLocalLinkHref(href: string | null | undefined): boolean {
-	return !!href && UMB_LOCAL_LINK_HREF_PATTERN.test(href);
+export function isLocalLinkHref(href: string | null | undefined): boolean {
+	return !!href && LOCAL_LINK_HREF_PATTERN.test(href);
 }
 
 /**
@@ -31,10 +31,10 @@ export function umbIsLocalLinkHref(href: string | null | undefined): boolean {
  * @param {UmbLinkAttributes} attrs - The attributes of the anchor, or an empty object when there is no anchor yet
  * @returns {UmbLinkPickerLink} The link model for the picker
  */
-export function umbLinkFromAttributes(attrs: UmbLinkAttributes): UmbLinkPickerLink {
+export function linkFromAttributes(attrs: UmbLinkAttributes): UmbLinkPickerLink {
 	const queryString = attrs['data-anchor'];
 	const url = attrs.href?.substring(0, attrs.href.length - (queryString?.length ?? 0));
-	const unique = umbIsLocalLinkHref(url) ? url!.substring(url!.indexOf(':') + 1, url!.indexOf('}')) : null;
+	const unique = isLocalLinkHref(url) ? url!.substring(url!.indexOf(':') + 1, url!.indexOf('}')) : null;
 
 	return {
 		name: attrs.title,
