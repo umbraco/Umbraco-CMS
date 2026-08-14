@@ -15,20 +15,19 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 type TestPropertyValueNestedType = {
-	nestedValue: UmbPropertyValueData;
+	nestedValue: UmbPotentialContentValueModel;
 };
 
-export class TestPropertyValueResolver
-	implements
-		UmbPropertyValueResolver<
-			UmbPropertyValueData<TestPropertyValueNestedType>,
-			UmbPropertyValueData,
-			UmbVariantDataModel
-		>
-{
+export class TestPropertyValueResolver implements UmbPropertyValueResolver<
+	UmbPropertyValueData<TestPropertyValueNestedType>,
+	UmbPotentialContentValueModel,
+	UmbVariantDataModel
+> {
 	async processValues(
 		property: UmbPropertyValueData<TestPropertyValueNestedType>,
-		valuesCallback: (values: Array<UmbPropertyValueData>) => Promise<Array<UmbPropertyValueData> | undefined>,
+		valuesCallback: (
+			values: Array<UmbPotentialContentValueModel>,
+		) => Promise<Array<UmbPotentialContentValueModel> | undefined>,
 	) {
 		if (property.value) {
 			const processedValues = await valuesCallback([property.value.nestedValue]);
@@ -53,16 +52,17 @@ type TestBlockValueType = {
  * Mirrors UmbBlockValueResolver._processValueBlockData: the values callback is invoked
  * once per contentData entry, in array order.
  */
-export class TestBlockValueResolver
-	implements
-		UmbPropertyValueResolver<UmbPropertyValueData<TestBlockValueType>, UmbPropertyValueData, UmbVariantDataModel>
-{
+export class TestBlockValueResolver implements UmbPropertyValueResolver<
+	UmbPropertyValueData<TestBlockValueType>,
+	UmbPotentialContentValueModel,
+	UmbVariantDataModel
+> {
 	async processValues(
 		property: UmbPropertyValueData<TestBlockValueType>,
 		valuesCallback: (
-			values: Array<UmbPropertyValueData>,
+			values: Array<UmbPotentialContentValueModel>,
 			groupIdentifier?: string,
-		) => Promise<Array<UmbPropertyValueData> | undefined>,
+		) => Promise<Array<UmbPotentialContentValueModel> | undefined>,
 	) {
 		if (property.value) {
 			const contentData = await Promise.all(
