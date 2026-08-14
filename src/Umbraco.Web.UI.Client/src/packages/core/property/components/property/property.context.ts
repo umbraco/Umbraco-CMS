@@ -160,12 +160,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	private async _observeProperty(): Promise<void> {
 		const alias = this.#alias.getValue();
-		if (!this.#datasetContext || !alias) {
-			this.removeUmbControllerByAlias('observeVariantId');
-			this.removeUmbControllerByAlias('observeValue');
-			this.removeUmbControllerByAlias('observeDatasetReadOnly');
-			return;
-		}
+		if (!this.#datasetContext || !alias) return;
 
 		const variantIdSource = await this.#datasetContext.propertyVariantId?.(alias);
 		const valueSource = await this.#datasetContext.propertyValueByAlias<ValueType>(alias);
@@ -189,21 +184,17 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 			'observeValue',
 		);
 
-		this.observe(
-			this.#datasetContext?.readOnly,
-			(value) => {
-				const unique = 'UMB_DATASET';
+		this.observe(this.#datasetContext?.readOnly, (value) => {
+			const unique = 'UMB_DATASET';
 
-				if (value) {
-					this.readOnlyState.addState({
-						unique,
-					});
-				} else {
-					this.readOnlyState.removeState(unique);
-				}
-			},
-			'observeDatasetReadOnly',
-		);
+			if (value) {
+				this.readOnlyState.addState({
+					unique,
+				});
+			} else {
+				this.readOnlyState.removeState(unique);
+			}
+		});
 	}
 
 	private _generateVariantDifferenceString() {
