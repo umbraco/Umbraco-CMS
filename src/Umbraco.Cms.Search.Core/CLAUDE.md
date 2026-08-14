@@ -141,9 +141,7 @@ cd src/Umbraco.Web.UI
 dotnet run
 ```
 
-The full search stack is registered in the default install via composers: `SearchCoreComposer` + `ExamineSearchProviderComposer` (core + Examine provider), `BackOfficeSearchComposer` (backoffice search services run on the new indexes) and `DeliveryApiSearchComposer` (Delivery API content querying runs on the new indexes; only active when the Delivery API is composed). The legacy Examine indexes are still maintained side-by-side.
-
-Temporary escape hatch: setting `Umbraco:CMS:Search:UseLegacySearchServices` to `true` reverts backoffice search and Delivery API querying to the legacy Examine based implementations. It is scheduled for removal along with the legacy search stack.
+The full search stack is registered in the default install via composers: `SearchCoreComposer` + `ExamineSearchProviderComposer` (core + Examine provider), `BackOfficeSearchComposer` (backoffice search services run on the new indexes) and `DeliveryApiSearchComposer` (Delivery API content querying runs on the new indexes; only active when the Delivery API is composed). The legacy Examine-based search stack has been fully removed from the codebase — there is no side-by-side legacy indexing and no legacy fallback setting.
 
 ## Architecture
 

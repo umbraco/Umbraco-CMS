@@ -34,7 +34,6 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
     /// <param name="logger">The logger used for diagnostic and error logging.</param>
     /// <param name="entityService">Service for accessing Umbraco entities.</param>
     /// <param name="contentSettings">The monitor providing current content settings options.</param>
-    /// <param name="examineManager">The manager for Examine search indexes.</param>
     /// <param name="variationContextAccessor">Accessor for the current variation context (e.g., culture/language).</param>
     /// <param name="umbracoContextAccessor">Accessor for the current Umbraco context.</param>
     /// <param name="documentUrlService">Service for resolving document URLs.</param>
