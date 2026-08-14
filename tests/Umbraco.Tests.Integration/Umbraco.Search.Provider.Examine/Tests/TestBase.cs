@@ -35,7 +35,7 @@ public abstract class TestBase : UmbracoIntegrationTest
     // How long to wait, after the most recent commit, without seeing another one before
     // considering indexing settled. A single batch of updates can trigger more than one
     // underlying Lucene commit, so waiting for just the first one is not sufficient.
-    private static readonly TimeSpan _indexingQuietPeriod = TimeSpan.FromMilliseconds(1000);
+    private static readonly TimeSpan _indexingQuietPeriod = TimeSpan.FromMilliseconds(500);
     private long _lastCommitTimestamp = -1;
 
     protected DateTime CurrentDateTime { get; set; }
