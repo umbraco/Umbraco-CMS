@@ -45,7 +45,7 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-dialog-layout headline=${headline}>
 				<div ?hidden=${!this._referencedByTotal}>
-					<p><umb-localize key="references_labelDependsOnThis"></umb-localize></p>
+					<p><umb-localize key="references_labelDependsOnThis">The following items depend on this</umb-localize></p>
 					<umb-entity-reference-list
 						readonly
 						.unique=${data.unique}
@@ -54,7 +54,11 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 						@change=${this.#onReferencedByChange}></umb-entity-reference-list>
 				</div>
 				<div ?hidden=${!this._descendantsTotal}>
-					<p><umb-localize key="references_labelDependentDescendants"></umb-localize></p>
+					<p>
+						<umb-localize key="references_labelDependentDescendants"
+							>The following descending items have dependencies</umb-localize
+						>
+					</p>
 					<umb-entity-reference-list
 						readonly
 						.unique=${data.unique}
@@ -67,7 +71,11 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 					data.includeReferencedElementsWithPendingChanges,
 					() => html`
 						<div ?hidden=${!this._pendingChangesTotal}>
-							<p><umb-localize key="references_labelElementsWithPendingChanges"></umb-localize></p>
+							<p>
+								<umb-localize key="references_labelElementsWithPendingChanges"
+									>The following referenced elements are not fully published</umb-localize
+								>
+							</p>
 							<umb-entity-reference-list
 								readonly
 								.unique=${data.unique}

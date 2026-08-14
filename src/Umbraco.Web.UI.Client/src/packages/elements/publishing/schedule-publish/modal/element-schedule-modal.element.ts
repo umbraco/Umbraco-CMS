@@ -11,7 +11,6 @@ import { css, customElement, html, ref, repeat, state, when } from '@umbraco-cms
 import { umbBindToValidation, UmbValidationContext } from '@umbraco-cms/backoffice/validation';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbConfirmActionModalEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
 import type { UUIBooleanInputElement, UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
@@ -449,7 +448,6 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 	}
 
 	static override readonly styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;
