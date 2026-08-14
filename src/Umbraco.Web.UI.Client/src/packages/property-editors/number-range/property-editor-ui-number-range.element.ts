@@ -26,6 +26,9 @@ export class UmbPropertyEditorUINumberRangeElement
 	@state()
 	private _validationRange?: UmbNumberRangeValueType;
 
+	@state()
+	private _step?: number;
+
 	@property({ type: Boolean })
 	mandatory = false;
 	@property({ type: String })
@@ -44,6 +47,7 @@ export class UmbPropertyEditorUINumberRangeElement
 	public set config(config: UmbPropertyEditorConfigCollection) {
 		if (!config) return;
 		this._validationRange = config.getValueByAlias<UmbNumberRangeValueType>('validationRange');
+		this._step = config.getValueByAlias<number>('step');
 	}
 
 	#onChange(event: CustomEvent & { target: UmbInputNumberRangeElement }) {
@@ -69,6 +73,7 @@ export class UmbPropertyEditorUINumberRangeElement
 				?required=${this.mandatory}
 				.requiredMessage=${this.mandatoryMessage}
 				.validationRange=${this._validationRange}
+				.step=${this._step}
 				@change=${this.#onChange}>
 			</umb-input-number-range>
 		`;

@@ -72,16 +72,16 @@ public class SliderPropertyEditor : DataEditor, IValueSchemaProvider
             var fromSchema = (JsonObject)schema["properties"]!["from"]!;
             var toSchema = (JsonObject)schema["properties"]!["to"]!;
 
-            if (sliderConfig.MinimumValue != 0)
+            if (sliderConfig.ValidationRange.Min is decimal minimum && minimum != 0)
             {
-                fromSchema["minimum"] = sliderConfig.MinimumValue;
-                toSchema["minimum"] = sliderConfig.MinimumValue;
+                fromSchema["minimum"] = minimum;
+                toSchema["minimum"] = minimum;
             }
 
-            if (sliderConfig.MaximumValue != 0)
+            if (sliderConfig.ValidationRange.Max is decimal maximum && maximum != 0)
             {
-                fromSchema["maximum"] = sliderConfig.MaximumValue;
-                toSchema["maximum"] = sliderConfig.MaximumValue;
+                fromSchema["maximum"] = maximum;
+                toSchema["maximum"] = maximum;
             }
         }
 
@@ -330,17 +330,18 @@ public class SliderPropertyEditor : DataEditor, IValueSchemaProvider
                     yield break;
                 }
 
-                if (sliderRange.From < sliderConfiguration.MinimumValue)
+                decimal minimum = sliderConfiguration.ValidationRange.Min ?? 0;
+                if (sliderRange.From < minimum)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [sliderRange.From.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [sliderRange.From.ToString(CultureInfo.InvariantCulture), minimum.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
 
-                if (sliderConfiguration.MaximumValue != 0 && sliderRange.To > sliderConfiguration.MaximumValue)
+                if (sliderConfiguration.ValidationRange.Max is decimal maximum && sliderRange.To > maximum)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MaximumValue.ToString(CultureInfo.InvariantCulture)]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(CultureInfo.InvariantCulture), maximum.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }
@@ -372,11 +373,12 @@ public class SliderPropertyEditor : DataEditor, IValueSchemaProvider
                     yield break;
                 }
 
-                if (ValidationHelper.IsValueValidForStep(sliderRange.From, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false ||
-                    ValidationHelper.IsValueValidForStep(sliderRange.To, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false)
+                decimal minimum = sliderConfiguration.ValidationRange.Min ?? 0;
+                if (ValidationHelper.IsValueValidForStep(sliderRange.From, minimum, sliderConfiguration.Step) is false ||
+                    ValidationHelper.IsValueValidForStep(sliderRange.To, minimum, sliderConfiguration.Step) is false)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
+                        LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(CultureInfo.InvariantCulture), minimum.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }
