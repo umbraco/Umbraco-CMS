@@ -1,5 +1,5 @@
 import type { UmbPublishedVariantWithPendingChanges } from '../publishing/index.js';
-import { html, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { sortVariants, UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbWorkspaceSplitViewVariantSelectorElement } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
@@ -96,6 +96,9 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 	}
 
 	protected override _renderVariantDetails(variantOption: VariantOptionModelType) {
+		if (variantOption.segment) {
+			return nothing;
+		}
 		return html`${this.#getVariantState(variantOption)}`;
 	}
 }
