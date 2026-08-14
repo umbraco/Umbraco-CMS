@@ -41,7 +41,7 @@ public class QueryTests : SearcherTestBase
                 var documents = result.Documents.ToList();
                 Assert.That(
                     documents.Select(d => d.Id),
-                    Is.EqualTo(
+                    Is.EquivalentTo(
                         new[]
                         {
                             DocumentIds[1],
@@ -56,7 +56,7 @@ public class QueryTests : SearcherTestBase
                             DocumentIds[18],
                             DocumentIds[19],
                             DocumentIds[100],
-                        }).AsCollection);
+                        }));
             });
     }
 
@@ -101,7 +101,7 @@ public class QueryTests : SearcherTestBase
                 var expectedIds = OddOrEvenIds(even);
                 Assert.That(
                     documents.Select(d => d.Id),
-                    Is.EqualTo(expectedIds.Select(id => DocumentIds[id])).AsCollection);
+                    Is.EquivalentTo(expectedIds.Select(id => DocumentIds[id])));
             });
     }
 

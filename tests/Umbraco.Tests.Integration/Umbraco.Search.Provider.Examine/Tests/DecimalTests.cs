@@ -83,7 +83,7 @@ public class DecimalTests : SearcherTestBase
                 // expecting 10 (15), 15 (15), 20 (30), 28 (42), 30 (30) and 42 (42)
                 Assert.That(
                     documents.Select(d => d.Id),
-                    Is.EqualTo(
+                    Is.EquivalentTo(
                         new[]
                         {
                             DocumentIds[10],
@@ -92,7 +92,7 @@ public class DecimalTests : SearcherTestBase
                             DocumentIds[28],
                             DocumentIds[30],
                             DocumentIds[42]
-                        }).AsCollection);
+                        }));
             });
     }
 
@@ -155,7 +155,7 @@ public class DecimalTests : SearcherTestBase
             () =>
             {
                 Assert.That(result.Total, Is.EqualTo(99));
-                Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(DocumentIds.Values.Skip(1)).AsCollection);
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(DocumentIds.Values.Skip(1)));
             });
     }
 
@@ -169,7 +169,7 @@ public class DecimalTests : SearcherTestBase
             () =>
             {
                 Assert.That(result.Total, Is.EqualTo(99));
-                Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(DocumentIds.Values.Skip(1)).AsCollection);
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(DocumentIds.Values.Skip(1)));
             });
     }
 

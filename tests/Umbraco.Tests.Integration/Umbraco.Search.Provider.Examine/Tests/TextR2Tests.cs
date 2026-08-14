@@ -38,7 +38,7 @@ public class TextR2Tests : SearcherTestBase
                 var documents = result.Documents.ToList();
                 Assert.That(
                     documents.Select(d => d.Id),
-                    Is.EqualTo(new[] { DocumentIds[21], DocumentIds[22], DocumentIds[23] }).AsCollection);
+                    Is.EquivalentTo(new[] { DocumentIds[21], DocumentIds[22], DocumentIds[23] }));
             });
     }
 
@@ -54,7 +54,7 @@ public class TextR2Tests : SearcherTestBase
                 Assert.That(result.Total, Is.EqualTo(99));
                 Assert.That(
                     result.Documents.Select(d => d.Id),
-                    Is.EqualTo(DocumentIds.Values.Except([DocumentIds[22]])).AsCollection);
+                    Is.EquivalentTo(DocumentIds.Values.Except([DocumentIds[22]])));
             });
     }
 }

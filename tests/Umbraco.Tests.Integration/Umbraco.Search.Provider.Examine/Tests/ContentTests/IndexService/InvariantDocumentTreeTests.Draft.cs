@@ -22,9 +22,14 @@ public partial class InvariantDocumentTreeTests
         Assert.Multiple(() =>
         {
             Assert.That(results.Length, Is.EqualTo(3));
-            Assert.That(results[0].Id, Is.EqualTo(RootKey.ToString()));
-            Assert.That(results[1].Id, Is.EqualTo(ChildKey.ToString()));
-            Assert.That(results[2].Id, Is.EqualTo(GrandchildKey.ToString()));
+            Assert.That(
+                results.Select(result => result.Id),
+                Is.EquivalentTo(new[]
+                {
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
+                    GrandchildKey.ToString(),
+                }));
         });
     }
 
@@ -56,12 +61,11 @@ public partial class InvariantDocumentTreeTests
         Assert.Multiple(() =>
         {
             Assert.That(results.Length, Is.EqualTo(3));
-            Assert.That(results[0].Id, Is.EqualTo(RootKey.ToString()));
-            Assert.That(results[1].Id, Is.EqualTo(ChildKey.ToString()));
-            Assert.That(results[2].Id, Is.EqualTo(GrandchildKey.ToString()));
+            Assert.That(
+                results.Select(d => d.Id),
+                Is.EquivalentTo(new[] { RootKey, ChildKey, GrandchildKey, }));
         });
     }
-
 
     [Test]
     public async Task DraftStructure_WithChildDeleted_YieldsNothingBelowRoot()
@@ -102,8 +106,13 @@ public partial class InvariantDocumentTreeTests
         Assert.Multiple(() =>
         {
             Assert.That(results.Length, Is.EqualTo(2));
-            Assert.That(results[0].Id, Is.EqualTo(RootKey.ToString()));
-            Assert.That(results[1].Id, Is.EqualTo(ChildKey.ToString()));
+            Assert.That(
+                results.Select(d => d.Id),
+                Is.EquivalentTo(new[]
+                {
+                    RootKey,
+                    ChildKey,
+                }));
         });
     }
 

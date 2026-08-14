@@ -42,15 +42,15 @@ public class VariousCasesTests : SearcherTestBase
 
         Assert.That(result.Total, Is.EqualTo(4));
 
-        Assert.Multiple(
-            () =>
+        Assert.That(
+            result.Documents.Select(d => d.ObjectType),
+            Is.EquivalentTo(new[]
             {
-                Document[] documents = result.Documents.ToArray();
-                Assert.That(documents[0].ObjectType, Is.EqualTo(UmbracoObjectTypes.Document));
-                Assert.That(documents[1].ObjectType, Is.EqualTo(UmbracoObjectTypes.Media));
-                Assert.That(documents[2].ObjectType, Is.EqualTo(UmbracoObjectTypes.Member));
-                Assert.That(documents[3].ObjectType, Is.EqualTo(UmbracoObjectTypes.Unknown));
-            });
+                UmbracoObjectTypes.Document,
+                UmbracoObjectTypes.Media,
+                UmbracoObjectTypes.Member,
+                UmbracoObjectTypes.Unknown,
+            }));
     }
 
     [Test]
@@ -293,17 +293,17 @@ public class VariousCasesTests : SearcherTestBase
 
         Assert.That(result.Total, Is.EqualTo(5));
 
-        Assert.Multiple(
-            () =>
+        // expecting 6, 7, 8, 9 and 10
+        Assert.That(
+            result.Documents.Select(d => d.Id),
+            Is.EquivalentTo(new[]
             {
-                // expecting 6, 7, 8, 9 and 10
-                Document[] documents = result.Documents.ToArray();
-                Assert.That(documents[0].Id, Is.EqualTo(DocumentIds[6]));
-                Assert.That(documents[1].Id, Is.EqualTo(DocumentIds[7]));
-                Assert.That(documents[2].Id, Is.EqualTo(DocumentIds[8]));
-                Assert.That(documents[3].Id, Is.EqualTo(DocumentIds[9]));
-                Assert.That(documents[4].Id, Is.EqualTo(DocumentIds[10]));
-            });
+                DocumentIds[6],
+                DocumentIds[7],
+                DocumentIds[8],
+                DocumentIds[9],
+                DocumentIds[10],
+            }));
     }
 
     [Test]
@@ -318,14 +318,14 @@ public class VariousCasesTests : SearcherTestBase
 
         Assert.That(result.Total, Is.EqualTo(2));
 
-        Assert.Multiple(
-            () =>
+        // expecting 3 (30) and 5 (50)
+        Assert.That(
+            result.Documents.Select(d => d.Id),
+            Is.EquivalentTo(new[]
             {
-                // expecting 3 (30) and 5 (50)
-                Document[] documents = result.Documents.ToArray();
-                Assert.That(documents[0].Id, Is.EqualTo(DocumentIds[3]));
-                Assert.That(documents[1].Id, Is.EqualTo(DocumentIds[5]));
-            });
+                DocumentIds[3],
+                DocumentIds[5],
+            }));
     }
 
     [TestCase(true)]

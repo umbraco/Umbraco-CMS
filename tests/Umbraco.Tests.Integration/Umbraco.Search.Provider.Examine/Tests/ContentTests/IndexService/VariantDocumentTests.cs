@@ -46,7 +46,12 @@ public class VariantDocumentTests : IndexTestBase
     public async Task CanRemoveSingleCultureFromPublishedDocument()
     {
         await CreateVariantDocument();
+
         var indexAlias = GetIndexAlias(true);
+        IIndex index = GetIndex(indexAlias);
+        ISearchResults results = index.Searcher.CreateQuery().All().Execute();
+        Assert.That(results.TotalItemCount, Is.EqualTo(3));
+
         await WaitForIndexing(indexAlias, () =>
         {
             IContent content = ContentService.GetById(RootKey)!;
@@ -54,8 +59,7 @@ public class VariantDocumentTests : IndexTestBase
             return Task.CompletedTask;
         });
 
-        IIndex index = GetIndex(indexAlias);
-        ISearchResults results = index.Searcher.CreateQuery().All().Execute();
+        results = index.Searcher.CreateQuery().All().Execute();
         Assert.That(results.TotalItemCount, Is.EqualTo(2));
     }
 

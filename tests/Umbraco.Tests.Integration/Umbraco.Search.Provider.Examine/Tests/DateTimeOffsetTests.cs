@@ -134,7 +134,7 @@ public class DateTimeOffsetTests : SearcherTestBase
             () =>
             {
                 Assert.That(result.Total, Is.EqualTo(99));
-                Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(DocumentIds.Values.Skip(1)).AsCollection);
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(DocumentIds.Values.Skip(1)));
             });
     }
 
@@ -154,7 +154,7 @@ public class DateTimeOffsetTests : SearcherTestBase
             () =>
             {
                 Assert.That(result.Total, Is.EqualTo(99));
-                Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(DocumentIds.Values.Skip(1)).AsCollection);
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(DocumentIds.Values.Skip(1)));
             });
     }
 

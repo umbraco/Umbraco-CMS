@@ -83,11 +83,11 @@ public class IntegerTests : SearcherTestBase
                 // expecting 1 (10), 5 (50), 10 (10 + 100), 50 (50) and 100 (100)
                 Assert.That(
                     documents.Select(d => d.Id).ToArray(),
-                    Is.EqualTo(
+                    Is.EquivalentTo(
                         new[]
                         {
                             DocumentIds[1], DocumentIds[5], DocumentIds[10], DocumentIds[50], DocumentIds[100]
-                        }.OrderBy(x => x).ToArray()).AsCollection);
+                        }.OrderBy(x => x).ToArray()));
             });
     }
 
@@ -147,7 +147,7 @@ public class IntegerTests : SearcherTestBase
             () =>
             {
                 Assert.That(result.Total, Is.EqualTo(99));
-                Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(DocumentIds.Values.Skip(1)).AsCollection);
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(DocumentIds.Values.Skip(1)));
             });
     }
 
@@ -161,7 +161,7 @@ public class IntegerTests : SearcherTestBase
             () =>
             {
                 Assert.That(result.Total, Is.EqualTo(99));
-                Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(DocumentIds.Values.Skip(1)).AsCollection);
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(DocumentIds.Values.Skip(1)));
             });
     }
 

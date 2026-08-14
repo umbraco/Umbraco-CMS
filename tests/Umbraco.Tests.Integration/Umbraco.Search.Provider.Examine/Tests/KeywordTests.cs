@@ -42,7 +42,7 @@ public class KeywordTests : SearcherTestBase
                 var expectedIds = OddOrEvenIds(even);
                 Assert.That(
                     documents.Select(d => d.Id),
-                    Is.EqualTo(expectedIds.Select(id => DocumentIds[id])).AsCollection);
+                    Is.EquivalentTo(expectedIds.Select(id => DocumentIds[id])));
             });
     }
 
@@ -56,7 +56,7 @@ public class KeywordTests : SearcherTestBase
             () =>
             {
                 Assert.That(result.Total, Is.EqualTo(100));
-                Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(DocumentIds.Values).AsCollection);
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(DocumentIds.Values));
             });
     }
 
@@ -70,7 +70,7 @@ public class KeywordTests : SearcherTestBase
             () =>
             {
                 Assert.That(result.Total, Is.EqualTo(99));
-                Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(DocumentIds.Values.Skip(1)).AsCollection);
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(DocumentIds.Values.Skip(1)));
             });
     }
 

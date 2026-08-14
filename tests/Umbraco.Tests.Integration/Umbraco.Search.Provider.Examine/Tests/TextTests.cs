@@ -39,7 +39,7 @@ public class TextTests : SearcherTestBase
                 var documents = result.Documents.ToList();
                 Assert.That(
                     documents.Select(d => d.Id),
-                    Is.EqualTo(new[] { DocumentIds[11], DocumentIds[22], DocumentIds[33] }).AsCollection);
+                    Is.EquivalentTo(new[] { DocumentIds[11], DocumentIds[22], DocumentIds[33] }));
             });
     }
 
@@ -59,7 +59,7 @@ public class TextTests : SearcherTestBase
                 var expectedIds = OddOrEvenIds(even);
                 Assert.That(
                     documents.Select(d => d.Id),
-                    Is.EqualTo(expectedIds.Select(id => DocumentIds[id])).AsCollection);
+                    Is.EquivalentTo(expectedIds.Select(id => DocumentIds[id])));
             });
     }
 
@@ -75,7 +75,7 @@ public class TextTests : SearcherTestBase
                 Assert.That(result.Total, Is.EqualTo(99));
                 Assert.That(
                     result.Documents.Select(d => d.Id),
-                    Is.EqualTo(DocumentIds.Values.Except([DocumentIds[12]])).AsCollection);
+                    Is.EquivalentTo(DocumentIds.Values.Except([DocumentIds[12]])));
             });
     }
 
@@ -95,7 +95,7 @@ public class TextTests : SearcherTestBase
                 var expectedIds = OddOrEvenIds(even is false);
                 Assert.That(
                     documents.Select(d => d.Id),
-                    Is.EqualTo(expectedIds.Select(id => DocumentIds[id])).AsCollection);
+                    Is.EquivalentTo(expectedIds.Select(id => DocumentIds[id])));
             });
     }
 
@@ -109,7 +109,7 @@ public class TextTests : SearcherTestBase
             () =>
             {
                 Assert.That(result.Total, Is.EqualTo(100));
-                Assert.That(result.Documents.Select(d => d.Id), Is.EqualTo(DocumentIds.Values).AsCollection);
+                Assert.That(result.Documents.Select(d => d.Id), Is.EquivalentTo(DocumentIds.Values));
             });
     }
 
