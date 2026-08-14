@@ -1,15 +1,16 @@
 import type { Editor } from '../../externals.js';
 import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-base.js';
 import { UmbLink } from './link.tiptap-extension.js';
+import { umbLinkFromAttributes } from './link-attributes.js';
 import { UMB_LINK_PICKER_MODAL } from '@umbraco-cms/backoffice/multi-url-picker';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import type { UmbLinkPickerLink, UmbLinkPickerLinkType } from '@umbraco-cms/backoffice/multi-url-picker';
+import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override async execute(editor?: Editor) {
 		const attrs = editor?.getAttributes(UmbLink.name) ?? {};
-		const link = this.#getLinkData(attrs);
+		const link = umbLinkFromAttributes(attrs);
 		const data = { config: {}, index: null, isNew: link?.url === undefined };
 		const value = { link };
 
@@ -27,44 +28,6 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 		} else {
 			editor?.chain().focus().extendMarkRange(UmbLink.name).unsetLink().run();
 		}
-	}
-
-	#getLinkData(attrs: Record<string, any>): UmbLinkPickerLink {
-		const queryString = attrs['data-anchor'];
-		const culture = attrs['data-culture'];
-		const url = attrs.href?.substring(0, attrs.href.length - (queryString?.length ?? 0));
-		const unique = url?.includes('localLink:') ? url.substring(url.indexOf(':') + 1, url.indexOf('}')) : null;
-
-		return {
-			name: attrs.title,
-			queryString,
-			target: attrs.target,
-			type: this.#getLinkType(attrs, unique),
-			unique,
-			url,
-			culture,
-		};
-	}
-
-	/**
-	 * Resolves the link type for the picker. Only a local link carries its type on the anchor, so for anything
-	 * else the type is derived from whether there is an anchor at all: an existing one was entered manually,
-	 * and no anchor means nothing has been picked yet.
-	 * @param {object} attrs - The attributes of the anchor
-	 * @param {string} [attrs.href] - The href of the anchor
-	 * @param {UmbLinkPickerLinkType} [attrs.type] - The type attribute of the anchor
-	 * @param {string | null} unique - The unique identifier of the linked entity, if the anchor is a local link
-	 * @returns {UmbLinkPickerLinkType | undefined} The link type, or undefined if it can not be determined
-	 */
-	#getLinkType(
-		attrs: { href?: string; type?: UmbLinkPickerLinkType | null },
-		unique: string | null,
-	): UmbLinkPickerLinkType | undefined {
-		if (unique) {
-			return attrs.type ?? undefined;
-		}
-
-		return attrs.href ? 'external' : undefined;
 	}
 
 	#parseLinkData(link: UmbLinkPickerLink) {

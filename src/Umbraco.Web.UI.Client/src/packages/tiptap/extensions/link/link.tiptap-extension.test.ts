@@ -90,6 +90,22 @@ describe('UmbLink', () => {
 
 			expect(editor.getHTML()).to.include('type="media"');
 		});
+
+		it('serializes the entity type of a local link stored without a leading slash', () => {
+			editor.commands.setContent(
+				'<p><a href="{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" type="document">link</a></p>',
+			);
+
+			expect(editor.getHTML()).to.include('type="document"');
+		});
+
+		it('drops the type attribute from a URL that merely contains the local link token', () => {
+			editor.commands.setContent(
+				'<p><a href="https://example.com/?ref=/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" type="external">link</a></p>',
+			);
+
+			expect(editor.getHTML()).to.not.include('type=');
+		});
 	});
 
 	// The `data-*` attributes extension is part of the default rich text editor configuration, and it round-trips
