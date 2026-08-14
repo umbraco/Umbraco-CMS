@@ -3,7 +3,7 @@ import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-ba
 import { UmbLink } from './link.tiptap-extension.js';
 import { UMB_LINK_PICKER_MODAL } from '@umbraco-cms/backoffice/multi-url-picker';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/multi-url-picker';
+import type { UmbLinkPickerLink, UmbLinkPickerLinkType } from '@umbraco-cms/backoffice/multi-url-picker';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 
 export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarElementApiBase {
@@ -39,11 +39,32 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 			name: attrs.title,
 			queryString,
 			target: attrs.target,
-			type: attrs.type,
+			type: this.#getLinkType(attrs, unique),
 			unique,
 			url,
 			culture,
 		};
+	}
+
+	/**
+	 * Resolves the link type for the picker. Only a local link carries its type on the anchor, so for anything
+	 * else the type is derived from whether there is an anchor at all: an existing one was entered manually,
+	 * and no anchor means nothing has been picked yet.
+	 * @param {object} attrs - The attributes of the anchor
+	 * @param {string} [attrs.href] - The href of the anchor
+	 * @param {UmbLinkPickerLinkType} [attrs.type] - The type attribute of the anchor
+	 * @param {string | null} unique - The unique identifier of the linked entity, if the anchor is a local link
+	 * @returns {UmbLinkPickerLinkType | undefined} The link type, or undefined if it can not be determined
+	 */
+	#getLinkType(
+		attrs: { href?: string; type?: UmbLinkPickerLinkType | null },
+		unique: string | null,
+	): UmbLinkPickerLinkType | undefined {
+		if (unique) {
+			return attrs.type ?? undefined;
+		}
+
+		return attrs.href ? 'external' : undefined;
 	}
 
 	#parseLinkData(link: UmbLinkPickerLink) {
@@ -81,7 +102,8 @@ export default class UmbTiptapToolbarLinkExtensionApi extends UmbTiptapToolbarEl
 		if (!url) return null;
 
 		return {
-			type: type ?? 'external',
+			// Only a local link carries its entity type on the anchor; see the `type` attribute on `UmbLink`.
+			type: unique ? type : null,
 			href: url,
 			'data-anchor': anchor,
 			target,
