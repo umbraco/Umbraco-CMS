@@ -4,6 +4,7 @@ import { UmbPropertyValueFlatMapperController } from '../property-value-flat-map
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { dedupeEntityModels } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 /**
@@ -20,7 +21,7 @@ export class UmbPropertyValueEntityReferencesController extends UmbControllerBas
 	async resolve(value: UmbPropertyValueDataPotentiallyWithEditorAlias): Promise<Array<UmbEntityModel>> {
 		const flatMapper = new UmbPropertyValueFlatMapperController(this);
 		const referencesPerValue = await flatMapper.flatMap(value, (property) => this.#resolveValue(property));
-		return this.#dedupe(referencesPerValue.flat());
+		return dedupeEntityModels(referencesPerValue.flat());
 	}
 
 	async #resolveValue(
@@ -41,17 +42,5 @@ export class UmbPropertyValueEntityReferencesController extends UmbControllerBas
 		api.manifest = manifest;
 
 		return api.resolveEntityReferences(value);
-	}
-
-	#dedupe(entities: Array<UmbEntityModel>): Array<UmbEntityModel> {
-		const seen = new Set<string>();
-		const result: Array<UmbEntityModel> = [];
-		for (const entity of entities) {
-			const key = `${entity.entityType}:${entity.unique}`;
-			if (seen.has(key)) continue;
-			seen.add(key);
-			result.push(entity);
-		}
-		return result;
 	}
 }

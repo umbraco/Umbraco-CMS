@@ -4,6 +4,7 @@ import type { UmbPropertyValueDataPotentiallyWithEditorAlias } from '@umbraco-cm
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { dedupeEntityModels } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
@@ -43,21 +44,16 @@ export class UmbContentReferencedEntitiesManager extends UmbControllerBase {
 		values: Array<UmbPropertyValueDataPotentiallyWithEditorAlias>,
 	): Promise<Array<UmbEntityModel>> {
 		const referencesPerValue = await Promise.all(
-			values.map((value) => new UmbPropertyValueEntityReferencesController(this).resolve(value)),
+			values.map(async (value) => {
+				const controller = new UmbPropertyValueEntityReferencesController(this);
+				try {
+					return await controller.resolve(value);
+				} finally {
+					controller.destroy();
+				}
+			}),
 		);
-		return this.#dedupe(referencesPerValue.flat());
-	}
-
-	#dedupe(entities: Array<UmbEntityModel>): Array<UmbEntityModel> {
-		const seen = new Set<string>();
-		const result: Array<UmbEntityModel> = [];
-		for (const entity of entities) {
-			const key = `${entity.entityType}:${entity.unique}`;
-			if (seen.has(key)) continue;
-			seen.add(key);
-			result.push(entity);
-		}
-		return result;
+		return dedupeEntityModels(referencesPerValue.flat());
 	}
 
 	#groupByEntityType(entities: Array<UmbEntityModel>): Record<string, Array<UmbEntityModel>> {
