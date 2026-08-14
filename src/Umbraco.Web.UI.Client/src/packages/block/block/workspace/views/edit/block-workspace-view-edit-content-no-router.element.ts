@@ -57,13 +57,31 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 		this.#tabsStructureHelper.setIsRoot(true);
 		this.#tabsStructureHelper.setContainerChildType('Tab');
+
+		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
+			this.#resetViewContexts();
+			this.#blockWorkspace = context;
+			this.#blockManager = context?.content;
+			// block manager does not need to be setup this in file as that it being done by the implementation of this element.
+			this.#tabsStructureHelper.setStructureManager(context?.content.structure);
+			this.#observeStructure();
+			this.#observeRootGroups();
+		});
+	}
+
+	/**
+	 * Observes the structure the view contexts are derived from. Must be re-established whenever that
+	 * state is cleared: the observed states deduplicate, so an unchanged value never reaches an existing
+	 * subscription — only a new subscription replays it.
+	 */
+	#observeStructure() {
 		this.observe(
 			this.#tabsStructureHelper.childContainers,
 			(tabs) => {
 				this._tabs = tabs;
 				this.#setupViewContexts();
 			},
-			null,
+			'observeTabs',
 		);
 
 		this.observe(
@@ -72,17 +90,8 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 				this._hasRootProperties = hasRootProperties;
 				this.#setupViewContexts();
 			},
-			null,
+			'observeRootProperties',
 		);
-
-		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
-			this.#resetViewContexts();
-			this.#blockWorkspace = context;
-			this.#blockManager = context?.content;
-			// block manager does not need to be setup this in file as that it being done by the implementation of this element.
-			this.#tabsStructureHelper.setStructureManager(context?.content.structure);
-			this.#observeRootGroups();
-		});
 	}
 
 	/**
