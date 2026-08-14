@@ -20,14 +20,9 @@ function makeItems(count: number): Array<UmbEntityModel> {
 	return Array.from({ length: count }, (_, i) => ({ unique: `item-${i}`, entityType: 'unknown' }));
 }
 
-function makePendingChangesItems(count: number): Array<UmbEntityModel> {
-	return Array.from({ length: count }, (_, i) => ({ unique: `element-${i}`, entityType: 'element' }));
-}
-
 class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 	static referencedByItems: Array<UmbEntityModel> = [];
 	static descendantItems: Array<UmbEntityModel> = [];
-	static pendingChangesItems: Array<UmbEntityModel> = [];
 
 	async requestReferencedBy(_unique: string, skip = 0, take = 20) {
 		const items = UmbTestReferenceRepository.referencedByItems;
@@ -40,11 +35,6 @@ class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 
 	async requestDescendantsWithReferences(_unique: string, skip = 0, take = 20) {
 		const items = UmbTestReferenceRepository.descendantItems;
-		return { data: { items: items.slice(skip, skip + take), total: items.length } };
-	}
-
-	async requestReferencedElementsWithPendingChanges(_unique: string, skip = 0, take = 20) {
-		const items = UmbTestReferenceRepository.pendingChangesItems;
 		return { data: { items: items.slice(skip, skip + take), total: items.length } };
 	}
 
@@ -89,7 +79,6 @@ describe('UmbEntityReferenceListElement', () => {
 	beforeEach(() => {
 		UmbTestReferenceRepository.referencedByItems = [];
 		UmbTestReferenceRepository.descendantItems = [];
-		UmbTestReferenceRepository.pendingChangesItems = [];
 		element = document.createElement('umb-entity-reference-list') as UmbEntityReferenceListElement;
 	});
 
@@ -212,22 +201,34 @@ describe('UmbEntityReferenceListElement', () => {
 		});
 	});
 
-	describe('referencedElementsWithPendingChanges source', () => {
-		it('renders one row per item', async () => {
-			UmbTestReferenceRepository.pendingChangesItems = makePendingChangesItems(2);
-			element.referenceRepositoryAlias = REFERENCE_REPOSITORY_ALIAS;
-			element.source = 'referencedElementsWithPendingChanges';
-			element.unique = 'doc-1';
+	describe('items (pre-resolved, statically-paged)', () => {
+		it('renders one row per item, without a repository', async () => {
+			element.items = makeItems(2);
 			document.body.appendChild(element);
 			await aTimeout(0);
 
 			expect(element.getTotal()).to.equal(2);
-			const rows = element.shadowRoot?.querySelectorAll('umb-entity-item-ref');
-			expect(rows).to.have.lengthOf(2);
+			expect(element.shadowRoot?.querySelectorAll('umb-entity-item-ref')).to.have.lengthOf(2);
 		});
 
-		it('reports zero when the repository does not support the lookup', async () => {
-			await expectZeroWhenUnsupported('referencedElementsWithPendingChanges', 'doc-1', 'NoPendingChanges');
+		it('paginates the given items locally', async () => {
+			element.itemsPerPage = 10;
+			element.items = makeItems(15);
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(element.getTotal()).to.equal(15);
+			expect(element.shadowRoot?.querySelectorAll('umb-entity-item-ref'), 'first page').to.have.lengthOf(10);
+			expect(element.shadowRoot?.querySelector('uui-pagination'), 'pagination shown').to.exist;
+		});
+
+		it('shows the "no references" state when given an empty array', async () => {
+			element.items = [];
+			document.body.appendChild(element);
+			await aTimeout(0);
+
+			expect(element.getTotal()).to.equal(0);
+			expect(element.shadowRoot?.querySelector('umb-localize'), 'empty state').to.exist;
 		});
 	});
 });

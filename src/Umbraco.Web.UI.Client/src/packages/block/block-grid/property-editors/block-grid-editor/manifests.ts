@@ -1,6 +1,9 @@
 import { manifest as propertyEditorSchema } from './Umbraco.BlockGrid.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
-import { UmbStandardBlockValueResolver } from '@umbraco-cms/backoffice/block';
+import {
+	UmbBlockPropertyValueEntityReferenceResolver,
+	UmbStandardBlockValueResolver,
+} from '@umbraco-cms/backoffice/block';
 
 const propertyEditorUi: UmbExtensionManifest = {
 	type: 'propertyEditorUi',
@@ -81,6 +84,14 @@ const propertyValueResolver: UmbExtensionManifest = {
 	forEditorAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 };
 
+const propertyValueEntityReference: UmbExtensionManifest = {
+	type: 'propertyValueEntityReference',
+	alias: 'Umb.PropertyValueEntityReference.BlockGrid',
+	name: 'Block Grid Entity Reference Resolver',
+	api: UmbBlockPropertyValueEntityReferenceResolver,
+	forEditorAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
+};
+
 const sortModePropertyContext: UmbExtensionManifest = {
 	type: 'propertyContext',
 	kind: 'sortMode',
@@ -93,5 +104,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 	propertyEditorSchema,
 	propertyEditorUi,
 	propertyValueResolver,
+	propertyValueEntityReference,
 	sortModePropertyContext,
 ];

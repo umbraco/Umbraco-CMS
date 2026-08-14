@@ -17,19 +17,12 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 	@state()
 	private _descendantsTotal = 0;
 
-	@state()
-	private _pendingChangesTotal = 0;
-
 	#onReferencedByChange(event: UmbChangeEvent) {
 		this._referencedByTotal = (event.target as UmbEntityReferenceListElement).getTotal();
 	}
 
 	#onDescendantsChange(event: UmbChangeEvent) {
 		this._descendantsTotal = (event.target as UmbEntityReferenceListElement).getTotal();
-	}
-
-	#onPendingChangesChange(event: UmbChangeEvent) {
-		this._pendingChangesTotal = (event.target as UmbEntityReferenceListElement).getTotal();
 	}
 
 	#close() {
@@ -68,9 +61,9 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 						@change=${this.#onDescendantsChange}></umb-entity-reference-list>
 				</div>
 				${when(
-					data.includeReferencedElementsWithPendingChanges,
+					data.entitiesNeedingAttention?.length,
 					() => html`
-						<div ?hidden=${!this._pendingChangesTotal}>
+						<div>
 							<p>
 								<umb-localize key="references_labelElementsWithPendingChanges"
 									>The following referenced elements are not fully published</umb-localize
@@ -78,10 +71,7 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 							</p>
 							<umb-entity-reference-list
 								readonly
-								.unique=${data.unique}
-								.referenceRepositoryAlias=${data.referenceRepositoryAlias}
-								source="referencedElementsWithPendingChanges"
-								@change=${this.#onPendingChangesChange}></umb-entity-reference-list>
+								.items=${data.entitiesNeedingAttention}></umb-entity-reference-list>
 						</div>
 					`,
 				)}

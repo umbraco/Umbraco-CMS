@@ -265,10 +265,6 @@ export interface UmbMockDataSet {
 	// Tracked references
 	trackedReferenceItems?: Array<UmbMockTrackedReferenceItemModel>;
 
-	// Referenced elements with pending changes — ids of directly-referenced elements that are not fully
-	// published, keyed by the referencing document/element's id.
-	referencedElementsWithPendingChanges?: Record<string, Array<string>>;
-
 	// News
 	news?: Array<NewsDashboardItemResponseModel>;
 

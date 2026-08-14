@@ -9,10 +9,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-export type UmbEntityReferenceListSource =
-	| 'referencedBy'
-	| 'descendantsWithReferences'
-	| 'referencedElementsWithPendingChanges';
+export type UmbEntityReferenceListSource = 'referencedBy' | 'descendantsWithReferences';
 
 // Properties that require re-running #init() when they change — see updated() below.
 const REPOSITORY_PROPERTIES = ['referenceRepositoryAlias', 'itemRepositoryAlias', 'source'] as const;
@@ -43,6 +40,23 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		return this.#unique;
 	}
 	#unique?: string;
+
+	/**
+	 * A pre-resolved, statically-paged set of items to render — e.g. entities resolved client-side from a
+	 * workspace draft. Setting this switches the element out of `unique`/`source`-driven fetch mode.
+	 */
+	@property({ type: Array, attribute: false })
+	public set items(value: Array<UmbReferenceItemModel | UmbEntityModel> | undefined) {
+		this.#staticItems = value;
+		this._currentPage = 1;
+		this._total = value?.length ?? 0;
+		this.#renderStaticItemsPage();
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+	public get items(): Array<UmbReferenceItemModel | UmbEntityModel> | undefined {
+		return this.#staticItems;
+	}
+	#staticItems?: Array<UmbReferenceItemModel | UmbEntityModel>;
 
 	@property({ attribute: 'reference-repository-alias' })
 	referenceRepositoryAlias?: string;
@@ -116,8 +130,6 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 
 		if (this.source === 'descendantsWithReferences') {
 			await this.#getDescendantsWithReferences(skip);
-		} else if (this.source === 'referencedElementsWithPendingChanges') {
-			await this.#getReferencedElementsWithPendingChanges(skip);
 		} else {
 			await this.#getReferencedBy(skip);
 		}
@@ -164,31 +176,21 @@ export class UmbEntityReferenceListElement extends UmbLitElement {
 		this._items = items ?? [];
 	}
 
-	async #getReferencedElementsWithPendingChanges(skip: number) {
-		if (!this.#referenceRepository || !this.#unique) return;
-
-		// If the repository does not have the method, there is nothing to report — this entity type hasn't
-		// opted in to publish-awareness of its own referenced elements.
-		if (!this.#referenceRepository.requestReferencedElementsWithPendingChanges) {
-			this._total = 0;
-			this._items = [];
-			return;
-		}
-
-		const { data } = await this.#referenceRepository.requestReferencedElementsWithPendingChanges(
-			this.#unique,
-			skip,
-			this.itemsPerPage,
-		);
-		if (!data) return;
-
-		this._total = data.total;
-		this._items = data.items;
+	#renderStaticItemsPage() {
+		if (!this.#staticItems) return;
+		const skip = (this._currentPage - 1) * this.itemsPerPage;
+		this._items = this.#staticItems.slice(skip, skip + this.itemsPerPage);
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
 		if (this._currentPage === event.target.current) return;
 		this._currentPage = event.target.current;
+
+		if (this.#staticItems) {
+			this.#renderStaticItemsPage();
+			return;
+		}
+
 		this.#getReferences();
 	}
 

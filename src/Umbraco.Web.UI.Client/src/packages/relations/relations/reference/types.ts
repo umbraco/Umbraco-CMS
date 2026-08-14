@@ -35,12 +35,6 @@ export interface UmbEntityReferenceRepository extends UmbApi {
 		skip?: number,
 		take?: number,
 	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbEntityModel>>>;
-
-	requestReferencedElementsWithPendingChanges?(
-		unique: string,
-		skip?: number,
-		take?: number,
-	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbReferenceItemModel>>>;
 }
 
 export interface UmbEntityReferenceDataSource {
@@ -61,10 +55,4 @@ export interface UmbEntityReferenceDataSource {
 		skip?: number,
 		take?: number,
 	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbEntityModel>>>;
-
-	getReferencedElementsWithPendingChanges?(
-		unique: string,
-		skip?: number,
-		take?: number,
-	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>>;
 }

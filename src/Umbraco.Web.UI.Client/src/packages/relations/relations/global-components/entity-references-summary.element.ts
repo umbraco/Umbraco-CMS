@@ -7,6 +7,7 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 /**
  * Publish/unpublish awareness: a neutral count of the items referencing the entity in `config`, with a link to the
@@ -27,15 +28,12 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 	private _totalDescendantsWithReferences = 0;
 
 	/**
-	 * When set, also loads and shows a second, independent summary line for elements this entity directly
-	 * references that are not fully published (draft, pending changes, or scheduled). Off by default so
-	 * consumers of this component (e.g. the unpublish modal) don't pick it up unasked.
+	 * Entities this entity's current draft directly references that need attention before publishing (e.g. an
+	 * element that isn't fully published). When set, shows a second, independent summary line for them.
+	 * Undefined by default so consumers of this component (e.g. the unpublish modal) don't pick it up unasked.
 	 */
-	@property({ type: Boolean, attribute: 'include-pending-changes' })
-	includePendingChanges = false;
-
-	@state()
-	private _totalReferencedElementsWithPendingChanges = 0;
+	@property({ type: Array, attribute: false })
+	entitiesNeedingAttention?: Array<UmbEntityModel>;
 
 	#referenceRepository?: UmbEntityReferenceRepository;
 
@@ -57,13 +55,12 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 	}
 
 	/**
-	 * The number of elements this entity directly references that are not fully published. `0` until the count
-	 * has loaded, if `includePendingChanges` is not set, or if the reference repository does not support this
-	 * lookup.
-	 * @returns {number} The referenced-elements-with-pending-changes count.
+	 * The number of entities this entity directly references that need attention before publishing, or `0` when
+	 * {@link entitiesNeedingAttention} is not set.
+	 * @returns {number} The entities-needing-attention count.
 	 */
-	getTotalReferencedElementsWithPendingChanges() {
-		return this._totalReferencedElementsWithPendingChanges;
+	getTotalEntitiesNeedingAttention() {
+		return this.entitiesNeedingAttention?.length ?? 0;
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
@@ -87,11 +84,7 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 		);
 
 		try {
-			await Promise.all([
-				this.#loadReferencedByTotal(),
-				this.#loadDescendantsWithReferencesTotal(),
-				this.#loadReferencedElementsWithPendingChangesTotal(),
-			]);
+			await Promise.all([this.#loadReferencedByTotal(), this.#loadDescendantsWithReferencesTotal()]);
 		} catch {
 			// One of the totals failed to load — whichever others succeeded keep their value, and we still
 			// dispatch below regardless. Consumers (e.g. the unpublish modal drives its submit button off
@@ -131,32 +124,6 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 		this._totalDescendantsWithReferences = data?.total ?? 0;
 	}
 
-	async #loadReferencedElementsWithPendingChangesTotal() {
-		if (!this.includePendingChanges) return;
-		this._totalReferencedElementsWithPendingChanges = await this.#fetchReferencedElementsWithPendingChangesTotal();
-	}
-
-	async #fetchReferencedElementsWithPendingChangesTotal(): Promise<number> {
-		if (!this.#referenceRepository) {
-			throw new Error('Failed to create reference repository.');
-		}
-
-		// If the repository does not have the method, this entity type hasn't opted in to publish-awareness of
-		// its own referenced elements — nothing to report.
-		if (!this.#referenceRepository.requestReferencedElementsWithPendingChanges) return 0;
-
-		if (!this.config?.unique) {
-			throw new Error('Missing unique in config.');
-		}
-
-		const { data } = await this.#referenceRepository.requestReferencedElementsWithPendingChanges(
-			this.config.unique,
-			0,
-			1,
-		);
-		return data?.total ?? 0;
-	}
-
 	#onClickViewAll(event: Event) {
 		event.preventDefault();
 		if (!this.config) return;
@@ -166,14 +133,15 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 				unique: this.config.unique,
 				referenceRepositoryAlias: this.config.referenceRepositoryAlias,
 				itemRepositoryAlias: this.config.itemRepositoryAlias,
-				includeReferencedElementsWithPendingChanges: this.includePendingChanges,
+				entitiesNeedingAttention: this.entitiesNeedingAttention,
 			},
 		}).catch(() => undefined);
 	}
 
 	override render() {
 		const total = this._totalReferencedByItems + this._totalDescendantsWithReferences;
-		if (total === 0 && this._totalReferencedElementsWithPendingChanges === 0) return nothing;
+		const totalNeedingAttention = this.getTotalEntitiesNeedingAttention();
+		if (total === 0 && totalNeedingAttention === 0) return nothing;
 
 		return html`
 			${when(
@@ -192,21 +160,20 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 				`,
 			)}
 			${when(
-				this._totalReferencedElementsWithPendingChanges > 0,
+				totalNeedingAttention > 0,
 				() => html`
 					<p class="reference-summary">
 						<uui-button
 							label=${this.localize.term(
 								'references_labelElementsWithPendingChangesCount',
-								this._totalReferencedElementsWithPendingChanges,
+								totalNeedingAttention,
 							)}
 							look="outline"
 							@click=${this.#onClickViewAll}>
 							<umb-localize
 								key="references_labelElementsWithPendingChangesCount"
-								.args=${[this._totalReferencedElementsWithPendingChanges]}
-								>${this._totalReferencedElementsWithPendingChanges} referenced element(s) have pending
-								changes</umb-localize
+								.args=${[totalNeedingAttention]}
+								>${totalNeedingAttention} referenced element(s) have pending changes</umb-localize
 							>
 						</uui-button>
 					</p>

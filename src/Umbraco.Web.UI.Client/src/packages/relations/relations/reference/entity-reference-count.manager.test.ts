@@ -18,14 +18,13 @@ interface UmbTestReferenceResponse {
 }
 
 /**
- * Each call to `requestReferencedBy` (or, when `supportsPendingChanges` is set, `requestReferencedElementsWithPendingChanges`)
- * consumes the next queued response, in call order — so a test can control exactly what each of several overlapping
- * calls resolves with (and how long each takes), regardless of which `unique` it was made for.
+ * Each call to `requestReferencedBy` consumes the next queued response, in call order — so a test can control
+ * exactly what each of several overlapping calls resolves with (and how long each takes), regardless of which
+ * `unique` it was made for.
  */
 class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 	static responseQueue: Array<UmbTestReferenceResponse> = [];
 	static callCount = 0;
-	static supportsPendingChanges = true;
 
 	async #nextResponse() {
 		UmbTestReferenceRepository.callCount++;
@@ -46,10 +45,6 @@ class UmbTestReferenceRepository implements UmbEntityReferenceRepository {
 	async requestAreReferenced() {
 		return { data: { items: [], total: 0 } };
 	}
-
-	requestReferencedElementsWithPendingChanges = UmbTestReferenceRepository.supportsPendingChanges
-		? () => this.#nextResponse()
-		: undefined;
 
 	destroy() {}
 }
@@ -77,7 +72,6 @@ describe('UmbEntityReferenceCountManager', () => {
 		manager = new UmbEntityReferenceCountManager(hostElement, { referenceRepositoryAlias: TEST_REPOSITORY_ALIAS });
 		UmbTestReferenceRepository.responseQueue = [];
 		UmbTestReferenceRepository.callCount = 0;
-		UmbTestReferenceRepository.supportsPendingChanges = true;
 	});
 
 	it('has no total until a unique is set', () => {
@@ -193,53 +187,6 @@ describe('UmbEntityReferenceCountManager', () => {
 			expect(total, 'must issue a fresh request rather than await the invalidated one').to.equal(5);
 
 			await staleRequest;
-		});
-	});
-
-	describe('source: referencedElementsWithPendingChanges', () => {
-		beforeEach(() => {
-			manager = new UmbEntityReferenceCountManager(hostElement, {
-				referenceRepositoryAlias: TEST_REPOSITORY_ALIAS,
-				source: 'referencedElementsWithPendingChanges',
-			});
-		});
-
-		it('routes to requestReferencedElementsWithPendingChanges instead of requestReferencedBy', async () => {
-			UmbTestReferenceRepository.responseQueue.push({ total: 2 });
-			await manager.setUnique('elm-1');
-			expect(manager.getTotal()).to.equal(2);
-		});
-
-		it('reports zero, not an error, when the repository does not support the lookup', async () => {
-			UmbTestReferenceRepository.supportsPendingChanges = false;
-			await manager.setUnique('elm-1');
-			expect(manager.getTotal()).to.equal(0);
-		});
-
-		// The backend endpoint for this lookup may not exist yet on an older/incomplete install. A 404 there
-		// means "not implemented", not "something is wrong" — it must not force the publish confirmation modal
-		// open (which is what an uncaught error would do at the workspace-context call site).
-		it('reports zero, not an error, when the request 404s', async () => {
-			const notFound = Object.assign(new Error('Not Found'), { status: 404 });
-			UmbTestReferenceRepository.responseQueue.push({ total: 0, error: notFound });
-
-			await manager.setUnique('elm-1');
-
-			expect(manager.getTotal()).to.equal(0);
-		});
-
-		it('still rejects on errors other than a 404', async () => {
-			const serverError = Object.assign(new Error('Internal Server Error'), { status: 500 });
-			UmbTestReferenceRepository.responseQueue.push({ total: 0, error: serverError });
-
-			let caught: unknown;
-			try {
-				await manager.setUnique('elm-1');
-			} catch (error) {
-				caught = error;
-			}
-
-			expect(caught).to.be.instanceOf(Error);
 		});
 	});
 

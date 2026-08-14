@@ -4,12 +4,8 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export type UmbEntityReferenceCountSource = 'referencedBy' | 'referencedElementsWithPendingChanges';
-
 export interface UmbEntityReferenceCountManagerArgs {
 	referenceRepositoryAlias: string;
-	/** Which repository lookup to count. Defaults to `'referencedBy'`. */
-	source?: UmbEntityReferenceCountSource;
 	/**
 	 * When `false`, `setUnique` only resets the cached total rather than loading it — the first
 	 * `getTotalAsync()` call after that loads it on demand. Defaults to `true`.
@@ -31,7 +27,6 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	public readonly total = this.#total.asObservable();
 
 	readonly #referenceRepositoryAlias: string;
-	readonly #source: UmbEntityReferenceCountSource;
 	readonly #prefetch: boolean;
 	#unique?: string;
 	#reloadToken = 0;
@@ -42,7 +37,6 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	constructor(host: UmbControllerHost, args: UmbEntityReferenceCountManagerArgs) {
 		super(host);
 		this.#referenceRepositoryAlias = args.referenceRepositoryAlias;
-		this.#source = args.source ?? 'referencedBy';
 		this.#prefetch = args.prefetch ?? true;
 	}
 
@@ -145,31 +139,9 @@ export class UmbEntityReferenceCountManager extends UmbControllerBase {
 	async #requestTotal(unique: string): Promise<number> {
 		const repository = await this.#getRepository();
 
-		if (this.#source === 'referencedElementsWithPendingChanges') {
-			return this.#requestReferencedElementsWithPendingChangesTotal(repository, unique);
-		}
-
 		const { data, error } = await repository.requestReferencedBy(unique, 0, 1);
 		if (error) throw error;
 		return data?.total ?? 0;
-	}
-
-	async #requestReferencedElementsWithPendingChangesTotal(
-		repository: UmbEntityReferenceRepository,
-		unique: string,
-	): Promise<number> {
-		// The repository not supporting this lookup at all is not a failure — it just means this entity type
-		// hasn't opted in, so there's nothing to count.
-		if (!repository.requestReferencedElementsWithPendingChanges) return 0;
-
-		const { data, error } = await repository.requestReferencedElementsWithPendingChanges(unique, 0, 1);
-		if (!error) return data?.total ?? 0;
-
-		// A 404 means the backend doesn't implement this lookup (yet) rather than something having gone
-		// wrong — treat it the same as the repository not supporting the method at all, so an
-		// incomplete/older backend doesn't force the publish confirmation modal open on every publish.
-		if ((error as { status?: number }).status === 404) return 0;
-		throw error;
 	}
 
 	async #getRepository(): Promise<UmbEntityReferenceRepository> {

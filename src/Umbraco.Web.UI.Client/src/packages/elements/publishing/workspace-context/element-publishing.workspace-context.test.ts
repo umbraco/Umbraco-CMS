@@ -11,6 +11,17 @@ import { UMB_CONTENT_PUBLISH_MODAL } from '@umbraco-cms/backoffice/content';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbElementPublishingServerDataSource } from '../repository/element-publishing.server.data-source.js';
 import { UmbElementReferenceRepository } from '../../reference/repository/element-reference.repository.js';
+import type {
+	ManifestEntityPublishAwareness,
+	UmbEntityPublishAwarenessApi,
+} from '@umbraco-cms/backoffice/content';
+import type {
+	ManifestPropertyValueEntityReference,
+	UmbPropertyValueEntityReferenceResolver,
+} from '@umbraco-cms/backoffice/property';
+import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 // Not simple-element-id: the mock referenced-by handler hardcodes that one to have references
 // (used elsewhere to test the "has references" case), which would defeat the "no modal" test below.
@@ -110,12 +121,59 @@ describe('UmbElementPublishingWorkspaceContext', () => {
 		});
 
 		it('opens the modal when this element references another element that is not fully published', async () => {
-			const original = UmbElementReferenceRepository.prototype.requestReferencedElementsWithPendingChanges;
+			// ELEMENT_ID's own property value is a plain `Umbraco.TextBox` — fake a `propertyValueEntityReference`
+			// resolver for it so the draft "references" a fake element, plus the `entityPublishAwareness` +
+			// item-repository plumbing that turns that reference into a real "needs attention" item.
+			const ITEM_REPOSITORY_ALIAS = 'Umb.Test.PublishingWorkspaceContext.ItemRepository';
+
+			class TestEntityReferenceResolver implements UmbPropertyValueEntityReferenceResolver {
+				async resolveEntityReferences(): Promise<Array<UmbEntityModel>> {
+					return [{ entityType: 'element', unique: 'other-element-id' }];
+				}
+				destroy(): void {}
+			}
+			class TestItemRepository implements UmbItemRepository<UmbEntityModel> {
+				async requestItems(uniques: Array<string>) {
+					return { data: uniques.map((unique) => ({ entityType: 'element', unique })) };
+				}
+				destroy(): void {}
+			}
+			class TestPublishAwarenessApi implements UmbEntityPublishAwarenessApi<UmbEntityModel> {
+				needsAttention(): boolean {
+					return true;
+				}
+				destroy(): void {}
+			}
+
+			const entityReferenceManifest: ManifestPropertyValueEntityReference = {
+				type: 'propertyValueEntityReference',
+				name: 'Test Entity Reference Resolver',
+				alias: 'Umb.Test.PublishingWorkspaceContext.EntityReferenceResolver',
+				api: TestEntityReferenceResolver,
+				forEditorAlias: 'Umbraco.TextBox',
+			};
+			const itemRepositoryManifest: ManifestApi<TestItemRepository> = {
+				type: 'repository',
+				name: 'Test Item Repository',
+				alias: ITEM_REPOSITORY_ALIAS,
+				api: TestItemRepository,
+			};
+			const publishAwarenessManifest: ManifestEntityPublishAwareness = {
+				type: 'entityPublishAwareness',
+				name: 'Test Entity Publish Awareness',
+				alias: 'Umb.Test.PublishingWorkspaceContext.PublishAwareness',
+				api: TestPublishAwarenessApi,
+				forEntityTypes: ['element'],
+				meta: { itemRepositoryAlias: ITEM_REPOSITORY_ALIAS },
+			};
+
+			umbExtensionsRegistry.register(entityReferenceManifest);
+			umbExtensionsRegistry.register(itemRepositoryManifest);
+			umbExtensionsRegistry.register(publishAwarenessManifest);
 			restores.push(() => {
-				UmbElementReferenceRepository.prototype.requestReferencedElementsWithPendingChanges = original;
-			});
-			UmbElementReferenceRepository.prototype.requestReferencedElementsWithPendingChanges = async () => ({
-				data: { items: [], total: 1 },
+				umbExtensionsRegistry.unregister(entityReferenceManifest.alias);
+				umbExtensionsRegistry.unregister(ITEM_REPOSITORY_ALIAS);
+				umbExtensionsRegistry.unregister(publishAwarenessManifest.alias);
 			});
 
 			const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());

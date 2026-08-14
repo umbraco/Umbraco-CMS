@@ -25,11 +25,6 @@ export class UmbDocumentReferenceRepository extends UmbControllerBase implements
 		if (!unique) throw new Error(`unique is required`);
 		return this.#referenceSource.getReferencedDescendants(unique, skip, take);
 	}
-
-	async requestReferencedElementsWithPendingChanges(unique: string, skip = 0, take = 20) {
-		if (!unique) throw new Error(`unique is required`);
-		return this.#referenceSource.getReferencedElementsWithPendingChanges(unique, skip, take);
-	}
 }
 
 export default UmbDocumentReferenceRepository;

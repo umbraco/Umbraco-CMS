@@ -1,6 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { DocumentService, client } from '@umbraco-cms/backoffice/external/backend-api';
-import type { ElementItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -119,65 +118,4 @@ export class UmbDocumentReferenceServerDataSource extends UmbControllerBase impl
 
 		return { data, error };
 	}
-
-	/**
-	 * Fetches the elements directly referenced by the given unique that are not fully published.
-	 * @param {string} unique - The unique identifier of the referencing document.
-	 * @param {number} skip - The number of items to skip.
-	 * @param {number} take - The maximum number of items to return.
-	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>>} - Referenced elements that are not fully published.
-	 * @memberof UmbDocumentReferenceServerDataSource
-	 */
-	async getReferencedElementsWithPendingChanges(
-		unique: string,
-		skip = 0,
-		take = 20,
-	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbReferenceItemModel>>> {
-		// No backend exists for this endpoint yet — the C# team is designing/implementing it separately, so it
-		// isn't in the generated client. Called directly against the raw client (the same way every generated
-		// service method ultimately does) rather than waiting for a generated wrapper that doesn't exist.
-		const { data, error } = await tryExecute(
-			this,
-			client.get<UmbPagedModel<ElementItemResponseModel>, unknown, true>({
-				url: '/umbraco/management/api/v1/document/{id}/referenced-elements-with-pending-changes',
-				path: { id: unique },
-				query: { skip, take },
-			}),
-		);
-
-		if (data) {
-			return { data: { items: data.items.map(mapReferencedElement), total: data.total } };
-		}
-
-		return { data, error };
-	}
-}
-
-// Not imported from `@umbraco-cms/backoffice/element` (which would create a documents<->elements package
-// cycle — elements already imports from documents) — same literal value as UMB_ELEMENT_ENTITY_TYPE.
-const ELEMENT_ENTITY_TYPE = 'element';
-
-// Maps the server's element item shape into the element-item-shaped row <umb-element-item-ref> renders directly.
-// Rows render as Elements (not Documents) even though this endpoint hangs off /document/{id} — it lists the
-// elements the document references, not the document itself.
-function mapReferencedElement(element: ElementItemResponseModel): UmbReferenceItemModel {
-	return {
-		documentType: {
-			unique: element.documentType.id,
-			icon: element.documentType.icon,
-			collection: null,
-		},
-		entityType: ELEMENT_ENTITY_TYPE,
-		hasChildren: element.hasChildren,
-		isTrashed: element.isTrashed,
-		parent: element.parent ? { unique: element.parent.id } : null,
-		unique: element.id,
-		variants: element.variants.map((variant) => ({
-			culture: variant.culture || null,
-			name: variant.name,
-			state: variant.state,
-			flags: variant.flags,
-		})),
-		flags: element.flags,
-	} as UmbReferenceItemModel;
 }
