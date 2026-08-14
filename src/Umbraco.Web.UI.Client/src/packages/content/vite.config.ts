@@ -15,7 +15,6 @@ export default defineConfig({
 			'content/index': './content/index.ts',
 			'property-type/index': './property-type/index.ts',
 			'umbraco-package': 'umbraco-package.ts',
-			manifests: 'manifests.ts',
 		},
 	}),
 });

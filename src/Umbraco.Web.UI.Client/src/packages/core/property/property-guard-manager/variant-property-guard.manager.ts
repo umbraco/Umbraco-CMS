@@ -1,6 +1,6 @@
 import type { UmbPropertyGuardRule } from './property-guard.manager.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UmbGuardManagerBase } from '@umbraco-cms/backoffice/utils';
 
@@ -43,7 +43,6 @@ function findRule(
 
 /**
  * UmbVariantPropertyGuardManager is a class that manages the rules for variant properties.
- * @export
  * @class UmbVariantPropertyGuardManager
  * @augments {UmbGuardManagerBase<UmbVariantPropertyGuardRule>}
  */
@@ -61,9 +60,9 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 		propertyType: UmbReferenceByUnique,
 		datasetVariantId: UmbVariantId,
 	): Observable<boolean> {
-		return this._rules.asObservablePart((rules) =>
-			this.#resolvePermission(rules, propertyVariantId, propertyType, datasetVariantId),
-		);
+		return mergeObservables([this.rules, this._fallback], ([rules, fallback]) => {
+			return this.#resolvePermission(rules, propertyVariantId, propertyType, datasetVariantId) ?? fallback;
+		});
 	}
 
 	/**
@@ -79,7 +78,10 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 		propertyType: UmbReferenceByUnique,
 		datasetVariantId: UmbVariantId,
 	): boolean {
-		return this.#resolvePermission(this._rules.getValue(), propertyVariantId, propertyType, datasetVariantId);
+		return (
+			this.#resolvePermission(this._rules.getValue(), propertyVariantId, propertyType, datasetVariantId) ??
+			this._getFallback()
+		);
 	}
 
 	#resolvePermission(
@@ -102,6 +104,6 @@ export class UmbVariantPropertyGuardManager extends UmbGuardManagerBase<UmbVaria
 		) {
 			return true;
 		}
-		return this._fallback;
+		return undefined;
 	}
 }

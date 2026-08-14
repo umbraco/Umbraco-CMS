@@ -47,7 +47,7 @@ public interface IPublishedUrlProvider
     ///         If the published content is multi-lingual, gets the url for the specified culture or,
     ///         when no culture is specified, the current culture.
     ///     </para>
-    ///     <para>If the provider is unable to provide a url, it returns "#".</para>
+    ///     <para>If the provider is unable to provide a url, it returns <see cref="Constants.Routing.Unroutable"/>.</para>
     /// </remarks>
     string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null);
 

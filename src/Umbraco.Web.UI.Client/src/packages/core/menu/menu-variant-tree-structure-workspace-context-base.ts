@@ -4,7 +4,7 @@ import { UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT } from './section-sidebar-menu
 import type { UmbTreeItemModel, UmbTreeRepository, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import {
@@ -32,12 +32,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
-	#parent = new UmbObjectState<UmbVariantStructureItemModel | undefined>(undefined);
-	/**
-	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead.
-	 */
-	public readonly parent = this.#parent.asObservable();
-
 	protected _sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
 	#parentContext = new UmbParentEntityContext(this);
@@ -52,8 +46,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 	constructor(host: UmbControllerHost, args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT);
-		// 'UmbMenuStructureWorkspaceContext' is Obsolete, will be removed in v.18
-		this.provideContext('UmbMenuStructureWorkspaceContext', this);
 		this.#args = args;
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
@@ -90,7 +82,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				(value) => {
 					// Workspace has changed from new to existing
 					if (value === false && this.#isNew === true) {
-						// TODO: We do not need to request here as we already know the structure and unique
 						this.#requestStructure();
 					}
 					this.#isNew = value;
@@ -144,10 +135,16 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
-		if (unique === undefined) throw new Error('Unique is not available');
+		if (unique === undefined) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] unique not available');
+			return;
+		}
 
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
-		if (!entityType) throw new Error('Entity type is not available');
+		if (!entityType) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] entityType not available');
+			return;
+		}
 
 		// TODO: introduce variant tree item model
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
@@ -186,6 +183,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 			structureItems.push(...treeItemAncestors);
 
+			// Guard: this context may have been destroyed while the async requests were in flight
+			// (e.g. a condition such as IS_NOT_TRASHED flips before the API response arrives).
+			if (!this._host) return;
+
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
 			this.#setAncestorData(data);
@@ -201,9 +202,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		/* If the item is not new, the current item is the last item in the array.
 			We filter out the current item unique to handle any case where it could show up */
 		const parent = structureItems.filter((item) => item.unique !== this.#workspaceContext?.getUnique()).pop();
-
-		// TODO: remove this when the parent gets removed from the structure interface
-		this.#parent.setValue(parent);
 
 		const parentEntity = parent
 			? {
@@ -264,7 +262,6 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	override destroy(): void {
 		super.destroy();
 		this.#structure.destroy();
-		this.#parent.destroy();
 		this.#parentContext.destroy();
 		this.#ancestorContext.destroy();
 	}

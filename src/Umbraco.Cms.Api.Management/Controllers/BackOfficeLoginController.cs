@@ -40,10 +40,15 @@ public class BackOfficeLoginController : Controller
     /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
     /// <param name="model">The model containing login information and the return URL.</param>
     /// <returns>
-    /// An <see cref="IActionResult"/> that renders the login view with the model, or a bad request result if the return URL is invalid.
+    /// An <see cref="IActionResult"/> that renders the login view with the model, or a bad request result if the model state or return URL is invalid.
     /// </returns>
     public async Task<IActionResult> Index(CancellationToken cancellationToken, BackOfficeLoginModel model)
     {
+        if (ModelState.IsValid is false)
+        {
+            return BadRequest();
+        }
+
         AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
         if (cookieAuthResult.Succeeded)
         {

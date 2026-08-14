@@ -13,6 +13,14 @@ uui-form-layout-item {
 	margin-bottom: var(--uui-size-space-4);
 }
 
+input {
+	font-family: inherit;
+	font-size: inherit;
+}
+input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px var(--uui-color-surface) inset;
+}
+
 #username-input {
 	width: 100%;
 	height: var(--input-height);

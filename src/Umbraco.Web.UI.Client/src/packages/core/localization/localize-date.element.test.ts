@@ -1,5 +1,6 @@
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLocalizeDateElement } from './localize-date.element.js';
+import { umbLocalizationRegistry } from './registry/localization.registry.js';
 import { aTimeout, expect, fixture, html } from '@open-wc/testing';
 
 const english = {
@@ -33,6 +34,7 @@ describe('umb-localize-date', () => {
 
 	describe('localization', () => {
 		umbExtensionsRegistry.register(english);
+		umbLocalizationRegistry.loadLanguage('en');
 
 		it('should localize a date', () => {
 			expect(element.shadowRoot?.textContent).to.equal('1/1/2020');

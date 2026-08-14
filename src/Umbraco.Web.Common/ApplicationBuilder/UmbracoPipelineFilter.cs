@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -10,8 +11,9 @@ public class UmbracoPipelineFilter : IUmbracoPipelineFilter
     /// </summary>
     /// <param name="name">The name.</param>
     public UmbracoPipelineFilter(string name)
-        : this(name, null, null, null, null, null)
-    { }
+        : this(name, null, null, null, null, null, null, null)
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoPipelineFilter" /> class.
@@ -22,13 +24,17 @@ public class UmbracoPipelineFilter : IUmbracoPipelineFilter
     /// <param name="postRouting">The post routing callback.</param>
     /// <param name="postPipeline">The post pipeline callback.</param>
     /// <param name="endpoints">The endpoints callback.</param>
+    /// <param name="preMapEndpoints">The pre map endpoints callback.</param>
+    /// <param name="postMapEndpoints">The post map endpoints callback.</param>
     public UmbracoPipelineFilter(
         string name,
         Action<IApplicationBuilder>? prePipeline = null,
         Action<IApplicationBuilder>? preRouting = null,
         Action<IApplicationBuilder>? postRouting = null,
         Action<IApplicationBuilder>? postPipeline = null,
-        Action<IApplicationBuilder>? endpoints = null)
+        Action<IApplicationBuilder>? endpoints = null,
+        Action<IEndpointRouteBuilder>? preMapEndpoints = null,
+        Action<IEndpointRouteBuilder>? postMapEndpoints = null)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         PrePipeline = prePipeline;
@@ -36,6 +42,8 @@ public class UmbracoPipelineFilter : IUmbracoPipelineFilter
         PostRouting = postRouting;
         PostPipeline = postPipeline;
         Endpoints = endpoints;
+        PreMapEndpoints = preMapEndpoints;
+        PostMapEndpoints = postMapEndpoints;
     }
 
     /// <summary>
@@ -78,6 +86,22 @@ public class UmbracoPipelineFilter : IUmbracoPipelineFilter
     /// </value>
     public Action<IApplicationBuilder>? Endpoints { get; set; }
 
+    /// <summary>
+    /// Gets or sets the pre map endpoints callback.
+    /// </summary>
+    /// <value>
+    /// The pre map endpoints callback.
+    /// </value>
+    public Action<IEndpointRouteBuilder>? PreMapEndpoints { get; set; }
+
+    /// <summary>
+    /// Gets or sets the post map endpoints callback.
+    /// </summary>
+    /// <value>
+    /// The post map endpoints callback.
+    /// </value>
+    public Action<IEndpointRouteBuilder>? PostMapEndpoints { get; set; }
+
     /// <inheritdoc />
     public string Name { get; }
 
@@ -95,4 +119,10 @@ public class UmbracoPipelineFilter : IUmbracoPipelineFilter
 
     /// <inheritdoc />
     public void OnEndpoints(IApplicationBuilder app) => Endpoints?.Invoke(app);
+
+    /// <inheritdoc />
+    public void OnPreMapEndpoints(IEndpointRouteBuilder endpoints) => PreMapEndpoints?.Invoke(endpoints);
+
+    /// <inheritdoc />
+    public void OnPostMapEndpoints(IEndpointRouteBuilder endpoints) => PostMapEndpoints?.Invoke(endpoints);
 }

@@ -256,6 +256,13 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <inheritdoc/>
         public void CacheReferencedEntities(IEnumerable<object> values)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (CacheReferencedEntitiesSuppression.IsSuppressed)
+            {
+                return;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+
             var mediaKeys = values
                 .SelectMany(value => Deserialize(_jsonSerializer, value))
                 .Select(dto => dto.MediaKey)
@@ -511,7 +518,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// Validates the min/max configuration for the media picker property editor.
         /// </summary>
-        internal sealed class MinMaxValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal sealed class MinMaxValidator : ITypedValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
 
@@ -573,7 +580,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// Validates the allowed type configuration for the media picker property editor.
         /// </summary>
-        internal sealed class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal sealed class AllowedTypeValidator : ITypedValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaService _mediaService;
@@ -615,10 +622,26 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                     .Where(x => x.MediaTypeAlias.IsNullOrWhiteSpace() is false)
                     .Select(x => x.MediaTypeAlias);
 
-                IEnumerable<Guid> retrievedMediaKeys = value
+                Guid[] retrievedMediaKeys = value
                     .Where(x => x.MediaTypeAlias.IsNullOrWhiteSpace())
-                    .Select(x => x.MediaKey);
-                IEnumerable<IMedia> retrievedMedia = _mediaService.GetByIds(retrievedMediaKeys);
+                    .Select(x => x.MediaKey)
+                    .Distinct()
+                    .ToArray();
+                IMedia[] retrievedMedia = _mediaService.GetByIds(retrievedMediaKeys).ToArray();
+
+                // If any of the media we had to look up (to resolve the type) could not be found, the selection
+                // references media that no longer exists, so the configured allowed types cannot be verified.
+                // Compare against the distinct requested keys so duplicates aren't reported as missing.
+                if (retrievedMedia.Length != retrievedMediaKeys.Length)
+                {
+                    return
+                    [
+                        new ValidationResult(
+                            _localizedTextService.Localize("validation", "missingMedia"),
+                            ["value"])
+                    ];
+                }
+
                 IEnumerable<string> retrievedTypeAliases = retrievedMedia
                     .Select(x => x.ContentType.Alias);
 
@@ -644,7 +667,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// <summary>
         /// Validates the start node configuration for the media picker property editor.
         /// </summary>
-        internal sealed class StartNodeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
+        internal sealed class StartNodeValidator : ITypedValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMediaNavigationQueryService _mediaNavigationQueryService;

@@ -1,12 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Package;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Models;
@@ -23,34 +20,10 @@ public class AllMigrationStatusPackageController : PackageControllerBase
     private readonly IPackagePresentationFactory _packagePresentationFactory;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AllMigrationStatusPackageController"/> class, responsible for handling migration status operations for packages.
-    /// </summary>
-    /// <param name="packagingService">The service used to manage package-related operations and migrations.</param>
-    /// <param name="umbracoMapper">The mapper used to convert between Umbraco domain models and API models.</param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper)
-        : this(packagingService, StaticServiceProvider.Instance.GetRequiredService<IPackagePresentationFactory>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AllMigrationStatusPackageController"/> class.
-    /// </summary>
-    /// <param name="packagingService">Service used for managing package operations and migrations.</param>
-    /// <param name="umbracoMapper">The mapper used to map between Umbraco domain and API models.</param>
-    /// <param name="packagePresentationFactory">Factory for creating package presentation models.</param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-    public AllMigrationStatusPackageController(IPackagingService packagingService, IUmbracoMapper umbracoMapper, IPackagePresentationFactory packagePresentationFactory)
-        : this(packagingService, packagePresentationFactory)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="AllMigrationStatusPackageController"/> class, which handles migration status operations for packages.
     /// </summary>
     /// <param name="packagingService">Service used for package-related operations.</param>
     /// <param name="packagePresentationFactory">Factory for creating package presentation models.</param>
-    [ActivatorUtilitiesConstructor]
     public AllMigrationStatusPackageController(IPackagingService packagingService, IPackagePresentationFactory packagePresentationFactory)
     {
         _packagingService = packagingService;

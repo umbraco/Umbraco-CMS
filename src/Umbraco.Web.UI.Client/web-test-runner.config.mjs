@@ -1,7 +1,8 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
+import { createImportMap } from './devops/importmap/index.js';
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { playwrightLauncher } from '@web/test-runner-playwright';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
-import { createImportMap } from './devops/importmap/index.js';
 
 const mode = process.env.MODE || 'dev';
 if (!['dev', 'prod'].includes(mode)) {
@@ -17,6 +18,7 @@ const silencedLogs = [
 	'Found an issue? https://github.com/mswjs/msw/issues',
 	'Worker script URL:',
 	'Worker scope:',
+	'[MSW] Using mock data set: "default"',
 ];
 
 /** @type {import('@web/dev-server').DevServerConfig} */
@@ -37,6 +39,7 @@ export default {
 					rootDir: './src',
 					additionalImports: {
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
+						'@umbraco-cms/internal/mock-manager': './mocks/mock-manager.ts',
 					},
 					replaceModuleExtensions: true,
 				}),
@@ -64,7 +67,7 @@ export default {
 					window.__UMBRACO_TEST_RUN_A11Y_TEST = ${(!devMode).toString()};
 				</script>
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
-				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
+				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui/dist/themes/light.css">
 				<link rel="stylesheet" href="src/css/umb-css.css">
 				<script type="module">
 					// Initialize MSW first and wait for it to be ready before loading tests

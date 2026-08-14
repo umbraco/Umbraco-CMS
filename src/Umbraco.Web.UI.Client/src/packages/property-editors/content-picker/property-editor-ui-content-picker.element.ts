@@ -92,9 +92,13 @@ export class UmbPropertyEditorUIContentPickerElement
 	constructor() {
 		super();
 
-		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
-			this._interactionMemories = interactionMemories ?? [];
-		});
+		this.observe(
+			this.#interactionMemoryManager.memoriesForPropertyEditor,
+			(interactionMemories) => {
+				this._interactionMemories = interactionMemories ?? [];
+			},
+			null,
+		);
 	}
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -237,12 +241,10 @@ export class UmbPropertyEditorUIContentPickerElement
 	#renderInvalidData() {
 		if (!this._invalidData?.length) return nothing;
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
 		const groupby = Object.groupBy(this._invalidData, (x) => x.type);
-		const grouped = Object.keys(groupby)
-			.sort((a, b) => a.localeCompare(b))
-			.map((key) => ({ key, items: groupby[key] }));
+		const grouped = Object.entries(groupby)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([key, items]) => ({ key, items: items ?? [] }));
 
 		const toPickerType = (type: string): UmbContentPickerSourceType => {
 			return type === UMB_DOCUMENT_ENTITY_TYPE ? 'content' : (type as UmbContentPickerSourceType);

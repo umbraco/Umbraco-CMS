@@ -7,9 +7,8 @@ export interface UmbPagedModel<T> {
 }
 
 export interface UmbTargetPagedModel<T> extends UmbPagedModel<T> {
-	// TODO: v18: make mandatory
-	totalAfter?: number;
-	totalBefore?: number;
+	totalAfter: number;
+	totalBefore: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

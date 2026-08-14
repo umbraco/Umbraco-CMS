@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Controllers;
 
+/// <summary>
+///     Surface controller that handles member registration from the Register Member snippet.
+/// </summary>
 public class UmbRegisterController : SurfaceController
 {
     private readonly IMemberManager _memberManager;
@@ -23,6 +26,9 @@ public class UmbRegisterController : SurfaceController
     private readonly IMemberSignInManager _memberSignInManager;
     private readonly ICoreScopeProvider _scopeProvider;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UmbRegisterController" /> class.
+    /// </summary>
     public UmbRegisterController(
         IMemberManager memberManager,
         IMemberService memberService,
@@ -42,6 +48,15 @@ public class UmbRegisterController : SurfaceController
         _scopeProvider = scopeProvider;
     }
 
+    /// <summary>
+    ///     Handles the registration form post, creating a new member and signing them in when
+    ///     <see cref="RegisterModel.AutomaticLogIn" /> is set.
+    /// </summary>
+    /// <param name="model">The posted registration model.</param>
+    /// <returns>
+    ///     A redirect to the supplied local URL (or the current page) on success; otherwise the current
+    ///     page with validation errors added to ModelState.
+    /// </returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     [ValidateUmbracoFormRouteString]
@@ -59,8 +74,8 @@ public class UmbRegisterController : SurfaceController
         {
             TempData["FormSuccess"] = true;
 
-            // If there is a specified path to redirect to then use it.
-            if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
+            // If there is a specified path to redirect to and it is validated as a local URL, then use it.
+            if (model.RedirectUrl.IsNullOrWhiteSpace() is false && Url.IsLocalUrl(model.RedirectUrl!))
             {
                 return Redirect(model.RedirectUrl!);
             }
@@ -73,10 +88,7 @@ public class UmbRegisterController : SurfaceController
         return CurrentUmbracoPage();
     }
 
-    /// <summary>
-    ///     We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use
-    /// </summary>
-    /// <param name="model"></param>
+    // Route values carry encrypted, tamper-proof overrides for the posted model (see ValidateUmbracoFormRouteString).
     private void MergeRouteValuesToModel(RegisterModel model)
     {
         if (RouteData.Values.TryGetValue(nameof(RegisterModel.RedirectUrl), out var redirectUrl) && redirectUrl != null)
@@ -111,11 +123,6 @@ public class UmbRegisterController : SurfaceController
         }
     }
 
-    /// <summary>
-    ///     Registers a new member.
-    /// </summary>
-    /// <param name="model">Register member model.</param>
-    /// <returns>Result of registration operation.</returns>
     private async Task<IdentityResult> RegisterMemberAsync(RegisterModel model)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();

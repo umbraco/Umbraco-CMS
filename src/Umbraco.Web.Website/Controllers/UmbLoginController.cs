@@ -18,6 +18,9 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Umbraco.Cms.Web.Website.Controllers;
 
+/// <summary>
+///     Surface controller that handles member login from the Login snippet.
+/// </summary>
 public class UmbLoginController : SurfaceController
 {
     private readonly IMemberManager _memberManager;
@@ -26,6 +29,9 @@ public class UmbLoginController : SurfaceController
     private readonly IDocumentNavigationQueryService _navigationQueryService;
     private readonly IPublishedContentStatusFilteringService _publishedContentStatusFilteringService;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="UmbLoginController" /> class.
+    /// </summary>
     public UmbLoginController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,
@@ -47,6 +53,14 @@ public class UmbLoginController : SurfaceController
         _publishedContentStatusFilteringService = publishedContentStatusFilteringService;
     }
 
+    /// <summary>
+    ///     Handles the login form post.
+    /// </summary>
+    /// <param name="model">The posted login model.</param>
+    /// <returns>
+    ///     A redirect to the specified (or current) page on success; otherwise the current page with
+    ///     validation errors or two-factor provider information populated in <see cref="Controller.ViewData" />.
+    /// </returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     [ValidateUmbracoFormRouteString]
@@ -113,10 +127,7 @@ public class UmbLoginController : SurfaceController
         return CurrentUmbracoPage();
     }
 
-    /// <summary>
-    ///     We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use
-    /// </summary>
-    /// <param name="model"></param>
+    // Route values carry encrypted, tamper-proof overrides for the posted model (see ValidateUmbracoFormRouteString).
     private void MergeRouteValuesToModel(LoginModel model)
     {
         if (RouteData.Values.TryGetValue(nameof(LoginModel.RedirectUrl), out var redirectUrl) && redirectUrl != null)

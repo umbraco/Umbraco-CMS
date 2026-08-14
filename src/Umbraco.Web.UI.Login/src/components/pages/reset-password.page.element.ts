@@ -40,10 +40,10 @@ export default class UmbResetPasswordPageElement extends UmbLitElement {
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
 					<header id="header">
 						<h1>
-							<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
+							<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
 						</h1>
 						<span>
-							<umb-localize key="auth_forgottenPasswordInstruction">
+							<umb-localize key="login_forgottenPasswordInstruction">
 								An email will be sent to the address specified with a link to reset your password
 							</umb-localize>
 						</span>
@@ -51,15 +51,15 @@ export default class UmbResetPasswordPageElement extends UmbLitElement {
 
 					<uui-form-layout-item>
 						<uui-label for="email" slot="label" required>
-							<umb-localize key="auth_email">Email</umb-localize>
+							<umb-localize key="login_email">Email</umb-localize>
 						</uui-label>
 						<uui-input
 							type="email"
 							id="email"
 							name="email"
-							.label=${this.localize.term('auth_email')}
+							.label=${this.localize.term('login_email')}
 							required
-							required-message=${this.localize.term('auth_required')}>
+							required-message=${this.localize.term('login_required')}>
 						</uui-input>
 					</uui-form-layout-item>
 
@@ -67,7 +67,7 @@ export default class UmbResetPasswordPageElement extends UmbLitElement {
 
 					<uui-button
 						type="submit"
-						.label=${this.localize.term('auth_submit')}
+						.label=${this.localize.term('login_submit')}
 						look="primary"
 						color="default"
 						.state=${this.resetCallState}></uui-button>
@@ -87,8 +87,8 @@ export default class UmbResetPasswordPageElement extends UmbLitElement {
 	#renderConfirmationPage() {
 		return html`
 			<umb-confirmation-layout
-				header=${this.localize.term('auth_forgottenPassword')}
-				message=${this.localize.term('auth_requestPasswordResetConfirmation')}>
+				header=${this.localize.term('login_forgottenPassword')}
+				message=${this.localize.term('login_requestPasswordResetConfirmation')}>
 			</umb-confirmation-layout>
 		`;
 	}

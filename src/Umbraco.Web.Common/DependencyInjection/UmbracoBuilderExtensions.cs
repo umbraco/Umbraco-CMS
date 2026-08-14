@@ -241,12 +241,15 @@ public static partial class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddHttpClients(this IUmbracoBuilder builder)
     {
         builder.Services.AddHttpClient();
+        // TODO (V19): Remove this registration along with Constants.HttpClients.IgnoreCertificateErrors.
+        #pragma warning disable CS0618 // Type or member is obsolete
         builder.Services.AddHttpClient(Constants.HttpClients.IgnoreCertificateErrors)
             .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback =
                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
             });
+        #pragma warning restore CS0618 // Type or member is obsolete
         builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring, (services, client) =>
         {
             var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
@@ -325,10 +328,6 @@ public static partial class UmbracoBuilderExtensions
         // register the umbraco context factory
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
         builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
-
-        var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-        builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
-            .Add(umbracoApiControllerTypes);
 
         builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();
         builder.Services.AddSingleton<PreviewAuthenticationMiddleware>();

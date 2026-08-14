@@ -18,6 +18,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
     private readonly IRedirectUrlService _redirectUrlService;
     private readonly IApiPublishedContentCache _apiPublishedContentCache;
     private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
+    private readonly IDocumentUrlService _documentUrlService;
     private readonly GlobalSettings _globalSettings;
 
     public RequestRedirectService(
@@ -28,13 +29,15 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
         IRedirectUrlService redirectUrlService,
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentRouteBuilder apiContentRouteBuilder,
-        IOptions<GlobalSettings> globalSettings)
+        IOptions<GlobalSettings> globalSettings,
+        IDocumentUrlService documentUrlService)
         : base(domainCache, httpContextAccessor, requestStartItemProviderAccessor)
     {
         _requestCultureService = requestCultureService;
         _redirectUrlService = redirectUrlService;
         _apiPublishedContentCache = apiPublishedContentCache;
         _apiContentRouteBuilder = apiContentRouteBuilder;
+        _documentUrlService = documentUrlService;
         _globalSettings = globalSettings.Value;
     }
 
@@ -43,15 +46,18 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
         requestedPath = requestedPath.EnsureStartsWith("/");
 
         IPublishedContent? startItem = GetStartItem();
+        var culture = _requestCultureService.GetRequestedCulture();
 
         // must append the root content url segment if it is not hidden by config, because
         // the URL tracking is based on the actual URL, including the root content url segment
-        if (_globalSettings.HideTopLevelNodeFromPath == false && startItem?.UrlSegment != null)
+        if (_globalSettings.HideTopLevelNodeFromPath == false && startItem is not null)
         {
-            requestedPath = $"{startItem.UrlSegment.EnsureStartsWith("/")}{requestedPath}";
+            var startItemUrlSegment = _documentUrlService.GetUrlSegment(startItem.Key, culture ?? string.Empty, isDraft: false);
+            if (startItemUrlSegment is not null)
+            {
+                requestedPath = $"{startItemUrlSegment.EnsureStartsWith("/")}{requestedPath}";
+            }
         }
-
-        var culture = _requestCultureService.GetRequestedCulture();
 
         // important: redirect URLs are always tracked without trailing slashes
         requestedPath = requestedPath.TrimEnd("/");

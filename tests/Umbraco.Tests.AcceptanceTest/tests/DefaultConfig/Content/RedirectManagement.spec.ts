@@ -30,7 +30,9 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
+// On the latest version, the URL tracker will not be allowed through the UI, but the appsettings can be used to disable it.
+// Related PR: https://github.com/umbraco/Umbraco-CMS/pull/22830
+test.fixme('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.redirectManagement.clickRedirectManagementTab();
@@ -53,7 +55,9 @@ test('can disable URL tracker', async ({umbracoApi, umbracoUi}) => {
   expect(statusData.status).toBe(disableStatus);
 });
 
-test('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
+// On the latest version, the URL tracker will not be allowed through the UI, but the appsettings can be used to disable it.
+// Related PR: https://github.com/umbraco/Umbraco-CMS/pull/22830
+test.fixme('can re-enable URL tracker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.redirectManagement.setStatus(disableStatus);
 

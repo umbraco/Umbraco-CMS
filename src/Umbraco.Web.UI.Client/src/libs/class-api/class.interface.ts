@@ -7,7 +7,11 @@ import type {
 	UmbContextToken,
 } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type {
+	ObserverCallback,
+	UmbObserverValueType,
+	UmbObserverController,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbClassGetContextOptions extends UmbContextConsumerAsPromiseOptionsType {
@@ -27,18 +31,13 @@ export interface UmbClassInterface extends UmbControllerHost {
 	observe<
 		ObservableType extends Observable<T> | undefined,
 		T,
-		SpecificT = ObservableType extends Observable<infer U>
-			? ObservableType extends undefined
-				? U | undefined
-				: U
-			: undefined,
+		SpecificT = UmbObserverValueType<ObservableType>,
 		SpecificR = ObservableType extends undefined
 			? UmbObserverController<SpecificT> | undefined
 			: UmbObserverController<SpecificT>,
 	>(
-		// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
 		source: ObservableType,
-		callback?: ObserverCallback<SpecificT>,
+		callback?: ObserverCallback<UmbObserverValueType<ObservableType>>,
 		controllerAlias?: UmbControllerAlias | null,
 	): SpecificR;
 
@@ -55,9 +54,9 @@ export interface UmbClassInterface extends UmbControllerHost {
 	): UmbContextProviderController<R>;
 
 	/**
-	 * @description Setup a subscription for a context. The callback is called when the context is resolved.
+	 * @description Subscribe to a context. The callback fires when the context resolves, again if the context is replaced, and can also be invoked with `undefined` if the context is unprovided or the host disconnects. Use this whenever a controller or element needs the context at setup time — both for ongoing observation and for reading values immediately on resolve. This is the default choice; prefer it over `getContext` unless the context is only needed inside a later user action.
 	 * @param {string} alias
-	 * @param {ObserverCallback} callback Callback method called when context is resolved.
+	 * @param {UmbContextCallback} callback Callback method called with the resolved context instance or `undefined`.
 	 * @returns {UmbContextConsumerController} Reference to the created Context Consumer Controller instance
 	 * @memberof UmbClassInterface
 	 */
@@ -67,9 +66,10 @@ export interface UmbClassInterface extends UmbControllerHost {
 	): UmbContextConsumerController<BaseType, ResultType>;
 
 	/**
-	 * @description Retrieve a context. Notice this is a one time retrieving of a context, meaning if you expect this to be up to date with reality you should instead use the consumeContext method.
+	 * @description Retrieve a context once as a Promise. Use this only when the context is first needed inside a user action or event handler that runs later (for example a button click, a property action, or an entity action `execute()`). For setup-time access — including a single immediate read — use `consumeContext` instead so the controller lifecycle handles resolution and cleanup. The returned Promise may reject if the context is not found before the default timeout; callers should handle rejection and/or pass `preventTimeout` in the options when waiting longer is expected.
 	 * @param {string} alias
-	 * @returns {Promise<unknown>} A Promise with the reference to the Context Api Instance
+	 * @param {UmbClassGetContextOptions} [options] Options for resolving the context once, including timeout-related behavior such as `preventTimeout`.
+	 * @returns {Promise<ResultType | undefined>} A Promise resolving to the Context API instance when available, or `undefined` when applicable.
 	 * @memberof UmbClassInterface
 	 */
 	getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(

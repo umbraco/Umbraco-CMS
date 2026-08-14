@@ -175,9 +175,9 @@ export class UmbPropertyEditorUIBlockGridElement
 			}
 		}).passContextAliasMatches();
 
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.observe(
-				context?.dataPath,
+				propertyContext?.dataPath,
 				(dataPath) => {
 					if (dataPath) {
 						// Set the data path for the local validation context:
@@ -187,10 +187,7 @@ export class UmbPropertyEditorUIBlockGridElement
 				},
 				'observeDataPath',
 			);
-		});
 
-		// TODO: Prevent initial notification from these observes
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.observe(
 				observeMultiple([
 					this.#managerContext.layouts,
@@ -248,7 +245,7 @@ export class UmbPropertyEditorUIBlockGridElement
 			);
 		});
 
-		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
+		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false), null);
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {

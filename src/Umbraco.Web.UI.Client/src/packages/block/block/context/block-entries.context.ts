@@ -38,8 +38,16 @@ export abstract class UmbBlockEntriesContext<
 		return this._layoutEntries.getValue().length;
 	}
 
+	/**
+	 * Returns the current layout entries.
+	 * @returns {Array<BlockLayoutType>} The current layout entries.
+	 */
+	getLayouts(): Array<BlockLayoutType> {
+		return this._layoutEntries.getValue();
+	}
+
 	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
-		super(host, UMB_BLOCK_ENTRIES_CONTEXT.toString());
+		super(host, UMB_BLOCK_ENTRIES_CONTEXT);
 
 		// TODO: Observe Blocks of the layout entries of this component.
 		this._retrieveManager = this.consumeContext(blockManagerContextToken, (blockGridManager) => {

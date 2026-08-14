@@ -23,8 +23,6 @@ internal sealed class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
 
     private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
-
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 
     private IDataTypeContainerRepository DataTypeContainerRepository =>

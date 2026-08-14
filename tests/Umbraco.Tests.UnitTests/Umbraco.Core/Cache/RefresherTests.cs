@@ -91,12 +91,68 @@ public class RefresherTests
         });
     }
 
+    [TestCase(TreeChangeTypes.None)]
+    [TestCase(TreeChangeTypes.RefreshAll)]
+    [TestCase(TreeChangeTypes.RefreshBranch)]
+    [TestCase(TreeChangeTypes.Remove)]
+    [TestCase(TreeChangeTypes.RefreshNode)]
+    public void ElementCacheRefresherCanDeserializeJsonPayload(TreeChangeTypes changeTypes)
+    {
+        var key = Guid.NewGuid();
+        ElementCacheRefresher.JsonPayload[] source =
+        {
+            new(1234, key, changeTypes)
+        };
+
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<ElementCacheRefresher.JsonPayload[]>(json);
+
+        Assert.AreEqual(1234, payload[0].Id);
+        Assert.AreEqual(key, payload[0].Key);
+        Assert.AreEqual(changeTypes, payload[0].ChangeTypes);
+        Assert.IsNull(payload[0].PublishedCultures);
+        Assert.IsNull(payload[0].UnpublishedCultures);
+    }
+
+    [Test]
+    public void ElementCacheRefresherCanDeserializeJsonPayloadWithCultures()
+    {
+        var key = Guid.NewGuid();
+        ElementCacheRefresher.JsonPayload[] source =
+        {
+            new(1234, key, TreeChangeTypes.RefreshNode)
+            {
+                PublishedCultures = ["en-US", "da-DK"],
+                UnpublishedCultures = ["de-DE"]
+            }
+        };
+
+        var json = JsonSerializer.Serialize(source);
+        var payload = JsonSerializer.Deserialize<ElementCacheRefresher.JsonPayload[]>(json);
+
+        Assert.IsNotNull(payload[0].PublishedCultures);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, payload[0].PublishedCultures.Length);
+            Assert.AreEqual("en-US", payload[0].PublishedCultures.First());
+            Assert.AreEqual("da-DK", payload[0].PublishedCultures.Last());
+        });
+
+        Assert.IsNotNull(payload[0].UnpublishedCultures);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, payload[0].UnpublishedCultures.Length);
+            Assert.AreEqual("de-DE", payload[0].UnpublishedCultures.First());
+        });
+    }
+
     [Test]
     public void ContentTypeCacheRefresherCanDeserializeJsonPayload()
     {
         ContentTypeCacheRefresher.JsonPayload[] source =
         {
             new ContentTypeCacheRefresher.JsonPayload("xxx", 1234, ContentTypeChangeTypes.None),
+            new ContentTypeCacheRefresher.JsonPayload("xxx", 5678, ContentTypeChangeTypes.None, true),
         };
 
         var json = JsonSerializer.Serialize(source);
@@ -105,6 +161,12 @@ public class RefresherTests
         Assert.AreEqual(source[0].ItemType, payload[0].ItemType);
         Assert.AreEqual(source[0].Id, payload[0].Id);
         Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
+
+        // IsElement drives which cache service a content type change is routed to, and on subscriber servers
+        // the payload only ever arrives via this JSON round trip.
+        Assert.IsFalse(payload[0].IsElement);
+        Assert.AreEqual(source[1].Id, payload[1].Id);
+        Assert.IsTrue(payload[1].IsElement);
     }
 
     [Test]

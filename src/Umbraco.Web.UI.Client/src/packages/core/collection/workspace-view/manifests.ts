@@ -1,3 +1,4 @@
+import { UmbCollectionWorkspaceViewElement } from './collection-workspace-view.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -9,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'workspaceView',
 			kind: 'collection',
-			element: () => import('./collection-workspace-view.element.js'),
+			element: UmbCollectionWorkspaceViewElement,
 			meta: {
 				label: 'Collection',
 				pathname: 'collection',

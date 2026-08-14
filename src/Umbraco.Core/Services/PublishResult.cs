@@ -6,12 +6,12 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Represents the result of publishing a document.
 /// </summary>
-public class PublishResult : OperationResult<PublishResultType, IContent>
+public class PublishResult : OperationResult<PublishResultType, IPublishableContentBase>
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishResult" /> class.
     /// </summary>
-    public PublishResult(PublishResultType resultType, EventMessages? eventMessages, IContent content)
+    public PublishResult(PublishResultType resultType, EventMessages? eventMessages, IPublishableContentBase content)
         : base(resultType, eventMessages, content)
     {
     }
@@ -19,7 +19,7 @@ public class PublishResult : OperationResult<PublishResultType, IContent>
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishResult" /> class.
     /// </summary>
-    public PublishResult(EventMessages eventMessages, IContent content)
+    public PublishResult(EventMessages eventMessages, IPublishableContentBase content)
         : base(PublishResultType.SuccessPublish, eventMessages, content)
     {
     }
@@ -27,7 +27,7 @@ public class PublishResult : OperationResult<PublishResultType, IContent>
     /// <summary>
     ///     Gets the document.
     /// </summary>
-    public IContent Content => Entity ?? throw new InvalidOperationException("The content entity was null. Nullability must have been circumvented when constructing this instance. Please don't do that.");
+    public IPublishableContentBase Content => Entity ?? throw new InvalidOperationException("The content entity was null. Nullability must have been circumvented when constructing this instance. Please don't do that.");
 
     /// <summary>
     ///     Gets or sets the invalid properties, if the status failed due to validation.

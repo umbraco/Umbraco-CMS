@@ -48,7 +48,7 @@ public class UserBasedPreviewTokenGenerator : IPreviewTokenGenerator
         }
         catch (Exception e)
         {
-            _logger.LogDebug(e, "An error occured when trying to get the user from the encrypted token");
+            _logger.LogDebug(e, "An error occurred when trying to get the user from the encrypted token");
         }
 
         return Attempt.Fail<Guid?>(null);

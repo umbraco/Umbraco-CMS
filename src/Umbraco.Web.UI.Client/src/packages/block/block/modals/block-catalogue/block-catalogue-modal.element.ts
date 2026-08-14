@@ -85,9 +85,13 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			this._manager = manager;
 		});
 
-		this.observe(this.#itemManager.items, async (items) => {
-			this.#observeBlockTypes(items);
-		});
+		this.observe(
+			this.#itemManager.items,
+			async (items) => {
+				this.#observeBlockTypes(items);
+			},
+			null,
+		);
 	}
 
 	override connectedCallback() {
@@ -212,6 +216,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				() => html`
 					<uui-input
 						id="search"
+						name="block-search"
 						@input=${this.#onSearch}
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}>
@@ -254,7 +259,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				@open=${() => this.#chooseBlock(block.contentElementTypeKey)}>
 				${when(
 					imgSrc,
-					(src) => html`<img src=${src} alt="" />`,
+					(src) => html`<img src=${src} alt="" decoding="async" />`,
 					() => html`<umb-icon name=${block.icon ?? ''} color=${ifDefined(block.iconColor)}></umb-icon>`,
 				)}
 				<slot name="actions" slot="actions"> </slot>

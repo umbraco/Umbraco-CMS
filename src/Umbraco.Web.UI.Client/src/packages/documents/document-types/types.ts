@@ -12,6 +12,7 @@ export type * from './entity.js';
 
 export interface UmbDocumentTypeDetailModel extends UmbContentTypeDetailModel {
 	entityType: UmbDocumentTypeEntityType;
+	allowedInLibrary: boolean;
 	allowedTemplates: Array<{ id: string }>;
 	defaultTemplate: { id: string } | null;
 	cleanup: UmbDocumentTypeCleanupModel;
@@ -23,8 +24,7 @@ export type UmbDocumentTypeCleanupModel = {
 	keepLatestVersionPerDayForDays?: number | null;
 };
 
-export interface UmbDocumentTypeAvailableCompositionRequestModel
-	extends UmbContentTypeAvailableCompositionRequestModel {
+export interface UmbDocumentTypeAvailableCompositionRequestModel extends UmbContentTypeAvailableCompositionRequestModel {
 	isElement: boolean;
 }
 

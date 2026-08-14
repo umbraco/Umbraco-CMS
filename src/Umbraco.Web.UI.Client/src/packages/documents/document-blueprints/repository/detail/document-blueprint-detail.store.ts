@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @class UmbDocumentBlueprintDetailStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Document Blueprint Details
  */
 export class UmbDocumentBlueprintDetailStore extends UmbDetailStoreBase<UmbDocumentBlueprintDetailModel> {
@@ -15,7 +15,7 @@ export class UmbDocumentBlueprintDetailStore extends UmbDetailStoreBase<UmbDocum
 	 * @memberof UmbDocumentBlueprintDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT);
 	}
 }
 

@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
 
@@ -24,6 +25,8 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     private readonly IEventAggregator _eventAggregator;
     private readonly ComponentCollection _components;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
+    private readonly IMigrationCoordinator _coordinator;
+    private readonly IContentRoutingReadiness _contentRoutingReadiness;
     private readonly ILogger<UnattendedUpgradeBackgroundService> _logger;
 
     /// <summary>
@@ -33,18 +36,24 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     /// <param name="eventAggregator">The event aggregator used to publish upgrade notifications.</param>
     /// <param name="components">The component collection to initialize after migration completes.</param>
     /// <param name="hostApplicationLifetime">The host application lifetime for registering started/stopped callbacks.</param>
+    /// <param name="coordinator">Coordinates migration leadership across servers in a load-balanced environment.</param>
+    /// <param name="contentRoutingReadiness">Signals when per-server content-routing initialization has completed.</param>
     /// <param name="logger">The logger.</param>
     public UnattendedUpgradeBackgroundService(
         IRuntimeState runtimeState,
         IEventAggregator eventAggregator,
         ComponentCollection components,
         IHostApplicationLifetime hostApplicationLifetime,
+        IMigrationCoordinator coordinator,
+        IContentRoutingReadiness contentRoutingReadiness,
         ILogger<UnattendedUpgradeBackgroundService> logger)
     {
         _runtimeState = runtimeState;
         _eventAggregator = eventAggregator;
         _components = components;
         _hostApplicationLifetime = hostApplicationLifetime;
+        _coordinator = coordinator;
+        _contentRoutingReadiness = contentRoutingReadiness;
         _logger = logger;
     }
 
@@ -59,9 +68,30 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
 
         _logger.LogInformation("Unattended upgrade background service started.");
 
+        bool isLeader = false;
+
         try
         {
-            await RunMigrationsAsync(stoppingToken);
+            isLeader = await _coordinator.TryBecomeLeaderAsync(stoppingToken);
+
+            if (_runtimeState.Level == RuntimeLevel.BootFailed)
+            {
+                return;
+            }
+
+            if (isLeader)
+            {
+                // Belt-and-suspenders for graceful shutdowns (e.g. Azure SIGTERM): release the claim
+                // as soon as the host begins stopping, even if a migration step is still blocking.
+                _hostApplicationLifetime.ApplicationStopping.Register(() => _coordinator.ReleaseLeadership());
+                await RunMigrationsAsync(stoppingToken);
+            }
+            else
+            {
+                // Follower: rebuild per-server in-memory navigation and publish status
+                // from the fully-migrated database.
+                await _eventAggregator.PublishAsync(new PostRuntimePremigrationsUpgradeNotification(), stoppingToken);
+            }
         }
         catch (Exception ex)
         {
@@ -69,14 +99,20 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
             _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, ex);
             return;
         }
+        finally
+        {
+            // Always release the claim — even on leader failure — so other servers
+            // can detect completion or take over.
+            if (isLeader)
+            {
+                _coordinator.ReleaseLeadership();
+            }
+        }
 
-        // Re-evaluate runtime level after migrations complete. This handles all result cases:
-        // - CoreUpgradeComplete / PackageMigrationComplete: confirms the new Run level.
-        // - NotRequired: another instance may have already run migrations; re-check to get Run level.
-        // - HasErrors: BootFailedException is set, so DetermineRuntimeLevel() returns early (no-op).
+        // For the leader: confirms migrations succeeded and level transitions to Run.
+        // For followers: level is already Run (set during TryBecomeLeaderAsync polling).
         DetermineRuntimeLevel();
 
-        // RunMigrationsAsync may have set BootFailed via a non-throwing error path (HasErrors result).
         if (_runtimeState.Level == RuntimeLevel.BootFailed)
         {
             return;
@@ -87,6 +123,11 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         {
             await _components.InitializeAsync(false, stoppingToken);
             await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(_runtimeState.Level, false), stoppingToken);
+
+            // Seeding has completed: the front-end may now route content. Until this point the runtime has
+            // been at Run (set above) while the content/URL/domain caches were still being seeded, so the
+            // front-end was gated to the maintenance page to avoid serving — and caching — a negative result.
+            _contentRoutingReadiness.MarkReady();
 
             _hostApplicationLifetime.ApplicationStarted.Register(
                 () => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));

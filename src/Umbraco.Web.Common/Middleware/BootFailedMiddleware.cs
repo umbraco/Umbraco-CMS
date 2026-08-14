@@ -51,7 +51,9 @@ public class BootFailedMiddleware : IMiddleware
                 if (fileInfo is not null)
                 {
                     using var sr = new StreamReader(fileInfo.CreateReadStream(), Encoding.UTF8);
-                    await context.Response.WriteAsync(await sr.ReadToEndAsync(), Encoding.UTF8);
+                    var html = await sr.ReadToEndAsync();
+                    html = html.Replace("{{pathBase}}", context.Request.PathBase.Value?.TrimEnd('/'));
+                    await context.Response.WriteAsync(html, Encoding.UTF8);
                 }
             }
         }

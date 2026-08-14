@@ -20,6 +20,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 {
+    private IRelationType _relateContentToMedia;
+
     [SetUp]
     public void SetUp() => CreateTestData();
 
@@ -101,7 +103,7 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var relationType = repository.Get(9) as IRelationTypeWithIsDependency;
+            var relationType = repository.Get(_relateContentToMedia.Id) as IRelationTypeWithIsDependency;
 
             // Assert
             Assert.That(relationType, Is.Not.Null);
@@ -129,9 +131,8 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(relationTypes, Is.Not.Null);
-            Assert.That(relationTypes.Any(), Is.True);
+            Assert.That(relationTypes.Length, Is.EqualTo(12));
             Assert.That(relationTypes.Any(x => x == null), Is.False);
-            Assert.That(relationTypes.Count(), Is.EqualTo(9));
         }
     }
 
@@ -188,7 +189,7 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var count = repository.Count(query);
 
             // Assert
-            Assert.That(count, Is.EqualTo(6));
+            Assert.That(count, Is.EqualTo(8));
         }
     }
 
@@ -243,10 +244,68 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
         {
             var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
-            repository.Save(relateContent); // Id 2
-            repository.Save(relateContentType); // Id 3
-            repository.Save(relateContentMedia); // Id 4
+            repository.Save(relateContent);
+            repository.Save(relateContentType);
+            repository.Save(relateContentMedia);
             scope.Complete();
+        }
+
+        _relateContentToMedia = relateContentMedia;
+    }
+
+    [Test]
+    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        ICoreScopeProvider provider = ScopeProvider;
+        using (provider.CreateCoreScope())
+        {
+            var repository = CreateRepository(provider);
+            var relationType = new RelationType("Test Clone", "testClone", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
+            repository.Save(relationType);
+
+            var first = repository.Get(relationType.Key);
+            var second = repository.Get(relationType.Key);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Guid_Returns_Correct_Result()
+    {
+        ICoreScopeProvider provider = ScopeProvider;
+        using (provider.CreateCoreScope())
+        {
+            var repository = CreateRepository(provider);
+            var relationType = new RelationType("Test Exists", "testExists", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
+            repository.Save(relationType);
+
+            Assert.IsTrue(repository.Exists(relationType.Key));
+            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+        }
+    }
+
+    [Test]
+    public void Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        ICoreScopeProvider provider = ScopeProvider;
+        using (provider.CreateCoreScope())
+        {
+            var repository = CreateRepository(provider);
+            var relationType = new RelationType("Test Mutation", "testMutation", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
+            repository.Save(relationType);
+
+            var first = repository.Get(relationType.Key);
+            Assert.IsNotNull(first);
+            var originalName = first!.Name;
+            first.Name = "MUTATED_" + Guid.NewGuid();
+
+            var second = repository.Get(relationType.Key);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
         }
     }
 }

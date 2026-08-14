@@ -25,6 +25,8 @@ export class UmbUserGroupWorkspaceContext
 	);
 	readonly documentStartNode = this._data.createObservablePartOfCurrent((data) => data?.documentStartNode || null);
 	readonly documentRootAccess = this._data.createObservablePartOfCurrent((data) => data?.documentRootAccess || false);
+	readonly elementStartNode = this._data.createObservablePartOfCurrent((data) => data?.elementStartNode || null);
+	readonly elementRootAccess = this._data.createObservablePartOfCurrent((data) => data?.elementRootAccess || false);
 	readonly mediaStartNode = this._data.createObservablePartOfCurrent((data) => data?.mediaStartNode || null);
 	readonly mediaRootAccess = this._data.createObservablePartOfCurrent((data) => data?.mediaRootAccess || false);
 	readonly fallbackPermissions = this._data.createObservablePartOfCurrent((data) => data?.fallbackPermissions || []);
@@ -69,6 +71,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Gets the user group user permissions.
+	 * @returns {Array<UmbUserPermissionModel>} The user group user permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getPermissions() {
@@ -77,7 +80,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Sets the user group user permissions.
-	 * @param {Array<UmbUserPermissionModel>} permissions
+	 * @param {Array<UmbUserPermissionModel>} permissions - The user group user permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setPermissions(permissions: Array<UmbUserPermissionModel>) {
@@ -86,6 +89,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Gets the user group fallback permissions.
+	 * @returns {Array<string>} The user group fallback permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	getFallbackPermissions() {
@@ -94,7 +98,7 @@ export class UmbUserGroupWorkspaceContext
 
 	/**
 	 * Sets the user group fallback permissions.
-	 * @param {Array<string>} fallbackPermissions
+	 * @param {Array<string>} fallbackPermissions - The user group fallback permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
 	setFallbackPermissions(fallbackPermissions: Array<string>) {

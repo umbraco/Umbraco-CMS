@@ -9,11 +9,12 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for the Media Recycle Bin tree that fetches data from the server
  * @class UmbMediaRecycleBinTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @augments {UmbTreeServerDataSourceBase}
  */
 export class UmbMediaRecycleBinTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	MediaRecycleBinItemResponseModel,
@@ -34,18 +35,31 @@ export class UmbMediaRecycleBinTreeServerDataSource extends UmbTreeServerDataSou
 	}
 }
 
-const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
+	const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	MediaService.getRecycleBinMediaRoot({ query: { skip: args.skip, take: args.take } });
+	const { data, ...rest } = await MediaService.getRecycleBinMediaRoot({
+		query: { skip, take },
+	});
+	return {
+		data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+		...rest,
+	};
+};
 
-const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
+		const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return MediaService.getRecycleBinMediaChildren({
-			query: { parentId: args.parent.unique, skip: args.skip, take: args.take },
+		const { data, ...rest } = await MediaService.getRecycleBinMediaChildren({
+			query: { parentId: args.parent.unique, skip, take },
 		});
+		return {
+			data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) },
+			...rest,
+		};
 	}
 };
 

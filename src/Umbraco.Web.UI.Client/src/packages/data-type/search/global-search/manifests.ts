@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'globalSearch',
 		weight: 400,
 		meta: {
-			label: 'Data Types',
+			label: '#treeHeaders_dataTypes',
 			searchProviderAlias: UMB_DATA_TYPE_SEARCH_PROVIDER_ALIAS,
 			sectionAlias: UMB_SETTINGS_SECTION_ALIAS,
 		},

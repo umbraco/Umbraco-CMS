@@ -237,7 +237,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbMyEntityDetailStore extends UmbDetailStoreBase<UmbMyEntityDetailModel> {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MY_ENTITY_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_MY_ENTITY_DETAIL_STORE_CONTEXT);
 	}
 }
 

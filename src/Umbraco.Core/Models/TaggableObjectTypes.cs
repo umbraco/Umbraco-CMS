@@ -24,4 +24,9 @@ public enum TaggableObjectTypes
     /// Represents member entities (user accounts).
     /// </summary>
     Member,
+
+    /// <summary>
+    /// Represents element entities.
+    /// </summary>
+    Element,
 }

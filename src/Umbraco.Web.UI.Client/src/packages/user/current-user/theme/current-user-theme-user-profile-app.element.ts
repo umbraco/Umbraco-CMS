@@ -3,7 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import type { UmbThemeContext } from '@umbraco-cms/backoffice/themes';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-current-user-theme-user-profile-app')
 export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
@@ -13,7 +13,7 @@ export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 	private _themeAlias?: string;
 
 	@state()
-	private _themes: Array<Option> = [];
+	private _themes: Array<UUISelectOption> = [];
 
 	constructor() {
 		super();

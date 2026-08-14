@@ -17,10 +17,20 @@ public class ContentSettings
     internal const bool StaticResolveUrlsFromTextString = false;
 
     /// <summary>
+    ///     The default value for whether sorting children by a field fires per-item notifications.
+    /// </summary>
+    internal const bool StaticSortChildrenByFieldFiresNotifications = false;
+
+    /// <summary>
+    ///     The placeholder in <see cref="PreviewBadge" /> that renders as the CSP nonce attribute.
+    /// </summary>
+    internal const string PreviewBadgeNoncePlaceholder = "{3}";
+
+    /// <summary>
     ///     The default preview badge markup template.
     /// </summary>
     internal const string StaticDefaultPreviewBadge = @"
-<script src=""{0}/website/preview.js""></script>
+<script{3} src=""{0}/website/preview.js""></script>
 <umb-website-preview path=""{0}"" url=""{1}"" unique=""{2}""></umb-website-preview>";
 
     /// <summary>
@@ -88,11 +98,10 @@ public class ContentSettings
     /// </summary>
     internal const bool StaticShowUnroutableContentWarnings = true;
 
-    // TODO (V18): Consider enabling this by default and documenting as a behavioural breaking change.
     /// <summary>
     ///     The default value for enabling media recycle bin protection.
     /// </summary>
-    private const bool StaticEnableMediaRecycleBinProtection = false;
+    private const bool StaticEnableMediaRecycleBinProtection = true;
 
     /// <summary>
     ///     Gets or sets a value for the content notification settings.
@@ -111,6 +120,18 @@ public class ContentSettings
     public bool ResolveUrlsFromTextString { get; set; } = StaticResolveUrlsFromTextString;
 
     /// <summary>
+    ///     Gets or sets a value indicating whether sorting the children of a node by a field fires
+    ///     per-item save/sort notifications (and therefore webhooks).
+    /// </summary>
+    /// <remarks>
+    ///     Defaults to <c>false</c>: the children are reordered with a single set-based update and a branch
+    ///     cache refresh, without per-item notifications. Set to <c>true</c> to restore per-item notifications
+    ///     (and webhooks), accepting the additional performance cost on nodes with many children.
+    /// </remarks>
+    [DefaultValue(StaticSortChildrenByFieldFiresNotifications)]
+    public bool SortChildrenByFieldFiresNotifications { get; set; } = StaticSortChildrenByFieldFiresNotifications;
+
+    /// <summary>
     ///     Gets or sets a value for the collection of error pages.
     /// </summary>
     public IEnumerable<ContentErrorPage> Error404Collection { get; set; } = [];
@@ -118,6 +139,29 @@ public class ContentSettings
     /// <summary>
     ///     Gets or sets a value for the preview badge mark-up.
     /// </summary>
+    /// <remarks>
+    ///     The mark-up is used as a format string with the following placeholders:
+    ///     <list type="bullet">
+    ///         <item><description><c>{0}</c>: the back office path.</description></item>
+    ///         <item><description><c>{1}</c>: the URL of the previewed page.</description></item>
+    ///         <item><description><c>{2}</c>: the key of the previewed content item.</description></item>
+    ///         <item>
+    ///             <description>
+    ///                 <c>{3}</c>: a <c>nonce</c> attribute (including the leading space) for the current request,
+    ///                 or an empty string when no nonce is available. Required for sites using a nonce-based
+    ///                 Content Security Policy.
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    ///     <para>
+    ///         The nonce rendered by <c>{3}</c> is the one provided by
+    ///         <see cref="Umbraco.Cms.Core.Security.ICspNonceService" />, so it only matches the policy when that
+    ///         same nonce reaches the <c>Content-Security-Policy</c> header — which is what
+    ///         <c>app.UseUmbracoCspNonceInjection()</c> does. A site whose own middleware generates a different
+    ///         nonce for the header needs to source its nonce from <c>ICspNonceService</c> as well, otherwise the
+    ///         values will not match and the badge stays blocked.
+    ///     </para>
+    /// </remarks>
     [DefaultValue(StaticDefaultPreviewBadge)]
     public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
 
@@ -163,13 +207,6 @@ public class ContentSettings
     /// <remarks>This is the alternative version to the regular logo found at <see cref="BackOfficeLogo"/>.</remarks>
     [DefaultValue(StaticBackOfficeLogoAlternative)]
     public string BackOfficeLogoAlternative { get; set; } = StaticBackOfficeLogoAlternative;
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.
-    /// </summary>
-    [DefaultValue(StaticHideBackOfficeLogo)]
-    [Obsolete("This setting is no longer used. An alternative BackOffice logo can be set using the BackOfficeLogo setting. Scheduled for removal in Umbraco 18.")]
-    public bool HideBackOfficeLogo { get; set; } = StaticHideBackOfficeLogo;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to disable the deletion of items referenced by other items.

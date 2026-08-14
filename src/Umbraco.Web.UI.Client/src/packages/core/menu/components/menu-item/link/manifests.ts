@@ -1,3 +1,4 @@
+import { UmbLinkMenuItemElement } from './link-menu-item.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -8,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		matchType: 'menuItem',
 		manifest: {
 			type: 'menuItem',
-			element: () => import('./link-menu-item.element.js'),
+			element: UmbLinkMenuItemElement,
 		},
 	},
 ];

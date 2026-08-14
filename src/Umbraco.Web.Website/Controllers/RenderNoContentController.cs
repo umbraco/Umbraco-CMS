@@ -16,7 +16,6 @@ public class RenderNoContentController : Controller
     private readonly GlobalSettings _globalSettings;
     private readonly IDocumentUrlService _urlService;
 
-    [ActivatorUtilitiesConstructor]
     public RenderNoContentController(
         IHostingEnvironment hostingEnvironment,
         IOptionsSnapshot<GlobalSettings> globalSettings,
@@ -25,15 +24,6 @@ public class RenderNoContentController : Controller
         _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         _urlService = urlService;
-    }
-
-    [Obsolete("Scheduled for removal in Umbraco 18")]
-    public RenderNoContentController(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IHostingEnvironment hostingEnvironment,
-        IOptionsSnapshot<GlobalSettings> globalSettings)
-    : this(hostingEnvironment, globalSettings, StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
-    {
     }
 
     public ActionResult Index()

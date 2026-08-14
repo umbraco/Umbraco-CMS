@@ -3,6 +3,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { type Observable, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 /**
  * The base class for a store that holds an object.
@@ -10,14 +11,14 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 	protected _data;
 
-	constructor(host: UmbControllerHost, storeAlias: string, initialData?: T) {
+	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string, initialData?: T) {
 		super(host, storeAlias);
 		this._data = new UmbObjectState<T | null>(initialData ?? null);
 	}
 
 	/**
 	 * Updates the store with the given data
-	 * @param data - The (partial) data to update the store with
+	 * @param {Partial<T>} data - The (partial) data to update the store with
 	 * @memberof UmbStoreObjectBase
 	 */
 	update(data: Partial<T>) {
@@ -27,6 +28,7 @@ export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 
 	/**
 	 * Returns the current state of the store
+	 * @returns {T | null} The current state of the store
 	 * @memberof UmbStoreObjectBase
 	 */
 	getState() {
@@ -35,6 +37,7 @@ export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 
 	/**
 	 * Returns an observable of the store
+	 * @returns {Observable<T | null>} An observable of the store
 	 * @memberof UmbStoreObjectBase
 	 */
 	all() {
@@ -43,7 +46,9 @@ export class UmbStoreObjectBase<T> extends UmbContextBase implements UmbApi {
 
 	/**
 	 * Returns an observable of a part of the store
-	 * @param key - The key of the part to return
+	 * @template {keyof T} Part
+	 * @param {Part} key - The key of the part to return
+	 * @returns {Observable<T[Part]>} An observable of the part of the store
 	 * @memberof UmbStoreObjectBase
 	 */
 	part<Part extends keyof T>(key: Part): Observable<T[Part]> {

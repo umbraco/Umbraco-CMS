@@ -69,7 +69,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 				content.</umb-localize
 			> `,
 			color: 'danger',
-			confirmLabel: this.localize.term('examineManagement_rebuildIndex'),
+			confirmLabel: '#examineManagement_rebuildIndex',
 		});
 
 		this._rebuild();

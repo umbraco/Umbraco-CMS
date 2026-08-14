@@ -11,7 +11,8 @@ const propertyEditorUi: UmbExtensionManifest = {
 		label: 'Block Grid',
 		propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-layout',
-		group: 'richContent',
+		group: '#propertyEditorUIGroups_richContent',
+		keywords: ['component', 'layout', 'grid', 'modules', 'widgets', 'page', 'builder', 'canvas'],
 		supportsReadOnly: true,
 		settings: {
 			properties: [
@@ -38,6 +39,12 @@ const propertyEditorUi: UmbExtensionManifest = {
 					label: 'Create Button Label',
 					description: 'Override the label text for adding a new block, Example Add Widget',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+				},
+				{
+					alias: 'createModalSize',
+					label: '#blockEditor_labelCreateModalSize',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+					config: [{ alias: 'defaultOptionLabel', value: 'Auto' }],
 				},
 				{
 					alias: 'gridColumns',

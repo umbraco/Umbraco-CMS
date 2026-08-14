@@ -10,17 +10,19 @@ namespace Umbraco.Cms.Tests.Integration.Testing;
 /// <summary>
 ///     A component to customize some services to work nicely with integration tests
 /// </summary>
-public class IntegrationTestComponent : IComponent
+public class IntegrationTestComponent : IAsyncComponent
 {
     private readonly IExamineManager _examineManager;
 
     public IntegrationTestComponent(IExamineManager examineManager) => _examineManager = examineManager;
 
-    public void Initialize() => ConfigureExamineIndexes();
-
-    public void Terminate()
+    public Task InitializeAsync(bool isRestarting, CancellationToken cancellationToken)
     {
+        ConfigureExamineIndexes();
+        return Task.CompletedTask;
     }
+
+    public Task TerminateAsync(bool isRestarting, CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>
     ///     Configure all indexes to run sync (non-backbround threads) and to use RAMDirectory

@@ -1,14 +1,12 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.PermissionFilter;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.PermissionFilter;
 
@@ -17,22 +15,21 @@ public class DocumentPermissionFilterServiceTests
 {
     private class DocumentPermissionFilterServiceSetup
     {
-        private readonly Guid _userKey = Guid.NewGuid();
-
         private DocumentPermissionFilterService? _sut;
+
         public DocumentPermissionFilterService Sut =>
             _sut ??= new DocumentPermissionFilterService(
                 BackOfficeSecurityAccessor.Object,
-                UserService.Object);
+                ContentPermissionService.Object);
 
         public Mock<IBackOfficeSecurityAccessor> BackOfficeSecurityAccessor { get; } = new();
 
-        public Mock<IUserService> UserService { get; } = new();
+        public Mock<IContentPermissionService> ContentPermissionService { get; } = new();
 
         public void SetupCurrentUser()
         {
             var userMock = new Mock<IUser>();
-            userMock.Setup(u => u.Key).Returns(_userKey);
+            userMock.Setup(u => u.Key).Returns(Guid.NewGuid());
 
             var backOfficeSecurityMock = new Mock<IBackOfficeSecurity>();
             backOfficeSecurityMock.Setup(b => b.CurrentUser).Returns(userMock.Object);
@@ -44,10 +41,9 @@ public class DocumentPermissionFilterServiceTests
 
         public void SetupGetDocumentPermissionsAsync(IEnumerable<NodePermissions> permissions)
         {
-            var attempt = Attempt.SucceedWithStatus(UserOperationStatus.Success, permissions);
-            UserService
-                .Setup(s => s.GetDocumentPermissionsAsync(It.IsAny<Guid>(), It.IsAny<ISet<Guid>>()))
-                .ReturnsAsync(attempt);
+            ContentPermissionService
+                .Setup(s => s.GetPermissionsAsync(It.IsAny<IUser>(), It.IsAny<IEnumerable<Guid>>()))
+                .ReturnsAsync(permissions);
         }
     }
 
@@ -98,7 +94,7 @@ public class DocumentPermissionFilterServiceTests
     }
 
     [Test]
-    public async Task FilterAsync_IncludesEntities_WhenNoPermissionEntryExists()
+    public async Task FilterAsync_FiltersEntities_WhenNoPermissionEntryExists()
     {
         // Arrange
         var entities = CreateEntities(3);
@@ -106,7 +102,7 @@ public class DocumentPermissionFilterServiceTests
         _setup.SetupGetDocumentPermissionsAsync(
             [
                 CreateNodePermissions(entities[0].Key, ActionBrowse.ActionLetter),
-                // entities[1] has no permission entry - should be included
+                // entities[1] has no permission entry - should be denied (fail-closed)
                 CreateNodePermissions(entities[2].Key, ActionBrowse.ActionLetter),
             ]);
 
@@ -114,8 +110,11 @@ public class DocumentPermissionFilterServiceTests
         var (filteredEntities, totalItems) = await _setup.Sut.FilterAsync(entities, 100);
 
         // Assert
-        Assert.AreEqual(3, filteredEntities.Length);
-        Assert.AreEqual(100, totalItems);
+        Assert.AreEqual(2, filteredEntities.Length);
+        Assert.AreEqual(99, totalItems);
+        Assert.IsTrue(filteredEntities.Any(e => e.Key == entities[0].Key));
+        Assert.IsFalse(filteredEntities.Any(e => e.Key == entities[1].Key));
+        Assert.IsTrue(filteredEntities.Any(e => e.Key == entities[2].Key));
     }
 
     [Test]

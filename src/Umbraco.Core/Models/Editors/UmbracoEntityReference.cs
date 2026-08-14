@@ -37,6 +37,9 @@ public struct UmbracoEntityReference : IEquatable<UmbracoEntityReference>
             case Constants.UdiEntityType.Member:
                 RelationTypeAlias = Constants.Conventions.RelationTypes.RelatedMemberAlias;
                 break;
+            case Constants.UdiEntityType.Element:
+                RelationTypeAlias = Constants.Conventions.RelationTypes.RelatedElementAlias;
+                break;
             default:
                 // No relation type alias convention for this entity type, so leave it empty
                 RelationTypeAlias = string.Empty;

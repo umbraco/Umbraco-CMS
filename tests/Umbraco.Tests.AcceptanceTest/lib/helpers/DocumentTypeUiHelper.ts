@@ -17,11 +17,11 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
   private readonly setAsDefaultBtn: Locator;
   private readonly tabGroup: Locator;
   private readonly documentTypesMenu: Locator;
-  private readonly createDocumentModal: Locator;
+  private readonly allowedChildNodesChooseBtn: Locator;
+  private readonly elementTypeNotApplicableMessage: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.createDocumentModal = page.locator('umb-entity-create-option-action-list-modal');
     this.newDocumentTypeBtn = page.getByLabel('New Document Type…');
     this.sharedAcrossCulturesToggle = page.locator('label').filter({hasText: 'Shared across cultures'}).locator('#toggle');
     this.tabGroup = page.getByTestId('workspace:view-links');
@@ -29,13 +29,15 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
     this.documentTypeTemplatesTabBtn = this.tabGroup.locator('[data-mark*="Templates"]');
     this.varyBySegmentsBtn = page.getByText('Vary by segment', {exact: true});
     this.varyByCultureBtn = page.getByText('Vary by culture', {exact: true});
-    this.createDocumentTypeBtn = this.createDocumentModal.locator('umb-ref-item').getByText('Document Type...', {exact: true});
-    this.createDocumentTypeWithTemplateBtn = this.createDocumentModal.locator('umb-ref-item', {hasText: 'Document Type with template'});
-    this.createElementTypeBtn = this.createDocumentModal.locator('umb-ref-item', {hasText: 'Element Type'});
-    this.createDocumentFolderBtn = this.createDocumentModal.locator('umb-ref-item', {hasText: 'Folder'});
+    this.createDocumentTypeBtn = this.createOptionActionListModal.locator('umb-ref-item').getByText('Document Type...', {exact: true});
+    this.createDocumentTypeWithTemplateBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Document Type with template'});
+    this.createElementTypeBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Element Type'});
+    this.createDocumentFolderBtn = this.createOptionActionListModal.locator('umb-ref-item', {hasText: 'Folder'});
     this.preventCleanupBtn = page.getByText('Prevent clean up');
     this.setAsDefaultBtn = page.getByText('Set as default');
     this.documentTypesMenu = page.locator('#menu-item').getByRole('link', {name: 'Document Types'});
+    this.allowedChildNodesChooseBtn = page.locator('umb-property-layout[alias="ChildNodeType"]').locator('umb-input-document-type');
+    this.elementTypeNotApplicableMessage = page.locator('umb-localize[key="contentTypeEditor_elementDoesNotSupport"]');
   }
 
   async clickActionsMenuForDocumentType(name: string) {
@@ -78,13 +80,37 @@ export class DocumentTypeUiHelper extends UiBaseLocators {
     await this.click(this.preventCleanupBtn);
   }
 
+  async isAllowAtRootButtonVisible(isVisible: boolean = true) {
+    await this.isVisible(this.allowAtRootBtn, isVisible);
+  }
+
+  async isAllowedChildNodesButtonVisible(isVisible: boolean = true) {
+    await this.isVisible(this.allowedChildNodesChooseBtn, isVisible);
+  }
+
+  async isAddCollectionButtonVisible(isVisible: boolean = true) {
+    await this.isVisible(this.addCollectionBtn, isVisible);
+  }
+
+  async isPreventCleanupButtonVisible(isVisible: boolean = true) {
+    await this.isVisible(this.preventCleanupBtn, isVisible);
+  }
+
+  async doesElementTypeNotApplicableMessageExist(isVisible: boolean = true) {
+    await this.isVisible(this.elementTypeNotApplicableMessage.first(), isVisible);
+  }
+  
+  async isElementTypeNotApplicableMessageForPropertyWithNameVisible(propertyName: string) {
+    await this.containsText(this.page.locator(`umb-property-layout[label="${propertyName}"] .info-message`) , 'This is not applicable for an Element Type.');
+  }
+
   async reloadDocumentTypeTree() {
     await this.reloadTree('Document Types');
   }
 
   async goToDocumentType(documentTypeName: string) {
     await this.clickRootFolderCaretButton();
-    await this.clickLabelWithName(documentTypeName);
+    await this.clickTreeItemWithName(documentTypeName);
   }
 
   async enterDocumentTypeName(documentTypeName: string) {

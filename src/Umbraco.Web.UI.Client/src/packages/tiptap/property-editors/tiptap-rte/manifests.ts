@@ -11,7 +11,20 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 			label: '#rte_label',
 			propertyEditorSchemaAlias: 'Umbraco.RichText',
 			icon: 'icon-browser-window',
-			group: 'richContent',
+			group: '#propertyEditorUIGroups_richContent',
+			supportsReadOnly: true,
+			keywords: [
+				'content',
+				'article',
+				'body',
+				'html',
+				'wysiwyg',
+				'richtext',
+				'rte',
+				'editor',
+				'formatted',
+				'paragraph',
+			],
 			settings: {
 				properties: [
 					{
@@ -62,6 +75,13 @@ _Drag and drop the available actions onto the statusbar areas._`,
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 						config: [{ alias: 'min', value: 0 }],
 						weight: 40,
+					},
+					{
+						alias: 'createModalSize',
+						label: '#blockEditor_labelCreateModalSize',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+						config: [{ alias: 'defaultOptionLabel', value: 'Auto' }],
+						weight: 55,
 					},
 					{
 						alias: 'overlaySize',

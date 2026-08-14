@@ -9,6 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: UMB_RELATION_TYPE_COLLECTION_ALIAS,
 		name: 'Relation Type Collection',
 		element: () => import('./relation-type-collection.element.js'),
+		api: () => import('./relation-type-collection.context.js'),
 		meta: {
 			repositoryAlias: UMB_RELATION_TYPE_COLLECTION_REPOSITORY_ALIAS,
 		},

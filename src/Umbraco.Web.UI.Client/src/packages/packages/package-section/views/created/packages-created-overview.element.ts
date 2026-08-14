@@ -53,7 +53,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 			color: 'danger',
 			headline: `Remove ${pkg.name}?`,
 			content: 'Are you sure you want to delete this package',
-			confirmLabel: this.localize.term('general_delete'),
+			confirmLabel: '#general_delete',
 		});
 
 		const success = await this.#packageRepository.deleteCreatedPackage(pkg.unique);
@@ -68,7 +68,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		return html`
 			<uui-button
 				look="primary"
-				href="section/packages/view/created/package-builder"
+				href="section/packages/view/created/package-builder/create"
 				label=${this.localize.term('packager_createPackage')}></uui-button>
 			${when(
 				this._loading,
@@ -112,7 +112,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 
 	#packageBuilder(pkg: UmbCreatedPackage) {
 		if (!pkg.unique) return;
-		window.history.pushState({}, '', `section/packages/view/created/package-builder/${pkg.unique}`);
+		window.history.pushState({}, '', `section/packages/view/created/package-builder/edit/${pkg.unique}`);
 	}
 
 	#renderPagination() {
@@ -146,9 +146,6 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 			.no-packages {
 				display: flex;
 				justify-content: space-around;
-			}
-			uui-pagination {
-				display: inline-block;
 			}
 
 			.container {

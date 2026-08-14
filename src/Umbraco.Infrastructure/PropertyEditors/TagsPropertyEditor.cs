@@ -75,6 +75,7 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IDataTypeService _dataTypeService;
+        private readonly IIdKeyMap _idKeyMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.TagsPropertyEditor.TagPropertyValueEditor"/> class,
@@ -85,16 +86,36 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
         /// <param name="ioHelper">Assists with IO operations and path handling.</param>
         /// <param name="attribute">The attribute that defines metadata for the data editor.</param>
         /// <param name="dataTypeService">Service for accessing and managing data types.</param>
+        /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
+        public TagPropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute,
+            IDataTypeService dataTypeService,
+            IIdKeyMap idKeyMap)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+        {
+            _jsonSerializer = jsonSerializer;
+            _dataTypeService = dataTypeService;
+            _idKeyMap = idKeyMap;
+        }
+
+        [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
         public TagPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
             IDataTypeService dataTypeService)
-            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+            : this(
+                shortStringHelper,
+                jsonSerializer,
+                ioHelper,
+                attribute,
+                dataTypeService,
+                StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
         {
-            _jsonSerializer = jsonSerializer;
-            _dataTypeService = dataTypeService;
         }
 
         /// <inheritdoc />
@@ -177,7 +198,7 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
                 return null;
             }
 
-            IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            IDataType? dataType = property.PropertyType.GetDataType(_dataTypeService, _idKeyMap);
             TagConfiguration configuration = dataType?.ConfigurationObject as TagConfiguration ?? new TagConfiguration();
             var tags = ParseTags(val, configuration);
 

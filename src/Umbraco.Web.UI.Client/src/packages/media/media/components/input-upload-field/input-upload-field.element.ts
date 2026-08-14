@@ -1,5 +1,5 @@
 import type { UmbMediaValueType } from '../../property-editors/upload-field/types.js';
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
+import { ensureMediaNameFromFile } from '../../utils/ensure-media-name-from-file.function.js';
 import type { ManifestFileUploadPreview } from './file-upload-preview.extension.js';
 import { getMimeTypeFromExtension } from './utils.js';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -9,7 +9,6 @@ import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extens
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -163,19 +162,9 @@ export class UmbInputUploadFieldElement extends UmbFormControlMixin<UmbMediaValu
 		const blobUrl = URL.createObjectURL(this.temporaryFile.file);
 		this.value = { src: blobUrl };
 
-		void this.#ensureMediaNameFromFile(this.temporaryFile.file);
+		void ensureMediaNameFromFile(this, this.temporaryFile.file);
 
 		this.dispatchEvent(new UmbChangeEvent());
-	}
-
-	async #ensureMediaNameFromFile(file: File) {
-		const datasetContext = await this.getContext(UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT);
-		if (!datasetContext || datasetContext.getEntityType() !== UMB_MEDIA_ENTITY_TYPE) return;
-
-		const currentName = datasetContext.getName();
-		if (currentName && currentName.trim() !== '') return;
-
-		datasetContext.setName(file.name);
 	}
 
 	override render() {

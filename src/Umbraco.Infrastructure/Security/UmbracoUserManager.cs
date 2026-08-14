@@ -301,13 +301,12 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
         return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
     }
 
-    // TODO (V18): Change 'new virtual' to 'override' to properly override base class method.
     /// <summary>
     /// Asynchronously retrieves the valid two-factor authentication providers for the specified user.
     /// </summary>
     /// <param name="user">The user whose valid two-factor providers are to be retrieved.</param>
     /// <returns>A task representing the asynchronous operation, containing a list of valid two-factor provider names.</returns>
-    public new virtual async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)
+    public override async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)
     {
         IList<string>? results = await base.GetValidTwoFactorProvidersAsync(user);
 

@@ -42,6 +42,10 @@ public static class UmbracoApplicationBuilderExtensions
 
         FrontEndRoutes surfaceRoutes = builder.ApplicationServices.GetRequiredService<FrontEndRoutes>();
         surfaceRoutes.CreateRoutes(builder.EndpointRouteBuilder);
+
+        BasicAuthLoginRoutes basicAuthLoginRoutes = builder.ApplicationServices.GetRequiredService<BasicAuthLoginRoutes>();
+        basicAuthLoginRoutes.CreateRoutes(builder.EndpointRouteBuilder);
+
         builder.EndpointRouteBuilder.MapDynamicControllerRoute<UmbracoRouteValueTransformer>(Constants.Web.Routing.DynamicRoutePattern);
 
         return builder;

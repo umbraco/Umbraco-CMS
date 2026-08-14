@@ -32,23 +32,6 @@ public class Upgrader
     public virtual string StateValueKey => Constants.Conventions.Migrations.KeyValuePrefix + Name;
 
     /// <summary>
-    /// Executes the migration plan synchronously using the provided migration plan executor, scope provider, and key value service.
-    /// </summary>
-    /// <param name="migrationPlanExecutor">The executor responsible for running the migration plan.</param>
-    /// <param name="scopeProvider">The scope provider used to manage database scopes during migration.</param>
-    /// <param name="keyValueService">The key value service used for storing migration state.</param>
-    /// <returns>The result of the executed migration plan.</returns>
-    /// <remarks>
-    /// This method is obsolete. Use <see cref="ExecuteAsync"/> instead.
-    /// </remarks>
-    [Obsolete("Use ExecuteAsync instead. Scheduled for removal in Umbraco 18.")]
-    public ExecutedMigrationPlan Execute(
-        IMigrationPlanExecutor migrationPlanExecutor,
-        ICoreScopeProvider scopeProvider,
-        IKeyValueService keyValueService)
-        => ExecuteAsync(migrationPlanExecutor, scopeProvider, keyValueService).GetAwaiter().GetResult();
-
-    /// <summary>
     ///     Executes the migration plan asynchronously using the specified executor, scope provider, and key-value service.
     /// </summary>
     /// <param name="migrationPlanExecutor">The executor responsible for running the migration plan.</param>

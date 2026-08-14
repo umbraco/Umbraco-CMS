@@ -7,6 +7,7 @@ import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as profileManifests } from './profile/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as themeManifests } from './theme/manifests.js';
+import { manifests as workspaceManifests } from './workspace/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -32,4 +33,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...profileManifests,
 	...repositoryManifests,
 	...themeManifests,
+	...workspaceManifests,
 ];

@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @class UmbClipboardEntryDetailStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase}
  * @description - Data Store for Clipboard Details
  */
 export class UmbClipboardEntryDetailStore extends UmbDetailStoreBase<UmbClipboardEntryDetailModel> {
@@ -15,7 +15,7 @@ export class UmbClipboardEntryDetailStore extends UmbDetailStoreBase<UmbClipboar
 	 * @memberof UmbClipboardEntryDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_CLIPBOARD_ENTRY_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_CLIPBOARD_ENTRY_DETAIL_STORE_CONTEXT);
 	}
 }
 

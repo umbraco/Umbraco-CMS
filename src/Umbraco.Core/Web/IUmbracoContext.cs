@@ -42,6 +42,11 @@ public interface IUmbracoContext : IDisposable
     IPublishedMediaCache Media { get; }
 
     /// <summary>
+    ///     Gets the published element cache.
+    /// </summary>
+    IPublishedElementCache Elements { get; }
+
+    /// <summary>
     ///     Gets the domains cache.
     /// </summary>
     IDomainCache Domains { get; }

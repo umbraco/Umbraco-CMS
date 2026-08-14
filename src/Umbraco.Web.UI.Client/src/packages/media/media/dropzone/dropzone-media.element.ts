@@ -1,12 +1,13 @@
 import { UmbMediaDropzoneManager } from './media-dropzone.manager.js';
-import {
-	UmbInputDropzoneElement,
-	UmbFileDropzoneItemStatus,
-	UmbDropzoneSubmittedEvent,
-	type UmbUploadableItem,
-} from '@umbraco-cms/backoffice/dropzone';
 import { css, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbInputDropzoneElement, UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
+
+import type { UmbDropzoneChangeEvent, UmbUploadableItem } from '@umbraco-cms/backoffice/dropzone';
+import {
+	UUIBlinkAnimationValue,
+	UUIBlinkKeyframes,
+	type UUIFileDropzoneEvent,
+} from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * A dropzone for uploading files and folders as media items. It is hidden by default and will be shown when dragging files over the window.
@@ -74,11 +75,6 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 	constructor() {
 		super();
 
-		document.addEventListener('dragenter', this.#handleDragEnter);
-		document.addEventListener('dragleave', this.#handleDragLeave);
-		document.addEventListener('dragover', this.#handleDragOver);
-		document.addEventListener('drop', this.#handleDrop);
-
 		// TODO: Revisit this. I am not sure why it is needed to call these methods here when they are already called in the constructor of the parent class.
 		// If we do not call them here, the observer will use the wrong instance of the dropzone manager (UmbDropZoneManager instead of UmbMediaDropzoneManager).
 		this._observeProgress();
@@ -99,6 +95,14 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		);
 	}
 
+	override connectedCallback(): void {
+		super.connectedCallback();
+		document.addEventListener('dragenter', this.#handleDragEnter);
+		document.addEventListener('dragleave', this.#handleDragLeave);
+		document.addEventListener('dragover', this.#handleDragOver);
+		document.addEventListener('drop', this.#handleDrop);
+	}
+
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		document.removeEventListener('dragenter', this.#handleDragEnter);
@@ -107,20 +111,18 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 		document.removeEventListener('drop', this.#handleDrop);
 	}
 
-	override async onUpload(event: UUIFileDropzoneEvent) {
-		if (this.disabled) return;
-		if (!event.detail.files.length && !event.detail.folders.length) return;
-
-		const uploadable = this._manager.createMediaItems(event.detail, this.parentUnique);
-		this.dispatchEvent(new UmbDropzoneSubmittedEvent(uploadable));
+	protected override async _handleUpload(event: UUIFileDropzoneEvent) {
+		return this._manager.createMediaItems(event.detail, this.parentUnique);
 	}
 
 	static override styles = [
 		...UmbInputDropzoneElement.styles,
+		UUIBlinkKeyframes,
 		css`
 			:host(:not([disabled])[dragging]) #dropzone {
 				opacity: 1;
 				pointer-events: all;
+				animation: ${UUIBlinkAnimationValue};
 			}
 
 			[dropzone] {
@@ -135,8 +137,6 @@ export class UmbDropzoneMediaElement extends UmbInputDropzoneElement {
 				justify-content: center;
 				position: absolute;
 				z-index: 100;
-				border-radius: var(--uui-border-radius);
-				border: 1px solid var(--uui-color-focus);
 				box-sizing: border-box;
 			}
 		`,

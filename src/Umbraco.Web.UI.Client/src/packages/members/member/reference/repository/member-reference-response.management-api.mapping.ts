@@ -1,6 +1,6 @@
 import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMemberReferenceModel } from './types.js';
-import type { MemberReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { IReferenceResponseModelMemberReferenceResponseModel as MemberReferenceResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbDataSourceDataMapping } from '@umbraco-cms/backoffice/repository';
 

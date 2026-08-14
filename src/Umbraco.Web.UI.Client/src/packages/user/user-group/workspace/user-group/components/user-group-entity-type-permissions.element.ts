@@ -38,14 +38,13 @@ export class UmbUserGroupEntityTypePermissionsElement extends UmbLitElement {
 	}
 
 	override render() {
-		return this.entityType
-			? html`
-					<umb-input-entity-user-permission
-						.entityType=${this.entityType}
-						.allowedVerbs=${this._fallBackPermissions || []}
-						@change=${this.#onPermissionChange}></umb-input-entity-user-permission>
-				`
-			: nothing;
+		if (!this.entityType) return nothing;
+		return html`
+			<umb-input-entity-user-permission
+				.entityType=${this.entityType}
+				.allowedVerbs=${this._fallBackPermissions || []}
+				@change=${this.#onPermissionChange}></umb-input-entity-user-permission>
+		`;
 	}
 
 	static override styles = [UmbTextStyles];

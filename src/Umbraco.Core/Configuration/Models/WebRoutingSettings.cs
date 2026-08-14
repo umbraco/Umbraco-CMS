@@ -139,7 +139,7 @@ public class WebRoutingSettings
     ///     Gets or sets a value indicating whether strict domain matching is used when finding content to match the request.
     /// </summary>
     /// <remarks>
-    ///     <para>This setting is used within Umbraco's routing process based on content finders, specifically <see cref="Routing.ContentFinderByUrlNew" />.</para>
+    ///     <para>This setting is used within Umbraco's routing process based on content finders, specifically <see cref="Routing.ContentFinderByUrl" />.</para>
     ///     <para>If set to the default value of <see langword="false"/>, requests that don't match a configured domain will be routed to the first root node.</para>
     ///     <para>If set to <see langword="true"/>, requests that don't match a configured domain will not be routed.</para>
     /// </remarks>

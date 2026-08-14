@@ -1,4 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.ContentPicker.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -10,10 +11,19 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Document Picker',
 			propertyEditorSchemaAlias: 'Umbraco.ContentPicker',
 			icon: 'icon-document',
-			group: 'pickers',
+			group: '#propertyEditorUIGroups_pickers',
+			keywords: ['select', 'page', 'link', 'reference', 'related', 'document', 'target', 'destination'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
+					{
+						alias: 'allowedContentTypes',
+						label: 'Accepted types',
+						description: 'Limit to specific types',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentTypePicker',
+						config: [{ alias: 'onlyPickDocumentTypes', value: true }],
+						weight: 10,
+					},
 					{
 						alias: 'startNodeId',
 						label: 'Start node',
@@ -25,10 +35,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 								value: { min: 0, max: 1 },
 							},
 						],
+						weight: 20,
 					},
 				],
 			},
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

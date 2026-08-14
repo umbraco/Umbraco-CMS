@@ -46,23 +46,6 @@ internal sealed class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : Defau
     {
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Cache.SingleItemsOnlyRepositoryCachePolicy{TEntity, TId}"/> class.
-    /// </summary>
-    /// <param name="cache">The <see cref="IAppPolicyCache"/> used for caching repository items.</param>
-    /// <param name="scopeAccessor">The <see cref="IScopeAccessor"/> that provides access to the current scope.</param>
-    /// <param name="options">The <see cref="RepositoryCachePolicyOptions"/> that configure the cache policy behavior.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public SingleItemsOnlyRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
-        : this(
-            cache,
-            scopeAccessor,
-            options,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
-    }
-
     protected override void InsertEntities(TId[]? ids, TEntity[]? entities)
     {
         // nop

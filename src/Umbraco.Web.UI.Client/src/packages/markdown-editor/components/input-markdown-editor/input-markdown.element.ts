@@ -10,6 +10,9 @@ import {
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
+import { UmbInteractionMemoryScopeContext } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -38,6 +41,27 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 ) {
 	protected override getFormElement() {
 		return this._codeEditor;
+	}
+
+	// Holds what the modals opened from this input remember between opens. They are rendered in the
+	// modal portal, not as descendants of this element, so context is the only channel that reaches
+	// them; upwards it is a property and an `interaction-memories-change` event.
+	#interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
+	#interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(this, this.#interactionMemoryScope.memory);
+
+	/**
+	 * The memories held by the modals opened from this input, e.g. the last-used folder in a media
+	 * picker opened from the markdown editor's toolbar. Bridged from the interaction-memory scope this
+	 * input provides.
+	 * @type {(Array<UmbInteractionMemoryModel> | undefined)}
+	 * @attr
+	 */
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#interactionMemoryBridge.getMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemoryBridge.setMemories(value);
 	}
 
 	// TODO: Make actions be able to handle multiple selection
@@ -455,6 +479,8 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 				disable-line-numbers
 				disable-minimap
 				disable-folding
+				word-wrap
+				auto-height
 				@input=${this.#onInput}
 				@keypress=${this.#onKeyPress}
 				@loaded=${this.#onCodeEditorLoaded}>
@@ -615,7 +641,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 					0 2px 2px -2px rgba(34, 47, 62, 0.1),
 					0 8px 8px -4px rgba(34, 47, 62, 0.07);
 
-				background-color: var(--uui-color-surface-alt);
+				background-color: var(--uui-color-surface);
 				color: var(--color-text);
 
 				position: sticky;
@@ -647,7 +673,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 			}
 
 			umb-code-editor {
-				height: 200px;
+				min-height: 200px;
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
 				border-top: 0;

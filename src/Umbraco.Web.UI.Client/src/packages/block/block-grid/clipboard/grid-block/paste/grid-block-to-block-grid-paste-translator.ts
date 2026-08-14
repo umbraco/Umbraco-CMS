@@ -37,8 +37,8 @@ export class UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 	/**
 	 * Checks if the clipboard entry value is compatible with the config.
 	 * @param {UmbGridBlockClipboardEntryValueModel} propertyValue - The grid block clipboard entry value.
-	 * @param {*} config - The Property Editor config.
-	 * @param {(value, config) => Promise<boolean>} filter - The filter function.
+	 * @param {UmbBlockGridPropertyEditorConfig} config - The Property Editor config.
+	 * @param {(propertyValue: UmbBlockGridValueModel, config: UmbBlockGridPropertyEditorConfig) => Promise<boolean>} filter - The filter function.
 	 * @returns {Promise<boolean>} {Promise<boolean>}
 	 * @memberof UmbGridBlockToBlockGridClipboardPastePropertyValueTranslator
 	 */

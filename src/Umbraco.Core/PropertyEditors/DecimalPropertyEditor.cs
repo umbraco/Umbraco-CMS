@@ -60,6 +60,11 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
             {
                 schema["multipleOf"] = step;
             }
+            else
+            {
+                // Default: allow up to 6 decimal places, matching DB DECIMAL(38,6)
+                schema["multipleOf"] = 0.000001;
+            }
         }
 
         return schema;
@@ -235,9 +240,20 @@ public class DecimalPropertyEditor : DataEditor, IValueSchemaProvider
                     yield break;
                 }
 
-                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out double min) &&
-                    TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out double step) &&
-                    ValidationHelper.IsValueValidForStep((decimal)parsedDecimalValue, (decimal)min, (decimal)step) is false)
+                // Default min to 0 if not configured (step validation is relative to min).
+                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyMinValue, out double min) is false)
+                {
+                    min = 0;
+                }
+
+                // Default step to 0.000001 (6 decimal places) if not configured,
+                // matching the database DECIMAL(38,6) column precision.
+                if (TryGetConfiguredValue(dataTypeConfiguration, ConfigurationKeyStepValue, out double step) is false)
+                {
+                    step = 0.000001;
+                }
+
+                if (ValidationHelper.IsValueValidForStep((decimal)parsedDecimalValue, (decimal)min, (decimal)step) is false)
                 {
                     yield return new ValidationResult(
                         LocalizedTextService.Localize("validation", "invalidStep", [parsedDecimalValue.ToString(), step.ToString(), min.ToString()]),

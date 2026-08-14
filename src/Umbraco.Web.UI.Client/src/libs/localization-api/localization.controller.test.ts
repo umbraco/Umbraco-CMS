@@ -83,8 +83,8 @@ describe('UmbLocalizationController', () => {
 
 	beforeEach(async () => {
 		umbLocalizationManager.registerManyLocalizations([english, danish, danishRegional]);
-		document.documentElement.lang = initialLanguage;
-		document.documentElement.dir = 'ltr';
+		umbLocalizationManager.documentLanguage = initialLanguage;
+		umbLocalizationManager.documentDirection = 'ltr';
 		await aTimeout(0);
 		const host = {
 			getHostElement: () => document.createElement('div'),
@@ -107,7 +107,7 @@ describe('UmbLocalizationController', () => {
 	});
 
 	it('should update the language when the language changes', async () => {
-		document.documentElement.lang = danishRegional.$code;
+		umbLocalizationManager.documentLanguage = danishRegional.$code;
 		await aTimeout(0);
 		expect(controller.lang()).to.equal(danishRegional.$code);
 	});
@@ -117,7 +117,7 @@ describe('UmbLocalizationController', () => {
 	});
 
 	it('should update the dir when the dir changes', async () => {
-		document.documentElement.dir = 'rtl';
+		umbLocalizationManager.documentDirection = 'rtl';
 		await aTimeout(0);
 		expect(controller.dir()).to.equal('rtl');
 	});
@@ -129,7 +129,7 @@ describe('UmbLocalizationController', () => {
 
 		it('should update the term when the language changes', async () => {
 			// Change language
-			document.documentElement.lang = danishRegional.$code;
+			umbLocalizationManager.documentLanguage = danishRegional.$code;
 			await aTimeout(0);
 
 			expect(controller.term('close')).to.equal('Luk');
@@ -137,7 +137,7 @@ describe('UmbLocalizationController', () => {
 
 		it('should provide a secondary term when the term is not found on the regional language', async () => {
 			// Load Danish
-			document.documentElement.lang = danishRegional.$code;
+			umbLocalizationManager.documentLanguage = danishRegional.$code;
 			await aTimeout(0);
 
 			expect(controller.term('notOnRegional')).to.equal('Not on regional');
@@ -145,7 +145,7 @@ describe('UmbLocalizationController', () => {
 
 		it('should provide a fallback term from the fallback language when the term is not found on primary or secondary', async () => {
 			// Load Danish
-			document.documentElement.lang = danishRegional.$code;
+			umbLocalizationManager.documentLanguage = danishRegional.$code;
 			await aTimeout(0);
 
 			expect(controller.term('close')).to.equal('Luk'); // Primary
@@ -225,7 +225,7 @@ describe('UmbLocalizationController', () => {
 			expect(controller.date(new Date(2020, 11, 31))).to.equal('12/31/2020');
 
 			// Switch browser to Danish
-			document.documentElement.lang = danishRegional.$code;
+			umbLocalizationManager.documentLanguage = danishRegional.$code;
 			await aTimeout(0);
 
 			expect(controller.date(new Date(2020, 11, 31))).to.equal('31.12.2020');
@@ -258,7 +258,7 @@ describe('UmbLocalizationController', () => {
 			const enResult = controller.dateTime(date);
 
 			// Switch browser to Danish
-			document.documentElement.lang = danishRegional.$code;
+			umbLocalizationManager.documentLanguage = danishRegional.$code;
 			await aTimeout(0);
 
 			const daResult = controller.dateTime(date);
@@ -280,7 +280,7 @@ describe('UmbLocalizationController', () => {
 
 		it('should update the number when the language changes', async () => {
 			// Switch browser to Danish
-			document.documentElement.lang = danishRegional.$code;
+			umbLocalizationManager.documentLanguage = danishRegional.$code;
 			await aTimeout(0);
 
 			expect(controller.number(123456.789)).to.equal('123.456,789');
@@ -300,7 +300,7 @@ describe('UmbLocalizationController', () => {
 
 		it('should update the relative time when the language changes', async () => {
 			// Switch browser to Danish
-			document.documentElement.lang = danishRegional.$code;
+			umbLocalizationManager.documentLanguage = danishRegional.$code;
 			await aTimeout(0);
 
 			expect(controller.relativeTime(2, 'days')).to.equal('om 2 dage');
@@ -380,7 +380,7 @@ describe('UmbLocalizationController', () => {
 
 		it('should handle the three-tier fallback before using defaultValue', async () => {
 			// Switch to Danish regional
-			document.documentElement.lang = danishRegional.$code;
+			umbLocalizationManager.documentLanguage = danishRegional.$code;
 			await aTimeout(0);
 
 			// Primary (da-dk) has 'close'
@@ -401,7 +401,7 @@ describe('UmbLocalizationController', () => {
 			expect(controller.termOrDefault('close', 'X')).to.equal('Close');
 
 			// Switch to Danish
-			document.documentElement.lang = danishRegional.$code;
+			umbLocalizationManager.documentLanguage = danishRegional.$code;
 			await aTimeout(0);
 
 			expect(controller.termOrDefault('close', 'X')).to.equal('Luk');
@@ -453,6 +453,23 @@ describe('UmbLocalizationController', () => {
 		});
 	});
 
+	describe('htmlString', () => {
+		it('should HTML-escape interpolated arguments', async () => {
+			const xss = '<script>alert("XSS")</script>';
+			// Render the directive into an element to inspect the resulting innerHTML
+			const host = await fixture<HTMLElement>(html`<div>${controller.htmlString('#withInlineToken', xss, '')}</div>`);
+			expect(host.innerHTML, 'XSS detected').to.not.contain('<script>');
+			expect(host.innerHTML).to.contain('&lt;script&gt;');
+		});
+
+		it('should HTML-escape the toString() representation of non-string args', async () => {
+			const xss = { toString: () => '<script>alert("XSS")</script>' };
+			const host = await fixture<HTMLElement>(html`<div>${controller.htmlString('#withInlineToken', xss, '')}</div>`);
+			expect(host.innerHTML, 'XSS via toString detected').to.not.contain('<script>');
+			expect(host.innerHTML).to.contain('&lt;script&gt;');
+		});
+	});
+
 	describe('host element', () => {
 		let element: UmbLocalizeControllerHostElement;
 
@@ -485,3 +502,4 @@ describe('UmbLocalizationController', () => {
 		});
 	});
 });
+

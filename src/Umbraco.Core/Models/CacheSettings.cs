@@ -4,11 +4,11 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
-///     Represents configuration settings for the Umbraco content and media cache.
+///     Represents configuration settings for the Umbraco content, media and element cache.
 /// </summary>
 /// <remarks>
 ///     This class configures cache seeding behavior and cache entry durations for
-///     documents and media items. Cache seeding pre-populates the cache during
+///     documents, media and element items. Cache seeding pre-populates the cache during
 ///     application startup for improved performance.
 /// </remarks>
 [UmbracoOptions(Constants.Configuration.ConfigCache)]
@@ -25,6 +25,11 @@ public class CacheSettings
     internal const int StaticMediaBreadthFirstSeedCount = 100;
 
     /// <summary>
+    ///     The default number of elements to seed using breadth-first traversal.
+    /// </summary>
+    internal const int StaticElementBreadthFirstSeedCount = 100;
+
+    /// <summary>
     ///     The default batch size for seeding documents.
     /// </summary>
     internal const int StaticDocumentSeedBatchSize = 100;
@@ -35,10 +40,19 @@ public class CacheSettings
     internal const int StaticMediaSeedBatchSize = 100;
 
     /// <summary>
+    ///     The default batch size for seeding element items.
+    /// </summary>
+    internal const int StaticElementSeedBatchSize = 100;
+
+    /// <summary>
+    ///     The default mode for rebuilding the database cache on content type structural changes.
+    /// </summary>
+    internal const ContentTypeRebuildMode StaticContentTypeRebuildMode = ContentTypeRebuildMode.Immediate;
+
+    /// <summary>
     /// Gets or sets a value for the collection of content type ids to always have in the cache.
     /// </summary>
-    public List<Guid> ContentTypeKeys { get; set; } =
-        new();
+    public List<Guid> ContentTypeKeys { get; set; } = new();
 
     /// <summary>
     /// Gets or sets a value for the document breadth first seed count.
@@ -50,7 +64,13 @@ public class CacheSettings
     /// Gets or sets a value for the media breadth first seed count.
     /// </summary>
     [DefaultValue(StaticMediaBreadthFirstSeedCount)]
-    public int MediaBreadthFirstSeedCount { get; set; } = StaticDocumentBreadthFirstSeedCount;
+    public int MediaBreadthFirstSeedCount { get; set; } = StaticMediaBreadthFirstSeedCount;
+
+    /// <summary>
+    /// Gets or sets a value for the element breadth first seed count.
+    /// </summary>
+    [DefaultValue(StaticElementBreadthFirstSeedCount)]
+    public int ElementBreadthFirstSeedCount { get; set; } = StaticElementBreadthFirstSeedCount;
 
     /// <summary>
     /// Gets or sets a value for the document seed batch size.
@@ -65,23 +85,45 @@ public class CacheSettings
     public int MediaSeedBatchSize { get; set; } = StaticMediaSeedBatchSize;
 
     /// <summary>
-    ///     Gets or sets the cache entry settings for documents and media.
+    /// Gets or sets a value for the element seed batch size.
+    /// </summary>
+    [DefaultValue(StaticElementSeedBatchSize)]
+    public int ElementSeedBatchSize { get; set; } = StaticElementSeedBatchSize;
+
+    /// <summary>
+    ///     Gets or sets the mode for rebuilding the database cache when content type structural changes occur.
+    /// </summary>
+    /// <remarks>
+    ///     <see cref="ContentTypeRebuildMode.Immediate" /> (default) rebuilds immediately during the save.
+    ///     <see cref="ContentTypeRebuildMode.Deferred" /> defers the rebuild to a background task with de-duplication,
+    ///     allowing the save to return faster at the cost of temporarily stale content.
+    /// </remarks>
+    [DefaultValue(StaticContentTypeRebuildMode)]
+    public ContentTypeRebuildMode ContentTypeRebuildMode { get; set; } = StaticContentTypeRebuildMode;
+
+    /// <summary>
+    ///     Gets or sets the cache entry settings for documents, media and elements.
     /// </summary>
     public CacheEntry Entry { get; set; } = new CacheEntry();
 
     /// <summary>
-    ///     Represents cache entry settings for documents and media items.
+    ///     Represents cache entry settings for documents, media and element items.
     /// </summary>
     public class CacheEntry
     {
         /// <summary>
         ///     Gets or sets the cache entry settings for documents.
         /// </summary>
-        public CacheEntrySettings Document { get; set; } = new CacheEntrySettings();
+        public CacheEntrySettings Document { get; set; } = new();
 
         /// <summary>
         ///     Gets or sets the cache entry settings for media items.
         /// </summary>
-        public CacheEntrySettings Media { get; set; } = new CacheEntrySettings();
+        public CacheEntrySettings Media { get; set; } = new();
+
+        /// <summary>
+        ///     Gets or sets the cache entry settings for element items.
+        /// </summary>
+        public CacheEntrySettings Element { get; set; } = new();
     }
 }

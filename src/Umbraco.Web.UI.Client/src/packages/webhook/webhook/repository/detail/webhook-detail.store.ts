@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @class UmbWebhookDetailStore
- * @augments {UmbStoreBase}
+ * @augments {UmbDetailStoreBase<UmbWebhookDetailModel>}
  * @description - Data Store for Webhook Details
  */
 export class UmbWebhookDetailStore extends UmbDetailStoreBase<UmbWebhookDetailModel> {
@@ -15,7 +15,7 @@ export class UmbWebhookDetailStore extends UmbDetailStoreBase<UmbWebhookDetailMo
 	 * @memberof UmbWebhookDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_WEBHOOK_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_WEBHOOK_DETAIL_STORE_CONTEXT);
 	}
 }
 

@@ -18,16 +18,18 @@ public class UmbracoEFCoreComposer : IComposer
     /// <inheritdoc />
     public void Compose(IUmbracoBuilder builder)
     {
-        builder.Services.AddSingleton<IEFCoreMigrationExecutor, EfCoreMigrationExecutor>();
+        builder.Services.AddSingleton<IEFCoreMigrationExecutor, EFCoreMigrationExecutor>();
 
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();
 
-        builder.Services.AddUmbracoDbContext<UmbracoDbContext>((provider, options, connectionString, providerName) =>
-        {
-            // Register the entity sets needed by OpenIddict.
-            options.UseOpenIddict();
-        });
+        builder.Services.AddUmbracoDbContext<UmbracoDbContext>(
+            (provider, options, connectionString, providerName) =>
+            {
+                // Register the entity sets needed by OpenIddict.
+                options.UseOpenIddict();
+            },
+            shareUmbracoConnection: true);
 
         builder.Services.AddOpenIddict()
 

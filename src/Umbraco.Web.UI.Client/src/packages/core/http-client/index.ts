@@ -32,3 +32,29 @@ client.setConfig({
  * ```
  */
 export { client as umbHttpClient };
+
+/**
+ * Structural type representing any `@hey-api/openapi-ts` generated client.
+ *
+ * Each call to the generator produces a fully-bound `Client<RequestFn, Config, …>`
+ * tied to that document's specific operation/options shapes, so the backoffice's
+ * own `umbHttpClient` and the client in an extension package's `Client/src/api/`
+ * are structurally identical but not assignable to each other under TypeScript's
+ * variance rules. Use `UmbApiClient` on APIs (such as `UmbAuthContext.configureClient`)
+ * that need to accept either.
+ *
+ * The shape only covers what those APIs touch — `setConfig`, `request`, and the
+ * three interceptor middlewares — so callers retain meaningful autocomplete on the
+ * concrete client they pass in, while we keep the public surface flexible.
+ */
+/* eslint-disable @typescript-eslint/no-explicit-any -- bivariant escape hatch: see jsdoc above */
+export type UmbApiClient = {
+	setConfig: (config: any) => any;
+	request: (options: any) => any;
+	interceptors: {
+		request: { use: (fn: any) => unknown; eject: (fn: any) => unknown };
+		response: { use: (fn: any) => unknown; eject: (fn: any) => unknown };
+		error: { use: (fn: any) => unknown; eject: (fn: any) => unknown };
+	};
+};
+/* eslint-enable @typescript-eslint/no-explicit-any */

@@ -1,4 +1,5 @@
-import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../../entity-action/default/default.action.kind.js';
+import { UmbTrashEntityAction } from './trash.action.js';
+import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_ENTITY_ACTION_TRASH_KIND_MANIFEST: UmbExtensionManifestKind = {
@@ -10,7 +11,7 @@ export const UMB_ENTITY_ACTION_TRASH_KIND_MANIFEST: UmbExtensionManifestKind = {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'trash',
-		api: () => import('./trash.action.js'),
+		api: UmbTrashEntityAction,
 		weight: 1150,
 		meta: {
 			icon: 'icon-trash',

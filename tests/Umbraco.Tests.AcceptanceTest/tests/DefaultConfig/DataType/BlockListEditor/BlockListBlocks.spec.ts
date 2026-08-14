@@ -179,7 +179,7 @@ test('can add a background color to a block', async ({umbracoApi, umbracoUi}) =>
 test('can update a background color for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const backgroundColor = '#ff0000';
-  const newBackgroundColor = '#ff4444';
+  const newBackgroundColor = '#ff4242';
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, backgroundColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
@@ -235,7 +235,7 @@ test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umb
 test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconColor = '#ff0000';
-  const newIconColor = '#ff4444';
+  const newIconColor = '#ff4242';
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', iconColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
@@ -284,7 +284,6 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(secondStylesheetName);
-  
 
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
@@ -314,7 +313,6 @@ test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umb
   const encodedStylesheetPath = await umbracoApi.stylesheet.encodeStylesheetPath(stylesheetPath);
   await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
-  
 
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
@@ -379,7 +377,6 @@ test('can add a thumbnail to a block', {tag: '@release'}, async ({umbracoApi, um
   // Act
   await umbracoUi.dataType.goToDataType(blockListEditorName);
   await umbracoUi.dataType.goToBlockWithName(elementTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.dataType.chooseBlockThumbnailWithPath(mediaUrl);
   await umbracoUi.dataType.clickSubmitButton();
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();

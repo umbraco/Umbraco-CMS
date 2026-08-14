@@ -145,7 +145,8 @@ test('can use query builder with Order By statement for a partial view', async (
   expect(updatedPartialView.content).toBe(expectedTemplateContent);
 });
 
-test('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22000
+test.skip('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';
@@ -195,7 +196,6 @@ test('can insert dictionary item into a partial view', async ({umbracoApi, umbra
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
   await umbracoUi.partialView.insertDictionaryItem(dictionaryName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the dictionary item to be inserted
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 
   // Assert
@@ -212,7 +212,6 @@ test('can insert value into a partial view', async ({umbracoApi, umbracoUi}) => 
 
   // Act
   await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
   await umbracoUi.template.insertSystemFieldValue(systemFieldValue);
   await umbracoUi.partialView.clickSaveButtonAndWaitForPartialViewToBeUpdated();
 

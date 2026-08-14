@@ -30,6 +30,9 @@ export class UmbPropertyEditorUIDocumentPickerElement
 		}
 
 		this._startNodeId = config.getValueByAlias('startNodeId');
+
+		const allowedContentTypes = config.getValueByAlias<string>('allowedContentTypes');
+		this._allowedContentTypes = allowedContentTypes ? allowedContentTypes.split(',').filter(Boolean) : undefined;
 	}
 
 	/**
@@ -57,6 +60,9 @@ export class UmbPropertyEditorUIDocumentPickerElement
 	private _startNodeId?: string;
 
 	@state()
+	private _allowedContentTypes?: string[];
+
+	@state()
 	private _interactionMemories: Array<UmbInteractionMemoryModel> = [];
 
 	#interactionMemoryManager = new UmbPropertyEditorUiInteractionMemoryManager(this, {
@@ -66,9 +72,13 @@ export class UmbPropertyEditorUIDocumentPickerElement
 	constructor() {
 		super();
 
-		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
-			this._interactionMemories = interactionMemories ?? [];
-		});
+		this.observe(
+			this.#interactionMemoryManager.memoriesForPropertyEditor,
+			(interactionMemories) => {
+				this._interactionMemories = interactionMemories ?? [];
+			},
+			null,
+		);
 	}
 
 	override firstUpdated() {
@@ -101,6 +111,7 @@ export class UmbPropertyEditorUIDocumentPickerElement
 				.min=${this._min}
 				.max=${this._max}
 				.startNode=${startNode}
+				.allowedContentTypeIds=${this._allowedContentTypes}
 				.value=${this.value}
 				@change=${this.#onChange}
 				?readonly=${this.readonly}

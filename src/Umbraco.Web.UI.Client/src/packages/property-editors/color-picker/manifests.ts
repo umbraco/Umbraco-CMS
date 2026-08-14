@@ -1,5 +1,6 @@
 import { UMB_COLOR_PICKER_PROPERTY_EDITOR_UI_ALIAS } from './constants.js';
 import { manifest as schemaManifest } from './Umbraco.ColorPicker.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,9 +12,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Color Picker',
 			propertyEditorSchemaAlias: 'Umbraco.ColorPicker',
 			icon: 'icon-colorpicker',
-			group: 'pickers',
+			group: '#propertyEditorUIGroups_pickers',
+			keywords: [
+				'select',
+				'color',
+				'colour',
+				'theme',
+				'brand',
+				'background',
+				'palette',
+				'accent',
+				'swatch',
+				'hex',
+				'rgb',
+				'foreground',
+			],
 			supportsReadOnly: true,
 		},
 	},
 	schemaManifest,
+	...valueSummaryManifests,
 ];

@@ -1,7 +1,7 @@
-import type { ManifestCollection } from './extensions/types.js';
 import type { UmbCollectionItemModel } from './item/types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export type * from './action/create/types.js';
@@ -56,11 +56,10 @@ export type UmbCollectionBulkActionConfiguration = {
 export interface UmbCollectionContext {
 	setConfig(config: UmbCollectionConfiguration): void;
 	getConfig(): UmbCollectionConfiguration | undefined;
-	setManifest(manifest: ManifestCollection): void;
-	getManifest(): ManifestCollection | undefined;
 	requestCollection(): Promise<void>;
 	requestItemHref?(item: UmbCollectionItemModel): Promise<string | undefined>;
 	pagination: UmbPaginationManager;
 	items: Observable<any[]>;
 	totalItems: Observable<number>;
+	readonly interactionMemory?: UmbInteractionMemoryManager;
 }

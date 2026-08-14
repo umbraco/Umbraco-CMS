@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.ModelBinders;
@@ -106,6 +107,8 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
 
     private IHostingEnvironment HostingEnvironment => Context.RequestServices.GetRequiredService<IHostingEnvironment>();
 
+    private ICspNonceService? CspNonceService => Context.RequestServices.GetService<ICspNonceService>();
+
     /// <inheritdoc />
     public override void Write(object? value)
     {
@@ -147,7 +150,8 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                                                                                                 // a valid culture code provided in the querystring of this URL.
                                                                                                 // But just to be sure of prevention of an XSS vulnterablity we'll HTML encode here too.
                                                                                                 // An expected URL is untouched by this encoding.
-                            UmbracoContext.PublishedRequest?.PublishedContent?.Key);
+                            UmbracoContext.PublishedRequest?.PublishedContent?.Key,
+                            CspNonceService?.GetNonceAttribute() ?? string.Empty);
                 }
                 else
                 {

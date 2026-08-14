@@ -6,6 +6,6 @@ export const manifest: UmbExtensionManifestKind = {
 	matchKind: 'menu',
 	matchType: 'tiptapToolbarExtension',
 	manifest: {
-		element: () => import('../components/toolbar/tiptap-toolbar-menu.element.js'),
+		element: () => import('./extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarMenuElement })),
 	},
 };

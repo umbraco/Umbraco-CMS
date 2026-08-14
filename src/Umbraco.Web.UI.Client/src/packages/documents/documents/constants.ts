@@ -1,6 +1,7 @@
 export { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from './entity.js';
 
 export * from './collection/constants.js';
+export * from './configuration/constants.js';
 export * from './entity-actions/constants.js';
 export type * from './entity-sign/constants.js';
 export * from './entity-bulk-actions/constants.js';
@@ -18,3 +19,4 @@ export * from './search/constants.js';
 export * from './url/constants.js';
 export * from './user-permissions/constants.js';
 export * from './workspace/constants.js';
+export * from './property-editors/document-picker/value-type/constants.js';

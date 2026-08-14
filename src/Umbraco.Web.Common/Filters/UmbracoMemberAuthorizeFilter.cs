@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Filters;
@@ -133,11 +131,7 @@ public class UmbracoMemberAuthorizeFilter : IAsyncAuthorizationFilter
     }
 
     private static bool IsApiController(AuthorizationFilterContext context)
-        => context.ActionDescriptor.EndpointMetadata.OfType<ApiControllerAttribute>().Any()
-#pragma warning disable CS0618 // Type or member is obsolete
-           || (context.ActionDescriptor is ControllerActionDescriptor controllerDescriptor
-               && controllerDescriptor.ControllerTypeInfo.IsSubclassOf(typeof(UmbracoApiController)));
-#pragma warning restore CS0618 // Type or member is obsolete
+        => context.ActionDescriptor.EndpointMetadata.OfType<ApiControllerAttribute>().Any();
 
     private async Task<bool> IsAuthorizedAsync(IMemberManager memberManager)
     {

@@ -22,7 +22,7 @@ public static class InstallerBuilderExtensions
     {
         IServiceCollection services = builder.Services;
 
-        services.AddTransient<IUserSettingsFactory, UserSettingsFactory>();
+        services.AddTransient<IUserSettingsFactory>(sp => ActivatorUtilities.CreateInstance<UserSettingsFactory>(sp));
         services.AddTransient<IInstallSettingsFactory, InstallSettingsFactory>();
         services.AddTransient<IDatabaseSettingsFactory, DatabaseSettingsFactory>();
 

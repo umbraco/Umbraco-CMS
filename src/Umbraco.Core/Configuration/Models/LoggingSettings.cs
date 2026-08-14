@@ -20,7 +20,7 @@ public class LoggingSettings
     /// <summary>
     ///     The default directory for log files.
     /// </summary>
-    internal const string StaticDirectory = Constants.SystemDirectories.LogFiles;
+    internal const string StaticDirectory = "~/umbraco/Logs";
 
     /// <summary>
     ///     The default file name format for log files.
@@ -31,6 +31,11 @@ public class LoggingSettings
     ///     The default file name format arguments for log files.
     /// </summary>
     internal const string StaticFileNameFormatArguments = "MachineName";
+
+    /// <summary>
+    ///     The default mode for enriching log events with a session identifier.
+    /// </summary>
+    internal const SessionIdLoggingMode StaticSessionIdLogging = SessionIdLoggingMode.SessionId;
 
     /// <summary>
     /// Gets or sets a value for the maximum age of a log file.
@@ -70,4 +75,16 @@ public class LoggingSettings
     /// </remarks>
     [DefaultValue(StaticFileNameFormatArguments)]
     public string FileNameFormatArguments { get; set; } = StaticFileNameFormatArguments;
+
+    /// <summary>
+    /// Gets or sets a value determining how log events are enriched with a session identifier.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <see cref="SessionIdLoggingMode.SessionId" /> for backward compatibility. Set to
+    /// <see cref="SessionIdLoggingMode.CookieHash" /> or <see cref="SessionIdLoggingMode.None" /> to avoid the
+    /// blocking session-store load that resolving the actual session id incurs per request when the session is
+    /// backed by an <c>IDistributedCache</c>.
+    /// </remarks>
+    [DefaultValue(StaticSessionIdLogging)]
+    public SessionIdLoggingMode SessionIdLogging { get; set; } = StaticSessionIdLogging;
 }

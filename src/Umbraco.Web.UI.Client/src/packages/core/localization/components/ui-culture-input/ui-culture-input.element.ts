@@ -23,6 +23,9 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 	private _options: Array<UmbCultureInputOption> = [];
 
 	@property({ type: String })
+	label = '';
+
+	@property({ type: String })
 	override set value(value: string | undefined) {
 		if (value && typeof value === 'string') {
 			const oldValue = super.value;
@@ -54,18 +57,19 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 
 				this._options = distinct.sort((a, b) => a.name.localeCompare(b.name));
 			},
-			'umbObserveLocalizationManifests',
+			null,
 		);
 
 		this.addValidator(
 			'customError',
-			() => this.localize.term('user_languageNotFound', this.#invalidCulture, this.value),
+			() => this.localize.term('user_languageNotFound', this.#invalidCulture ?? '', this.value ?? ''),
 			() => !!this.#invalidCulture && !this.#invalidBaseCulture,
 		);
 
 		this.addValidator(
 			'customError',
-			() => this.localize.term('user_languageNotFoundFallback', this.#invalidCulture, this.#invalidBaseCulture),
+			() =>
+				this.localize.term('user_languageNotFoundFallback', this.#invalidCulture ?? '', this.#invalidBaseCulture ?? ''),
 			() => !!this.#invalidCulture && !!this.#invalidBaseCulture,
 		);
 	}
@@ -111,6 +115,7 @@ export class UmbUiCultureInputElement extends UmbFormControlMixin<string, typeof
 	override render() {
 		return html`
 			<uui-select
+				label=${this.label || this.localize.term('general_language')}
 				.options=${this._options.map((e) => ({ ...e, selected: e.value == this.value }))}
 				@change=${this.#onCustomValidationChange}>
 			</uui-select>

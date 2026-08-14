@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Api.Management.Middleware;
 public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
 {
     private SemaphoreSlim _firstBackOfficeRequestLocker = new(1); // this only works because this is a singleton
-    private ISet<string> _knownHosts = new HashSet<string>(); // this only works because this is a singleton
+    private ISet<string> _knownHosts = new HashSet<string>(StringComparer.OrdinalIgnoreCase); // this only works because this is a singleton
 
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
     private readonly IServiceProvider _serviceProvider;
@@ -79,30 +79,48 @@ public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
 
         await _firstBackOfficeRequestLocker.WaitAsync();
 
-        // NOTE: _knownHosts is not thread safe; check again after entering the semaphore
-        if (_knownHosts.Add(host) is false)
+        try
+        {
+            // NOTE: _knownHosts is not thread safe; check again after entering the semaphore.
+            if (_knownHosts.Contains(host))
+            {
+                return;
+            }
+
+            // Ensure we explicitly add UmbracoApplicationUrl if configured (https://github.com/umbraco/Umbraco-CMS/issues/16179).
+            var hostsToRegister = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { host };
+            if (_webRoutingSettings.UmbracoApplicationUrl.IsNullOrWhiteSpace() is false)
+            {
+                hostsToRegister.Add(_webRoutingSettings.UmbracoApplicationUrl);
+            }
+
+            // Merge with already-known hosts so the OpenIddict application includes all redirect URIs.
+            foreach (var knownHost in _knownHosts)
+            {
+                hostsToRegister.Add(knownHost);
+            }
+
+            Uri[] backOfficeHosts = hostsToRegister
+                .Select(h => Uri.TryCreate(h, UriKind.Absolute, out Uri? hostUri)
+                    ? hostUri
+                    : null)
+                .WhereNotNull()
+                .ToArray();
+
+            using IServiceScope scope = _serviceProvider.CreateScope();
+            IBackOfficeApplicationManager backOfficeApplicationManager = scope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>();
+            await backOfficeApplicationManager.EnsureBackOfficeApplicationAsync(backOfficeHosts);
+
+            // Only mark hosts as known after successful registration, so a transient failure
+            // (e.g. database contention during an unattended upgrade) is retried on the next request.
+            foreach (var registered in hostsToRegister)
+            {
+                _knownHosts.Add(registered);
+            }
+        }
+        finally
         {
             _firstBackOfficeRequestLocker.Release();
-            return;
         }
-
-        // ensure we explicitly add UmbracoApplicationUrl if configured (https://github.com/umbraco/Umbraco-CMS/issues/16179)
-        if (_webRoutingSettings.UmbracoApplicationUrl.IsNullOrWhiteSpace() is false)
-        {
-            _knownHosts.Add(_webRoutingSettings.UmbracoApplicationUrl);
-        }
-
-        Uri[] backOfficeHosts = _knownHosts
-            .Select(host => Uri.TryCreate(host, UriKind.Absolute, out Uri? hostUri)
-                ? hostUri
-                : null)
-            .WhereNotNull()
-            .ToArray();
-
-        using IServiceScope scope = _serviceProvider.CreateScope();
-        IBackOfficeApplicationManager backOfficeApplicationManager = scope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>();
-        await backOfficeApplicationManager.EnsureBackOfficeApplicationAsync(backOfficeHosts);
-
-        _firstBackOfficeRequestLocker.Release();
     }
 }

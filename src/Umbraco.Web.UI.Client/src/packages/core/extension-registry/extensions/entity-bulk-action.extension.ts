@@ -7,7 +7,8 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * For example for content you may wish to move one or more documents in bulk
  */
 export interface ManifestEntityBulkAction<MetaType extends MetaEntityBulkAction = MetaEntityBulkAction>
-	extends ManifestElementAndApi<UmbEntityBulkActionElement, UmbEntityBulkAction<MetaType>>,
+	extends
+		ManifestElementAndApi<UmbEntityBulkActionElement, UmbEntityBulkAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'entityBulkAction';
 	forEntityTypes: Array<string>;
@@ -27,26 +28,19 @@ export interface ManifestEntityBulkActionDefaultKind<
 export interface MetaEntityBulkActionDefaultKind extends MetaEntityBulkAction {
 	/**
 	 * An icon to represent the action to be performed
-	 * @examples [
-	 *   "icon-box",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-box", "icon-grid"]
 	 */
-	icon: string;
+	icon?: string;
 
 	/**
 	 * The friendly name of the action to perform
-	 * @examples [
-	 *   "Create",
-	 *   "Create Content Template"
-	 * ]
+	 * @examples ["Create", "Create Content Template"]
 	 */
 	label?: string;
 }
 
 // DUPLICATE TO
-export interface ManifestEntityBulkActionDuplicateToKind
-	extends ManifestEntityBulkAction<MetaEntityBulkActionDuplicateToKind> {
+export interface ManifestEntityBulkActionDuplicateToKind extends ManifestEntityBulkAction<MetaEntityBulkActionDuplicateToKind> {
 	type: 'entityBulkAction';
 	kind: 'duplicateTo';
 }
@@ -56,6 +50,10 @@ export interface MetaEntityBulkActionDuplicateToKind extends ManifestEntityBulkA
 	hideTreeRoot?: boolean;
 	foldersOnly?: boolean;
 	treeAlias: string;
+	/**
+	 * The alias of a search provider used to enable search in the destination picker.
+	 */
+	searchProviderAlias?: string;
 }
 
 // MOVE TO
@@ -69,6 +67,10 @@ export interface MetaEntityBulkActionMoveToKind extends MetaEntityBulkActionDefa
 	hideTreeRoot?: boolean;
 	foldersOnly?: boolean;
 	treeAlias: string;
+	/**
+	 * The alias of a search provider used to enable search in the destination picker.
+	 */
+	searchProviderAlias?: string;
 }
 
 // TRASH

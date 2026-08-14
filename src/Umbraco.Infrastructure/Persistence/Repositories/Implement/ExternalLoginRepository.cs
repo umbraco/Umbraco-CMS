@@ -74,10 +74,14 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
     /// <inheritdoc />
     public void DeleteUserLogins(Guid userOrMemberKey)
     {
-        Sql<ISqlContext> sql = SqlContext.Sql()
-            .Delete<ExternalLoginDto>()
+        // Find login IDs first, then use the shared helper that deletes tokens before logins.
+        Sql<ISqlContext> sql = Sql()
+            .Select<ExternalLoginDto>(x => x.Id)
+            .From<ExternalLoginDto>()
             .Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
-        Database.Execute(sql);
+
+        var loginIds = Database.Query<ExternalLoginDto>(sql).Select(x => x.Id).ToList();
+        DeleteExternalLogins(loginIds);
     }
 
     /// <inheritdoc />

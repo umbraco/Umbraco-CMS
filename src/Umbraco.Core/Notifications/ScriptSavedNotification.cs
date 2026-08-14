@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Notifications;
 ///     Notification that is published after a script file has been saved.
 /// </summary>
 /// <remarks>
-///     This notification is published by the <see cref="Services.IFileService"/> after the script has been persisted.
+///     This notification is published by the <see cref="Services.IScriptService"/> after the script has been persisted.
 ///     It is not cancelable since the save operation has already completed.
 /// </remarks>
 public class ScriptSavedNotification : SavedNotification<IScript>

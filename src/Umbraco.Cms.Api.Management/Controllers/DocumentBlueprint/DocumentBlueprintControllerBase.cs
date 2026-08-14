@@ -14,6 +14,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
 public abstract class DocumentBlueprintControllerBase : ContentControllerBase
 {
+    protected override string EntityName => "document blueprint";
+
     protected IActionResult DocumentBlueprintNotFound()
         => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
             => NotFound(problemDetailsBuilder

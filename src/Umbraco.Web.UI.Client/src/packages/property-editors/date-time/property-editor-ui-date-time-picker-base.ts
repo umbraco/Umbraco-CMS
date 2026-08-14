@@ -55,6 +55,12 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 	private _dateInputStep: number = 1;
 
 	@state()
+	private _min?: string;
+
+	@state()
+	private _max?: string;
+
+	@state()
 	private _selectedDate?: DateTime;
 
 	@state()
@@ -117,6 +123,8 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		if (!config) return;
 
 		const timeFormat = config.getValueByAlias<string>('timeFormat');
+		this._min = this.#formatMinMaxValue(config.getValueByAlias<string>('min'), 'min');
+		this._max = this.#formatMinMaxValue(config.getValueByAlias<string>('max'), 'max');
 		let timeZonePickerConfig: UmbTimeZonePickerValue | undefined = undefined;
 
 		if (this._displayTimeZone) {
@@ -256,6 +264,34 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		}
 	}
 
+	// A native date/datetime-local/time input ignores min/max unless they match the input's own
+	// value format, so normalise the configured bound to the active input type (e.g. a date-only
+	// bound like "2026-07-01" must gain a time component to constrain a datetime-local input).
+	#formatMinMaxValue(value: string | undefined, bound: 'min' | 'max'): string | undefined {
+		if (!value) return undefined;
+
+		let dateTime = DateTime.fromISO(value);
+		if (!dateTime.isValid) {
+			dateTime = DateTime.fromSQL(value);
+		}
+		if (!dateTime.isValid) return value;
+
+		switch (this._dateInputType) {
+			case 'date':
+				return dateTime.toFormat('yyyy-MM-dd');
+			case 'time':
+				return dateTime.toFormat('HH:mm:ss');
+			default: {
+				// A date-only bound should cover the whole day on a datetime-local field, mirroring
+				// how a date field treats it: the lower bound starts the day, the upper bound ends it.
+				if (/^\d{4}-\d{2}-\d{2}$/.test(value.trim())) {
+					dateTime = bound === 'max' ? dateTime.endOf('day') : dateTime.startOf('day');
+				}
+				return dateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss");
+			}
+		}
+	}
+
 	#setTimeInputStep(timeFormat: string | undefined) {
 		switch (timeFormat) {
 			case 'HH:mm':
@@ -325,7 +361,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		const previousDate = this._selectedDate;
 		this._selectedDate = newDate;
 
-		let timeZoneToStore = null;
+		let timeZoneToStore: string | null;
 		if (!this._displayTimeZone || !this._timeZoneMode) {
 			timeZoneToStore = null;
 		} else if (this._timeZoneMode === 'local') {
@@ -396,6 +432,8 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 				<umb-input-date
 					label=${this.localize.term('placeholders_enterdate')}
 					.value=${this._datePickerValue}
+					.min=${this._min}
+					.max=${this._max}
 					.step=${this._dateInputStep}
 					type=${this._dateInputType}
 					@change=${this.#onValueChange}

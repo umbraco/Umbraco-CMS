@@ -66,7 +66,7 @@ export class UmbDefaultCollectionItemCardElement extends UmbLitElement implement
 
 	#renderThumbnail(item: UmbDefaultCollectionItemCardItemModel) {
 		if (!item.thumbnail) return nothing;
-		return html`<img src=${item.thumbnail.src} alt=${item.thumbnail.alt || item.name || ''} />`;
+		return html`<img src=${item.thumbnail.src} alt=${item.thumbnail.alt || item.name || ''} decoding="async" />`;
 	}
 
 	#renderIcon(item: UmbDefaultCollectionItemCardItemModel) {

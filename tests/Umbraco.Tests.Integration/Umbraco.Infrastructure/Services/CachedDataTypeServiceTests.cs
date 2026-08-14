@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -30,7 +31,7 @@ internal sealed class CachedDataTypeServiceTests : UmbracoIntegrationTest
     ///     with Count verification works.
     /// </summary>
     [Test]
-    public void DataTypeService_Can_Get_All()
+    public async Task DataTypeService_Can_Get_All()
     {
         IDataType dataType =
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
@@ -38,13 +39,13 @@ internal sealed class CachedDataTypeServiceTests : UmbracoIntegrationTest
                 Name = "Testing Textfield",
                 DatabaseType = ValueStorageType.Ntext
             };
-        DataTypeService.Save(dataType);
+        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
 
         // Get all the first time (no cache)
-        var all = DataTypeService.GetAll();
+        var all = await DataTypeService.GetAllAsync();
 
         // Get all a second time (with cache)
-        all = DataTypeService.GetAll();
+        all = await DataTypeService.GetAllAsync();
 
         Assert.Pass();
     }

@@ -7,7 +7,7 @@ body:
   id: "version"
   attributes:
     label: "Which Umbraco version are you using?"
-    description: "Please write the *exact* version, example: `10.1.0`. Use the help icon in the Umbraco backoffice to find the version you're using"
+    description: "Please write the *exact* version, example: `10.1.0`. Click the Umbraco logo in the top left corner of the backoffice to find the version you're using."
   validations:
     required: true
 - type: textarea

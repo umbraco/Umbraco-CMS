@@ -1,6 +1,6 @@
 import type { UmbPartialSome } from '../type/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export interface UmbGuardIncomingRuleBase {
 	unique?: string | symbol;
@@ -22,33 +22,38 @@ export abstract class UmbGuardManagerBase<
 	public readonly rules = this._rules.asObservable();
 	public readonly hasRules = this._rules.asObservablePart((x) => x.length > 0);
 
-	protected _fallback = false;
+	#fallback = new UmbBooleanState(false);
+	protected _fallback = this.#fallback.asObservable();
+	protected _getFallback() {
+		return this.#fallback.getValue();
+	}
 
 	public fallbackToNotPermitted() {
-		this._fallback = false;
+		this.#fallback.setValue(false);
 	}
 
 	public fallbackToPermitted() {
-		this._fallback = true;
+		this.#fallback.setValue(true);
 	}
 
 	/**
 	 * Add a new rule
-	 * @param {RuleType} rule
+	 * @param {RuleType} rule - The rule to add
+	 * @returns {RuleType['unique']} The unique value of the added rule
 	 */
-	addRule(rule: IncomingRuleType) {
+	addRule(rule: IncomingRuleType): RuleType['unique'] {
 		const newRule = { ...rule } as unknown as RuleType;
 		newRule.unique ??= Symbol();
 		if (newRule.permitted === undefined) {
 			newRule.permitted = true;
 		}
 		this._rules.appendOne(newRule);
-		return rule.unique;
+		return newRule.unique;
 	}
 
 	/**
 	 * Add multiple rules
-	 * @param {RuleType[]} rules
+	 * @param {RuleType[]} rules - The rules to add
 	 */
 	addRules(rules: IncomingRuleType[]) {
 		this._rules.mute();

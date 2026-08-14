@@ -24,7 +24,7 @@ export class UmbPropertyValuePresetBuilderController<
 	/**
 	 * Clones the property data.
 	 * @param {UmbPropertyValueDataPotentiallyWithEditorAlias} propertyTypes - Data about the properties to make a preset for.
-	 * @param createArgs
+	 * @param {Partial<UmbPropertyValuePresetApiCallArgsEntityBase>} [createArgs] - The base arguments used when calling the preset APIs.
 	 * @returns {Promise<UmbPropertyValueDataPotentiallyWithEditorAlias>} - A promise that resolves to the cloned property data.
 	 */
 	async create<GivenPropertyTypesType extends UmbPropertyTypePresetModel>(
@@ -122,6 +122,9 @@ export class UmbPropertyValuePresetBuilderController<
 		let value: unknown = incomingCallArgs.value;
 
 		// Only process value if it is `undefined`, if a property has a value we do not want to process it. [NL]
+		// TODO: For v.19, we should run presets for all value always. Make it up to the preset to decide if it should process the value or not. [NL]
+		// Consider how we should communicate such change, as some might have build their own presets that rely on the current behavior. [NL]
+		// notice the important difference between `undefined` and `null` here, as `null` is a valid value for a property, while `undefined` means that the property has no value. [NL]
 		if (value === undefined) {
 			const callArgs: UmbPropertyValuePresetApiCallArgs = {
 				...this.#baseCreateArgs!,

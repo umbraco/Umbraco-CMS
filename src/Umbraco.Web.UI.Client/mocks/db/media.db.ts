@@ -1,0 +1,163 @@
+import type { UmbMockMediaModel } from '../data/mock-data-set.types.js';
+import { UmbMockEntityTreeManager } from './utils/entity/entity-tree.manager.js';
+import { UmbMockEntityVariantItemManager } from './utils/entity/entity-variant-item.manager.js';
+import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
+import { UmbMockEntityVariantUrlManager } from './utils/entity/entity-variant-url.manager.js';
+import { umbMediaTypeMockDb } from './media-type.db.js';
+import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
+import { UmbEntityRecycleBin } from './utils/entity/entity-recycle-bin.js';
+import { UmbMockMediaCollectionManager } from './media-collection.manager.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import type {
+	CreateMediaRequestModel,
+	GetMediaUrlsResponse,
+	MediaCollectionResponseModel,
+	MediaItemResponseModel,
+	MediaResponseModel,
+	MediaTreeItemResponseModel,
+	MediaValueResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+
+export function getMediaFileUrl(item: UmbMockMediaModel): string | null {
+	const fileValue = item.values.find((v) => v.alias === 'umbracoFile');
+	if (!fileValue?.value) return null;
+
+	// ImageCropper stores { src, focalPoint, crops }, UploadField stores the path directly
+	if (typeof fileValue.value === 'object' && 'src' in (fileValue.value as Record<string, unknown>)) {
+		return (fileValue.value as { src: string }).src;
+	}
+	if (typeof fileValue.value === 'string') {
+		return fileValue.value;
+	}
+	return null;
+}
+
+export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
+	tree = new UmbMockEntityTreeManager<UmbMockMediaModel>(this, treeItemMapper);
+	item = new UmbMockEntityVariantItemManager<UmbMockMediaModel>(this, itemMapper);
+	detail = new UmbMockEntityDetailManager<UmbMockMediaModel>(this, createMockMediaMapper, detailResponseMapper);
+	recycleBin = new UmbEntityRecycleBin<UmbMockMediaModel>(this.data, treeItemMapper);
+	collection = new UmbMockMediaCollectionManager(this, collectionMapper);
+	url = new UmbMockEntityVariantUrlManager<UmbMockMediaModel>(this);
+
+	constructor(data: Array<UmbMockMediaModel>) {
+		super('media', data);
+	}
+
+	override setData(data: Array<UmbMockMediaModel>) {
+		super.setData(data);
+		// Update recycleBin's data to match - it has its own data array
+		this.recycleBin.setData(data);
+	}
+
+	getFileUrls(ids: string[]): GetMediaUrlsResponse {
+		return ids.map((id) => {
+			const item = this.read(id);
+			const fileUrl = item ? getMediaFileUrl(item) : null;
+			return {
+				id,
+				urlInfos: fileUrl ? [{ culture: null, url: fileUrl }] : [],
+			};
+		});
+	}
+}
+
+const treeItemMapper = (model: UmbMockMediaModel): MediaTreeItemResponseModel => {
+	const mediaType = umbMediaTypeMockDb.read(model.mediaType.id);
+	if (!mediaType) throw new Error(`Media type with id ${model.mediaType.id} not found`);
+
+	return {
+		mediaType: {
+			collection: model.mediaType.collection,
+			icon: model.mediaType.icon,
+			id: model.mediaType.id,
+		},
+		hasChildren: model.hasChildren,
+		id: model.id,
+		isTrashed: model.isTrashed,
+		noAccess: model.noAccess,
+		parent: model.parent,
+		variants: model.variants,
+		createDate: model.createDate,
+		flags: model.flags,
+	};
+};
+
+const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaModel => {
+	const mediaType = umbMediaTypeMockDb.read(request.mediaType.id);
+	if (!mediaType) throw new Error(`Media type with id ${request.mediaType.id} not found`);
+
+	const now = new Date().toString();
+
+	return {
+		mediaType: {
+			id: mediaType.id,
+			icon: mediaType.icon,
+			collection: mediaType.collection,
+		},
+		hasChildren: false,
+		id: request.id ? request.id : UmbId.new(),
+		createDate: now,
+		isTrashed: false,
+		noAccess: false,
+		parent: request.parent,
+		// We trust blindly that we send of the editorAlias to the create end point.
+		values: request.values as MediaValueResponseModel[],
+		variants: request.variants.map((variantRequest) => {
+			return {
+				culture: variantRequest.culture,
+				segment: variantRequest.segment,
+				name: variantRequest.name,
+				createDate: now,
+				updateDate: now,
+				publishDate: null,
+			};
+		}),
+		flags: [],
+	};
+};
+
+const detailResponseMapper = (model: UmbMockMediaModel): MediaResponseModel => {
+	return {
+		mediaType: model.mediaType,
+		id: model.id,
+		isTrashed: model.isTrashed,
+		values: model.values,
+		variants: model.variants,
+		flags: model.flags,
+	};
+};
+
+const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
+	return {
+		mediaType: {
+			collection: model.mediaType.collection,
+			icon: model.mediaType.icon,
+			id: model.mediaType.id,
+		},
+		hasChildren: model.hasChildren,
+		id: model.id,
+		isTrashed: model.isTrashed,
+		parent: model.parent,
+		variants: model.variants,
+		flags: model.flags,
+	};
+};
+
+const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseModel => {
+	return {
+		creator: null,
+		id: model.id,
+		mediaType: {
+			id: model.mediaType.id,
+			alias: '',
+			icon: model.mediaType.icon,
+		},
+		sortOrder: 0,
+		values: model.values,
+		variants: model.variants,
+		flags: model.flags,
+	};
+};
+
+export const umbMediaMockDb = new UmbMediaMockDB([]);

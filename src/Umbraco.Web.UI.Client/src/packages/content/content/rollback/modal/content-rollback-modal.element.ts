@@ -2,12 +2,12 @@ import type { UmbContentRollbackRepository } from '../rollback-repository.interf
 import type { UmbContentDetailModel } from '../../types.js';
 import type { UmbContentRollbackModalData, UmbContentRollbackModalValue } from './types.js';
 import { diffWords, type UmbDiffChange } from '@umbraco-cms/backoffice/utils';
-import { css, customElement, html, nothing, repeat, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageItemRepository } from '@umbraco-cms/backoffice/language';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -51,7 +51,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 	private _isInvariant = true;
 
 	@state()
-	private _availableVariants: Array<Option> = [];
+	private _availableVariants: Array<UUISelectOption> = [];
 
 	@state()
 	private _diffs: Array<{ alias: string; diff: Array<UmbDiffChange> }> = [];
@@ -416,7 +416,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 					label=${this.localize.term('rollback_showDiff')}
 					@change=${this.#onToggleDiff}
 					.checked=${this._showDiff}></uui-toggle>
-				${this._showDiff ? html`<p>${unsafeHTML(this.localize.term('rollback_diffHelp'))}</p>` : nothing}
+				${this._showDiff ? html`<p>${this.localize.htmlString('#rollback_diffHelp')}</p>` : nothing}
 				<uui-table>
 					<uui-table-column style="width: 0"></uui-table-column>
 					<uui-table-column></uui-table-column>
@@ -465,7 +465,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline="Rollback">
 				<div id="main">
-					<div id="box-left">
+					<uui-scroll-container id="box-left">
 						${this._availableVariants.length
 							? html`
 									<uui-box id="language-box" headline=${this.localize.term('general_language')}>
@@ -474,7 +474,7 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 								`
 							: nothing}
 						${this.#renderVersions()}
-					</div>
+					</uui-scroll-container>
 					${this.#renderSelectedVersion()}
 				</div>
 				<umb-footer-layout slot="footer">
@@ -597,7 +597,6 @@ export class UmbContentRollbackModalElement extends UmbModalBaseElement<
 			#box-left {
 				max-width: 500px;
 				flex: 1;
-				overflow: auto;
 				height: 100%;
 			}
 

@@ -20,8 +20,7 @@ src/packages/media/          <- package root
 │   ├── index.ts
 │   ├── manifests.ts
 │   └── ...
-├── manifests.ts             <- aggregates all module manifests
-└── umbraco-package.ts       <- bundle entry point
+└── umbraco-package.ts       <- aggregates module manifests + bundle entry point
 ```
 
 ### Public vs. Private Modules
@@ -53,25 +52,21 @@ Reusable elements for other packages. Must be registered as custom elements at s
 ```typescript
 @customElement('umb-feature')
 export class UmbFeatureElement extends UmbLitElement {
-  render() { return html`Feature Element`; }
+	render() {
+		return html`Feature Element`;
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    ['umb-feature']: UmbFeatureElement;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-feature': UmbFeatureElement;
+	}
 }
 ```
 
-### Manifest Bubbling
+### Manifest Bundling
 
-Each sub-feature exports its own `manifests` array. The package-level `manifests.ts` aggregates them:
-
-```typescript
-import { manifests as sectionManifests } from './section/manifests.js';
-import { manifests as dashboardManifests } from './dashboard/manifests.js';
-export const manifests = [...sectionManifests, ...dashboardManifests];
-```
+Each sub-feature exports its own `manifests` array from its local `manifests.ts`. These bubble up to `umbraco-package.ts`, which assembles them and registers the bundle — there is no separate root-level `manifests.ts`. See [Manifests & Aliases — Package Bundles](./manifests.md#package-bundles-internal-packages) for the full pattern.
 
 ---
 
@@ -86,11 +81,13 @@ Only export what constitutes the public contract — context tokens, types, cons
 To make a module importable by other packages:
 
 1. Add the subpath to `package.json` exports:
+
 ```json
 { "exports": { "./module": "./dist-cms/packages/package/module/index.js" } }
 ```
 
 2. Run the generators:
+
 ```bash
 npm i && npm run generate:tsconfig
 ```
@@ -105,6 +102,35 @@ No hardcoded UI-facing strings. All user-visible text must go through the locali
 
 For step-by-step instructions on adding localization keys and using them in elements or controllers, use the `general-add-localization` skill.
 
+### Type-safe localization keys
+
+`this.localize.term()`, `termOrDefault()`, and the `<umb-localize key="…">` element are typed against the `en.ts` localization.
+
+After adding or renaming a key in `en.ts`, run:
+```bash
+npm run generate:localization-keys
+```
+The script also runs automatically as a `prebuild` hook, and as part of the test scripts.
+
+### Active language
+
+The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`, not by `<html lang>`:
+
+- Razor sets `lang` on the shell element from `GlobalSettings.DefaultUILanguage`. The shell reads its own `lang` on connect and calls `umbLocalizationRegistry.loadLanguage(this.lang)`.
+- After login, `current-user.context` calls `loadLanguage(user.languageIsoCode)` and the shell mirrors the new value back onto its own `lang` attribute via `umbLocalizationRegistry.currentLanguage`.
+- `<html lang>` is the static `"en"` for the noscript fallback text. Don't conflate it with the dynamic UI language.
+
+If you're adding a new shell-like element (rare — most code lives inside `<umb-app>`), give it a `lang` attribute and the same subscribe-and-mirror pattern. For everything else, just use `this.localize` and the inherited context resolves the rest.
+
+### Default UI language vs fallback culture
+
+Two separate concepts — don't conflate them:
+
+- **Active UI locale** — `GlobalSettings.DefaultUILanguage` (default `en-US`). What Razor renders as `lang` on the shell, what `loadLanguage()` is called with. The locale users actually see.
+- **Fallback culture** — `en` (`UMB_DEFAULT_LOCALIZATION_CULTURE`). The culture the canonical `en.ts` dictionary ships under (`Umb.Localization.EN`). Always loaded _alongside_ the active locale so any missing key falls back to English.
+
+A third-party language pack overriding canonical keys for a default install should declare `culture: 'en-US'` (matches active locale), not `culture: 'en'`. The keys come _from_ `en.ts`, but the override extension's `culture` must match the active locale, otherwise the registry filters it out.
+
 ---
 
 ## Conventions & Rules
@@ -118,4 +144,4 @@ For step-by-step instructions on adding localization keys and using them in elem
 7. **Declare custom manifest types** on `UmbExtensionManifestMap` so other packages can extend yours.
 8. **No hardcoded UI strings** — use the localization system. See [Localization](#localization) above and the `general-add-localization` skill.
 9. **Element naming**: `umb-` prefix for core. Package developers use their own prefix.
-10. **Extension aliases**: Dot-separated namespace (`Umb.Section.Content`, `My.Dashboard.Analytics`).
+10. **Extension aliases**: Dot-separated namespace — see [Manifests & Aliases — Naming Convention](./manifests.md#naming-convention).

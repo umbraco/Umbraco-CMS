@@ -1,4 +1,4 @@
-import type { UmbPropertyValueData } from '../../property/types.js';
+import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 
 /**
  * @function UmbObjectToPropertyValueArray

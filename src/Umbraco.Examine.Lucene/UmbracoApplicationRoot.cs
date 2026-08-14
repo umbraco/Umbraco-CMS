@@ -1,6 +1,10 @@
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -9,14 +13,24 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </summary>
 public class UmbracoApplicationRoot : IApplicationRoot
 {
-    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IHostEnvironment _hostEnvironment;
 
+    // TODO (V20): Remove this obsolete constructor and the [ActivatorUtilitiesConstructor] attribute below.
+    // Also revert the registration in UmbracoBuilderExtensions to:
+    //   services.AddSingleton<IApplicationRoot, UmbracoApplicationRoot>();
+    // (the factory form is required so [ActivatorUtilitiesConstructor] is honored).
+    [Obsolete("Use the constructor accepting IHostEnvironment. Scheduled for removal in Umbraco 20.")]
     public UmbracoApplicationRoot(IHostingEnvironment hostingEnvironment)
-        => _hostingEnvironment = hostingEnvironment;
+        : this(StaticServiceProvider.Instance.GetRequiredService<IHostEnvironment>())
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public UmbracoApplicationRoot(IHostEnvironment hostEnvironment)
+        => _hostEnvironment = hostEnvironment;
 
     public DirectoryInfo ApplicationRoot
-        => new(
-            Path.Combine(
-                _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData),
-                "ExamineIndexes"));
+        => new(Path.Combine(
+            _hostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData),
+            "ExamineIndexes"));
 }

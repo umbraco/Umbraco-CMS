@@ -1,5 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, property, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 //TODO consider adding a highlight prop to the code block, that could spin up/access monaco instance and highlight the code
 
@@ -8,7 +11,7 @@ import { css, customElement, html, property, state, when, LitElement } from '@um
  *  @slot - the default slot where the full message resides
  */
 @customElement('umb-code-block')
-export class UmbCodeBlockElement extends LitElement {
+export class UmbCodeBlockElement extends UmbLitElement {
 	@property()
 	language = '';
 
@@ -18,14 +21,29 @@ export class UmbCodeBlockElement extends LitElement {
 	@state()
 	private _copyState: 'idle' | 'success' = 'idle';
 
+	#notificationContext?: UmbNotificationContext;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => (this.#notificationContext = instance));
+	}
+
 	async copyCode() {
 		const text = this.textContent;
-		if (text) {
+		if (!text) return;
+
+		try {
+			// navigator.clipboard only exists in secure contexts (https or localhost) and the
+			// write can also be denied by permissions policy, so failures must be surfaced.
 			await navigator.clipboard.writeText(text);
 			this._copyState = 'success';
 			setTimeout(() => {
 				this._copyState = 'idle';
 			}, 2000);
+		} catch {
+			this.#notificationContext?.peek('danger', {
+				data: { message: this.localize.term('speechBubbles_cannotCopyToClipboard') },
+			});
 		}
 	}
 
@@ -44,7 +62,12 @@ export class UmbCodeBlockElement extends LitElement {
 				${when(
 					this.copy,
 					() => html`
-						<uui-button color=${this._copyState === 'idle' ? 'default' : 'positive'} @click=${this.copyCode}>
+						<uui-button
+							.label=${this._copyState === 'idle'
+								? this.localize.term('general_copy')
+								: this.localize.term('general_copied')}
+							@click=${this.copyCode}
+							compact>
 							${when(
 								this._copyState === 'idle',
 								() => html`<uui-icon name="copy"></uui-icon> <umb-localize key="general_copy">Copy</umb-localize>`,
@@ -63,7 +86,8 @@ export class UmbCodeBlockElement extends LitElement {
 		css`
 			:host {
 				display: block;
-				border: 1px solid var(--uui-color-divider-emphasis);
+				background-color: var(--uui-color-surface);
+				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 			}
 
@@ -74,12 +98,11 @@ export class UmbCodeBlockElement extends LitElement {
 
 			pre {
 				font-family: monospace;
-				background-color: var(--uui-color-surface-alt);
 				color: #303033;
 				display: block;
 				margin: 0;
 				overflow-x: auto;
-				padding: 9.5px;
+				padding: var(--uui-size-space-3);
 			}
 
 			pre,
@@ -93,30 +116,15 @@ export class UmbCodeBlockElement extends LitElement {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				background-color: var(--uui-color-surface-alt);
-				border-bottom: 1px solid var(--uui-color-divider-emphasis);
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+
+			#header uui-button {
+				margin-right: var(--uui-size-space-1);
 			}
 
 			#lang {
-				margin-left: 16px;
-				font-weight: bold;
-			}
-
-			button {
-				font-family: inherit;
-				padding: 6px 16px;
-				background-color: transparent;
-				border: none;
-				border-left: 1px solid var(--uui-color-divider-emphasis);
-				border-radius: 0;
-				color: #000;
-				display: flex;
-				align-items: center;
-				gap: 8px;
-			}
-
-			button:hover {
-				background-color: var(--uui-color-surface-emphasis);
+				margin-left: var(--uui-size-space-3);
 			}
 		`,
 	];

@@ -86,7 +86,7 @@ public sealed class MemberIndexingNotificationHandler : INotificationHandler<Mem
                     {
                         _umbracoIndexingHandler.DeleteIndexForEntity(p.Id, false);
                     }
-                    else
+                    else if (p.IndexableFieldsChanged)
                     {
                         IMember? m = _memberService.GetById(p.Id);
                         if (m != null)

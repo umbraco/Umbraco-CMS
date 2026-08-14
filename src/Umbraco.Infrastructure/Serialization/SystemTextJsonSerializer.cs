@@ -12,16 +12,6 @@ public sealed class SystemTextJsonSerializer : SystemTextJsonSerializerBase
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SystemTextConfigurationEditorJsonSerializer" /> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public SystemTextJsonSerializer()
-        : this(
-              StaticServiceProvider.Instance.GetRequiredService<IJsonSerializerEncoderFactory>())
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="SystemTextJsonSerializer" /> class.
     /// </summary>
     public SystemTextJsonSerializer(IJsonSerializerEncoderFactory jsonSerializerEncoderFactory)

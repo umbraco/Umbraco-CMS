@@ -24,6 +24,8 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// </summary>
     int? StartMediaId { get; set; }
 
+    int? StartElementId { get; set; }
+
     /// <summary>
     ///     The icon
     /// </summary>
@@ -37,14 +39,7 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// <summary>
     /// Gets or sets the description of the user group.
     /// </summary>
-    /// <remarks>
-    /// TODO (V18): Remove the default implementations.
-    /// </remarks>
-    string? Description
-    {
-        get => null;
-        set { }
-    }
+    string? Description { get; set; }
 
     /// <summary>
     ///     If this property is true it will give the group access to all languages

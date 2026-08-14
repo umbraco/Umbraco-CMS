@@ -403,7 +403,8 @@
 	    0: Comma delimitted list of failed folder paths
   	-->
     <key alias="umbracoApplicationUrlCheckResultTrue"><![CDATA[AppSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' je postavljen na <strong>%0%</strong>.]]></key>
-    <key alias="umbracoApplicationUrlCheckResultFalse">AppSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' nije postavljen.</key>
+    <key alias="umbracoApplicationUrlCheckResultFalse"><![CDATA[AppSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' nije postavljen, pa će se URL aplikacije automatski otkriti iz dolaznih zahtjeva. Preporučuje se da ga postavite izričito.]]></key>
+    <key alias="umbracoApplicationUrlCheckResultError"><![CDATA[AppSetting 'Umbraco:CMS:WebRouting:UmbracoApplicationUrl' nije postavljen, a automatsko otkrivanje URL-a aplikacije je onemogućeno ('Umbraco:CMS:WebRouting:ApplicationUrlDetection' je 'None'). Značajke koje zahtijevaju apsolutni URL, poput e-pošte za poništavanje lozinke i pozivnica, neće raditi. Postavite URL aplikacije izričito ili omogućite automatsko otkrivanje.]]></key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
@@ -445,10 +446,6 @@
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[E-pošta za obavještenje je i dalje postavljena na zadanu vrijednost od <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Rezultati zakazanih Umbraco provjera zdravlja koji se pokreću na %0% na %1% su sljedeći:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Status provjere zdravlja Umbraco: %0%</key>
-  </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Sadržaj u otpadu s ID-om: {0} povezan je s originalnim nadređenim sadržajem s ID-om: {1}</key>
-    <key alias="mediaTrashed">Medij u otpadu s ID-om: {0} povezan je s originalnim nadređenim medijem s ID-om: {1}</key>
   </area>
   <area alias="permissions">
     <key alias="FolderCreation">Kreiranje mape</key>

@@ -8,13 +8,6 @@ export type UmbPackage = ManifestResponseModel;
  */
 export type UmbPackageManifestResponse = UmbPackage[];
 
-/**
- * Represents the response from the package manifest endpoint.
- * @deprecated Use `UmbPackageManifestResponse` instead. This will be removed in Umbraco 18.
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type PackageManifestResponse = UmbPackageManifestResponse;
-
 export type UmbPackageWithMigrationStatus = UmbPackage & {
 	hasPendingMigrations: boolean;
 };
@@ -29,6 +22,8 @@ export type UmbCreatedPackageDefinition = UmbCreatedPackage & {
 	contentLoadChildNodes: boolean;
 	mediaIds: Array<string>;
 	mediaLoadChildNodes: boolean;
+	// TODO (V20): make required and non-nullable
+	elementIds?: null | Array<string>;
 	documentTypes: Array<string>;
 	mediaTypes: Array<string>;
 	dataTypes: Array<string>;

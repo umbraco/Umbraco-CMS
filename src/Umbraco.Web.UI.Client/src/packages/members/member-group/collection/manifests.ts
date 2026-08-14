@@ -9,6 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: UMB_MEMBER_GROUP_COLLECTION_ALIAS,
 		name: 'Member Group Collection',
+		api: () => import('./member-group-collection.context.js'),
 		meta: {
 			repositoryAlias: UMB_MEMBER_GROUP_COLLECTION_REPOSITORY_ALIAS,
 		},

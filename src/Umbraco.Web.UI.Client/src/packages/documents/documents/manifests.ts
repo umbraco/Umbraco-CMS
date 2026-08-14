@@ -1,5 +1,7 @@
+import { manifests as startNodeManifests } from './user-start-node/manifests.js';
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
+import { manifests as configurationManifests } from './configuration/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as entitySignManifests } from './entity-sign/manifests.js';
@@ -12,6 +14,7 @@ import { manifests as previewManifests } from './preview/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
 import { manifests as publishingManifests } from './publishing/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
+import { manifests as redirectManagementManifests } from './redirect-management/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as rollbackManifests } from './rollback/manifests.js';
 import { manifests as searchProviderManifests } from './search/manifests.js';
@@ -26,8 +29,10 @@ import * as entryPointModule from './entry-point.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+	...startNodeManifests,
 	...auditLogManifests,
 	...collectionManifests,
+	...configurationManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
 	...entitySignManifests,
@@ -40,6 +45,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertyEditorManifests,
 	...publishingManifests,
 	...recycleBinManifests,
+	...redirectManagementManifests,
 	...repositoryManifests,
 	...rollbackManifests,
 	...searchProviderManifests,

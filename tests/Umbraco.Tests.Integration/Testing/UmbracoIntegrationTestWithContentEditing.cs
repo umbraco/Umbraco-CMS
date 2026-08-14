@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using NUnit.Framework;
@@ -51,9 +51,9 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
     protected IContentType ContentType { get; private set; }
 
     [SetUp]
-    public new void Setup() => CreateTestData();
+    public new async Task Setup() => await CreateTestData();
 
-    protected async void CreateTestData()
+    protected async Task CreateTestData()
     {
         // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");

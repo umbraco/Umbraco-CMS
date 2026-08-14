@@ -2,13 +2,17 @@ import type { UmbMemberTypeDetailModel } from '../../types.js';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbManagementApiMemberTypeDetailDataRequestManager } from './server-data-source/member-type-detail.server.request-manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateMemberTypeRequestModel,
 	MemberTypeResponseModel,
 	UpdateMemberTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -25,7 +29,7 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Creates a new Member Type scaffold
 	 * @param {Partial<UmbMemberTypeDetailModel>} [preset] - Optional preset data to merge with the scaffold
-	 * @returns { CreateMemberTypeRequestModel }
+	 * @returns { CreateMemberTypeRequestModel } The scaffolded Member Type
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
 	async createScaffold(preset: Partial<UmbMemberTypeDetailModel> = {}) {
@@ -54,10 +58,10 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Fetches a Member Type with the given id from the server
 	 * @param {string} unique - The unique identifier of the Member Type to fetch
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>>} The Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await this.#detailRequestManager.read(unique);
@@ -68,10 +72,10 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Fetches multiple Member Types by their unique IDs from the server
 	 * @param {Array<string>} uniques - The unique IDs of the member types to fetch
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbMemberTypeDetailModel>>>} The Member Types, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async readMany(uniques: Array<string>) {
+	async readMany(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbMemberTypeDetailModel>>> {
 		if (!uniques || uniques.length === 0) {
 			return { data: [] };
 		}
@@ -87,10 +91,13 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Inserts a new Member Type on the server
 	 * @param {UmbMemberTypeDetailModel} model - Member Type Model
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>>} The created Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async create(model: UmbMemberTypeDetailModel, parentUnique: string | null = null) {
+	async create(
+		model: UmbMemberTypeDetailModel,
+		parentUnique: string | null = null,
+	): Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>> {
 		if (!model) throw new Error('Member Type is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -103,6 +110,7 @@ export class UmbMemberTypeDetailServerDataSource
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
+			allowedInLibrary: false,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,
@@ -139,10 +147,10 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Updates a MemberType on the server
 	 * @param { UmbMemberTypeDetailModel } model - Member Type Model
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>>} The updated Member Type, or an error
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async update(model: UmbMemberTypeDetailModel) {
+	async update(model: UmbMemberTypeDetailModel): Promise<UmbDataSourceResponse<UmbMemberTypeDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -155,6 +163,7 @@ export class UmbMemberTypeDetailServerDataSource
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
+			allowedInLibrary: false,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,
@@ -189,10 +198,10 @@ export class UmbMemberTypeDetailServerDataSource
 	/**
 	 * Deletes a Member Type on the server
 	 * @param {string} unique - The unique identifier of the Member Type to delete
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return this.#detailRequestManager.delete(unique);
 	}
@@ -227,7 +236,15 @@ export class UmbMemberTypeDetailServerDataSource
 					isSensitive: property.isSensitive,
 				};
 			}),
-			containers: data.containers as UmbPropertyTypeContainerModel[],
+			containers: data.containers.map((container) => {
+				return {
+					id: container.id,
+					parent: container.parent ? { id: container.parent.id } : null,
+					name: container.name ?? '',
+					type: container.type as UmbPropertyContainerTypes, // TODO: check if the value is valid
+					sortOrder: container.sortOrder,
+				};
+			}),
 			allowedContentTypes: [],
 			compositions: data.compositions.map((composition) => {
 				return {

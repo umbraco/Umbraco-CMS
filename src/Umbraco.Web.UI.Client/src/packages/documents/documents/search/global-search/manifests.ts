@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		weight: 800,
 		api: () => import('./document-global-search.js'),
 		meta: {
-			label: 'Documents',
+			label: '#globalSearch_documents',
 			searchProviderAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
 			sectionAlias: UMB_CONTENT_SECTION_ALIAS,
 		},

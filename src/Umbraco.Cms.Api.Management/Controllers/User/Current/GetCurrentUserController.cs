@@ -59,7 +59,7 @@ public class GetCurrentUserController : CurrentUserControllerBase
     [EndpointDescription("Gets the currently authenticated back office user's information and permissions.")]
     public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
-        var currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
+        Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
@@ -78,7 +78,7 @@ public class GetCurrentUserController : CurrentUserControllerBase
             return Unauthorized();
         }
 
-        var responseModel = await _userPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+        CurrentUserResponseModel responseModel = await _userPresentationFactory.CreateCurrentUserResponseModelAsync(user);
         return Ok(responseModel);
     }
 }

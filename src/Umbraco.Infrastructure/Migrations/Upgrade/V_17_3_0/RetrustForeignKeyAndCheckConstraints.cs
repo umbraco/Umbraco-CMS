@@ -1,6 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
 
@@ -12,14 +14,27 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
 /// </summary>
 public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
 {
+    private readonly IUmbracoDatabaseFactory _databaseFactory;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="RetrustForeignKeyAndCheckConstraints"/> class.
     /// </summary>
     /// <param name="context">The migration context.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public RetrustForeignKeyAndCheckConstraints(IMigrationContext context)
-        : base(context)
+        : this(
+            context,
+            StaticServiceProvider.Instance.GetRequiredService<IUmbracoDatabaseFactory>())
     {
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RetrustForeignKeyAndCheckConstraints"/> class.
+    /// </summary>
+    /// <param name="context">The migration context.</param>
+    /// <param name="databaseFactory">The database factory used to create separate connections for constraint validation.</param>
+    public RetrustForeignKeyAndCheckConstraints(IMigrationContext context, IUmbracoDatabaseFactory databaseFactory)
+        : base(context) => _databaseFactory = databaseFactory;
 
     /// <inheritdoc />
     protected override Task MigrateAsync()
@@ -36,28 +51,8 @@ public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
 
     private void RetrustConstraints()
     {
-        // Only target Umbraco tables (prefixed "umbraco" or "cms") to avoid touching
-        // custom or third-party tables that share the same database.
-        List<UntrustedConstraintDto> untrustedConstraints = Database.Fetch<UntrustedConstraintDto>(
-            @"SELECT
-                s.name AS SchemaName,
-                OBJECT_NAME(fk.parent_object_id) AS TableName,
-                fk.name AS ConstraintName
-            FROM sys.foreign_keys fk
-            INNER JOIN sys.schemas s ON fk.schema_id = s.schema_id
-            WHERE fk.is_not_trusted = 1
-              AND (OBJECT_NAME(fk.parent_object_id) LIKE 'umbraco%' OR OBJECT_NAME(fk.parent_object_id) LIKE 'cms%')
-
-            UNION ALL
-
-            SELECT
-                s.name AS SchemaName,
-                OBJECT_NAME(cc.parent_object_id) AS TableName,
-                cc.name AS ConstraintName
-            FROM sys.check_constraints cc
-            INNER JOIN sys.schemas s ON cc.schema_id = s.schema_id
-            WHERE cc.is_not_trusted = 1
-              AND (OBJECT_NAME(cc.parent_object_id) LIKE 'umbraco%' OR OBJECT_NAME(cc.parent_object_id) LIKE 'cms%')");
+        List<UntrustedConstraintsQuery.UntrustedConstraintDto> untrustedConstraints =
+            Database.Fetch<UntrustedConstraintsQuery.UntrustedConstraintDto>(UntrustedConstraintsQuery.Sql);
 
         if (untrustedConstraints.Count == 0)
         {
@@ -67,17 +62,21 @@ public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
 
         Logger.LogInformation("Found {Count} untrusted constraint(s) to re-trust.", untrustedConstraints.Count);
 
-        // Ensure we have a long command timeout, in case the migration targets a huge table.
-        EnsureLongCommandTimeout(Database);
-
+        // ALTER TABLE ... WITH CHECK CHECK CONSTRAINT is executed on a separate database connection
+        // to isolate failures from the migration scope's transaction. When constraint validation fails
+        // (e.g. orphaned FK rows), the error can zombie the .NET SqlTransaction even when caught by
+        // T-SQL TRY...CATCH, because the transaction state change propagates through the TDS (Tabular
+        // Data Stream) protocol layer that underlies SQL Server client-server communication.
+        // Using a separate connection (which has no explicit transaction) avoids this entirely —
+        // TRY...CATCH works correctly and no SqlException is thrown to the .NET layer.
         var retrusted = 0;
         var failed = 0;
 
-        foreach (UntrustedConstraintDto constraint in untrustedConstraints)
+        using IUmbracoDatabase db = _databaseFactory.CreateDatabase();
+        EnsureLongCommandTimeout(db);
+
+        foreach (UntrustedConstraintsQuery.UntrustedConstraintDto constraint in untrustedConstraints)
         {
-            // Use T-SQL TRY...CATCH to handle errors at the SQL level. This prevents a constraint
-            // validation failure from dooming the .NET SqlTransaction, which would cause all
-            // subsequent operations to fail with "This SqlTransaction has completed".
             // Leading semicolon prevents NPoco's auto-select from prepending
             // "SELECT ... FROM []" based on the empty [TableName("")] attribute.
             var sql = $@";
@@ -89,7 +88,7 @@ BEGIN CATCH
     SELECT CAST(0 AS BIT) AS Success, ERROR_MESSAGE() AS ErrorMessage;
 END CATCH";
 
-            RetrustResultDto result = Database.Single<RetrustResultDto>(sql);
+            RetrustResultDto result = db.Single<RetrustResultDto>(sql);
 
             if (result.Success)
             {
@@ -119,19 +118,6 @@ END CATCH";
             retrusted,
             failed,
             untrustedConstraints.Count);
-    }
-
-    [TableName("")]
-    private class UntrustedConstraintDto
-    {
-        [Column("SchemaName")]
-        public string SchemaName { get; set; } = null!;
-
-        [Column("TableName")]
-        public string TableName { get; set; } = null!;
-
-        [Column("ConstraintName")]
-        public string ConstraintName { get; set; } = null!;
     }
 
     [TableName("")]

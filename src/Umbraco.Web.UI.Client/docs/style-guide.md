@@ -3,6 +3,10 @@
 
 ---
 
+This guide covers naming and formatting conventions. For visual design choices — icons, colours, buttons, and UX copy — see [design-choices.md](./design-choices.md).
+
+---
+
 
 ### Naming Conventions
 
@@ -155,7 +159,6 @@ export class UmbBadElement extends LitElement {
 **Placement in Class**:
 - Place event handler arrow functions near the top of the class with other properties
 - Place them after state properties but before constructor
-- Add a comment indicating they are event handlers
 
 **Naming**:
 - Private handlers: `#onEventName` or `#handleEventName`
@@ -208,9 +211,10 @@ Use the correct capitalization for third-party libraries:
 
 ### Documentation
 
+- **Default to no comment.** Self-descriptive code (good names, small functions) is the primary documentation. See [Code Comment Policy](../../../CLAUDE.md#9-code-comment-policy) and [Clean Code → Comments and Documentation](./clean-code.md#comments-and-documentation) for the full rules and worked examples.
 - **Public APIs**: JSDoc comments with `@description`, `@param`, `@returns`, `@example`
 - **Web Components**: JSDoc with web-component-analyzer tags
-- **Complex logic**: Inline comments explaining "why" not "what"
+- **Inline comments**: only for the non-obvious WHY (hidden constraints, ordering, workarounds, edge cases). Never restate what the code does.
 - **TODOs**: Format as `// TODO: description [initials]`
 - **Deprecated**: Use `@deprecated` tag with migration instructions
 

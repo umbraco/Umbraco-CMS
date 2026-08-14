@@ -30,6 +30,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     private readonly ILanguageService _languageService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IMediaTypeService _mediaTypeService;
+    private readonly IMemberTypeService _memberTypeService;
     private readonly IDataTypeService _dataTypeService;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly SingleBlockListProcessor _singleBlockListProcessor;
@@ -48,6 +49,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     /// <param name="languageService">Service for managing languages in Umbraco.</param>
     /// <param name="contentTypeService">Service for managing content types.</param>
     /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="memberTypeService">Service for managing member types.</param>
     /// <param name="dataTypeService">Service for managing data types.</param>
     /// <param name="logger">The logger used for logging migration operations.</param>
     /// <param name="coreScopeProvider">Provides scope management for database operations.</param>
@@ -65,11 +67,12 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         ILanguageService languageService,
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
+        IMemberTypeService memberTypeService,
         IDataTypeService dataTypeService,
         ILogger<MigrateSingleBlockList> logger,
         ICoreScopeProvider coreScopeProvider,
-        SingleBlockListProcessor  singleBlockListProcessor,
-        IJsonSerializer  jsonSerializer,
+        SingleBlockListProcessor singleBlockListProcessor,
+        IJsonSerializer jsonSerializer,
         SingleBlockListConfigurationCache blockListConfigurationCache,
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
@@ -82,6 +85,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         _languageService = languageService;
         _contentTypeService = contentTypeService;
         _mediaTypeService = mediaTypeService;
+        _memberTypeService = memberTypeService;
         _dataTypeService = dataTypeService;
         _logger = logger;
         _coreScopeProvider = coreScopeProvider;
@@ -111,9 +115,13 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         IEnumerable<IPropertyType> mediaPropertyTypes = allMediaTypes
             .SelectMany(ct => ct.PropertyTypes);
 
+        IMemberType[] allMemberTypes = _memberTypeService.GetAll().ToArray();
+        IEnumerable<IPropertyType> memberPropertyTypes = allMemberTypes
+            .SelectMany(mt => mt.PropertyTypes);
+
         // get all relevantPropertyTypes
         var relevantPropertyEditors =
-            contentPropertyTypes.Concat(mediaPropertyTypes).DistinctBy(pt => pt.Id)
+            contentPropertyTypes.Concat(mediaPropertyTypes).Concat(memberPropertyTypes).DistinctBy(pt => pt.Id)
                 .Where(pt => propertyEditorAliases.Contains(pt.PropertyEditorAlias))
                 .GroupBy(pt => pt.PropertyEditorAlias)
                 .ToDictionary(group => group.Key, group => group.ToArray());
@@ -153,7 +161,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
                 _logger.LogInformation(
                     "No properties have been found to migrate for {propertyEditorAlias}",
                     propertyEditorAlias);
-                return;
+                continue;
             }
 
             updateItemsByPropertyEditorAlias[propertyEditorAlias] = updateItemsByPropertyType;
@@ -165,7 +173,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         string updateSql = $@"
 UPDATE umbracoDataType
 SET propertyEditorAlias = '{Constants.PropertyEditors.Aliases.SingleBlock}',
-    propertyEditorUiAlias = 'Umb.PropertyEditorUi.SingleBlock'
+    propertyEditorUiAlias = 'Umb.PropertyEditorUi.BlockSingle'
 WHERE nodeId IN (@0)";
         await Database.ExecuteAsync(updateSql, singleBlockListDataTypesIds);
 
@@ -394,9 +402,20 @@ WHERE nodeId IN (@0)";
     private bool FinalizeUpdateItem(UpdateItem updateItem, IDataValueEditor updatedValueEditor)
     {
         var editorValue = _jsonSerializer.Serialize(updateItem.UpdatedValue);
-        var dbValue = updateItem.UpdatedValue is SingleBlockValue
-            ? _dummySingleBlockValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null)
-            : updatedValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+
+        // Re-running FromEditor here is only to re-serialize the converted value; the referenced-entity
+        // caching it would otherwise trigger is wasted work that issues per-property content/media reads
+        // in separate scopes, contending with this migration's own scope. Suppress it.
+        object? dbValue;
+#pragma warning disable CS0618 // Type or member is obsolete
+        using (CacheReferencedEntitiesSuppression.Suppress())
+        {
+            dbValue = updateItem.UpdatedValue is SingleBlockValue
+                ? _dummySingleBlockValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null)
+                : updatedValueEditor.FromEditor(new ContentPropertyData(editorValue, null), null);
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
         if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
         {
             _logger.LogWarning(

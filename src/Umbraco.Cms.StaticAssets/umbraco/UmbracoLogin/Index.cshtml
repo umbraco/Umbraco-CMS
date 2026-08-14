@@ -35,7 +35,7 @@
 }
 
 <!DOCTYPE html>
-<html lang="@GlobalSettings.Value.DefaultUILanguage">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <base href="@backOfficePath.EnsureEndsWith('/')" />
@@ -46,7 +46,7 @@
     <meta name="pinterest" content="nopin"/>
     <title>Umbraco</title>
 
-    <link rel="stylesheet" href="~/umbraco/backoffice/css/uui-css.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/umbraco/backoffice/css/light.css" asp-append-version="true" />
     <style>
       body {
         margin: 0;
@@ -83,6 +83,7 @@
 </noscript>
 
 <umb-auth
+    lang="@GlobalSettings.Value.DefaultUILanguage"
     return-url="@backOfficePath"
     logo-image="@loginLogoImage"
     logo-image-alternative="@loginLogoImageAlternative"

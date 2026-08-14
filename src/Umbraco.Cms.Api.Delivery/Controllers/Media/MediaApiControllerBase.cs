@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Delivery.Caching;
 using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
 using Umbraco.Cms.Core;
@@ -32,6 +33,13 @@ public abstract class MediaApiControllerBase : DeliveryApiControllerBase
 
     protected IApiMediaWithCropsResponse BuildApiMediaWithCrops(IPublishedContent media)
         => _apiMediaWithCropsResponseBuilder.Build(media);
+
+    /// <summary>
+    ///     Stores the resolved media items in the HTTP context for use by the output cache policy.
+    /// </summary>
+    /// <param name="items">The resolved published media items.</param>
+    protected void SetOutputCacheMedia(params IPublishedContent[] items)
+        => HttpContext.Items[DeliveryApiOutputCacheKeys.ResolvedMediaItemsKey] = items;
 
     protected IActionResult ApiMediaQueryOperationStatusResult(ApiMediaQueryOperationStatus status) =>
         status switch

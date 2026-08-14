@@ -1,4 +1,5 @@
 export { UmbTrashEntityAction, UmbEntityTrashedEvent } from './trash/index.js';
+export { UmbTrashFolderEntityAction } from './trash-folder/index.js';
 export {
 	UmbRestoreFromRecycleBinEntityAction,
 	UmbEntityRestoredFromRecycleBinEvent,

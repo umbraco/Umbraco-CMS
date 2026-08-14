@@ -25,7 +25,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	/**
 	 * Appends a validation context to the workspace.
-	 * @param context
+	 * @param {UmbValidationController} context - The validation context to append.
 	 */
 	addValidationContext(context: UmbValidationController) {
 		this.#validationContexts.push(context);
@@ -51,7 +51,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	//isDirty = this.#isNew.asObservable();
 
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
-		super(host, UMB_WORKSPACE_CONTEXT.toString());
+		super(host, UMB_WORKSPACE_CONTEXT);
 		this.workspaceAlias = workspaceAlias;
 		// TODO: Consider if we can move this consumption to #resolveSubmit, just as a getContext, but it depends if others use the modalContext prop.. [NL]
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
@@ -81,7 +81,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 
 	/**
 	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
-	 * @returns Promise that resolves to void when the validation is complete.
+	 * @returns {Promise<Array<void>>} Promise that resolves to void when the validation is complete.
 	 */
 	public async validate(): Promise<Array<void>> {
 		return await Promise.all(this.#validationContexts.map((context) => context.validate()));

@@ -139,6 +139,69 @@ internal class MediaPicker3ValueEditorValidationTests
         ValidateResult(shouldSucceed, result);
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Validates_Missing_Media(bool mediaFound)
+    {
+        var (valueEditor, mediaTypeServiceMock, mediaServiceMock, _) = CreateValueEditor();
+
+        var mediaKey = Guid.NewGuid();
+        var mediaTypeKey = Guid.NewGuid();
+        const string mediaTypeAlias = "Alias";
+
+        // An allowed-type filter must be configured for the existence check to run.
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { Filter = $"{mediaTypeKey}" };
+
+        var mediaTypeMock = new Mock<IMediaType>();
+        mediaTypeMock.Setup(x => x.Key).Returns(mediaTypeKey);
+        mediaTypeServiceMock.Setup(x => x.Get(mediaTypeAlias)).Returns(mediaTypeMock.Object);
+
+        if (mediaFound)
+        {
+            var mediaMock = new Mock<IMedia>();
+            mediaMock.SetupGet(x => x.ContentType.Alias).Returns(mediaTypeAlias);
+            mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([mediaMock.Object]);
+        }
+        else
+        {
+            // The selected media (looked up because no type alias was provided) cannot be found.
+            mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([]);
+        }
+
+        var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
+
+        var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
+
+        ValidateResult(mediaFound, result);
+    }
+
+    [Test]
+    public void Can_Pass_Validation_When_Selection_Contains_Duplicate_Media()
+    {
+        var (valueEditor, mediaTypeServiceMock, mediaServiceMock, _) = CreateValueEditor();
+
+        var mediaKey = Guid.NewGuid();
+        var mediaTypeKey = Guid.NewGuid();
+        const string mediaTypeAlias = "Alias";
+
+        valueEditor.ConfigurationObject = new MediaPicker3Configuration { Multiple = true, Filter = $"{mediaTypeKey}" };
+
+        var mediaTypeMock = new Mock<IMediaType>();
+        mediaTypeMock.Setup(x => x.Key).Returns(mediaTypeKey);
+        mediaTypeServiceMock.Setup(x => x.Get(mediaTypeAlias)).Returns(mediaTypeMock.Object);
+
+        var mediaMock = new Mock<IMedia>();
+        mediaMock.SetupGet(x => x.ContentType.Alias).Returns(mediaTypeAlias);
+        mediaServiceMock.Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>())).Returns([mediaMock.Object]);
+
+        // The same media key selected twice (no provided alias) must not be reported as missing.
+        var value = "[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"" + mediaKey + "\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]";
+
+        var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
+
+        ValidateResult(true, result);
+    }
+
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", false, true)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", false, false)]
     [TestCase("[ {\n  \" key\" : \"20266ebe-1f7e-4cf3-a694-7a5fb210223b\",\n  \"mediaKey\" : \"7AD39018-0920-4818-89D3-26F47DBCE62E\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n}, {\n  \" key\" : \"1C70519E-C3AE-4D45-8E48-30B3D02E455E\",\n  \"mediaKey\" : \"E243A7E2-8D2E-4DC9-88FB-822350A40142\",\n  \"mediaTypeAlias\" : \"\",\n  \"crops\" : [ ],\n  \"focalPoint\" : null\n} ]", true, true)]

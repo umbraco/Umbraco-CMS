@@ -1,4 +1,4 @@
-import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
+import { ensureMediaNameFromFile } from '../../utils/ensure-media-name-from-file.function.js';
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
 import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
 import { css, customElement, html, ifDefined, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -6,7 +6,6 @@ import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFileDropzoneItemStatus } from '@umbraco-cms/backoffice/dropzone';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -21,12 +20,11 @@ import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper.element.js';
 
-const DefaultFocalPoint = { left: 0.5, top: 0.5 };
 const DefaultValue: UmbImageCropperPropertyEditorValue = {
 	temporaryFileId: null,
 	src: '',
 	crops: [],
-	focalPoint: DefaultFocalPoint,
+	focalPoint: null,
 };
 
 @customElement('umb-input-image-cropper')
@@ -76,8 +74,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 		this.#observeAcceptedFileTypes();
 	}
 
-	async #observeAcceptedFileTypes() {
-		await this.#config.initialized;
+	#observeAcceptedFileTypes() {
 		this.observe(
 			this.#config.part('imageFileTypes'),
 			(imageFileTypes) => {
@@ -100,7 +97,7 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 
 		const underlyingFile = file.temporaryFile?.file;
 		if (underlyingFile) {
-			void this.#ensureMediaNameFromFile(underlyingFile);
+			void ensureMediaNameFromFile(this, underlyingFile);
 		}
 
 		this.value = assignToFrozenObject(this.value ?? DefaultValue, {
@@ -108,16 +105,6 @@ export class UmbInputImageCropperElement extends UmbFormControlMixin<
 		});
 
 		this.dispatchEvent(new UmbChangeEvent());
-	}
-
-	async #ensureMediaNameFromFile(file: File) {
-		const datasetContext = await this.getContext(UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT);
-		if (!datasetContext || datasetContext.getEntityType() !== UMB_MEDIA_ENTITY_TYPE) return;
-
-		const currentName = datasetContext.getName();
-		if (currentName && currentName.trim() !== '') return;
-
-		datasetContext.setName(file.name);
 	}
 
 	#onRemove = () => {

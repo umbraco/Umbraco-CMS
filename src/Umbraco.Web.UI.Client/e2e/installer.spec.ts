@@ -63,10 +63,8 @@ test.describe('installer tests', () => {
 						{
 							status: 400,
 							type: 'validation',
-							detail: 'Something went wrong',
-							errors: {
-								databaseName: ['The database name is required'],
-							},
+							title: 'Something went wrong',
+							detail: 'The database name is required',
 						},
 						{ status: 400 },
 					);

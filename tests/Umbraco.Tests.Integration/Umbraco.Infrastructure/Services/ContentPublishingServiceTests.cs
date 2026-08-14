@@ -52,11 +52,11 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", mandatoryProperties: true, defaultTemplateId: template.Id);
         contentType.AllowedAsRoot = true;
         contentType.AllowedContentTypes = new[] { new ContentTypeSort(ContentType.Key, 0, ContentType.Alias) };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // allow the new content type as child to the default content type
         ContentType.AllowedContentTypes = new[] { new ContentTypeSort(contentType.Key, 0, contentType.Alias) };
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Invalid Content", parent?.Id ?? Constants.System.Root);
         content.SetValue("title", string.Empty);
@@ -108,7 +108,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             .Build();
 
         contentType.AllowedAsRoot = true;
-        await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return (langEn, langDa, contentType);
     }
@@ -143,7 +143,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
             .Build();
 
         contentType.AllowedAsRoot = true;
-        await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return contentType;
     }

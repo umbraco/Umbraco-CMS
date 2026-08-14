@@ -103,7 +103,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	}
 
 	async #requestLanguages() {
-		const { data } = await this.#languageCollectionRepository.requestCollection({ take: 999 });
+		const { data } = await this.#languageCollectionRepository.requestAllItems();
 		// Set to empty array if no data, to indicate loading is complete
 		this._languageModel = data?.items ?? [];
 	}
@@ -311,14 +311,14 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 					popovertarget="more-options">
 					<uui-icon name="icon-navigation-down"></uui-icon>
 				</uui-button>
-				<uui-popover-container id="more-options" placement="bottom-end">
-					<umb-popover-layout>
-						<uui-button
-							label=${this.localize.term('assignDomain_addCurrent')}
-							@click=${() => this.#onAddDomain(true)}></uui-button>
-					</umb-popover-layout>
-				</uui-popover-container>
 			</uui-button-group>
+			<uui-popover-container id="more-options" placement="bottom-end">
+				<umb-popover-layout>
+					<uui-button
+						label=${this.localize.term('assignDomain_addCurrent')}
+						@click=${() => this.#onAddDomain(true)}></uui-button>
+				</umb-popover-layout>
+			</uui-popover-container>
 		`;
 	}
 

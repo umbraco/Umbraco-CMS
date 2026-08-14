@@ -43,6 +43,8 @@ public static class UdiEntityTypeHelper
                 return Constants.UdiEntityType.DataTypeContainer;
             case UmbracoObjectTypes.MemberType:
                 return Constants.UdiEntityType.MemberType;
+            case UmbracoObjectTypes.MemberTypeContainer:
+                return Constants.UdiEntityType.MemberTypeContainer;
             case UmbracoObjectTypes.MemberGroup:
                 return Constants.UdiEntityType.MemberGroup;
             case UmbracoObjectTypes.RelationType:
@@ -55,6 +57,10 @@ public static class UdiEntityTypeHelper
                 return Constants.UdiEntityType.FormsDataSource;
             case UmbracoObjectTypes.Language:
                 return Constants.UdiEntityType.Language;
+            case UmbracoObjectTypes.Element:
+                return Constants.UdiEntityType.Element;
+            case UmbracoObjectTypes.ElementContainer:
+                return Constants.UdiEntityType.ElementContainer;
         }
 
         throw new NotSupportedException(
@@ -75,6 +81,8 @@ public static class UdiEntityTypeHelper
                 return UmbracoObjectTypes.Document;
             case Constants.UdiEntityType.DocumentBlueprint:
                 return UmbracoObjectTypes.DocumentBlueprint;
+            case Constants.UdiEntityType.DocumentBlueprintContainer:
+                return UmbracoObjectTypes.DocumentBlueprintContainer;
             case Constants.UdiEntityType.Media:
                 return UmbracoObjectTypes.Media;
             case Constants.UdiEntityType.Member:
@@ -95,6 +103,8 @@ public static class UdiEntityTypeHelper
                 return UmbracoObjectTypes.DataTypeContainer;
             case Constants.UdiEntityType.MemberType:
                 return UmbracoObjectTypes.MemberType;
+            case Constants.UdiEntityType.MemberTypeContainer:
+                return UmbracoObjectTypes.MemberTypeContainer;
             case Constants.UdiEntityType.MemberGroup:
                 return UmbracoObjectTypes.MemberGroup;
             case Constants.UdiEntityType.RelationType:
@@ -107,6 +117,10 @@ public static class UdiEntityTypeHelper
                 return UmbracoObjectTypes.FormsDataSource;
             case Constants.UdiEntityType.Language:
                 return UmbracoObjectTypes.Language;
+            case Constants.UdiEntityType.Element:
+                return UmbracoObjectTypes.Element;
+            case Constants.UdiEntityType.ElementContainer:
+                return UmbracoObjectTypes.ElementContainer;
         }
 
         throw new NotSupportedException(
