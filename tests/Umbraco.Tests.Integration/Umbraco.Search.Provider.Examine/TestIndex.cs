@@ -9,6 +9,5 @@ internal class TestIndex : LuceneIndex
 {
     public TestIndex(ILoggerFactory loggerFactory, string name, IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions) : base(loggerFactory, name, indexOptions)
     {
-        RunAsync = false;
     }
 }
