@@ -143,25 +143,25 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 			// A resolver may emit several groups of inner values.
 			// Pair each draft group with its persisted group by the
 			// identifier the resolver supplies, not by call order.
-			const persistedValuesHolder = new Map<string, Array<UmbPotentialContentValueModel>>();
-			let persistedIndex = 0;
+			const persistedInnerValues = new Map<string, Array<UmbPotentialContentValueModel>>();
+			let persistedFallbackIndex = 0;
 
 			if (persistedValue) {
-				await api.processValues(persistedValue, async (values, groupIdentifier) => {
-					persistedValuesHolder.set(
-						groupIdentifier ?? `index:${persistedIndex++}`,
+				await api.processValues(persistedValue, async (values, identifier) => {
+					persistedInnerValues.set(
+						// Resolvers that do not supply an identifier will fallback to call order.
+						identifier ?? (persistedFallbackIndex++).toString(),
 						values as unknown as Array<UmbPotentialContentValueModel>,
 					);
 					return undefined;
 				});
 			}
 
-			let valuesIndex = 0;
+			let valuesFallbackIndex = 0;
 			newValue =
-				(await api.processValues(newValue, async (values, groupIdentifier) => {
-					// Resolvers that do not supply an identifier only ever emit a single group, so falling
-					// back to call order keeps them working unchanged.
-					const persistedValues = persistedValuesHolder.get(groupIdentifier ?? `index:${valuesIndex++}`);
+				(await api.processValues(newValue, async (values, identifier) => {
+					// Resolvers that do not supply an identifier will fallback to call order.
+					const persistedValues = persistedInnerValues.get(identifier ?? (valuesFallbackIndex++).toString());
 
 					return await this.#processValues(persistedValues, values, variantsToStore);
 				})) ?? newValue;
