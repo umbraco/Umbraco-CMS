@@ -19,7 +19,7 @@ export default {
 		auditTrail: 'Revisionsspor',
 		browse: 'Gennemse elementer',
 		changeDocType: 'Skift dokumenttype',
-		changeDataType: 'Skift inputtype',
+		changeDataType: 'Skift datatype',
 		copy: 'Kopier',
 		copyTo: 'Kopier til',
 		create: 'Opret',
@@ -2481,7 +2481,8 @@ export default {
 			'Der refereres til dette element eller dets underliggende elementer. Sletning kan medføre ødelagte links på dit websted.',
 		unpublishWarning:
 			'Der refereres til dette element eller dets underliggende elementer. Hvis det afpubliceres, kan det føre til døde links på dit websted. Foretag venligst de nødvendige tiltag.',
-		deleteDisabledWarning: 'Der refereres til dette element eller dets underliggende elementer. Derfor er sletning blevet deaktiveret.',
+		deleteDisabledWarning:
+			'Der refereres til dette element eller dets underliggende elementer. Derfor er sletning blevet deaktiveret.',
 		listViewDialogWarning: 'Følgende elementer, som du forsøger at %0%, refereres til af andet indhold.',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...og en mere';
@@ -2864,7 +2865,7 @@ export default {
 	startupDashboard: {
 		fallbackHeadline: 'Velkommen til det venlige CMS',
 		fallbackDescription:
-			"Tak, fordi du har valgt Umbraco – vi tror på, at dette kan blive begyndelsen på noget\n      fantastisk. Selvom det måske kan virke overvældende i starten, har vi gjort meget for at gøre indlæringskurven så jævn og hurtig som muligt.",
+			'Tak, fordi du har valgt Umbraco – vi tror på, at dette kan blive begyndelsen på noget\n      fantastisk. Selvom det måske kan virke overvældende i starten, har vi gjort meget for at gøre indlæringskurven så jævn og hurtig som muligt.',
 	},
 	welcomeDashboard: {
 		ourUmbracoHeadline: 'Our Umbraco - det venligste fællesskab',
