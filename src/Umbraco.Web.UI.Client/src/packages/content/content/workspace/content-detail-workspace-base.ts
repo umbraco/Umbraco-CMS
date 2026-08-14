@@ -6,6 +6,7 @@ import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
+import { UmbElementDataValueVariantsController } from '../controller/element-data-value-variants.controller.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
@@ -40,7 +41,6 @@ import {
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import {
-	UmbPropertyValueFlatMapperController,
 	UmbPropertyValuePresetVariantBuilderController,
 	UmbVariantPropertyGuardManager,
 } from '@umbraco-cms/backoffice/property';
@@ -59,7 +59,11 @@ import type { UmbContentTypeDetailModel, UmbPropertyTypeModel } from '@umbraco-c
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
-import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
+import type {
+	UmbEntityVariantModel,
+	UmbEntityVariantOptionModel,
+	UmbObjectWithVariantProperties,
+} from '@umbraco-cms/backoffice/variant';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
 import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
@@ -140,6 +144,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	public readonly values = this._data.createObservablePartOfCurrent((data) => data?.values);
 	public readonly variants = this._data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 	public override readonly persistedData = this._data.persisted;
+
+	public readonly valueVariants = new UmbElementDataValueVariantsController(this, this._data);
 
 	/* Content Type (Structure) Data */
 	public readonly structure;
@@ -364,6 +370,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 						this.#variantValidationContexts.push(context);
 					}
 				});
+			},
+			null,
+		);
+
+		this.observe(
+			this.valueVariants.variants,
+			(variants) => {
+				this.#ensureVariantEntriesOf(variants);
 			},
 			null,
 		);
@@ -746,8 +760,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 					(x) => x.alias === alias && variantId!.compare(x),
 				);
 
-				this.#ensureVariantsExistsForProperty(variantId, entry);
-
 				this._data.updateCurrent({ values } as Partial<DetailModelType>);
 			}
 		} finally {
@@ -755,55 +767,36 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 	}
 
-	async #ensureVariantsExistsForProperty(variantId: UmbVariantId, entry: UmbElementValueModel) {
-		// TODO: Implement queueing of these operations to ensure this does not execute too often. [NL]
+	/**
+	 * Ensure the given variants exist in the data's variants array, if not, add them.
+	 * But it should only contain culture-variant entries, as we do not want to create segment-variant entries.
+	 * @param {Array<UmbObjectWithVariantProperties>} variants The variants to ensure exist in the data's variants array
+	 * @returns {Promise<void>}
+	 * @memberof UmbContentDetailWorkspaceContextBase
+	 */
+	async #ensureVariantEntriesOf(variants: Array<UmbObjectWithVariantProperties>): Promise<void> {
+		const existingVariants = this._data.getCurrent()?.variants ?? [];
+		// Filter variantIds on what is already present:
+		const missingVariants = variants.filter((variantId) => {
+			return !existingVariants.some((v) => variantId.culture === v.culture);
+		});
+
+		if (missingVariants.length === 0) return;
 
 		const cultureOptions = await this.getCultureVariantOptions();
-		// TODO: make sure they are unique:
-		let valueVariantIds: Array<UmbVariantId> = [];
 
-		// Find inner values to determine if any of this holds variants that needs to be created.
-		if (variantId.isInvariant() && entry.value) {
-			valueVariantIds = await new UmbPropertyValueFlatMapperController(this).flatMap(entry, (property) => {
-				return UmbVariantId.CreateFromPartial(property);
-			});
-		}
+		// Filter away missingVariants that are not part of the cultureOptions:
+		const variantsToUpdate = missingVariants.filter((variant) => {
+			return cultureOptions.some((x) => variant.culture === x.culture);
+		});
 
-		valueVariantIds.push(variantId);
-		/**
-		 * Handling of Not-Culture but Segment variant properties: [NL]
-		 * We need to ensure variant-entries across all culture variants for the given segment variant, when er property is configured to vary by segment but not culture.
-		 * This is the only different case, in all other cases its fine to just target the given variant.
-		 */
-		const variantOptionsToCheck = new Map<string, UmbVariantId>();
-		for (const variant of valueVariantIds) {
-			// If a non-culture but segmented value, then spread across all cultures for the given segment:
-			/*if (this.getVariesByCulture() && variant.culture === null && variant.segment !== null) {
-				// get all culture options:
-				for (const option of variantOptions) {
-					if (option.segment === variant.segment) {
-						const optionVariant = UmbVariantId.Create(option);
-						variantOptionsToCheck.set(optionVariant.toString(), optionVariant);
-					}
-				}
-			}*/
-			// If a non-segmented but culture-variant value, then spread across all segments for the given culture:
-			if (this.getVariesBySegment() && variant.culture !== null && variant.segment === null) {
-				// get all segment options:
-				for (const option of cultureOptions) {
-					if (option.culture === variant.culture) {
-						const optionVariant = UmbVariantId.Create(option);
-						variantOptionsToCheck.set(optionVariant.toString(), optionVariant);
-					}
-				}
-			} else if (cultureOptions.some((x) => variant.compare(x))) {
-				// otherwise we can parse the variant-id on:
-				const segmentInvariant = variant.toSegmentInvariant();
-				variantOptionsToCheck.set(segmentInvariant.toString(), segmentInvariant);
-			}
-		}
+		// ensure variantToUpdate is unique by culture, as we do not want to create multiple entries for the same culture:
+		const uniqueVariantsToUpdate = variantsToUpdate.filter(
+			(variant, index, self) => index === self.findIndex((v) => v.culture === variant.culture),
+		);
 
-		this._data.ensureVariantsData(Array.from(variantOptionsToCheck.values()));
+		// Only create Culture Variant IDs, we only want to have variant entries for the culture
+		this._data.ensureVariantsData(uniqueVariantsToUpdate.map((variant) => new UmbVariantId(variant.culture, null)));
 	}
 
 	public initiatePropertyValueChange() {
