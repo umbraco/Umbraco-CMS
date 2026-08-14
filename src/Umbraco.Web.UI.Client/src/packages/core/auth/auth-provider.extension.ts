@@ -1,5 +1,4 @@
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
-
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 
 /**
