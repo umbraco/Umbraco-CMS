@@ -28,6 +28,18 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
         var validationContextCulture = isWildcardCulture ? null : validationContext.Culture.NullOrWhiteSpaceAsNull();
         elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, validationContextCulture, validationContext.Segment));
 
+        // We don't have managed segments, so we will simply trust the ones present in the model.
+        var segmentsByCulture = blockEditorData
+            .BlockValue.ContentData.SelectMany(cd => cd.Values)
+            .Union(blockEditorData.BlockValue.SettingsData.SelectMany(cd => cd.Values))
+            .GroupBy(v => v.Culture)
+            .Select(g => new
+            {
+                Culture = g.Key,
+                Segments = g.Select(v => v.Segment).WhereNotNull().Distinct().Union([null]).ToArray(),
+            })
+            .ToArray();
+
         if (validationContextCulture is null)
         {
             // make sure we extend validation to variant block value (element level variation)
@@ -36,7 +48,8 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
                 : validationContext.CulturesBeingValidated;
             foreach (var culture in validationContextCulturesBeingValidated)
             {
-                foreach (var segment in validationContext.SegmentsBeingValidated.DefaultIfEmpty(null))
+                var segmentsToValidate = segmentsByCulture.FirstOrDefault(s => s.Culture.InvariantEquals(culture))?.Segments ?? [];
+                foreach (var segment in segmentsToValidate.DefaultIfEmpty(null))
                 {
                     elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, culture, segment));
                 }
@@ -45,7 +58,8 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
         else
         {
             // make sure we extend validation to invariant block values (no element level variation)
-            foreach (var segment in validationContext.SegmentsBeingValidated.DefaultIfEmpty(null))
+            var segmentsToValidate = segmentsByCulture.SelectMany(s => s.Segments).Distinct().ToArray();
+            foreach (var segment in segmentsToValidate.DefaultIfEmpty(null))
             {
                 elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, null, segment));
             }
@@ -124,7 +138,12 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
 
                     if (segment != "*")
                     {
-                        if (propertyType.VariesBySegment() != (segment is not null) || blockPropertyValue.Segment.InvariantEquals(segment) is false)
+                        if (propertyType.VariesBySegment() is false && segment is not null)
+                        {
+                            continue;
+                        }
+
+                        if (propertyType.VariesBySegment() && blockPropertyValue.Segment.InvariantEquals(segment) is false)
                         {
                             continue;
                         }

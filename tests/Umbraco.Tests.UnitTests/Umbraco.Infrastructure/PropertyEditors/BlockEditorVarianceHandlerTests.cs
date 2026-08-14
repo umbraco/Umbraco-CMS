@@ -69,7 +69,7 @@ public class BlockEditorVarianceHandlerTests
         var element = PublishedElement(ContentVariation.Culture);
         var blockValue = new BlockListValue
         {
-            Expose = [new() { ContentKey = element.Key, Culture = null, Segment = null }],
+            Expose = [new() { ContentKey = element.Key, Culture = null }],
         };
 
         var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
@@ -167,26 +167,6 @@ public class BlockEditorVarianceHandlerTests
     }
 
     [Test]
-    public async Task AlignedExposeVarianceAsync_Preserves_Segment_When_Assigning_Culture()
-    {
-        var owner = PublishedElement(ContentVariation.CultureAndSegment);
-        var element = PublishedElement(ContentVariation.CultureAndSegment);
-        var blockValue = new BlockListValue
-        {
-            Expose = [new() { ContentKey = element.Key, Culture = null, Segment = "my-segment" }],
-        };
-
-        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
-
-        var variation = result.Single();
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual("da-DK", variation.Culture);
-            Assert.AreEqual("my-segment", variation.Segment);
-        });
-    }
-
-    [Test]
     public void AlignExposeVariance_Can_Align_Invariance()
     {
         var owner = PublishedElement(ContentVariation.Nothing);
@@ -215,7 +195,6 @@ public class BlockEditorVarianceHandlerTests
         {
             var alignedExpose = blockValue.Expose.First();
             Assert.AreEqual("en-US", alignedExpose.Culture);
-            Assert.AreEqual("segment-one", alignedExpose.Segment);
         });
     }
 
@@ -398,7 +377,6 @@ public class BlockEditorVarianceHandlerTests
         {
             ContentKey = c.contentKey,
             Culture = c.culture,
-            Segment = c.segment,
         }).ToList();
 
     private static BlockListValue CreateBlockListValue(Guid contentDataKey, Guid contentTypeKey, List<BlockPropertyValue> values, List<BlockItemVariation> expose) =>

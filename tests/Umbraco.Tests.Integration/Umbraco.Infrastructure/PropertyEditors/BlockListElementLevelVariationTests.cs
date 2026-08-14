@@ -88,15 +88,8 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
                 cultures = [null];
             }
 
-            var segments = elementType.VariesBySegment()
-                ? new[] { block.BlocksProperty.Segment }
-                    .Union(block.BlocksProperty.BlockContentValues.Select(value => value.Segment))
-                    .Distinct()
-                    .ToArray()
-                : [null];
-
-            expose.AddRange(cultures.SelectMany(culture => segments.Select(segment =>
-                new BlockItemVariation(block.contentElementKey, culture, segment))));
+            expose.AddRange(cultures.Select(culture =>
+                new BlockItemVariation(block.contentElementKey, culture)));
         }
 
         return new BlockListValue

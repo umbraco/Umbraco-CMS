@@ -145,7 +145,7 @@ public sealed class BlockEditorVarianceHandler
         if (exposeVariation.VariesByCulture() && blockVariations.All(v => v.Culture is null))
         {
             var defaultCulture = await _languageService.GetDefaultIsoCodeAsync();
-            return blockVariations.Select(v => new BlockItemVariation(v.ContentKey, defaultCulture, v.Segment));
+            return blockVariations.Select(v => new BlockItemVariation(v.ContentKey, defaultCulture));
         }
 
         if (exposeVariation.VariesByCulture() is false && blockVariations.All(v => v.Culture is not null))
@@ -153,7 +153,7 @@ public sealed class BlockEditorVarianceHandler
             var defaultCulture = await _languageService.GetDefaultIsoCodeAsync();
             return blockVariations
                 .Where(v => v.Culture == defaultCulture)
-                .Select(v => new BlockItemVariation(v.ContentKey, null, v.Segment))
+                .Select(v => new BlockItemVariation(v.ContentKey, null))
                 .ToList();
         }
 
@@ -220,14 +220,14 @@ public sealed class BlockEditorVarianceHandler
                 var omitNullCulture = contentData.Values.Any(v => v.Culture is not null);
                 foreach (BlockPropertyValue value in contentData.Values
                     .Where(v => omitNullCulture is false || v.Culture is not null)
-                    .DistinctBy(v => v.Culture + v.Segment))
+                    .DistinctBy(v => v.Culture))
                 {
-                    blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture, value.Segment));
+                    blockValue.Expose.Add(new BlockItemVariation(contentData.Key, value.Culture));
                 }
             }
         }
 
-        blockValue.Expose = blockValue.Expose.DistinctBy(e => $"{e.ContentKey}.{e.Culture}.{e.Segment}").ToList();
+        blockValue.Expose = blockValue.Expose.DistinctBy(e => $"{e.ContentKey}.{e.Culture}").ToList();
     }
 
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)

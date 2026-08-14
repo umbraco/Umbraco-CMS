@@ -149,20 +149,6 @@ public class BlockExposeFallbackHelperTests
     }
 
     [Test]
-    public void IsBlockExposed_Returns_False_When_Segment_Does_Not_Match_In_Fallback()
-    {
-        var expose = CreateExpose(("en-US", "segment-a"));
-        var languages = BuildLanguageMap(
-            CreateLanguage("en-US"),
-            CreateLanguage("nl-BE", fallbackIsoCode: "en-US"));
-
-        var result = BlockExposeFallbackHelper.IsBlockExposed(expose, _elementKey, "nl-BE", "segment-b", Fallback.ToLanguage, languages, "en-US", out var resolvedCulture);
-
-        Assert.IsFalse(result);
-        Assert.IsNull(resolvedCulture);
-    }
-
-    [Test]
     public void IsBlockExposed_Returns_False_When_No_Fallback_Configured_For_Language()
     {
         var expose = CreateExpose(("en-US", null));
@@ -179,7 +165,7 @@ public class BlockExposeFallbackHelperTests
     }
 
     private static List<BlockItemVariation> CreateExpose(params (string? Culture, string? Segment)[] entries)
-        => entries.Select(e => new BlockItemVariation { ContentKey = _elementKey, Culture = e.Culture, Segment = e.Segment }).ToList();
+        => entries.Select(e => new BlockItemVariation { ContentKey = _elementKey, Culture = e.Culture }).ToList();
 
     private static Dictionary<string, ILanguage> BuildLanguageMap(params ILanguage[] languages)
         => languages.ToDictionary(l => l.IsoCode, StringComparer.OrdinalIgnoreCase);
