@@ -63,7 +63,12 @@ public partial class InvariantDocumentTreeTests
             Assert.That(results.Length, Is.EqualTo(3));
             Assert.That(
                 results.Select(d => d.Id),
-                Is.EquivalentTo(new[] { RootKey, ChildKey, GrandchildKey, }));
+                Is.EquivalentTo(new[]
+                {
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
+                    GrandchildKey.ToString(),
+                }));
         });
     }
 
@@ -110,8 +115,8 @@ public partial class InvariantDocumentTreeTests
                 results.Select(d => d.Id),
                 Is.EquivalentTo(new[]
                 {
-                    RootKey,
-                    ChildKey,
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
                 }));
         });
     }

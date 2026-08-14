@@ -20,9 +20,9 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
                 results.Select(d => d.Id),
                 Is.EquivalentTo(new[]
                 {
-                    RootKey,
-                    ChildKey,
-                    GrandchildKey,
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
+                    GrandchildKey.ToString(),
                 }));
         });
     }
@@ -41,9 +41,9 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
                 results.Select(d => d.Id),
                 Is.EquivalentTo(new[]
                 {
-                    RootKey,
-                    ChildKey,
-                    GrandchildKey,
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
+                    GrandchildKey.ToString(),
                 }));
         });
     }
@@ -104,8 +104,8 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
                 results.Select(d => d.Id),
                 Is.EquivalentTo(new[]
                 {
-                    RootKey,
-                    ChildKey,
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
                 }));
         });
     }
@@ -166,8 +166,8 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
                 results.Select(d => d.Id),
                 Is.EquivalentTo(new[]
                 {
-                    RootKey,
-                    ChildKey,
+                    RootKey.ToString(),
+                    ChildKey.ToString(),
                 }));
         });
     }
