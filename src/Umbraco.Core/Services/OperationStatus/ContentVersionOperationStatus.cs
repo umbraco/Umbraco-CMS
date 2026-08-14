@@ -36,7 +36,7 @@ public enum ContentVersionOperationStatus
     RollBackCanceled,
 
     /// <summary>
-    ///     The specified culture is not supported by the content item.
+    ///     A culture was specified for content that does not vary by culture.
     /// </summary>
-    InvalidCulture
+    InvalidCulture,
 }

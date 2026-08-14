@@ -66,7 +66,7 @@ internal class ContentVersionServiceTests : UmbracoIntegrationTest
     {
         IContentType contentType = await CreateContentTypeAsync(ContentVariation.Nothing);
 
-        IContent content = ContentBuilder.CreateSimpleContent(contentType);
+        Content content = ContentBuilder.CreateSimpleContent(contentType);
         content.SetValue("title", "Original title");
         ContentService.Save(content);
         ContentService.Publish(content, []);
@@ -82,7 +82,7 @@ internal class ContentVersionServiceTests : UmbracoIntegrationTest
     {
         IContentType contentType = await CreateContentTypeAsync(ContentVariation.Culture);
 
-        IContent content = ContentBuilder.CreateSimpleContent(contentType, "Home", culture: "en-US");
+        Content content = ContentBuilder.CreateSimpleContent(contentType, "Home", culture: "en-US");
         content.SetCultureName("Home", "en-US");
         content.SetValue("title", "Original title", "en-US");
         ContentService.Save(content);
@@ -97,10 +97,10 @@ internal class ContentVersionServiceTests : UmbracoIntegrationTest
 
     private async Task<IContentType> CreateContentTypeAsync(ContentVariation variation)
     {
-        ITemplate template = TemplateBuilder.CreateTextPageTemplate();
+        Template template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
-        IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(
+        ContentType contentType = ContentTypeBuilder.CreateSimpleContentType(
             "umbTextpage", "Textpage", defaultTemplateId: template.Id);
         contentType.Variations = variation;
         foreach (IPropertyType propertyType in contentType.PropertyTypes)
@@ -120,9 +120,11 @@ internal class ContentVersionServiceTests : UmbracoIntegrationTest
 
         Assert.IsTrue(versions.Success);
 
-        ContentVersionMeta historicVersion = versions.Result!.Items
-            .First(version => version.CurrentDraftVersion is false && version.CurrentPublishedVersion is false);
+        ContentVersionMeta? historicVersion = versions.Result!.Items
+            .FirstOrDefault(version => version.CurrentDraftVersion is false && version.CurrentPublishedVersion is false);
 
-        return historicVersion.VersionId.ToGuid();
+        Assert.IsNotNull(historicVersion, "Expected the content to have at least one historic version.");
+
+        return historicVersion!.VersionId.ToGuid();
     }
 }
