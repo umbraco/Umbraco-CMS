@@ -48,8 +48,7 @@ public sealed class ExternalMemberCacheRefresher : PayloadCacheRefresherBase<Ext
         ///     Whether any field that is part of the search index value set has changed as part of this
         ///     operation. Defaults to <c>true</c>. Mirrors
         ///     <see cref="Constants.Conventions.Member.IndexableFieldsChangedStateKey"/> from the
-        ///     originating save. External members are indexed alongside content-based members in the
-        ///     shared members index; when <c>false</c>, re-indexing is skipped for this payload.
+        ///     originating save. Note that external members are not currently indexed by search at all.
         /// </param>
         public JsonPayload(int id, Guid key, bool removed, bool indexableFieldsChanged = true)
         {
@@ -80,8 +79,8 @@ public sealed class ExternalMemberCacheRefresher : PayloadCacheRefresherBase<Ext
         /// <remarks>
         ///     Explicitly set to <c>false</c> on login-only updates (which do not bump
         ///     <c>UpdateDate</c>), mirroring <see cref="Constants.Conventions.Member.IndexableFieldsChangedStateKey"/>
-        ///     from the originating save, so that the shared members index skips re-indexing this
-        ///     payload.
+        ///     from the originating save. Note that external members are not currently indexed by
+        ///     search at all.
         /// </remarks>
         public bool IndexableFieldsChanged { get; }
     }

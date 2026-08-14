@@ -2,13 +2,10 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Search.Core.Extensions;
-using Umbraco.Cms.Search.Core.Helpers;
 using Umbraco.Cms.Search.Core.Models.Indexing;
-using Umbraco.Cms.Search.Core.Models.Persistence;
 using Umbraco.Cms.Search.Core.Notifications;
 using Umbraco.Extensions;
 
@@ -16,9 +13,7 @@ namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 
 /// <summary>
 /// Default implementation of <see cref="IDraftContentChangeStrategy"/>: indexes draft documents (including trashed
-/// content), and draft media/members, regardless of publish state. Members are indexed regardless of whether they
-/// are backed by a full content-based <see cref="IMember"/> or a lightweight <see cref="ExternalMemberIdentity"/> -
-/// both share the same members index.
+/// content), and draft media/members, regardless of publish state.
 /// </summary>
 internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, IDraftContentChangeStrategy
 {
@@ -26,9 +21,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
     private readonly IContentService _contentService;
     private readonly IMediaService _mediaService;
     private readonly IMemberService _memberService;
-    private readonly IExternalMemberService _externalMemberService;
-    private readonly IIndexDocumentService _indexDocumentService;
-    private readonly IDateTimeOffsetConverter _dateTimeOffsetConverter;
     private readonly IEventAggregator _eventAggregator;
 
     /// <inheritdoc />
@@ -41,9 +33,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
     /// <param name="contentService">The service used to retrieve documents and enumerate the document tree, including the recycle bin.</param>
     /// <param name="mediaService">The service used to retrieve media and enumerate the media tree, including the recycle bin.</param>
     /// <param name="memberService">The service used to retrieve members.</param>
-    /// <param name="externalMemberService">The service used to retrieve lightweight external members, tried as a fallback when a member change does not resolve via <paramref name="memberService"/>.</param>
-    /// <param name="indexDocumentService">The service used to look up and persist index document snapshots for external members (which bypass <see cref="IContentIndexingDataCollectionService"/>, as they are not <see cref="IContentBase"/>).</param>
-    /// <param name="dateTimeOffsetConverter">The converter used to normalize external members' indexed date values to <see cref="DateTimeOffset"/>.</param>
     /// <param name="eventAggregator">The event aggregator used to publish the cancelable content indexing notification.</param>
     /// <param name="umbracoDatabaseFactory">The database factory passed to the base class for paged descendant enumeration.</param>
     /// <param name="idKeyMap">The map passed to the base class for resolving root item keys.</param>
@@ -53,9 +42,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         IContentService contentService,
         IMediaService mediaService,
         IMemberService memberService,
-        IExternalMemberService externalMemberService,
-        IIndexDocumentService indexDocumentService,
-        IDateTimeOffsetConverter dateTimeOffsetConverter,
         IEventAggregator eventAggregator,
         IUmbracoDatabaseFactory umbracoDatabaseFactory,
         IIdKeyMap idKeyMap,
@@ -66,9 +52,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         _contentService = contentService;
         _mediaService = mediaService;
         _memberService = memberService;
-        _externalMemberService = externalMemberService;
-        _indexDocumentService = indexDocumentService;
-        _dateTimeOffsetConverter = dateTimeOffsetConverter;
         _eventAggregator = eventAggregator;
     }
 
@@ -95,23 +78,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
                 IContentBase? content = GetContent(change);
                 if (content is null)
                 {
-                    // members have two possible backing representations - a full content-based IMember
-                    // (handled above) or a lightweight ExternalMemberIdentity - both share this index.
-                    ExternalMemberIdentity? externalMember = change.ObjectType is UmbracoObjectTypes.Member
-                        ? await _externalMemberService.GetByKeyAsync(change.Id)
-                        : null;
-
-                    if (externalMember is null)
-                    {
-                        pendingRemovals.Add(change);
-                        continue;
-                    }
-
-                    await RemoveFromIndexAsync(indexInfosAsArray, pendingRemovals);
-                    pendingRemovals.Clear();
-
-                    ContentIndexInfo[] applicableIndexInfos = indexInfosAsArray.Where(info => info.ContainedObjectTypes.Contains(UmbracoObjectTypes.Member)).ToArray();
-                    await UpdateIndexForExternalMemberAsync(applicableIndexInfos, externalMember, cancellationToken);
+                    pendingRemovals.Add(change);
                     continue;
                 }
 
@@ -186,36 +153,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
             pageIndex++;
         }
         while (members.Length == ContentEnumerationPageSize);
-
-        if (cancellationToken.IsCancellationRequested)
-        {
-            LogIndexRebuildCancellation(indexInfo);
-            return;
-        }
-
-        // external members share this index with content-based members (indexed above).
-        long externalMembersTotal;
-        var externalMembersSkip = 0;
-        do
-        {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                break;
-            }
-
-            PagedModel<ExternalMemberIdentity> page = await _externalMemberService.GetAllAsync(externalMembersSkip, ContentEnumerationPageSize);
-            externalMembersTotal = page.Total;
-            foreach (ExternalMemberIdentity externalMember in page.Items)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
-                await UpdateIndexForExternalMemberAsync([indexInfo], externalMember, cancellationToken);
-            }
-            externalMembersSkip += ContentEnumerationPageSize;
-        }
-        while (externalMembersSkip < externalMembersTotal);
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -307,72 +244,6 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         }
 
         return true;
-    }
-
-    // external members are not IContentBase (no content type, tree or properties), so they bypass
-    // IContentIndexingDataCollectionService/ISystemFieldsContentIndexer entirely and are indexed via
-    // this dedicated path instead - reusing IIndexDocumentService directly for change-detection parity
-    // with the regular content pipeline.
-    private async Task UpdateIndexForExternalMemberAsync(ContentIndexInfo[] indexInfos, ExternalMemberIdentity member, CancellationToken cancellationToken)
-    {
-        if (indexInfos.Length is 0)
-        {
-            return;
-        }
-
-        IndexField[] fields = await CollectExternalMemberFieldsAsync(member);
-        Variation[] variations = [new Variation(null, null)];
-
-        foreach (ContentIndexInfo indexInfo in indexInfos)
-        {
-            var notification = new ContentIndexingNotification(indexInfo.IndexAlias, member.Key, UmbracoObjectTypes.Member, variations, fields);
-            if (await _eventAggregator.PublishCancelableAsync(notification))
-            {
-                // the indexing operation was cancelled for this index; continue with the rest of the indexes
-                continue;
-            }
-
-            await indexInfo.Indexer.AddOrUpdateAsync(indexInfo.IndexAlias, member.Key, UmbracoObjectTypes.Member, variations, notification.Fields, null);
-        }
-    }
-
-    private async Task<IndexField[]> CollectExternalMemberFieldsAsync(ExternalMemberIdentity member)
-    {
-        IndexDocument? document = await _indexDocumentService.GetAsync(member.Key, published: false);
-        if (document is not null)
-        {
-            return document.Fields;
-        }
-
-        IndexField[] fields = BuildExternalMemberIndexFields(member);
-
-        await _indexDocumentService.AddAsync(new IndexDocument
-        {
-            Key = member.Key,
-            Fields = fields,
-            Published = false,
-        });
-
-        return fields;
-    }
-
-    private IndexField[] BuildExternalMemberIndexFields(ExternalMemberIdentity member)
-    {
-        var name = member.Name.IsNullOrWhiteSpace() is false ? member.Name! : member.UserName;
-
-        return
-        [
-            new IndexField(Constants.FieldNames.Id, new IndexValue { Keywords = [member.Key.AsKeyword()] }, null, null),
-            new IndexField(Constants.FieldNames.ObjectType, new IndexValue { Keywords = [UmbracoObjectTypes.Member.ToString()] }, null, null),
-            new IndexField(Constants.FieldNames.CreateDate, new IndexValue { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(member.CreateDate)] }, null, null),
-            new IndexField(Constants.FieldNames.UpdateDate, new IndexValue { DateTimeOffsets = [_dateTimeOffsetConverter.ToDateTimeOffset(member.UpdateDate)] }, null, null),
-            new IndexField(Constants.FieldNames.Name, new IndexValue { TextsR1 = [name], Keywords = [name] }, null, null),
-            new IndexField(Constants.MemberFieldNames.Email, new IndexValue { TextsR2 = [member.Email], Keywords = [member.Email] }, null, null),
-            new IndexField(Constants.MemberFieldNames.UserName, new IndexValue { TextsR2 = [member.UserName], Keywords = [member.UserName] }, null, null),
-            new IndexField(Constants.MemberFieldNames.IsApproved, new IndexValue { Integers = [member.IsApproved ? 1 : 0] }, null, null),
-            new IndexField(Constants.MemberFieldNames.IsLockedOut, new IndexValue { Integers = [member.IsLockedOut ? 1 : 0] }, null, null),
-            new IndexField(Constants.MemberFieldNames.IsExternalMember, new IndexValue { Keywords = ["1"] }, null, null),
-        ];
     }
 
     private async Task RemoveFromIndexAsync(ContentIndexInfo[] indexInfos, IReadOnlyCollection<ContentChange> contentChanges)
