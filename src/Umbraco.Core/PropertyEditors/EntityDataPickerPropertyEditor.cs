@@ -32,9 +32,6 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
     }
 
     /// <inheritdoc />
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
-
-    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()
         => DataValueEditorFactory.Create<EntityDataPickerPropertyValueEditor>(Attribute!);
 

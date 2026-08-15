@@ -48,9 +48,6 @@ public class MissingPropertyEditor : IDataEditor
     public IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>();
 
     /// <inheritdoc />
-    public IPropertyIndexValueFactory PropertyIndexValueFactory => new DefaultPropertyIndexValueFactory();
-
-    /// <inheritdoc />
     public IDataValueEditor GetValueEditor() => _valueEditor
         ??= _dataValueEditorFactory.Create<MissingPropertyValueEditor>(
             new DataEditorAttribute(EditorAlias));

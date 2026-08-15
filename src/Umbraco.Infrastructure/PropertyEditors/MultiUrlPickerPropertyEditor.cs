@@ -31,12 +31,6 @@ public class MultiUrlPickerPropertyEditor : DataEditor, IValueSchemaProvider
         SupportsReadOnly = true;
     }
 
-    /// <summary>
-    /// Gets the property index value factory used by the multi URL picker property editor.
-    /// By default, this returns a <see cref="NoopPropertyIndexValueFactory"/>, indicating that no custom indexing is performed for this property editor.
-    /// </summary>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory { get; } = new NoopPropertyIndexValueFactory();
-
     /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(LinkDisplay[]);
 

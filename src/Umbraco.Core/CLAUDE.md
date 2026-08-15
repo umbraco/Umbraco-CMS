@@ -245,7 +245,6 @@ public class MyPropertyEditor : IDataEditor
 **Key interfaces**:
 - `IDataEditor` - Property editor registration
 - `IDataValueEditor` - Value editing and conversion
-- `IPropertyIndexValueFactory` - Search indexing
 - `IPropertyValueConverter` - Convert stored values to typed values
 
 ### 7. Cache Refreshers (Distributed Cache)
