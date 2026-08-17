@@ -246,6 +246,9 @@ test('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}
   expect(await umbracoApi.dataType.doesBlockGridContainGroupWithName(blockGridEditorName, groupName)).toBeFalsy();
   // Deleting a group moves its blocks out of the group rather than deleting them
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
 test('can add a min and max amount to a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
