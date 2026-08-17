@@ -12,9 +12,11 @@ import {
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import { UMB_MARK_ATTRIBUTE_NAME, UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import type { IRoute, IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_BACKOFFICE_CONTEXT } from '../../../../apps/backoffice/backoffice.context.js';
+import type { UmbBackofficeContext } from '../../../../apps/backoffice/backoffice.context.js';
 
 /**
  * @class UmbBaseSectionElement
@@ -33,6 +35,11 @@ export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectio
 	@state()
 	private _splitPanelPosition = '300px';
 
+	@state()
+	private _sidebarOpen = false;
+	readonly #mobileQuery = window.matchMedia(`(max-width: ${UMB_MOBILE_BREAKPOINT}px)`);
+	#backofficeContext?: UmbBackofficeContext;
+
 	constructor() {
 		super();
 
@@ -45,6 +52,17 @@ export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectio
 			this.requestUpdate('_sidebarApps', oldValue);
 		});
 
+		this.consumeContext(UMB_BACKOFFICE_CONTEXT, (ctx) => {
+			this.#backofficeContext = ctx;
+			this.observe(
+				ctx?.mobileSidebarOpen,
+				(open) => {
+					this._sidebarOpen = open === true;
+				},
+				'_observeMobileSidebarOpen',
+			);
+		});
+
 		this.#observeRoutes();
 
 		const splitPanelPosition = localStorage.getItem('umb-split-panel-position');
@@ -52,6 +70,30 @@ export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectio
 			this._splitPanelPosition = splitPanelPosition;
 		}
 	}
+
+	override connectedCallback() {
+		super.connectedCallback();
+		window.addEventListener('changestate', this.#onNavigation);
+		this.#mobileQuery.addEventListener('change', this.#onMobileChange);
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		window.removeEventListener('changestate', this.#onNavigation);
+		this.#mobileQuery.removeEventListener('change', this.#onMobileChange);
+	}
+
+	#onNavigation = () => {
+		if (this.#mobileQuery.matches) {
+			this.#backofficeContext?.setMobileSidebarOpen(false);
+		}
+	};
+
+	#onMobileChange = (e: MediaQueryListEvent) => {
+		if (!e.matches) {
+			this.#backofficeContext?.setMobileSidebarOpen(false);
+		}
+	};
 
 	#observeRoutes(): void {
 		new UmbExtensionsManifestInitializer<ManifestSectionRoute, 'sectionRoute', ManifestSectionRoute>(
@@ -117,6 +159,7 @@ export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectio
 			<umb-split-panel
 				lock="start"
 				snap="300px"
+				?sidebar-open=${this._sidebarOpen}
 				@position-changed=${this.#onSplitPanelChange}
 				.position=${this._splitPanelPosition}>
 				${this._sidebarApps && this._sidebarApps.length > 0
