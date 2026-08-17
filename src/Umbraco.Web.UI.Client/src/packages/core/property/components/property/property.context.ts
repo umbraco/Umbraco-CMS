@@ -23,6 +23,8 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbReadOnlyStateManager } from '@umbraco-cms/backoffice/utils';
 
+const UMB_READONLY_STATE_UNIQUE = 'UMB_DATASET';
+
 export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 	#alias = new UmbStringState(undefined);
 	public readonly alias = this.#alias.asObservable();
@@ -164,7 +166,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 			this.removeUmbControllerByAlias('observeVariantId');
 			this.removeUmbControllerByAlias('observeValue');
 			this.removeUmbControllerByAlias('observeDatasetReadOnly');
-			this.readOnlyState.removeState('UMB_DATASET');
+			this.readOnlyState.removeState(UMB_READONLY_STATE_UNIQUE);
 			return;
 		}
 
@@ -193,14 +195,12 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 		this.observe(
 			this.#datasetContext?.readOnly,
 			(value) => {
-				const unique = 'UMB_DATASET';
-
 				if (value) {
 					this.readOnlyState.addState({
-						unique,
+						unique: UMB_READONLY_STATE_UNIQUE,
 					});
 				} else {
-					this.readOnlyState.removeState(unique);
+					this.readOnlyState.removeState(UMB_READONLY_STATE_UNIQUE);
 				}
 			},
 			'observeDatasetReadOnly',
