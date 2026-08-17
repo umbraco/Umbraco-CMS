@@ -264,6 +264,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikk for å laste opp',
+		browseFilesAction: 'Bla gjennom filer',
+		dropFilesOr: 'Dra og slipp medier her<br />eller',
 	},
 	member: {
 		createNewMember: 'Opprett et nytt medlem',
@@ -534,6 +536,8 @@ export default {
 		no: 'Nei',
 		noItemsInList: 'Ingen elementer er lagt til',
 		nodeName: 'Nodenavn',
+		noResults: 'Ingen resultater',
+		noResultsFor: (query: string) => `Ingen resultater for "${query}".`,
 		of: 'av',
 		off: 'Av',
 		ok: 'OK',
@@ -1154,7 +1158,6 @@ export default {
 		contentRedirectManager: 'URL-håndtering',
 		mediaFolderBrowser: 'Innhold',
 		settingsWelcome: 'Velkommen',
-		settingsExamine: 'Examine innstillinger',
 		settingsPublishedStatus: 'Publiseringsstatus',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Helsesjekk',
@@ -1327,5 +1330,10 @@ export default {
 		tabClipboard: 'Utklippstavle',
 		tabCreateEmpty: 'Opprett tomt',
 		thumbnail: 'Miniatyrbilde',
+	},
+	picker: {
+		browseTab: 'Bla gjennom',
+		searchTab: 'Søk',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
 	},
 } as UmbLocalizationDictionary;

@@ -8,6 +8,12 @@ export * from './global-components/index.js';
 export * from './reference/index.js';
 export * from './utils.js';
 
-export type { MetaEntityBulkActionTrashWithRelationKind, ManifestEntityBulkActionTrashWithRelationKind } from './entity-actions/bulk-trash/types.js';
-export type { MetaEntityActionTrashWithRelationKind, ManifestEntityActionTrashWithRelationKind } from './entity-actions/trash/types.js';
+export type {
+	MetaEntityBulkActionTrashWithRelationKind,
+	ManifestEntityBulkActionTrashWithRelationKind,
+} from './entity-actions/bulk-trash/types.js';
+export type {
+	MetaEntityActionTrashWithRelationKind,
+	ManifestEntityActionTrashWithRelationKind,
+} from './entity-actions/trash/types.js';
 export type * from './types.js';

@@ -280,12 +280,15 @@ export default {
 		compositionsDescriptionMemberType:
 			'Успадкувати вкладки та властивості з існуючого типу учасників. Вкладки будуть або додані до створюваного типу, або у разі збігу назв вкладок будуть додані успадковані властивості.',
 		compositionInUse: 'Цей тип документів вже бере участь у композиції іншого типу, тому сам може бути композицією.',
-		compositionInUseMediaType: 'Цей тип медіа вже бере участь у композиції іншого типу, тому сам може бути композицією.',
-		compositionInUseMemberType: 'Цей тип учасників вже бере участь у композиції іншого типу, тому сам може бути композицією.',
+		compositionInUseMediaType:
+			'Цей тип медіа вже бере участь у композиції іншого типу, тому сам може бути композицією.',
+		compositionInUseMemberType:
+			'Цей тип учасників вже бере участь у композиції іншого типу, тому сам може бути композицією.',
 		compositionUsageHeading: 'Де використовується ця композиція?',
 		compositionUsageSpecification: 'Ця композиція зараз використовується при створенні таких типів документів:',
 		compositionUsageSpecificationMediaType: 'Ця композиція зараз використовується при створенні таких типів медіа:',
-		compositionUsageSpecificationMemberType: 'Ця композиція зараз використовується при створенні таких типів учасників:',
+		compositionUsageSpecificationMemberType:
+			'Ця композиція зараз використовується при створенні таких типів учасників:',
 		noAvailableCompositions: 'Наразі немає типів документів, допустимих побудови композиції.',
 		noAvailableCompositionsMediaType: 'Наразі немає типів медіа, допустимих побудови композиції.',
 		noAvailableCompositionsMemberType: 'Наразі немає типів учасників, допустимих побудови композиції.',
@@ -568,6 +571,8 @@ export default {
 		next: 'Наст.',
 		no: 'Ні',
 		noItemsInList: 'Тут поки що немає елементів',
+		noResults: 'Немає результатів',
+		noResultsFor: (query: string) => `Немає результатів за запитом "${query}".`,
 		of: 'з',
 		off: 'Вимк',
 		ok: 'Ok',
@@ -830,6 +835,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Натисніть, щоб завантажити',
+		browseFilesAction: 'Огляд файлів',
+		dropFilesOr: 'Перетягніть медіафайли сюди<br />або',
 		disallowedFileType: 'Неможливе завантаження цього файлу, цей тип файлів не дозволяється для завантаження',
 		orClickHereToUpload: 'або натисніть тут, щоб вибрати файли',
 		maxFileSize: 'Максимально допустимий розмір файлу: ',
@@ -1324,6 +1331,10 @@ export default {
 		stylesheets: 'Стилі CSS',
 		templates: 'Шаблони',
 		users: 'Користувачі',
+	},
+	picker: {
+		browseTab: 'Огляд',
+		searchTab: 'Пошук',
 	},
 	update: {
 		updateAvailable: 'Доступні оновлення',

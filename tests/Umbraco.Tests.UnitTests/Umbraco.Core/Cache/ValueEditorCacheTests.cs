@@ -122,7 +122,5 @@ public class ValueEditorCacheTests
         public IDictionary<string, object> DefaultConfiguration { get; }
 
         public IConfigurationEditor GetConfigurationEditor() => throw new NotImplementedException();
-
-        public IPropertyIndexValueFactory PropertyIndexValueFactory { get; }
     }
 }

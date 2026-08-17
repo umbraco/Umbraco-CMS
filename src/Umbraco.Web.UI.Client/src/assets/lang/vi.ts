@@ -390,6 +390,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Nhấp để tải lên',
+		browseFilesAction: 'Duyệt tệp',
+		dropFilesOr: 'Kéo và thả tệp phương tiện vào đây<br />hoặc',
 		orClickHereToUpload: 'hoặc nhấp vào đây để chọn tệp',
 		disallowedFileType: 'Không thể tải lên tệp này, nó không có loại tệp được phê duyệt',
 		disallowedMediaType: "Không thể tải lên tệp này, loại phương tiện có bí danh '%0%' không được phép ở đây",
@@ -537,7 +539,8 @@ export default {
 		confirmremoveusageof: 'Bạn có chắc chắn muốn xóa việc sử dụng <strong>%0%</strong> không?',
 		confirmlogout: 'Bạn có chắc chắn muốn đăng xuất?',
 		confirmSure: 'Bạn có chắc chắn?',
-		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
 		confirmTrash: (name: string) => `Bạn có chắc chắn muốn di chuyển <strong>${name}</strong> vào Thùng rác?`,
 		cannotBulkTrashWhenReferenced: (total: number) =>
 			`<strong>${total} ${total === 1 ? 'mục' : 'các mục'}</strong> đã chọn không thể được chuyển vào Thùng rác vì ít nhất một mục được tham chiếu bởi nội dung khác.`,
@@ -667,38 +670,6 @@ export default {
 		displayName: 'Tên văn hóa',
 		changeKeyError: "Khóa '%0%' đã tồn tại.",
 		overviewTitle: 'Tổng quan từ điển',
-	},
-	examineManagement: {
-		configuredSearchers: 'Các tìm kiếm đã cấu hình',
-		configuredSearchersDescription:
-			'Hiển thị các thuộc tính và công cụ cho bất kỳ tìm kiếm nào đã cấu hình (ví dụ: như một tìm kiếm đa chỉ mục)',
-		fieldValues: 'Giá trị trường',
-		healthStatus: 'Trạng thái sức khỏe',
-		healthStatusDescription: 'Trạng thái sức khỏe của chỉ mục và nếu nó có thể được đọc',
-		indexers: 'Bộ lập chỉ mục',
-		indexInfo: 'Thông tin chỉ mục',
-		contentInIndex: 'Nội dung trong chỉ mục',
-		indexInfoDescription: 'Liệt kê các thuộc tính của chỉ mục',
-		manageIndexes: 'Quản lý các chỉ mục Examine',
-		manageIndexesDescription:
-			'Cho phép bạn xem chi tiết của từng chỉ mục và cung cấp một số công cụ để quản lý các chỉ mục',
-		rebuildIndex: 'Xây dựng lại chỉ mục',
-		rebuildIndexWarning:
-			'Điều này sẽ khiến chỉ mục được xây dựng lại.<br />Tùy thuộc vào lượng nội dung trên trang web của bạn, quá trình này có thể mất một thời gian.<br />Không khuyến nghị xây dựng lại chỉ mục trong thời gian lưu lượng truy cập cao hoặc khi các biên tập viên đang chỉnh sửa nội dung.',
-		searchers: 'Bộ tìm kiếm',
-		searchDescription: 'Tìm kiếm trong chỉ mục và xem kết quả',
-		tools: 'Công cụ',
-		toolsDescription: 'Công cụ quản lý chỉ mục',
-		fields: 'trường',
-		indexCannotRead: 'Không thể đọc chỉ mục và cần được xây dựng lại',
-		processIsTakingLonger:
-			'Quá trình mất nhiều thời gian hơn dự kiến, hãy kiểm tra nhật ký Umbraco để xem có lỗi nào trong quá trình này không',
-		indexCannotRebuild: 'Chỉ mục này không thể được xây dựng lại vì không có IIndexPopulator được gán',
-		iIndexPopulator: 'IIndexPopulator',
-		noResults: 'Không tìm thấy kết quả nào',
-		searchResultsFound: 'Hiển thị %0% - %1% của %2% kết quả - Trang %3% trên %4%',
-		corruptStatus: 'Phát hiện chỉ mục có khả năng bị hỏng',
-		corruptErrorDescription: 'Lỗi nhận được khi đánh giá chỉ mục:',
 	},
 	placeholders: {
 		username: 'Nhập tên người dùng...',
@@ -906,6 +877,8 @@ export default {
 		no: 'Không',
 		nodeName: 'Tên nút',
 		notFound: 'Không tìm thấy',
+		noResults: 'Không có kết quả',
+		noResultsFor: (query: string) => `Không tìm thấy kết quả cho "${query}".`,
 		of: 'của',
 		off: 'Tắt',
 		ok: 'OK',
@@ -1743,8 +1716,10 @@ export default {
 		compositionsDescriptionMemberType:
 			'Kế thừa các tab và thuộc tính từ một loại thành viên hiện có. Các tab mới sẽ được thêm vào loại thành viên hiện tại hoặc được hợp nhất nếu một tab có tên giống hệt tồn tại.',
 		compositionInUse: 'Loại nội dung này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
-		compositionInUseMediaType: 'Loại phương tiện này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
-		compositionInUseMemberType: 'Loại thành viên này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMediaType:
+			'Loại phương tiện này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMemberType:
+			'Loại thành viên này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
 		noAvailableCompositions: 'Không có loại nội dung nào có sẵn để sử dụng làm thành phần.',
 		noAvailableCompositionsMediaType: 'Không có loại phương tiện nào có sẵn để sử dụng làm thành phần.',
 		noAvailableCompositionsMemberType: 'Không có loại thành viên nào có sẵn để sử dụng làm thành phần.',
@@ -2364,7 +2339,6 @@ export default {
 		contentRedirectManager: 'Quản lý URL chuyển hướng',
 		mediaFolderBrowser: 'Nội dung',
 		settingsWelcome: 'Chào mừng',
-		settingsExamine: 'Quản lý Examine',
 		settingsPublishedStatus: 'Trạng thái đã xuất bản',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',
@@ -2827,5 +2801,10 @@ export default {
 		resetUrlHeadline: 'Đặt lại URL?',
 		resetUrlMessage: 'Bạn có chắc chắn muốn đặt lại URL này không?',
 		resetUrlLabel: 'Đặt lại',
+	},
+	picker: {
+		browseTab: 'Duyệt',
+		searchTab: 'Tìm kiếm',
+		selectedCount: (count: number) => `Đã chọn ${count} mục`,
 	},
 } as UmbLocalizationDictionary;

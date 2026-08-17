@@ -656,44 +656,6 @@
 		</key>
 		<key alias="overviewTitle">Wörterbuch Übersicht</key>
 	</area>
-	<area alias="examineManagement">
-		<key alias="configuredSearchers"><![CDATA[<em>Sucher</em> einrichten ]]></key>
-		<key alias="configuredSearchersDescription">
-			<![CDATA[
-    Zeigt die Eigenschaften und Werkzeuge für eingerichtete <em>Sucher</em> (z.B.: multi-index searcher)]]>
-		</key>
-		<key alias="fieldValues">Feldwerte</key>
-		<key alias="healthStatus">Gesundheitsstatus</key>
-		<key alias="healthStatusDescription">Der Gesundheitsstatus und Lesbarkeit des Indizes.</key>
-		<key alias="indexers">Indizierer</key>
-		<key alias="indexInfo">Indexinformationen</key>
-		<key alias="contentInIndex">Inhalt des Indexes</key>
-		<key alias="indexInfoDescription">Zeigt die Eigenschaften des Indizes</key>
-		<key alias="manageIndexes">Examine Index-Verwaltung</key>
-		<key alias="manageIndexesDescription">
-			Index Detailanzeige und Verwaltungswerkzeuge
-		</key>
-		<key alias="rebuildIndex">Index erneuern</key>
-		<key alias="rebuildIndexWarning">
-			<![CDATA[
-      Dies erzeugt den Index neu.<br />
-      Abhängig von der Inhaltsmenge Ihrer <em>Website</em> kann das eingie Zeit dauern.<br />
-      Es wird davon abgeraten, einen Index einer <em>Website</em> während hoher Auslastung- oder Inhaltbearbeitungszeiten zu erneuern.
-     ]]>
-		</key>
-		<key alias="searchers">Sucher</key>
-		<key alias="searchDescription">Durchsuche den Index und betrachte die Ergebnisse</key>
-		<key alias="tools">Werkzeuge</key>
-		<key alias="toolsDescription">Werkzeuge zur Indexverwaltung</key>
-		<key alias="fields">Felder</key>
-		<key alias="indexCannotRead">Der Index kann nicht gelesen werden und wird deshalb neu erstellt.</key>
-		<key alias="processIsTakingLonger">
-			Der Prozess dauert länger als erwartet, checken Sie die Umbraco Logs um zu sehen ob
-			Fehler passiert sind.
-		</key>
-		<key alias="indexCannotRebuild">Der Index kann nicht rebuilded werden weil er nicht zugewissen wurde.</key>
-		<key alias="iIndexPopulator">IIndexPopulator</key>
-	</area>
 	<area alias="placeholders">
 		<key alias="username">Benutzername eingeben</key>
 		<key alias="password">Kennwort eingeben</key>
@@ -2357,7 +2319,6 @@
 		<key alias="contentRedirectManager">URL-Weiterleitungen verwalten</key>
 		<key alias="mediaFolderBrowser">Inhalt</key>
 		<key alias="settingsWelcome">Begrüßung</key>
-		<key alias="settingsExamine">Examine Management</key>
 		<key alias="settingsPublishedStatus">Status der Veröffentlichungen</key>
 		<key alias="settingsModelsBuilder">Models Builder</key>
 		<key alias="settingsHealthCheck">Systemzustand prüfen</key>

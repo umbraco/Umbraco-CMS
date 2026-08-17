@@ -6,6 +6,7 @@ import type {
 	UmbBlockLayoutBaseModel,
 } from '../types.js';
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
+import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-to-element-library/transfer-to-element-library-modal.token.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -32,7 +33,6 @@ import {
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
-import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-to-element-library/transfer-to-element-library-modal.token.js';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
@@ -336,6 +336,7 @@ export abstract class UmbBlockManagerContext<
 	/**
 	 * Returns an observable that emits true when the layout for the given contentKey
 	 * has `isExternalContent` set (i.e., the block references external content).
+	 * @param key
 	 */
 	isExternalContentOf(key: string) {
 		return this._layouts.asObservablePart(
@@ -346,13 +347,11 @@ export abstract class UmbBlockManagerContext<
 	/**
 	 * Returns an observable of the external content variant state.
 	 * Emits the state string (e.g., 'Published', 'Draft') or null if not resolved yet.
+	 * @param key
 	 */
 	externalContentStateOf(key: string) {
 		return mergeObservables(
-			[
-				this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)),
-				this.variantId,
-			],
+			[this.#externalContentVariants.asObservablePart((source) => source.find((x) => x.key === key)), this.variantId],
 			([entry, variantId]) => {
 				if (!entry?.variants.length) return null;
 				if (!variantId) return entry.variants[0]?.state ?? null;
@@ -511,6 +510,8 @@ export abstract class UmbBlockManagerContext<
 	 * Insert a block whose content is an external content reference.
 	 * Only creates a layout entry — no contentData entry is added.
 	 * The layout observer handles fetching the element data.
+	 * @param elementKey
+	 * @param _originData
 	 */
 	insertExternalContent(elementKey: string, _originData?: BlockOriginDataType) {
 		const layout = { key: UmbId.new(), contentKey: elementKey, isExternalContent: true } as BlockLayoutType;
@@ -520,6 +521,7 @@ export abstract class UmbBlockManagerContext<
 	/**
 	 * Request to transfer a local block's content to external content (Element Library).
 	 * @param {string} key the block layout key.
+	 * @param name
 	 */
 	async requestTransferToExternalContent(key: string, name?: string) {
 		const layout = this._layouts.getValue().find((x) => x.key === key);

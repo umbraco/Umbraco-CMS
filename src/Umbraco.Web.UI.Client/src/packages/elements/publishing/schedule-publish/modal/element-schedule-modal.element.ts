@@ -81,7 +81,7 @@ export class UmbElementScheduleModalElement extends UmbModalBaseElement<
 
 				this.requestUpdate();
 			},
-			'_selection',
+			null,
 		);
 	}
 

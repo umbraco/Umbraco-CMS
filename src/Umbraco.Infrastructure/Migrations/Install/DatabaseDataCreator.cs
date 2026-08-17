@@ -63,7 +63,7 @@ internal sealed class DatabaseDataCreator
         new()
         {
             Name = "Find logs where one of the items in the SortedComponentTypes property array is equal to",
-            Query = "SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'",
+            Query = "SortedComponentTypes[?] = 'Umbraco.Cms.Infrastructure.Runtime.CoreRuntime'",
         },
         new()
         {

@@ -371,6 +371,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Für Upload klicken',
+		browseFilesAction: 'Dateien durchsuchen',
+		dropFilesOr: 'Medien hierher ziehen<br />oder',
 		orClickHereToUpload: 'oder klicken Sie hier um eine Datei zu wählen',
 		disallowedFileType: 'Dieser Dateityp darf nicht hochgeladen werden',
 		invalidFileName: 'Diese Datei kann nicht hochgeladen werden wil der Dateiname ungültig ist.',
@@ -622,33 +624,6 @@ export default {
 		changeKeyError: "Der Wert '%0%' ist bereits vorhanden.",
 		overviewTitle: 'Wörterbuch Übersicht',
 	},
-	examineManagement: {
-		configuredSearchers: '<em>Sucher</em> einrichten ',
-		configuredSearchersDescription:
-			'\n    Zeigt die Eigenschaften und Werkzeuge für eingerichtete <em>Sucher</em> (z.B.: multi-index searcher)',
-		fieldValues: 'Feldwerte',
-		healthStatus: 'Gesundheitsstatus',
-		healthStatusDescription: 'Der Gesundheitsstatus und Lesbarkeit des Indizes.',
-		indexers: 'Indizierer',
-		indexInfo: 'Indexinformationen',
-		contentInIndex: 'Inhalt des Indexes',
-		indexInfoDescription: 'Zeigt die Eigenschaften des Indizes',
-		manageIndexes: 'Examine Index-Verwaltung',
-		manageIndexesDescription: '\n      Index Detailanzeige und Verwaltungswerkzeuge\n    ',
-		rebuildIndex: 'Index erneuern',
-		rebuildIndexWarning:
-			'\n      Dies erzeugt den Index neu.<br />\n      Abhängig von der Inhaltsmenge Ihrer <em>Website</em> kann das eingie Zeit dauern.<br />\n      Es wird davon abgeraten, einen Index einer <em>Website</em> während hoher Auslastung- oder Inhaltbearbeitungszeiten zu erneuern.\n     ',
-		searchers: 'Sucher',
-		searchDescription: 'Durchsuche den Index und betrachte die Ergebnisse',
-		tools: 'Werkzeuge',
-		toolsDescription: 'Werkzeuge zur Indexverwaltung',
-		fields: 'Felder',
-		indexCannotRead: 'Der Index kann nicht gelesen werden und wird deshalb neu erstellt.',
-		processIsTakingLonger:
-			'Der Prozess dauert länger als erwartet, checken Sie die Umbraco Logs um zu sehen ob\n      Fehler passiert sind.\n    ',
-		indexCannotRebuild: 'Der Index kann nicht rebuilded werden weil er nicht zugewissen wurde.',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Benutzername eingeben',
 		password: 'Kennwort eingeben',
@@ -830,6 +805,8 @@ export default {
 		next: 'Weiter',
 		no: 'Nein',
 		nodeName: 'Knoten Name',
+		noResults: 'Keine Ergebnisse',
+		noResultsFor: (query: string) => `Kein Ergebnis für "${query}".`,
 		of: 'von',
 		off: 'Aus',
 		ok: 'Ok',
@@ -2023,7 +2000,6 @@ export default {
 		contentRedirectManager: 'URL-Weiterleitungen verwalten',
 		mediaFolderBrowser: 'Inhalt',
 		settingsWelcome: 'Begrüßung',
-		settingsExamine: 'Examine Management',
 		settingsPublishedStatus: 'Status der Veröffentlichungen',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Systemzustand prüfen',
@@ -2108,5 +2084,10 @@ export default {
 		routeForbiddenTitle: 'Zugriff verweigert',
 		routeForbiddenDescription:
 			'Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte wenden Sie sich an Ihren Administrator, um Unterstützung zu erhalten.',
+	},
+	picker: {
+		browseTab: 'Durchsuchen',
+		searchTab: 'Suchen',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'Element' : 'Elemente'} ausgewählt`,
 	},
 } as UmbLocalizationDictionary;

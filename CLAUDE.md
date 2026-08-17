@@ -28,7 +28,7 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 3. **Specialized Features** (Pluggable Modules)
    - Persistence: EF Core (modern), NPoco (legacy) for SQL Server & SQLite
    - Caching: `PublishedCache.HybridCache` (in-memory + distributed)
-   - Search: `Examine.Lucene` (full-text search)
+   - Search: `Umbraco.Cms.Search.*` (search abstractions + Examine/Lucene provider)
    - Imaging: `Imaging.ImageSharp` v1 & v2 (image processing)
    - Other: Static assets, targets, development tools
 
@@ -53,7 +53,17 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 
 ---
 
-## 2. Repository Structure
+## 2. General-Purpose by Default
+
+This repository is a product platform, not an application. Every layer is consumed by code that does not live here — implementors, package developers, and other parts of the CMS. A change is finished when it serves the use case that prompted it *and* the use cases nobody has described yet.
+
+**Design to the contract.** When you change shared code, work out the rule the layer must uphold for *any* implementation of it, and make that rule hold there. Name a concrete implementation freely in the code that owns it — a specific service, package, or project; a shared or generic layer implements only the contract. A specific editor alias, content type alias, or class name appearing in generic code is the signal that a fix has been fitted to one caller — express it instead as a capability the contract exposes.
+
+**Describe the contract.** Comments and public docs use the vocabulary of the layer they sit in. In public XML doc / JSDoc a concrete illustration is welcome where it reads as one possible implementation ("for example, an editor that emits several groups may…"), never as the definition of the behaviour.
+
+---
+
+## 3. Repository Structure
 
 ```
 Umbraco-CMS/
@@ -68,7 +78,10 @@ Umbraco-CMS/
 │   ├── Umbraco.Cms.Api.Common/            # Shared API infrastructure
 │   │   └── CLAUDE.md                      # ⭐ API patterns guide
 │   ├── Umbraco.PublishedCache.HybridCache/ # Content caching
-│   ├── Umbraco.Examine.Lucene/            # Search indexing
+│   ├── Umbraco.Cms.Search.Core/           # Search abstractions
+│   ├── Umbraco.Cms.Search.BackOffice/     # Backoffice search integration
+│   ├── Umbraco.Cms.Search.DeliveryApi/    # Delivery API search integration
+│   ├── Umbraco.Cms.Search.Provider.Examine/ # Examine (Lucene) search provider
 │   ├── Umbraco.Cms.Persistence.EFCore/    # EF Core data access
 │   ├── Umbraco.Cms.Persistence.EFCore.Sqlite/
 │   ├── Umbraco.Cms.Persistence.EFCore.SqlServer/
@@ -124,7 +137,8 @@ Web.UI → Web.Common → Infrastructure → Core
 **Infrastructure Layer**:
 - `Umbraco.Infrastructure` → `Umbraco.Core`
 - `Umbraco.PublishedCache.*` → `Umbraco.Infrastructure`
-- `Umbraco.Examine.Lucene` → `Umbraco.Infrastructure`
+- `Umbraco.Cms.Search.Core` → `Umbraco.Infrastructure` + `Umbraco.Web.Common`
+- `Umbraco.Cms.Search.Provider.Examine` → `Umbraco.Cms.Search.Core`
 - `Umbraco.Cms.Persistence.*` → `Umbraco.Infrastructure`
 
 **Web Layer**:
@@ -138,7 +152,7 @@ Web.UI → Web.Common → Infrastructure → Core
 
 ---
 
-## 3. Teamwork & Collaboration
+## 4. Teamwork & Collaboration
 
 ### Branching Strategy
 
@@ -222,7 +236,7 @@ Project ownership is distributed across teams. Check individual project director
 
 ---
 
-## 4. Architecture Patterns
+## 5. Architecture Patterns
 
 ### Core Architectural Decisions
 
@@ -262,11 +276,11 @@ Project ownership is distributed across teams. Check individual project director
 
 ---
 
-## 5. Avoiding Breaking Changes
+## 6. Avoiding Breaking Changes
 
 No binary breaking changes are allowed within a major version. Three patterns are used:
 
-### 5.1 Obsolete Constructor + StaticServiceProvider
+### 6.1 Obsolete Constructor + StaticServiceProvider
 
 When a public class needs new dependencies, obsolete the existing constructor and add a new one. The old constructor delegates to the new one, resolving missing deps via `StaticServiceProvider`.
 
@@ -297,7 +311,7 @@ public MyService(IDependencyA depA, IDependencyB depB)
 - Uses `StaticServiceProvider.Instance.GetRequiredService<T>()` for new params only
 - DI registration must use the NEW constructor (old is for external consumers only)
 
-### 5.2 Obsolete Method + New Overload
+### 6.2 Obsolete Method + New Overload
 
 When a public method signature needs to change, add the new method/overload and obsolete the old. The obsolete method should call the new one with suitable defaults.
 
@@ -318,7 +332,7 @@ public void DoThing(string name, string? extraParam)
 - All internal callers must be updated to use the new method
 - No callers should remain on the obsolete method within the codebase
 
-### 5.3 Default Interface Implementation
+### 6.3 Default Interface Implementation
 
 When adding methods to a public interface, provide a default implementation so existing external implementations don't break.
 
@@ -348,7 +362,7 @@ public interface IMyService
 - Default impl should be functionally correct even if not optimal
 - If using `StaticServiceProvider` in a default impl, note this is temporary
 
-### 5.4 General Rules
+### 6.4 General Rules
 
 - **Removal policy**: Obsoleted members must remain for at least one full major version before removal. If obsoleted in version N, the earliest removal is version N+2. For example, something obsoleted in v17 is scheduled for removal in v19 (giving the whole of v18 as a deprecation period).
 - All `[Obsolete]` attributes must include **"Scheduled for removal in Umbraco {current+2}"**
@@ -363,7 +377,7 @@ public interface IMyService
 
 ---
 
-## 6. Project-Specific Notes
+## 7. Project-Specific Notes
 
 ### Centralized Package Management
 
@@ -476,7 +490,7 @@ Full guidance, safe patterns and decision rule: see `/src/Umbraco.Infrastructure
 
 ---
 
-## 7. CI/CD — Claude AI Assistant
+## 8. CI/CD — Claude AI Assistant
 
 Two GitHub Actions workflows powered by `anthropics/claude-code-action@v1`. Advisory only — does not block merging.
 
@@ -538,21 +552,31 @@ Labels are only added, never removed. Claude applies only labels it is confident
 
 ---
 
-## 8. Code Comment Policy
+## 9. Code Comment Policy
 
 **Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Well-named identifiers and small functions carry the meaning; a comment is a fallback for what the code genuinely cannot say — a non-obvious *why*, a subtle invariant the types don't enforce, or a surprising edge case the code handles deliberately. Add XML doc / JSDoc on public members, but keep it concise.
 
-Linking a tracked issue (`(#21996)`, `https://...`) to explain a non-obvious *why* is welcome — for example, on a section of code or to explain why a regression test exists. Such a link stays useful even after the issue is closed, since it documents why the code is the way it is.
+**Write the rule, at the altitude of the code it sits in.** A comment states what must hold going forward, in the vocabulary of the layer it lives in — see §2. Where a comment exists because something once went wrong, the rule is what survives; the incident and the reported scenario belong in the commit message and PR body:
 
-**Don't leave provenance noise.** No `// Fix for X`, `// Used by Y`, `// Added for the Z flow`, `// See PR #1234`. The transient task or PR that produced a change belongs in commit messages and PR descriptions; in source it rots as the codebase evolves.
+```typescript
+// A resolver may emit several groups of inner values.
+// Pair each draft group with its persisted group by the
+// identifier the resolver supplies, not by call order.
+```
+
+**Keep issue references where they stay actionable.** A tracked issue link (`(#21996)`, `https://...`) is welcome wherever it explains a non-obvious *why* — a guard whose reason isn't clear from the code, a workaround for a defect this code cannot fix (so it can be deleted when the fix lands), or a regression test recording why it exists. Elsewhere the comment stands on its own in general terms.
+
+**Let commit messages and PR descriptions carry provenance.** Which task, PR, or issue produced a change (`Fix for X`, `Used by Y`, `Added for the Z flow`, `See PR #1234`) is recorded in git history, where it stays accurate. Source describes the code as it is now.
 
 ### TODOs
 
-Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
+Allowed, and can name the specific issue, implementation, or use case it concerns — the one exception to §2, since the comment is deleted once the TODO is done. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
 
 ---
 
-## 9. Testing Practices
+## 10. Testing Practices
+
+A test for shared code asserts the general rule from §2, not the scenario that reported it, and is named for the rule.
 
 ### Tests for a bug fix must fail before the fix
 
@@ -562,7 +586,7 @@ For integration tests that exercise caching or cache refreshers, see `tests/Umbr
 
 ---
 
-## 10. Verification Discipline
+## 11. Verification Discipline
 
 - **Fresh build before trusting a green.** Never treat `--no-build` or cached/incremental output as proof a change compiles or passes — a stale run can mask a compile error. Rebuild before reporting build or test state. (Integration tests have a related false-green trap — see `tests/Umbraco.Tests.Integration/CLAUDE.md`.)
 - **Grep the branch you think you're on.** A search only supports a claim against the branch actually checked out, so confirm HEAD is where you expect before drawing a conclusion from a grep. Easy to get wrong whenever the tree moves under you — reviewing a PR head, switching worktrees, or mid merge-up/rebase.
@@ -611,7 +635,8 @@ SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running
 | **Umbraco.Cms.Api.Delivery** | Library | Delivery API (headless CMS) |
 | **Umbraco.Cms.Api.Common** | Library | Shared API infrastructure |
 | **Umbraco.PublishedCache.HybridCache** | Library | Published content caching |
-| **Umbraco.Examine.Lucene** | Library | Full-text search indexing |
+| **Umbraco.Cms.Search.Core** | Library | Search abstractions and indexing pipeline |
+| **Umbraco.Cms.Search.Provider.Examine** | Library | Examine (Lucene) search provider |
 
 ### Important Files
 

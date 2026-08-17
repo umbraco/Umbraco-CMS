@@ -2,7 +2,16 @@ import type { ManifestBlockAction } from '../block-action.extension.js';
 import type { UmbBlockAction } from '../block-action.interface.js';
 import type { UmbBlockActionElement } from '../block-action-element.interface.js';
 import type { MetaBlockActionDefaultKind } from './types.js';
-import { css, customElement, html, ifDefined, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	property,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
@@ -14,9 +23,9 @@ import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/val
  */
 @customElement('umb-block-action')
 export class UmbBlockActionDefaultElement<
-		MetaType extends MetaBlockActionDefaultKind = MetaBlockActionDefaultKind,
-		ApiType extends UmbBlockAction<MetaType> = UmbBlockAction<MetaType>,
-	>
+	MetaType extends MetaBlockActionDefaultKind = MetaBlockActionDefaultKind,
+	ApiType extends UmbBlockAction<MetaType> = UmbBlockAction<MetaType>,
+>
 	extends UmbLitElement
 	implements UmbBlockActionElement
 {

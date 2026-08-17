@@ -91,12 +91,12 @@ public interface IContentService
     Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(...);
 }
 
-// Implementation lives in Umbraco.Core/Services/ (see root CLAUDE.md §4)
+// Implementation lives in Umbraco.Core/Services/ (see root CLAUDE.md §5)
 // Service operations return Attempt<T, TStatus> for typed results
 ```
 
 **Key conventions**:
-- Interfaces in Umbraco.Core; most service implementations live in Umbraco.Core/Services/ too, moving to Umbraco.Infrastructure only when a concrete dependency requires it (see root CLAUDE.md §4)
+- Interfaces in Umbraco.Core; most service implementations live in Umbraco.Core/Services/ too, moving to Umbraco.Infrastructure only when a concrete dependency requires it (see root CLAUDE.md §5)
 - Use `Attempt<TResult, TStatus>` for operations that can fail with specific reasons
 - OperationStatus enums provide detailed failure reasons
 - Services are registered via DI in builder extensions
@@ -245,7 +245,6 @@ public class MyPropertyEditor : IDataEditor
 **Key interfaces**:
 - `IDataEditor` - Property editor registration
 - `IDataValueEditor` - Value editing and conversion
-- `IPropertyIndexValueFactory` - Search indexing
 - `IPropertyValueConverter` - Convert stored values to typed values
 
 ### 7. Cache Refreshers (Distributed Cache)
@@ -539,4 +538,4 @@ Internal types are accessible in test projects for more thorough testing.
 
 ---
 
-**Remember**: Umbraco.Core defines the contracts. Domain **service** implementations mostly live here too (`Services/`); repository and other Infrastructure-backed implementations live in Umbraco.Infrastructure. See root CLAUDE.md §4.
+**Remember**: Umbraco.Core defines the contracts. Domain **service** implementations mostly live here too (`Services/`); repository and other Infrastructure-backed implementations live in Umbraco.Infrastructure. See root CLAUDE.md §5.

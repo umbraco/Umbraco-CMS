@@ -24,9 +24,8 @@ public sealed class DateOnlyPropertyEditor : DateTimePropertyEditorBase
     /// </summary>
     public DateOnlyPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IDateOnlyPropertyIndexValueFactory propertyIndexValueFactory)
-        : base(dataValueEditorFactory, ioHelper, propertyIndexValueFactory)
+        IIOHelper ioHelper)
+        : base(dataValueEditorFactory, ioHelper)
     {
     }
 

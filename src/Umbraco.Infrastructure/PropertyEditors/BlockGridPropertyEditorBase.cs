@@ -25,19 +25,11 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProvider
 {
-    private readonly IBlockGridPropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
-
-    protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockGridPropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+    protected BlockGridPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
     {
-        _blockValuePropertyIndexValueFactory = blockValuePropertyIndexValueFactory;
         SupportsReadOnly = true;
     }
-
-    /// <summary>
-    /// Gets the <see cref="IPropertyIndexValueFactory"/> instance used to generate index values for block grid properties.
-    /// </summary>
-    public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
     /// <inheritdoc />
     public virtual Type? GetValueType(object? configuration) => typeof(string); // JSON string representation

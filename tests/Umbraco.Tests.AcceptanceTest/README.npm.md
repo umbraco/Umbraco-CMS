@@ -110,7 +110,7 @@ await umbracoUi.content.isSuccessStateVisibleForSaveButton();
 await umbracoUi.content.doesSuccessNotificationHaveText('Content saved');
 ```
 
-**Available UI helpers**: `content`, `contentRender`, `currentUserProfile`, `dataType`, `dictionary`, `documentBlueprint`, `documentType`, `examineManagement`, `externalLogin`, `form`, `healthCheck`, `install`, `language`, `login`, `logViewer`, `media`, `mediaType`, `member`, `memberGroup`, `memberType`, `modelsBuilder`, `package`, `partialView`, `profiling`, `publishedStatus`, `redirectManagement`, `relationType`, `script`, `stylesheet`, `telemetryData`, `template`, `user`, `userGroup`, `webhook`, `welcomeDashboard`
+**Available UI helpers**: `content`, `contentRender`, `currentUserProfile`, `dataType`, `dictionary`, `documentBlueprint`, `documentType`, `externalLogin`, `form`, `healthCheck`, `install`, `language`, `login`, `logViewer`, `media`, `mediaType`, `member`, `memberGroup`, `memberType`, `modelsBuilder`, `package`, `partialView`, `profiling`, `publishedStatus`, `redirectManagement`, `relationType`, `script`, `stylesheet`, `telemetryData`, `template`, `user`, `userGroup`, `webhook`, `welcomeDashboard`
 
 ### `page` — Raw Playwright Page
 
