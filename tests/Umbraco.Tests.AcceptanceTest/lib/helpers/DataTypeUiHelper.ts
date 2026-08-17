@@ -126,6 +126,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly expandChildItemsForMediaBtn: Locator;
   private readonly tiptapToolbarConfiguration: Locator;
   private readonly addGroupToolbarBtn: Locator;
+  private readonly blockGroups: Locator;
+  private readonly layoutStylesheetAddBtn: Locator;
   private readonly addRowToolbarBtn: Locator;
   private readonly tiptapExtensionsConfiguration: Locator;
   private readonly propertyEditor: Locator;
@@ -320,6 +322,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
     // Tiptap
     this.tiptapToolbarConfiguration = this.page.locator('umb-property-editor-ui-tiptap-toolbar-configuration');
     this.addGroupToolbarBtn = this.tiptapToolbarConfiguration.locator('uui-button').filter({hasText: 'Add group'});
+    this.blockGroups = page.locator('.group');
+    this.layoutStylesheetAddBtn = page.getByTestId('property:layoutStylesheet').locator('#btn-add');
     this.addRowToolbarBtn = this.tiptapToolbarConfiguration.locator('uui-button').filter({hasText: 'Add row'});
     this.tiptapExtensionsConfiguration = this.page.locator('umb-property-editor-ui-tiptap-extensions-configuration');
     this.propertyEditor = this.page.locator('umb-ref-property-editor-ui');
@@ -954,7 +958,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async chooseLayoutStylesheetWithName(name: string) {
-    await this.click(this.page.getByTestId('property:layoutStylesheet').locator('#btn-add'));
+    await this.click(this.layoutStylesheetAddBtn);
     await this.openCaretButtonForName('wwwroot');
     await this.openCaretButtonForName('css');
     await this.clickTreeItemWithName(name, this.sidebarModal);
@@ -1149,7 +1153,7 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   // The group name is the value of a textbox, not text content, so hasText cannot be used to find it.
   private async getGroupWithName(name: string) {
-    const groups = this.page.locator('.group');
+    const groups = this.blockGroups;
     await expect(groups.first()).toBeVisible({timeout: ConstantHelper.timeout.medium});
     const groupCount = await groups.count();
 
