@@ -1979,6 +1979,8 @@ export default {
 			'A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.',
 		elementDoesNotSupport: 'This is not applicable for an Element Type.',
 		elementTypeOnlySupport: 'This is only applicable for an Element Type.',
+		elementTypeOnlyAllowedInLibrarySupport:
+			'This is only applicable for an Element Type that is allowed in the Library.',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',
