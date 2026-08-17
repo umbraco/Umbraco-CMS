@@ -4747,7 +4747,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         int[] ChildIdsInSortOrder() => ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _)
+            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
             .OrderBy(child => child.SortOrder)
             .Select(child => child.Id)
             .ToArray();
