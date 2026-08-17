@@ -43,15 +43,16 @@ internal sealed class RichTextBlockPropertyValueCreator : BlockPropertyValueCrea
     /// <param name="referenceCacheLevel">The cache level to use for property references during model creation.</param>
     /// <param name="blockValue">The <see cref="RichTextBlockValue"/> representing the value to convert.</param>
     /// <param name="preview">True to create the model in preview mode; otherwise, false.</param>
+    /// <param name="owningPropertyVariesByCulture">Whether the property holding the block value varies by culture.</param>
     /// <param name="blockConfigurations">An array of <see cref="RichTextConfiguration.RichTextBlockConfiguration"/> objects that define the configuration for each block type.</param>
     /// <returns>A <see cref="RichTextBlockModel"/> that represents the parsed and configured block content, or <see cref="RichTextBlockModel.Empty"/> if the value is invalid or empty.</returns>
-    public async Task<RichTextBlockModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
+    public async Task<RichTextBlockModel> CreateBlockModelAsync(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, bool owningPropertyVariesByCulture, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
     {
         RichTextBlockModel CreateEmptyModel() => RichTextBlockModel.Empty;
 
         RichTextBlockModel CreateModel(IList<RichTextBlockItem> items) => new RichTextBlockModel(items);
 
-        RichTextBlockModel blockModel = await CreateBlockModelAsync(owner, referenceCacheLevel, blockValue, preview, blockConfigurations, CreateEmptyModel, CreateModel);
+        RichTextBlockModel blockModel = await CreateBlockModelAsync(owner, referenceCacheLevel, blockValue, preview, owningPropertyVariesByCulture, blockConfigurations, CreateEmptyModel, CreateModel);
 
         return blockModel;
     }

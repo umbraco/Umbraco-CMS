@@ -294,7 +294,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     {
         MapBlockItemDataToEditor(property, blockValue.ContentData, culture, segment);
         MapBlockItemDataToEditor(property, blockValue.SettingsData, culture, segment);
-        _blockEditorVarianceHandler.AlignExposeVariance(blockValue);
+        _blockEditorVarianceHandler.AlignExposeVariance(blockValue, culture);
     }
 
     protected IEnumerable<Guid> ConfiguredElementTypeKeys(IBlockConfiguration configuration)

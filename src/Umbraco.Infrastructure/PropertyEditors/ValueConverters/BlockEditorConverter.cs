@@ -51,7 +51,22 @@ public sealed class BlockEditorConverter
     /// <returns>
     /// An <see cref="IPublishedElement"/> representing the converted block if the conversion is successful and the data is valid; otherwise, <c>null</c> if the content type is not found, is not an element type, or the key is missing or invalid.
     /// </returns>
+    [Obsolete("Please use the overload that states whether the owning property varies by culture. Scheduled for removal in Umbraco 19.")]
     public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
+        => ConvertToElement(owner, data, referenceCacheLevel, preview, owningPropertyVariesByCulture: false);
+
+    /// <summary>
+    /// Converts a <see cref="BlockItemData"/> instance into an <see cref="IPublishedElement"/> for use in the block editor.
+    /// </summary>
+    /// <param name="owner">The parent <see cref="IPublishedElement"/> that owns the block element, used for context such as culture and segment variations.</param>
+    /// <param name="data">The <see cref="BlockItemData"/> representing the block to convert.</param>
+    /// <param name="referenceCacheLevel">The <see cref="PropertyCacheLevel"/> to use for resolving references during conversion.</param>
+    /// <param name="preview">If <c>true</c>, conversion is performed in preview mode; otherwise, in published mode.</param>
+    /// <param name="owningPropertyVariesByCulture">Whether the property holding the block value varies by culture, in which case <paramref name="data"/> was loaded from the stored value for the current culture.</param>
+    /// <returns>
+    /// An <see cref="IPublishedElement"/> representing the converted block if the conversion is successful and the data is valid; otherwise, <c>null</c> if the content type is not found, is not an element type, or the key is missing or invalid.
+    /// </returns>
+    public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview, bool owningPropertyVariesByCulture)
     {
         // Only convert element types - content types will cause an exception when PublishedModelFactory creates the model
         IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Element, data.ContentTypeKey);
@@ -61,6 +76,10 @@ public sealed class BlockEditorConverter
         }
 
         VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
+
+        // When the owning property varies by culture, the block value being converted was loaded from the stored value
+        // for the rendering culture, so that is the culture its block property values belong to.
+        var owningPropertyCulture = owningPropertyVariesByCulture ? variationContext.Culture : null;
 
         var propertyTypesByAlias = publishedContentType
             .PropertyTypes
@@ -77,7 +96,7 @@ public sealed class BlockEditorConverter
             // if case changes have been made to the content or element type variation since the parent content was published,
             // we need to align those changes for the block properties - unlike for root level properties, where these
             // things are handled when a content type is saved.
-            BlockPropertyValue? alignedProperty = _blockEditorVarianceHandler.AlignedPropertyVarianceAsync(property, propertyType, owner).GetAwaiter().GetResult();
+            BlockPropertyValue? alignedProperty = _blockEditorVarianceHandler.AlignedPropertyVarianceAsync(property, propertyType, owner, owningPropertyCulture).GetAwaiter().GetResult();
             if (alignedProperty is null)
             {
                 continue;
