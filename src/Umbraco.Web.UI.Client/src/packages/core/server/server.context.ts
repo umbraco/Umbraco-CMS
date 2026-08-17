@@ -23,13 +23,20 @@ export class UmbServerContext extends UmbContextBase {
 	 * The server information is fetched lazily on first subscription.
 	 */
 	public readonly isProductionMode = defer(() => {
-		if (!this.#serverInformationFetched) {
-			this.#serverInformationFetched = true;
-			this.#fetchServerInformation();
-		}
+		this.#ensureServerInformation();
 		return this.#serverInformation.asObservablePart((info) =>
 			info ? info.runtimeMode === RuntimeModeModel.PRODUCTION : undefined,
 		);
+	});
+
+	/**
+	 * Observable that emits true when the server is running in debug mode,
+	 * false when not, or undefined until server information is loaded.
+	 * The server information is fetched lazily on first subscription.
+	 */
+	public readonly isDebugMode = defer(() => {
+		this.#ensureServerInformation();
+		return this.#serverInformation.asObservablePart((info) => (info ? info.isDebugMode : undefined));
 	});
 
 	/**
@@ -42,6 +49,12 @@ export class UmbServerContext extends UmbContextBase {
 		this.#serverUrl = config.serverUrl;
 		this.#backofficePath = config.backofficePath;
 		this.#serverConnection = config.serverConnection;
+	}
+
+	#ensureServerInformation() {
+		if (this.#serverInformationFetched) return;
+		this.#serverInformationFetched = true;
+		this.#fetchServerInformation();
 	}
 
 	async #fetchServerInformation() {

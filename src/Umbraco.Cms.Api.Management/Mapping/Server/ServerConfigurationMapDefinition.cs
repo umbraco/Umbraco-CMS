@@ -35,5 +35,6 @@ public class ServerConfigurationMapDefinition : IMapDefinition
         target.Version = source.SemVersion.ToSemanticString();
         target.AssemblyVersion = source.SemVersion.ToSemanticStringWithoutBuild();
         target.BaseUtcOffset = source.TimeZoneInfo.BaseUtcOffset.ToString();
+        target.IsDebugMode = source.IsDebugMode;
     }
 }
