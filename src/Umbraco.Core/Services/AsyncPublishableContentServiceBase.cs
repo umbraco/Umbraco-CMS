@@ -401,31 +401,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids)
-    {
-        Guid[] idsA = ids.ToArray();
-        if (idsA.Length == 0)
-        {
-            return Enumerable.Empty<TContent>();
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            IEnumerable<TContent>? items = _contentRepository.GetMany(idsA);
-
-            if (items is not null)
-            {
-                var index = items.ToDictionary(x => x.Key, x => x);
-
-                return idsA.Select(x => index.GetValueOrDefault(x)).WhereNotNull();
-            }
-
-            return Enumerable.Empty<TContent>();
-        }
-    }
-
     /// <inheritdoc />
     public IEnumerable<TContent> GetPagedOfType(
         int contentTypeId,

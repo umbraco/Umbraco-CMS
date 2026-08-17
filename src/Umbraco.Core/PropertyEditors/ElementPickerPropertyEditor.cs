@@ -207,7 +207,7 @@ public class ElementPickerPropertyEditor : DataEditor
                 .ToArray();
 
             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-            IElement[] elements = _elementService.GetByIds(elementIds).ToArray();
+            IElement[] elements = _elementService.GetByIdsAsync(elementIds, CancellationToken.None).GetAwaiter().GetResult().ToArray();
             scope.Complete();
 
             // Compare against the distinct requested keys (not the raw value count, which may include

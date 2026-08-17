@@ -762,7 +762,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     private void PackageElements(PackageDefinition definition, XContainer root)
     {
         // Each element's container (folder) ancestry is encoded on the serialized element and recreated on import.
-        IEnumerable<IElement> elements = _elementService.GetByIds(definition.Elements);
+        IEnumerable<IElement> elements = _elementService.GetByIdsAsync(definition.Elements, CancellationToken.None).GetAwaiter().GetResult();
 
         var elementsXml = new XElement(
             "Elements",

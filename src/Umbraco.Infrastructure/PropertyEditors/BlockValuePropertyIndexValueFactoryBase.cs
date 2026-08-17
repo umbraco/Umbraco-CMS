@@ -181,7 +181,7 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     private Dictionary<Guid, RawDataItem> GetExternalElementDataItems(IBlockLayoutItem[] allLayouts)
     {
         Guid[] externalKeys = allLayouts.Where(l => l.IsExternalContent).Select(l => l.ContentKey).ToArray();
-        return _elementService.GetByIds(externalKeys)
+        return _elementService.GetByIdsAsync(externalKeys, CancellationToken.None).GetAwaiter().GetResult()
             // A trashed or unpublished element is not live, so its content must not be flattened into a referencing document's index.
             .Where(element => element.Trashed is false && element.Published)
             .ToDictionary(

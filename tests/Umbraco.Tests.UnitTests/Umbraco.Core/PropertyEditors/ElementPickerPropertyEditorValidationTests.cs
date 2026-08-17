@@ -63,8 +63,8 @@ public class ElementPickerPropertyEditorValidationTests
         var elementKey = Guid.NewGuid();
 
         _elementServiceMock
-            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
-            .Returns([CreateElement(elementKey, Guid.NewGuid())]);
+            .Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateElement(elementKey, Guid.NewGuid())]);
 
         // AllowedContentTypeIds is null — no restriction
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration { AllowedContentTypeIds = null };
@@ -80,8 +80,8 @@ public class ElementPickerPropertyEditorValidationTests
         var allowedContentTypeKey = Guid.NewGuid();
 
         _elementServiceMock
-            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
-            .Returns([CreateElement(elementKey, allowedContentTypeKey)]);
+            .Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateElement(elementKey, allowedContentTypeKey)]);
 
         var extraAllowedKey = hasMultipleAllowedTypes ? Guid.NewGuid().ToString() : null;
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration
@@ -102,8 +102,8 @@ public class ElementPickerPropertyEditorValidationTests
         var actualContentTypeKey = Guid.NewGuid(); // different from allowed
 
         _elementServiceMock
-            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
-            .Returns([CreateElement(elementKey, actualContentTypeKey)]);
+            .Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateElement(elementKey, actualContentTypeKey)]);
 
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration
         {
@@ -120,8 +120,8 @@ public class ElementPickerPropertyEditorValidationTests
 
         // The selected element cannot be found, so its type cannot be verified against the allowed types.
         _elementServiceMock
-            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
-            .Returns([]);
+            .Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration
         {
@@ -151,8 +151,8 @@ public class ElementPickerPropertyEditorValidationTests
 
         // The (deduplicated) key resolves to a single element.
         _elementServiceMock
-            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
-            .Returns([CreateElement(elementKey, allowedContentTypeKey)]);
+            .Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateElement(elementKey, allowedContentTypeKey)]);
 
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration
         {
@@ -170,8 +170,8 @@ public class ElementPickerPropertyEditorValidationTests
         var allowedContentTypeKey = Guid.NewGuid();
 
         _elementServiceMock
-            .Setup(x => x.GetByIds(It.IsAny<IEnumerable<Guid>>()))
-            .Returns([CreateElement(elementKey, allowedContentTypeKey)]);
+            .Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([CreateElement(elementKey, allowedContentTypeKey)]);
 
         _valueEditor.ConfigurationObject = new ElementPickerConfiguration
         {

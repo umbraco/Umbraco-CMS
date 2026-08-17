@@ -448,7 +448,9 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc/>
+    // No longer an interface member (retired from IPublishableContentService<TContent> in favour of
+    // GetByIdsAsync) — kept as a plain method because ElementService.GetByIdsAsync bridges to it
+    // (Task.FromResult(GetByIds(ids))) until Element has its own async repository.
     public IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids)
     {
         Guid[] idsA = ids.ToArray();

@@ -40,7 +40,7 @@ public static class ContentServiceExtensions
             guids.Add(guidUdi);
         }
 
-        return contentService.GetByIds(guids.Select(x => x.Guid));
+        return contentService.GetByIdsAsync(guids.Select(x => x.Guid), CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>

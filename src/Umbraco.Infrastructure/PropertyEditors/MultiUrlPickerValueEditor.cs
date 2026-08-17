@@ -141,7 +141,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
 
         if (contentKeys.Count > 0)
         {
-            IEnumerable<IContent> contentItems = _contentService.GetByIds(contentKeys);
+            IEnumerable<IContent> contentItems = _contentService.GetByIdsAsync(contentKeys, CancellationToken.None).GetAwaiter().GetResult();
             foreach (IContent content in contentItems)
             {
                 CacheContentById(content, _appCaches.RequestCache);

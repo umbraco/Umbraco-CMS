@@ -16,12 +16,8 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     /// <returns>An attempt containing the operation result.</returns>
     Attempt<OperationResult?> Save(IEnumerable<TContent> contents, int userId = Constants.Security.SuperUserId);
 
-    /// <summary>
-    ///     Gets content.
-    /// </summary>
-    /// <param name="ids">The unique identifiers of the content.</param>
-    /// <returns>The content.</returns>
-    IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids);
+    // GetByIds(IEnumerable<Guid>) has been retired from this interface in favour of the async
+    // GetByIdsAsync (declared on IAsyncPublishableContentService<TContent>).
 
     /// <summary>
     ///     Saves content.
