@@ -1,11 +1,12 @@
+import type { UmbCollectionViewElementBase } from '../view/umb-collection-view-element-base.js';
 import { UmbDefaultCollectionContext } from './collection-default.context.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -26,7 +27,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	#collectionContext?: UmbDefaultCollectionContext;
 
 	@state()
-	private _routes: Array<UmbRoute> = [];
+	private _viewElement?: HTMLElement;
 
 	@state()
 	private _hasItems = false;
@@ -42,7 +43,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, async (context) => {
 			this.#collectionContext = context;
 			this.#observeIsLoading();
-			this.#observeCollectionRoutes();
+			this.#observeCurrentView();
 			this.#observeTotalItems();
 			this.#getEmptyStateLabel();
 			this.#collectionContext?.loadCollection();
@@ -69,15 +70,25 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		);
 	}
 
-	#observeCollectionRoutes() {
+	#observeCurrentView() {
 		if (!this.#collectionContext) return;
 
 		this.observe(
-			this.#collectionContext.view.routes,
-			(routes) => {
-				this._routes = routes;
+			this.#collectionContext.view.currentView,
+			async (manifest) => {
+				if (!manifest) {
+					this._viewElement = undefined;
+					return;
+				}
+
+				const element = await createExtensionElement(manifest);
+				if (element) {
+					element.setAttribute('data-mark', `collection-view:${manifest.alias}`);
+					(element as UmbCollectionViewElementBase).manifest = manifest;
+				}
+				this._viewElement = element;
 			},
-			'umbCollectionRoutesObserver',
+			'umbCollectionCurrentViewObserver',
 		);
 	}
 
@@ -106,10 +117,10 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	}
 
 	#renderBody() {
-		if (!this._initialLoadDone || !this._routes.length) return html`<umb-view-loader></umb-view-loader>`;
+		if (!this._initialLoadDone || !this._viewElement) return html`<umb-view-loader></umb-view-loader>`;
 
 		return html`
-			<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
+			<div id="view">${this._viewElement}</div>
 			${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this._renderEmptyState()}
 		`;
 	}
@@ -149,11 +160,13 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				height: 100%;
 			}
 
-			#router {
+			/* Sizes to the view it holds, so the empty state below it is not pushed out of sight when the view is empty. */
+			#view {
+				position: relative;
 				visibility: hidden;
 			}
 
-			.has-items #router {
+			.has-items #view {
 				visibility: visible;
 			}
 
@@ -163,11 +176,6 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				text-align: center;
 				opacity: 0;
 				animation: fadeIn 200ms 200ms forwards;
-			}
-
-			router-slot {
-				width: 100%;
-				height: 100%;
 			}
 
 			@keyframes fadeIn {
