@@ -22,7 +22,7 @@ export class UmbServerContext extends UmbContextBase {
 	 * app session, no matter how many consumers observe this or the derived `isProductionMode`.
 	 */
 	public readonly serverInformation = defer(() => {
-		this.#ensureServerInformationRequested();
+		this.#requestServerInformation();
 		return this.#serverInformation.asObservable();
 	});
 
@@ -42,7 +42,7 @@ export class UmbServerContext extends UmbContextBase {
 		this.#serverConnection = config.serverConnection;
 	}
 
-	#ensureServerInformationRequested() {
+	#requestServerInformation() {
 		if (this.#serverInformationFetched) return;
 		this.#serverInformationFetched = true;
 		this.#fetchServerInformation();
@@ -54,6 +54,9 @@ export class UmbServerContext extends UmbContextBase {
 		});
 		if (data) {
 			this.#serverInformation.setValue(data);
+		} else {
+			this.#serverInformationFetched = false;
+			// Might need a retry mechanism here, but for now we just reset the flag so the next subscriber will trigger a new request. [NL]
 		}
 	}
 
