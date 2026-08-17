@@ -164,6 +164,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 			this.removeUmbControllerByAlias('observeVariantId');
 			this.removeUmbControllerByAlias('observeValue');
 			this.removeUmbControllerByAlias('observeDatasetReadOnly');
+			this.readOnlyState.removeState('UMB_DATASET');
 			return;
 		}
 
