@@ -125,8 +125,6 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
 
         await SetUnmappedProperties(contentCollection, collectionResponseModels);
 
-        // Called here rather than from SetUnmappedProperties because overrides of that method are not
-        // required to call base, so anything placed there is silently skipped for those collections.
         PopulateHasChildren(collectionResponseModels);
 
         await PopulateFlags(collectionResponseModels);
