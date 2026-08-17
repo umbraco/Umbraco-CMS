@@ -89,7 +89,7 @@ public class PropertyValidationService : IPropertyValidationService
             return [];
         }
 
-        var isRequired = propertyType.Mandatory && validationContext.Segment.IsNullOrWhiteSpace();
+        var isRequired = ShouldValidateAsRequired(propertyType, validationContext);
         return ValidatePropertyValue(dataEditor, dataType, postedValue, isRequired, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage, validationContext);
     }
 
@@ -219,6 +219,19 @@ public class PropertyValidationService : IPropertyValidationService
             return true;
         }
 
+        // if the property varies by segment, make explicitly sure we validate mandatory against
+        // the non-segmented value (if present)
+        if (property.PropertyType.VariesBySegment())
+        {
+            IPropertyValue? defaultSegmentValue = property
+                .Values
+                .FirstOrDefault(x => (culture == "*" || x.Culture.InvariantEquals(culture)) && x.Segment == null);
+            if (!IsValidPropertyValue(property, defaultSegmentValue?.EditedValue, PropertyValidationContext.CultureAndSegment(culture, null)))
+            {
+                return false;
+            }
+        }
+
         // if nothing else to validate, we are good
         if ((culture == null || culture == "*") && (segment == null || segment == "*") &&
             !property.PropertyType.VariesByCulture())
@@ -280,7 +293,14 @@ public class PropertyValidationService : IPropertyValidationService
         var configuration = GetDataType(propertyType)?.ConfigurationObject;
         IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
 
-        return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp, validationContext).Any();
+        var isRequired = ShouldValidateAsRequired(propertyType, validationContext);
+        return !valueEditor.Validate(value, isRequired, propertyType.ValidationRegExp, validationContext).Any();
+    }
+
+    private static bool ShouldValidateAsRequired(IPropertyType propertyType, PropertyValidationContext validationContext)
+    {
+        var isRequired = propertyType.Mandatory && validationContext.Segment.IsNullOrWhiteSpace();
+        return isRequired;
     }
 
     private IDataType? GetDataType(IPropertyType propertyType)

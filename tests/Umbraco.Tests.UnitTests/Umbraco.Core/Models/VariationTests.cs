@@ -618,6 +618,59 @@ public class VariationTests
         prop.PublishValues();
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void SegmentValueIsNeverMandatoryTests(bool variesByCulture)
+    {
+        var variation = variesByCulture
+            ? ContentVariation.CultureAndSegment
+            : ContentVariation.Segment;
+
+        var culture = variesByCulture ? "en-US" : null;
+
+        var propertyType = new PropertyTypeBuilder()
+            .WithAlias("prop")
+            .WithSupportsPublishing(true)
+            .WithVariations(variation)
+            .WithMandatory(true)
+            .Build();
+
+        var prop = new Property(propertyType);
+        prop.SetValue("a", culture);
+
+        var propertyValidationService = GetPropertyValidationService();
+
+        // property validation service ignores mandatory validation for segments
+        Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, "*")));
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public void SegmentValueDoesNotSatisfyMandatoryTests(bool variesByCulture)
+    {
+        var variation = variesByCulture
+            ? ContentVariation.CultureAndSegment
+            : ContentVariation.Segment;
+
+        var culture = variesByCulture ? "en-US" : null;
+
+        var propertyType = new PropertyTypeBuilder()
+            .WithAlias("prop")
+            .WithSupportsPublishing(true)
+            .WithVariations(variation)
+            .WithMandatory(true)
+            .Build();
+
+        var prop = new Property(propertyType);
+        prop.SetValue("a", culture, "seg-1");
+
+        var propertyValidationService = GetPropertyValidationService();
+
+        // property validation service must apply mandatory validation to the default segment,
+        // even if a value exists for another segment
+        Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, "*")));
+    }
+
     private static Content CreateContent(IContentType contentType, int id = 1, string name = "content") =>
         new ContentBuilder()
             .WithId(id)
