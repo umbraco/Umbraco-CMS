@@ -89,6 +89,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	async #doLoad(): Promise<void> {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
+		// TODO: Fail early? if no asObservable method is available on the server response, we should probably throw an error or handle it differently. [NL]
 		if (asObservable) {
 			await this.observe(
 				asObservable(),
@@ -97,7 +98,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 				},
 				'observeUser',
 			)
-				.asPromise()
+				?.asPromise()
 				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
 				.catch(() => undefined);
 		}

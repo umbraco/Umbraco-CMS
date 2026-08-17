@@ -6,6 +6,7 @@ import type {
 	UmbAuditLogTagData,
 } from '@umbraco-cms/backoffice/audit-log';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbPagedModel, UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const UmbDocumentBlueprintAuditLog = Object.freeze({
@@ -42,10 +43,12 @@ export class UmbDocumentBlueprintAuditLogRepository
 	/**
 	 * Request the audit log for a document blueprint.
 	 * @param {UmbAuditLogRequestArgs} args - The arguments for the audit log request.
-	 * @returns {*} The audit log.
+	 * @returns {Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentBlueprintAuditLogModel>>>} The audit log.
 	 * @memberof UmbDocumentBlueprintAuditLogRepository
 	 */
-	async requestAuditLog(args: UmbAuditLogRequestArgs) {
+	async requestAuditLog(
+		args: UmbAuditLogRequestArgs,
+	): Promise<UmbRepositoryResponse<UmbPagedModel<UmbDocumentBlueprintAuditLogModel>>> {
 		return this.#dataSource.getAuditLog(args);
 	}
 

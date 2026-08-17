@@ -2,7 +2,11 @@ import type { UmbUserDetailModel, UmbUserStartNodesModel } from '../../types.js'
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbUserKind } from '../../utils/user-kind.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateUserRequestModel,
 	UpdateUserRequestModel,
@@ -16,7 +20,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the User that fetches data from the server
  * @class UmbUserServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbUserDetailModel>}
  */
 export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetailModel> {
 	#host: UmbControllerHost;
@@ -68,10 +72,10 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Fetches a User with the given id from the server
 	 * @param {string} unique - The unique id of the user
-	 * @returns {*} The requested user
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserDetailModel>>} The requested user
 	 * @memberof UmbUserServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbUserDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this.#host, UserService.getUserById({ path: { id: unique } }));
@@ -86,10 +90,10 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Fetches the Users with the given ids from the server
 	 * @param {Array<string>} uniques - The unique ids of the users
-	 * @returns {*} The requested users
+	 * @returns {Promise<UmbDataSourceResponse<Array<UmbUserDetailModel>>>} The requested users
 	 * @memberof UmbUserServerDataSource
 	 */
-	async readMany(uniques: Array<string>) {
+	async readMany(uniques: Array<string>): Promise<UmbDataSourceResponse<Array<UmbUserDetailModel>>> {
 		if (!uniques.length) {
 			return { data: [] };
 		}
@@ -134,10 +138,10 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Inserts a new User on the server
 	 * @param {UmbUserDetailModel} model - The user model to create
-	 * @returns {*} The created user
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserDetailModel>>} The created user
 	 * @memberof UmbUserServerDataSource
 	 */
-	async create(model: UmbUserDetailModel) {
+	async create(model: UmbUserDetailModel): Promise<UmbDataSourceResponse<UmbUserDetailModel>> {
 		if (!model) throw new Error('User is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -170,10 +174,10 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Updates a User on the server
 	 * @param {UmbUserDetailModel} model - The user model to update
-	 * @returns {*} The updated user
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserDetailModel>>} The updated user
 	 * @memberof UmbUserServerDataSource
 	 */
-	async update(model: UmbUserDetailModel) {
+	async update(model: UmbUserDetailModel): Promise<UmbDataSourceResponse<UmbUserDetailModel>> {
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
@@ -209,10 +213,10 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Deletes a User on the server
 	 * @param {string} unique - The unique id of the user
-	 * @returns {*} The result of the deletion
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the deletion
 	 * @memberof UmbUserServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecute(
@@ -226,10 +230,10 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	/**
 	 * Calculates the start nodes for the User
 	 * @param {string} unique - The unique id of the user
-	 * @returns {*} The calculated start nodes
+	 * @returns {Promise<UmbDataSourceResponse<UmbUserStartNodesModel>>} The calculated start nodes
 	 * @memberof UmbUserServerDataSource
 	 */
-	async calculateStartNodes(unique: string) {
+	async calculateStartNodes(unique: string): Promise<UmbDataSourceResponse<UmbUserStartNodesModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(

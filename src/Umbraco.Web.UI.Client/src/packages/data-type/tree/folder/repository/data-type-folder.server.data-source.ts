@@ -4,12 +4,16 @@ import { DataTypeService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for a Data Type folder that fetches data from the server
  * @class UmbDataTypeFolderServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource<UmbFolderModel>}
  */
 export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<UmbFolderModel> {
 	#host: UmbControllerHost;
@@ -26,10 +30,10 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 	/**
 	 * Creates a scaffold for a Data Type folder
 	 * @param {Partial<UmbFolderModel>} [preset] - The preset data to populate the scaffold with.
-	 * @returns {*} The data type folder scaffold.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The data type folder scaffold.
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async createScaffold(preset?: Partial<UmbFolderModel>) {
+	async createScaffold(preset?: Partial<UmbFolderModel>): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		const scaffold: UmbFolderModel = {
 			entityType: UMB_DATA_TYPE_FOLDER_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -43,10 +47,10 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 	/**
 	 * Fetches a Data Type folder from the server
 	 * @param {string} unique - The unique identifier of the folder to fetch.
-	 * @returns {*} The data type folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The data type folder.
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(
@@ -72,10 +76,10 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 	/**
 	 * Creates a Data Type folder on the server
 	 * @param {UmbFolderModel} model - The data type folder to create.
-	 * @returns {*} The created data type folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The created data type folder.
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async create(model: UmbFolderModel, parentUnique: string | null) {
+	async create(model: UmbFolderModel, parentUnique: string | null): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!model) throw new Error('Data is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
@@ -103,10 +107,10 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 	/**
 	 * Updates a Data Type folder on the server
 	 * @param {UmbFolderModel} model - The data type folder to update.
-	 * @returns {*} The updated data type folder.
+	 * @returns {Promise<UmbDataSourceResponse<UmbFolderModel>>} The updated data type folder.
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async update(model: UmbFolderModel) {
+	async update(model: UmbFolderModel): Promise<UmbDataSourceResponse<UmbFolderModel>> {
 		if (!model) throw new Error('Data is missing');
 		if (!model.unique) throw new Error('Unique is missing');
 		if (!model.name) throw new Error('Folder name is missing');
@@ -129,10 +133,10 @@ export class UmbDataTypeFolderServerDataSource implements UmbDetailDataSource<Um
 	/**
 	 * Deletes a Data Type folder on the server
 	 * @param {string} unique - The unique identifier of the folder to delete.
-	 * @returns {*} The result of the delete operation.
-	 * @memberof UmbDataTypeServerDataSource
+	 * @returns {Promise<UmbDataSourceErrorResponse>} The result of the delete operation.
+	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(
 			this.#host,

@@ -17,7 +17,7 @@ export class UmbDocumentSegmentRepository extends UmbRepositoryBase {
 	): Promise<UmbRepositoryResponse<UmbSegmentResponseModel>> {
 		const { data, error } = await tryExecute(
 			this,
-			// eslint-disable-next-line @typescript-eslint/no-deprecated
+
 			DocumentService.getDocumentByIdAvailableSegmentOptions({ path: { id: unique }, query: filter }),
 		);
 
@@ -26,7 +26,7 @@ export class UmbDocumentSegmentRepository extends UmbRepositoryBase {
 				const model: UmbSegmentModel = {
 					alias: item.alias,
 					name: item.name,
-					// eslint-disable-next-line @typescript-eslint/no-deprecated
+
 					cultures: item.cultures,
 				};
 
