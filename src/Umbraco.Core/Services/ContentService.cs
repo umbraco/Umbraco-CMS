@@ -389,19 +389,14 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// </summary>
     /// <param name="id">Id of the <see cref="IContent" /> to retrieve ancestors for</param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
+    [Obsolete("Use GetAncestorsAsync(Guid, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
     public IEnumerable<IContent> GetAncestors(int id)
     {
         // intentionally not locking
         Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-        IContent? content = keyAttempt.Success
-            ? GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
-            : null;
-        if (content is null)
-        {
-            return Enumerable.Empty<IContent>();
-        }
-
-        return GetAncestors(content);
+        return keyAttempt.Success
+            ? GetAncestorsAsync(keyAttempt.Result, 0, int.MaxValue, CancellationToken.None).GetAwaiter().GetResult().Items
+            : Enumerable.Empty<IContent>();
     }
 
     /// <summary>
@@ -409,26 +404,21 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// </summary>
     /// <param name="content"><see cref="IContent" /> to retrieve ancestors for</param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    public IEnumerable<IContent> GetAncestors(IContent content)
+    [Obsolete("Use GetAncestorsAsync(IContent, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
+    public IEnumerable<IContent> GetAncestors(IContent content) =>
+        GetAncestorsAsync(content, 0, int.MaxValue, CancellationToken.None).GetAwaiter().GetResult().Items;
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken)
     {
-        // null check otherwise we get exceptions
-        if (content.Path.IsNullOrWhiteSpace())
-        {
-            return Enumerable.Empty<IContent>();
-        }
-
-        var ids = content.GetAncestorIds()?.ToArray();
-        if (ids?.Any() == false)
-        {
-            return new List<IContent>();
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetMany(ids!);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+        return await _asyncDocumentRepository.GetAncestorsAsync(key, skip, take, cancellationToken);
     }
+
+    /// <inheritdoc />
+    public Task<PagedModel<IContent>> GetAncestorsAsync(IContent content, int skip, int take, CancellationToken cancellationToken) =>
+        GetAncestorsAsync(content.Key, skip, take, cancellationToken);
 
     /// <summary>
     ///     Gets a collection of published <see cref="IContent" /> objects by Parent Id

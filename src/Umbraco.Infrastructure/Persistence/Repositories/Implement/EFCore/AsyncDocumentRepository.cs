@@ -1405,6 +1405,103 @@ internal class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
+    public Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            var self = await db.Nodes
+                .Where(node => node.UniqueId == key)
+                .Select(node => new { node.NodeId, node.Path })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (self is null)
+            {
+                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+            }
+
+            // Path is stored root-first (e.g. "-1,1063,1066,1092"), so splitting it already yields the
+            // ancestors in root-first order — excluding the root node itself and the node whose ancestors
+            // are being requested, mirroring ContentExtensions.GetAncestorIds().
+            List<int> ancestorNodeIds = self.Path.Split(',')
+                .Select(segment => int.Parse(segment, CultureInfo.InvariantCulture))
+                .Where(nodeId => nodeId != Constants.System.Root && nodeId != self.NodeId)
+                .ToList();
+
+            int total = ancestorNodeIds.Count;
+            if (total == 0)
+            {
+                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+            }
+
+            List<int> pageNodeIds = ancestorNodeIds.Skip(skip).Take(take).ToList();
+            if (pageNodeIds.Count == 0)
+            {
+                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+            }
+
+            var publishedSubquery = db.ContentVersions
+                .Join(
+                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
+                    contentVersion => contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
+
+            List<DocumentRow> rows = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && pageNodeIds.Contains(node.NodeId))
+                .Join(
+                    db.Documents,
+                    node => node.NodeId,
+                    document => document.NodeId,
+                    (node, document) => new { node, document })
+                .Join(
+                    db.Content,
+                    joined => joined.node.NodeId,
+                    content => content.NodeId,
+                    (joined, content) => new { joined.node, joined.document, content })
+                .Join(
+                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
+                    joined => joined.node.NodeId,
+                    contentVersion => contentVersion.NodeId,
+                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
+                .Join(
+                    db.DocumentVersions,
+                    joined => joined.contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
+                .Join(
+                    db.ContentTypes,
+                    joined => joined.content.ContentTypeId,
+                    contentType => contentType.NodeId,
+                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
+                .GroupJoin(
+                    publishedSubquery,
+                    joined => joined.node.NodeId,
+                    pub => pub.contentVersion.NodeId,
+                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
+                .SelectMany(
+                    joined => joined.pubGroup.DefaultIfEmpty(),
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
+                .Select(joined => new DocumentRow(
+                    joined.node,
+                    joined.document,
+                    joined.content,
+                    joined.contentVersion,
+                    joined.documentVersion,
+                    joined.pub!.contentVersion,
+                    joined.pub!.documentVersion))
+                .ToListAsync(cancellationToken);
+
+            // The Contains-filtered fetch above does not preserve pageNodeIds' root-first order, so
+            // re-sort in memory to match it before assembling entities.
+            Dictionary<int, int> position = pageNodeIds
+                .Select((nodeId, index) => (nodeId, index))
+                .ToDictionary(x => x.nodeId, x => x.index);
+            List<DocumentRow> orderedRows = rows.OrderBy(row => position[row.Node.NodeId]).ToList();
+
+            List<IContent> items = await AssembleEntitiesAsync(orderedRows, db);
+            return new PagedModel<IContent> { Total = total, Items = items };
+        });
+
+    /// <inheritdoc />
     public Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {

@@ -3350,4 +3350,94 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(custom.Select(c => c.Key), Is.EqualTo(new[] { docLow.Key, docMid.Key, docHigh.Key }),
             "Ascending custom-field ordering should sort by the integer property value, low to high");
     }
+
+    [Test]
+    public async Task GetAncestorsAsync_ReturnsAncestorsInRootFirstOrder_ExcludingSelf()
+    {
+        var grandchild = new ContentBuilder().WithContentType(_contentType).WithName("Grandchild").WithParentId(_subpage.Id).Build();
+        ContentService.Save(grandchild, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetAncestorsAsync(grandchild.Key, skip: 0, take: 100, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(2));
+        Assert.That(result.Items.Select(c => c.Key), Is.EqualTo(new[] { _textpage.Key, _subpage.Key }),
+            "Ancestors must be returned root-first (textpage before subpage), and must not include the item itself");
+    }
+
+    [Test]
+    public async Task GetAncestorsAsync_Paging_ReturnsCorrectPagesAndTotal()
+    {
+        var level3 = new ContentBuilder().WithContentType(_contentType).WithName("Level 3").WithParentId(_subpage.Id).Build();
+        ContentService.Save(level3, -1);
+
+        var level4 = new ContentBuilder().WithContentType(_contentType).WithName("Level 4").WithParentId(level3.Id).Build();
+        ContentService.Save(level4, -1);
+
+        // Ancestors of level4, root-first: _textpage, _subpage, level3.
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> firstPage = await repository.GetAncestorsAsync(level4.Key, skip: 0, take: 2, CancellationToken.None);
+        PagedModel<IContent> secondPage = await repository.GetAncestorsAsync(level4.Key, skip: 2, take: 2, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(firstPage.Total, Is.EqualTo(3));
+        Assert.That(firstPage.Items.Select(c => c.Key), Is.EqualTo(new[] { _textpage.Key, _subpage.Key }));
+        Assert.That(secondPage.Total, Is.EqualTo(3));
+        Assert.That(secondPage.Items.Select(c => c.Key), Is.EqualTo(new[] { level3.Key }),
+            "page 2 must continue the root-first order across the page boundary");
+    }
+
+    [Test]
+    public async Task GetAncestorsAsync_UnknownKey_ReturnsEmptyWithZeroTotal()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetAncestorsAsync(Guid.NewGuid(), skip: 0, take: 100, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAncestorsAsync_ContentDirectlyUnderRoot_ReturnsEmptyWithZeroTotal()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // _textpage is a direct child of the content root (-1), so its only "ancestor" is the
+        // root itself, which is deliberately excluded — mirroring ContentExtensions.GetAncestorIds().
+        PagedModel<IContent> result = await repository.GetAncestorsAsync(_textpage.Key, skip: 0, take: 100, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(0));
+        Assert.That(result.Items, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetAncestorsAsync_IncludesTrashedAncestors()
+    {
+        // Unlike GetByLevelAsync, an ancestor chain must not silently drop trashed ancestors — a
+        // document's own breadcrumb still needs to reflect its real parentage even if a parent was trashed.
+        _subpage.Trashed = true;
+        ContentService.Save(_subpage, -1);
+
+        var child = new ContentBuilder().WithContentType(_contentType).WithName("Child Of Trashed Parent").WithParentId(_subpage.Id).Build();
+        ContentService.Save(child, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetAncestorsAsync(child.Key, skip: 0, take: 100, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Items.Select(c => c.Key), Does.Contain(_subpage.Key),
+            "GetAncestorsAsync must include trashed ancestors, unlike GetByLevelAsync's trashed exclusion");
+    }
 }

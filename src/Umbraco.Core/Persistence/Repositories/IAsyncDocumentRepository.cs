@@ -69,6 +69,16 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Gets a paged list of ancestor documents of a document, ordered root-first.
+    /// </summary>
+    /// <param name="key">The Guid key of the document to retrieve ancestors for.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the document's ancestors, root-first. Empty if the key does not resolve to a document.</returns>
+    Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Bulk-replaces all permissions for a content item with the provided permission set.
     /// </summary>
     /// <param name="permissionSet">The new set of permissions to apply, replacing any existing permissions.</param>

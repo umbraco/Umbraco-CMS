@@ -124,6 +124,7 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// </summary>
     /// <param name="id">The identifier of the document.</param>
     /// <returns>The ancestor documents.</returns>
+    [Obsolete("Use GetAncestorsAsync(Guid, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
     IEnumerable<IContent> GetAncestors(int id);
 
     /// <summary>
@@ -131,7 +132,28 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// </summary>
     /// <param name="content">The document.</param>
     /// <returns>The ancestor documents.</returns>
+    [Obsolete("Use GetAncestorsAsync(IContent, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
     IEnumerable<IContent> GetAncestors(IContent content);
+
+    /// <summary>
+    ///     Gets a paged list of ancestor documents of a document, ordered root-first.
+    /// </summary>
+    /// <param name="key">The Guid key of the document to retrieve ancestors for.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the document's ancestors, root-first.</returns>
+    Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a paged list of ancestor documents of a document, ordered root-first.
+    /// </summary>
+    /// <param name="content">The document to retrieve ancestors for.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the document's ancestors, root-first.</returns>
+    Task<PagedModel<IContent>> GetAncestorsAsync(IContent content, int skip, int take, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets root-level documents.
