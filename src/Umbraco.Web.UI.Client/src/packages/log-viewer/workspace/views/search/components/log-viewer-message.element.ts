@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 
 //TODO: check how to display EventId field in the message properties
 @customElement('umb-log-viewer-message')
@@ -304,6 +305,42 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 			.search-item {
 				width: 100%;
+			}
+
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
+				summary {
+					flex-wrap: wrap;
+				}
+
+				#machine {
+					display: none;
+				}
+
+				#timestamp {
+					flex: 1 1 auto;
+					padding-bottom: 4px;
+					font-size: 0.85em;
+					color: var(--uui-color-text-alt);
+				}
+
+				#level {
+					flex: 0 0 auto;
+					padding-bottom: 4px;
+				}
+
+				#message {
+					flex: 1 0 100%;
+					padding-top: 0;
+					padding-bottom: 8px;
+				}
+
+				.property {
+					display: block;
+				}
+
+				.property-value {
+					word-break: break-all;
+				}
 			}
 		`,
 	];

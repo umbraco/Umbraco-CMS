@@ -4,6 +4,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
@@ -95,6 +96,25 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 			umb-log-viewer-date-range-selector {
 				flex-direction: row;
+			}
+
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
+				#levels-container {
+					flex-wrap: wrap;
+				}
+
+				#dates-polling-container {
+					display: contents;
+				}
+
+				umb-log-viewer-date-range-selector {
+					order: 2;
+					flex: 1 0 100%;
+				}
+
+				umb-log-viewer-polling-button {
+					margin-left: auto;
+				}
 			}
 		`,
 	];
