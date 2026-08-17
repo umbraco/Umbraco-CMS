@@ -12,7 +12,6 @@ export interface UmbElementDetailModel {
 
 export interface UmbElementValueModel<ValueType = unknown> extends UmbPropertyValueDataWithVariant<ValueType> {
 	editorAlias: string;
-	segment: string | null;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbContentValueModel<ValueType = unknown> extends UmbElementValueModel<ValueType> {}

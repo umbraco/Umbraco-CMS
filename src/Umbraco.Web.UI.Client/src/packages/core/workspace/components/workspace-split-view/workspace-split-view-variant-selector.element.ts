@@ -1,6 +1,15 @@
 import type { UmbVariantDatasetWorkspaceContext } from '../../contexts/index.js';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
-import { css, customElement, html, nothing, query, ref, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	nothing,
+	query,
+	ref,
+	state,
+	type TemplateResult,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -514,18 +523,14 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 	#renderSegmentVariantOption(variantOption: VariantOptionModelType) {
 		const variantId = UmbVariantId.Create(variantOption);
-		const notCreated = this.#isCreateMode(variantOption, variantId);
 		const hint = this._hintMap.get(variantId.toString());
 		const active = this.#isVariantActive(variantId);
 
 		return html`
 			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
 				<button
-					class="switch-button ${notCreated ? 'add-mode' : ''} ${this.#isReadOnlyCulture(variantId.culture)
-						? 'readonly-mode'
-						: ''}"
+					class="switch-button ${this.#isReadOnlyCulture(variantId.culture) ? 'readonly-mode' : ''}"
 					@click=${() => this.#switchVariant(variantOption)}>
-					${notCreated ? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>` : nothing}
 					<div class="variant-info">
 						<div class="variant-name">
 							${this.#getVariantDisplayName(variantOption)}${this.#renderReadOnlyTag(
@@ -585,8 +590,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected _renderVariantDetails(variantOption: VariantOptionModelType) {
-		return html``;
+	protected _renderVariantDetails(variantOption: VariantOptionModelType): TemplateResult | typeof nothing {
+		return nothing;
 	}
 
 	#renderReadOnlyTag(culture?: string | null) {

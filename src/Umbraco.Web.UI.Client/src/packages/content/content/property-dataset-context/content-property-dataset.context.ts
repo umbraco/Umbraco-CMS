@@ -23,7 +23,7 @@ export class UmbContentPropertyDatasetContext<
 
 	name = this.#currentVariant.asObservablePart((x) => x?.name);
 	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
-	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
+	segment = this.#currentVariant.asObservablePart(() => this.getVariantId().segment);
 
 	readonly IS_CONTENT = true;
 

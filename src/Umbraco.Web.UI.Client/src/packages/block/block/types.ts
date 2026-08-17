@@ -28,7 +28,6 @@ export interface UmbBlockDataType {
 export interface UmbBlockExposeModel {
 	contentKey: string;
 	culture: string | null;
-	segment: string | null;
 }
 
 export interface UmbBlockValueDataPropertiesBaseType {

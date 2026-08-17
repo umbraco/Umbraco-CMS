@@ -103,11 +103,11 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		appCulture: string | undefined,
 	): Array<UmbEntityVariantOptionModel> {
 		// only display culture variants as options
-		const cultureVariantOptions = detailData.variants.filter((variant) => variant.segment === null);
+		const cultureVariantOptions = detailData.variants;
 
 		return cultureVariantOptions.map<UmbEntityVariantOptionModel>((variant) => ({
 			culture: variant.culture,
-			segment: variant.segment,
+			segment: null,
 			language: languageData?.items.find((language) => language.unique === variant.culture) ?? {
 				name: appCulture!,
 				entityType: 'language',
@@ -117,7 +117,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 				unique: appCulture!,
 			},
 			variant,
-			unique: new UmbVariantId(variant.culture, variant.segment).toString(),
+			unique: new UmbVariantId(variant.culture, null).toString(),
 		}));
 	}
 
@@ -154,7 +154,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 		return variantIds.flatMap((variantId) =>
 			detailData.variants
 				.filter((variant) => variantId.culture === variant.culture)
-				.map((variant) => UmbVariantId.Create(variant).toSegment(variant.segment)),
+				.map((variant) => new UmbVariantId(variant.culture, null)),
 		);
 	}
 
@@ -203,7 +203,7 @@ export class UmbContentPublishEntityAction extends UmbEntityActionBase<MetaEntit
 					headline: localize.term('speechBubbles_editContentPublishedHeader'),
 					message: localize.string(
 						this.args.meta.variantPublishedNotificationMessage || '#speechBubbles_editVariantPublishedText',
-						localize.list(publishedVariants.map((v) => UmbVariantId.Create(v).toString() ?? v.name)),
+						localize.list(publishedVariants.map((v) => new UmbVariantId(v.culture, null).toString() ?? v.name)),
 					),
 				},
 			});
