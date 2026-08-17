@@ -64,10 +64,20 @@ public interface IEntityRepository : IRepository
     /// <returns>The keys that have at least one child. Keys that do not exist are omitted.</returns>
     // TODO (V19): Remove the default implementation.
     ISet<Guid> GetKeysWithChildren(Guid objectType, IEnumerable<Guid> keys)
-        => GetAll(objectType, keys.Distinct().ToArray())
+    {
+        Guid[] distinctKeys = keys.Distinct().ToArray();
+
+        // GetAll treats an empty key array as "return everything", so the empty case cannot reach it.
+        if (distinctKeys.Length == 0)
+        {
+            return new HashSet<Guid>();
+        }
+
+        return GetAll(objectType, distinctKeys)
             .Where(entity => entity.HasChildren)
             .Select(entity => entity.Key)
             .ToHashSet();
+    }
 
     /// <summary>
     /// Gets sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.

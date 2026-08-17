@@ -1198,6 +1198,15 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void EntityService_Cannot_Get_Keys_With_Children_For_An_Empty_Key_Set()
+    {
+        // Guards against delegating to GetAll, which treats an empty key array as "return everything".
+        var result = EntityService.GetKeysWithChildren(UmbracoObjectTypes.Document, []);
+
+        Assert.IsEmpty(result);
+    }
+
+    [Test]
     public void EntityService_Can_Get_Keys_With_Children_Omitting_Keys_That_Do_Not_Exist()
     {
         var result = EntityService.GetKeysWithChildren(

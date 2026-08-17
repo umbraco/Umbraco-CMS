@@ -170,10 +170,20 @@ public interface IEntityService
     /// </remarks>
     // TODO (V19): Remove the default implementation.
     ISet<Guid> GetKeysWithChildren(UmbracoObjectTypes objectType, IEnumerable<Guid> keys)
-        => GetAll(objectType, keys.Distinct().ToArray())
+    {
+        Guid[] distinctKeys = keys.Distinct().ToArray();
+
+        // GetAll treats an empty key array as "return everything", so the empty case cannot reach it.
+        if (distinctKeys.Length == 0)
+        {
+            return new HashSet<Guid>();
+        }
+
+        return GetAll(objectType, distinctKeys)
             .Where(entity => entity.HasChildren)
             .Select(entity => entity.Key)
             .ToHashSet();
+    }
 
     /// <summary>
     ///     Gets entities at root.

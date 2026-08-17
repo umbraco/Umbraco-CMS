@@ -26,6 +26,13 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     private readonly IUmbracoMapper _mapper;
     private readonly IUserService _userService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCollectionPresentationFactory{TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel}"/> class.
+    /// </summary>
+    /// <param name="mapper">The mapper used to map content items to collection response models.</param>
+    /// <param name="flagProviderCollection">The collection of flag providers used to populate flags on the response models.</param>
+    /// <param name="userService">The service used to resolve the names of the creating and updating users.</param>
+    /// <param name="entityService">The service used to resolve which items have children.</param>
     protected ContentCollectionPresentationFactory(
         IUmbracoMapper mapper,
         FlagProviderCollection flagProviderCollection,
@@ -39,10 +46,11 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     }
 
     /// <summary>
-    /// Gets the service used to interact with Umbraco entities.
+    /// Initializes a new instance of the <see cref="ContentCollectionPresentationFactory{TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel}"/> class.
     /// </summary>
-    protected IEntityService EntityService { get; }
-
+    /// <param name="mapper">The mapper used to map content items to collection response models.</param>
+    /// <param name="flagProviderCollection">The collection of flag providers used to populate flags on the response models.</param>
+    /// <param name="userService">The service used to resolve the names of the creating and updating users.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     protected ContentCollectionPresentationFactory(
         IUmbracoMapper mapper,
@@ -56,6 +64,11 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCollectionPresentationFactory{TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel}"/> class.
+    /// </summary>
+    /// <param name="mapper">The mapper used to map content items to collection response models.</param>
+    /// <param name="flagProviderCollection">The collection of flag providers used to populate flags on the response models.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     protected ContentCollectionPresentationFactory(
         IUmbracoMapper mapper,
@@ -67,6 +80,10 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCollectionPresentationFactory{TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel}"/> class.
+    /// </summary>
+    /// <param name="mapper">The mapper used to map content items to collection response models.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     protected ContentCollectionPresentationFactory(IUmbracoMapper mapper)
         : this(
@@ -74,6 +91,11 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
             StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
+
+    /// <summary>
+    /// Gets the service used to interact with Umbraco entities.
+    /// </summary>
+    protected IEntityService EntityService { get; }
 
     /// <summary>
     /// Asynchronously creates a list of collection response models from the specified paged content collection.
@@ -103,6 +125,8 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
 
         await SetUnmappedProperties(contentCollection, collectionResponseModels);
 
+        // Called here rather than from SetUnmappedProperties because overrides of that method are not
+        // required to call base, so anything placed there is silently skipped for those collections.
         PopulateHasChildren(collectionResponseModels);
 
         await PopulateFlags(collectionResponseModels);
@@ -128,7 +152,8 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
 
     private void PopulateHasChildren(List<TCollectionResponseModel> models)
     {
-        if (ItemObjectType == UmbracoObjectTypes.Unknown)
+        UmbracoObjectTypes itemObjectType = ItemObjectType;
+        if (itemObjectType == UmbracoObjectTypes.Unknown)
         {
             return;
         }
@@ -144,7 +169,7 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
         }
 
         ISet<Guid> keysWithChildren = EntityService.GetKeysWithChildren(
-            ItemObjectType,
+            itemObjectType,
             targets.Select(target => target.Key));
 
         foreach ((Guid key, IHasChildren target) in targets)
