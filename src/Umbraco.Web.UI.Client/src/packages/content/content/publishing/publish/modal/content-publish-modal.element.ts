@@ -106,28 +106,28 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-dialog-layout headline=${headline}>
 				<p><umb-localize key="prompt_confirmPublish"></umb-localize></p>
-
 				${when(
 					!this._isInvariant,
-					() =>
-						html`<umb-content-variant-language-picker
+					() => html`
+						<umb-content-variant-language-picker
 							.selectionManager=${this.#selectionManager}
 							.variantLanguageOptions=${this._options}
 							.requiredFilter=${isNotPublishedMandatory}
-							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>`,
+							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>
+					`,
 				)}
 				${when(
 					this._referencesConfig,
-					() => html`<umb-entity-references-summary .config=${this._referencesConfig}></umb-entity-references-summary>`,
+					() => html`
+						<umb-confirm-action-modal-entity-references .config=${this._referencesConfig}>
+						</umb-confirm-action-modal-entity-references>
+					`,
 				)}
-
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 					<uui-button
 						${umbFocus()}
-						label="${this.data?.confirmLabel
-							? this.localize.string(this.data.confirmLabel)
-							: this.localize.term('buttons_saveAndPublish')}"
+						label=${this.localize.string(this.data?.confirmLabel || '#buttons_saveAndPublish')}
 						look="primary"
 						color="positive"
 						?disabled=${this._hasNotSelectedMandatory}
@@ -143,6 +143,10 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 				display: block;
 				min-width: 460px;
 				max-width: 90vw;
+			}
+
+			umb-content-variant-language-picker {
+				margin-bottom: var(--uui-size-3);
 			}
 		`,
 	];

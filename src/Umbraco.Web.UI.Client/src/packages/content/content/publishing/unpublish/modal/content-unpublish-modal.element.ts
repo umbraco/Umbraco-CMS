@@ -8,7 +8,7 @@ import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type {
 	UmbConfirmActionModalEntityReferencesConfig,
-	UmbEntityReferencesSummaryElement,
+	UmbConfirmActionModalEntityReferencesElement,
 } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
@@ -140,7 +140,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 
 	async #onReferencesChange(event: UmbChangeEvent) {
 		event.stopPropagation();
-		const target = event.target as UmbEntityReferencesSummaryElement;
+		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
 		const total = target.getTotalReferencedBy() + target.getTotalDescendantsWithReferences();
 
 		if (total === 0) {
@@ -189,8 +189,10 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 				${when(
 					this._referencesConfig,
 					() => html`
-						<umb-entity-references-summary .config=${this._referencesConfig} @change=${this.#onReferencesChange}>
-						</umb-entity-references-summary>
+						<umb-confirm-action-modal-entity-references
+							.config=${this._referencesConfig}
+							@change=${this.#onReferencesChange}>
+						</umb-confirm-action-modal-entity-references>
 					`,
 				)}
 				<div slot="actions">
@@ -214,6 +216,10 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 				display: block;
 				min-width: 600px;
 				max-width: 90vw;
+			}
+
+			umb-content-variant-language-picker {
+				margin-bottom: var(--uui-size-3);
 			}
 		`,
 	];
