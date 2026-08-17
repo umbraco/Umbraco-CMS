@@ -129,6 +129,53 @@ public class BlockEditorVarianceHandlerTests
     }
 
     [Test]
+    public async Task AlignedExposeVarianceAsync_Retains_Owning_Property_Culture_When_Expected_Invariant()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose =
+            [
+                new() { ContentKey = element.Key, Culture = "da-DK", Segment = "danish" },
+                new() { ContentKey = element.Key, Culture = "en-US", Segment = "english" },
+            ],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, "en-US");
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.IsNull(variation.Culture);
+            Assert.AreEqual("english", variation.Segment);
+        });
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Falls_Back_To_Default_Culture_When_No_Entry_For_Owning_Property_Culture()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose =
+            [
+                new() { ContentKey = element.Key, Culture = "da-DK", Segment = "danish" },
+            ],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, "en-US");
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.IsNull(variation.Culture);
+            Assert.AreEqual("danish", variation.Segment);
+        });
+    }
+
+    [Test]
     public async Task AlignedExposeVarianceAsync_Returns_Unchanged_When_Already_Variant()
     {
         var owner = PublishedElement(ContentVariation.Culture);
@@ -485,10 +532,11 @@ public class BlockEditorVarianceHandlerTests
     private static async Task<IEnumerable<BlockItemVariation>> ExecuteAlignedExposeVarianceAsync(
         IPublishedElement owner,
         IPublishedElement element,
-        BlockListValue blockValue)
+        BlockListValue blockValue,
+        string? culture = null)
     {
         var subject = BlockEditorVarianceHandler("da-DK", element);
-        return await subject.AlignedExposeVarianceAsync(blockValue, owner, element);
+        return await subject.AlignedExposeVarianceAsync(blockValue, owner, element, culture);
     }
 
     private static IPublishedElement PublishedElement(ContentVariation variation)

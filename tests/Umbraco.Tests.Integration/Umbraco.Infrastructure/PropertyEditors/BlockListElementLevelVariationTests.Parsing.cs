@@ -261,10 +261,10 @@ internal partial class BlockListElementLevelVariationTests
         // the content and element types are created invariant; now make them culture variant, and enable culture variance on the "variantText" property
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         RefreshContentTypeCache(elementType, contentType);
 
@@ -349,11 +349,11 @@ internal partial class BlockListElementLevelVariationTests
         // the content and element types are created as variant; now update the element type according to the test case
         elementType.Variations = elementVariationAfterPublish;
         elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = elementVariationAfterPublish;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // ...and make the content type invariant
         contentType.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         RefreshContentTypeCache(elementType, contentType);
 
@@ -501,12 +501,12 @@ internal partial class BlockListElementLevelVariationTests
                     new List<BlockPropertyValue>
                     {
                         new() { Alias = "invariantText", Value = "English invariant content value" },
-                        new() { Alias = "variantText", Value = "English variant content value", Culture = "en-US" }
+                        new() { Alias = "variantText", Value = "English variant content value", Culture = "en-US" },
                     },
                     new List<BlockPropertyValue>
                     {
                         new() { Alias = "invariantText", Value = "English invariant settings value" },
-                        new() { Alias = "variantText", Value = "English variant settings value", Culture = "en-US" }
+                        new() { Alias = "variantText", Value = "English variant settings value", Culture = "en-US" },
                     },
                     "en-US",
                     null),
@@ -514,15 +514,15 @@ internal partial class BlockListElementLevelVariationTests
                     new List<BlockPropertyValue>
                     {
                         new() { Alias = "invariantText", Value = "Danish invariant content value" },
-                        new() { Alias = "variantText", Value = "Danish variant content value", Culture = "da-DK" }
+                        new() { Alias = "variantText", Value = "Danish variant content value", Culture = "da-DK" },
                     },
                     new List<BlockPropertyValue>
                     {
                         new() { Alias = "invariantText", Value = "Danish invariant settings value" },
-                        new() { Alias = "variantText", Value = "Danish variant settings value", Culture = "da-DK" }
+                        new() { Alias = "variantText", Value = "Danish variant settings value", Culture = "da-DK" },
                     },
                     "da-DK",
-                    null)
+                    null),
             },
             true);
 
@@ -530,7 +530,7 @@ internal partial class BlockListElementLevelVariationTests
         // holds its own block value - which means every culture retains the values it was published with.
         elementType.Variations = ContentVariation.Nothing;
         elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         RefreshContentTypeCache(elementType);
 

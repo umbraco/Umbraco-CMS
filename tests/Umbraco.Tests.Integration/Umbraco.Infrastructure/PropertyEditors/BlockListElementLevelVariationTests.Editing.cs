@@ -1158,7 +1158,7 @@ internal partial class BlockListElementLevelVariationTests
             .WithVariations(ContentVariation.Nothing)
             .Done()
             .Build();
-        ContentTypeService.Save(rootElementType);
+        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
         var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
@@ -1310,7 +1310,7 @@ internal partial class BlockListElementLevelVariationTests
             false);
 
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1369,7 +1369,7 @@ internal partial class BlockListElementLevelVariationTests
 
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1430,7 +1430,7 @@ internal partial class BlockListElementLevelVariationTests
 
         elementType.Variations = ContentVariation.Nothing;
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1486,13 +1486,13 @@ internal partial class BlockListElementLevelVariationTests
                     {
                         new() { Alias = "invariantText", Value = "The invariant content value" },
                         new() { Alias = "variantText", Value = "Variant content in English", Culture = "en-US" },
-                        new() { Alias = "variantText", Value = null, Culture = "da-DK" }
+                        new() { Alias = "variantText", Value = null, Culture = "da-DK" },
                     },
                     new List<BlockPropertyValue>
                     {
                         new() { Alias = "invariantText", Value = "The invariant settings value" },
                         new() { Alias = "variantText", Value = "Variant settings in English", Culture = "en-US" },
-                        new() { Alias = "variantText", Value = null, Culture = "da-DK" }
+                        new() { Alias = "variantText", Value = null, Culture = "da-DK" },
                     },
                     "en-US",
                     null),
@@ -1501,22 +1501,22 @@ internal partial class BlockListElementLevelVariationTests
                     {
                         new() { Alias = "invariantText", Value = "The invariant content value" },
                         new() { Alias = "variantText", Value = null, Culture = "en-US" },
-                        new() { Alias = "variantText", Value = "Variant content in Danish", Culture = "da-DK" }
+                        new() { Alias = "variantText", Value = "Variant content in Danish", Culture = "da-DK" },
                     },
                     new List<BlockPropertyValue>
                     {
                         new() { Alias = "invariantText", Value = "The invariant settings value" },
                         new() { Alias = "variantText", Value = null, Culture = "en-US" },
-                        new() { Alias = "variantText", Value = "Variant settings in Danish", Culture = "da-DK" }
+                        new() { Alias = "variantText", Value = "Variant settings in Danish", Culture = "da-DK" },
                     },
                     "da-DK",
-                    null)
+                    null),
             },
             false);
 
         elementType.Variations = ContentVariation.Nothing;
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
