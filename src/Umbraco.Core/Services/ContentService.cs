@@ -26,6 +26,7 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class ContentService : AsyncPublishableContentServiceBase<IContent>, IContentService
 {
+    private readonly IAsyncDocumentRepository _asyncDocumentRepository;
     private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
     private readonly IDocumentRepository _documentRepository;
     private readonly IEntityRepository _entityRepository;
@@ -98,6 +99,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             propertyEditorCollection,
             idKeyMap)
     {
+        _asyncDocumentRepository = asyncDocumentRepository;
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
         _documentBlueprintRepository = documentBlueprintRepository;
@@ -374,20 +376,12 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     #region Get, Has, Is
 
-    /// <summary>
-    ///     Gets a collection of <see cref="IContent" /> objects by Level
-    /// </summary>
-    /// <param name="level">The level to retrieve Content from</param>
-    /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    /// <remarks>Contrary to most methods, this method filters out trashed content items.</remarks>
-    public IEnumerable<IContent> GetByLevel(int level)
+    /// <inheritdoc />
+    public async Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent>? query = Query<IContent>().Where(x => x.Level == level && x.Trashed == false);
-            return _documentRepository.Get(query);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+        return await _asyncDocumentRepository.GetByLevelAsync(level, skip, take, ordering, cancellationToken);
     }
 
     /// <summary>

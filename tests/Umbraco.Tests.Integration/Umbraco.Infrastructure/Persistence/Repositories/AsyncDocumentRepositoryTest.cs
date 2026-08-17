@@ -3272,4 +3272,82 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         Assert.That(result.Items.Select(c => c.Key), Is.EqualTo(expectedOrder));
     }
+
+    [Test]
+    public async Task GetByLevelAsync_ExcludesTrashedItemsAtSameLevel()
+    {
+        // _subpage and _subpage2 are both direct children of _textpage, i.e. the same tree level.
+        // Trashing one of them must not affect the other's presence in the result.
+        _subpage2.Trashed = true;
+        ContentService.Save(_subpage2, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetByLevelAsync(
+            _subpage.Level, skip: 0, take: 100, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Guid[] keys = result.Items.Select(c => c.Key).ToArray();
+        Assert.That(keys, Does.Contain(_subpage.Key));
+        Assert.That(keys, Does.Not.Contain(_subpage2.Key),
+            "GetByLevelAsync must filter out trashed content items, contrary to most other query methods");
+    }
+
+    [Test]
+    public async Task GetByLevelAsync_Paging_ReturnsCorrectPagesAndTotal()
+    {
+        var extraSibling1 = new ContentBuilder().WithContentType(_contentType).WithName("Extra Sibling 1").WithParentId(_textpage.Id).Build();
+        ContentService.Save(extraSibling1, -1);
+
+        var extraSibling2 = new ContentBuilder().WithContentType(_contentType).WithName("Extra Sibling 2").WithParentId(_textpage.Id).Build();
+        ContentService.Save(extraSibling2, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> firstPage = await repository.GetByLevelAsync(
+            _subpage.Level, skip: 0, take: 2, ordering: null, CancellationToken.None);
+        PagedModel<IContent> secondPage = await repository.GetByLevelAsync(
+            _subpage.Level, skip: 2, take: 2, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(firstPage.Total, Is.EqualTo(4));
+        Assert.That(firstPage.Items.Count(), Is.EqualTo(2));
+        Assert.That(secondPage.Total, Is.EqualTo(4));
+        Assert.That(secondPage.Items.Count(), Is.EqualTo(2));
+
+        Guid[] allKeys = firstPage.Items.Select(c => c.Key).Concat(secondPage.Items.Select(c => c.Key)).ToArray();
+        Assert.That(allKeys, Is.EquivalentTo(new[] { _subpage.Key, _subpage2.Key, extraSibling1.Key, extraSibling2.Key }),
+            "the two pages together must cover all 4 items at the level with no duplicates/omissions");
+    }
+
+    [Test]
+    public async Task GetByLevelAsync_OrderedByCustomIntProperty_OrdersByPropertyValue()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_textpage.Id).Build();
+        docHigh.SetValue("priority", 30);
+        ContentService.Save(docHigh, -1);
+
+        var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
+        docLow.SetValue("priority", 5);
+        ContentService.Save(docLow, -1);
+
+        var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").WithParentId(_textpage.Id).Build();
+        docMid.SetValue("priority", 15);
+        ContentService.Save(docMid, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetByLevelAsync(
+            _subpage.Level, skip: 0, take: 100, ordering: Ordering.By("priority", isCustomField: true), CancellationToken.None);
+        scope.Complete();
+
+        IContent[] custom = result.Items.Where(item => item.ContentType.Alias == contentType.Alias).ToArray();
+        Assert.That(custom.Select(c => c.Key), Is.EqualTo(new[] { docLow.Key, docMid.Key, docHigh.Key }),
+            "Ascending custom-field ordering should sort by the integer property value, low to high");
+    }
 }

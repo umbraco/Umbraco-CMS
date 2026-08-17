@@ -92,11 +92,18 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     #region Get, Count Documents
 
     /// <summary>
-    ///     Gets documents at a given level.
+    ///     Gets a paged list of documents at a given level.
     /// </summary>
+    /// <remarks>
+    ///     Contrary to most methods, this method filters out trashed content items.
+    /// </remarks>
     /// <param name="level">The level.</param>
-    /// <returns>The documents at the specified level.</returns>
-    IEnumerable<IContent> GetByLevel(int level);
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching, non-trashed documents.</returns>
+    Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets the parent of a document.

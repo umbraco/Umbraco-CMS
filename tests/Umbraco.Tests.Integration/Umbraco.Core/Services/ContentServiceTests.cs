@@ -678,16 +678,16 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Get_Content_By_Level()
+    public async Task Can_Get_Content_By_Level()
     {
         // Arrange
         // Act
-        var contents = ContentService.GetByLevel(2).ToList();
+        PagedModel<IContent> contents = await ContentService.GetByLevelAsync(2, 0, 100, null, CancellationToken.None);
 
         // Assert
         Assert.That(contents, Is.Not.Null);
-        Assert.That(contents.Any(), Is.True);
-        Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(2));
+        Assert.That(contents.Items.Any(), Is.True);
+        Assert.That(contents.Items.Count(), Is.GreaterThanOrEqualTo(2));
     }
 
     [Test]

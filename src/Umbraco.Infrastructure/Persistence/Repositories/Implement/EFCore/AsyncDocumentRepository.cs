@@ -1217,6 +1217,194 @@ internal class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
+    public Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int total = await db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed)
+                .CountAsync(cancellationToken);
+
+            if (total == 0)
+            {
+                return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
+            }
+
+            var publishedSubquery = db.ContentVersions
+                .Join(
+                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
+                    contentVersion => contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
+
+            // Mirrors GetPagedRecycleBinAsync — only the leading node predicate (Level == level plus the
+            // same !Trashed exclusion the old sync ContentService.GetByLevel documented — "contrary to most
+            // methods, this method filters out trashed content items") differs from that method.
+            var baseQuery = db.Nodes
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed)
+                .Join(
+                    db.Documents,
+                    node => node.NodeId,
+                    document => document.NodeId,
+                    (node, document) => new { node, document })
+                .Join(
+                    db.Content,
+                    joined => joined.node.NodeId,
+                    content => content.NodeId,
+                    (joined, content) => new { joined.node, joined.document, content })
+                .Join(
+                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
+                    joined => joined.node.NodeId,
+                    contentVersion => contentVersion.NodeId,
+                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
+                .Join(
+                    db.DocumentVersions,
+                    joined => joined.contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
+                .Join(
+                    db.ContentTypes,
+                    joined => joined.content.ContentTypeId,
+                    contentType => contentType.NodeId,
+                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
+                .GroupJoin(
+                    publishedSubquery,
+                    joined => joined.node.NodeId,
+                    pub => pub.contentVersion.NodeId,
+                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
+                .SelectMany(
+                    joined => joined.pubGroup.DefaultIfEmpty(),
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
+
+            bool isCustomFieldOrdering = ordering?.IsCustomField == true;
+            bool isCultureNameOrdering =
+                !isCustomFieldOrdering
+                && ordering?.OrderBy?.Equals("name", StringComparison.OrdinalIgnoreCase) == true
+                && ordering?.IsInvariant == false;
+
+            IReadOnlyList<DocumentRow> rows = isCustomFieldOrdering
+                ? await FetchCustomFieldOrdered()
+                : isCultureNameOrdering
+                    ? await FetchCultureNameOrdered()
+                    : await FetchDefaultOrdered();
+
+            if (rows.Count == 0)
+            {
+                return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
+            }
+
+            List<IContent> items = await AssembleEntitiesAsync(rows, db);
+
+            async Task<IReadOnlyList<DocumentRow>> FetchCustomFieldOrdered()
+            {
+                List<int> candidateNodeIds = await db.Nodes
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed)
+                    .Select(node => node.NodeId)
+                    .ToListAsync(cancellationToken);
+
+                return await FetchCustomFieldOrderedPageAsync(
+                    db,
+                    candidateNodeIds,
+                    ordering!,
+                    skip,
+                    take,
+                    pageNodeIds => baseQuery
+                        .Where(joined => pageNodeIds.Contains(joined.node.NodeId))
+                        .Select(joined => new DocumentRow(
+                            joined.node,
+                            joined.document,
+                            joined.content,
+                            joined.contentVersion,
+                            joined.documentVersion,
+                            joined.pub!.contentVersion,
+                            joined.pub!.documentVersion))
+                        .ToListAsync(cancellationToken),
+                    cancellationToken);
+            }
+
+            async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
+            {
+                // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
+                // An unknown culture yields languageId = 0, which matches no CCV rows, so
+                // variantName falls back to node.Text for every row (graceful degradation).
+                int languageId = await db.Language
+                    .Where(lang => lang.IsoCode == ordering!.Culture)
+                    .Select(lang => lang.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                var withVariantName = baseQuery
+                    .GroupJoin(
+                        db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
+                        joined => joined.contentVersion.Id,
+                        ccv => ccv.VersionId,
+                        (joined, ccvGroup) => new
+                        {
+                            joined.node, joined.document, joined.content,
+                            joined.contentVersion, joined.documentVersion,
+                            joined.contentType, joined.pub, ccvGroup
+                        })
+                    .SelectMany(
+                        joined => joined.ccvGroup.DefaultIfEmpty(),
+                        (joined, ccv) => new
+                        {
+                            joined.node, joined.document, joined.content,
+                            joined.contentVersion, joined.documentVersion,
+                            joined.contentType, joined.pub,
+                            variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
+                        });
+
+                bool descending = ordering!.Direction == Direction.Descending;
+
+                // ThenBy NodeId breaks ties in variantName so paged results stay stable/non-duplicated
+                // across separate fetches — mirrors GetPagedRecycleBinAsync's identical tiebreak.
+                var ordered = descending
+                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
+                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
+
+                return await ordered
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(joined => new DocumentRow(
+                        joined.node,
+                        joined.document,
+                        joined.content,
+                        joined.contentVersion,
+                        joined.documentVersion,
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion))
+                    .ToListAsync(cancellationToken);
+            }
+
+            async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
+            {
+                var orderedQuery = ApplyDocumentOrdering(
+                    baseQuery,
+                    ordering,
+                    sortOrderSelector: joined => joined.node.SortOrder,
+                    textSelector: joined => joined.node.Text,
+                    createDateSelector: joined => joined.node.CreateDate,
+                    versionDateSelector: joined => joined.contentVersion.VersionDate,
+                    idSelector: joined => joined.node.NodeId,
+                    ownerSelector: joined => joined.node.UserId,
+                    publishedSelector: joined => joined.documentVersion.Published,
+                    contentTypeAliasSelector: joined => joined.contentType.Alias);
+
+                return await orderedQuery
+                    .Skip(skip)
+                    .Take(take)
+                    .Select(joined => new DocumentRow(
+                        joined.node,
+                        joined.document,
+                        joined.content,
+                        joined.contentVersion,
+                        joined.documentVersion,
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion))
+                    .ToListAsync(cancellationToken);
+            }
+            return new PagedModel<IContent> { Total = total, Items = items };
+        });
+
+    /// <inheritdoc />
     public Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
