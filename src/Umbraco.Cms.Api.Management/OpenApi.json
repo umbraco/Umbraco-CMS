@@ -43412,6 +43412,7 @@
           "ancestors",
           "documentType",
           "flags",
+          "hasChildren",
           "id",
           "isProtected",
           "isTrashed",
@@ -43462,6 +43463,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "documentType": {
             "oneOf": [
@@ -46118,6 +46122,7 @@
       "MediaCollectionResponseModel": {
         "required": [
           "flags",
+          "hasChildren",
           "id",
           "mediaType",
           "sortOrder",
@@ -46167,6 +46172,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "mediaType": {
             "oneOf": [

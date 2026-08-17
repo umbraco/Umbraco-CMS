@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -32,6 +33,10 @@ public class DocumentCollectionPresentationFactoryTests
         // Default: return empty user list for any batch call
         _userService.Setup(x => x.GetUsersById(It.IsAny<int[]>()))
             .Returns(Enumerable.Empty<IUser>());
+
+        // Default: no items have children
+        _entityService.Setup(x => x.GetKeysWithChildren(It.IsAny<UmbracoObjectTypes>(), It.IsAny<IEnumerable<Guid>>()))
+            .Returns(new HashSet<Guid>());
 
         _factory = new DocumentCollectionPresentationFactory(
             _mapper.Object,
@@ -319,6 +324,87 @@ public class DocumentCollectionPresentationFactoryTests
 
         // Per-item profile resolution should never be called
         _userService.Verify(x => x.GetProfileById(It.IsAny<int>()), Times.Never);
+    }
+
+    [Test]
+    public async Task Can_Flag_Collection_Items_That_Have_Children()
+    {
+        // Arrange - a mixed set, so that flagging all or none is visibly wrong.
+        var contentKey1 = Guid.NewGuid();
+        var contentKey2 = Guid.NewGuid();
+        var contentKey3 = Guid.NewGuid();
+
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey1, contentKey2, contentKey3);
+
+        _entityService.Setup(x => x.GetKeysWithChildren(It.IsAny<UmbracoObjectTypes>(), It.IsAny<IEnumerable<Guid>>()))
+            .Returns(new HashSet<Guid> { contentKey1, contentKey3 });
+
+        // Act
+        List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
+
+        // Assert
+        Assert.IsTrue(result[0].HasChildren);
+        Assert.IsFalse(result[1].HasChildren);
+        Assert.IsTrue(result[2].HasChildren);
+    }
+
+    [Test]
+    public async Task Can_Resolve_Has_Children_In_A_Single_Batched_Call()
+    {
+        var contentKey1 = Guid.NewGuid();
+        var contentKey2 = Guid.NewGuid();
+        var contentKey3 = Guid.NewGuid();
+
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey1, contentKey2, contentKey3);
+
+        await _factory.CreateCollectionModelAsync(contentCollection);
+
+        // One call, carrying exactly the keys of the items being populated - no more, no less.
+        _entityService.Verify(
+            x => x.GetKeysWithChildren(
+                It.IsAny<UmbracoObjectTypes>(),
+                It.Is<IEnumerable<Guid>>(keys =>
+                    keys.Count() == 3
+                    && keys.Contains(contentKey1)
+                    && keys.Contains(contentKey2)
+                    && keys.Contains(contentKey3))),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task Can_Query_Has_Children_With_The_Document_Object_Type()
+    {
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(Guid.NewGuid());
+
+        await _factory.CreateCollectionModelAsync(contentCollection);
+
+        _entityService.Verify(
+            x => x.GetKeysWithChildren(UmbracoObjectTypes.Document, It.IsAny<IEnumerable<Guid>>()),
+            Times.Once);
+    }
+
+    private ListViewPagedModel<IContent> SetupCollection(params Guid[] keys)
+    {
+        IContent[] items = keys
+            .Select((key, index) => CreateContentMock(key, id: (index + 1) * 10, path: $"-1,100,{(index + 1) * 10}"))
+            .ToArray();
+
+        _mapper.Setup(m => m.MapEnumerable<IContent, DocumentCollectionResponseModel>(
+                It.IsAny<IEnumerable<IContent>>(),
+                It.IsAny<Action<MapperContext>>()))
+            .Returns(keys.Select(key => new DocumentCollectionResponseModel { Id = key }).ToList());
+
+        _publicAccessService.Setup(x => x.GetAll())
+            .Returns(Enumerable.Empty<PublicAccessEntry>());
+
+        _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
+            .Returns(Array.Empty<Guid>());
+
+        return new ListViewPagedModel<IContent>
+        {
+            Items = new PagedModel<IContent>(items.Length, items),
+            ListViewConfiguration = new ListViewConfiguration(),
+        };
     }
 
     private static IContent CreateContentMock(Guid key, int id, string path, int creatorId = 0, int writerId = 0)

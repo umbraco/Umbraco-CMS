@@ -57,6 +57,19 @@ public interface IEntityRepository : IRepository
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
 
     /// <summary>
+    ///     Gets the subset of the supplied entity keys that have at least one child of the same object type.
+    /// </summary>
+    /// <param name="objectType">The object type identifier, applied to both the supplied entities and their children.</param>
+    /// <param name="keys">The unique keys of the entities to test.</param>
+    /// <returns>The keys that have at least one child. Keys that do not exist are omitted.</returns>
+    // TODO (V19): Remove the default implementation.
+    ISet<Guid> GetKeysWithChildren(Guid objectType, IEnumerable<Guid> keys)
+        => GetAll(objectType, keys.Distinct().ToArray())
+            .Where(entity => entity.HasChildren)
+            .Select(entity => entity.Key)
+            .ToHashSet();
+
+    /// <summary>
     /// Gets sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.
     /// </summary>
     /// <param name="objectTypes">The object type keys of the entities.</param>
