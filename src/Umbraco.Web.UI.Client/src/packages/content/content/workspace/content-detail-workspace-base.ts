@@ -26,7 +26,12 @@ import {
 	UmbEntityDetailWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbWorkspaceActionExecutionOptions } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbWorkspaceActionExecutionOptions,
+	UmbEntityDetailWorkspaceContextArgs,
+	UmbEntityDetailWorkspaceContextCreateArgs,
+	UmbSaveableWorkspaceContext,
+} from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -54,11 +59,6 @@ import type { UmbContentTypeDetailModel, UmbPropertyTypeModel } from '@umbraco-c
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbDetailRepository, UmbDetailRepositoryConstructor } from '@umbraco-cms/backoffice/repository';
-import type {
-	UmbEntityDetailWorkspaceContextArgs,
-	UmbEntityDetailWorkspaceContextCreateArgs,
-	UmbSaveableWorkspaceContext,
-} from '@umbraco-cms/backoffice/workspace';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import type { UmbPropertyTypePresetModel, UmbPropertyTypePresetModelTypeModel } from '@umbraco-cms/backoffice/property';
