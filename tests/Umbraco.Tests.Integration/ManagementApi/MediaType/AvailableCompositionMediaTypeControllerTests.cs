@@ -1,13 +1,15 @@
 using System.Linq.Expressions;
 using System.Net;
-using Umbraco.Cms.Api.Management.Controllers.Searcher;
+using System.Net.Http.Json;
+using Umbraco.Cms.Api.Management.Controllers.MediaType;
+using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.Searcher;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.MediaType;
 
-public class AllSearcherControllerTests : ManagementApiUserGroupTestBase<AllSearcherController>
+public class AvailableCompositionMediaTypeControllerTests : ManagementApiUserGroupTestBase<AvailableCompositionMediaTypeController>
 {
-    protected override Expression<Func<AllSearcherController, object>> MethodSelector =>
-        x => x.All(CancellationToken.None, 0, 100);
+    protected override Expression<Func<AvailableCompositionMediaTypeController, object>> MethodSelector =>
+        x => x.AvailableCompositions(CancellationToken.None, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -38,4 +40,11 @@ public class AllSearcherControllerTests : ManagementApiUserGroupTestBase<AllSear
     {
         ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
+
+    protected override async Task<HttpResponseMessage> ClientRequest()
+    {
+        MediaTypeCompositionRequestModel requestModel = new();
+
+        return await Client.PostAsync(Url, JsonContent.Create(requestModel));
+    }
 }
