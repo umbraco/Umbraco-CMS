@@ -1668,10 +1668,10 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     /// <inheritdoc />
-    public OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+    public async Task<OperationResult> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
-        if (orderedChildIds.Count == 0)
+        if (orderedChildKeys.Count == 0)
         {
             return new OperationResult(OperationResultType.NoOperation, evtMsgs);
         }
@@ -1679,28 +1679,30 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
 
-        _documentRepository.UpdateSortOrder(orderedChildIds);
+        await _asyncDocumentRepository.UpdateSortOrderAsync(orderedChildKeys, cancellationToken);
 
         // Sort order lives in umbracoNode; neither the published cache nor the content repository cache keeps
         // a separate serialized copy of it, so refreshing the affected branch (which invalidates both and has
         // them reload from umbracoNode) is enough to pick up the new order without re-saving each child.
-        if (parentId == Constants.System.Root)
+        int parentId;
+        if (parentKey.HasValue)
         {
-            IContent[] roots = GetByIdsAsync(ResolveKeys(orderedChildIds), CancellationToken.None).GetAwaiter().GetResult().ToArray();
-            scope.Notifications.Publish(new ContentTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
-        }
-        else
-        {
-            IContent? parent = TryGetParentKey(parentId, out Guid? parentKey)
-                ? GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult()
-                : null;
+            IContent? parent = await GetByIdAsync(parentKey.Value, cancellationToken);
+            parentId = parent?.Id ?? Constants.System.Root;
             if (parent is not null)
             {
                 scope.Notifications.Publish(new ContentTreeChangeNotification(parent, TreeChangeTypes.RefreshBranch, evtMsgs));
             }
         }
+        else
+        {
+            parentId = Constants.System.Root;
+            IEnumerable<IContent> roots = await GetByIdsAsync(orderedChildKeys, cancellationToken);
+            scope.Notifications.Publish(new ContentTreeChangeNotification(roots, TreeChangeTypes.RefreshNode, evtMsgs));
+        }
 
-        Audit(AuditType.Sort, userId, parentId);
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        await AuditAsync(AuditType.Sort, userId, parentId);
 
         scope.Complete();
         return OperationResult.Succeed(evtMsgs);

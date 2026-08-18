@@ -103,7 +103,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [TestCase(true)]
     [TestCase(false)]
-    public void Sort_Preserves_Template_And_Property_Data_When_Items_Loaded_Without_Them(bool useSortChildren)
+    public async Task Sort_Preserves_Template_And_Property_Data_When_Items_Loaded_Without_Them(bool useSortChildren)
     {
         // The fixture's children share the content type's default template; assign it so we can verify it survives.
         var templateId = ContentType.DefaultTemplateId;
@@ -133,14 +133,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Dictionary<Guid, IContent> byKey = partialChildren.ToDictionary(x => x.Key, x => x);
         if (useSortChildren)
         {
-            int[] rotated =
+            Guid[] rotated =
             [
-                byKey[new Guid(SubPage2Key)].Id,
-                byKey[new Guid(SubPage3Key)].Id,
-                byKey[new Guid(SubPageKey)].Id,
+                byKey[new Guid(SubPage2Key)].Key,
+                byKey[new Guid(SubPage3Key)].Key,
+                byKey[new Guid(SubPageKey)].Key,
             ];
 
-            var result = ContentService.SortChildren(Textpage.Id, rotated);
+            var result = await ContentService.SortChildrenAsync(Textpage.Key, rotated, Constants.Security.SuperUserKey, CancellationToken.None);
             Assert.That(result.Success, Is.True);
         }
         else
@@ -4777,11 +4777,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(root);
 
         var childIds = new List<int>();
+        var childKeys = new List<Guid>();
         for (var i = 0; i < 5; i++)
         {
             var child = new Content($"Child {i}", root.Id, contentType);
             ContentService.Save(child);
             childIds.Add(child.Id);
+            childKeys.Add(child.Key);
         }
 
         int[] ChildIdsInSortOrder() => ContentService
@@ -4793,11 +4795,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Children were created in ascending sort order.
         Assert.AreEqual(childIds.ToArray(), ChildIdsInSortOrder());
 
-        var reversed = Enumerable.Reverse(childIds).ToArray();
-        var result = ContentService.SortChildren(root.Id, reversed, Constants.Security.SuperUserId);
+        var reversedKeys = Enumerable.Reverse(childKeys).ToArray();
+        var result = await ContentService.SortChildrenAsync(root.Key, reversedKeys, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(reversed, ChildIdsInSortOrder());
+        Assert.AreEqual(Enumerable.Reverse(childIds).ToArray(), ChildIdsInSortOrder());
     }
 
     [Test]

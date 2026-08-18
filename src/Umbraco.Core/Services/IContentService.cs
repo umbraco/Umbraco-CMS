@@ -471,20 +471,19 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Sorts the children of a parent by persisting the supplied (already ordered) child identifiers
-    ///     as the new sort order, in a single set-based update.
+    ///     Sorts the children of a parent by persisting the supplied (already ordered) child keys as the
+    ///     new sort order, in a single batched operation.
     /// </summary>
-    /// <param name="parentId">The identifier of the parent, or <see cref="Constants.System.Root"/> for the root.</param>
-    /// <param name="orderedChildIds">The child document identifiers, in the desired order.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the content tree.</param>
+    /// <param name="orderedChildKeys">The Guid keys of the children, in the desired order.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The operation result.</returns>
     /// <remarks>
     ///     Unlike <see cref="Sort(IEnumerable{int}?, int)" />, this does not load the children or fire per-item
     ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
-        => throw new NotImplementedException();
+    Task<OperationResult> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken);
 
     #endregion
 

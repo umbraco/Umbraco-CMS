@@ -91,14 +91,14 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
     protected abstract Task<PagedModel<TContent>> GetPagedChildrenAsync(Guid? parentKey, int pageIndex, int pageSize, Ordering? ordering);
 
     /// <summary>
-    /// Persists the supplied (already ordered) child identifiers as the new sort order, without loading
+    /// Persists the supplied (already ordered) child keys as the new sort order, without loading
     /// the children or firing per-item notifications.
     /// </summary>
-    /// <param name="parentId">The parent identifier, or the root identifier for root-level sorting.</param>
-    /// <param name="orderedChildIds">The child identifiers in their desired order.</param>
-    /// <param name="userId">The user performing the operation.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for root-level sorting.</param>
+    /// <param name="orderedChildKeys">The child keys in their desired order.</param>
+    /// <param name="userKey">The Guid key of the user performing the operation.</param>
     /// <returns>The operation status.</returns>
-    protected abstract ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId);
+    protected abstract Task<ContentEditingOperationStatus> SortChildrenInBulkAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey);
 
     /// <summary>
     /// Handles the sorting operation asynchronously.
@@ -152,11 +152,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
         string? culture,
         Guid userKey)
     {
-        TContent? parent = parentKey.HasValue
-            ? await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None)
-            : null;
-
-        if (parentKey.HasValue && parent is null)
+        if (parentKey.HasValue && await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None) is null)
         {
             return ContentEditingOperationStatus.NotFound;
         }
@@ -179,21 +175,18 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
 
         // Default path: persist the resulting order with a single set-based update and a branch cache
         // refresh, without loading every child or firing per-item notifications.
-        List<int> orderedChildIds = await LoadOrderedChildIdsAsync(parentKey, ordering);
-        if (orderedChildIds.Count == 0)
+        List<Guid> orderedChildKeys = await LoadOrderedChildKeysAsync(parentKey, ordering);
+        if (orderedChildKeys.Count == 0)
         {
             // Nothing to sort - the order is trivially correct.
             return ContentEditingOperationStatus.Success;
         }
 
-        // SortChildrenInBulk is still int-keyed (it writes through the older IContentService.SortChildren
-        // NPoco path) - resolve the parent id here rather than converting that write path too.
-        int parentId = parent?.Id ?? Constants.System.Root;
-        return SortChildrenInBulk(parentId, orderedChildIds, await GetUserIdAsync(userKey));
+        return await SortChildrenInBulkAsync(parentKey, orderedChildKeys, userKey);
     }
 
-    private Task<List<int>> LoadOrderedChildIdsAsync(Guid? parentKey, Ordering ordering)
-        => LoadAllChildrenAsync(parentKey, ordering, child => child.Id);
+    private Task<List<Guid>> LoadOrderedChildKeysAsync(Guid? parentKey, Ordering ordering)
+        => LoadAllChildrenAsync(parentKey, ordering, child => child.Key);
 
     private Task<List<TContent>> LoadAllChildrenAsync(Guid? parentKey, Ordering? ordering)
         => LoadAllChildrenAsync(parentKey, ordering, child => child);
