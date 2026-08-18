@@ -1168,16 +1168,12 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
   async getBlockCardInGroupWithName(groupName: string, blockName: string) {
     const group = await this.getGroupWithName(groupName);
-    const card = group.locator('umb-block-type-card').filter({has: this.page.getByText(blockName, {exact: true})});
-    await this.isVisible(card);
-    return card;
+    return group.locator('umb-block-type-card').filter({has: this.page.getByText(blockName, {exact: true})});
   }
 
   async getBlocksContainerInGroupWithName(groupName: string) {
     const group = await this.getGroupWithName(groupName);
-    const blocks = group.locator('#blocks');
-    await this.isVisible(blocks);
-    return blocks;
+    return group.locator('#blocks');
   }
 
   async getAddButtonInGroupWithName(name: string) {
