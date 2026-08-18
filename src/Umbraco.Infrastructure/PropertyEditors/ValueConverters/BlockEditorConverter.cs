@@ -91,20 +91,8 @@ public sealed class BlockEditorConverter
         var propertyValues = new Dictionary<string, object?>();
         foreach (BlockPropertyValue alignedProperty in alignedProperties)
         {
-            if (!propertyTypesByAlias.TryGetValue(alignedProperty.Alias, out IPublishedPropertyType? propertyType))
-            {
-                continue;
-            }
-
-            var expectedCulture = owner.ContentType.VariesByCulture() && publishedContentType.VariesByCulture() && propertyType.VariesByCulture()
-                ? variationContext.Culture
-                : null;
-            var expectedSegment = owner.ContentType.VariesBySegment() && publishedContentType.VariesBySegment() && propertyType.VariesBySegment()
-                ? variationContext.Segment
-                : null;
-
-            if (alignedProperty.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
-                && alignedProperty.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull()))
+            if (propertyTypesByAlias.TryGetValue(alignedProperty.Alias, out IPublishedPropertyType? propertyType)
+                && IsRenderedVariation(alignedProperty, propertyType, owner, publishedContentType, variationContext))
             {
                 propertyValues[alignedProperty.Alias] = alignedProperty.Value;
             }
@@ -144,4 +132,26 @@ public sealed class BlockEditorConverter
 
         return typeof(IPublishedElement);
     }
+
+    /// <summary>
+    /// Determines whether a block property value is the one to render for the current variation context.
+    /// </summary>
+    private static bool IsRenderedVariation(
+        BlockPropertyValue blockPropertyValue,
+        IPublishedPropertyType propertyType,
+        IPublishedElement owner,
+        IPublishedContentType elementType,
+        VariationContext variationContext)
+    {
+        var expectedCulture = owner.ContentType.VariesByCulture() && elementType.VariesByCulture() && propertyType.VariesByCulture()
+            ? variationContext.Culture
+            : null;
+        var expectedSegment = owner.ContentType.VariesBySegment() && elementType.VariesBySegment() && propertyType.VariesBySegment()
+            ? variationContext.Segment
+            : null;
+
+        return blockPropertyValue.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
+               && blockPropertyValue.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull());
+    }
+
 }

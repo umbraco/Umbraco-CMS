@@ -7,6 +7,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
+/// <summary>
+/// Helpers for resolving the effective variance of a property holding a block editor value.
+/// </summary>
 internal static class BlockPropertyVariance
 {
     /// <summary>
@@ -20,6 +23,10 @@ internal static class BlockPropertyVariance
     /// stored value and there is no owning culture.
     /// </para>
     /// </remarks>
+    /// <param name="variationContextAccessor">Accessor for the current variation context.</param>
+    /// <param name="owner">The content or element that owns the block property.</param>
+    /// <param name="propertyType">The property type holding the block value.</param>
+    /// <returns>The culture the stored property value belongs to, or <c>null</c> when the property does not vary by culture.</returns>
     public static string? OwningPropertyCulture(
         IVariationContextAccessor variationContextAccessor,
         IPublishedElement owner,

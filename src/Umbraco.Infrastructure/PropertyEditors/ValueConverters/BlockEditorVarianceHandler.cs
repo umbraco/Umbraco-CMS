@@ -105,11 +105,14 @@ public sealed class BlockEditorVarianceHandler
             return blockPropertyValue;
         }
 
-        return variation.VariesByCulture()
-            ? WithCulture(blockPropertyValue, defaultCulture)
-            : defaultCulture.InvariantEquals(blockPropertyValue.Culture)
-                ? WithCulture(blockPropertyValue, null)
-                : null;
+        if (variation.VariesByCulture())
+        {
+            return WithCulture(blockPropertyValue, defaultCulture);
+        }
+
+        return defaultCulture.InvariantEquals(blockPropertyValue.Culture)
+            ? WithCulture(blockPropertyValue, null)
+            : null;
     }
 
     /// <summary>
@@ -262,7 +265,6 @@ public sealed class BlockEditorVarianceHandler
     /// </remarks>
     public void AlignExposeVariance(BlockValue blockValue, string? culture)
     {
-        var contentDataToAlign = new List<BlockItemData>();
         var elementTypesByKey = blockValue
             .ContentData
             .Select(cd => cd.ContentTypeKey)
@@ -271,31 +273,11 @@ public sealed class BlockEditorVarianceHandler
             .WhereNotNull()
             .ToDictionary(c => c.Key);
 
-        foreach (BlockItemVariation variation in blockValue.Expose)
-        {
-            BlockItemData? contentData = blockValue.ContentData.FirstOrDefault(cd => cd.Key == variation.ContentKey);
-            if (contentData is null)
-            {
-                continue;
-            }
-
-            if (elementTypesByKey.TryGetValue(contentData.ContentTypeKey, out IContentType? elementType) is false)
-            {
-                continue;
-            }
-
-            if ((variation.Culture is not null) == elementType.VariesByCulture())
-            {
-                continue;
-            }
-
-            if (contentData.Values.Count == 0 ||
-                (variation.Culture is null && contentData.Values.Any(v => v.Culture is not null)) ||
-                (variation.Culture is not null && contentData.Values.All(v => v.Culture is null)))
-            {
-                contentDataToAlign.Add(contentData);
-            }
-        }
+        List<BlockItemData> contentDataToAlign = blockValue.Expose
+            .Select(variation => ContentDataToAlign(blockValue, elementTypesByKey, variation))
+            .WhereNotNull()
+            .DistinctBy(contentData => contentData.Key)
+            .ToList();
 
         // Remove expose entries that don't have matching entries in the block value's content data.
         var validContentKeys = blockValue.ContentData.Select(cd => cd.Key).ToHashSet();
@@ -303,33 +285,16 @@ public sealed class BlockEditorVarianceHandler
 
         if (contentDataToAlign.Count > 0)
         {
-            var replacedVariations = blockValue.Expose
-                .Where(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey))
+            var contentKeysToAlign = contentDataToAlign.Select(cd => cd.Key).ToHashSet();
+            List<BlockItemVariation> replacedVariations = blockValue.Expose
+                .Where(v => contentKeysToAlign.Contains(v.ContentKey))
                 .ToList();
-            blockValue.Expose.RemoveAll(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey));
+            blockValue.Expose.RemoveAll(v => contentKeysToAlign.Contains(v.ContentKey));
+
             foreach (BlockItemData contentData in contentDataToAlign)
             {
-                var omitNullCulture = contentData.Values.Any(v => v.Culture is not null);
-                var alignedVariations = contentData.Values
-                    .Where(v => omitNullCulture is false || v.Culture is not null)
-                    .DistinctBy(v => v.Culture + v.Segment)
-                    .Select(v => new BlockItemVariation(contentData.Key, v.Culture, v.Segment))
-                    .ToList();
-
-                if (alignedVariations.Count == 0)
-                {
-                    // a block without property values has no value variance to align against, so keep it exposed for
-                    // the element type's variance, retaining the segments it was exposed for
-                    var alignedCulture = elementTypesByKey[contentData.ContentTypeKey].VariesByCulture() ? culture : null;
-                    alignedVariations.AddRange(replacedVariations
-                        .Where(v => v.ContentKey == contentData.Key)
-                        .Select(v => v.Segment)
-                        .DefaultIfEmpty(null)
-                        .Distinct()
-                        .Select(segment => new BlockItemVariation(contentData.Key, alignedCulture, segment)));
-                }
-
-                foreach (BlockItemVariation alignedVariation in alignedVariations)
+                IContentType elementType = elementTypesByKey[contentData.ContentTypeKey];
+                foreach (BlockItemVariation alignedVariation in AlignedExposeVariations(contentData, elementType, replacedVariations, culture))
                 {
                     blockValue.Expose.Add(alignedVariation);
                 }
@@ -337,6 +302,61 @@ public sealed class BlockEditorVarianceHandler
         }
 
         blockValue.Expose = blockValue.Expose.DistinctBy(e => $"{e.ContentKey}.{e.Culture}.{e.Segment}").ToList();
+    }
+
+    /// <summary>
+    /// Determines whether an expose entry's block requires realignment, returning the block's content data when it does.
+    /// </summary>
+    private static BlockItemData? ContentDataToAlign(
+        BlockValue blockValue,
+        IReadOnlyDictionary<Guid, IContentType> elementTypesByKey,
+        BlockItemVariation variation)
+    {
+        BlockItemData? contentData = blockValue.ContentData.FirstOrDefault(cd => cd.Key == variation.ContentKey);
+        if (contentData is null
+            || elementTypesByKey.TryGetValue(contentData.ContentTypeKey, out IContentType? elementType) is false
+            || (variation.Culture is not null) == elementType.VariesByCulture())
+        {
+            return null;
+        }
+
+        var requiresAlignment = contentData.Values.Count == 0
+                                || (variation.Culture is null && contentData.Values.Any(v => v.Culture is not null))
+                                || (variation.Culture is not null && contentData.Values.All(v => v.Culture is null));
+
+        return requiresAlignment ? contentData : null;
+    }
+
+    /// <summary>
+    /// Builds the expose entries for a block, derived from the variance of its property values.
+    /// </summary>
+    private static IEnumerable<BlockItemVariation> AlignedExposeVariations(
+        BlockItemData contentData,
+        IContentType elementType,
+        IEnumerable<BlockItemVariation> replacedVariations,
+        string? culture)
+    {
+        var omitNullCulture = contentData.Values.Any(v => v.Culture is not null);
+        List<BlockItemVariation> alignedVariations = contentData.Values
+            .Where(v => omitNullCulture is false || v.Culture is not null)
+            .DistinctBy(v => v.Culture + v.Segment)
+            .Select(v => new BlockItemVariation(contentData.Key, v.Culture, v.Segment))
+            .ToList();
+
+        if (alignedVariations.Count > 0)
+        {
+            return alignedVariations;
+        }
+
+        // a block without property values has no value variance to align against, so keep it exposed for the element
+        // type's variance, retaining the segments it was exposed for
+        var alignedCulture = elementType.VariesByCulture() ? culture : null;
+        return replacedVariations
+            .Where(v => v.ContentKey == contentData.Key)
+            .Select(v => v.Segment)
+            .DefaultIfEmpty(null)
+            .Distinct()
+            .Select(segment => new BlockItemVariation(contentData.Key, alignedCulture, segment));
     }
 
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)
