@@ -6,7 +6,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbConfirmActionModalEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
+import type { UmbEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 import '../../../variant-picker/content-variant-language-picker.element.js';
@@ -29,7 +29,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	private _isInvariant = false;
 
 	@state()
-	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbPublishableVariantState.NOT_CREATED) {
@@ -107,15 +107,15 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-dialog-layout headline=${headline}>
 				<p><umb-localize key="prompt_confirmPublish"></umb-localize></p>
-
 				${when(
 					!this._isInvariant,
-					() =>
-						html`<umb-content-variant-language-picker
+					() => html`
+						<umb-content-variant-language-picker
 							.selectionManager=${this.#selectionManager}
 							.variantLanguageOptions=${this._options}
 							.requiredFilter=${isNotPublishedMandatory}
-							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>`,
+							.pickableFilter=${this.#pickableFilter}></umb-content-variant-language-picker>
+					`,
 				)}
 				${when(
 					this._referencesConfig,
@@ -125,14 +125,11 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 							.entitiesNeedingAttention=${this.data
 								?.entitiesNeedingAttention}></umb-entity-references-summary>`,
 				)}
-
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 					<uui-button
 						${umbFocus()}
-						label="${this.data?.confirmLabel
-							? this.localize.string(this.data.confirmLabel)
-							: this.localize.term('buttons_saveAndPublish')}"
+						label=${this.localize.string(this.data?.confirmLabel || '#buttons_saveAndPublish')}
 						look="primary"
 						color="positive"
 						?disabled=${this._hasNotSelectedMandatory}
@@ -149,6 +146,10 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 				display: block;
 				min-width: 460px;
 				max-width: 90vw;
+			}
+
+			umb-content-variant-language-picker {
+				margin-bottom: var(--uui-size-3);
 			}
 		`,
 	];
