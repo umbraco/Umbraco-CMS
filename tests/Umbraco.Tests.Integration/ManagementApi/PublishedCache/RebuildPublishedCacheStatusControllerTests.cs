@@ -1,13 +1,13 @@
 using System.Linq.Expressions;
 using System.Net;
-using Umbraco.Cms.Api.Management.Controllers.Searcher;
+using Umbraco.Cms.Api.Management.Controllers.PublishedCache;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.Searcher;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.PublishedCache;
 
-public class AllSearcherControllerTests : ManagementApiUserGroupTestBase<AllSearcherController>
+public class RebuildPublishedCacheStatusControllerTests : ManagementApiUserGroupTestBase<RebuildPublishedCacheStatusController>
 {
-    protected override Expression<Func<AllSearcherController, object>> MethodSelector =>
-        x => x.All(CancellationToken.None, 0, 100);
+    protected override Expression<Func<RebuildPublishedCacheStatusController, object>> MethodSelector =>
+        x => x.Status(CancellationToken.None);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
