@@ -1847,6 +1847,7 @@ declare global {
 		references_labelDependentDescendants: string;
 		references_labelDependsOnThis: string;
 		references_labelMoreReferences: (count: number) => string;
+		references_labelUsedByCount: (count: number) => string;
 		references_labelUsedByDocuments: string;
 		references_labelUsedByDocumentTypes: string;
 		references_labelUsedByItems: string;

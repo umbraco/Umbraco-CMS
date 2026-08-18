@@ -8,7 +8,7 @@ import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type {
 	UmbConfirmActionModalEntityReferencesConfig,
-	UmbConfirmActionModalEntityReferencesElement,
+	UmbEntityReferencesSummaryElement,
 } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
@@ -140,7 +140,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 
 	async #onReferencesChange(event: UmbChangeEvent) {
 		event.stopPropagation();
-		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
+		const target = event.target as UmbEntityReferencesSummaryElement;
 		const total = target.getTotalReferencedBy() + target.getTotalDescendantsWithReferences();
 
 		if (total === 0) {
@@ -189,10 +189,8 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 				${when(
 					this._referencesConfig,
 					() => html`
-						<umb-confirm-action-modal-entity-references
-							.config=${this._referencesConfig}
-							@change=${this.#onReferencesChange}>
-						</umb-confirm-action-modal-entity-references>
+						<umb-entity-references-summary .config=${this._referencesConfig} @change=${this.#onReferencesChange}>
+						</umb-entity-references-summary>
 					`,
 				)}
 				<div slot="actions">

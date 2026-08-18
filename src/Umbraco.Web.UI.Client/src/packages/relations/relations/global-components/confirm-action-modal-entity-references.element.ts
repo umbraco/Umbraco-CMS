@@ -1,8 +1,6 @@
-import { UMB_ENTITY_REFERENCES_MODAL } from '../reference/modal/constants.js';
 import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../reference/types.js';
 import { customElement, css, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -126,19 +124,6 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 		}
 	}
 
-	#onClickViewAll(event: Event) {
-		event.preventDefault();
-		if (!this.config) return;
-
-		umbOpenModal(this, UMB_ENTITY_REFERENCES_MODAL, {
-			data: {
-				unique: this.config.unique,
-				referenceRepositoryAlias: this.config.referenceRepositoryAlias,
-				itemRepositoryAlias: this.config.itemRepositoryAlias,
-			},
-		}).catch(() => undefined);
-	}
-
 	override render() {
 		return html`
 			${this.#renderItems('references_labelDependsOnThis', this._referencedByItems, this._totalReferencedByItems)}
@@ -152,7 +137,6 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 
 	#renderItems(headline: string, items: Array<UmbReferenceItemModel>, total: number) {
 		if (total === 0) return nothing;
-
 		return html`
 			<h5 class="uui-h5">${this.localize.term(headline)}</h5>
 			<uui-ref-list>
@@ -164,12 +148,7 @@ export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement 
 			</uui-ref-list>
 			${when(
 				total > this.#limitItems,
-				() => html`
-					<uui-button
-						look="default"
-						label=${this.localize.term('references_labelMoreReferences', total - this.#limitItems)}
-						@click=${this.#onClickViewAll}></uui-button>
-				`,
+				() => html`<span>${this.localize.term('references_labelMoreReferences', total - this.#limitItems)}</span>`,
 			)}
 		`;
 	}

@@ -1820,6 +1820,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'references_labelDependentDescendants',
 	'references_labelDependsOnThis',
 	'references_labelMoreReferences',
+	'references_labelUsedByCount',
 	'references_labelUsedByDocuments',
 	'references_labelUsedByDocumentTypes',
 	'references_labelUsedByItems',

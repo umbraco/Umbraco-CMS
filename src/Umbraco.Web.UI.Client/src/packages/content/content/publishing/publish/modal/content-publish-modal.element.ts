@@ -118,10 +118,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 				)}
 				${when(
 					this._referencesConfig,
-					() => html`
-						<umb-confirm-action-modal-entity-references .config=${this._referencesConfig}>
-						</umb-confirm-action-modal-entity-references>
-					`,
+					() => html`<umb-entity-references-summary .config=${this._referencesConfig}></umb-entity-references-summary>`,
 				)}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
