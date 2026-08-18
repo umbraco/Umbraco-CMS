@@ -17,7 +17,7 @@ public class ContentTypeEditingHelperTests
     private static readonly IShortStringHelper ShortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
     [Test]
-    public void GetAllDescendantPropertyAliases_Excludes_Sources_Own_Composition_Contribution()
+    public void GetPropertyAliasesReservedByDescendants_Excludes_Sources_Own_Composition_Contribution()
     {
         var composition = ContentTypeBuilder.CreateBasicContentType("composition", "Composition");
         composition.Id = 1;
@@ -30,13 +30,13 @@ public class ContentTypeEditingHelperTests
         var child = ContentTypeBuilder.CreateBasicContentType("child", "Child", parent);
         child.Id = 3;
 
-        var descendantAliases = parent.GetAllDescendantPropertyAliases(new IContentTypeComposition[] { composition, parent, child });
+        var descendantAliases = parent.GetPropertyAliasesReservedByDescendants(new IContentTypeComposition[] { composition, parent, child });
 
         CollectionAssert.IsEmpty(descendantAliases);
     }
 
     [Test]
-    public void GetAllDescendantPropertyAliases_Excludes_Sources_Own_Property()
+    public void GetPropertyAliasesReservedByDescendants_Excludes_Sources_Own_Property()
     {
         var parent = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
         parent.Id = 1;
@@ -45,13 +45,13 @@ public class ContentTypeEditingHelperTests
         var child = ContentTypeBuilder.CreateBasicContentType("child", "Child", parent);
         child.Id = 2;
 
-        var descendantAliases = parent.GetAllDescendantPropertyAliases(new IContentTypeComposition[] { parent, child });
+        var descendantAliases = parent.GetPropertyAliasesReservedByDescendants(new IContentTypeComposition[] { parent, child });
 
         CollectionAssert.IsEmpty(descendantAliases);
     }
 
     [Test]
-    public void GetAllDescendantPropertyAliases_Includes_Genuinely_Separate_Descendant_Alias()
+    public void GetPropertyAliasesReservedByDescendants_Includes_Genuinely_Separate_Descendant_Alias()
     {
         var parent = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
         parent.Id = 1;
@@ -60,13 +60,13 @@ public class ContentTypeEditingHelperTests
         child.Id = 2;
         AddPropertyType(child, "childOwn");
 
-        var descendantAliases = parent.GetAllDescendantPropertyAliases(new IContentTypeComposition[] { parent, child });
+        var descendantAliases = parent.GetPropertyAliasesReservedByDescendants(new IContentTypeComposition[] { parent, child });
 
         CollectionAssert.AreEquivalent(new[] { "childOwn" }, descendantAliases);
     }
 
     [Test]
-    public void GetAllDescendantPropertyAliases_Walks_Multiple_Inheritance_Levels()
+    public void GetPropertyAliasesReservedByDescendants_Walks_Multiple_Inheritance_Levels()
     {
         var parent = ContentTypeBuilder.CreateBasicContentType("parent", "Parent");
         parent.Id = 1;
@@ -78,7 +78,7 @@ public class ContentTypeEditingHelperTests
         grandchild.Id = 3;
         AddPropertyType(grandchild, "deep");
 
-        var descendantAliases = parent.GetAllDescendantPropertyAliases(new IContentTypeComposition[] { parent, child, grandchild });
+        var descendantAliases = parent.GetPropertyAliasesReservedByDescendants(new IContentTypeComposition[] { parent, child, grandchild });
 
         CollectionAssert.AreEquivalent(new[] { "deep" }, descendantAliases);
     }

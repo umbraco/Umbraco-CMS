@@ -501,7 +501,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model,
         IContentTypeComposition[] allContentTypeCompositions)
     {
-        HashSet<string> descendantPropertyAliases = contentType.GetAllDescendantPropertyAliases(allContentTypeCompositions);
+        HashSet<string> descendantPropertyAliases = contentType.GetPropertyAliasesReservedByDescendants(allContentTypeCompositions);
 
         var collidesWithDescendants = model.Properties.Select(p => p.Alias).Any(descendantPropertyAliases.InvariantContains);
 

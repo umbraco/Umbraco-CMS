@@ -100,7 +100,7 @@ public static class ContentTypeServiceExtensions
                 .Where(c => filterContentTypes.InvariantContains(c.Alias))
                 .SelectMany(c => c.PropertyTypes)
                 .Select(c => c.Alias),
-            .. source.GetAllDescendantPropertyAliases(allContentTypes)
+            .. source.GetPropertyAliasesReservedByDescendants(allContentTypes)
         ];
 
         var sourceId = source?.Id ?? 0;

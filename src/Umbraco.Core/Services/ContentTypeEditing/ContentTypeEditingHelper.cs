@@ -20,7 +20,7 @@ internal static class ContentTypeEditingHelper
     ///     Inheritance children hold their parent in their own <see cref="IContentTypeComposition.ContentTypeComposition"/>,
     ///     so walking the composition graph downward captures inheritance and composition descendants alike.
     /// </remarks>
-    internal static HashSet<string> GetAllDescendantPropertyAliases(this IContentTypeComposition? source, IContentTypeComposition[] allContentTypes)
+    internal static HashSet<string> GetPropertyAliasesReservedByDescendants(this IContentTypeComposition? source, IContentTypeComposition[] allContentTypes)
     {
         if (source is null)
         {
