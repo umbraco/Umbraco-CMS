@@ -315,8 +315,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             // if changes were made to the element type variations, we need those changes reflected in the block property values.
             // for regular content this happens when a content type is saved (copies of property values are created in the DB),
             // but for local block level properties we don't have that kind of handling, so we to do it manually.
-            // to be friendly we'll map "formerly invariant properties" to the default language ISO code instead of performing a
-            // hard reset of the property values (which would likely be the most correct thing to do from a data point of view).
+            // to be friendly we'll map the values onto the culture being aligned - falling back to the default language -
+            // instead of performing a hard reset of the property values (which would likely be the most correct thing to
+            // do from a data point of view).
             item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult();
             foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {

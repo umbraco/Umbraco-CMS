@@ -62,7 +62,16 @@ public sealed class BlockEditorVarianceHandler
 
         foreach (IGrouping<(string Alias, string? Segment), BlockPropertyValue> group in collapsingValues)
         {
-            BlockPropertyValue? valueToRetain = ValueToRetain(blockPropertyValues, group, culture, defaultIsoCode);
+            // An explicitly invariant value is the one matching the current schema, so it takes precedence over the
+            // culture specific leftovers - see axiom 3 in block-element-level-variation.md, structure over data.
+            var hasInvariantValue = blockPropertyValues.Any(blockPropertyValue
+                => blockPropertyValue.Alias == group.Key.Alias
+                   && blockPropertyValue.Segment == group.Key.Segment
+                   && VariesByCulture(blockPropertyValue) is false);
+
+            BlockPropertyValue? valueToRetain = hasInvariantValue
+                ? null
+                : ValueToRetain(group, culture, defaultIsoCode);
             foreach (BlockPropertyValue blockPropertyValue in group)
             {
                 if (blockPropertyValue == valueToRetain)
@@ -86,65 +95,85 @@ public sealed class BlockEditorVarianceHandler
     /// <param name="propertyType">The underlying property type.</param>
     /// <param name="owner">The containing block element.</param>
     /// <returns>A task representing the asynchronous operation. The task result contains the aligned <see cref="BlockPropertyValue"/>, or <c>null</c> if alignment is not applicable.</returns>
-    [Obsolete("Please use the overload that takes the culture of the owning property value. Scheduled for removal in Umbraco 19.")]
-    public Task<BlockPropertyValue?> AlignedPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPublishedPropertyType propertyType, IPublishedElement owner)
-        => AlignedPropertyVarianceAsync(blockPropertyValue, propertyType, owner, culture: null);
-
-    /// <summary>
-    /// Aligns a block property value for variance changes.
-    /// </summary>
-    /// <param name="blockPropertyValue">The block property value to align.</param>
-    /// <param name="propertyType">The underlying property type.</param>
-    /// <param name="owner">The containing block element.</param>
-    /// <param name="culture">The culture of the owning property value, or <c>null</c> when the owning property does not vary by culture.</param>
-    /// <returns>A task representing the asynchronous operation. The task result contains the aligned <see cref="BlockPropertyValue"/>, or <c>null</c> if alignment is not applicable.</returns>
-    /// <remarks>
-    /// <para>Used for aligning variance changes when rendering content.</para>
-    /// <para>
-    /// When the owning property varies by culture, each culture is stored separately, so the block property values that
-    /// belong to <paramref name="culture"/> are the ones that represent the block. Otherwise all cultures share a single
-    /// stored value, and the default language is the one that survives becoming invariant.
-    /// </para>
-    /// </remarks>
-    public async Task<BlockPropertyValue?> AlignedPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPublishedPropertyType propertyType, IPublishedElement owner, string? culture)
+    [Obsolete("Please use the overload that aligns all property values of a block element. Scheduled for removal in Umbraco 19.")]
+    public async Task<BlockPropertyValue?> AlignedPropertyVarianceAsync(BlockPropertyValue blockPropertyValue, IPublishedPropertyType propertyType, IPublishedElement owner)
     {
-        ContentVariation propertyTypeVariation = owner.ContentType.Variations & propertyType.Variations;
-        if (propertyTypeVariation.VariesByCulture() == VariesByCulture(blockPropertyValue))
+        var defaultCulture = await _languageService.GetDefaultIsoCodeAsync();
+        ContentVariation variation = owner.ContentType.Variations & propertyType.Variations;
+        if (variation.VariesByCulture() == VariesByCulture(blockPropertyValue))
         {
             return blockPropertyValue;
         }
 
-        // mismatch in culture variation for published content:
-        // - if the property type varies by culture, assign the default culture
-        // - if the property type does not vary by culture:
-        //   - if the property value culture is the one representing the block, assign a null value for it to be rendered as the invariant value
-        //   - otherwise return null (not applicable for rendering)
+        return variation.VariesByCulture()
+            ? WithCulture(blockPropertyValue, defaultCulture)
+            : defaultCulture.InvariantEquals(blockPropertyValue.Culture)
+                ? WithCulture(blockPropertyValue, null)
+                : null;
+    }
+
+    /// <summary>
+    /// Aligns the property values of a block element for variance changes.
+    /// </summary>
+    /// <param name="blockPropertyValues">The block property values to align.</param>
+    /// <param name="elementType">The published element type the values belong to.</param>
+    /// <param name="owner">The owner element, which is either the content for block properties at the content level or the parent element for nested block properties.</param>
+    /// <param name="culture">The culture of the owning property value, or <c>null</c> when the owning property does not vary by culture.</param>
+    /// <returns>A task representing the asynchronous operation, with a result containing the aligned block property values.</returns>
+    /// <remarks>
+    /// <para>Used for aligning variance changes when rendering content.</para>
+    /// <para>
+    /// This applies the same rule as <see cref="AlignPropertyVarianceAsync"/> does when editing: a property type that has
+    /// become culture variant adopts <paramref name="culture"/>, and a property type that has become culture invariant
+    /// retains a single value per alias and segment - an explicitly invariant value first, then the value for
+    /// <paramref name="culture"/>, then the value for the default language.
+    /// </para>
+    /// <para>The supplied values are never modified; realigned values are returned as new instances.</para>
+    /// </remarks>
+    public async Task<IList<BlockPropertyValue>> AlignedPropertyVarianceAsync(
+        IList<BlockPropertyValue> blockPropertyValues,
+        IPublishedContentType elementType,
+        IPublishedElement owner,
+        string? culture)
+    {
         var defaultCulture = await _languageService.GetDefaultIsoCodeAsync();
-        if (propertyTypeVariation.VariesByCulture())
+        var alignmentCulture = culture ?? defaultCulture;
+
+        var alignedValues = new List<BlockPropertyValue>();
+        foreach (IGrouping<(string Alias, string? Segment), BlockPropertyValue> group in blockPropertyValues
+                     .GroupBy(blockPropertyValue => (blockPropertyValue.Alias, blockPropertyValue.Segment)))
         {
-            return new BlockPropertyValue
+            IPublishedPropertyType? propertyType = elementType.GetPropertyType(group.Key.Alias);
+            if (propertyType is null)
             {
-                Alias = blockPropertyValue.Alias,
-                Culture = defaultCulture,
-                Segment = blockPropertyValue.Segment,
-                Value = blockPropertyValue.Value,
-                PropertyType = blockPropertyValue.PropertyType
-            };
+                alignedValues.AddRange(group);
+                continue;
+            }
+
+            ContentVariation variation = owner.ContentType.Variations & propertyType.Variations;
+            if (variation.VariesByCulture())
+            {
+                alignedValues.AddRange(group.Select(blockPropertyValue => VariesByCulture(blockPropertyValue)
+                    ? blockPropertyValue
+                    : WithCulture(blockPropertyValue, alignmentCulture)));
+                continue;
+            }
+
+            // the property type no longer varies by culture, so only a single value can survive
+            alignedValues.AddRange(group.Where(blockPropertyValue => VariesByCulture(blockPropertyValue) is false));
+            if (group.Any(blockPropertyValue => VariesByCulture(blockPropertyValue) is false))
+            {
+                continue;
+            }
+
+            BlockPropertyValue? valueToRetain = ValueToRetain(group, alignmentCulture, defaultCulture);
+            if (valueToRetain is not null)
+            {
+                alignedValues.Add(WithCulture(valueToRetain, null));
+            }
         }
 
-        if ((culture ?? defaultCulture).InvariantEquals(blockPropertyValue.Culture))
-        {
-            return new BlockPropertyValue
-            {
-                Alias = blockPropertyValue.Alias,
-                Culture = null,
-                Segment = blockPropertyValue.Segment,
-                Value = blockPropertyValue.Value,
-                PropertyType = blockPropertyValue.PropertyType
-            };
-        }
-
-        return null;
+        return alignedValues;
     }
 
     /// <summary>
@@ -274,6 +303,9 @@ public sealed class BlockEditorVarianceHandler
 
         if (contentDataToAlign.Count > 0)
         {
+            var replacedVariations = blockValue.Expose
+                .Where(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey))
+                .ToList();
             blockValue.Expose.RemoveAll(v => contentDataToAlign.Any(cd => cd.Key == v.ContentKey));
             foreach (BlockItemData contentData in contentDataToAlign)
             {
@@ -286,10 +318,15 @@ public sealed class BlockEditorVarianceHandler
 
                 if (alignedVariations.Count == 0)
                 {
-                    alignedVariations.Add(new BlockItemVariation(
-                        contentData.Key,
-                        elementTypesByKey[contentData.ContentTypeKey].VariesByCulture() ? culture : null,
-                        null));
+                    // a block without property values has no value variance to align against, so keep it exposed for
+                    // the element type's variance, retaining the segments it was exposed for
+                    var alignedCulture = elementTypesByKey[contentData.ContentTypeKey].VariesByCulture() ? culture : null;
+                    alignedVariations.AddRange(replacedVariations
+                        .Where(v => v.ContentKey == contentData.Key)
+                        .Select(v => v.Segment)
+                        .DefaultIfEmpty(null)
+                        .Distinct()
+                        .Select(segment => new BlockItemVariation(contentData.Key, alignedCulture, segment)));
                 }
 
                 foreach (BlockItemVariation alignedVariation in alignedVariations)
@@ -305,21 +342,23 @@ public sealed class BlockEditorVarianceHandler
     private static bool VariesByCulture(BlockPropertyValue blockPropertyValue)
         => blockPropertyValue.Culture.IsNullOrWhiteSpace() is false;
 
+    /// <summary>
+    /// Determines which of a property's culture specific values survives the property type becoming culture invariant.
+    /// </summary>
     private static BlockPropertyValue? ValueToRetain(
-        IEnumerable<BlockPropertyValue> blockPropertyValues,
-        IGrouping<(string Alias, string? Segment), BlockPropertyValue> collapsingValues,
+        IEnumerable<BlockPropertyValue> cultureSpecificValues,
         string culture,
         string defaultIsoCode)
-    {
-        // an explicitly invariant value already covers the property, so the culture specific ones are leftovers
-        var hasInvariantValue = blockPropertyValues.Any(blockPropertyValue
-            => blockPropertyValue.Alias == collapsingValues.Key.Alias
-               && blockPropertyValue.Segment == collapsingValues.Key.Segment
-               && VariesByCulture(blockPropertyValue) is false);
+        => cultureSpecificValues.FirstOrDefault(blockPropertyValue => blockPropertyValue.Culture.InvariantEquals(culture))
+           ?? cultureSpecificValues.FirstOrDefault(blockPropertyValue => blockPropertyValue.Culture.InvariantEquals(defaultIsoCode));
 
-        return hasInvariantValue
-            ? null
-            : collapsingValues.FirstOrDefault(blockPropertyValue => blockPropertyValue.Culture.InvariantEquals(culture))
-              ?? collapsingValues.FirstOrDefault(blockPropertyValue => blockPropertyValue.Culture.InvariantEquals(defaultIsoCode));
-    }
+    private static BlockPropertyValue WithCulture(BlockPropertyValue blockPropertyValue, string? culture)
+        => new()
+        {
+            Alias = blockPropertyValue.Alias,
+            Culture = culture,
+            Segment = blockPropertyValue.Segment,
+            Value = blockPropertyValue.Value,
+            PropertyType = blockPropertyValue.PropertyType,
+        };
 }

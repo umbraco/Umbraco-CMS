@@ -314,7 +314,7 @@ public class BlockEditorVarianceHandlerTests
     }
 
     [Test]
-    public async Task AlignedPropertyVarianceAsync_Ignores_Other_Cultures_Than_The_Owning_Property_Culture()
+    public async Task AlignedPropertyVarianceAsync_Falls_Back_To_Default_Culture_When_No_Value_For_Owning_Property_Culture()
     {
         var result = await ExecuteAlignedPropertyVarianceAsync(
             ContentVariation.Nothing,
@@ -322,7 +322,45 @@ public class BlockEditorVarianceHandlerTests
             new BlockPropertyValue { Culture = "da-DK", Value = "Danish" },
             culture: "en-US");
 
-        Assert.IsNull(result);
+        Assert.IsNotNull(result);
+        Assert.Multiple(() =>
+        {
+            Assert.IsNull(result.Culture);
+            Assert.AreEqual("Danish", result.Value);
+        });
+    }
+
+    [Test]
+    public async Task AlignedPropertyVarianceAsync_Prefers_Owning_Property_Culture_Over_Default_Culture()
+    {
+        IList<BlockPropertyValue> result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Nothing,
+            ContentVariation.Nothing,
+            [
+                new() { Alias = "text", Culture = "da-DK", Value = "Danish" },
+                new() { Alias = "text", Culture = "en-US", Value = "English" },
+            ],
+            culture: "en-US");
+
+        Assert.AreEqual(1, result.Count);
+        Assert.Multiple(() =>
+        {
+            Assert.IsNull(result.First().Culture);
+            Assert.AreEqual("English", result.First().Value);
+        });
+    }
+
+    [Test]
+    public async Task AlignedPropertyVarianceAsync_Assigns_Owning_Property_Culture_When_Culture_Variance_Is_Enabled()
+    {
+        var result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Culture,
+            ContentVariation.Culture,
+            new BlockPropertyValue { Culture = null, Value = "Shared" },
+            culture: "en-US");
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual("en-US", result.Culture);
     }
 
     [Test]
@@ -520,13 +558,36 @@ public class BlockEditorVarianceHandlerTests
         BlockPropertyValue propertyValue,
         string? culture = null)
     {
+        IList<BlockPropertyValue> result = await ExecuteAlignedPropertyVarianceAsync(
+            ownerVariation,
+            propertyTypeVariation,
+            [propertyValue],
+            culture);
+        return result.SingleOrDefault();
+    }
+
+    private static async Task<IList<BlockPropertyValue>> ExecuteAlignedPropertyVarianceAsync(
+        ContentVariation ownerVariation,
+        ContentVariation propertyTypeVariation,
+        IList<BlockPropertyValue> propertyValues,
+        string? culture = null)
+    {
         var owner = PublishedElement(ownerVariation);
         var subject = BlockEditorVarianceHandler("da-DK", owner);
         return await subject.AlignedPropertyVarianceAsync(
-            propertyValue,
-            PublishedPropertyType(propertyTypeVariation),
+            propertyValues,
+            PublishedContentType(propertyTypeVariation),
             owner,
             culture);
+    }
+
+    private static IPublishedContentType PublishedContentType(ContentVariation propertyTypeVariation)
+    {
+        var contentTypeMock = new Mock<IPublishedContentType>();
+        contentTypeMock
+            .Setup(m => m.GetPropertyType(It.IsAny<string>()))
+            .Returns(PublishedPropertyType(propertyTypeVariation));
+        return contentTypeMock.Object;
     }
 
     private static async Task<IEnumerable<BlockItemVariation>> ExecuteAlignedExposeVarianceAsync(
