@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -156,6 +157,97 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             repository.Get(content.Key);
             Assert.AreEqual(sqlCount, udb.SqlCount);
         }
+    }
+
+    [Test]
+    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var element = CreateElement(repository, contentTypeRepository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IElement so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IElement>();
+
+        // Initial request by ID should hit the database.
+        repository.Get(element.Id);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(element.Id);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(element.Key);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    [Test]
+    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    {
+        var realCache = new AppCaches(
+            new ObjectCacheAppCache(),
+            new DictionaryAppCache(),
+            new IsolatedCaches(t => new ObjectCacheAppCache()));
+
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, realCache);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        database.EnableSqlCount = false;
+
+        var element = CreateElement(repository, contentTypeRepository);
+
+        database.EnableSqlCount = true;
+
+        // Clear the isolated cache for IElement so the next retrieval hits the database
+        realCache.IsolatedCaches.ClearCache<IElement>();
+
+        // Initial request by key should hit the database.
+        repository.Get(element.Key);
+        Assert.Greater(database.SqlCount, 0);
+
+        // Reset counter.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
+        repository.Get(element.Key);
+        Assert.AreEqual(0, database.SqlCount);
+
+        repository.Get(element.Id);
+        Assert.AreEqual(0, database.SqlCount);
+    }
+
+    private IElement CreateElement(ElementRepository repository, ContentTypeRepository contentTypeRepository)
+    {
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+        var element = ElementBuilder.CreateSimpleElement(elementType);
+        repository.Save(element);
+        return element;
     }
 
     [Test]
@@ -363,6 +455,53 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
+    public void GetAllElementsManyVersions()
+    {
+        var provider = ScopeProvider;
+        IElement[] result;
+
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+            var elementType = ContentTypeBuilder.CreateSimpleElementType();
+            contentTypeRepository.Save(elementType);
+
+            for (var i = 0; i < 4; i++)
+            {
+                repository.Save(ElementBuilder.CreateSimpleElement(elementType, "Element " + i));
+            }
+
+            result = repository.GetMany().ToArray();
+
+            // save them all
+            foreach (var element in result)
+            {
+                element.SetValue("title", element.GetValue<string>("title") + "x");
+                repository.Save(element);
+            }
+
+            // publish them all
+            foreach (var element in result)
+            {
+                element.PublishCulture(CultureImpact.Invariant, DateTime.Now, PropertyEditorCollection);
+                repository.Save(element);
+            }
+
+            scope.Complete();
+        }
+
+        // get them all again
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository((IScopeAccessor)provider, out _, out DataTypeRepository _);
+            var result2 = repository.GetMany().ToArray();
+
+            Assert.AreEqual(result.Length, result2.Length);
+        }
+    }
+
+    [Test]
     public void GetPagedResultsByQuery_FilterMatchingSome()
     {
         var provider = ScopeProvider;
@@ -389,6 +528,111 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(1, totalRecords);
             Assert.AreEqual(1, result.Length);
             Assert.AreEqual("Element Two", result.First().Name);
+        });
+    }
+
+    [Test]
+    public void GetPagedResultsByQuery_FilterMatchingAll()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+        var otherElementType = ContentTypeBuilder.CreateSimpleElementType("otherElementType", "Other Element Type");
+        contentTypeRepository.Save(otherElementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
+        var otherTypeElement = ElementBuilder.CreateSimpleElement(otherElementType, "Element Three"); // different type - must not match the type-scoped query
+        repository.Save(element1);
+        repository.Save(element2);
+        repository.Save(otherTypeElement);
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ContentTypeId == elementType.Id);
+        var filterQuery = ScopeProvider.CreateQuery<IElement>().Where(x => x.Name.Contains("Element"));
+        var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: filterQuery, ordering: Ordering.By("Name")).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, totalRecords);
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual("Element One", result.First().Name);
+        });
+    }
+
+    [Test]
+    public void GetPagedResultsByQuery_FirstPage()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
+        repository.Save(element1);
+        repository.Save(element2);
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ContentTypeId == elementType.Id);
+        var result = repository.GetPage(query, 0, 1, out var totalRecords, propertyAliases: null, filter: null, ordering: Ordering.By("Name")).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, totalRecords);
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual("Element One", result.First().Name);
+        });
+    }
+
+    [Test]
+    public void GetPagedResultsByQuery_SecondPage()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
+        repository.Save(element1);
+        repository.Save(element2);
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ContentTypeId == elementType.Id);
+        var result = repository.GetPage(query, 1, 1, out var totalRecords, propertyAliases: null, filter: null, ordering: Ordering.By("Name")).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, totalRecords);
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual("Element Two", result.First().Name);
+        });
+    }
+
+    [Test]
+    public void GetPagedResultsByQuery_SinglePage()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
+        repository.Save(element1);
+        repository.Save(element2);
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.ContentTypeId == elementType.Id);
+        var result = repository.GetPage(query, 0, 2, out var totalRecords, propertyAliases: null, filter: null, ordering: Ordering.By("Name")).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, totalRecords);
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual("Element One", result.First().Name);
         });
     }
 
@@ -445,6 +689,82 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(2, elements.Length);
             CollectionAssert.AreEquivalent(new[] { element1.Id, element2.Id }, elements.Select(e => e.Id));
         });
+    }
+
+    [Test]
+    public void GetAllElements()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        repository.Save(ElementBuilder.CreateSimpleElement(elementType, "Element One"));
+        repository.Save(ElementBuilder.CreateSimpleElement(elementType, "Element Two"));
+
+        var elements = repository.GetMany().ToArray();
+        Assert.That(elements, Is.Not.Null);
+        Assert.That(elements.Any(), Is.True);
+        Assert.That(elements.Length, Is.GreaterThanOrEqualTo(2));
+
+        elements = repository.GetMany(elements.Select(x => x.Id).ToArray()).ToArray();
+        Assert.That(elements, Is.Not.Null);
+        Assert.That(elements.Any(), Is.True);
+        Assert.That(elements.Length, Is.GreaterThanOrEqualTo(2));
+
+        elements = ((IReadRepository<Guid, IElement>)repository).GetMany(elements.Select(x => x.Key).ToArray()).ToArray();
+        Assert.That(elements, Is.Not.Null);
+        Assert.That(elements.Any(), Is.True);
+        Assert.That(elements.Length, Is.GreaterThanOrEqualTo(2));
+    }
+
+    [Test]
+    public void GetElement()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var saved = ElementBuilder.CreateSimpleElement(elementType, "Element One");
+        repository.Save(saved);
+
+        var element = repository.Get(saved.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(saved.Id, element.Id);
+            Assert.That(element.CreateDate, Is.GreaterThan(DateTime.MinValue));
+            Assert.That(element.UpdateDate, Is.GreaterThan(DateTime.MinValue));
+            Assert.AreNotEqual(0, element.ParentId);
+            Assert.AreEqual("Element One", element.Name);
+            Assert.AreNotEqual(0, element.VersionId);
+            Assert.AreEqual(elementType.Id, element.ContentTypeId);
+            Assert.That(element.Path, Is.Not.Empty);
+            Assert.That(element.Properties.Any(), Is.True);
+        });
+    }
+
+    [Test]
+    public void QueryElement()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element1 = ElementBuilder.CreateSimpleElement(elementType, "Element One");
+        var element2 = ElementBuilder.CreateSimpleElement(elementType, "Element Two");
+        repository.Save(element1);
+        repository.Save(element2);
+
+        var query = ScopeProvider.CreateQuery<IElement>().Where(x => x.Level == element1.Level);
+        var result = repository.Get(query);
+
+        Assert.GreaterOrEqual(result.Count(), 2);
     }
 
     [Test]
@@ -719,6 +1039,25 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
         var content = repository.Get(element.Id);
         Assert.IsFalse(((Element)content).IsDirty());
+    }
+
+    [Test]
+    public void SaveElement()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
+        var elementType = ContentTypeBuilder.CreateSimpleElementType();
+        contentTypeRepository.Save(elementType);
+
+        var element = ElementBuilder.CreateSimpleElement(elementType);
+        repository.Save(element);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(elementType.HasIdentity, Is.True);
+            Assert.That(element.HasIdentity, Is.True);
+        });
     }
 
     // Covers issue U4-2791 and U4-2607

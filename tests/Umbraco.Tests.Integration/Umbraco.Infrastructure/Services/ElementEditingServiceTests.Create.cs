@@ -583,6 +583,8 @@ public partial class ElementEditingServiceTests
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.ParentNotFound, result.Status);
+        Assert.IsNotNull(result.Result);
+        Assert.IsNull(result.Result.Content);
     }
 
     private static ElementCreateModel CreateElementModel(Guid contentTypeKey, Guid? parentKey)
