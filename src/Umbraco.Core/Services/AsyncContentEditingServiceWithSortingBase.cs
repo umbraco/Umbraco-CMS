@@ -83,13 +83,12 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
     /// <summary>
     /// Gets the paged children of the specified parent.
     /// </summary>
-    /// <param name="parentId">The parent identifier.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the content tree.</param>
     /// <param name="pageIndex">The zero-based page index.</param>
     /// <param name="pageSize">The page size.</param>
     /// <param name="ordering">The ordering to apply, or <c>null</c> to use the default (sort order).</param>
-    /// <param name="total">The total number of children.</param>
     /// <returns>The paged children.</returns>
-    protected abstract Task<IEnumerable<TContent>> GetPagedChildrenAsync(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total);
+    protected abstract Task<PagedModel<TContent>> GetPagedChildrenAsync(Guid? parentKey, int pageIndex, int pageSize, Ordering? ordering);
 
     /// <summary>
     /// Persists the supplied (already ordered) child identifiers as the new sort order, without loading
@@ -113,16 +112,12 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
         IEnumerable<SortingModel> sortingModels,
         Guid userKey)
     {
-        var contentId = parentKey.HasValue
-            ? (await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None))?.Id
-            : Constants.System.Root;
-
-        if (contentId.HasValue is false)
+        if (parentKey.HasValue && await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None) is null)
         {
             return ContentEditingOperationStatus.NotFound;
         }
 
-        List<TContent> children = await LoadAllChildrenAsync(contentId.Value, ordering: null);
+        List<TContent> children = await LoadAllChildrenAsync(parentKey, ordering: null);
 
         try
         {
@@ -157,11 +152,11 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
         string? culture,
         Guid userKey)
     {
-        var contentId = parentKey.HasValue
-            ? (await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None))?.Id
-            : Constants.System.Root;
+        TContent? parent = parentKey.HasValue
+            ? await ContentService.GetByIdAsync(parentKey.Value, CancellationToken.None)
+            : null;
 
-        if (contentId.HasValue is false)
+        if (parentKey.HasValue && parent is null)
         {
             return ContentEditingOperationStatus.NotFound;
         }
@@ -173,7 +168,7 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
         {
             // Opt-in path: load the children and persist via the standard sort, firing per-item
             // save/sort notifications (and therefore webhooks), at the cost of loading every child.
-            List<TContent> orderedChildren = await LoadAllChildrenAsync(contentId.Value, ordering);
+            List<TContent> orderedChildren = await LoadAllChildrenAsync(parentKey, ordering);
             if (orderedChildren.Count == 0)
             {
                 return ContentEditingOperationStatus.Success;
@@ -184,35 +179,38 @@ internal abstract class AsyncContentEditingServiceWithSortingBase<TContent, TCon
 
         // Default path: persist the resulting order with a single set-based update and a branch cache
         // refresh, without loading every child or firing per-item notifications.
-        List<int> orderedChildIds = await LoadOrderedChildIdsAsync(contentId.Value, ordering);
+        List<int> orderedChildIds = await LoadOrderedChildIdsAsync(parentKey, ordering);
         if (orderedChildIds.Count == 0)
         {
             // Nothing to sort - the order is trivially correct.
             return ContentEditingOperationStatus.Success;
         }
 
-        return SortChildrenInBulk(contentId.Value, orderedChildIds, await GetUserIdAsync(userKey));
+        // SortChildrenInBulk is still int-keyed (it writes through the older IContentService.SortChildren
+        // NPoco path) - resolve the parent id here rather than converting that write path too.
+        int parentId = parent?.Id ?? Constants.System.Root;
+        return SortChildrenInBulk(parentId, orderedChildIds, await GetUserIdAsync(userKey));
     }
 
-    private Task<List<int>> LoadOrderedChildIdsAsync(int contentId, Ordering ordering)
-        => LoadAllChildrenAsync(contentId, ordering, child => child.Id);
+    private Task<List<int>> LoadOrderedChildIdsAsync(Guid? parentKey, Ordering ordering)
+        => LoadAllChildrenAsync(parentKey, ordering, child => child.Id);
 
-    private Task<List<TContent>> LoadAllChildrenAsync(int contentId, Ordering? ordering)
-        => LoadAllChildrenAsync(contentId, ordering, child => child);
+    private Task<List<TContent>> LoadAllChildrenAsync(Guid? parentKey, Ordering? ordering)
+        => LoadAllChildrenAsync(parentKey, ordering, child => child);
 
     // Pages through all children, projecting each page with the selector so callers that only need a
     // lightweight value (e.g. the id) don't retain every loaded child.
-    private async Task<List<TResult>> LoadAllChildrenAsync<TResult>(int contentId, Ordering? ordering, Func<TContent, TResult> selector)
+    private async Task<List<TResult>> LoadAllChildrenAsync<TResult>(Guid? parentKey, Ordering? ordering, Func<TContent, TResult> selector)
     {
         const int pageSize = 500;
         var pageNumber = 0;
-        IEnumerable<TContent> page = await GetPagedChildrenAsync(contentId, pageNumber++, pageSize, ordering, out var total);
-        var results = new List<TResult>((int)total);
-        results.AddRange(page.Select(selector));
-        while (pageNumber * pageSize < total)
+        PagedModel<TContent> page = await GetPagedChildrenAsync(parentKey, pageNumber++, pageSize, ordering);
+        var results = new List<TResult>((int)page.Total);
+        results.AddRange(page.Items.Select(selector));
+        while (pageNumber * pageSize < page.Total)
         {
-            page = await GetPagedChildrenAsync(contentId, pageNumber++, pageSize, ordering, out _);
-            results.AddRange(page.Select(selector));
+            page = await GetPagedChildrenAsync(parentKey, pageNumber++, pageSize, ordering);
+            results.AddRange(page.Items.Select(selector));
         }
 
         return results;
