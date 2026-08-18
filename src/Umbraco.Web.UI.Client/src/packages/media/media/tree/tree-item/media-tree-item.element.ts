@@ -10,7 +10,7 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 			<div id="icon-container" slot="icon">
 				<umb-entity-sign-bundle .entityType=${this._item?.entityType} .entityFlags=${this._flags}>
 					${when(
-						this.item?.mediaType.icon,
+						this.item?.contentType?.icon,
 						(icon) => html`<umb-icon id="icon" name=${this._getIconToRender(icon)}></umb-icon>`,
 					)}
 				</umb-entity-sign-bundle>
@@ -26,7 +26,7 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	}
 
 	#renderStateIcon() {
-		if (this.item?.mediaType.collection) {
+		if (this.item?.contentType?.collection) {
 			return this.#renderIsCollectionIcon();
 		}
 

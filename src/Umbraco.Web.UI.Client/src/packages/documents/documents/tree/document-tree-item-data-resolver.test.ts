@@ -25,6 +25,7 @@ function observeFirst<T>(observable: Observable<T>): Promise<T> {
 // A document tree item carries its create date on the item itself, as a string — unlike a document
 // item, which carries create/update dates per variant.
 function makeTreeItem(overrides: Partial<UmbDocumentTreeItemModel> = {}): UmbDocumentTreeItemModel {
+	const contentType = { unique: 'dt-1', icon: 'icon-document', collection: null };
 	return {
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
 		unique: 'test-123',
@@ -37,7 +38,8 @@ function makeTreeItem(overrides: Partial<UmbDocumentTreeItemModel> = {}): UmbDoc
 		isProtected: false,
 		isTrashed: false,
 		flags: [],
-		documentType: { unique: 'dt-1', icon: 'icon-document', collection: null },
+		contentType,
+		documentType: contentType,
 		createDate: '2024-01-01T00:00:00Z',
 		variants: [
 			{ culture: 'en-US', segment: null, name: 'English Title', state: UmbDocumentVariantState.PUBLISHED, flags: [] },
@@ -97,8 +99,8 @@ describe('UmbDocumentTreeItemDataResolver', () => {
 			expect(await resolver.getState()).to.equal(UmbDocumentVariantState.PUBLISHED);
 		});
 
-		it('resolves the icon from the document type', async () => {
-			resolver.setData(makeTreeItem({ documentType: { unique: 'dt-1', icon: 'icon-article', collection: null } }));
+		it('resolves the icon from the content type', async () => {
+			resolver.setData(makeTreeItem({ contentType: { unique: 'dt-1', icon: 'icon-article', collection: null } }));
 			expect(await resolver.getIcon()).to.equal('icon-article');
 		});
 	});

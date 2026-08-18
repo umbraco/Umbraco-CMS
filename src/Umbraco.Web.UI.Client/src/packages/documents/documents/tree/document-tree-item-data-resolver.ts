@@ -20,10 +20,10 @@ export class UmbDocumentTreeItemDataResolver
 
 	public readonly entityType = this.#data.asObservablePart((x) => x?.entityType);
 	public readonly unique = this.#data.asObservablePart((x) => x?.unique);
-	public readonly icon = this.#data.asObservablePart((x) => x?.documentType.icon);
-	public readonly typeUnique = this.#data.asObservablePart((x) => x?.documentType.unique);
+	public readonly icon = this.#data.asObservablePart((x) => x?.contentType?.icon);
+	public readonly typeUnique = this.#data.asObservablePart((x) => x?.contentType?.unique);
 	public readonly isTrashed = this.#data.asObservablePart((x) => x?.isTrashed);
-	public readonly hasCollection = this.#data.asObservablePart((x) => !!x?.documentType.collection);
+	public readonly hasCollection = this.#data.asObservablePart((x) => !!x?.contentType?.collection);
 
 	public readonly name = this.#variant.name;
 	public readonly state = this.#variant.state;
@@ -140,6 +140,6 @@ export class UmbDocumentTreeItemDataResolver
 	 * @memberof UmbDocumentTreeItemDataResolver
 	 */
 	getHasCollection(): boolean {
-		return this.getData()?.documentType.collection != undefined;
+		return this.getData()?.contentType?.collection != undefined;
 	}
 }

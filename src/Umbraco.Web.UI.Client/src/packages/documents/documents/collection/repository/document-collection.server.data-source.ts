@@ -35,6 +35,13 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {
+				const contentType = {
+					unique: item.documentType.id,
+					icon: item.documentType.icon,
+					alias: item.documentType.alias,
+					collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
+				};
+
 				const model: UmbDocumentCollectionItemModel = {
 					ancestors: item.ancestors.map((ancestor) => {
 						return {
@@ -59,11 +66,9 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 							value: item.value as string,
 						};
 					}),
-					documentType: {
-						unique: item.documentType.id,
-						icon: item.documentType.icon,
-						alias: item.documentType.alias,
-					},
+					contentType,
+					// TODO (V20): remove when the deprecated `documentType` field is removed.
+					documentType: { unique: contentType.unique, icon: contentType.icon, alias: contentType.alias },
 					variants: item.variants.map((item) => {
 						return {
 							name: item.name,
