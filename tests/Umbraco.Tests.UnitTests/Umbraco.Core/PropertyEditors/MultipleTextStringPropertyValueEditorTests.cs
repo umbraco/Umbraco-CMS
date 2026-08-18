@@ -131,17 +131,27 @@ public class MultipleTextStringPropertyValueEditorTests
     }
 
     [Test]
-    public void Validates_Null_As_Below_Configured_Min()
+    public void Can_Validate_Null_When_Minimum_Configured_And_Not_Mandatory()
     {
         var editor = CreateValueEditor();
-        var result = editor.Validate(null, false, null, PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
 
-        var validationResult = result.First();
-        Assert.AreEqual($"validation_outOfRangeMultipleItemsMinimum", validationResult.ErrorMessage);
+        var result = editor.Validate(null, false, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(result);
     }
 
-    [TestCase(0, false, "outOfRangeMultipleItemsMinimum")]
+    [Test]
+    public void Cannot_Validate_Null_When_Mandatory()
+    {
+        var editor = CreateValueEditor();
+
+        var result = editor.Validate(null, true, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(Constants.Validation.ErrorMessages.Properties.Missing, result.First().ErrorMessage);
+    }
+
+    [TestCase(0, true, "")]
     [TestCase(1, false, "outOfRangeSingleItemMinimum")]
     [TestCase(2, true, "")]
     [TestCase(3, true, "")]
@@ -163,7 +173,28 @@ public class MultipleTextStringPropertyValueEditorTests
         }
     }
 
-    [TestCase("", false, "outOfRangeMultipleItemsMinimum")]
+    [Test]
+    public void Minimum_Message_Is_Given_The_Tokens_Its_Template_Expects()
+    {
+        // The message templates place the item count in %0% and the configured limit in %1%, so both must be
+        // supplied even where the template only renders one of them.
+        var localizedTextServiceMock = new Mock<ILocalizedTextService>();
+        string[]? tokens = null;
+        localizedTextServiceMock
+            .Setup(x => x.Localize("validation", "outOfRangeSingleItemMinimum", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>()))
+            .Callback((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => tokens = args?.Values.ToArray())
+            .Returns("localized");
+
+        var editor = CreateValueEditor(localizedTextServiceMock.Object);
+
+        editor.Validate(new[] { "one" }, false, null, PropertyValidationContext.Empty()).ToArray();
+
+        Assert.IsNotNull(tokens);
+        Assert.AreEqual(2, tokens!.Length);
+        Assert.AreEqual("2", tokens[1]);
+    }
+
+    [TestCase("", true, "")]
     [TestCase("one", false, "outOfRangeSingleItemMinimum")]
     [TestCase("one\ntwo", true, "")]
     [TestCase("one\ntwo\nthree", true, "")]
@@ -361,7 +392,7 @@ public class MultipleTextStringPropertyValueEditorTests
         return CreateValueEditor().ToEditor(property.Object);
     }
 
-    private static MultipleTextStringPropertyEditor.MultipleTextStringPropertyValueEditor CreateValueEditor()
+    private static MultipleTextStringPropertyEditor.MultipleTextStringPropertyValueEditor CreateValueEditor(ILocalizedTextService? localizedTextService = null)
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
         localizedTextServiceMock.Setup(x => x.Localize(
@@ -375,7 +406,7 @@ public class MultipleTextStringPropertyValueEditorTests
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
             new DataEditorAttribute("alias"),
-            localizedTextServiceMock.Object)
+            localizedTextService ?? localizedTextServiceMock.Object)
         {
             ConfigurationObject = new MultipleTextStringConfiguration
             {

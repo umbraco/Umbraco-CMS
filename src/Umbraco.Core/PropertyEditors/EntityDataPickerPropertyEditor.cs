@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -46,6 +47,8 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
     /// </summary>
     internal sealed class EntityDataPickerPropertyValueEditor : DataValueEditor
     {
+        private readonly IJsonSerializer _jsonSerializer;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityDataPickerPropertyValueEditor"/> class.
         /// </summary>
@@ -57,12 +60,17 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
             ILocalizedTextService localizedTextService)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
+            _jsonSerializer = jsonSerializer;
+
             var validators = new TypedJsonValidatorRunner<EntityDataPickerDto, EntityDataPickerConfiguration>(
                 jsonSerializer,
                 new MinMaxValidator(localizedTextService));
 
             Validators.Add(validators);
         }
+
+        /// <inheritdoc/>
+        public override IValueRequiredValidator RequiredValidator => new EntityDataPickerRequiredValidator(_jsonSerializer);
 
         /// <summary>
         /// Validates the min/max configuration for the entity data picker property editor.
@@ -91,8 +99,7 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
                     return validationResults;
                 }
 
-                if (configuration.ValidationLimit.Min is not null
-                    && data.Ids.Length < configuration.ValidationLimit.Min)
+                if (ItemCountValidationHelper.IsBelowMinimum(data.Ids.Length, configuration.ValidationLimit.Min))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(
@@ -116,6 +123,38 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
 
                 return validationResults;
             }
+        }
+    }
+
+    /// <summary>
+    /// A custom <see cref="IValueRequiredValidator" /> that treats a value holding no selected entities as no value,
+    /// which the default validator cannot detect as the value retains its surrounding structure once emptied.
+    /// </summary>
+    internal sealed class EntityDataPickerRequiredValidator : RequiredValidator
+    {
+        private readonly IJsonSerializer _jsonSerializer;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EntityDataPickerRequiredValidator"/> class.
+        /// </summary>
+        public EntityDataPickerRequiredValidator(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
+
+        /// <inheritdoc/>
+        public override IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
+        {
+            IEnumerable<ValidationResult> validationResults = base.ValidateRequired(value, valueType);
+
+            if (value is null)
+            {
+                return validationResults;
+            }
+
+            if (_jsonSerializer.TryDeserialize(value, out EntityDataPickerDto? dto) && dto.Ids.Length == 0)
+            {
+                validationResults = validationResults.Append(new ValidationResult(Constants.Validation.ErrorMessages.Properties.Empty, ["value"]));
+            }
+
+            return validationResults;
         }
     }
 

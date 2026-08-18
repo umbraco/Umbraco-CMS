@@ -549,8 +549,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                         ["value"]));
                 }
 
-                if (mediaPickerConfiguration.ValidationLimit.Min is not null
-                    && mediaWithCropsDtos.Count < mediaPickerConfiguration.ValidationLimit.Min)
+                if (ItemCountValidationHelper.IsBelowMinimum(mediaWithCropsDtos.Count, mediaPickerConfiguration.ValidationLimit.Min))
                 {
                     validationResults.Add(new ValidationResult(
                         _localizedTextService.Localize(

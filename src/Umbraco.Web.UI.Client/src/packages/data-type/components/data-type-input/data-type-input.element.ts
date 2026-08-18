@@ -6,6 +6,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { isBelowMinItemCount } from '@umbraco-cms/backoffice/validation';
 
 // TODO: Rename to 'umb-input-data-type'. [LK]
 @customElement('umb-data-type-input')
@@ -100,7 +101,7 @@ export class UmbDataTypeInputElement extends UUIFormControlMixin(UmbLitElement, 
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isBelowMinItemCount(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

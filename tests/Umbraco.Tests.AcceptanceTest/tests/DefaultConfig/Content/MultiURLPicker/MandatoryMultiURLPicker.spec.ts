@@ -114,3 +114,49 @@ test('can see validation error clear when minimum number of links is met', async
   await umbracoApi.documentType.ensureNameNotExists(minNumberDocumentTypeName);
   await umbracoApi.dataType.ensureNameNotExists(minNumberDataTypeName);
 });
+
+test('can publish content with an empty non-mandatory multi url picker that has a minimum number of links', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const minNumberDataTypeName = 'MinNumberMultiUrlPicker';
+  const minNumberDataTypeId = await umbracoApi.dataType.createMultiUrlPickerDataTypeWithMinNumberOfItems(minNumberDataTypeName, 2);
+  const minNumberDocumentTypeName = 'MinNumberDocumentType';
+  const minNumberDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(minNumberDocumentTypeName, minNumberDataTypeName, minNumberDataTypeId, 'TestGroup', false, false, false);
+  await umbracoApi.document.createDefaultDocument(contentName, minNumberDocumentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  // The minimum applies once links are added, so an empty optional picker is valid.
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.needMoreItems, false);
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(minNumberDocumentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(minNumberDataTypeName);
+});
+
+test('can not publish content with an empty mandatory multi url picker that has a minimum number of links', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const minNumberDataTypeName = 'MinNumberMandatoryMultiUrlPicker';
+  const minNumberDataTypeId = await umbracoApi.dataType.createMultiUrlPickerDataTypeWithMinNumberOfItems(minNumberDataTypeName, 2);
+  const minNumberDocumentTypeName = 'MinNumberMandatoryDocumentType';
+  const minNumberDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(minNumberDocumentTypeName, minNumberDataTypeName, minNumberDataTypeId, 'TestGroup', false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, minNumberDocumentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.isErrorNotificationVisible();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(minNumberDocumentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(minNumberDataTypeName);
+});
