@@ -612,8 +612,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			}
 
 			:host([is-reference]) .umb-block-list__block {
-				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
-				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+				--umb-entity-frame-color: var(--umb-color-reference);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast);
 			}
 
 			.umb-block-list__block {

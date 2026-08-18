@@ -190,6 +190,12 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             return null;
         }
 
+        // The node carries both identifiers, so the id/key map can be warmed without a lookup of its own.
+        // Unlike the content itself the mapping is permanent, so this is done regardless of snapshotIsCurrent.
+        // Deliberately outside the read-through branch above, so that backing store hits populate the map too.
+        _idKeyMap.PopulateCache(contentCacheNode.Id, contentCacheNode.Key, UmbracoObjectTypes.Document);
+
+
         IPublishedContent? result = _publishedContentFactory.ToIPublishedContent(contentCacheNode, preview).CreateModel(_publishedModelFactory);
 
         // Only published content is stored in L0: the read fast path above is guarded by preview is false, so a
@@ -342,11 +348,19 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-            List<ContentCacheNode> cacheNodes = (await _databaseCacheRepository.GetDocumentSourcesAsync(uncachedKeys)).ToList();
+            // Materialized because the repository defers deserialization of each node until it is enumerated,
+            // and the sequence is walked more than once below.
+            var cacheNodes = (await _databaseCacheRepository.GetDocumentSourcesAsync(uncachedKeys)).ToList();
 
             scope.Complete();
 
-            _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count);
+            }
+
+            // The seeded nodes carry both identifiers, so the id/key map is warmed without any lookups of its own.
+            var idKeyPairs = new List<(int Id, Guid Key)>(cacheNodes.Count);
 
             foreach (ContentCacheNode cacheNode in cacheNodes)
             {
@@ -357,7 +371,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
                     GetSeedEntryOptions(),
                     GenerateTags(cacheNode),
                     cancellationToken: cancellationToken);
+
+                idKeyPairs.Add((cacheNode.Id, cacheNode.Key));
             }
+
+            _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Document);
         }
 
 #if DEBUG

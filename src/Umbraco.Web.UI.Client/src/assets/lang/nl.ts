@@ -335,6 +335,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klik om te uploaden',
+		browseFilesAction: 'Blader door bestanden',
+		dropFilesOr: 'Sleep media hierheen<br />of',
 		orClickHereToUpload: 'Of klik hier om bestanden te kiezen',
 		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype',
 		maxFileSize: 'Maximale bestandsgrootte is',
@@ -540,33 +542,6 @@ export default {
 		changeKeyError: "De key '%0%' bestaat al.",
 		overviewTitle: 'Woordenboek overzicht',
 	},
-	examineManagement: {
-		configuredSearchers: 'Ingestelde Zoekers',
-		configuredSearchersDescription:
-			'Toont eigenschappen en hulpmiddelen voor elke geconfigureerde Zoeker\n      (bijv. zoals een multi-indexzoeker)\n    ',
-		fieldValues: 'Veldwaarden',
-		healthStatus: 'Gezondheidsstatus',
-		healthStatusDescription: 'De gezondheidsstatus van de index en of het kan gelezen worden',
-		indexers: 'Indexeerders',
-		indexInfo: 'Index info',
-		indexInfoDescription: 'De eigenschappen oplijsten van de index',
-		manageIndexes: 'Beheer de indexen van Examine',
-		manageIndexesDescription:
-			'Bekijk de details van elke index en gebruik hulpmiddelen voor het beheer er\n      van\n    ',
-		rebuildIndex: 'Index opnieuw bouwen',
-		rebuildIndexWarning:
-			'\n      Hierdoor wordt de index opnieuw opgebouwd.<br />\n      Afhankelijk van hoeveel inhoud er op je site staat, kan dit even duren.<br />\n      Het wordt niet aanbevolen om een index opnieuw op te bouwen terwijl er veel verkeer op de website is of wanneer editors inhoud bewerken.\n     ',
-		searchers: 'Zoekers',
-		searchDescription: 'Zoek in de index en bekijk de resultaten',
-		tools: 'Hulpmiddelen',
-		toolsDescription: 'Hulpmiddelen om de index te beheren',
-		fields: 'velden',
-		indexCannotRead: 'De index kan niet gelezen worden en moet opnieuw worden gebouwd',
-		processIsTakingLonger:
-			'Het proces duurt langer dan verwacht, controleer het Umbraco logboek om te kijken\n      of er geen fouten waren tijdens deze operatie\n    ',
-		indexCannotRebuild: 'Deze index kan niet opnieuw worden opgebouwd want het heeft geen toegewezen',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Typ jouw gebruikersnaam',
 		password: 'Typ jouw wachtwoord',
@@ -743,6 +718,8 @@ export default {
 		new: 'Nieuw',
 		next: 'Volgende',
 		no: 'Nee',
+		noResults: 'Geen resultaten',
+		noResultsFor: (query: string) => `Geen resultaat voor "${query}".`,
 		of: 'of',
 		off: 'Uit',
 		ok: 'OK',
@@ -1954,7 +1931,6 @@ export default {
 		contentRedirectManager: 'Redirect URL Beheer',
 		mediaFolderBrowser: 'Inhoud',
 		settingsWelcome: 'Welkom',
-		settingsExamine: 'Examine Beheer',
 		settingsPublishedStatus: 'Publicatiestatus',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Gezondheidscontrole',
@@ -2206,5 +2182,10 @@ export default {
 		manageHeadline: 'Hoe beheer ik Inhoudssjablonen?',
 		manageDescription:
 			'U kunt Inhoudssjablonen bewerken en verwijderen vanuit de boomstructuur\n      "inhoudssjablonen" in de sectie Instellingen. Vouw het documenttype uit waarop de Inhoudssjabloon is gebaseerd en\n      klik erop om het te bewerken of te verwijderen.\n    ',
+	},
+	picker: {
+		browseTab: 'Bladeren',
+		searchTab: 'Zoeken',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
 	},
 } as UmbLocalizationDictionary;

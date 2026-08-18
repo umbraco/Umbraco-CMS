@@ -117,7 +117,8 @@ public class PropertyValidationService : IPropertyValidationService
             return [];
         }
 
-        return ValidatePropertyValue(dataEditor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage, validationContext);
+        var isRequired = propertyType.Mandatory && validationContext.Segment.IsNullOrWhiteSpace();
+        return ValidatePropertyValue(dataEditor, dataType, postedValue, isRequired, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage, validationContext);
     }
 
     /// <inheritdoc />

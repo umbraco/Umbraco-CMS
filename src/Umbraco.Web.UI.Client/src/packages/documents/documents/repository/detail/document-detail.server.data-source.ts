@@ -1,7 +1,12 @@
 import type { UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { umbMapDocumentCreateRequestBody, umbMapDocumentUpdateRequestBody } from './document-detail-request.mappers.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
+	UmbDataSourceErrorResponse,
+	UmbDataSourceResponse,
+	UmbDetailDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
@@ -11,12 +16,11 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentTypeDetailServerDataSource } from '@umbraco-cms/backoffice/document-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { umbMapDocumentCreateRequestBody, umbMapDocumentUpdateRequestBody } from './document-detail-request.mappers.js';
 
 /**
  * A data source for the Document that fetches data from the server
  * @class UmbDocumentServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbDetailDataSource}
  */
 export class UmbDocumentServerDataSource
 	extends UmbControllerBase
@@ -24,8 +28,8 @@ export class UmbDocumentServerDataSource
 {
 	/**
 	 * Creates a new Document scaffold
-	 * @param preset
-	 * @returns { UmbDocumentDetailModel }
+	 * @param {UmbDeepPartialObject<UmbDocumentDetailModel>} preset - Partial data to merge into the scaffold.
+	 * @returns { UmbDocumentDetailModel } The scaffolded document.
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async createScaffold(preset: UmbDeepPartialObject<UmbDocumentDetailModel> = {}) {
@@ -63,11 +67,11 @@ export class UmbDocumentServerDataSource
 
 	/**
 	 * Fetches a Document with the given id from the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The document unique identifier.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentDetailModel>>} The requested document.
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async read(unique: string) {
+	async read(unique: string): Promise<UmbDataSourceResponse<UmbDocumentDetailModel>> {
 		if (!unique) throw new Error('Unique is missing');
 
 		const { data, error } = await tryExecute(this, DocumentService.getDocumentById({ path: { id: unique } }));
@@ -119,8 +123,8 @@ export class UmbDocumentServerDataSource
 	/**
 	 * Inserts a new Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @param parentUnique
-	 * @returns {*}
+	 * @param {string | null} parentUnique - The unique identifier of the parent document.
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentDetailModel>>} The created document.
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async create(model: UmbDocumentDetailModel, parentUnique: string | null = null) {
@@ -146,7 +150,7 @@ export class UmbDocumentServerDataSource
 	/**
 	 * Updates a Document on the server
 	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<UmbDocumentDetailModel>>} The updated document.
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async update(model: UmbDocumentDetailModel) {
@@ -171,11 +175,11 @@ export class UmbDocumentServerDataSource
 
 	/**
 	 * Deletes a Document on the server
-	 * @param {string} unique
-	 * @returns {*}
+	 * @param {string} unique - The document unique identifier.
+	 * @returns {Promise<UmbDataSourceErrorResponse>} Undefined if the operation succeeded, otherwise an error.
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async delete(unique: string) {
+	async delete(unique: string): Promise<UmbDataSourceErrorResponse> {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(this, DocumentService.deleteDocumentById({ path: { id: unique } }));
 	}

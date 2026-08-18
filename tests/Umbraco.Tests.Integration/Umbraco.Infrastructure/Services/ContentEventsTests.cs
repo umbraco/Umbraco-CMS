@@ -655,7 +655,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - unpublished page cache :: refresh root
             // - published page cache :: remove root
             // note: subscribers must take care of the hierarchy and unpublish
-            // the whole branch by themselves. Examine does it in UmbracoContentIndexer,
+            // the whole branch by themselves. Umbraco Search does it via ChangeImpact.RefreshWithDescendants,
             // content caches have to do it too... wondering whether we should instead
             // trigger RemovePublished for all of the removed content?
             IContent content1 = CreateBranch();

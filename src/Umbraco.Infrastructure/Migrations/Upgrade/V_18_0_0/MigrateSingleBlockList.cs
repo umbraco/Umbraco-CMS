@@ -58,7 +58,6 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     /// <param name="blockListConfigurationCache">Cache for block list configuration data.</param>
     /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
     /// <param name="ioHelper">Helper for IO operations, such as file and path management.</param>
-    /// <param name="blockValuePropertyIndexValueFactory">Factory for creating property index values for block values.</param>
     /// <param name="elementTypeCache">Cache for block editor element types.</param>
     /// <param name="appCaches">Provides access to application-level caches.</param>
     public MigrateSingleBlockList(
@@ -76,7 +75,6 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         SingleBlockListConfigurationCache blockListConfigurationCache,
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        ISingleBlockPropertyIndexValueFactory blockValuePropertyIndexValueFactory,
         IBlockEditorElementTypeCache elementTypeCache,
         AppCaches appCaches)
         : base(context)
@@ -95,7 +93,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         _elementTypeCache = elementTypeCache;
         _appCaches = appCaches;
 
-        _dummySingleBlockValueEditor = new SingleBlockPropertyEditor(dataValueEditorFactory, jsonSerializer, ioHelper, blockValuePropertyIndexValueFactory).GetValueEditor();
+        _dummySingleBlockValueEditor = new SingleBlockPropertyEditor(dataValueEditorFactory, jsonSerializer, ioHelper).GetValueEditor();
     }
 
     protected override async Task MigrateAsync()

@@ -43,7 +43,6 @@ public static partial class UmbracoBuilderExtensions
 #pragma warning restore CS0618 // Type or member is obsolete
                 .AddInstaller()
                 .AddUpgrader()
-                .AddSearchManagement()
                 .AddTrees()
                 .AddAuditLogs()
                 .AddConfigurationFactories()
