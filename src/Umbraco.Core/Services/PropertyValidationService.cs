@@ -145,23 +145,30 @@ public class PropertyValidationService : IPropertyValidationService
             // impacts invariant = validate invariant property, invariant culture
             if (impact.ImpactsOnlyInvariantCulture)
             {
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
                 return !(propertyTypeVaries || IsPropertyValid(x, PropertyValidationContext.Empty()));
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             // impacts all = validate property, all cultures (incl. invariant)
             if (impact.ImpactsAllCultures)
             {
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
                 return !IsPropertyValid(x, PropertyValidationContext.CultureAndSegment("*", null));
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             // impacts explicit culture = validate variant property, explicit culture
             if (propertyTypeVaries)
             {
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
                 return !IsPropertyValid(x, PropertyValidationContext.CultureAndSegment(impact.Culture, null));
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             if (impact.ImpactsExplicitCulture && GetDataEditor(x.PropertyType)?.CanMergePartialPropertyValues(x.PropertyType) is true)
             {
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
                 return !IsPropertyValid(x, new PropertyValidationContext
                 {
                     Culture = null,
@@ -169,6 +176,7 @@ public class PropertyValidationService : IPropertyValidationService
                     CulturesBeingValidated = [impact.Culture!],
                     SegmentsBeingValidated = []
                 });
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             // and, for explicit culture, we may also have to validate invariant property, invariant culture
@@ -176,15 +184,19 @@ public class PropertyValidationService : IPropertyValidationService
             // - it is impacted (default culture), or
             // - there is no published version of the content - maybe non-default culture, but no published version
             var alsoInvariant = impact.ImpactsAlsoInvariantProperties || !content.Published;
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
             return alsoInvariant && !IsPropertyValid(x, PropertyValidationContext.Empty());
+#pragma warning restore CS0618 // Type or member is obsolete
         }).ToArray();
 
         return invalidProperties.Length == 0;
     }
 
     /// <inheritdoc />
-    // NOTE: we should make this internal rather than removing it entirely in V10, so the
-    //       referencing unit tests can continue to exercise this code.
+    // TODO (V20): Make this internal rather than removing it entirely in V20, so the
+    // referencing unit tests can continue to exercise this code.
+    // Also remove the obsolete code warning suppressions added around the various
+    // callers to this method (including the unit tests).
     [Obsolete("Property level validation is not going to be supported moving forward. Please use content level validation with IsPropertyDataValid instead. Scheduled for removal in Umbraco 20.")]
     public bool IsPropertyValid(IProperty property, PropertyValidationContext validationContext)
     {

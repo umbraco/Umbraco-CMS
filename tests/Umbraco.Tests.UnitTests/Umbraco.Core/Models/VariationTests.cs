@@ -568,13 +568,19 @@ public class VariationTests
         Assert.IsNull(prop.GetValue(published: true));
         var propertyValidationService = GetPropertyValidationService();
 
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
         Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         propertyType.Mandatory = true;
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
         Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         prop.SetValue(null);
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
         Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.Empty()));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // can publish, even though invalid
         prop.PublishValues();
@@ -606,13 +612,17 @@ public class VariationTests
         var prop = new Property(propertyType);
         var propertyValidationService = GetPropertyValidationService();
 
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
         // "no value" is valid for non-mandatory properties
         Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, segment)));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         propertyType.Mandatory = true;
 
         // "no value" is NOT valid for mandatory properties
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
         Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, segment)));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // can publish, even though invalid
         prop.PublishValues();
@@ -640,8 +650,10 @@ public class VariationTests
 
         var propertyValidationService = GetPropertyValidationService();
 
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
         // property validation service ignores mandatory validation for segments
         Assert.IsTrue(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, "*")));
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     [TestCase(true)]
@@ -667,8 +679,10 @@ public class VariationTests
         var propertyValidationService = GetPropertyValidationService();
 
         // property validation service must apply mandatory validation to the default segment,
+#pragma warning disable CS0618 // Type or member is obsolete - IsPropertyValid() will be retained as internal after the obsoletion period.
         // even if a value exists for another segment
         Assert.IsFalse(propertyValidationService.IsPropertyValid(prop, PropertyValidationContext.CultureAndSegment(culture, "*")));
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     private static Content CreateContent(IContentType contentType, int id = 1, string name = "content") =>
