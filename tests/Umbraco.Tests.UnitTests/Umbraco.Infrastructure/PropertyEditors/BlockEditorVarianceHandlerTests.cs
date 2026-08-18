@@ -378,6 +378,27 @@ public class BlockEditorVarianceHandlerTests
     }
 
     [Test]
+    public void AlignExposeVariance_Retains_Segments_For_Block_Without_Values()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var contentDataKey = Guid.NewGuid();
+        var expose = CreateBlockItemVariations(
+            (contentDataKey, "da-DK", "segment-one"),
+            (contentDataKey, "da-DK", "segment-two"));
+        var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, [], expose);
+
+        ExecuteAlignExposeVariance(owner, blockValue);
+
+        Assert.AreEqual(2, blockValue.Expose.Count);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(blockValue.Expose.All(e => e.Culture is null));
+            Assert.IsTrue(blockValue.Expose.Any(e => e.Segment == "segment-one"));
+            Assert.IsTrue(blockValue.Expose.Any(e => e.Segment == "segment-two"));
+        });
+    }
+
+    [Test]
     public void AlignExposeVariance_Aligns_Expose_For_Block_Without_Values_To_Variant_Element_Type()
     {
         var owner = PublishedElement(ContentVariation.Culture);
