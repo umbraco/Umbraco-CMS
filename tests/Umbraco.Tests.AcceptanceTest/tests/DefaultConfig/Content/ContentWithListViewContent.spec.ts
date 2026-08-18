@@ -214,12 +214,8 @@ test('can publish child content from list', async ({umbracoApi, umbracoUi}) => {
   expect(childContentData.variants[0].state).toBe(expectedState);
 });
 
-// Verified still failing (https://github.com/umbraco/Umbraco-CMS/issues/18615): no danger toast is shown.
-// Verified product bug (https://github.com/umbraco/Umbraco-CMS/issues/18615): the failure is silent.
-// The server does reject correctly - ContentControllerBase maps ContentPublishingOperationStatus.PathNotPublished
-// to a BadRequest titled 'Parent not published', and the child is still Unpublished afterwards - but the bulk
-// publish flow in the list view shows no notification at all, neither danger nor success, so the editor gets no
-// feedback that nothing was published.
+// Product bug (https://github.com/umbraco/Umbraco-CMS/issues/18615): the server rejects the publish and the
+// child stays Unpublished, but the list view shows no notification at all.
 test.skip('can not publish child content from list when parent is not published', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';

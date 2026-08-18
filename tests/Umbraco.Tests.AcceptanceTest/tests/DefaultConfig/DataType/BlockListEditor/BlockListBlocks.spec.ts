@@ -254,10 +254,7 @@ test('can delete a icon color from a block', async ({umbracoApi, umbracoUi}) => 
   expect(blockData.values[0].value[0].iconColor).toEqual('');
 });
 
-// Verified product gap: there is no custom stylesheet editor on a block at all.
-// The block workspace renders Catalogue appearance with backgroundColor, iconColor and thumbnail only, and the
-// whole block-type package contains no reference to stylesheet, so the field cannot be reached from the UI.
-// The server model still stores it (the API helpers set it), so this is a missing editor rather than a removed feature.
+// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
 test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';
@@ -291,10 +288,7 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
 });
 
-// Verified product gap: there is no custom stylesheet editor on a block at all.
-// The block workspace renders Catalogue appearance with backgroundColor, iconColor and thumbnail only, and the
-// whole block-type package contains no reference to stylesheet, so the field cannot be reached from the UI.
-// The server model still stores it (the API helpers set it), so this is a missing editor rather than a removed feature.
+// Product gap: there is no custom stylesheet editor on a block; the block-type package never references one.
 test.skip('can delete a custom stylesheet from a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const stylesheetName = 'TestStylesheet.css';

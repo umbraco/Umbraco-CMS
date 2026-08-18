@@ -49,11 +49,8 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Verified still failing, and it is a feature gap rather than a UI bug: this sets a plain element
-// (childElementOneId) as the start node, but UserPresentationFactory resolves element start nodes as
-// UmbracoObjectTypes.ElementContainer, so only element folders resolve. The user is left with no valid start
-// node and no root access, so the Library tab never renders at all. The sibling test above passes because it
-// uses rootFolderId. Supporting a specific element as a start node is the thing that does not exist yet.
+// Feature gap: a plain element cannot be a start node - UserPresentationFactory resolves them as
+// UmbracoObjectTypes.ElementContainer, so the user gets no element access and no Library tab.
 test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
@@ -79,9 +76,7 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
 });
 
-// Verified still failing for the same reason as the test above: a plain element is used as the start node,
-// which UserPresentationFactory cannot resolve (it expects UmbracoObjectTypes.ElementContainer), so the user
-// has no element access and the Library tab never renders.
+// Feature gap, as above: a plain element cannot be a start node, so the user has no element access.
 test.skip('see no-access view when deep-linking to restricted element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);

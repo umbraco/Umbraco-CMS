@@ -48,9 +48,8 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Verified still failing: this passes a plain element as the start node, but UserGroupPresentationFactory
-// resolves element start nodes as UmbracoObjectTypes.ElementContainer, so the key never resolves and
-// POST /umbraco/management/api/v1/user-group returns 404 during arrange. Only element folders are supported.
+// Feature gap: a plain element cannot be a start node - UserGroupPresentationFactory resolves them as
+// UmbracoObjectTypes.ElementContainer, so creating the user group returns 404.
 test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithElementStartNode(userGroupName, childElementOneId);

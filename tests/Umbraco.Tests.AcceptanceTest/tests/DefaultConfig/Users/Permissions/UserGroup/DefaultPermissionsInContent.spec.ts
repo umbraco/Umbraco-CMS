@@ -70,10 +70,8 @@ test('can read content node with permission enabled', {tag: '@release'}, async (
   await umbracoUi.content.doesDocumentHaveName(rootDocumentName);
 });
 
-// Verified product gap, the same one as DocumentPropertyValuePermission 'cannot open content without document
-// read permission ...' (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the
-// user may not read renders an empty umb-document-workspace-editor rather than the Access denied view.
-// The navigation defect is fixed here - the node is absent from the tree, so it must be deep-linked.
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the user may not
+// read renders an empty umb-document-workspace-editor instead of Access denied. Navigation fixed to deep-link.
 test.skip('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermission(userGroupName, false);

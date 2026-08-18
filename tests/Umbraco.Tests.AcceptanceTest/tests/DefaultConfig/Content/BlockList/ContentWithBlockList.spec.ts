@@ -200,13 +200,8 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   await umbracoApi.documentType.ensureNameNotExists(settingModelName);
 });
 
-// Unwritten, and NOT known to be blocked by the block card drag bug - that one is in the block type config UI
-// (umb-block-type-card), and a content entry has no anchor in its shadow root, so it may well drag fine.
-// What stops it being written is getting two blocks into the content at all: addBlockElementBtn resolves with
-// .first(), so once a block exists it matches that block's own button and reopens it for editing - the modal
-// then offers Update rather than Create. Appending through the '_catalogue/create/-1' link, and using two
-// distinct block types so the catalogue always appears, both hit the same wall.
-// Sort that add-a-second-block flow out first; only then is the drag itself testable.
+// Unwritten: addBlockElementBtn resolves with .first(), so once a block exists it reopens that block instead
+// of adding a second one. Not the block card drag bug - a content entry has no anchor in its shadow root.
 test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
 });

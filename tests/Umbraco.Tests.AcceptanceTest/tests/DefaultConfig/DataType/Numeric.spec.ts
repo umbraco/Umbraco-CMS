@@ -58,9 +58,7 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
 
-// Verified still failing (https://github.com/umbraco/Umbraco-CMS/issues/17509): the save succeeds, so no
-// failed-state button or error notification appears. The only min>max handling is a console warning on the
-// content editor, which is too late to block saving the data type.
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/17509): no min/max cross-validation, the save succeeds.
 test.skip('cannot update the minimum greater than the maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = 5;

@@ -28,9 +28,8 @@ test('can add allow vary by culture for a document type', {tag: '@smoke'}, async
   expect(documentTypeData.variesByCulture).toBeTruthy();
 });
 
-// The "Vary by segment" toggle is gated on Umbraco:CMS:Segments:Enabled (ConfigurationPresentationFactory
-// maps it to UseSegments, and the settings view returns nothing when it is false), so this cannot pass under
-// defaultConfig. It needs its own config project with segments enabled.
+// Needs its own config project: the toggle is gated on Umbraco:CMS:Segments:Enabled, which no acceptance setup
+// turns on, so it cannot pass under defaultConfig.
 test.skip('can add allow segmentation for a document type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);

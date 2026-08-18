@@ -299,12 +299,8 @@ test('cannot restore an element folder from the recycle bin without move folder 
   expect(await umbracoApi.element.doesItemExistInRecycleBin(folderName)).toBeTruthy();
 });
 
-// Verified product gap: the element folder workspace has no access-denied view.
-// umb-element-workspace-editor observes workspaceContext.forbidden.isOn and renders one, but
-// umb-element-folder-workspace-editor is a bare wrapper around umb-folder-workspace-editor with no forbidden
-// handling, so it renders empty for a folder the user cannot read.
-// (The locator was also wrong here - it asserted against umb-element-workspace-editor, which never renders on a
-// folder workspace; that is fixed, so the test now reaches the real gap.)
+// Product gap: umb-element-folder-workspace-editor has no forbidden handling, so it renders empty for a folder
+// the user cannot read. The workspace locator was also wrong and is fixed.
 test.skip('cannot see an element inside a folder when read folder permission is disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const innerElementId = await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);

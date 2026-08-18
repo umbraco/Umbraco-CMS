@@ -55,13 +55,7 @@ test('can add an area for a block', {tag: '@smoke'}, async ({umbracoApi, umbraco
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithAlias(blockGridEditorName, contentElementTypeId)).toBeTruthy();
 });
 
-// Investigated: writable, but only as a pixel drag, so it is left unwritten deliberately.
-// The handle is umb-block-scale-handler inside umb-block-grid-area-config-entry; it resizes on mousedown and
-// block-grid-scale-manager.controller.ts derives the new span from the pointer X relative to
-// .umb-block-grid__area-container, so a drag to the container edge clamps to areaGridColumns.
-// The handle also renders its own '{columnSpan}x{rowSpan}' text, which is the natural assertion target, and an
-// API assertion would need a new doesBlockEditorBlockContainAreaWithColumnSpan helper.
-// Decide whether a pixel-precision drag is acceptable here before writing it - the suite has no other one.
+// Unwritten: reachable only as a pixel drag against umb-block-scale-handler, which the suite has none of.
 test.skip('can resize an area for a block', async ({umbracoApi, umbracoUi}) => {
 // Arrange
   const areaAlias = 'TestArea';
@@ -257,9 +251,8 @@ test('can remove max allowed for an area in a block', async ({umbracoApi, umbrac
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithMaxAllowed(blockGridEditorName, contentElementTypeId, areaAlias, maxAllowed)).toBeFalsy();
 });
 
-// Verified product gap, same family as https://github.com/umbraco/Umbraco-CMS/issues/17509: the area config
-// editor has no min/max validation at all, so the save succeeds. min/max is only enforced at content time in
-// block-grid-entries.context.ts, which is too late to stop a misconfigured area being saved.
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/17509): the area config has no min/max validation,
+// so the save succeeds.
 test.skip('min can not be more than max an area in a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const areaAlias = 'TestArea';

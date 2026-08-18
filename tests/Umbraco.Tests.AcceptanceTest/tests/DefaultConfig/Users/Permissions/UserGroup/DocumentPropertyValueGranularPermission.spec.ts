@@ -35,10 +35,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
 });
 
-// Blocked only by the shared forbidden-workspace gap (https://github.com/umbraco/Umbraco-CMS/issues/20505):
-// everything up to the last two lines passes, so the granular read-UI permission itself works. Deep-linking to
-// the document outside the permission renders an empty umb-document-workspace-editor instead of Access denied.
-// The navigation defect is fixed here - the second document is absent from the tree, so it must be deep-linked.
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): only the final assertion fails, so the
+// granular read-UI permission itself works. Navigation fixed to deep-link.
 test.skip('can only see property values for specific document with read UI enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithPermissionsForSpecificDocumentAndTwoPropertyValues(userGroupName, firstDocumentId, documentTypeId, firstPropertyName[0], true, false, secondPropertyName[0], true, false);

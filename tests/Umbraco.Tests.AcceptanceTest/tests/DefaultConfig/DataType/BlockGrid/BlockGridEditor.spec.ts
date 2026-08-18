@@ -196,15 +196,8 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-// Verified product bug: a block type card cannot be dragged at all, because its own link hijacks the drag.
-// An event trace of this drag shows dragstart firing on an A element, and the drop reaching the right place
-// (a DIV inside #blocks) - so the target is correct but the payload is not.
-// UmbSorterController marks links non-draggable through setupIgnorerElements, but that uses
-// element.querySelectorAll, which does not pierce shadow DOM. umb-block-type-card renders
-// <uui-card-block-type href=...>, whose anchor lives in that component's own shadow root, so it is never
-// marked draggable=false. The browser therefore starts a native link drag whose dataTransfer has no
-// 'text/umb-sorter-identifier#umb-block-type-sorter' entry, and #itemDraggedOver/#itemDropped ignore it.
-// This affects reordering blocks generally, not just moving them between groups.
+// Product bug: the card's anchor sits in uui-card-block-type's shadow root, which setupIgnorerElements cannot
+// reach, so a native link drag starts and the sorter ignores the drop. Affects block reordering generally.
 test.skip('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);

@@ -58,13 +58,8 @@ test('can see property values with UI read but not UI write permission', {tag: '
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Verified product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the
-// user may not read renders an empty umb-document-workspace-editor instead of the Access denied view.
-// document-workspace-editor only falls back to UmbRouteForbiddenElement from its catch-all '**' route, but the
-// edit route still matches, so that branch is never reached and render() stays empty while _loading is true.
-// The test navigation was also wrong and is fixed here: without read permission the node is absent from the
-// tree, so it must be deep-linked rather than clicked. When the product renders the view, the expected text
-// should be 'Access denied' (UmbRouteForbiddenElement), not 'Not found'.
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the user may not
+// read renders an empty workspace. Expected text should be 'Access denied'. Navigation fixed to deep-link.
 test.skip('cannot open content without document read permission even with UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermissionAndReadPropertyValueDocumentPermission(userGroupName, false, true);

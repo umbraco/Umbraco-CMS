@@ -84,8 +84,7 @@ test('can update hide anchor/query string input', async ({umbracoApi, umbracoUi}
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'hideAnchor', true)).toBeTruthy();
 });
 
-// Verified still failing (https://github.com/umbraco/Umbraco-CMS/issues/17509): the save succeeds, so no
-// failed-state button or error notification appears. No min/max cross-validation exists in the data type config.
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/17509): no min/max cross-validation, the save succeeds.
 test.skip('cannot update the minimum number of items greater than the maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = 5;

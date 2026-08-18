@@ -68,10 +68,8 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
 });
 
-// Verified still failing, and needs redesigning rather than retuning: doesLogLevelCountMatch counts rendered
-// umb-log-viewer-message rows while getLevelCount returns the API total for the whole log. The viewer pages at
-// 100 rows and mixes all levels on one page, so per-level row counts cannot match the totals once the log is
-// non-trivial (observed: expected 140 Warning, rendered 100). Assert on the level filter totals instead.
+// Needs redesigning: it compares rendered rows against whole-log API totals, but the viewer pages at 100 and
+// mixes levels on one page. Assert on the level filter totals instead.
 test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'ComplexTest';
@@ -156,8 +154,8 @@ test('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.logViewer.clickSearchButton();
   // Sorts logs by timestamp
   await umbracoUi.logViewer.clickSortLogByTimestampButton();
-  // Gets the last log from the log viewer
-  const lastLog = await umbracoApi.logViewer.getLog(0, 1, 'Descending');
+  // The sort button orders ascending, so the first row is the oldest entry
+  const lastLog = await umbracoApi.logViewer.getLog(0, 1, 'Ascending');
   const dateToFormat = new Date(lastLog.items[0].timestamp);
   const lastLogTimestamp = new Intl.DateTimeFormat(locale, options).format(dateToFormat);
 
