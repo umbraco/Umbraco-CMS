@@ -76,24 +76,34 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`
-			${this._hasProperties
-				? html`<uui-box>
-						<umb-block-workspace-view-edit-properties
-							.managerName=${this.#managerName}
-							data-mark="property-group:root"
-							.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>
-					</uui-box>`
-				: ''}
-			${this.hideSingleGroup && this._groups.length === 1
-				? this.renderGroup(this._groups[0])
-				: repeat(
-						this._groups,
-						(group) => group.key,
-						(group) =>
-							html`<uui-box .headline=${this.localize.string(group.name)}>${this.renderGroup(group)}</uui-box>`,
-					)}
-		`;
+		return html` ${this.#renderRootProperties()} ${this.#renderGroups()} `;
+	}
+
+	#renderRootProperties() {
+		if (!this._hasProperties) return;
+		if (this.hideSingleGroup && this._groups.length === 0) {
+			return html`<umb-block-workspace-view-edit-properties
+				.managerName=${this.#managerName}
+				data-mark="property-group:root"
+				.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>`;
+		}
+		return html`<uui-box>
+			<umb-block-workspace-view-edit-properties
+				.managerName=${this.#managerName}
+				data-mark="property-group:root"
+				.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>
+		</uui-box>`;
+	}
+
+	#renderGroups() {
+		if (this.hideSingleGroup && this._hasProperties === false && this._groups.length === 1) {
+			return this.renderGroup(this._groups[0]);
+		}
+		return repeat(
+			this._groups,
+			(group) => group.key,
+			(group) => html`<uui-box .headline=${this.localize.string(group.name)}>${this.renderGroup(group)}</uui-box>`,
+		);
 	}
 
 	renderGroup(group: UmbPropertyTypeContainerMergedModel) {
