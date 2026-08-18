@@ -22,13 +22,13 @@ describe('UmbUfmFallbackFilter', () => {
 		});
 
 		it('should return fallback when value is null', () => {
-			const result = filter.filter(null as any, 'Fallback');
+			const result = filter.filter(null, 'Fallback');
 
 			expect(result).to.equal('Fallback');
 		});
 
 		it('should return fallback when value is undefined', () => {
-			const result = filter.filter(undefined as any, 'Fallback');
+			const result = filter.filter(undefined, 'Fallback');
 
 			expect(result).to.equal('Fallback');
 		});
