@@ -1861,8 +1861,8 @@ declare global {
 		references_tabName: string;
 		references_unpublishWarning: string;
 		references_usedByProperties: string;
-		references_viewDependentItemsAction: (count: number) => string;
-		references_viewDescendantsWithReferencesAction: (count: number) => string;
+		references_viewDependentItemsAction: string;
+		references_viewDescendantsWithReferencesAction: string;
 		relatedlinks_caption: string;
 		relatedlinks_captionPlaceholder: string;
 		relatedlinks_chooseInternal: string;

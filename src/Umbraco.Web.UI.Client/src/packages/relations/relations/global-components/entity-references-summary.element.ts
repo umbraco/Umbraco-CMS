@@ -125,12 +125,10 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 					this._totalReferencedByItems,
 					() => html`
 						<uui-button
-							label=${this.localize.term('references_viewDependentItemsAction', this._totalReferencedByItems)}
+							label=${this.localize.term('references_viewDependentItemsAction')}
 							look="outline"
 							@click=${(event: Event) => this.#onClickView('referencedBy', event)}>
-							<umb-localize key="references_viewDependentItemsAction" .args=${[this._totalReferencedByItems]}
-								>View ${this._totalReferencedByItems} item(s) that depend on this…</umb-localize
-							>
+							<umb-localize key="references_viewDependentItemsAction">View items that depend on this…</umb-localize>
 						</uui-button>
 					`,
 				)}
@@ -138,16 +136,11 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 					this._totalDescendantsWithReferences,
 					() => html`
 						<uui-button
-							label=${this.localize.term(
-								'references_viewDescendantsWithReferencesAction',
-								this._totalDescendantsWithReferences,
-							)}
+							label=${this.localize.term('references_viewDescendantsWithReferencesAction')}
 							look="outline"
 							@click=${(event: Event) => this.#onClickView('descendantsWithReferences', event)}>
-							<umb-localize
-								key="references_viewDescendantsWithReferencesAction"
-								.args=${[this._totalDescendantsWithReferences]}
-								>View ${this._totalDescendantsWithReferences} descendant(s) with references…</umb-localize
+							<umb-localize key="references_viewDescendantsWithReferencesAction"
+								>View referenced descendants…</umb-localize
 							>
 						</uui-button>
 					`,

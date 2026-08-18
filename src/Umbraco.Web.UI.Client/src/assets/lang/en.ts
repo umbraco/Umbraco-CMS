@@ -2668,9 +2668,8 @@ export default {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
 		},
-		viewDependentItemsAction: (count: number) => `View ${count} ${count === 1 ? 'item' : 'items'} that depend on this…`,
-		viewDescendantsWithReferencesAction: (count: number) =>
-			`View ${count} ${count === 1 ? 'descendant' : 'descendants'} with references…`,
+		viewDependentItemsAction: 'View items that depend on this…',
+		viewDescendantsWithReferencesAction: 'View referenced descendants…',
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',

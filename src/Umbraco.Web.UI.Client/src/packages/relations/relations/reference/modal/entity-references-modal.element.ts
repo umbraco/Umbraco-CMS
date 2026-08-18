@@ -31,13 +31,14 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 
 	override render() {
 		if (!this.data) return nothing;
+		const data = this.data;
 
-		const source = this.data.source;
+		const source = data.source;
 		const showReferencedBy = !source || source === 'referencedBy';
 		const showDescendants = !source || source === 'descendantsWithReferences';
 
 		const headline =
-			this.data.headline ??
+			data.headline ??
 			(source === 'descendantsWithReferences'
 				? this.localize.term('references_labelDescendantsWithReferences')
 				: this.localize.term('references_labelUsedByItems'));
@@ -53,8 +54,8 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 							</p>
 							<umb-entity-reference-list
 								readonly
-								.unique=${this.data.unique}
-								.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
+								.unique=${data.unique}
+								.referenceRepositoryAlias=${data.referenceRepositoryAlias}
 								source="referencedBy"
 								@change=${this.#onReferencedByChange}>
 							</umb-entity-reference-list>
@@ -72,9 +73,9 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 							</p>
 							<umb-entity-reference-list
 								readonly
-								.unique=${this.data.unique}
-								.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
-								.itemRepositoryAlias=${this.data.itemRepositoryAlias}
+								.unique=${data.unique}
+								.referenceRepositoryAlias=${data.referenceRepositoryAlias}
+								.itemRepositoryAlias=${data.itemRepositoryAlias}
 								source="descendantsWithReferences"
 								@change=${this.#onDescendantsChange}>
 							</umb-entity-reference-list>
