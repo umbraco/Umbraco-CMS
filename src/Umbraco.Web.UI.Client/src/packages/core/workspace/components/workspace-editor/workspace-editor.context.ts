@@ -1,6 +1,6 @@
 import type { ManifestWorkspaceView } from '../../types.js';
-import { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import { UMB_WORKSPACE_EDITOR_CONTEXT } from './workspace-editor.context-token.js';
+import { UmbWorkspaceViewController } from './workspace-view.controller.js';
 import { UmbBasicState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -20,7 +20,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 	#overrides = new UmbBasicState<Array<UmbDeepPartialObject<ManifestWorkspaceView>>>([]);
 	public readonly views = mergeObservables(
 		[this.#manifests.asObservable(), this.#overrides.asObservable()],
-		([manifests, overrides]): Array<UmbWorkspaceViewContext> => {
+		([manifests, overrides]): Array<UmbWorkspaceViewController> => {
 			let contexts = this.#contexts;
 
 			// remove ones that are no longer contained in the workspaceViews (And thereby make the new array):
@@ -40,7 +40,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 				manifests
 					.filter((manifest) => !contextsToKeep.some((x) => x.manifest.alias === manifest.alias))
 					.forEach((manifest) => {
-						const context = new UmbWorkspaceViewContext(this, manifest);
+						const context = new UmbWorkspaceViewController(this, manifest);
 						context.setVariantId(this.#variantId);
 						context.setTitle(manifest.meta.label);
 						context.inherit();
@@ -75,7 +75,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 			return hasOverrideChange || hasDiff ? [...contexts] : contexts;
 		},
 		// Custom memoize method, to check context instance and manifest instance:
-		(previousValue: Array<UmbWorkspaceViewContext>, currentValue: Array<UmbWorkspaceViewContext>): boolean => {
+		(previousValue: Array<UmbWorkspaceViewController>, currentValue: Array<UmbWorkspaceViewController>): boolean => {
 			return (
 				previousValue === currentValue &&
 				currentValue.every(
@@ -85,7 +85,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 		},
 	);
 	// A storage and cache for the current contexts, to enable communicating to them and to avoid re-initializing them every time there is a change of manifests/overrides. [NL]
-	#contexts = new Array<UmbWorkspaceViewContext>();
+	#contexts = new Array<UmbWorkspaceViewController>();
 
 	#variantId?: UmbVariantId;
 
@@ -114,7 +114,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 		this.#overrides.setValue(overrides ?? []);
 	}
 
-	async getViewContext(alias: string): Promise<UmbWorkspaceViewContext | undefined> {
+	async getViewContext(alias: string): Promise<UmbWorkspaceViewController | undefined> {
 		await this.#init;
 		return this.#contexts.find((view) => view.manifest.alias === alias);
 	}
