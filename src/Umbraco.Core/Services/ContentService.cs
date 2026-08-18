@@ -387,17 +387,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects, which are ancestors of the current content.
     /// </summary>
-    /// <param name="id">Id of the <see cref="IContent" /> to retrieve ancestors for</param>
+    /// <param name="key">Guid key of the <see cref="IContent" /> to retrieve ancestors for</param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     [Obsolete("Use GetAncestorsAsync(Guid, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
-    public IEnumerable<IContent> GetAncestors(int id)
-    {
-        // intentionally not locking
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-        return keyAttempt.Success
-            ? GetAncestorsAsync(keyAttempt.Result, 0, int.MaxValue, CancellationToken.None).GetAwaiter().GetResult().Items
-            : Enumerable.Empty<IContent>();
-    }
+    public IEnumerable<IContent> GetAncestors(Guid key) =>
+        GetAncestorsAsync(key, 0, int.MaxValue, CancellationToken.None).GetAwaiter().GetResult().Items;
 
     /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects, which are ancestors of the current content.

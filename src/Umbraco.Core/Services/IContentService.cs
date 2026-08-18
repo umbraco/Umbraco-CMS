@@ -122,10 +122,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Gets ancestor documents of a document.
     /// </summary>
-    /// <param name="id">The identifier of the document.</param>
+    /// <param name="key">The Guid key of the document.</param>
     /// <returns>The ancestor documents.</returns>
     [Obsolete("Use GetAncestorsAsync(Guid, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
-    IEnumerable<IContent> GetAncestors(int id);
+    IEnumerable<IContent> GetAncestors(Guid key);
 
     /// <summary>
     ///     Gets ancestor documents of a document.

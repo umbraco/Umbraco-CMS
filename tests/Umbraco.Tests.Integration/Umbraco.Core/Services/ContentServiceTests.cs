@@ -587,6 +587,15 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public void GetAncestors_Guid_Returns_Ancestors_Of_Content()
+    {
+        var res = ContentService.GetAncestors(Subpage.Key).ToList();
+
+        Assert.That(res, Has.Count.EqualTo(1));
+        Assert.That(res[0].Key, Is.EqualTo(Textpage.Key));
+    }
+
+    [Test]
     public void Can_Remove_Property_Type()
     {
         // Arrange
