@@ -36,8 +36,8 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	private _name = '';
 
 	/**
-	 * @internal
 	 * Indicates whether the document is a draft, this is controlled internally but present as an attribute as it affects styling.
+	 * @internal
 	 */
 	@property({ type: Boolean, reflect: true, attribute: 'draft' })
 	protected _isDraft = false;

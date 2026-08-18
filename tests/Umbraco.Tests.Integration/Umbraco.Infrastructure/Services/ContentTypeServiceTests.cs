@@ -2099,6 +2099,112 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Move_PropertyType_To_No_Group()
+    {
+        IContentType basePage = await CreateContentTypeWithSingleGroupedProperty();
+
+        Assert.IsTrue(basePage.MovePropertyType("title", null));
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, basePage.PropertyTypes.Count(), "the property type should not be orphaned in memory");
+            Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias);
+            Assert.IsEmpty(basePage.PropertyGroups["content"].PropertyTypes!);
+        });
+
+        await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
+        basePage = ContentTypeService.Get(basePage.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, basePage.PropertyTypes.Count(), "the property type should not be deleted on save");
+            Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias);
+            Assert.IsNull(basePage.NoGroupPropertyTypes.Single().PropertyGroupId);
+            Assert.IsEmpty(basePage.PropertyGroups["content"].PropertyTypes!);
+        });
+    }
+
+    [Test]
+    public async Task Can_Move_PropertyType_To_No_Group_Without_Losing_Content_Values()
+    {
+        IContentType basePage = await CreateContentTypeWithSingleGroupedProperty();
+
+        IContent contentItem = ContentBuilder.CreateBasicContent(basePage);
+        contentItem.SetValue("title", "The title");
+        ContentService.Save(contentItem);
+
+        basePage.MovePropertyType("title", null);
+        await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
+
+        contentItem = ContentService.GetById(contentItem.Id);
+
+        Assert.AreEqual("The title", contentItem.GetValue<string>("title"));
+    }
+
+    [Test]
+    public async Task Can_Move_PropertyType_From_No_Group_Into_Group()
+    {
+        IContentType basePage = await CreateContentTypeWithSingleUngroupedProperty();
+        Assert.AreEqual("title", basePage.NoGroupPropertyTypes.SingleOrDefault()?.Alias, "the property type should start un-grouped");
+
+        Assert.IsTrue(basePage.MovePropertyType("title", "content"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsEmpty(basePage.NoGroupPropertyTypes, "the property type should no longer be un-grouped in memory");
+            Assert.AreEqual("title", basePage.PropertyGroups["content"].PropertyTypes!.SingleOrDefault()?.Alias);
+        });
+
+        await ContentTypeService.UpdateAsync(basePage, Constants.Security.SuperUserKey);
+        basePage = ContentTypeService.Get(basePage.Id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, basePage.PropertyTypes.Count());
+            Assert.IsEmpty(basePage.NoGroupPropertyTypes);
+            Assert.AreEqual("title", basePage.PropertyGroups["content"].PropertyTypes!.SingleOrDefault()?.Alias);
+        });
+    }
+
+    private async Task<IContentType> CreateContentTypeWithSingleGroupedProperty()
+    {
+        ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
+        basePage.AddPropertyGroup("content", "Content");
+        Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType(), "content", "Content"));
+
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
+
+        return ContentTypeService.Get(basePage.Id);
+    }
+
+    private async Task<IContentType> CreateContentTypeWithSingleUngroupedProperty()
+    {
+        ContentType basePage = ContentTypeBuilder.CreateBasicContentType();
+        basePage.AddPropertyGroup("content", "Content");
+
+        // the single argument overload adds the property type without a group
+        Assert.IsTrue(basePage.AddPropertyType(CreateTitlePropertyType()));
+
+        await ContentTypeService.CreateAsync(basePage, Constants.Security.SuperUserKey);
+
+        return ContentTypeService.Get(basePage.Id);
+    }
+
+    private PropertyType CreateTitlePropertyType() =>
+        new(
+            ShortStringHelper,
+            Constants.PropertyEditors.Aliases.TextBox,
+            ValueStorageType.Nvarchar,
+            "title")
+        {
+            Name = "Title",
+            Description = string.Empty,
+            Mandatory = false,
+            SortOrder = 1,
+            DataTypeId = Constants.DataTypes.Textbox,
+        };
+
+    [Test]
     public async Task Can_Add_PropertyGroup_With_Same_Name_On_Parent_and_Child()
     {
         /*

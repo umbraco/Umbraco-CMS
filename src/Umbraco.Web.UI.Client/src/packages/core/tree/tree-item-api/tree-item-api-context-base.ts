@@ -1,14 +1,14 @@
 import type { UmbTreeItemModel } from '../types.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
 import { UMB_TREE_ITEM_BASE_CONTEXT } from '../tree-item/tree-item.context.token.js';
-import { UmbTreeItemEntityActionManager } from '../tree-item/tree-item-entity-action.manager.js';
 import type { UmbTreeItemApi } from './tree-item-api.interface.js';
-import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { combineLatest, distinctUntilChanged, map } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
-import { ensureSlash } from '@umbraco-cms/backoffice/router';
-import { debounce } from '@umbraco-cms/backoffice/utils';
+import { debounce, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityContext, UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -68,15 +68,36 @@ export abstract class UmbTreeItemApiContextBase<
 	#hasActiveDescendant = new UmbBooleanState(undefined);
 	readonly hasActiveDescendant = this.#hasActiveDescendant.asObservable();
 
-	#treeItemEntityActionManager = new UmbTreeItemEntityActionManager(this);
 	#hideTreeItemActions = new UmbBooleanState(false);
 
 	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
 
-	readonly hasActions = combineLatest([
-		this.#treeItemEntityActionManager.hasActions,
-		this.#hideTreeItemActions.asObservable(),
-	]).pipe(map(([has, hide]) => !hide && has));
+	/**
+	 * @returns {Observable<boolean>} True if any entity action is registered for this entity type
+	 * @deprecated Deprecated since v17. This only tells whether a manifest exists for the entity type, it does not
+	 * evaluate the conditions of the actions. Render `<umb-entity-actions-bundle>`, which resolves the actions
+	 * that are actually permitted for the item. Will be removed in v19.
+	 */
+	get hasActions(): Observable<boolean> {
+		new UmbDeprecation({
+			deprecated: 'UmbTreeItemApiContextBase.hasActions',
+			removeInVersion: '19.0.0',
+			solution:
+				'Render <umb-entity-actions-bundle>, which resolves the entity actions that are permitted for the item.',
+		}).warn();
+
+		return combineLatest([
+			this._treeItem.asObservablePart((item) => item?.entityType),
+			umbExtensionsRegistry.byType('entityAction'),
+			this.#hideTreeItemActions.asObservable(),
+		]).pipe(
+			map(
+				([entityType, actions, hide]) =>
+					!hide && !!entityType && actions.some((action) => action.forEntityTypes.includes(entityType)),
+			),
+			distinctUntilChanged(),
+		);
+	}
 
 	protected readonly _selectOnly = new UmbBooleanState(false);
 	readonly selectOnly = this._selectOnly.asObservable();
@@ -88,7 +109,10 @@ export abstract class UmbTreeItemApiContextBase<
 	#entityContext = new UmbEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
-	/** Public accessor for the tree context. Kept public for backward compatibility. */
+	/**
+	 * Public accessor for the tree context. Kept public for backward compatibility.
+	 * @returns {typeof UMB_TREE_CONTEXT.TYPE | undefined} The tree context
+	 */
 	public get treeContext(): typeof UMB_TREE_CONTEXT.TYPE | undefined {
 		return this._treeContext;
 	}
@@ -109,8 +133,6 @@ export abstract class UmbTreeItemApiContextBase<
 			this.#sectionContext = instance;
 			this.#observeSectionPath();
 		});
-
-		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
 
 	setTreeItem(item: TreeItemType | undefined): void {
@@ -118,13 +140,14 @@ export abstract class UmbTreeItemApiContextBase<
 			this._treeItem.setValue(undefined);
 			this.#entityContext.setEntityType(undefined);
 			this.#entityContext.setUnique(null);
-			this.#treeItemEntityActionManager.setTreeItem(undefined);
 			return;
 		}
 
 		// Only check for undefined. The tree root has null as unique.
 		if (item.unique === undefined) throw new Error('Could not set tree item, unique is missing');
 		if (!item.entityType) throw new Error('Could not set tree item, entity type is missing');
+
+		if (item === this._treeItem.getValue()) return;
 
 		this._treeItem.setValue(item);
 		this.unique = item.unique;
@@ -137,8 +160,6 @@ export abstract class UmbTreeItemApiContextBase<
 			? { entityType: item.parent.entityType, unique: item.parent.unique }
 			: undefined;
 		this.#parentContext.setParent(parentEntity);
-
-		this.#treeItemEntityActionManager.setTreeItem(item);
 
 		this._observeIsSelected();
 		this._observeIsSelectable();
@@ -167,7 +188,7 @@ export abstract class UmbTreeItemApiContextBase<
 				const isSelectable = value ? (ctx.selectableFilter?.(this.getTreeItem()!) ?? true) : false;
 				this._isSelectable.setValue(isSelectable);
 				if (value === true) {
-					this.#checkIsActive();
+					this.#applyActiveState();
 				}
 			},
 			'_observeIsSelectable',
@@ -194,10 +215,11 @@ export abstract class UmbTreeItemApiContextBase<
 
 	/**
 	 * Hook called when the tree context is received or changes. Subclasses can override to add additional observations.
-	 * @param _context
+	 * @param {typeof UMB_TREE_CONTEXT.TYPE} _context - The tree context
 	 */
 	protected _onTreeContextChanged(_context: typeof UMB_TREE_CONTEXT.TYPE): void {
 		this.#observeActive();
+		this.#observeIsCurrentLocation();
 		if (_context.hideTreeItemActions) {
 			this.observe(
 				_context.hideTreeItemActions,
@@ -223,6 +245,17 @@ export abstract class UmbTreeItemApiContextBase<
 		);
 	}
 
+	#observeIsCurrentLocation() {
+		this.observe(
+			this._treeContext?.activeManager.isCurrentLocation(this.path),
+			(isCurrentLocation) => {
+				this.#isCurrentLocation = isCurrentLocation ?? false;
+				this.#applyActiveState();
+			},
+			'observeIsCurrentLocation',
+		);
+	}
+
 	#observeSectionPath() {
 		this.observe(
 			this.#sectionContext?.pathname,
@@ -230,13 +263,14 @@ export abstract class UmbTreeItemApiContextBase<
 				if (!pathname || !this.entityType || this.unique === undefined) return;
 				const path = this.constructPath(pathname, this.entityType, this.unique);
 				this.#path.setValue(path);
-				this.#checkIsActive();
 			},
 			'observeSectionPath',
 		);
 	}
 
-	#checkIsActive = async () => {
+	#isCurrentLocation = false;
+
+	#applyActiveState = async () => {
 		const isSelectable = this._isSelectable.getValue();
 
 		if (isSelectable) {
@@ -244,16 +278,7 @@ export abstract class UmbTreeItemApiContextBase<
 			return;
 		}
 
-		/* Check if the current location includes the path of this tree item.
-		We ensure that the paths ends with a slash to avoid collisions with paths like /path-1 and /path-1-2 where /path-1 is in both.
-		Instead we compare /path-1/ with /path-1-2/ which wont collide.*/
-		const path = this.#path.getValue();
-		// If the path hasn't been resolved yet (e.g. no section context in a modal), skip the check.
-		// ensureSlash('') produces '/' which matches every URL and would mark all items as active.
-		if (!path) return;
-		const location = ensureSlash(window.location.pathname);
-		const comparePath = ensureSlash(path);
-		const isActive = location.includes(comparePath);
+		const isActive = this.#isCurrentLocation;
 
 		if (this._isActive.getValue() === isActive) return;
 		if (!this.entityType || this.unique === undefined) {
@@ -268,19 +293,17 @@ export abstract class UmbTreeItemApiContextBase<
 			await this.#gotTreeContext;
 
 			if (isActive) {
-				this._treeContext?.activeManager.setActive(path);
+				this._treeContext?.activeManager.setActiveTrail(path);
 			} else {
 				// If this is the current, then remove it:
 				// This is a hack, where we are assuming that another active item would have made its entrance and replaced the 'active' within 2 second. [NL]
 				// The problem is that it may take some time before an item appears in the tree and communicates that its active.
 				// And in the meantime the removal of this would have resulted in the parent closing. And since we don't use Active state to open the tree, then we have a problem.
-				debounce(() => this._treeContext?.activeManager.removeActiveIfMatch(path), 1000);
+				debounce(() => this._treeContext?.activeManager.removeActiveTrailIfMatch(path), 1000);
 			}
 		}
 		this._isActive.setValue(isActive);
 	};
-
-	#debouncedCheckIsActive = debounce(this.#checkIsActive, 100);
 
 	open(): void {
 		const item = this.getTreeItem();
@@ -304,10 +327,5 @@ export abstract class UmbTreeItemApiContextBase<
 			entityType,
 			unique: unique ?? 'null',
 		});
-	}
-
-	override destroy(): void {
-		window.removeEventListener('navigationend', this.#debouncedCheckIsActive);
-		super.destroy();
 	}
 }

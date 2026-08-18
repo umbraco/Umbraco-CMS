@@ -9,7 +9,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
  * @abstract
  * @class UmbWorkspaceActionBase
  * @augments {UmbActionBase}
- * @implements {UmbEntityAction}
+ * @implements {UmbWorkspaceAction}
  * @template RepositoryType
  */
 export abstract class UmbWorkspaceActionBase<ArgsMetaType = never>
@@ -26,7 +26,7 @@ export abstract class UmbWorkspaceActionBase<ArgsMetaType = never>
 	 * By specifying the href, the action will act as a link.
 	 * The `execute` method will not be called.
 	 * @abstract
-	 * @returns {string | undefined}
+	 * @returns {string | undefined} the href to link to.
 	 */
 	public getHref(): Promise<string | undefined> {
 		return Promise.resolve(undefined);

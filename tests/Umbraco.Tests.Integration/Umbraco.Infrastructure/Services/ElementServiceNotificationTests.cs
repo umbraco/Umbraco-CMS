@@ -143,6 +143,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         IElement element = new Element("content", -1, _elementType);
 
         var savedWasCalled = false;
+        var publishedWasCalled = false;
 
         ElementNotificationHandler.SavedElement = notification =>
         {
@@ -155,9 +156,50 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
             savedWasCalled = true;
         };
 
+        ElementNotificationHandler.PublishedElement = _ => publishedWasCalled = true;
+
         try
         {
             PublishResult result = ElementService.SaveAndPublish(element, []);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
+            Assert.IsTrue(publishedWasCalled, "ElementPublishedNotification should fire when saving and publishing.");
+        }
+        finally
+        {
+            ElementNotificationHandler.SavedElement = null;
+            ElementNotificationHandler.PublishedElement = null;
+        }
+    }
+
+    [Test]
+    public async Task Can_Read_Saved_Notification_When_Save_And_Publishing_Variant()
+    {
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
+        await MakeElementTypeVariant();
+
+        IElement element = new Element("content", -1, _elementType);
+        element.SetCultureName("hello", "en-US");
+        element.SetCultureName("bonjour", "fr-FR");
+
+        var savedWasCalled = false;
+
+        ElementNotificationHandler.SavedElement = notification =>
+        {
+            IElement saved = notification.SavedEntities.First();
+
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+
+            // both cultures were changed as part of the save-and-publish, so both are reported as saved
+            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[saved.Key]);
+
+            savedWasCalled = true;
+        };
+
+        try
+        {
+            PublishResult result = ElementService.SaveAndPublish(element, ["en-US", "fr-FR"]);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
         }
