@@ -414,21 +414,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     public Task<PagedModel<IContent>> GetAncestorsAsync(IContent content, int skip, int take, CancellationToken cancellationToken) =>
         GetAncestorsAsync(content.Key, skip, take, cancellationToken);
 
-    /// <summary>
-    ///     Gets a collection of published <see cref="IContent" /> objects by Parent Id
-    /// </summary>
-    /// <param name="id">Id of the Parent to retrieve Children from</param>
-    /// <returns>An Enumerable list of published <see cref="IContent" /> objects</returns>
-    public IEnumerable<IContent> GetPublishedChildren(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent>? query = Query<IContent>().Where(x => x.ParentId == id && x.Published);
-            return _documentRepository.Get(query).OrderBy(x => x.SortOrder);
-        }
-    }
-
     /// <inheritdoc />
     public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
     {
