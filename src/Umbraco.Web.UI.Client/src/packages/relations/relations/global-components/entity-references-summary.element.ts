@@ -1,6 +1,6 @@
 import { UMB_ENTITY_REFERENCES_MODAL } from '../reference/modal/constants.js';
 import type { UmbEntityReferenceRepository } from '../reference/types.js';
-import type { UmbConfirmActionModalEntityReferencesConfig } from './confirm-action-modal-entity-references.element.js';
+import type { UmbEntityReferencesConfig } from './types.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -18,7 +18,7 @@ import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 @customElement('umb-entity-references-summary')
 export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	config?: UmbConfirmActionModalEntityReferencesConfig;
+	config?: UmbEntityReferencesConfig;
 
 	@state()
 	private _totalReferencedByItems = 0;

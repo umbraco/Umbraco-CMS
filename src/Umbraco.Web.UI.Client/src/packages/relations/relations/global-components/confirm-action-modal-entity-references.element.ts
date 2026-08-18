@@ -1,4 +1,5 @@
 import type { UmbEntityReferenceRepository, UmbReferenceItemModel } from '../reference/types.js';
+import type { UmbEntityReferencesConfig } from './types.js';
 import { customElement, css, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -7,16 +8,13 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
-export interface UmbConfirmActionModalEntityReferencesConfig {
-	itemRepositoryAlias: string;
-	referenceRepositoryAlias: string;
-	unique: string;
-}
+/** @deprecated Scheduled for removal in Umbraco 21. Use `UmbEntityReferencesConfig` instead. [LK] */
+export type UmbConfirmActionModalEntityReferencesConfig = UmbEntityReferencesConfig;
 
 @customElement('umb-confirm-action-modal-entity-references')
 export class UmbConfirmActionModalEntityReferencesElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	config?: UmbConfirmActionModalEntityReferencesConfig;
+	config?: UmbEntityReferencesConfig;
 
 	@state()
 	private _referencedByItems: Array<UmbReferenceItemModel> = [];

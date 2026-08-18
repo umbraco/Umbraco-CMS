@@ -1,5 +1,5 @@
 import type {
-	UmbConfirmActionModalEntityReferencesConfig,
+	UmbEntityReferencesConfig,
 	UmbEntityReferencesSummaryElement,
 } from '../../../global-components/types.js';
 import type {
@@ -23,7 +23,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	private _name?: string;
 
 	@state()
-	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	// Three-state model for reference-aware trashing:
 	//   undefined = loading (button disabled, no message yet)

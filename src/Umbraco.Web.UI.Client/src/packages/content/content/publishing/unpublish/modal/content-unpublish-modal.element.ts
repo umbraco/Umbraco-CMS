@@ -7,7 +7,7 @@ import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type {
-	UmbConfirmActionModalEntityReferencesConfig,
+	UmbEntityReferencesConfig,
 	UmbEntityReferencesSummaryElement,
 } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
@@ -54,7 +54,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	private _isInvariant = false;
 
 	@state()
-	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant) {

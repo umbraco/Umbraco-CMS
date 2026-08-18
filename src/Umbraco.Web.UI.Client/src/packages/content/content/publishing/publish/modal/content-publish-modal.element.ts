@@ -5,7 +5,7 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import type { UmbConfirmActionModalEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
+import type { UmbEntityReferencesConfig } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 import '../../../variant-picker/content-variant-language-picker.element.js';
@@ -28,7 +28,7 @@ export class UmbContentPublishModalElement extends UmbModalBaseElement<
 	private _isInvariant = false;
 
 	@state()
-	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant || option.variant.state === UmbPublishableVariantState.NOT_CREATED) {
