@@ -183,6 +183,9 @@ public class PropertyValidationService : IPropertyValidationService
     }
 
     /// <inheritdoc />
+    // NOTE: we should make this internal rather than removing it entirely in V10, so the
+    //       referencing unit tests can continue to exercise this code.
+    [Obsolete("Property level validation is not going to be supported moving forward. Please use content level validation with IsPropertyDataValid instead. Scheduled for removal in Umbraco 20.")]
     public bool IsPropertyValid(IProperty property, PropertyValidationContext validationContext)
     {
         // NOTE - the pvalue and vvalues logic in here is borrowed directly from the Property.Values setter so if you are wondering what that's all about, look there.
