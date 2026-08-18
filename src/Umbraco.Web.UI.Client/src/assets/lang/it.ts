@@ -347,6 +347,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Clicca per caricare',
+		browseFilesAction: 'Sfoglia file',
+		dropFilesOr: 'Trascina qui i file multimediali<br />o',
 		orClickHereToUpload: 'o clicca qui per scegliere i files',
 		dragFilesHereToUpload: 'Puoi trascinare i file qui per caricarli.',
 		disallowedFileType: 'Impossibile caricare questo file, non ha un tipo di file approvato',
@@ -578,33 +580,6 @@ export default {
 		changeKeyError: "La chiave '%0%' esiste già.",
 		overviewTitle: 'Panoramica del Dizionario',
 	},
-	examineManagement: {
-		configuredSearchers: 'Searchers configurati',
-		configuredSearchersDescription:
-			'Visualizza le proprietà e gli strumenti per ogni Searcher configurato (per esempio un multi-index searcher)',
-		fieldValues: 'Valori del campo',
-		healthStatus: 'Stato di salute',
-		healthStatusDescription: "Lo stato di salute dell'index e se può essere letto",
-		indexers: 'Indexers',
-		indexInfo: 'Index info',
-		indexInfoDescription: "Elenca le proprietà dell'index",
-		manageIndexes: 'Gestisci gli indexes di Examine',
-		manageIndexesDescription:
-			'Permette di visualizzare i dettagli di ogni index e fornisce alcuni strumenti\n      per gestire gli index\n    ',
-		rebuildIndex: 'Ricostruisci index',
-		rebuildIndexWarning:
-			"\n      Questo causerà la ricostruzione dell'index.<br />\n      A seconda della quantità di contenuti presenti nel tuo sito, potrebbe volerci un po' di tempo.<br />\n      Non è consigliabile ricostruire un indice durante i periodi di elevato traffico del sito Web o quando gli editor modificano i contenuti.\n     ",
-		searchers: 'Searchers',
-		searchDescription: "Cerca nell'index e visualizza i risultati",
-		tools: 'Strumenti',
-		toolsDescription: "Strumenti per gestire l'index",
-		fields: 'Campi',
-		indexCannotRead: "L'indice non può essere letto e dovrà essere ricostruito",
-		processIsTakingLonger:
-			'Il processo sta impiegando più tempo del previsto, controlla il log di Umbraco per vedere se ci sono stati errori durante questa operazione',
-		indexCannotRebuild: 'Questo indice non può essere ricostruito perché non ha assegnato',
-		iIndexPopulator: 'IIndexPopulator',
-	},
 	placeholders: {
 		username: 'Inserisci il tuo username',
 		password: 'Inserisci la tua password',
@@ -783,6 +758,8 @@ export default {
 		new: 'Nuovo',
 		next: 'Successivo',
 		no: 'No',
+		noResults: 'Nessun risultato',
+		noResultsFor: (query: string) => `Nessun risultato per "${query}".`,
 		of: 'di',
 		off: 'Off',
 		ok: 'Ok',
@@ -1575,8 +1552,10 @@ export default {
 		tabHasNoSortOrder: 'la scheda non ha un ordine',
 		compositionUsageHeading: 'Dove è usata questa composizione?',
 		compositionUsageSpecification: 'Questa composizione è usata nella composizione dei seguenti tipi di contenuto:',
-		compositionUsageSpecificationMediaType: 'Questa composizione è usata nella composizione dei seguenti tipi di media:',
-		compositionUsageSpecificationMemberType: 'Questa composizione è usata nella composizione dei seguenti tipi di membro:',
+		compositionUsageSpecificationMediaType:
+			'Questa composizione è usata nella composizione dei seguenti tipi di media:',
+		compositionUsageSpecificationMemberType:
+			'Questa composizione è usata nella composizione dei seguenti tipi di membro:',
 		variantsHeading: 'Consenti variazioni',
 		cultureVariantHeading: 'Consenti variazioni in base alla lingua',
 		segmentVariantHeading: 'Consenti segmentazione',
@@ -2064,7 +2043,6 @@ export default {
 		contentRedirectManager: 'Gestione Redirect URL',
 		mediaFolderBrowser: 'Contenuto',
 		settingsWelcome: 'Benvenuto',
-		settingsExamine: 'Gestione Examine',
 		settingsPublishedStatus: 'Stato di pubblicazione',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',
@@ -2297,5 +2275,10 @@ export default {
 	treeSearch: {
 		searchResult: 'oggetto trovato',
 		searchResults: 'oggetti trovati',
+	},
+	picker: {
+		browseTab: 'Sfoglia',
+		searchTab: 'Cerca',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento selezionato' : 'elementi selezionati'}`,
 	},
 } as UmbLocalizationDictionary;

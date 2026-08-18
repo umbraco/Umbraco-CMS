@@ -50,6 +50,7 @@
     <ProjectReference Include="..\..\src\Umbraco.Cms.Persistence.EFCore.Sqlite\Umbraco.Cms.Persistence.EFCore.Sqlite.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache\Umbraco.PublishedCache.HybridCache.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.HybridCache.Bounded\Umbraco.PublishedCache.HybridCache.Bounded.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Cms.Search.Core\Umbraco.Cms.Search.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
   </ItemGroup>
 
@@ -86,6 +87,33 @@
     </Compile>
     <Compile Update="Umbraco.Core\Factories\MachineIdentityProviderTests.AzureWebsiteInstanceId.cs">
       <DependentUpon>MachineIdentityProviderTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Web.Common\Views\UmbracoViewPageTests.PreviewBadge.cs">
+      <DependentUpon>UmbracoViewPageTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Web.Common\Views\UmbracoViewPageTests.RenderModel.cs">
+      <DependentUpon>UmbracoViewPageTests.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Umbraco.Cms.Search.Core\Extensions\ContentExtensionsTests.AncestorIds.cs">
+      <DependentUpon>ContentExtensionsTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\Extensions\ContentExtensionsTests.AvailableCultures.cs">
+      <DependentUpon>ContentExtensionsTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\Extensions\ContentExtensionsTests.IsPublished.cs">
+      <DependentUpon>ContentExtensionsTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\Extensions\ContentExtensionsTests.ObjectType.cs">
+      <DependentUpon>ContentExtensionsTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\Extensions\ContentExtensionsTests.PublishedCultures.cs">
+      <DependentUpon>ContentExtensionsTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Cms.Search.Core\Extensions\ContentExtensionsTests.VariesByCulture.cs">
+      <DependentUpon>ContentExtensionsTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

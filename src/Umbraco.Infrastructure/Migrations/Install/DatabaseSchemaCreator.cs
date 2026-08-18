@@ -102,6 +102,7 @@ public class DatabaseSchemaCreator
         typeof(DistributedJobDto),
         typeof(LastSyncedDto),
         typeof(RepositoryCacheVersionDto),
+        typeof(IndexDocumentDto),
     };
 
     private readonly IUmbracoDatabase _database;

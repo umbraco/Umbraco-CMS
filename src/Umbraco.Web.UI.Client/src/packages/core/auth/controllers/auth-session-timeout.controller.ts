@@ -44,7 +44,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 					}
 				}
 			},
-			'_sessionState',
+			null,
 		);
 
 		// When the user times out, clean up
@@ -54,7 +54,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 				this.#clearScheduledCheck();
 				await this.#closeTimeoutModal();
 			},
-			'_timeoutSignal',
+			null,
 		);
 	}
 
@@ -138,8 +138,7 @@ export class UmbAuthSessionTimeoutController extends UmbControllerBase {
 		// Otherwise, show the timeout overlay.
 		if (this.#host.keepUserLoggedIn) {
 			await this.#tryKeepAlive();
-		}
-		else {
+		} else {
 			await this.#openTimeoutModal(secondsRemaining);
 		}
 	}

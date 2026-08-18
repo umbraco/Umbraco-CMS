@@ -345,6 +345,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Cliciwch i lanlwytho',
+		browseFilesAction: 'Pori ffeiliau',
+		dropFilesOr: 'Llusgwch a gollwng cyfryngau yma<br />neu',
 		orClickHereToUpload: 'neu cliciwch yma i ddewis ffeiliau',
 		disallowedFileType: "Ni ellir lanlwytho'r ffeil yma, nid yw math y ffeil yn wedi'i gymeradwyo",
 		maxFileSize: 'Maint ffeil uchaf',
@@ -598,36 +600,6 @@ export default {
 		changeKeyError: "Mae'r allwedd '%0%' yn bodoli eisoes.",
 		overviewTitle: 'Trosolwg Geiriadur',
 	},
-	examineManagement: {
-		configuredSearchers: "Chwilwyr wedi'u Ffurfweddu",
-		configuredSearchersDescription:
-			"Yn dangos priodweddau ac offer ar gyfer unrhyw Chwiliwr wedi'i ffurfweddu (h.y. fel chwiliwr aml-fynegai)",
-		fieldValues: 'Gwerthoedd maes',
-		healthStatus: 'Statws iechyd',
-		healthStatusDescription: 'Statws iechyd y mynegai ac os gellir ei ddarllen',
-		indexers: 'Mynegewyr',
-		indexInfo: 'Gwybodaeth mynegai',
-		indexInfoDescription: "Yn rhestru priodweddau'r mynegai",
-		manageIndexes: 'Rheoli mynegeion Examine',
-		manageIndexesDescription:
-			"Yn caniatáu ichi weld manylion pob mynegai ac yn darparu rhai offer ar gyfer rheoli'r mynegeion",
-		rebuildIndex: 'Ailadeiladu mynegai ',
-		rebuildIndexWarning:
-			"\n            Bydd hyn yn achosi i'r mynegai gael ei ailadeiladu.<br />\n            Yn dibynnu ar faint o gynnwys sydd yn eich gwefan, gallai hyn gymryd cryn amser.<br />\n            Ni argymhellir ailadeiladu mynegai ar adegau o draffig gwefan uchel neu pan fydd golygyddion yn golygu cynnwys.\n            ",
-		searchers: 'Chwilwyr',
-		searchDescription: 'Chwiliwch y mynegai a gweld y canlyniadau',
-		tools: 'Offer',
-		toolsDescription: "Offer i reoli'r mynegai",
-		fields: 'meysydd',
-		indexCannotRead: 'Ni ellir darllen yr mynegai a bydd angen ei ailadeiladu',
-		processIsTakingLonger:
-			"Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log Umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn",
-		indexCannotRebuild: "Ni ellir ailadeiladu'r mynegai hwn oherwydd nad yw wedi'i aseinio",
-		iIndexPopulator: 'IIndexPopulator',
-		contentInIndex: 'Cynnwys yn y mynegai',
-		noResults: 'Ni ddarganfuwyd unrhyw ganlyniadau',
-		searchResultsFound: 'Dangos %0% - %1% o %2% canlyniad(au) - Tudalen %3% o %4%',
-	},
 	placeholders: {
 		username: 'Darparwch eich enw defnyddiwr',
 		password: 'Darparwch eich cyfrinair',
@@ -807,6 +779,8 @@ export default {
 		new: 'Newydd',
 		next: 'Nesaf',
 		no: 'Na',
+		noResults: 'Ni ddarganfuwyd unrhyw ganlyniadau',
+		noResultsFor: (query: string) => `Ni ddarganfuwyd unrhyw ganlyniad ar gyfer "${query}".`,
 		of: 'o',
 		off: 'I ffwrdd',
 		ok: 'Iawn',
@@ -1845,6 +1819,10 @@ export default {
 		thirdPartyGroup: 'Trydydd parti',
 		webhooks: 'Bachau gwe',
 	},
+	picker: {
+		browseTab: 'Pori',
+		searchTab: 'Chwilio',
+	},
 	update: {
 		updateAvailable: 'Diweddariad newydd yn barod',
 		updateDownloadText: '%0% yn barod, cliciwch yma i lawrlwytho',
@@ -2147,7 +2125,6 @@ export default {
 		contentRedirectManager: 'Rheolaeth Ailgyfeirio URL',
 		mediaFolderBrowser: 'Cynnwys',
 		settingsWelcome: 'Croeso',
-		settingsExamine: 'Rheolaeth Examine',
 		settingsPublishedStatus: 'Statws Cyhoeddedig',
 		settingsModelsBuilder: 'Adeiladwr Modelau',
 		settingsHealthCheck: 'Gwiriad Iechyd',

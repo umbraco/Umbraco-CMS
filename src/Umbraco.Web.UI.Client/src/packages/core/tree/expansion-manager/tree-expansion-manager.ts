@@ -94,7 +94,7 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 * @param {UmbEntityModel} entity The entity to get
 	 * @param {string} entity.entityType The entity type
 	 * @param {string} entity.unique The unique key
-	 * @returns {*}  {(Promise<UmbEntityExpansionEntryModel | undefined>)}
+	 * @returns {Promise<UmbEntityExpansionEntryModel | undefined>} The expansion entry, if found
 	 * @memberof UmbEntityExpansionManager
 	 */
 	public async getItem(entity: UmbEntityModel): Promise<UmbEntityExpansionEntryModel | undefined> {

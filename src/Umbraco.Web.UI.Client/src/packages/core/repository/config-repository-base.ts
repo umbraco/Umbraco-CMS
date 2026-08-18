@@ -75,6 +75,7 @@ export abstract class UmbConfigRepositoryBase<ConfigModel> extends UmbRepository
 
 	/**
 	 * Subscribe to a part of the configuration.
+	 * @template {keyof ConfigModel} Part
 	 * @param {Part} part The configuration key to subscribe to.
 	 * @returns {Observable<ConfigModel[Part]>} An observable of that part.
 	 */

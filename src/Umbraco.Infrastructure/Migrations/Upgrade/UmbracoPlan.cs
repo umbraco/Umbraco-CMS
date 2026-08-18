@@ -119,6 +119,8 @@ public partial class UmbracoPlan : MigrationPlan
 
         // To 19.0.0
         To<V_19_0_0.AddExternalBlockElementRelationType>("{2D8F1B6E-4C3A-4E7D-9A1B-5F0C7E2D8A93}");
+        To<V_19_0_0.AddIndexDocumentTable>("{8A5C1B2E-4F6D-4E1A-9C3B-D2E7F0A16C54}");
+        To<V_19_0_0.RemoveLegacyExamineIndexFiles>("{6F1A9C3D-2B4E-4F7A-8C1D-9E3F5A7B2C60}");
 
         // To EFCore
         To<V_18_0_0.AddWebhookDto>("{F3CC0076-0692-41E5-9B2B-C58D46E556D4}");

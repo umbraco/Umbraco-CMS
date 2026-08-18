@@ -423,6 +423,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Click to upload',
+		browseFilesAction: 'Browse files',
+		dropFilesOr: 'Drag and drop media here<br />or',
 		orClickHereToUpload: 'or click here to choose files',
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
 		disallowedFileExtension: (extension: string) =>
@@ -720,38 +722,6 @@ export default {
 		changeKeyError: "The key '%0%' already exists.",
 		overviewTitle: 'Dictionary overview',
 	},
-	examineManagement: {
-		configuredSearchers: 'Configured Searchers',
-		configuredSearchersDescription:
-			'Shows properties and tools for any configured Searcher (e.g. such as a multi-index searcher)',
-		fieldValues: 'Field values',
-		healthStatus: 'Health status',
-		healthStatusDescription: 'The health status of the index and if it can be read',
-		indexers: 'Indexers',
-		indexInfo: 'Index info',
-		contentInIndex: 'Content in index',
-		indexInfoDescription: 'Lists the properties of the index',
-		manageIndexes: 'Manage Examine indexes',
-		manageIndexesDescription:
-			'Allows you to view the details of each index and provides some tools for managing the indexes',
-		rebuildIndex: 'Rebuild index',
-		rebuildIndexWarning:
-			'This will cause the index to be rebuilt.<br /> Depending on how much content there is in your site this could take a while.<br /> It is not recommended to rebuild an index during times of high website traffic or when editors are editing content.',
-		searchers: 'Searchers',
-		searchDescription: 'Search the index and view the results',
-		tools: 'Tools',
-		toolsDescription: 'Tools to manage the index',
-		fields: 'fields',
-		indexCannotRead: 'The index cannot be read and will need to be rebuilt',
-		processIsTakingLonger:
-			'The process is taking longer than expected, check the Umbraco log to see if there have been any errors during this operation',
-		indexCannotRebuild: 'This index cannot be rebuilt because it has no assigned',
-		iIndexPopulator: 'IIndexPopulator',
-		noResults: 'No results were found',
-		searchResultsFound: 'Showing %0% - %1% of %2% result(s) - Page %3% of %4%',
-		corruptStatus: 'Possible corrupt index detected',
-		corruptErrorDescription: 'Error received when evaluating the index:',
-	},
 	placeholders: {
 		username: 'Enter your username',
 		password: 'Enter your password',
@@ -965,6 +935,8 @@ export default {
 		nodeName: 'Node Name',
 		none: 'None',
 		notFound: 'Not found',
+		noResults: 'No results',
+		noResultsFor: (query: string) => `No result for "${query}".`,
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
@@ -2178,6 +2150,11 @@ export default {
 		children: 'Children',
 		noItems: 'No items',
 	},
+	picker: {
+		browseTab: 'Browse',
+		searchTab: 'Search',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} selected`,
+	},
 	update: {
 		updateAvailable: 'New update ready',
 		updateDownloadText: '%0% is ready, click here for download',
@@ -2566,11 +2543,14 @@ export default {
 		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
+		restoreItemTo: (from: string, to: string) => `Restore <strong>${from}</strong> to <strong>${to}</strong>`,
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
 		mediaTrashed: 'Trashed media with Id: {0} related to original parent media item with Id: {1}',
 		itemCannotBeRestored: 'Cannot automatically restore this item',
 		itemCannotBeRestoredHelpText:
-			'There is no location where this item can be automatically restored. You can move the item manually using the tree below.',
+			'There is no location where this item can be automatically restored. You can select a new location below.',
+		restoreToTitle: 'Restore to',
+		selectRestoreLocation: 'Select location',
 		wasRestored: 'was restored under',
 	},
 	relationType: {
@@ -2598,7 +2578,6 @@ export default {
 		libraryWelcome: 'Welcome',
 		mediaFolderBrowser: 'Content',
 		settingsWelcome: 'Welcome',
-		settingsExamine: 'Examine Management',
 		settingsPublishedStatus: 'Published Status',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',

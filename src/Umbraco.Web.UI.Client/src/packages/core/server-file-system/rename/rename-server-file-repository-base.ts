@@ -3,6 +3,7 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbRepositoryResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 export abstract class UmbRenameServerFileRepositoryBase<
@@ -23,12 +24,12 @@ export abstract class UmbRenameServerFileRepositoryBase<
 
 	/**
 	 * Rename
-	 * @param {string} unique
-	 * @param {string} name
-	 * @returns {*}
+	 * @param {string} unique - The unique identifier of the file to rename
+	 * @param {string} name - The new name for the file
+	 * @returns {Promise<UmbRepositoryResponse<DetailModelType>>} The renamed detail data
 	 * @memberof UmbRenameServerFileRepositoryBase
 	 */
-	async rename(unique: string, name: string) {
+	async rename(unique: string, name: string): Promise<UmbRepositoryResponse<DetailModelType>> {
 		if (!unique) throw new Error('Unique is missing');
 		if (!name) throw new Error('Name is missing');
 

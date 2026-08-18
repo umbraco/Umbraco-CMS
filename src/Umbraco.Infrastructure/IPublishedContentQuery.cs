@@ -1,4 +1,3 @@
-using Examine.Search;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core;
@@ -122,11 +121,7 @@ public interface IPublishedContentQuery
     /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
     /// <param name="indexName">
     ///     The name of the index to search (defaults to
-    ///     <see cref="Constants.UmbracoIndexes.ExternalIndexName" />).
-    /// </param>
-    /// <param name="loadedFields">
-    ///     This parameter is no longer used, because the results are loaded from the published snapshot
-    ///     using the single item ID field.
+    ///     <see cref="Constants.IndexAliases.PublishedContent" />).
     /// </param>
     /// <returns>
     ///     The search results.
@@ -139,6 +134,10 @@ public interface IPublishedContentQuery
     ///         invariant fields for all documents.
     ///     </para>
     ///     <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
+    ///     <para>
+    ///         This method only supports simple term searches. For filtering, faceting, or sorting, use
+    ///         <c>ISearcher</c> (resolved via <c>ISearcherResolver</c>) from Umbraco.Cms.Search.Core directly.
+    ///     </para>
     /// </remarks>
     IEnumerable<PublishedSearchResult> Search(
         string term,
@@ -146,8 +145,7 @@ public interface IPublishedContentQuery
         int take,
         out long totalRecords,
         string culture = "*",
-        string indexName = Constants.UmbracoIndexes.ExternalIndexName,
-        ISet<string>? loadedFields = null);
+        string indexName = Constants.IndexAliases.PublishedContent);
 
     /// <summary>
     ///     Searches content.
@@ -156,7 +154,7 @@ public interface IPublishedContentQuery
     /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
     /// <param name="indexName">
     ///     The name of the index to search (defaults to
-    ///     <see cref="Cms.Core.Constants.UmbracoIndexes.ExternalIndexName" />).
+    ///     <see cref="Constants.IndexAliases.PublishedContent" />).
     /// </param>
     /// <returns>
     ///     The search results.
@@ -170,43 +168,5 @@ public interface IPublishedContentQuery
     ///     </para>
     ///     <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
     /// </remarks>
-    IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName);
-
-    /// <summary>
-    ///     Executes the query and converts the results to <see cref="PublishedSearchResult" />.
-    /// </summary>
-    /// <param name="query">The query.</param>
-    /// <returns>
-    ///     The search results.
-    /// </returns>
-    IEnumerable<PublishedSearchResult> Search(IQueryExecutor query);
-
-    /// <summary>
-    ///     Executes the query and converts the results to <see cref="PublishedSearchResult" />.
-    /// </summary>
-    /// <param name="query">The query.</param>
-    /// <param name="skip">The amount of results to skip.</param>
-    /// <param name="take">The amount of results to take/return.</param>
-    /// <param name="totalRecords">The total amount of records.</param>
-    /// <returns>
-    ///     The search results.
-    /// </returns>
-    IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords);
-
-    /// <summary>
-    ///     Executes the query and converts the results to <see cref="PublishedSearchResult" />.
-    /// </summary>
-    /// <param name="query">The query.</param>
-    /// <param name="skip">The amount of results to skip.</param>
-    /// <param name="take">The amount of results to take/return.</param>
-    /// <param name="totalRecords">The total amount of records.</param>
-    /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
-    /// <returns>
-    ///     The search results.
-    /// </returns>
-    /// <remarks>
-    ///     While enumerating results, the ambient culture is changed to be the searched culture.
-    /// </remarks>
-    IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords, string? culture)
-        => Search(query, skip, take, out totalRecords);
+    IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.IndexAliases.PublishedContent);
 }

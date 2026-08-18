@@ -336,7 +336,7 @@ export abstract class UmbBlockEntryContext<
 		x ? (x.contentTypeKey ?? undefined) : null,
 	);
 	/**
-	 * @deprecated Use {@link _settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
+	 * @deprecated Use {@link UmbBlockEntryContext#_settingsDataContentTypeKey} instead. This will be removed in Umbraco 18.
 	 */
 	// eslint-disable-next-line
 	private readonly settingsDataContentTypeKey = this._settingsDataContentTypeKey;
@@ -398,11 +398,15 @@ export abstract class UmbBlockEntryContext<
 				}).warn();
 			}
 			this.#labelRender = new UmbUfmVirtualRenderController(this);
-			this.observe(this.label, (label) => {
-				if (this.#labelRender) {
-					this.#labelRender.markdown = label;
-				}
-			});
+			this.observe(
+				this.label,
+				(label) => {
+					if (this.#labelRender) {
+						this.#labelRender.markdown = label;
+					}
+				},
+				null,
+			);
 			this.#watchContentForLabelRender();
 		}
 

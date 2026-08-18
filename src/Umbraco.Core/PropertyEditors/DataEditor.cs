@@ -167,9 +167,6 @@ public class DataEditor : IDataEditor
     /// </remarks>
     public IConfigurationEditor GetConfigurationEditor() => ExplicitConfigurationEditor ?? CreateConfigurationEditor();
 
-    /// <inheritdoc />
-    public virtual IPropertyIndexValueFactory PropertyIndexValueFactory => new DefaultPropertyIndexValueFactory();
-
     /// <summary>
     ///     Creates a value editor instance.
     /// </summary>

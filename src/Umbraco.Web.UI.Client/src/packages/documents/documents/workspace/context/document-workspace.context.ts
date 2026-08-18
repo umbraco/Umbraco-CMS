@@ -143,7 +143,7 @@ export class UmbDocumentWorkspaceContext
 			null,
 		);
 
-		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
+		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed), null);
 
 		this.routes.setRoutes([
 			{

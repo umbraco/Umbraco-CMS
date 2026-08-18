@@ -16,7 +16,6 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.HostedServices;
-using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
@@ -25,6 +24,7 @@ using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.EFCore.Sqlite;
 using Umbraco.Cms.Persistence.EFCore.SqlServer;
+using Umbraco.Cms.Search.Provider.Examine.Lucene;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -48,8 +48,6 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
         builder.Services.AddUnique(testHelper.MainDom);
-
-        builder.Services.AddUnique<IIndexRebuilder, TestBackgroundIndexRebuilder>();
 
 #if IS_WINDOWS
         // ensure all lucene indexes are using RAM directory (no file system)
@@ -155,39 +153,6 @@ public static class UmbracoBuilderExtensions
             loggerFactory.CreateLogger<LocalizedTextService>());
 
         return localizedTextService;
-    }
-
-    // replace the default so there is no background index rebuilder
-    private sealed class TestBackgroundIndexRebuilder : ExamineIndexRebuilder
-    {
-        public TestBackgroundIndexRebuilder(
-            IMainDom mainDom,
-            IRuntimeState runtimeState,
-            ILogger<ExamineIndexRebuilder> logger,
-            IExamineManager examineManager,
-            IEnumerable<IIndexPopulator> populators,
-            IBackgroundTaskQueue backgroundTaskQueue)
-            : base(
-            mainDom,
-            runtimeState,
-            logger,
-            examineManager,
-            populators,
-            backgroundTaskQueue)
-        {
-        }
-
-        [Obsolete("Use RebuildIndexAsync() instead. Scheduled for removal in Umbraco 19.")]
-        public override void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
-        {
-            // noop
-        }
-
-        [Obsolete("Use RebuildIndexesAsync() instead. Scheduled for removal in Umbraco 19.")]
-        public override void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
-        {
-            // noop
-        }
     }
 
     private class NoopServerMessenger : IServerMessenger

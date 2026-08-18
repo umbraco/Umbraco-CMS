@@ -379,6 +379,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Clique para carregar',
+		browseFilesAction: 'Procurar ficheiros',
+		dropFilesOr: 'Arraste e solte ficheiros multimédia aqui<br />ou',
 		orClickHereToUpload: 'ou clique aqui para escolher ficheiros',
 		disallowedFileType: 'Não é possível carregar este ficheiro, não tem um tipo de ficheiro aprovado',
 		disallowedMediaType:
@@ -529,7 +531,8 @@ export default {
 		confirmremoveusageof: 'Tem a certeza que quer remover o uso de <strong>%0%</strong>',
 		confirmlogout: 'Tem a certeza?',
 		confirmSure: 'Tem a certeza?',
-		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> não pode ser movido para a Reciclagem porque é referenciado por outros itens.`,
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> não pode ser movido para a Reciclagem porque é referenciado por outros itens.`,
 		confirmTrash: (name: string) => `Tem a certeza que quer mover <strong>${name}</strong> para a Reciclagem?`,
 		cannotBulkTrashWhenReferenced: (total: number) =>
 			`Os <strong>${total} ${total === 1 ? 'item selecionado' : 'itens selecionados'}</strong> não podem ser movidos para a Reciclagem porque pelo menos um item é referenciado por outro conteúdo.`,
@@ -658,38 +661,6 @@ export default {
 		displayName: 'Nome da Cultura',
 		changeKeyError: "A chave '%0%' já existe.",
 		overviewTitle: 'Visão geral do dicionário',
-	},
-	examineManagement: {
-		configuredSearchers: 'Pesquisadores Configurados',
-		configuredSearchersDescription:
-			'Mostra propriedades e ferramentas para qualquer Pesquisador configurado (por exemplo, um pesquisador de múltiplos índices)',
-		fieldValues: 'Valores do campo',
-		healthStatus: 'Estado de saúde',
-		healthStatusDescription: 'O estado de saúde do índice e se pode ser lido',
-		indexers: 'Indexadores',
-		indexInfo: 'Informação do índice',
-		contentInIndex: 'Conteúdo no índice',
-		indexInfoDescription: 'Lista as propriedades do índice',
-		manageIndexes: 'Gerir índices Examine',
-		manageIndexesDescription:
-			'Permite visualizar os detalhes de cada índice e fornece algumas ferramentas para gerir os índices',
-		rebuildIndex: 'Reconstruir índice',
-		rebuildIndexWarning:
-			'Isto fará com que o índice seja reconstruído.<br /> Dependendo da quantidade de conteúdo no seu site, isto pode demorar algum tempo.<br /> Não é recomendado reconstruir um índice durante períodos de tráfego elevado no website ou quando os editores estão a editar conteúdo.',
-		searchers: 'Pesquisadores',
-		searchDescription: 'Pesquisar no índice e visualizar os resultados',
-		tools: 'Ferramentas',
-		toolsDescription: 'Ferramentas para gerir o índice',
-		fields: 'campos',
-		indexCannotRead: 'O índice não pode ser lido e precisará de ser reconstruído',
-		processIsTakingLonger:
-			'O processo está a demorar mais do que o esperado, verifique o log do Umbraco para ver se ocorreram erros durante esta operação',
-		indexCannotRebuild: 'Este índice não pode ser reconstruído porque não tem nenhum atribuído',
-		iIndexPopulator: 'IIndexPopulator',
-		noResults: 'Nenhum resultado foi encontrado',
-		searchResultsFound: 'A mostrar %0% - %1% de %2% resultado(s) - Página %3% de %4%',
-		corruptStatus: 'Possível índice corrompido detetado',
-		corruptErrorDescription: 'Erro recebido ao avaliar o índice:',
 	},
 	placeholders: {
 		username: 'Introduza o seu nome de utilizador',
@@ -900,6 +871,8 @@ export default {
 		no: 'Não',
 		nodeName: 'Nome do Nó',
 		notFound: 'Não encontrado',
+		noResults: 'Sem resultados',
+		noResultsFor: (query: string) => `Nenhum resultado para "${query}".`,
 		of: 'de',
 		off: 'Desligado',
 		ok: 'OK',
@@ -1736,8 +1709,10 @@ export default {
 		compositionsDescriptionMemberType:
 			'Herde separadores e propriedades de um Tipo de Membro existente. Novos separadores serão adicionados ao Tipo de Membro atual ou fundidos se existir um separador com um nome idêntico.',
 		compositionInUse: 'Este Tipo de Conteúdo é usado numa composição e, portanto, não pode ser composto ele próprio.',
-		compositionInUseMediaType: 'Este Tipo de Multimédia é usado numa composição e, portanto, não pode ser composto ele próprio.',
-		compositionInUseMemberType: 'Este Tipo de Membro é usado numa composição e, portanto, não pode ser composto ele próprio.',
+		compositionInUseMediaType:
+			'Este Tipo de Multimédia é usado numa composição e, portanto, não pode ser composto ele próprio.',
+		compositionInUseMemberType:
+			'Este Tipo de Membro é usado numa composição e, portanto, não pode ser composto ele próprio.',
 		noAvailableCompositions: 'Não existem Tipos de Conteúdo disponíveis para usar como composição.',
 		noAvailableCompositionsMediaType: 'Não existem Tipos de Multimédia disponíveis para usar como composição.',
 		noAvailableCompositionsMemberType: 'Não existem Tipos de Membro disponíveis para usar como composição.',
@@ -1777,8 +1752,10 @@ export default {
 		tabHasNoSortOrder: 'o separador não tem ordem',
 		compositionUsageHeading: 'Onde é usada esta composição?',
 		compositionUsageSpecification: 'Esta composição é atualmente usada na composição dos seguintes Tipos de Conteúdo:',
-		compositionUsageSpecificationMediaType: 'Esta composição é atualmente usada na composição dos seguintes Tipos de Multimédia:',
-		compositionUsageSpecificationMemberType: 'Esta composição é atualmente usada na composição dos seguintes Tipos de Membro:',
+		compositionUsageSpecificationMediaType:
+			'Esta composição é atualmente usada na composição dos seguintes Tipos de Multimédia:',
+		compositionUsageSpecificationMemberType:
+			'Esta composição é atualmente usada na composição dos seguintes Tipos de Membro:',
 		variantsHeading: 'Variação',
 		cultureVariantHeading: 'Permitir variar por cultura',
 		segmentVariantHeading: 'Permitir segmentação',
@@ -2359,7 +2336,6 @@ export default {
 		contentRedirectManager: 'Gestão de URL de Redirecionamento',
 		mediaFolderBrowser: 'Conteúdo',
 		settingsWelcome: 'Bem-vindo(a)',
-		settingsExamine: 'Gerir Examine',
 		settingsPublishedStatus: 'Estado de Publicação',
 		settingsModelsBuilder: 'Gerador de Modelos',
 		settingsHealthCheck: 'Verificação de Saúde',
@@ -2860,5 +2836,10 @@ export default {
 		emptyDate: 'Por favor, selecione uma data',
 		emptyTimeZone: 'Por favor, selecione um fuso horário',
 		invalidTimeZone: 'O fuso horário selecionado não é válido',
+	},
+	picker: {
+		browseTab: 'Procurar',
+		searchTab: 'Pesquisar',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
 	},
 } as UmbLocalizationDictionary;
