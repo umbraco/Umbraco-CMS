@@ -35,10 +35,10 @@ public class ProtectedContentTests : InvariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructure_IncludesExistingContentProtectionOnIndexUpdate()
+    public async Task PublishedStructure_IncludesExistingContentProtectionOnIndexUpdate()
     {
         IContent root = Root();
-        Attempt<OperationResult?> entryResult = PublicAccessService.Save(
+        Attempt<OperationResult?> entryResult = await PublicAccessService.SaveAsync(
             new PublicAccessEntry(root, root, root, [
                 new PublicAccessRule
                 {
@@ -69,13 +69,13 @@ public class ProtectedContentTests : InvariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructure_CanAddContentProtectionWithoutRepublishing()
+    public async Task PublishedStructure_CanAddContentProtectionWithoutRepublishing()
     {
         ContentService.Save(Root());
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IContent root = Root();
-        Attempt<OperationResult?> entryResult = PublicAccessService.Save(
+        Attempt<OperationResult?> entryResult = await PublicAccessService.SaveAsync(
             new PublicAccessEntry(root, root, root, [
                 new PublicAccessRule
                 {
@@ -103,10 +103,10 @@ public class ProtectedContentTests : InvariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructure_CanRemoveContentProtectionWithoutRepublishing()
+    public async Task PublishedStructure_CanRemoveContentProtectionWithoutRepublishing()
     {
         IContent root = Root();
-        Attempt<OperationResult?> entryResult = PublicAccessService.Save(
+        Attempt<OperationResult?> entryResult = await PublicAccessService.SaveAsync(
             new PublicAccessEntry(root, root, root, [
                 new PublicAccessRule
                 {
@@ -124,10 +124,10 @@ public class ProtectedContentTests : InvariantContentTestBase
         ContentService.Save(Root());
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        PublicAccessEntry? entry = PublicAccessService.GetEntryForContent(root);
+        PublicAccessEntry? entry = await PublicAccessService.GetEntryForContentAsync(root);
         Assert.That(entry, Is.Not.Null);
 
-        entryResult = PublicAccessService.Delete(entry);
+        entryResult = await PublicAccessService.DeleteAsync(entry);
         Assert.That(entryResult.Success, Is.True);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);

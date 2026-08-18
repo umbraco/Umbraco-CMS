@@ -148,7 +148,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
         });
     }
 
-    private IContentType GetContentType() => ContentTypeService.Get(ContentTypeAlias)
+    private IContentType GetContentType() => ContentTypeService.GetAsync(ContentTypeAlias).GetAwaiter().GetResult()
         ?? throw new InvalidOperationException($"Could not find the content type \"{ContentTypeAlias}\"");
 
     private async Task CreateDateTimeEditorsContentType()

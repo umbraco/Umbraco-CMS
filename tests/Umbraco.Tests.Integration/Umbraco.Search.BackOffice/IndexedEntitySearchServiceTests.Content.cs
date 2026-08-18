@@ -137,7 +137,7 @@ public partial class IndexedEntitySearchServiceTests
     [TestCase("childContentType", true, 10)]
     public async Task Content_CanFindAllByContentType(string contentTypeAlias, bool? trashed, int expectedTotal)
     {
-        Guid contentTypeKey = ContentTypeService.Get(contentTypeAlias)?.Key
+        Guid contentTypeKey = (await ContentTypeService.GetAsync(contentTypeAlias))?.Key
                               ?? throw new InvalidOperationException($"Could not find {contentTypeAlias}.");
 
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(
@@ -160,7 +160,7 @@ public partial class IndexedEntitySearchServiceTests
     public async Task Content_CanCombineParentAndContentTypeFiltering()
     {
         IContent root = ContentService.GetRootContent().Last();
-        Guid contentTypeKey = ContentTypeService.Get("childContentType")?.Key
+        Guid contentTypeKey = (await ContentTypeService.GetAsync("childContentType"))?.Key
                               ?? throw new InvalidOperationException("Could not find childContentType");
 
         PagedModel<IEntitySlim> result = await IndexedEntitySearchService.SearchAsync(

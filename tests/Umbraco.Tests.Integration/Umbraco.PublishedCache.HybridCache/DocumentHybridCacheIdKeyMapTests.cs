@@ -35,7 +35,7 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
         builder.Services.AddUnique<IIdKeyMapRepository>(factory =>
             new CountingIdKeyMapRepository(
                 new IdKeyMapRepository(
-                    factory.GetRequiredService<global::Umbraco.Cms.Infrastructure.Scoping.IScopeAccessor>())));
+                    factory.GetRequiredService<global::Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping.IEFCoreScopeAccessor<global::Umbraco.Cms.Infrastructure.Persistence.EFCore.UmbracoDbContext>>())));
     }
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
@@ -61,7 +61,7 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
         await DocumentCacheService.SeedAsync(CancellationToken.None);
 
         // Assert - the seeded node carried both identifiers, so both directions resolve from memory.
-        AssertResolvesWithoutQuerying(PublishedTextPageId, key);
+        await AssertResolvesWithoutQuerying(PublishedTextPageId, key);
     }
 
     [Test]
@@ -79,7 +79,7 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
         Assert.IsNotNull(content);
 
         // Assert
-        AssertResolvesWithoutQuerying(PublishedTextPageId, key);
+        await AssertResolvesWithoutQuerying(PublishedTextPageId, key);
     }
 
     [Test]
@@ -99,13 +99,13 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
         Assert.IsNotNull(await PublishedContentHybridCache.GetByIdAsync(key));
 
         // Assert
-        AssertResolvesWithoutQuerying(PublishedTextPageId, key);
+        await AssertResolvesWithoutQuerying(PublishedTextPageId, key);
     }
 
-    private void AssertResolvesWithoutQuerying(int expectedId, Guid expectedKey)
+    private async Task AssertResolvesWithoutQuerying(int expectedId, Guid expectedKey)
     {
-        Attempt<int> idAttempt = IdKeyMap.GetIdForKey(expectedKey, UmbracoObjectTypes.Document);
-        Attempt<Guid> keyAttempt = IdKeyMap.GetKeyForId(expectedId, UmbracoObjectTypes.Document);
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(expectedKey, UmbracoObjectTypes.Document);
+        Attempt<Guid> keyAttempt = await IdKeyMap.GetKeyForIdAsync(expectedId, UmbracoObjectTypes.Document);
 
         Assert.Multiple(() =>
         {
@@ -131,16 +131,16 @@ internal sealed class DocumentHybridCacheIdKeyMapTests : UmbracoIntegrationTestW
 
         public void Reset() => Interlocked.Exchange(ref _count, 0);
 
-        public int? GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
+        public Task<int?> GetIdForKeyAsync(Guid key, UmbracoObjectTypes umbracoObjectType)
         {
             Interlocked.Increment(ref _count);
-            return _inner.GetIdForKey(key, umbracoObjectType);
+            return _inner.GetIdForKeyAsync(key, umbracoObjectType);
         }
 
-        public Guid? GetIdForKey(int id, UmbracoObjectTypes umbracoObjectType)
+        public Task<Guid?> GetKeyForIdAsync(int id, UmbracoObjectTypes umbracoObjectType)
         {
             Interlocked.Increment(ref _count);
-            return _inner.GetIdForKey(id, umbracoObjectType);
+            return _inner.GetKeyForIdAsync(id, umbracoObjectType);
         }
     }
 }

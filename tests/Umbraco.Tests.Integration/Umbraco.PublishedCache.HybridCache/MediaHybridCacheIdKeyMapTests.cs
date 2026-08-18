@@ -34,7 +34,7 @@ internal sealed class MediaHybridCacheIdKeyMapTests : UmbracoIntegrationTestWith
         builder.Services.AddUnique<IIdKeyMapRepository>(factory =>
             new CountingIdKeyMapRepository(
                 new IdKeyMapRepository(
-                    factory.GetRequiredService<global::Umbraco.Cms.Infrastructure.Scoping.IScopeAccessor>())));
+                    factory.GetRequiredService<global::Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping.IEFCoreScopeAccessor<global::Umbraco.Cms.Infrastructure.Persistence.EFCore.UmbracoDbContext>>())));
     }
 
     private IPublishedMediaCache PublishedMediaHybridCache => GetRequiredService<IPublishedMediaCache>();
@@ -62,7 +62,7 @@ internal sealed class MediaHybridCacheIdKeyMapTests : UmbracoIntegrationTestWith
         await MediaCacheService.SeedAsync(CancellationToken.None);
 
         // Assert - the seeded node carried both identifiers, so both directions resolve from memory.
-        AssertResolvesWithoutQuerying(RootFolderId, key);
+        await AssertResolvesWithoutQuerying(RootFolderId, key);
     }
 
     [Test]
@@ -79,7 +79,7 @@ internal sealed class MediaHybridCacheIdKeyMapTests : UmbracoIntegrationTestWith
         Assert.IsNotNull(await PublishedMediaHybridCache.GetByIdAsync(key));
 
         // Assert
-        AssertResolvesWithoutQuerying(RootFolderId, key);
+        await AssertResolvesWithoutQuerying(RootFolderId, key);
     }
 
     [Test]
@@ -99,13 +99,13 @@ internal sealed class MediaHybridCacheIdKeyMapTests : UmbracoIntegrationTestWith
         Assert.IsNotNull(await PublishedMediaHybridCache.GetByIdAsync(key));
 
         // Assert
-        AssertResolvesWithoutQuerying(RootFolderId, key);
+        await AssertResolvesWithoutQuerying(RootFolderId, key);
     }
 
-    private void AssertResolvesWithoutQuerying(int expectedId, Guid expectedKey)
+    private async Task AssertResolvesWithoutQuerying(int expectedId, Guid expectedKey)
     {
-        Attempt<int> idAttempt = IdKeyMap.GetIdForKey(expectedKey, UmbracoObjectTypes.Media);
-        Attempt<Guid> keyAttempt = IdKeyMap.GetKeyForId(expectedId, UmbracoObjectTypes.Media);
+        Attempt<int> idAttempt = await IdKeyMap.GetIdForKeyAsync(expectedKey, UmbracoObjectTypes.Media);
+        Attempt<Guid> keyAttempt = await IdKeyMap.GetKeyForIdAsync(expectedId, UmbracoObjectTypes.Media);
 
         Assert.Multiple(() =>
         {
@@ -131,16 +131,16 @@ internal sealed class MediaHybridCacheIdKeyMapTests : UmbracoIntegrationTestWith
 
         public void Reset() => Interlocked.Exchange(ref _count, 0);
 
-        public int? GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
+        public Task<int?> GetIdForKeyAsync(Guid key, UmbracoObjectTypes umbracoObjectType)
         {
             Interlocked.Increment(ref _count);
-            return _inner.GetIdForKey(key, umbracoObjectType);
+            return _inner.GetIdForKeyAsync(key, umbracoObjectType);
         }
 
-        public Guid? GetIdForKey(int id, UmbracoObjectTypes umbracoObjectType)
+        public Task<Guid?> GetKeyForIdAsync(int id, UmbracoObjectTypes umbracoObjectType)
         {
             Interlocked.Increment(ref _count);
-            return _inner.GetIdForKey(id, umbracoObjectType);
+            return _inner.GetKeyForIdAsync(id, umbracoObjectType);
         }
     }
 }

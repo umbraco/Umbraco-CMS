@@ -335,6 +335,6 @@ public abstract class PropertyValueHandlerTestsBase : ContentTestBase
         return contentType;
     }
 
-    protected IContentType GetAllSimpleEditorsContentType() => ContentTypeService.Get("allSimpleEditors")
+    protected IContentType GetAllSimpleEditorsContentType() => ContentTypeService.GetAsync("allSimpleEditors").GetAwaiter().GetResult()
                                                                ?? throw new InvalidOperationException("Could not find the content type \"allSimpleEditors\"");
 }

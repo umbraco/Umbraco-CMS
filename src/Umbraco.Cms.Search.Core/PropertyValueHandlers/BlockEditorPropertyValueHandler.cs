@@ -114,7 +114,8 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
 
         // load all the contained element types up front
         var elementTypesByKey = _contentTypeService
-            .GetMany(items.Select(cd => cd.ContentTypeKey).Distinct())
+            .GetManyAsync(items.Select(cd => cd.ContentTypeKey).Distinct())
+            .GetAwaiter().GetResult()
             .ToDictionary(c => c.Key);
 
         // these are the cumulative index values (for all contained blocks) per contained variation

@@ -191,7 +191,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
         builder.Services.AddUnique(Mock.Of<IPublishedUrlProvider>());
     }
 
-    private IContentType GetContentType() => ContentTypeService.Get("allEditors")
+    private IContentType GetContentType() => ContentTypeService.GetAsync("allEditors").GetAwaiter().GetResult()
                                              ?? throw new InvalidOperationException("Could not find the content type");
 
     private IMediaType GetMediaType() => GetRequiredService<IMediaTypeService>().Get(Constants.Conventions.MediaTypes.Image)

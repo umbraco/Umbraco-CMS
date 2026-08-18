@@ -47,7 +47,7 @@ internal sealed class PublicAccessNotificationHandler : ContentNotificationHandl
     {
         PublicAccessDetailedCacheRefresher.JsonPayload[] payloads = entities.Select(entity =>
             {
-                Attempt<Guid> attempt = _idKeyMap.GetKeyForId(entity.ProtectedNodeId, UmbracoObjectTypes.Document);
+                Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(entity.ProtectedNodeId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
                 return attempt.Success
                     ? new PublicAccessDetailedCacheRefresher.JsonPayload(attempt.Result)
                     : null;

@@ -215,7 +215,7 @@ public partial class InvariantContentTests
         var secondRootKey = Guid.NewGuid();
         Content secondRoot = new ContentBuilder()
             .WithKey(secondRootKey)
-            .WithContentType(ContentTypeService.Get(Root().ContentType.Key)!)
+            .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
         ContentService.Save(secondRoot);
@@ -256,7 +256,7 @@ public partial class InvariantContentTests
         var secondRootKey = Guid.NewGuid();
         Content secondRoot = new ContentBuilder()
             .WithKey(secondRootKey)
-            .WithContentType(ContentTypeService.Get(Root().ContentType.Key)!)
+            .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
         ContentService.Save(secondRoot);

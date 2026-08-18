@@ -58,7 +58,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
     public void ReindexByContentTypes(Guid[] contentTypeKeys, UmbracoObjectTypes objectType, string origin)
         => _backgroundTaskQueue.QueueBackgroundWorkItem(async _ =>
         {
-            Guid[] contentKeys = GetContentKeysByContentTypes(contentTypeKeys, objectType);
+            Guid[] contentKeys = await GetContentKeysByContentTypesAsync(contentTypeKeys, objectType);
             if (contentKeys.Length == 0)
             {
                 return;
@@ -70,21 +70,19 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
             _contentIndexingService.Handle(changes, origin);
         });
 
-    private Guid[] GetContentKeysByContentTypes(Guid[] contentTypeKeys, UmbracoObjectTypes objectType)
+    private async Task<Guid[]> GetContentKeysByContentTypesAsync(Guid[] contentTypeKeys, UmbracoObjectTypes objectType)
         => objectType switch
         {
-            UmbracoObjectTypes.Document => GetDocumentKeysByContentTypes(contentTypeKeys),
+            UmbracoObjectTypes.Document => await GetDocumentKeysByContentTypesAsync(contentTypeKeys),
             UmbracoObjectTypes.Media => GetMediaKeysByMediaTypes(contentTypeKeys),
             UmbracoObjectTypes.Member => GetMemberKeysByMemberTypes(contentTypeKeys),
             _ => [],
         };
 
-    private Guid[] GetDocumentKeysByContentTypes(Guid[] contentTypeKeys)
+    private async Task<Guid[]> GetDocumentKeysByContentTypesAsync(Guid[] contentTypeKeys)
     {
-        int[] directContentTypeIds = contentTypeKeys
-            .Select(key => _contentTypeService.Get(key))
-            .Where(ct => ct is not null)
-            .Select(ct => ct!.Id)
+        int[] directContentTypeIds = (await _contentTypeService.GetManyAsync(contentTypeKeys))
+            .Select(ct => ct.Id)
             .ToArray();
 
         if (directContentTypeIds.Length == 0)
@@ -92,7 +90,7 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
             return [];
         }
 
-        int[] allContentTypeIds = ExpandWithDependentContentTypes(_contentTypeService, directContentTypeIds);
+        int[] allContentTypeIds = await ExpandWithDependentContentTypesAsync(directContentTypeIds);
 
         var keys = new List<Guid>();
         var pageIndex = 0L;
@@ -176,6 +174,18 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         where T : IContentTypeComposition
     {
         T[] allTypes = contentTypeService.GetAll().ToArray();
+        return ExpandWithDependentContentTypes(allTypes, contentTypeIds);
+    }
+
+    private async Task<int[]> ExpandWithDependentContentTypesAsync(int[] contentTypeIds)
+    {
+        IContentType[] allTypes = (await _contentTypeService.GetAllAsync()).ToArray();
+        return ExpandWithDependentContentTypes(allTypes, contentTypeIds);
+    }
+
+    private static int[] ExpandWithDependentContentTypes<T>(T[] allTypes, int[] contentTypeIds)
+        where T : IContentTypeComposition
+    {
         var result = new HashSet<int>(contentTypeIds);
 
         int previousCount;

@@ -58,7 +58,7 @@ internal abstract class ContentChangeStrategyBase
         Func<T[], Task> actionToPerform)
         where T : IContentBase
     {
-        Attempt<int> rootIdAttempt = _idKeyMap.GetIdForKey(rootId, objectType);
+        Attempt<int> rootIdAttempt = await _idKeyMap.GetIdForKeyAsync(rootId, objectType);
         if (rootIdAttempt.Success is false)
         {
             _logger.LogWarning("Could not resolve ID for {objectType} item {rootId} - aborting enumerations of descendants.", objectType, rootId);

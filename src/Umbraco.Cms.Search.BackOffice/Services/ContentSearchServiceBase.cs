@@ -127,7 +127,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
     {
         if (query.IsNullOrWhiteSpace())
         {
-            return SearchChildrenFromDatabase(parentId, ordering, skip, take);
+            return await SearchChildrenFromDatabaseAsync(parentId, ordering, skip, take);
         }
 
         return await SearchChildrenFromIndexAsync(query, parentId, ordering, skip, take);
@@ -141,12 +141,12 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The number of items to take.</param>
     /// <returns>A paged model of content items, empty if <paramref name="parentId"/> could not be resolved.</returns>
-    private PagedModel<TContent> SearchChildrenFromDatabase(Guid? parentId, Ordering? ordering, int skip, int take)
+    private async Task<PagedModel<TContent>> SearchChildrenFromDatabaseAsync(Guid? parentId, Ordering? ordering, int skip, int take)
     {
         var parentIdAsInt = Constants.System.Root;
         if (parentId.HasValue)
         {
-            Attempt<int> keyToId = _idKeyMap.GetIdForKey(parentId.Value, ObjectType);
+            Attempt<int> keyToId = await _idKeyMap.GetIdForKeyAsync(parentId.Value, ObjectType);
             if (keyToId.Success is false)
             {
                 _logger.LogWarning("Could not obtain an ID for parent key: {parentId} (object type: {contentType}", parentId, typeof(TContent).FullName);

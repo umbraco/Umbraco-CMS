@@ -35,7 +35,7 @@ internal sealed class ContentProtectionProvider : IContentProtectionProvider
             return null;
         }
 
-        PublicAccessEntry? publicAccessEntry = _publicAccessService.GetEntryForContent(content.Path);
+        PublicAccessEntry? publicAccessEntry = await _publicAccessService.GetEntryForContentAsync(content.Path);
         if (publicAccessEntry is null)
         {
             return null;

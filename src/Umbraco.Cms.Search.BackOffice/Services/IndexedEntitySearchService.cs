@@ -66,7 +66,7 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
         int take = 100,
         bool ignoreUserStartNodes = false)
     {
-        Guid[] startNodeKeys = CurrentUserStartNodeKeys(objectType);
+        Guid[] startNodeKeys = await CurrentUserStartNodeKeysAsync(objectType);
 
         // cannot combine trashed and start node filtering - this should always yield zero results
         if (startNodeKeys.Length > 0 && trashed is true)
@@ -152,7 +152,7 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
     /// </summary>
     /// <param name="objectType">The entity type to resolve start nodes for.</param>
     /// <returns>The current user's start node keys, or an empty array if none apply.</returns>
-    private Guid[] CurrentUserStartNodeKeys(UmbracoObjectTypes objectType)
+    private async Task<Guid[]> CurrentUserStartNodeKeysAsync(UmbracoObjectTypes objectType)
     {
         IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
         var startNodeIds = objectType switch
@@ -162,15 +162,21 @@ internal sealed class IndexedEntitySearchService : IndexedSearchServiceBase, IIn
             _ => null
         };
 
-        return startNodeIds is not null
-            ? startNodeIds.Select(id =>
-                {
-                    Attempt<Guid> attempt = _idKeyMap.GetKeyForId(id, objectType);
-                    return attempt.Success ? attempt.Result : (Guid?)null;
-                })
-                .Where(key => key.HasValue)
-                .Select(key => key!.Value)
-                .ToArray()
-            : [];
+        if (startNodeIds is null)
+        {
+            return [];
+        }
+
+        var keys = new List<Guid>();
+        foreach (var id in startNodeIds)
+        {
+            Attempt<Guid> attempt = await _idKeyMap.GetKeyForIdAsync(id, objectType);
+            if (attempt.Success)
+            {
+                keys.Add(attempt.Result);
+            }
+        }
+
+        return keys.ToArray();
     }
 }

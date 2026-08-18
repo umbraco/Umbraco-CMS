@@ -103,7 +103,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
             return true;
         }
 
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(content.ParentId, objectType);
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, objectType).GetAwaiter().GetResult();
         if (parentKeyAttempt.Success is false)
         {
             _logger.LogWarning(
@@ -139,7 +139,7 @@ internal sealed class SystemFieldsContentIndexer : ISystemFieldsContentIndexer
         IEnumerable<int> ancestorIds = content.AncestorIds();
         foreach (var ancestorId in ancestorIds)
         {
-            Attempt<Guid> attempt = _idKeyMap.GetKeyForId(ancestorId, objectType);
+            Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(ancestorId, objectType).GetAwaiter().GetResult();
             if (attempt.Success is false)
             {
                 _logger.LogWarning(
