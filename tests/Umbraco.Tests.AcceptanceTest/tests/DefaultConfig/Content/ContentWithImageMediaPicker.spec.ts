@@ -253,7 +253,6 @@ test('can reset focal point in a image from the image media picker', async ({umb
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-// TODO: Remove skip when the front-end is ready as currently the crop is not being selected.
 test('can add an image from the image media picker with a image crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const cropLabel = 'TestCrop';

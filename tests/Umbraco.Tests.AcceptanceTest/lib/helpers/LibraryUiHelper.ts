@@ -1136,7 +1136,6 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.containsText(this.elementWorkspace, text);
   }
 
-  // An element folder opens umb-element-folder-workspace-editor, not umb-element-workspace-editor.
   async doesElementFolderWorkspaceHaveText(text: string) {
     await this.containsText(this.elementFolderWorkspace, text);
   }

@@ -145,7 +145,6 @@ test('can use query builder with Order By statement for a partial view', async (
   expect(updatedPartialView.content).toBe(expectedTemplateContent);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22000
 test('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
   //Arrange
   const propertyAliasValue = 'Name';

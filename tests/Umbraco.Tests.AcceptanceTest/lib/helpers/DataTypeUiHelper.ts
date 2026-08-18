@@ -1151,20 +1151,13 @@ export class DataTypeUiHelper extends UiBaseLocators {
     return this.page.getByRole('link', {name: name});
   }
 
-  // The group name is the value of a textbox, not text content, so hasText cannot be used to find it.
   private async getGroupWithName(name: string) {
-    const groups = this.blockGroups;
-    await expect(groups.first()).toBeVisible({timeout: ConstantHelper.timeout.medium});
-    const groupCount = await groups.count();
-
-    for (let i = 0; i < groupCount; i++) {
-      const group = groups.nth(i);
-      if (await group.getByRole('textbox').inputValue() === name) {
-        return group;
-      }
-    }
-
-    throw new Error(`Could not find a block grid group named '${name}'`);
+    await this.isVisible(this.blockGroups.first());
+    const index = await this.blockGroups.getByRole('textbox').evaluateAll(
+      (inputs, groupName) => inputs.findIndex((input) => (input as HTMLInputElement).value === groupName),
+      name,
+    );
+    return this.blockGroups.nth(index);
   }
 
   async clickDeleteGroupButtonWithName(name: string) {
@@ -1173,11 +1166,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.click(group.getByLabel('Delete'), {force: true});
   }
 
-  // The sortable item is the card itself; the sorter marks links as non-draggable, so a block's link
-  // cannot be used as a drag handle.
   async getBlockCardInGroupWithName(groupName: string, blockName: string) {
     const group = await this.getGroupWithName(groupName);
-    // Exact match: block names are often prefixes of one another, which would break strict mode.
     const card = group.locator('umb-block-type-card').filter({has: this.page.getByText(blockName, {exact: true})});
     await this.isVisible(card);
     return card;
