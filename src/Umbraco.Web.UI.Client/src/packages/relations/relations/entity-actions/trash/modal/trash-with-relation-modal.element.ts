@@ -1,6 +1,6 @@
 import type {
 	UmbConfirmActionModalEntityReferencesConfig,
-	UmbConfirmActionModalEntityReferencesElement,
+	UmbEntityReferencesSummaryElement,
 } from '../../../global-components/types.js';
 import type {
 	UmbTrashWithRelationConfirmModalData,
@@ -75,7 +75,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 	#onReferencesChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		if (this._canTrash !== undefined) return;
-		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
+		const target = event.target as UmbEntityReferencesSummaryElement;
 		const total = target.getTotalReferencedBy() + target.getTotalDescendantsWithReferences();
 		this._canTrash = total === 0;
 	}
@@ -88,9 +88,9 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 			<uui-dialog-layout class="uui-text" headline=${headline}>
 				${this._canTrash !== undefined ? html`<p>${this.localize.htmlString(messageKey, this._name)}</p>` : nothing}
 				${this._referencesConfig
-					? html`<umb-confirm-action-modal-entity-references
+					? html`<umb-entity-references-summary
 							.config=${this._referencesConfig}
-							@change=${this.#onReferencesChange}></umb-confirm-action-modal-entity-references>`
+							@change=${this.#onReferencesChange}></umb-entity-references-summary>`
 					: nothing}
 
 				<uui-button
