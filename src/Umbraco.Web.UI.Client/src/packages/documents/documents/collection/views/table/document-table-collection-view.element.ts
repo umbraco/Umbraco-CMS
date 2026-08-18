@@ -108,7 +108,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 		if (
 			changedProperties.has('_items') ||
 			changedProperties.has('_userDefinedProperties') ||
-			changedProperties.has('_selectable')
+			changedProperties.has('_selectable') ||
+			changedProperties.has('_hideItemActions')
 		) {
 			this.#createTableHeadings();
 			this.#createTableItems();
@@ -131,7 +132,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElem
 			this._tableColumns = [
 				...this.#systemColumns,
 				...userColumns,
-				{ name: '', alias: 'entityActions', align: 'right' },
+				...(this._hideItemActions ? [] : [{ name: '', alias: 'entityActions', align: 'right' } as UmbTableColumn]),
 			];
 		}
 	}
