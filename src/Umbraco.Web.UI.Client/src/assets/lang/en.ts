@@ -549,6 +549,7 @@ export default {
 			'Unpublishing will make the selected items and all their descendants publicly unavailable.',
 		confirmPublish: 'Publishing will make this content and all its published descendants publicly available.',
 		confirmUnpublish: 'Unpublishing will make this content publicly unavailable.',
+		cannotUnpublishWhenReferenced: 'This item cannot be unpublished because it is referenced by other items.',
 		doctypeChangeWarning: 'You have unsaved changes. Making changes to the Document Type will discard the changes.',
 	},
 	bulk: {

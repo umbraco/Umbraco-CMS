@@ -1748,6 +1748,7 @@ declare global {
 		profiling_profilerEnabledDescription: string;
 		profiling_reminder: string;
 		profiling_reminderDescription: string;
+		prompt_cannotUnpublishWhenReferenced: string;
 		prompt_confirmListViewPublish: string;
 		prompt_confirmListViewUnpublish: string;
 		prompt_confirmPublish: string;

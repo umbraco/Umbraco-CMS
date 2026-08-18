@@ -6,10 +6,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type {
-	UmbEntityReferencesConfig,
-	UmbEntityReferencesSummaryElement,
-} from '@umbraco-cms/backoffice/relations';
+import type { UmbEntityReferencesConfig, UmbEntityReferencesSummaryElement } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 import '../../../variant-picker/content-variant-language-picker.element.js';
@@ -171,9 +168,11 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	};
 
 	override render() {
+		const messageKey = this._canUnpublish ? 'prompt_confirmUnpublish' : 'prompt_cannotUnpublishWhenReferenced';
+
 		return html`
 			<uui-dialog-layout headline=${this.localize.term('content_unpublish')}>
-				<p><umb-localize key="prompt_confirmUnpublish"></umb-localize></p>
+				${when(this._canUnpublish !== undefined, () => html`<p><umb-localize key=${messageKey}></umb-localize></p>`)}
 				${when(
 					!this._isInvariant,
 					() => html`

@@ -1721,6 +1721,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'profiling_profilerEnabledDescription',
 	'profiling_reminder',
 	'profiling_reminderDescription',
+	'prompt_cannotUnpublishWhenReferenced',
 	'prompt_confirmListViewPublish',
 	'prompt_confirmListViewUnpublish',
 	'prompt_confirmPublish',
