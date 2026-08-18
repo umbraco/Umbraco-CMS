@@ -76,7 +76,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html` ${this.#renderRootProperties()} ${this.#renderGroups()} `;
+		return html`${this.#renderRootProperties()}${this.#renderGroups()}`;
 	}
 
 	#renderRootProperties() {
@@ -96,6 +96,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	#renderGroups() {
+		if (this._groups.length === 0) return;
 		if (this.hideSingleGroup && this._hasProperties === false && this._groups.length === 1) {
 			return this.renderGroup(this._groups[0]);
 		}
