@@ -226,7 +226,16 @@ public class PropertyValidationService : IPropertyValidationService
             IPropertyValue? defaultSegmentValue = property
                 .Values
                 .FirstOrDefault(x => (culture == "*" || x.Culture.InvariantEquals(culture)) && x.Segment == null);
-            if (!IsValidPropertyValue(property, defaultSegmentValue?.EditedValue, PropertyValidationContext.CultureAndSegment(culture, null)))
+            if (!IsValidPropertyValue(
+                    property,
+                    defaultSegmentValue?.EditedValue,
+                    new PropertyValidationContext
+                    {
+                        Culture = culture,
+                        Segment = null,
+                        CulturesBeingValidated = validationContext.CulturesBeingValidated,
+                        SegmentsBeingValidated = validationContext.SegmentsBeingValidated,
+                    }))
             {
                 return false;
             }
@@ -297,6 +306,13 @@ public class PropertyValidationService : IPropertyValidationService
         return !valueEditor.Validate(value, isRequired, propertyType.ValidationRegExp, validationContext).Any();
     }
 
+    /// <summary>
+    ///     Determines whether mandatory validation applies within the given validation context.
+    /// </summary>
+    /// <remarks>
+    ///     Values for non-default segments are optional overrides of the default segment value, so a mandatory
+    ///     property type is only enforced as required when validating the default (null) segment.
+    /// </remarks>
     private static bool ShouldValidateAsRequired(IPropertyType propertyType, PropertyValidationContext validationContext)
         => propertyType.Mandatory && validationContext.Segment.IsNullOrWhiteSpace();
 
