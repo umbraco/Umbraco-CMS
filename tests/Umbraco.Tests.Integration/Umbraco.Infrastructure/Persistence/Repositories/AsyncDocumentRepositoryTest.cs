@@ -785,6 +785,21 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task GetChildrenAsync_WithNullParentKey_ReturnsRootContent()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            null, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Total, Is.EqualTo(2),
+            "a null parentKey must be treated as the root of the content tree, since root has no Guid identity of its own");
+        Assert.That(result.Items.Select(c => c.Key), Is.EquivalentTo(new[] { _textpage.Key, _publishedPage.Key }));
+    }
+
+    [Test]
     public async Task GetChildrenAsync_WithPaging_ReturnsCorrectPage()
     {
         using var scope = NewScopeProvider.CreateScope();

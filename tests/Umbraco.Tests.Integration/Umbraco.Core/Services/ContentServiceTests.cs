@@ -596,6 +596,35 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task GetChildrenAsync_Returns_Children_Of_Parent()
+    {
+        PagedModel<IContent> result = await ContentService.GetChildrenAsync(Textpage.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None);
+
+        Assert.That(result.Total, Is.EqualTo(3));
+        Assert.That(result.Items.Select(c => c.Key), Is.EquivalentTo(new[] { Subpage.Key, Subpage2.Key, Subpage3.Key }));
+        Assert.That(result.Items.All(c => c.TemplateId.HasValue), Is.True);
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_WithNullParentKey_Returns_Root_Content()
+    {
+        PagedModel<IContent> result = await ContentService.GetChildrenAsync(null, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None);
+
+        Assert.That(result.Total, Is.EqualTo(1));
+        Assert.That(result.Items.Single().Key, Is.EqualTo(Textpage.Key));
+    }
+
+    [Test]
+    public async Task GetChildrenWithoutTemplatesAsync_Returns_Children_Of_Parent_With_Null_Templates()
+    {
+        PagedModel<IContent> result = await ContentService.GetChildrenWithoutTemplatesAsync(Textpage.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None);
+
+        Assert.That(result.Total, Is.EqualTo(3));
+        Assert.That(result.Items.Select(c => c.Key), Is.EquivalentTo(new[] { Subpage.Key, Subpage2.Key, Subpage3.Key }));
+        Assert.That(result.Items.All(c => c.TemplateId.HasValue), Is.False);
+    }
+
+    [Test]
     public void Can_Remove_Property_Type()
     {
         // Arrange

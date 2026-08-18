@@ -18,6 +18,7 @@ internal sealed class ContentEditingService
 {
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentEditingService"/> class.
@@ -37,6 +38,7 @@ internal sealed class ContentEditingService
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
+    /// <param name="idKeyMap">The id-key map.</param>
     public ContentEditingService(
         IContentService contentService,
         IContentTypeService contentTypeService,
@@ -52,7 +54,8 @@ internal sealed class ContentEditingService
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters)
+        ContentTypeFilterCollection contentTypeFilters,
+        IIdKeyMap idKeyMap)
         : base(
             contentService,
             contentTypeService,
@@ -71,6 +74,7 @@ internal sealed class ContentEditingService
     {
         _templateService = templateService;
         _logger = logger;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc/>
@@ -297,8 +301,29 @@ internal sealed class ContentEditingService
     /// <inheritdoc />
     protected override Task<IEnumerable<IContent>> GetPagedChildrenAsync(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total)
     {
-        IEnumerable<IContent> pagedChildren = ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, propertyAliases: null, filter: null, ordering: ordering);
-        return Task.FromResult(pagedChildren);
+        // Root content (Constants.System.Root, -1) has no Guid key at all (Constants.System.RootKey is
+        // deliberately null) - it isn't a real node, so it can't be resolved via IIdKeyMap. GetChildrenAsync
+        // treats a null parentKey as "the root of the content tree" for exactly this reason.
+        Guid? parentKey;
+        if (parentId == Constants.System.Root)
+        {
+            parentKey = null;
+        }
+        else
+        {
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(parentId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+            if (!keyAttempt.Success)
+            {
+                total = 0;
+                return Task.FromResult(Enumerable.Empty<IContent>());
+            }
+
+            parentKey = keyAttempt.Result;
+        }
+
+        PagedModel<IContent> page = ContentService.GetChildrenAsync(parentKey, pageIndex * pageSize, pageSize, propertyAliases: null, ordering, CancellationToken.None).GetAwaiter().GetResult();
+        total = page.Total;
+        return Task.FromResult(page.Items);
     }
 
     /// <inheritdoc />

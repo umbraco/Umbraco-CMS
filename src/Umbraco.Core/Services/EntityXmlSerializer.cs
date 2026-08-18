@@ -132,13 +132,14 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         if (withDescendants)
         {
             const int pageSize = 500;
-            var page = 0;
+            var skip = 0;
             var total = long.MaxValue;
-            while (page * pageSize < total)
+            while (skip < total)
             {
-                IEnumerable<IContent> children =
-                    _contentService.GetPagedChildren(content.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
-                SerializeChildren(children, xml, published, templateCache);
+                PagedModel<IContent> page = _contentService.GetChildrenAsync(content.Key, skip, pageSize, propertyAliases: null, ordering: null, CancellationToken.None).GetAwaiter().GetResult();
+                total = page.Total;
+                SerializeChildren(page.Items, xml, published, templateCache);
+                skip += pageSize;
             }
         }
 
@@ -780,15 +781,16 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             xml.Add(childXml);
 
             const int pageSize = 500;
-            var page = 0;
+            var skip = 0;
             var total = long.MaxValue;
-            while (page * pageSize < total)
+            while (skip < total)
             {
-                IEnumerable<IContent> grandChildren =
-                    _contentService.GetPagedChildren(child.Id, page++, pageSize, out total, propertyAliases: null, filter: null, ordering: null);
+                PagedModel<IContent> grandChildren = _contentService.GetChildrenAsync(child.Key, skip, pageSize, propertyAliases: null, ordering: null, CancellationToken.None).GetAwaiter().GetResult();
+                total = grandChildren.Total;
+                skip += pageSize;
 
                 // recurse
-                SerializeChildren(grandChildren, childXml, published, templateCache);
+                SerializeChildren(grandChildren.Items, childXml, published, templateCache);
             }
         }
     }

@@ -557,19 +557,23 @@ internal class AsyncDocumentRepository
 
     /// <inheritdoc />
     public override Task<PagedModel<IContent>> GetChildrenAsync(
-        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
+        Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
         => GetChildrenCoreAsync(parentKey, skip, take, propertyAliases, ordering, loadTemplates: true, cancellationToken);
 
     /// <inheritdoc />
     public Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(
-        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
+        Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
         => GetChildrenCoreAsync(parentKey, skip, take, propertyAliases, ordering, loadTemplates: false, cancellationToken);
 
     private Task<PagedModel<IContent>> GetChildrenCoreAsync(
-        Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken) =>
+        Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            int parentNodeId = await ResolveNodeIdAsync(db, parentKey, cancellationToken);
+            // A null parentKey means the root of the content tree - root has no Guid identity at all
+            // (Constants.System.RootKey is deliberately null), so it can't be resolved via ResolveNodeIdAsync.
+            int parentNodeId = parentKey.HasValue
+                ? await ResolveNodeIdAsync(db, parentKey.Value, cancellationToken)
+                : Constants.System.Root;
 
             int total = await db.Nodes
                 .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId)

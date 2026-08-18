@@ -16,7 +16,7 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     ///     Use this overload when template IDs are not required (e.g. collection/list views) to avoid the
     ///     template-existence validation round-trip against the template repository.
     /// </remarks>
-    /// <param name="parentKey">The Guid key of the parent node.</param>
+    /// <param name="parentKey">The Guid key of the parent node, or <c>null</c> for the root of the content tree.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
     /// <param name="propertyAliases">
@@ -26,7 +26,7 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching children with <c>null</c> template IDs.</returns>
-    Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
+    Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a paged list of all descendants of a document node, without loading template information.

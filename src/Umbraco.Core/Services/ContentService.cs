@@ -439,6 +439,22 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     /// <inheritdoc />
+    public async Task<PagedModel<IContent>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+        return await _asyncDocumentRepository.GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+        return await _asyncDocumentRepository.GetChildrenWithoutTemplatesAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
     {
         ordering ??= Ordering.By("Path");

@@ -137,7 +137,7 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <summary>
     ///     Gets a paged list of direct children of a content node.
     /// </summary>
-    /// <param name="parentKey">The Guid key of the parent node.</param>
+    /// <param name="parentKey">The Guid key of the parent node, or <c>null</c> for the root of the content tree.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
     /// <param name="propertyAliases">
@@ -147,7 +147,7 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching children and the total record count.</returns>
-    Task<PagedModel<TEntity>> GetChildrenAsync(Guid parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
+    Task<PagedModel<TEntity>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a paged list of all descendants of a content node.
