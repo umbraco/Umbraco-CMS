@@ -220,7 +220,7 @@ public class PropertyValidationService : IPropertyValidationService
         }
 
         // if the property varies by segment, make explicitly sure we validate mandatory against
-        // the non-segmented value (if present)
+        // the non-segmented value (or null, if not present)
         if (property.PropertyType.VariesBySegment())
         {
             IPropertyValue? defaultSegmentValue = property
@@ -298,10 +298,7 @@ public class PropertyValidationService : IPropertyValidationService
     }
 
     private static bool ShouldValidateAsRequired(IPropertyType propertyType, PropertyValidationContext validationContext)
-    {
-        var isRequired = propertyType.Mandatory && validationContext.Segment.IsNullOrWhiteSpace();
-        return isRequired;
-    }
+        => propertyType.Mandatory && validationContext.Segment.IsNullOrWhiteSpace();
 
     private IDataType? GetDataType(IPropertyType propertyType)
         => _dataTypeService.GetDataType(propertyType.DataTypeId);
