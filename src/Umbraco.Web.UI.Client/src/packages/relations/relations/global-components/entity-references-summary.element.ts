@@ -150,6 +150,7 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 				unique: this.config.unique,
 				referenceRepositoryAlias: this.config.referenceRepositoryAlias,
 				itemRepositoryAlias: this.config.itemRepositoryAlias,
+				source: 'needingAttention',
 				entitiesNeedingAttention: this.entitiesNeedingAttention,
 			},
 		}).catch(() => undefined);

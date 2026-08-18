@@ -9,7 +9,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-export type UmbEntityReferenceListSource = 'referencedBy' | 'descendantsWithReferences';
+export type UmbEntityReferenceListSource = 'referencedBy' | 'descendantsWithReferences' | 'needingAttention';
 
 // Properties that require re-running #init() when they change — see updated() below.
 const REPOSITORY_PROPERTIES = ['referenceRepositoryAlias', 'itemRepositoryAlias', 'source'] as const;

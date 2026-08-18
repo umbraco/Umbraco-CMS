@@ -36,12 +36,15 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 		const source = data.source;
 		const showReferencedBy = !source || source === 'referencedBy';
 		const showDescendants = !source || source === 'descendantsWithReferences';
+		const showNeedingAttention = !source || source === 'needingAttention';
 
 		const headline =
 			data.headline ??
 			(source === 'descendantsWithReferences'
 				? this.localize.term('references_labelDescendantsWithReferences')
-				: this.localize.term('references_labelUsedByItems'));
+				: source === 'needingAttention'
+					? this.localize.term('references_labelElementsWithPendingChanges')
+					: this.localize.term('references_labelUsedByItems'));
 
 		return html`
 			<uui-dialog-layout headline=${headline}>
@@ -83,7 +86,7 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 					`,
 				)}
 				${when(
-					data.entitiesNeedingAttention?.length,
+					showNeedingAttention && data.entitiesNeedingAttention?.length,
 					() => html`
 						<div>
 							<p>
@@ -96,10 +99,7 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 					`,
 				)}
 				<div slot="actions">
-					<uui-button
-						label=${this.localize.term('general_close')}
-						look="primary"
-						@click=${this.#close}></uui-button>
+					<uui-button label=${this.localize.term('general_close')} look="primary" @click=${this.#close}></uui-button>
 				</div>
 			</uui-dialog-layout>
 		`;
