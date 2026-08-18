@@ -1,6 +1,7 @@
 import type { UmbCollectionItemModel } from './item/types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import type { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export type * from './action/create/types.js';
@@ -60,4 +61,5 @@ export interface UmbCollectionContext {
 	pagination: UmbPaginationManager;
 	items: Observable<any[]>;
 	totalItems: Observable<number>;
+	readonly interactionMemory?: UmbInteractionMemoryManager;
 }

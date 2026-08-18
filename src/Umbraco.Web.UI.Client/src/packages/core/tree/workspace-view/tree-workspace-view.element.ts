@@ -1,10 +1,10 @@
-import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbTreeElement } from '../tree.element.js';
 import type { ManifestWorkspaceViewTreeKind } from './types.js';
+import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { html, nothing, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_INTERACTION_MEMORY_CONTEXT } from '@umbraco-cms/backoffice/interaction-memory';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
-import type { UmbTreeElement } from '../tree.element.js';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-tree-workspace-view')

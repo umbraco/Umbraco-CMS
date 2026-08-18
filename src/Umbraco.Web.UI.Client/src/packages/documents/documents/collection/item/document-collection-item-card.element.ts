@@ -1,6 +1,7 @@
 import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../document-collection.context-token.js';
 import type { UmbDocumentCollectionFilterModel } from '../types.js';
 import { UmbDocumentItemDataResolver } from '../../item/document-item-data-resolver.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import type { UmbDocumentCollectionItemModel } from './types.js';
 import {
 	css,
@@ -20,7 +21,6 @@ import type {
 	UmbDefaultCollectionContext,
 	UmbEntityCollectionItemElement,
 } from '@umbraco-cms/backoffice/collection';
-import { UmbDocumentVariantState } from '../../variant-state.js';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
@@ -216,7 +216,9 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 					() => html`<umb-ufm-render inline .markdown=${column.nameTemplate} .value=${{ value }}></umb-ufm-render>`,
 					() =>
 						editorAlias
-							? html`<umb-value-summary-extension .valueType=${editorAlias} .value=${value}></umb-value-summary-extension>`
+							? html`<umb-value-summary-extension
+									.valueType=${editorAlias}
+									.value=${value}></umb-value-summary-extension>`
 							: html`${value}`,
 				)}
 			</li>

@@ -160,8 +160,6 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	private async _observeProperty(): Promise<void> {
 		const alias = this.#alias.getValue();
-		// Don't fall through to observing an `undefined` source: that blanks the value and tears down the live value
-		// subscription, so a transient absence of the dataset context or alias would wipe an already-filled value.
 		if (!this.#datasetContext || !alias) return;
 
 		const variantIdSource = await this.#datasetContext.propertyVariantId?.(alias);
@@ -243,7 +241,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	/**
 	 * Get the alias of this property.
-	 * @returns {*}  {(string | undefined)}
+	 * @returns {string | undefined} The alias of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public getAlias(): string | undefined {
@@ -270,7 +268,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	/**
 	 * Set the description of this property.
-	 * @param {(string | undefined)} description
+	 * @param {(string | undefined)} description - The description of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public setDescription(description: string | undefined): void {
@@ -279,7 +277,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbContextBase {
 
 	/**
 	 * Get the description of this property.
-	 * @returns {*}  {(string | undefined)}
+	 * @returns {string | undefined} The description of the property
 	 * @memberof UmbPropertyContext
 	 */
 	public getDescription(): string | undefined {

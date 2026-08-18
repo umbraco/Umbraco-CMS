@@ -9,7 +9,8 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * the action appears on.
  */
 export interface ManifestBlockAction<MetaType extends MetaBlockAction = MetaBlockAction>
-	extends ManifestElementAndApi<UmbBlockActionElement, UmbBlockAction<MetaType>>,
+	extends
+		ManifestElementAndApi<UmbBlockActionElement, UmbBlockAction<MetaType>>,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'blockAction';
 	/**

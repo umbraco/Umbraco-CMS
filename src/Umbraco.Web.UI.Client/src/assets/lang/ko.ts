@@ -300,6 +300,8 @@ export default {
 		new: '새로',
 		next: '다음',
 		no: '아니요',
+		noResults: '결과 없음',
+		noResultsFor: (query: string) => `"${query}"에 대한 결과가 없습니다.`,
 		of: '의',
 		ok: '완료',
 		open: '열기',
@@ -790,6 +792,8 @@ export default {
 		deselectAllLogLevelFilters: '모두 선택 해제',
 	},
 	picker: {
+		browseTab: '찾아보기',
+		searchTab: '검색',
 		selectedCount: (count: number) => `${count}개 선택됨`,
 	},
 } as UmbLocalizationDictionary;

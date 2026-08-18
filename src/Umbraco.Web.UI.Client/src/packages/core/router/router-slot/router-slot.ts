@@ -94,6 +94,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 	/**
 	 * Whether the router is a root router.
+	 * @returns {boolean} True if the router has no parent.
 	 */
 	get isRoot(): boolean {
 		return this.parent == null;
@@ -110,6 +111,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 	/**
 	 * The current route of the match.
+	 * @returns {IRoute<D> | null} The current route, or null if there is no match.
 	 */
 	get route(): IRoute<D> | null {
 		return this.match != null ? this.match.route : null;
@@ -117,6 +119,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 	/**
 	 * The current path fragment of the match
+	 * @returns {IPathFragments | null} The current path fragments, or null if there is no match.
 	 */
 	get fragments(): IPathFragments | null {
 		return this.match != null ? this.match.fragments : null;
@@ -124,6 +127,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 	/**
 	 * The current params of the match.
+	 * @returns {Params | null} The current params, or null if there is no match.
 	 */
 	get params(): Params | null {
 		return this.match != null ? this.match.params : null;
@@ -186,6 +190,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 	/**
 	 * Queries the parent router.
+	 * @returns {IRouterSlot<P> | null} The parent router slot, or null if none was found.
 	 */
 	queryParentRouterSlot(): IRouterSlot<P> | null {
 		return queryParentRouterSlot<P>(this);
@@ -193,7 +198,8 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 	/**
 	 * Returns an absolute path relative to the router slot.
-	 * @param path
+	 * @param {PathFragment} path - The path fragment to make absolute.
+	 * @returns {string} The absolute path.
 	 */
 	constructAbsolutePath(path: PathFragment): string {
 		return constructAbsolutePath(this, path);
@@ -202,8 +208,8 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	/**
 	 * Adds routes to the router.
 	 * Navigates automatically if the router slot is the root and is connected.
-	 * @param routes
-	 * @param navigate
+	 * @param {IRoute<D>[]} routes - The routes to add.
+	 * @param {boolean} [navigate] - Whether to navigate after adding the routes.
 	 */
 	add(routes: IRoute<D>[], navigate?: boolean): void {
 		// Add the routes to the array
@@ -300,7 +306,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 	/**
 	 * Notify the listeners.
-	 * @param info
+	 * @param {IRoutingInfo<D>} info - The routing info to notify with.
 	 */
 	notifyChildRouters<D = any>(info: IRoutingInfo<D>) {
 		// This method should be called before routeMatch is being set!
@@ -340,7 +346,8 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	/**
 	 * Loads a new path based on the routes.
 	 * Returns true if a navigation was made to a new page.
-	 * @param path
+	 * @param {string | PathFragment} path - The path to render.
+	 * @returns {Promise<boolean>} True if a navigation was made.
 	 */
 	protected async renderPath(path: string | PathFragment): Promise<boolean> {
 		// Notice: Since this is never called from any other place than one higher in this file(when writing this...), we could just retrieve the path and find a match by using this.getRouteMatch() [NL]

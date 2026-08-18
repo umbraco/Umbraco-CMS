@@ -22,6 +22,7 @@ type UmbArrayStateValue<T, D extends T[] | undefined> = undefined extends D ? T[
  * `undefined` — or a value typed to include `undefined` — makes the state nullable (`getValue()` returns `T[] | undefined`).
  * Note this detection only works when the generic parameters aren't pinned explicitly to just `T`; to opt into the nullable
  * behaviour while still naming `T`, provide all three generics: `new UmbArrayState<Item, unknown, undefined>(undefined, ...)`.
+ * @template T
  */
 export class UmbArrayState<T, U = unknown, D extends T[] | undefined = T[]> extends UmbDeepState<
 	UmbArrayStateValue<T, D>
@@ -58,8 +59,7 @@ export class UmbArrayState<T, U = unknown, D extends T[] | undefined = T[]> exte
 
 	/**
 	 * @function setValue
-	 * @param value
-	 * @param {T} data - The next data for this state to hold.
+	 * @param {UmbArrayStateValue<T, D>} value - The next data for this state to hold.
 	 * @description - Set the data of this state, if sortBy has been defined for this state the data will be sorted before set. If data is different than current this will trigger observations to update.
 	 * @example <caption>Example change the data of a state</caption>
 	 * const myState = new UmbArrayState(['Good morning']);
@@ -169,8 +169,7 @@ export class UmbArrayState<T, U = unknown, D extends T[] | undefined = T[]> exte
 
 	/**
 	 * @function filter
-	 * @param predicate
-	 * @param {unknown} filterMethod - The unique value to remove.
+	 * @param {(value: T, index: number, array: T[]) => boolean} predicate - Method to determine which entries to keep.
 	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Remove some new data of this Subject.
 	 * @example <caption>Example remove entry with key '1'</caption>
@@ -279,8 +278,7 @@ export class UmbArrayState<T, U = unknown, D extends T[] | undefined = T[]> exte
 
 	/**
 	 * @function replace
-	 * @param {Partial<T>} entires - data of entries to be replaced.
-	 * @param entries
+	 * @param {Array<T>} entries - data of entries to be replaced.
 	 * @returns {UmbArrayState<T>} Reference to it self.
 	 * @description - Replaces one or more entries, requires the ArrayState to be constructed with a getUnique method.
 	 * @example <caption>Example append some data.</caption>
