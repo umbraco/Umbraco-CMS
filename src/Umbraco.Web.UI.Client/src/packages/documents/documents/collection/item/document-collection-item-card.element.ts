@@ -147,6 +147,10 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 		}
 	}
 
+	get #selectOnly(): boolean {
+		return !this.item?.hasChildren && this.selectOnly;
+	}
+
 	override render() {
 		if (!this.item) return nothing;
 		return html`
@@ -154,7 +158,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 				.name=${this._name}
 				href=${ifDefined(this.href)}
 				?selectable=${this.selectable}
-				?select-only=${this.selectOnly}
+				?select-only=${this.#selectOnly}
 				?selected=${this.selected}
 				?disabled=${this.disabled}
 				@selected=${this.#onSelected}

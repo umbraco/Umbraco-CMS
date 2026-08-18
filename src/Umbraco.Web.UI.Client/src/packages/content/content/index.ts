@@ -5,6 +5,7 @@ export * from './constants.js';
 export * from './controller/merge-content-variant-data.controller.js';
 export * from './global-components/index.js';
 export * from './manager/index.js';
+export * from './picker-modal/index.js';
 export * from './property-dataset-context/index.js';
 export * from './publishing/index.js';
 export * from './rollback/index.js';
