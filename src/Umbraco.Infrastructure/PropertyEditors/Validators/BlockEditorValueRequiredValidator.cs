@@ -18,6 +18,7 @@ internal sealed class BlockEditorValueRequiredValidator<TValue> : RequiredValida
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockEditorValueRequiredValidator{TValue}"/> class.
     /// </summary>
+    /// <param name="jsonSerializer">The JSON serializer.</param>
     public BlockEditorValueRequiredValidator(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
 
     /// <inheritdoc/>

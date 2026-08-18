@@ -217,7 +217,6 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
         /// </summary>
         internal const string MemberObjectType = "member";
 
-        /// <inheritdoc/>
         /// <summary>
         /// A custom <see cref="IValueRequiredValidator" /> that treats a value holding no entity references as no value.
         /// </summary>
@@ -233,6 +232,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor, IValueSchemaProvide
             /// <summary>
             /// Initializes a new instance of the <see cref="MultiNodeTreePickerRequiredValidator"/> class.
             /// </summary>
+            /// <param name="jsonSerializer">The JSON serializer.</param>
             public MultiNodeTreePickerRequiredValidator(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
 
             /// <inheritdoc/>

@@ -137,6 +137,7 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityDataPickerRequiredValidator"/> class.
         /// </summary>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
         public EntityDataPickerRequiredValidator(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
 
         /// <inheritdoc/>
@@ -163,9 +164,19 @@ internal sealed class EntityDataPickerPropertyEditor : DataEditor
     /// </summary>
     internal sealed class EntityDataPickerDto
     {
+        private string[] _ids = [];
+
         /// <summary>
         ///     Gets or sets the array of selected entity identifiers.
         /// </summary>
-        public string[] Ids { get; set; } = [];
+        /// <remarks>
+        ///     An explicit <c>null</c> in the JSON replaces the property initializer, so it is coalesced here rather
+        ///     than at each use.
+        /// </remarks>
+        public string[] Ids
+        {
+            get => _ids;
+            set => _ids = value ?? [];
+        }
     }
 }

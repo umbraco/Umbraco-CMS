@@ -179,19 +179,20 @@ public class MultipleTextStringPropertyValueEditorTests
         // The message templates place the item count in %0% and the configured limit in %1%, so both must be
         // supplied even where the template only renders one of them.
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
-        string[]? tokens = null;
+        IDictionary<string, string>? tokens = null;
         localizedTextServiceMock
             .Setup(x => x.Localize("validation", "outOfRangeSingleItemMinimum", It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>()))
-            .Callback((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => tokens = args?.Values.ToArray())
+            .Callback((string key, string alias, CultureInfo culture, IDictionary<string, string> args) => tokens = args)
             .Returns("localized");
 
         var editor = CreateValueEditor(localizedTextServiceMock.Object);
 
-        editor.Validate(new[] { "one" }, false, null, PropertyValidationContext.Empty()).ToArray();
+        var result = editor.Validate(new[] { "one" }, false, null, PropertyValidationContext.Empty()).ToArray();
 
+        Assert.AreEqual(1, result.Length);
         Assert.IsNotNull(tokens);
-        Assert.AreEqual(2, tokens!.Length);
-        Assert.AreEqual("2", tokens[1]);
+        Assert.AreEqual(2, tokens!.Count);
+        Assert.AreEqual("2", tokens["1"]);
     }
 
     [TestCase("", true, "")]

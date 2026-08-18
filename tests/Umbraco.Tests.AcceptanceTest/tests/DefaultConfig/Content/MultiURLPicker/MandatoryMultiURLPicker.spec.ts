@@ -31,7 +31,7 @@ test('can save content with mandatory multi url picker after adding a link', asy
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   // Add a manual link
   await umbracoUi.content.clickAddMultiURLPickerButton();
   await umbracoUi.content.clickManualLinkButton();
@@ -41,7 +41,7 @@ test('can save content with mandatory multi url picker after adding a link', asy
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue, false);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue, false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(mandatoryDataTypeName));
@@ -153,8 +153,10 @@ test('can not publish content with an empty mandatory multi url picker that has 
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.emptyValue);
   await umbracoUi.content.isErrorNotificationVisible();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Draft');
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(minNumberDocumentTypeName);

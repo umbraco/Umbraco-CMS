@@ -68,7 +68,7 @@ public abstract class SystemTextJsonSerializerBase : IJsonSerializer
         }
         catch (JsonException)
         {
-            // The input is valid JSON, but not of the requested shape.
+            // The input could not be deserialized as the requested type.
             value = null;
         }
 

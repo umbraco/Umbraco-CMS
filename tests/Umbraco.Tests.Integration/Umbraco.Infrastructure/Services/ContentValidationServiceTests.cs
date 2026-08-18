@@ -276,15 +276,15 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
             new ContentCreateModel
             {
                 ContentTypeKey = documentType.Key,
-                Variants = [new () { Name = "Test Document" }],
+                Variants = [new() { Name = "Test Document" }],
                 Properties = new[]
                 {
                     new PropertyValueModel
                     {
                         Alias = "links",
-                        Value = null
-                    }
-                }
+                        Value = null,
+                    },
+                },
             },
             documentType);
 
@@ -301,15 +301,15 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
             new ContentCreateModel
             {
                 ContentTypeKey = documentType.Key,
-                Variants = [new () { Name = "Test Document" }],
+                Variants = [new() { Name = "Test Document" }],
                 Properties = new[]
                 {
                     new PropertyValueModel
                     {
                         Alias = "links",
-                        Value = "[{\"name\":\"Page 1\",\"type\":\"external\",\"url\":\"https://umbraco.com\"}]"
-                    }
-                }
+                        Value = "[{\"name\":\"Page 1\",\"type\":\"external\",\"url\":\"https://umbraco.com\"}]",
+                    },
+                },
             },
             documentType);
 
@@ -743,8 +743,8 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
             DatabaseType = ValueTypes.ToStorageType(dataEditor.GetValueEditor().ValueType),
             ConfigurationData = new Dictionary<string, object>
             {
-                { nameof(MultiUrlPickerConfiguration.MinNumber).ToFirstLowerInvariant(), 3 }
-            }
+                { nameof(MultiUrlPickerConfiguration.MinNumber).ToFirstLowerInvariant(), 3 },
+            },
         };
 
         var dataTypeService = GetRequiredService<IDataTypeService>();
@@ -757,9 +757,9 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         };
         documentType.AddPropertyType(new PropertyType(ShortStringHelper, dataTypeCreateResult.Result, "links")
         {
-            Mandatory = mandatory
+            Mandatory = mandatory,
         });
-        await ContentTypeService.SaveAsync(documentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(documentType, Constants.Security.SuperUserKey);
         Assert.IsTrue(documentType.HasIdentity, "Could not create the document type");
 
         return documentType;
