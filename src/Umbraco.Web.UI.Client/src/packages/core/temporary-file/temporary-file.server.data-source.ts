@@ -24,6 +24,8 @@ export class UmbTemporaryFileServerDataSource {
 	 * Uploads a temporary file to the server
 	 * @param {string} id - The unique identifier of the temporary file
 	 * @param {File} file - The file to upload
+	 * @param onProgress
+	 * @param abortSignal
 	 * @returns {Promise<UmbDataSourceResponse<unknown>>} The upload response
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */

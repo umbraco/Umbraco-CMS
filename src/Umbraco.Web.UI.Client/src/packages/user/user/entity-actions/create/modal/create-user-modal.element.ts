@@ -74,7 +74,8 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 	}
 
 	override render() {
-		return html`<uui-dialog-layout headline=${this.localize.term('user_createUserHeadline', this.data?.user.kind ?? '')}>
+		return html`<uui-dialog-layout
+			headline=${this.localize.term('user_createUserHeadline', this.data?.user.kind ?? '')}>
 			<p>${this.localize.term('user_createUserDescription', this.data?.user.kind ?? '')}</p>
 
 			${this.#renderForm()}
