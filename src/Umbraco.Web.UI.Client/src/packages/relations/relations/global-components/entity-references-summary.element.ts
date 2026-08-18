@@ -1,7 +1,8 @@
 import { UMB_ENTITY_REFERENCES_MODAL } from '../reference/modal/constants.js';
 import type { UmbEntityReferenceRepository } from '../reference/types.js';
+import type { UmbEntityReferenceListSource } from './entity-reference-list.element.js';
 import type { UmbEntityReferencesConfig } from './types.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -9,10 +10,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 
 /**
- * Publish/unpublish awareness: a neutral count of the items referencing the entity in `config`, with a link to the
- * full, paged overview. Renders nothing when there are no references. Same `config` shape, getters, and
- * `UmbChangeEvent` contract as `umb-confirm-action-modal-entity-references`, so it can be used as a drop-in
- * replacement wherever that component's reference-aware gating (e.g. `disableUnpublishWhenReferenced`) is relied on.
+ * Publish/unpublish awareness: independent action buttons for the entities referencing the entity in `config`,
+ * and for its descendants that are referenced elsewhere, each opening a paged overview of only that kind of
+ * reference. Renders nothing when there are no references. Same `config` shape, getters, and `UmbChangeEvent`
+ * contract as `umb-confirm-action-modal-entity-references`, so it can be used as a drop-in replacement wherever
+ * that component's reference-aware gating (e.g. `disableUnpublishWhenReferenced`) is relied on.
  * @element umb-entity-references-summary
  */
 @customElement('umb-entity-references-summary')
@@ -99,7 +101,7 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 		this._totalDescendantsWithReferences = data?.total ?? 0;
 	}
 
-	#onClickViewAll(event: Event) {
+	#onClickView(source: UmbEntityReferenceListSource, event: Event) {
 		event.preventDefault();
 		if (!this.config) return;
 
@@ -108,6 +110,7 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 				unique: this.config.unique,
 				referenceRepositoryAlias: this.config.referenceRepositoryAlias,
 				itemRepositoryAlias: this.config.itemRepositoryAlias,
+				source,
 			},
 		}).catch(() => undefined);
 	}
@@ -118,12 +121,37 @@ export class UmbEntityReferencesSummaryElement extends UmbLitElement {
 
 		return html`
 			<p class="reference-summary">
-				<uui-button
-					label=${this.localize.term('references_labelUsedByCount', total)}
-					look="outline"
-					@click=${this.#onClickViewAll}>
-					<umb-localize key="references_labelUsedByCount" .args=${[total]}>Used by ${total} item(s)</umb-localize>
-				</uui-button>
+				${when(
+					this._totalReferencedByItems,
+					() => html`
+						<uui-button
+							label=${this.localize.term('references_viewDependentItemsAction', this._totalReferencedByItems)}
+							look="outline"
+							@click=${(event: Event) => this.#onClickView('referencedBy', event)}>
+							<umb-localize key="references_viewDependentItemsAction" .args=${[this._totalReferencedByItems]}
+								>View ${this._totalReferencedByItems} item(s) that depend on this…</umb-localize
+							>
+						</uui-button>
+					`,
+				)}
+				${when(
+					this._totalDescendantsWithReferences,
+					() => html`
+						<uui-button
+							label=${this.localize.term(
+								'references_viewDescendantsWithReferencesAction',
+								this._totalDescendantsWithReferences,
+							)}
+							look="outline"
+							@click=${(event: Event) => this.#onClickView('descendantsWithReferences', event)}>
+							<umb-localize
+								key="references_viewDescendantsWithReferencesAction"
+								.args=${[this._totalDescendantsWithReferences]}
+								>View ${this._totalDescendantsWithReferences} descendant(s) with references…</umb-localize
+							>
+						</uui-button>
+					`,
+				)}
 			</p>
 		`;
 	}

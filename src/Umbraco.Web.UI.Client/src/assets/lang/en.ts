@@ -2661,13 +2661,16 @@ export default {
 		deleteDisabledWarning: 'This item or its descendants is being used. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are used by other content.',
 		labelUsedByItems: 'Referenced by',
+		labelDescendantsWithReferences: 'Descendants with references',
 		labelDependsOnThis: 'The following items depend on this',
 		labelDependentDescendants: 'The following descending items have dependencies',
 		labelMoreReferences: (count: number) => {
 			if (count === 1) return '...and one more item';
 			return `...and ${count} more items`;
 		},
-		labelUsedByCount: (count: number) => `Referenced by ${count} ${count === 1 ? 'item' : 'items'}`,
+		viewDependentItemsAction: (count: number) => `View ${count} ${count === 1 ? 'item' : 'items'} that depend on this…`,
+		viewDescendantsWithReferencesAction: (count: number) =>
+			`View ${count} ${count === 1 ? 'descendant' : 'descendants'} with references…`,
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',

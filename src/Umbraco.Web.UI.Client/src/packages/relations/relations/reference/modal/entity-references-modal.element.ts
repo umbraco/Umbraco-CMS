@@ -1,6 +1,6 @@
-import type { UmbEntityReferencesModalData, UmbEntityReferencesModalValue } from './types.js';
 import type { UmbEntityReferenceListElement } from '../../global-components/entity-reference-list.element.js';
-import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbEntityReferencesModalData, UmbEntityReferencesModalValue } from './types.js';
+import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -31,34 +31,56 @@ export class UmbEntityReferencesModalElement extends UmbModalBaseElement<
 
 	override render() {
 		if (!this.data) return nothing;
-		const headline = this.data.headline ?? this.localize.term('references_labelUsedByItems');
+
+		const source = this.data.source;
+		const showReferencedBy = !source || source === 'referencedBy';
+		const showDescendants = !source || source === 'descendantsWithReferences';
+
+		const headline =
+			this.data.headline ??
+			(source === 'descendantsWithReferences'
+				? this.localize.term('references_labelDescendantsWithReferences')
+				: this.localize.term('references_labelUsedByItems'));
+
 		return html`
 			<uui-dialog-layout headline=${headline}>
-				<div ?hidden=${!this._referencedByTotal}>
-					<p><umb-localize key="references_labelDependsOnThis">The following items depend on this</umb-localize></p>
-					<umb-entity-reference-list
-						readonly
-						.unique=${this.data.unique}
-						.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
-						source="referencedBy"
-						@change=${this.#onReferencedByChange}>
-					</umb-entity-reference-list>
-				</div>
-				<div ?hidden=${!this._descendantsTotal}>
-					<p>
-						<umb-localize key="references_labelDependentDescendants"
-							>The following descending items have dependencies</umb-localize
-						>
-					</p>
-					<umb-entity-reference-list
-						readonly
-						.unique=${this.data.unique}
-						.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
-						.itemRepositoryAlias=${this.data.itemRepositoryAlias}
-						source="descendantsWithReferences"
-						@change=${this.#onDescendantsChange}>
-					</umb-entity-reference-list>
-				</div>
+				${when(
+					showReferencedBy,
+					() => html`
+						<div ?hidden=${!this._referencedByTotal}>
+							<p>
+								<umb-localize key="references_labelDependsOnThis">The following items depend on this</umb-localize>
+							</p>
+							<umb-entity-reference-list
+								readonly
+								.unique=${this.data.unique}
+								.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
+								source="referencedBy"
+								@change=${this.#onReferencedByChange}>
+							</umb-entity-reference-list>
+						</div>
+					`,
+				)}
+				${when(
+					showDescendants,
+					() => html`
+						<div ?hidden=${!this._descendantsTotal}>
+							<p>
+								<umb-localize key="references_labelDependentDescendants"
+									>The following descending items have dependencies</umb-localize
+								>
+							</p>
+							<umb-entity-reference-list
+								readonly
+								.unique=${this.data.unique}
+								.referenceRepositoryAlias=${this.data.referenceRepositoryAlias}
+								.itemRepositoryAlias=${this.data.itemRepositoryAlias}
+								source="descendantsWithReferences"
+								@change=${this.#onDescendantsChange}>
+							</umb-entity-reference-list>
+						</div>
+					`,
+				)}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} look="primary" @click=${this.#close}></uui-button>
 				</div>

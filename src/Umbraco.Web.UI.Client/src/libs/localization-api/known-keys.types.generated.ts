@@ -1846,8 +1846,8 @@ declare global {
 		references_itemHasNoReferences: string;
 		references_labelDependentDescendants: string;
 		references_labelDependsOnThis: string;
+		references_labelDescendantsWithReferences: string;
 		references_labelMoreReferences: (count: number) => string;
-		references_labelUsedByCount: (count: number) => string;
 		references_labelUsedByDocuments: string;
 		references_labelUsedByDocumentTypes: string;
 		references_labelUsedByItems: string;
@@ -1861,6 +1861,8 @@ declare global {
 		references_tabName: string;
 		references_unpublishWarning: string;
 		references_usedByProperties: string;
+		references_viewDependentItemsAction: (count: number) => string;
+		references_viewDescendantsWithReferencesAction: (count: number) => string;
 		relatedlinks_caption: string;
 		relatedlinks_captionPlaceholder: string;
 		relatedlinks_chooseInternal: string;

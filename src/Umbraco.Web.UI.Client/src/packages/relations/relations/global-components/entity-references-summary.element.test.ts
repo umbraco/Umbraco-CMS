@@ -61,16 +61,26 @@ describe('UmbEntityReferencesSummaryElement', () => {
 		expect(element.shadowRoot?.querySelector('p'), 'summary line').to.equal(null);
 	});
 
-	it('renders the combined referenced-by and descendant totals once references exist', async () => {
+	it('renders a separate button for each reference kind once references exist', async () => {
 		UmbTestReferenceRepository.referencedByTotal = 2;
 		UmbTestReferenceRepository.descendantsTotal = 1;
 		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
 		document.body.appendChild(element);
 		await aTimeout(0);
 
-		expect(element.shadowRoot?.querySelector('p'), 'summary line').to.exist;
+		expect(element.shadowRoot?.querySelectorAll('uui-button'), 'reference buttons').to.have.length(2);
 		expect(element.getTotalReferencedBy()).to.equal(2);
 		expect(element.getTotalDescendantsWithReferences()).to.equal(1);
+	});
+
+	it('renders only the referenced-by button when there are no descendant references', async () => {
+		UmbTestReferenceRepository.referencedByTotal = 3;
+		UmbTestReferenceRepository.descendantsTotal = 0;
+		element.config = { unique: 'elm-1', referenceRepositoryAlias: TEST_REPOSITORY_ALIAS, itemRepositoryAlias: 'n/a' };
+		document.body.appendChild(element);
+		await aTimeout(0);
+
+		expect(element.shadowRoot?.querySelectorAll('uui-button'), 'reference buttons').to.have.length(1);
 	});
 
 	it('dispatches a change event once both totals have loaded', async () => {
