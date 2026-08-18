@@ -80,11 +80,19 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	/**
-	 * If a Workspace has multiple validation contexts, then this method can be overwritten to return the correct one.
+	 * Validates all validation contexts of this workspace.
 	 * @returns {Promise<Array<void>>} Promise that resolves to void when the validation is complete.
 	 */
 	public async validate(): Promise<Array<void>> {
 		return await Promise.all(this.#validationContexts.map((context) => context.validate()));
+	}
+
+	/**
+	 * If valid, then this resets validation state of all validation contexts in this workspace.
+	 * Call this when a workspace submittion is complete without any validation errors.
+	 */
+	#resetValidationIfValid(): void {
+		this.#validationContexts.forEach((context) => !context.messages.getHasAnyMessages() && context.reset());
 	}
 
 	public async requestSubmit(): Promise<void> {
@@ -123,7 +131,11 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		});
 		validationMethod().then(
 			async () => {
-				onValid().then(this.#completeSubmit, this.#rejectSubmit);
+				onValid().then(() => {
+					// Reset validation state if the onValid fallback was successful. [NL]
+					this.#resetValidationIfValid();
+					this.#completeSubmit();
+				}, this.#rejectSubmit);
 			},
 			async (error) => {
 				onInvalid(error).then(this.#resolveSubmit, this.#rejectSubmit);
