@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Globalization;
 using System.Reflection;
 using Examine;
 using Examine.Lucene;
@@ -601,7 +602,12 @@ public class Searcher : IExamineSearcher
 
                     foreach (IFacetValue decimalExactFacetValue in examineDecimalFacets)
                     {
-                        if (decimal.TryParse(decimalExactFacetValue.Label, out var labelValue) is false)
+                        // The label is formatted by the indexing thread's ambient culture, which can differ from
+                        // this (query) thread's, so the decimal separator may be '.' or ',' regardless of what
+                        // culture is active here; a grouping separator is never present. Normalize before parsing
+                        // so the round-trip doesn't depend on either thread's culture matching the other's.
+                        var normalizedLabel = decimalExactFacetValue.Label.Replace(',', '.');
+                        if (decimal.TryParse(normalizedLabel, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var labelValue) is false)
                         {
                             // Cannot convert the label to decimal, skipping.
                             continue;
