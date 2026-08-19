@@ -170,7 +170,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 
 			if (viewAlias === null) {
 				// for the root tab, we need to filter hints, so in this case we do accept everything that is not in a tab: [NL]
-				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
+				view.hints.setPathFilter((paths) => paths[0]?.includes('tab/') === false);
 			}
 
 			view.setTitle(tabName);
@@ -257,7 +257,6 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			fullPath === this._activePath ||
 			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath) ||
 			(this._hasRootGroups && index === 0 && path === null && this._routerPath + '/' === this._activePath);
-		console.log(active, this._activePath, hint);
 		return html`<uui-tab
 			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}
