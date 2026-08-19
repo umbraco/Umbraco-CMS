@@ -31,7 +31,7 @@ public class InvariantDocumentTests : IndexTestBase
         var indexAlias = GetIndexAlias(publish);
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Delete(content);
             return Task.CompletedTask;
         });
@@ -46,7 +46,7 @@ public class InvariantDocumentTests : IndexTestBase
     {
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Unpublish(content);
             return Task.CompletedTask;
         });
@@ -162,7 +162,7 @@ public class InvariantDocumentTests : IndexTestBase
         var indexAlias = GetIndexAlias(publish);
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Delete(content);
             return Task.CompletedTask;
         });
@@ -233,13 +233,13 @@ public class InvariantDocumentTests : IndexTestBase
             return Task.CompletedTask;
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 
     private async Task UpdateProperty(string propertyName, object value, bool publish)
     {
-        IContent content = ContentService.GetById(RootKey)!;
+        IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
         content.SetValue(propertyName, value);
 
         await WaitForIndexing(GetIndexAlias(publish), () =>

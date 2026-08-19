@@ -113,7 +113,7 @@ public class InvariantDocumentProtectionIndexTests : IndexTestBase
             return Task.CompletedTask;
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 }

@@ -160,14 +160,14 @@ public class VariantDocumentTests : SearcherTestBase
             return Task.CompletedTask;
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 
 
     private async Task UpdateProperty(string propertyName, object value, string culture)
     {
-        IContent content = ContentService.GetById(RootKey)!;
+        IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
         content.SetValue(propertyName, value, culture);
 
         await WaitForIndexing(GetIndexAlias(true), () =>

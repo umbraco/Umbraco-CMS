@@ -54,7 +54,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await CreateInvariantDocumentTree(true);
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Unpublish(root);
             return Task.CompletedTask;
         });
@@ -70,7 +70,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await CreateInvariantDocumentTree(true);
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent child = ContentService.GetById(ChildKey)!;
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Unpublish(child);
             return Task.CompletedTask;
         });
@@ -90,7 +90,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await CreateInvariantDocumentTree(true);
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent grandChild = ContentService.GetById(GrandchildKey)!;
+            IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Unpublish(grandChild);
             return Task.CompletedTask;
         });
@@ -116,7 +116,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await CreateInvariantDocumentTree(true);
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.MoveToRecycleBin(root);
             return Task.CompletedTask;
         });
@@ -132,7 +132,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await CreateInvariantDocumentTree(true);
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent child = ContentService.GetById(ChildKey)!;
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.MoveToRecycleBin(child);
             return Task.CompletedTask;
         });
@@ -152,7 +152,7 @@ public partial class InvariantDocumentTreeTests : IndexTestBase
         await CreateInvariantDocumentTree(true);
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent grandChild = ContentService.GetById(GrandchildKey)!;
+            IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.MoveToRecycleBin(grandChild);
             return Task.CompletedTask;
         });

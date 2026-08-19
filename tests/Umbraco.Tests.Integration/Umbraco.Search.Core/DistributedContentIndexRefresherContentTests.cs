@@ -150,7 +150,7 @@ public class DistributedContentIndexRefresherContentTests : TestBase
         Assert.That(dump[0].Variations.Any(v => v.Culture == "da-DK"), Is.EqualTo(publishDanish));
     }
 
-    private IContent VariantContent() => ContentService.GetById(_variantContentKey) ?? throw new InvalidOperationException("Variant content was not found");
+    private IContent VariantContent() => ContentService.GetByIdAsync(_variantContentKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Variant content was not found");
 
-    private IContent InvariantContent() => ContentService.GetById(_invariantContentKey) ?? throw new InvalidOperationException("Invariant content was not found");
+    private IContent InvariantContent() => ContentService.GetByIdAsync(_invariantContentKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Invariant content was not found");
 }

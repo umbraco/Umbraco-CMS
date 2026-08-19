@@ -39,7 +39,7 @@ public class VariantContentTreeTests : IndexTestBase
         await PublishEntireStructure();
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Unpublish(root);
             return Task.CompletedTask;
         });
@@ -74,7 +74,7 @@ public class VariantContentTreeTests : IndexTestBase
         await PublishEntireStructure();
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent child = ContentService.GetById(ChildKey)!;
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Unpublish(child);
             return Task.CompletedTask;
         });
@@ -109,7 +109,7 @@ public class VariantContentTreeTests : IndexTestBase
         await PublishEntireStructure();
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent grandChild = ContentService.GetById(GrandchildKey)!;
+            IContent grandChild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Unpublish(grandChild);
             return Task.CompletedTask;
         });
@@ -145,7 +145,7 @@ public class VariantContentTreeTests : IndexTestBase
     {
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, [culture]);
             return Task.CompletedTask;
         });
@@ -162,7 +162,7 @@ public class VariantContentTreeTests : IndexTestBase
         await PublishEntireStructure();
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             PublishResult result = ContentService.Unpublish(root, cultureToUnpublish);
             Assert.That(result.Success, Is.True);
             return Task.CompletedTask;
@@ -327,7 +327,7 @@ public class VariantContentTreeTests : IndexTestBase
     private async Task PublishEntireStructure() =>
         await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
         {
-            IContent root = ContentService.GetById(RootKey)!;
+            IContent root = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);
             return Task.CompletedTask;
         });

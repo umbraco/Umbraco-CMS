@@ -36,9 +36,9 @@ internal sealed class ContentSearchService : ContentSearchServiceBase<IContent>,
 
     /// <inheritdoc />
     protected override IEnumerable<IContent> SearchChildrenFromDatabase(int parentId, Ordering? ordering, long pageNumber, int pageSize, out long total)
-        => _contentService.GetPagedChildren(parentId, pageNumber, pageSize, out total, null, ordering);
+        => _contentService.GetPagedChildren(parentId, pageNumber, pageSize, out total, propertyAliases: null, filter: null, ordering: ordering);
 
     /// <inheritdoc />
     protected override IEnumerable<IContent> GetItems(IEnumerable<Guid> keys)
-        => _contentService.GetByIds(keys);
+        => _contentService.GetByIdsAsync(keys, CancellationToken.None).GetAwaiter().GetResult();
 }

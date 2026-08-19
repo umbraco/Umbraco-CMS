@@ -21,11 +21,11 @@ public abstract class ContentTestBase : ContentBaseTestBase
 
     protected Guid GreatGrandchildKey { get; } = Guid.NewGuid();
 
-    protected IContent Root() => ContentService.GetById(RootKey) ?? throw new InvalidOperationException("Root was not found");
+    protected IContent Root() => ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Root was not found");
 
-    protected IContent Child() => ContentService.GetById(ChildKey) ?? throw new InvalidOperationException("Child was not found");
+    protected IContent Child() => ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Child was not found");
 
-    protected IContent Grandchild() => ContentService.GetById(GrandchildKey) ?? throw new InvalidOperationException("Grandchild was not found");
+    protected IContent Grandchild() => ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Grandchild was not found");
 
-    protected IContent GreatGrandchild() => ContentService.GetById(GreatGrandchildKey) ?? throw new InvalidOperationException("Great grandchild was not found");
+    protected IContent GreatGrandchild() => ContentService.GetByIdAsync(GreatGrandchildKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Great grandchild was not found");
 }

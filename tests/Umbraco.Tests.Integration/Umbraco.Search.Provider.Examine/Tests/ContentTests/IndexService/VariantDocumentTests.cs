@@ -32,7 +32,7 @@ public class VariantDocumentTests : IndexTestBase
         var indexAlias = GetIndexAlias(publish);
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Delete(content);
             return Task.CompletedTask;
         });
@@ -54,7 +54,7 @@ public class VariantDocumentTests : IndexTestBase
 
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent content = ContentService.GetById(RootKey)!;
+            IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Unpublish(content, "da-DK");
             return Task.CompletedTask;
         });
@@ -251,14 +251,14 @@ public class VariantDocumentTests : IndexTestBase
             return Task.CompletedTask;
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 
 
     private async Task UpdateProperty(string propertyName, object value, string culture)
     {
-        IContent content = ContentService.GetById(RootKey)!;
+        IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
         content.SetValue(propertyName, value, culture);
 
         await WaitForIndexing(GetIndexAlias(true), () =>

@@ -17,7 +17,7 @@ public partial class InvariantContentTreeTests : SearcherTestBase
         await WaitForIndexing(GetIndexAlias(false), async () =>
         {
             await CreateInvariantDocumentTree(false);
-            IContent root = ContentService.GetById(RootKey)!;
+            IContent root = (await ContentService.GetByIdAsync(RootKey, CancellationToken.None))!;
             ContentService.MoveToRecycleBin(root);
         });
 
@@ -49,7 +49,7 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent child = ContentService.GetById(ChildKey)!;
+            IContent child = ContentService.GetByIdAsync(ChildKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Delete(child);
             return Task.CompletedTask;
         });
@@ -78,7 +78,7 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         await WaitForIndexing(indexAlias, () =>
         {
-            IContent grandchild = ContentService.GetById(GrandchildKey)!;
+            IContent grandchild = ContentService.GetByIdAsync(GrandchildKey, CancellationToken.None).GetAwaiter().GetResult()!;
             ContentService.Delete(grandchild);
             return Task.CompletedTask;
         });

@@ -24,6 +24,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
     private readonly IMediaService _mediaService;
     private readonly IMemberService _memberService;
     private readonly IEventAggregator _eventAggregator;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly ILogger<PublishedContentChangeStrategy> _logger;
 
     /// <inheritdoc />
@@ -60,6 +61,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         _memberService = memberService;
         _logger = logger;
         _eventAggregator = eventAggregator;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -90,7 +92,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
             }
             else
             {
-                IContentBase? content = GetContent(change);
+                IContentBase? content = await GetContentAsync(change, cancellationToken);
                 if (content is null || content.Trashed)
                 {
                     pendingRemovals.Add(change);
@@ -244,7 +246,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
     private async Task<Variation[]> UpdateIndexAsync(ContentIndexInfo[] indexInfos, IContentBase content, UmbracoObjectTypes objectType, CancellationToken cancellationToken)
     {
         Variation[] variations = objectType is UmbracoObjectTypes.Document
-            ? RoutablePublishedVariations(content)
+            ? await RoutablePublishedVariationsAsync(content, cancellationToken)
             : NonDocumentVariations(content);
         if (variations.Length is 0)
         {
@@ -316,10 +318,10 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         }
     }
 
-    private IContentBase? GetContent(ContentChange change)
+    private async Task<IContentBase?> GetContentAsync(ContentChange change, CancellationToken cancellationToken)
         => change.ObjectType switch
         {
-            UmbracoObjectTypes.Document => _contentService.GetById(change.Id),
+            UmbracoObjectTypes.Document => await _contentService.GetByIdAsync(change.Id, cancellationToken),
             UmbracoObjectTypes.Media => _mediaService.GetById(change.Id),
             UmbracoObjectTypes.Member => _memberService.GetById(change.Id),
             _ => throw new ArgumentOutOfRangeException(nameof(change), change.ObjectType, "This strategy only supports documents, media and members")
@@ -332,7 +334,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
 
     // NOTE: for the time being, segments are not individually publishable, but it will likely happen at some point,
     //       so this method deals with variations - not cultures.
-    private Variation[] RoutablePublishedVariations(IContentBase content)
+    private async Task<Variation[]> RoutablePublishedVariationsAsync(IContentBase content, CancellationToken cancellationToken)
     {
         if (content.IsPublished() is false)
         {
@@ -348,7 +350,10 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
         // now iterate all ancestors and make sure all cultures are published all the way up the tree
         foreach (var ancestorId in content.AncestorIds())
         {
-            IContent? ancestor = _contentService.GetById(ancestorId);
+            Attempt<Guid> ancestorKeyAttempt = await _idKeyMap.GetKeyForIdAsync(ancestorId, UmbracoObjectTypes.Document);
+            IContent? ancestor = ancestorKeyAttempt.Success
+                ? await _contentService.GetByIdAsync(ancestorKeyAttempt.Result, cancellationToken)
+                : null;
             if (ancestor is null || ancestor.Published is false)
             {
                 // no published ancestor => don't index anything

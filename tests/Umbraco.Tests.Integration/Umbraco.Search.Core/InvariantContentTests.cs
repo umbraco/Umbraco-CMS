@@ -10,7 +10,7 @@ public partial class InvariantContentTests : InvariantContentTestBase
     {
         foreach (Guid key in new[] { RootKey, ChildKey, GrandchildKey, GreatGrandchildKey })
         {
-            IContent content = ContentService.GetById(key)
+            IContent content = ContentService.GetByIdAsync(key, CancellationToken.None).GetAwaiter().GetResult()
                                ?? throw new InvalidOperationException($"Could not find content for key: {key}");
             content.Name += " (draft)";
             content.SetValue("title", content.GetValue<string>("title") + " (draft)");

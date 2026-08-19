@@ -93,7 +93,7 @@ public class PublishedContentQueryTests : TestBase
 
         await WaitForIndexing(GetIndexAlias(true), () =>
         {
-            ContentService.Unpublish(ContentService.GetById(ChildBetaKey)!);
+            ContentService.Unpublish(ContentService.GetByIdAsync(ChildBetaKey, CancellationToken.None).GetAwaiter().GetResult()!);
             return Task.CompletedTask;
         });
 

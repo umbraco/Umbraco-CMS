@@ -79,7 +79,7 @@ public partial class InvariantContentStructureTests
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.True);
-            Assert.That(ContentService.GetById(GreatGrandchildKey), Is.Null);
+            Assert.That(ContentService.GetByIdAsync(GreatGrandchildKey, CancellationToken.None).GetAwaiter().GetResult(), Is.Null);
         });
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);

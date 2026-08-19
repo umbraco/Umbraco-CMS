@@ -39,7 +39,7 @@ public class InvariantDocumentTests : SearcherTestBase
     {
         await WaitForIndexing(GetIndexAlias(true), () =>
         {
-            IContent? content = ContentService.GetById(RootKey);
+            IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
             ContentService.Delete(content!);
             return Task.CompletedTask;
         });
@@ -171,13 +171,13 @@ public class InvariantDocumentTests : SearcherTestBase
             return Task.CompletedTask;
         });
 
-        IContent? content = ContentService.GetById(RootKey);
+        IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
         Assert.That(content, Is.Not.Null);
     }
 
     private async Task UpdateProperty(string propertyName, object value, bool publish)
     {
-        IContent content = ContentService.GetById(RootKey)!;
+        IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
         content.SetValue(propertyName, value);
 
         await WaitForIndexing(GetIndexAlias(publish), () =>

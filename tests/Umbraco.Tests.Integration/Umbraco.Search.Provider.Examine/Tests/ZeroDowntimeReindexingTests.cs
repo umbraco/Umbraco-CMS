@@ -87,7 +87,7 @@ public class ZeroDowntimeReindexingTests : TestBase
         // During rebuild, a content change should write to shadow
         await WaitForShadowIndexing(indexAlias, () =>
         {
-            IContent content = ContentService.GetById(_createdContentKey)!;
+            IContent content = ContentService.GetByIdAsync(_createdContentKey, CancellationToken.None).GetAwaiter().GetResult()!;
             content.Name = "Updated During Rebuild";
             ContentService.Save(content);
             if (publish)
@@ -145,7 +145,7 @@ public class ZeroDowntimeReindexingTests : TestBase
 
         await WaitForShadowIndexing(indexAlias, () =>
         {
-            IContent content = ContentService.GetById(_createdContentKey)!;
+            IContent content = ContentService.GetByIdAsync(_createdContentKey, CancellationToken.None).GetAwaiter().GetResult()!;
             content.Name = "Rebuilt Content";
             ContentService.Save(content);
             if (publish)

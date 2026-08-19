@@ -140,7 +140,7 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
         });
     }
 
-    private IContent Content() => ContentService.GetById(ContentKey) ?? throw new InvalidOperationException("Content was not found");
+    private IContent Content() => ContentService.GetByIdAsync(ContentKey, CancellationToken.None).GetAwaiter().GetResult() ?? throw new InvalidOperationException("Content was not found");
 
     private IMedia Media() => MediaService.GetById(MediaKey) ?? throw new InvalidOperationException("Media was not found");
 

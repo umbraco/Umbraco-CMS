@@ -75,7 +75,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
             }
             else
             {
-                IContentBase? content = GetContent(change);
+                IContentBase? content = await GetContentAsync(change, cancellationToken);
                 if (content is null)
                 {
                     pendingRemovals.Add(change);
@@ -105,7 +105,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
             indexInfo,
             UmbracoObjectTypes.Document,
             () => _contentService.GetRootContent(),
-            (pageIndex, pageSize) => _contentService.GetPagedChildren(Cms.Core.Constants.System.RecycleBinContent, pageIndex, pageSize, out _),
+            (pageIndex, pageSize) => _contentService.GetPagedChildren(Cms.Core.Constants.System.RecycleBinContent, pageIndex, pageSize, out _, propertyAliases: null, filter: null, ordering: null),
             cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
@@ -263,10 +263,10 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         }
     }
 
-    private IContentBase? GetContent(ContentChange change)
+    private async Task<IContentBase?> GetContentAsync(ContentChange change, CancellationToken cancellationToken)
         => change.ObjectType switch
         {
-            UmbracoObjectTypes.Document => _contentService.GetById(change.Id),
+            UmbracoObjectTypes.Document => await _contentService.GetByIdAsync(change.Id, cancellationToken),
             UmbracoObjectTypes.Media => _mediaService.GetById(change.Id),
             UmbracoObjectTypes.Member => _memberService.GetById(change.Id),
             _ => throw new ArgumentOutOfRangeException(nameof(change), change.ObjectType, "This strategy only supports documents, media and members")
