@@ -63,6 +63,7 @@ export class UmbBadgeElement extends LitElement {
 				:host(:not([inline-mode])) uui-badge {
 					position: fixed;
 					position-anchor: --umb-badge-anchor;
+					position-visibility: always;
 					z-index: 1;
 					top: anchor(top);
 					right: anchor(right);
