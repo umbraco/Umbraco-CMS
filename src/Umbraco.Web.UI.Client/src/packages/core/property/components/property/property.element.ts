@@ -154,7 +154,8 @@ export class UmbPropertyElement extends UmbLitElement {
 			},
 			'observeValidationState',
 		);
-		// #setupControlValidation() is deliberately not called here — see the methods JS-docs. [NL]
+
+		this.#setupControlValidation();
 	}
 	public get dataPath(): string | undefined {
 		return this.#propertyContext.getDataPath();
@@ -293,22 +294,6 @@ export class UmbPropertyElement extends UmbLitElement {
 					this._element.readonly = value;
 					this._element.toggleAttribute('readonly', value);
 				}
-			},
-			null,
-		);
-
-		// `variantId` is the signal that the dataset context behind this property has confirmed the current
-		// variant: a variant switch tears down the old dataset context and provides a brand new one, so this is a
-		// fresh subscription each time and — unlike the value itself — can't be skipped by a dedup that considers
-		// two different variants' (coincidentally identical) values unchanged. By the time this fires,
-		// `#propertyContext.getValue()` is already correct for the current dataPath: `UmbPropertyContext` writes
-		// its value state unconditionally, synchronously, right after resolving variantId, before either is
-		// notified out. That's what makes it safe to (re)bind validation here, whereas doing so eagerly — before
-		// this fires — risks the element re-validating the *previous* dataPath's still-present value. [NL]
-		this.observe(
-			this.#propertyContext.variantId,
-			() => {
-				this.#setupControlValidation();
 			},
 			null,
 		);
