@@ -106,7 +106,7 @@ export class UmbWorkspaceEditorContext extends UmbContextBase {
 	setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId = variantId;
 		this.#contexts.forEach((view) => {
-			view.hints.updateScaffold({ variantId });
+			view.setVariantId(variantId);
 		});
 	}
 
