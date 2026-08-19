@@ -392,8 +392,7 @@ public class PublishedContentStatusFilteringServiceTests
             .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
 
-        var previewService = new Mock<IPreviewService>();
-        previewService.Setup(p => p.IsInPreview()).Returns(forPreview);
+        var previewSessionService = SetupPreviewService(forPreview);
 
         var variationContextAccessor = new Mock<IVariationContextAccessor>();
         variationContextAccessor.SetupGet(v => v.VariationContext).Returns(new VariationContext(null));
@@ -401,7 +400,7 @@ public class PublishedContentStatusFilteringServiceTests
         var service = new PublishedContentStatusFilteringService(
             variationContextAccessor.Object,
             statusMock.Object,
-            previewService.Object,
+            previewSessionService,
             cacheMock.Object);
 
         return (service, items, cacheMock, statusMock);
@@ -430,7 +429,7 @@ public class PublishedContentStatusFilteringServiceTests
         }
 
         var publishedContentCache = SetupPublishedContentCache(forPreview, items);
-        var previewService = SetupPreviewService(forPreview);
+        var previewSessionService = SetupPreviewService(forPreview);
         var publishStatusQueryService = SetupPublishStatusQueryService(items);
         var variationContextAccessor = SetupVariantContextAccessor(null);
 
@@ -438,7 +437,7 @@ public class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
-                previewService,
+                previewSessionService,
                 publishedContentCache),
             items);
     }
@@ -475,7 +474,7 @@ public class PublishedContentStatusFilteringServiceTests
         }
 
         var publishedContentCache = SetupPublishedContentCache(forPreview, items);
-        var previewService = SetupPreviewService(forPreview);
+        var previewSessionService = SetupPreviewService(forPreview);
         var publishStatusQueryService = SetupPublishStatusQueryService(items, hasPublishedAncestorPath);
         var variationContextAccessor = SetupVariantContextAccessor(requestCulture);
 
@@ -483,7 +482,7 @@ public class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
-                previewService,
+                previewSessionService,
                 publishedContentCache),
             items);
     }
@@ -529,7 +528,7 @@ public class PublishedContentStatusFilteringServiceTests
         }
 
         var publishedContentCache = SetupPublishedContentCache(forPreview, items);
-        var previewService = SetupPreviewService(forPreview);
+        var previewSessionService = SetupPreviewService(forPreview);
         var publishStatusQueryService = SetupPublishStatusQueryService(items);
         var variationContextAccessor = SetupVariantContextAccessor(requestCulture);
 
@@ -537,7 +536,7 @@ public class PublishedContentStatusFilteringServiceTests
             new PublishedContentStatusFilteringService(
                 variationContextAccessor,
                 publishStatusQueryService,
-                previewService,
+                previewSessionService,
                 publishedContentCache),
             items);
     }
@@ -560,11 +559,11 @@ public class PublishedContentStatusFilteringServiceTests
         return publishStatusQueryService.Object;
     }
 
-    private IPreviewService SetupPreviewService(bool forPreview)
+    private IPreviewSessionService SetupPreviewService(bool forPreview)
     {
-        var previewService = new Mock<IPreviewService>();
-        previewService.Setup(p => p.IsInPreview()).Returns(forPreview);
-        return previewService.Object;
+        var previewSessionService = new Mock<IPreviewSessionService>();
+        previewSessionService.Setup(p => p.IsActive()).Returns(forPreview);
+        return previewSessionService.Object;
     }
 
     private IVariationContextAccessor SetupVariantContextAccessor(string? requestCulture)

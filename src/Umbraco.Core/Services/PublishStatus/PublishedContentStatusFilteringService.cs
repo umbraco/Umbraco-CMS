@@ -16,7 +16,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
-    private readonly IPreviewService _previewService;
+    private readonly IPreviewSessionService _previewSessionService;
     private readonly IPublishedContentCache _publishedContentCache;
 
     /// <summary>
@@ -24,17 +24,17 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     /// </summary>
     /// <param name="variationContextAccessor">The variation context accessor for retrieving culture information.</param>
     /// <param name="publishStatusQueryService">The service for querying document publish status.</param>
-    /// <param name="previewService">The service for determining if the current request is in preview mode.</param>
+    /// <param name="previewSessionService">The service for determining if the current request is in preview mode.</param>
     /// <param name="publishedContentCache">The published content cache for retrieving content items.</param>
     public PublishedContentStatusFilteringService(
         IVariationContextAccessor variationContextAccessor,
         IDocumentPublishStatusQueryService publishStatusQueryService,
-        IPreviewService previewService,
+        IPreviewSessionService previewSessionService,
         IPublishedContentCache publishedContentCache)
     {
         _variationContextAccessor = variationContextAccessor;
         _publishStatusQueryService = publishStatusQueryService;
-        _previewService = previewService;
+        _previewSessionService = previewSessionService;
         _publishedContentCache = publishedContentCache;
     }
 
@@ -49,7 +49,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
             return [];
         }
 
-        var preview = _previewService.IsInPreview();
+        var preview = _previewSessionService.IsActive();
         candidateKeys = preview
             ? candidateKeysAsArray
             : candidateKeysAsArray.Where(key =>
@@ -65,7 +65,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
     {
-        var preview = _previewService.IsInPreview();
+        var preview = _previewSessionService.IsActive();
         return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull();
     }
 

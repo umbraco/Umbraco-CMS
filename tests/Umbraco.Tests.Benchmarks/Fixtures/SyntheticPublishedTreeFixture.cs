@@ -109,8 +109,8 @@ internal sealed class SyntheticPublishedTreeFixture
         repoMock.Setup(r => r.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((ContentCacheNode?)null);
 
-        var previewMock = new Mock<IPreviewService>();
-        previewMock.Setup(x => x.IsInPreview()).Returns(false);
+        var previewMock = new Mock<IPreviewSessionService>();
+        previewMock.Setup(x => x.IsActive()).Returns(false);
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
         idKeyMapMock.Setup(x => x.GetKeyForId(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))

@@ -30,7 +30,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private readonly ICacheNodeFactory _cacheNodeFactory;
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
-    private readonly IPreviewService _previewService;
+    private readonly IPreviewSessionService _previewSessionService;
     private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<DocumentCacheService> _logger;
@@ -82,7 +82,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         IEnumerable<IDocumentSeedKeyProvider> seedKeyProviders,
         IOptions<CacheSettings> cacheSettings,
         IPublishedModelFactory publishedModelFactory,
-        IPreviewService previewService,
+        IPreviewSessionService previewSessionService,
         IDocumentPublishStatusQueryService publishStatusQueryService,
         ILogger<DocumentCacheService> logger,
         IConvertedPublishedContentCacheFactory cacheFactory)
@@ -95,7 +95,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         _cacheNodeFactory = cacheNodeFactory;
         _seedKeyProviders = seedKeyProviders;
         _publishedModelFactory = publishedModelFactory;
-        _previewService = previewService;
+        _previewSessionService = previewSessionService;
         _publishStatusQueryService = publishStatusQueryService;
         _cacheSettings = cacheSettings.Value;
         _logger = logger;
@@ -239,7 +239,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
     }
 
-    private bool GetPreview() => _previewService.IsInPreview();
+    private bool GetPreview() => _previewSessionService.IsActive();
 
     // Bumped after every in-memory cache invalidation/refresh so in-flight read-through snapshots
     // (see GetNodeAsync) can detect they have been superseded and skip writing back stale content.

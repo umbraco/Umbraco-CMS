@@ -112,7 +112,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             GetSeedProviders(mockedPublishedStatusService.Object),
             new OptionsWrapper<CacheSettings>(new CacheSettings()),
             GetRequiredService<IPublishedModelFactory>(),
-            GetRequiredService<IPreviewService>(),
+            GetRequiredService<IPreviewSessionService>(),
             mockedPublishedStatusService.Object,
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
@@ -302,7 +302,7 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             GetSeedProviders(controllableMock.Object),
             new OptionsWrapper<CacheSettings>(new CacheSettings()),
             GetRequiredService<IPublishedModelFactory>(),
-            GetRequiredService<IPreviewService>(),
+            GetRequiredService<IPreviewSessionService>(),
             controllableMock.Object,
             new NullLogger<DocumentCacheService>(),
             new ConvertedPublishedContentCacheFactory(null, new NullLogger<ConvertedPublishedContentCacheFactory>()));
