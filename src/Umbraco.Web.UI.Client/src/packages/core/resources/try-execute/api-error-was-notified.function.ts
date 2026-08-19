@@ -6,7 +6,7 @@ import { UmbApiError, UmbCancelError } from '../umb-error.js';
  * such as 401 (Unauthorized), 403 (Forbidden), and 404 (Not Found).
  * The UI should handle these cases without showing a notification.
  */
-const IGNORED_ERROR_CODES = [401, 403, 404];
+const IGNORED_ERROR_CODES = new Set([401, 403, 404]);
 
 /**
  * Operation statuses that are ignored for notifications.
@@ -14,7 +14,7 @@ const IGNORED_ERROR_CODES = [401, 403, 404];
  * via the Umb-Notifications response header, so we avoid showing a duplicate
  * notification from the ProblemDetails body.
  */
-const IGNORED_OPERATION_STATUSES = ['CancelledByNotification'];
+const IGNORED_OPERATION_STATUSES = new Set(['CancelledByNotification']);
 
 /**
  * Whether `tryExecute` surfaces a notification for this error.
@@ -41,11 +41,11 @@ export function apiErrorWasNotified(error: unknown): boolean {
 		return true;
 	}
 
-	if (IGNORED_ERROR_CODES.includes(error.problemDetails.status)) {
+	if (IGNORED_ERROR_CODES.has(error.problemDetails.status)) {
 		return false;
 	}
 
 	return !(
-		error.problemDetails.operationStatus && IGNORED_OPERATION_STATUSES.includes(error.problemDetails.operationStatus)
+		error.problemDetails.operationStatus && IGNORED_OPERATION_STATUSES.has(error.problemDetails.operationStatus)
 	);
 }

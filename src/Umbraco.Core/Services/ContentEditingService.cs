@@ -530,12 +530,12 @@ internal sealed class ContentEditingService
                     Enumerable.Empty<string>());
             }
 
-            // A cancelling notification handler leaves nothing persisted, so the outcome belongs to the save. This holds
-            // for the publishing notification too, as it is raised before the document is persisted, and the two cancel
-            // points are indistinguishable in the result.
-            if (publishResult.Result is PublishResultType.FailedPublishCancelledByEvent)
+            // Some failures are returned before the document is persisted, so they cannot be reported against the
+            // publishing status: doing so would state that the save succeeded when nothing was written at all.
+            ContentEditingOperationStatus? nothingPersistedStatus = NothingPersistedStatus(publishResult.Result);
+            if (nothingPersistedStatus is not null)
             {
-                return (EditingStatus(ContentEditingOperationStatus.CancelledByNotification), Enumerable.Empty<string>());
+                return (EditingStatus(nothingPersistedStatus.Value), Enumerable.Empty<string>());
             }
 
             // Any other failure means the publish was rejected after the save took effect, so report the save as
@@ -579,6 +579,27 @@ internal sealed class ContentEditingService
             ? ContentEditingOperationStatus.InvalidCulture
             : null;
     }
+
+    /// <summary>
+    ///     Gets the editing status for a publish result that is returned before the document is persisted, or
+    ///     <c>null</c> when the result implies the save took effect.
+    /// </summary>
+    /// <remarks>
+    ///     These are the results <see cref="IContentService.SaveAndPublish"/> can return without having written
+    ///     anything: a handler cancelling the saving, publishing or unpublishing notification, and a concurrency
+    ///     violation. Every other failure is raised after the document has been saved.
+    /// </remarks>
+    private static ContentEditingOperationStatus? NothingPersistedStatus(PublishResultType resultType)
+        => resultType switch
+        {
+            // The saving and publishing notifications are both raised before persistence, and the two cancel points
+            // are indistinguishable in the result.
+            PublishResultType.FailedPublishCancelledByEvent or PublishResultType.FailedUnpublishCancelledByEvent
+                => ContentEditingOperationStatus.CancelledByNotification,
+            PublishResultType.FailedPublishConcurrencyViolation
+                => ContentEditingOperationStatus.ConcurrencyViolation,
+            _ => null,
+        };
 
     private static ContentEditingAndPublishingStatus EditingStatus(ContentEditingOperationStatus status)
         => new() { ContentEditingOperationStatus = status };

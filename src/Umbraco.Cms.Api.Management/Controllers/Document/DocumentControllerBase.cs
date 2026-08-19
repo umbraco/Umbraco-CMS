@@ -38,15 +38,26 @@ public abstract class DocumentControllerBase : ContentControllerBase
     /// Maps the combined status of a save-and-publish operation onto a result, using the editing or the publishing
     /// mapper depending on which part of the operation failed.
     /// </summary>
+    /// <param name="status">The combined status of the save and the publish.</param>
+    /// <param name="invalidPropertyAliases">The aliases of the properties that failed validation when publishing, if any.</param>
+    /// <returns>The problem details for whichever part of the operation failed.</returns>
     protected IActionResult DocumentEditingAndPublishingOperationStatusResult(
         ContentEditingAndPublishingStatus status,
         IEnumerable<string>? invalidPropertyAliases = null)
-        => status.ContentEditingOperationStatus is not ContentEditingOperationStatus.Success
-            ? ContentEditingOperationStatusResult(status.ContentEditingOperationStatus)
-            : status.ContentPublishingOperationStatus is { } publishingStatus
-              && publishingStatus is not ContentPublishingOperationStatus.Success
-                ? DocumentPublishingOperationStatusResult(publishingStatus, invalidPropertyAliases)
-                : throw new ArgumentException("Please handle success status explicitly in the controllers", nameof(status));
+    {
+        if (status.ContentEditingOperationStatus is not ContentEditingOperationStatus.Success)
+        {
+            return ContentEditingOperationStatusResult(status.ContentEditingOperationStatus);
+        }
+
+        if (status.ContentPublishingOperationStatus is { } publishingStatus
+            && publishingStatus is not ContentPublishingOperationStatus.Success)
+        {
+            return DocumentPublishingOperationStatusResult(publishingStatus, invalidPropertyAliases);
+        }
+
+        throw new ArgumentException("Please handle success status explicitly in the controllers", nameof(status));
+    }
 
     protected IActionResult DocumentPublishingOperationStatusResult(
         ContentPublishingOperationStatus status,

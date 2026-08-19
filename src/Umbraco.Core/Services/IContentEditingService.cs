@@ -52,7 +52,7 @@ public interface IContentEditingService
     ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
     ///     a publish blocked by a business rule still leaves the save in effect.
     /// </remarks>
-    // TODO (V19): Remove default implementation.
+    // TODO (V19): Remove the default implementation when the obsolete CreateAndPublishAsync(ContentCreateModel, string[], Guid) overload is removed.
     Task<Attempt<ContentCreateResult, ContentEditingAndPublishingStatus>> CreateAndPublishAsync(ContentCreateModel createModel, ISet<string> culturesToPublish, Guid userKey)
         => throw new NotImplementedException();
 
@@ -88,7 +88,7 @@ public interface IContentEditingService
     ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
     ///     a publish blocked by a business rule still leaves the save in effect.
     /// </remarks>
-    // TODO (V19): Remove default implementation.
+    // TODO (V19): Remove the default implementation when the obsolete UpdateAndPublishAsync(Guid, ContentUpdateModel, string[], Guid) overload is removed.
     Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey)
         => throw new NotImplementedException();
 

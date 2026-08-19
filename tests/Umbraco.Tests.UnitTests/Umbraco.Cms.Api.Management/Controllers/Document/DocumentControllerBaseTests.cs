@@ -81,6 +81,22 @@ public class DocumentControllerBaseTests
     }
 
     [Test]
+    public void Concurrency_Violation_Is_Reported_As_A_Conflict()
+    {
+        // A concurrency violation is returned before the document is persisted, so it is reported against the save
+        // rather than the publish - otherwise the response would state that the save succeeded.
+        var status = new ContentEditingAndPublishingStatus
+        {
+            ContentEditingOperationStatus = ContentEditingOperationStatus.ConcurrencyViolation,
+        };
+
+        IActionResult result = _controller.MapStatus(status);
+
+        ProblemDetails problemDetails = AssertProblemDetails(result, StatusCodes.Status409Conflict);
+        Assert.AreEqual("Concurrency violation detected", problemDetails.Title);
+    }
+
+    [Test]
     public void Success_Must_Be_Handled_By_The_Controller()
     {
         var status = new ContentEditingAndPublishingStatus

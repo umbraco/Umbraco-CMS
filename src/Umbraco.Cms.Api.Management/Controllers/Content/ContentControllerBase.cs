@@ -77,6 +77,10 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid sorting options")
                 .WithDetail("The supplied sorting operations were invalid. Additional details can be found in the log.")
                 .Build()),
+            ContentEditingOperationStatus.ConcurrencyViolation => Conflict(problemDetailsBuilder
+                .WithTitle("Concurrency violation detected")
+                .WithDetail("The content was modified by another operation, so the attempted operation was abandoned. Please reload and try again.")
+                .Build()),
             ContentEditingOperationStatus.InvalidName => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid name")
                 .WithDetail("One or more of the supplied names was too long. Names cannot exceed 255 characters.")

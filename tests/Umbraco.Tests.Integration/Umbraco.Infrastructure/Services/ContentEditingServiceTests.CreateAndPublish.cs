@@ -364,6 +364,7 @@ public partial class ContentEditingServiceTests
     {
         var contentType = CreateInvariantContentType();
 
+        // "title" is mandatory, so publishing is rejected while saving is not
         var createModel = new ContentCreateModel
         {
             ContentTypeKey = contentType.Key,
@@ -371,7 +372,6 @@ public partial class ContentEditingServiceTests
             Variants = [new VariantModel { Name = "The Page" }],
             Properties =
             [
-                // "title" is mandatory, so publishing is rejected while saving is not
                 new PropertyValueModel { Alias = "title", Value = null },
                 new PropertyValueModel { Alias = "text", Value = "The text" }
             ],

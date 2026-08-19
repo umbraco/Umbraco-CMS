@@ -51,10 +51,10 @@ public class PublishResultExtensionsTests
             .Where(resultType => _expectedMappings.ContainsKey(resultType) is false)
             .ToArray();
 
-        Assert.IsEmpty(
-            unaccountedFor,
-            $"Result types without an expected mapping: {string.Join(", ", unaccountedFor)}. Add the mapping to "
-            + $"{nameof(PublishResultExtensions)} and to this test's expectations.");
+        var message = $"Result types without an expected mapping: {string.Join(", ", unaccountedFor)}. "
+                      + $"Add the mapping to {nameof(PublishResultExtensions)} and to this test's expectations.";
+
+        Assert.IsEmpty(unaccountedFor, message);
     }
 
     [Test]
@@ -70,6 +70,7 @@ public class PublishResultExtensionsTests
     [Test]
     public void Never_Maps_A_Known_Result_Type_To_Unknown()
     {
+
         // "Unknown" is only the defensive fallback for a result type the mapping has not been taught about. Reaching it
         // for a known type would surface as the "unknown error, see the log" response the combined status exists to avoid.
         Assert.Multiple(() =>

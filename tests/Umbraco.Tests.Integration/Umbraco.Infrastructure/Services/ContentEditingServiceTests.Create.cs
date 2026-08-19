@@ -1100,10 +1100,10 @@ public partial class ContentEditingServiceTests
         {
             ContentTypeKey = contentType.Key,
             ParentKey = Constants.System.RootKey,
+            // only the non-default culture is too long, so a check on the entity name alone would miss it
             Variants =
             [
                 new VariantModel { Culture = "en-US", Name = "English" },
-                // only the non-default culture is too long, so a check on the entity name alone would miss it
                 new VariantModel { Culture = "da-DK", Name = new string('x', 256) }
             ],
             Properties =

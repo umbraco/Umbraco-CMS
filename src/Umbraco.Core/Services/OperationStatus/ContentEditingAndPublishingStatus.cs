@@ -6,13 +6,13 @@ namespace Umbraco.Cms.Core.Services.OperationStatus;
 public sealed class ContentEditingAndPublishingStatus
 {
     /// <summary>
-    /// Gets or sets the status of the save part of the operation.
+    /// Gets the status of the save part of the operation.
     /// </summary>
-    public ContentEditingOperationStatus ContentEditingOperationStatus { get; set; } = ContentEditingOperationStatus.Unknown;
+    public ContentEditingOperationStatus ContentEditingOperationStatus { get; init; } = ContentEditingOperationStatus.Unknown;
 
     /// <summary>
-    /// Gets or sets the status of the publish part of the operation, or <c>null</c> when publishing was not
-    /// attempted because the save did not complete.
+    /// Gets the status of the publish part of the operation, or <c>null</c> when publishing was not attempted
+    /// because the save did not complete.
     /// </summary>
-    public ContentPublishingOperationStatus? ContentPublishingOperationStatus { get; set; }
+    public ContentPublishingOperationStatus? ContentPublishingOperationStatus { get; init; }
 }
