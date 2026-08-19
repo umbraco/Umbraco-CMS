@@ -149,7 +149,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanFindChildByIdQuery()
     {
         IContent root = ContentService.GetRootContent().First();
-        IContent child = ContentService.GetPagedChildren(root.Id, 0, 10, out _, propertyAliases: null, filter: null, ordering: null).First();
+        IContent child = (await ContentService.GetChildrenAsync(root.Key, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)).Items.First();
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(child.Key.AsKeyword(), root.Key, null);
 
         Assert.Multiple(() =>
@@ -164,7 +164,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanSortAllChildrenByNameWithoutQuery(Direction direction)
     {
         IContent root = ContentService.GetRootContent().Last();
-        IEnumerable<IContent> children = ContentService.GetPagedChildren(root.Id, 0, 10, out _, propertyAliases: null, filter: null, ordering: null);
+        IEnumerable<IContent> children = (await ContentService.GetChildrenAsync(root.Key, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)).Items;
         Guid[] expectedChildrenKeys = (direction is Direction.Ascending
                 ? children.OrderBy(child => child.Name)
                 : children.OrderByDescending(child => child.Name)
@@ -185,7 +185,7 @@ public partial class ContentSearchServiceTests
     public async Task Content_CanSortAllChildrenByUpdateDateWithoutQuery(Direction direction)
     {
         IContent root = ContentService.GetRootContent().Last();
-        IEnumerable<IContent> children = ContentService.GetPagedChildren(root.Id, 0, 10, out _, propertyAliases: null, filter: null, ordering: null);
+        IEnumerable<IContent> children = (await ContentService.GetChildrenAsync(root.Key, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)).Items;
         Guid[] expectedChildrenKeys = (direction is Direction.Ascending
                 ? children.OrderBy(child => child.UpdateDate)
                 : children.OrderByDescending(child => child.UpdateDate)

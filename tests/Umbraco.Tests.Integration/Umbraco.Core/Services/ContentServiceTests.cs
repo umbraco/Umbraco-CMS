@@ -118,8 +118,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Load the children the way a collection view does: without templates or property data (#23120).
-        List<IContent> partialChildren = ContentService
-            .GetPagedChildren(Textpage.Id, 0, 100, out _, propertyAliases: [], filter: null, ordering: null, loadTemplates: false)
+        List<IContent> partialChildren = (await ContentService.GetChildrenWithoutTemplatesAsync(Textpage.Key, 0, 100, propertyAliases: [], ordering: null, CancellationToken.None))
+            .Items
             .ToList();
         Assert.That(partialChildren, Has.Count.EqualTo(3));
         Assert.Multiple(() =>
@@ -1509,8 +1509,6 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     [Test]
     public async Task Can_Publish_Content_Children()
     {
-        var parentId = Textpage.Id;
-
         var parent = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         Console.WriteLine(" " + parent.Id);
@@ -1544,15 +1542,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(parentPublished.All(x => x.Success));
         Assert.IsTrue(parent.Published);
 
-        var
-            children = ContentService.GetPagedChildren(
-                parentId,
-                0,
-                500,
-                out var totalChildren,
-                propertyAliases: null,
-                filter: null,
-                ordering: null); // we only want the first so page size, etc.. is abitrary
+        // we only want the first so page size, etc.. is abitrary
+        var children = (await ContentService.GetChildrenAsync(parent.Key, 0, 500, propertyAliases: null, ordering: null, CancellationToken.None)).Items;
 
         // children are published including ... that was released 5 mins ago
         Assert.IsTrue(children.First(x => x.Id == Subpage.Id).Published);
@@ -2781,8 +2772,8 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Act: copy the branch (recursive)
         var copy = ContentService.Copy(parent, parent.ParentId, false, recursive: true);
 
-        var childCopy = ContentService
-            .GetPagedChildren(copy!.Id, 0, 500, out _, propertyAliases: null, filter: null, ordering: null)
+        var childCopy = (await ContentService.GetChildrenAsync(copy!.Key, 0, 500, propertyAliases: null, ordering: null, CancellationToken.None))
+            .Items
             .First();
 
         // Assert against umbracoDocumentCultureVariation directly for both the root copy and the descendant copy.
@@ -2892,7 +2883,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual(3, ContentService.CountChildren(copy.Id));
 
         var child = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
-        var childCopy = ContentService.GetPagedChildren(copy.Id, 0, 500, out var total, propertyAliases: null, filter: null, ordering: null).First();
+        var childCopy = (await ContentService.GetChildrenAsync(copy.Key, 0, 500, propertyAliases: null, ordering: null, CancellationToken.None)).Items.First();
         Assert.AreEqual(childCopy.Name, child.Name);
         Assert.AreNotEqual(childCopy.Id, child.Id);
         Assert.AreNotEqual(childCopy.Key, child.Key);
@@ -3458,12 +3449,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             ContentService.Save(c1);
         }
 
-        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
+        PagedModel<IContent> page = await ContentService.GetChildrenAsync(null, 0, 6, propertyAliases: null, ordering: null, CancellationToken.None);
+        var entities = page.Items.ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
-        Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
+        Assert.That(page.Total, Is.EqualTo(10));
+        page = await ContentService.GetChildrenAsync(null, 6, 6, propertyAliases: null, ordering: null, CancellationToken.None);
+        entities = page.Items.ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
-        Assert.That(total, Is.EqualTo(10));
+        Assert.That(page.Total, Is.EqualTo(10));
     }
 
     [Test]
@@ -3496,30 +3489,34 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // children in root including the folder - not the descendants in the folder
-        var entities = ContentService.GetPagedChildren(Constants.System.Root, 0, 6, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
+        PagedModel<IContent> page = await ContentService.GetChildrenAsync(null, 0, 6, propertyAliases: null, ordering: null, CancellationToken.None);
+        var entities = page.Items.ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
-        Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(Constants.System.Root, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
+        Assert.That(page.Total, Is.EqualTo(10));
+        page = await ContentService.GetChildrenAsync(null, 6, 6, propertyAliases: null, ordering: null, CancellationToken.None);
+        entities = page.Items.ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
-        Assert.That(total, Is.EqualTo(10));
+        Assert.That(page.Total, Is.EqualTo(10));
 
         // children in folder
-        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 0, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
+        page = await ContentService.GetChildrenAsync(willHaveChildren.Key, 0, 6, propertyAliases: null, ordering: null, CancellationToken.None);
+        entities = page.Items.ToArray();
         Assert.That(entities.Length, Is.EqualTo(6));
-        Assert.That(total, Is.EqualTo(10));
-        entities = ContentService.GetPagedChildren(willHaveChildren.Id, 1, 6, out total, propertyAliases: null, filter: null, ordering: null).ToArray();
+        Assert.That(page.Total, Is.EqualTo(10));
+        page = await ContentService.GetChildrenAsync(willHaveChildren.Key, 6, 6, propertyAliases: null, ordering: null, CancellationToken.None);
+        entities = page.Items.ToArray();
         Assert.That(entities.Length, Is.EqualTo(4));
-        Assert.That(total, Is.EqualTo(10));
+        Assert.That(page.Total, Is.EqualTo(10));
     }
 
     [Test]
     public async Task GetPagedChildren_With_Null_PropertyAliases_Returns_All_Properties()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentKey = await CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - null propertyAliases should load all properties
-        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: null);
+        var retrievedChild = await GetSingleChildWithPropertyAliases(parentKey, propertyAliases: null);
 
         // Assert - All properties should have their values loaded
         Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
@@ -3531,10 +3528,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task GetPagedChildren_With_Empty_PropertyAliases_Returns_No_Property_Values()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentKey = await CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - empty propertyAliases should load no custom properties
-        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: []);
+        var retrievedChild = await GetSingleChildWithPropertyAliases(parentKey, propertyAliases: []);
 
         // Assert - Properties should not be present when propertyAliases is empty
         Assert.That(retrievedChild.Properties.Contains("title"), Is.False, "title property should not be present");
@@ -3546,10 +3543,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task GetPagedChildren_With_Single_PropertyAlias_Returns_Only_That_Property()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentKey = await CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - only "title" should be loaded
-        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title"]);
+        var retrievedChild = await GetSingleChildWithPropertyAliases(parentKey, propertyAliases: ["title"]);
 
         // Assert - Only "title" property should have its value loaded
         Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
@@ -3561,10 +3558,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task GetPagedChildren_With_Multiple_PropertyAliases_Returns_Only_Those_Properties()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentKey = await CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - "title" and "author" should be loaded, but not "bodyText"
-        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["title", "author"]);
+        var retrievedChild = await GetSingleChildWithPropertyAliases(parentKey, propertyAliases: ["title", "author"]);
 
         // Assert - Only "title" and "author" properties should have values loaded
         Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Not.Null);
@@ -3576,10 +3573,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task GetPagedChildren_With_NonExistent_PropertyAlias_Returns_No_Properties()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentKey = await CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - non-existent property alias should result in no property values
-        var retrievedChild = GetSingleChildWithPropertyAliases(parentId, propertyAliases: ["nonExistentProperty"]);
+        var retrievedChild = await GetSingleChildWithPropertyAliases(parentKey, propertyAliases: ["nonExistentProperty"]);
 
         // Assert - No property values should be loaded since the alias doesn't exist
         Assert.That(retrievedChild.Properties["title"]?.GetValue(), Is.Null);
@@ -3592,10 +3589,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task GetPagedChildren_With_LoadTemplates_True_Loads_Template()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentKey = await CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - loadTemplates: true (default) should load templates
-        var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: true);
+        var retrievedChild = await GetSingleChildWithLoadTemplates(parentKey, loadTemplates: true);
 
         // Assert - Template should be loaded
         Assert.That(retrievedChild.TemplateId, Is.Not.Null);
@@ -3605,10 +3602,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task GetPagedChildren_With_LoadTemplates_False_Does_Not_Load_Template()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentKey = await CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - loadTemplates: false should not load templates
-        var retrievedChild = GetSingleChildWithLoadTemplates(parentId, loadTemplates: false);
+        var retrievedChild = await GetSingleChildWithLoadTemplates(parentKey, loadTemplates: false);
 
         // Assert - Template should not be loaded
         Assert.That(retrievedChild.TemplateId, Is.Null);
@@ -3618,10 +3615,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task GetPagedChildren_Default_LoadTemplates_Loads_Template()
     {
         // Arrange
-        var parentId = await CreateContentWithChildForGetPagedChildrenParameterTests();
+        var parentKey = await CreateContentWithChildForGetPagedChildrenParameterTests();
 
         // Act - default (no loadTemplates specified) should load templates (backwards compatible)
-        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null).ToArray();
+        var children = (await ContentService.GetChildrenAsync(parentKey, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)).Items.ToArray();
 
         Assert.That(children.Length, Is.EqualTo(1));
 
@@ -3631,9 +3628,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     /// <summary>
     /// Creates a content type with properties (title, bodyText, author) and a parent with one child.
-    /// Returns the parent ID for use in GetPagedChildren tests.
+    /// Returns the parent key for use in GetPagedChildren tests.
     /// </summary>
-    private async Task<int> CreateContentWithChildForGetPagedChildrenParameterTests()
+    private async Task<Guid> CreateContentWithChildForGetPagedChildrenParameterTests()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -3647,33 +3644,37 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var child = ContentBuilder.CreateSimpleContent(contentType, "Child", parent.Id);
         ContentService.Save(child);
 
-        return parent.Id;
+        return parent.Key;
     }
 
     /// <summary>
-    /// Gets the single child of the parent using GetPagedChildren with the specified propertyAliases.
+    /// Gets the single child of the parent using GetChildrenAsync with the specified propertyAliases.
     /// Asserts that exactly one child is returned.
     /// </summary>
-    private IContent GetSingleChildWithPropertyAliases(int parentId, string[]? propertyAliases)
+    private async Task<IContent> GetSingleChildWithPropertyAliases(Guid parentKey, string[]? propertyAliases)
     {
-        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases, filter: null, ordering: null).ToArray();
+        PagedModel<IContent> page = await ContentService.GetChildrenAsync(parentKey, 0, 10, propertyAliases, ordering: null, CancellationToken.None);
+        var children = page.Items.ToArray();
 
         Assert.That(children.Length, Is.EqualTo(1));
-        Assert.That(total, Is.EqualTo(1));
+        Assert.That(page.Total, Is.EqualTo(1));
 
         return children[0];
     }
 
     /// <summary>
-    /// Gets the single child of the parent using GetPagedChildren with the specified loadTemplates parameter.
+    /// Gets the single child of the parent using GetChildrenAsync/GetChildrenWithoutTemplatesAsync with the specified loadTemplates parameter.
     /// Asserts that exactly one child is returned.
     /// </summary>
-    private IContent GetSingleChildWithLoadTemplates(int parentId, bool loadTemplates)
+    private async Task<IContent> GetSingleChildWithLoadTemplates(Guid parentKey, bool loadTemplates)
     {
-        var children = ContentService.GetPagedChildren(parentId, 0, 10, out var total, propertyAliases: null, filter: null, ordering: null, loadTemplates: loadTemplates).ToArray();
+        PagedModel<IContent> page = loadTemplates
+            ? await ContentService.GetChildrenAsync(parentKey, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)
+            : await ContentService.GetChildrenWithoutTemplatesAsync(parentKey, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None);
+        var children = page.Items.ToArray();
 
         Assert.That(children.Length, Is.EqualTo(1));
-        Assert.That(total, Is.EqualTo(1));
+        Assert.That(page.Total, Is.EqualTo(1));
 
         return children[0];
     }
@@ -3955,149 +3956,6 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Save again to verify the name is stable (idempotent).
         ContentService.Save(child2);
         Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
-    }
-
-    [Test]
-    [LongRunning]
-    public async Task Can_Get_Paged_Children_WithFilterAndOrder()
-    {
-        var languageService = LanguageService;
-
-        var langUk = new LanguageBuilder()
-            .WithCultureInfo("en-GB")
-            .WithIsDefault(true)
-            .WithIsMandatory(true)
-            .Build();
-        var langFr = new LanguageBuilder()
-            .WithCultureInfo("fr-FR")
-            .Build();
-        var langDa = new LanguageBuilder()
-            .WithCultureInfo("da-DK")
-            .Build();
-
-        await languageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
-        await languageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
-        await languageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
-
-        var contentTypeService = ContentTypeService;
-
-        var contentType = await ContentTypeService.GetAsync("umbTextpage");
-        contentType.Variations = ContentVariation.Culture;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-
-        int[] o = { 2, 1, 3, 0, 4 }; // randomly different
-        for (var i = 0; i < 5; i++)
-        {
-            var contentA = new Content(string.Empty, Constants.System.Root, contentType);
-            contentA.SetCultureName("contentA" + i + "uk", langUk.IsoCode);
-            contentA.SetCultureName("contentA" + o[i] + "fr", langFr.IsoCode);
-            contentA.SetCultureName("contentX" + i + "da", langDa.IsoCode);
-            ContentService.Save(contentA);
-
-            var contentB = new Content(string.Empty, Constants.System.Root, contentType);
-            contentB.SetCultureName("contentB" + i + "uk", langUk.IsoCode);
-            contentB.SetCultureName("contentB" + o[i] + "fr", langFr.IsoCode);
-            contentB.SetCultureName("contentX" + i + "da", langDa.IsoCode);
-            ContentService.Save(contentB);
-        }
-
-        // get all
-        var list = ContentService.GetPagedChildren(Constants.System.Root, 0, 100, out var total, propertyAliases: null, filter: null, ordering: null).ToList();
-
-        Console.WriteLine("ALL");
-        WriteList(list);
-
-        // 10 items (there's already a Home content in there...)
-        Assert.AreEqual(11, total);
-        Assert.AreEqual(11, list.Count);
-
-        var sqlContext = GetRequiredService<ISqlContext>();
-
-        // filter
-        list = ContentService.GetPagedChildren(
-            Constants.System.Root,
-            0,
-            100,
-            out total,
-            propertyAliases: null,
-            sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
-            Ordering.By("name", culture: langFr.IsoCode)).ToList();
-
-        Assert.AreEqual(0, total);
-        Assert.AreEqual(0, list.Count);
-
-        // filter
-        list = ContentService.GetPagedChildren(
-            Constants.System.Root,
-            0,
-            100,
-            out total,
-            propertyAliases: null,
-            sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentX")),
-            Ordering.By("name", culture: langDa.IsoCode)).ToList();
-
-        Console.WriteLine("FILTER BY NAME da:'contentX'");
-        WriteList(list);
-
-        Assert.AreEqual(10, total);
-        Assert.AreEqual(10, list.Count);
-
-        // filter
-        list = ContentService.GetPagedChildren(
-            Constants.System.Root,
-            0,
-            100,
-            out total,
-            propertyAliases: null,
-            sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
-            Ordering.By("name", culture: langFr.IsoCode)).ToList();
-
-        Console.WriteLine("FILTER BY NAME fr:'contentA', ORDER ASC");
-        WriteList(list);
-
-        Assert.AreEqual(5, total);
-        Assert.AreEqual(5, list.Count);
-
-        for (var i = 0; i < 5; i++)
-        {
-            Assert.AreEqual("contentA" + i + "fr", list[i].GetCultureName(langFr.IsoCode));
-        }
-
-        list = ContentService.GetPagedChildren(
-            Constants.System.Root,
-            0,
-            100,
-            out total,
-            propertyAliases: null,
-            sqlContext.Query<IContent>().Where(x => x.Name.Contains("contentA")),
-            Ordering.By("name", Direction.Descending, langFr.IsoCode)).ToList();
-
-        Console.WriteLine("FILTER BY NAME fr:'contentA', ORDER DESC");
-        WriteList(list);
-
-        Assert.AreEqual(5, total);
-        Assert.AreEqual(5, list.Count);
-
-        for (var i = 0; i < 5; i++)
-        {
-            Assert.AreEqual("contentA" + (4 - i) + "fr", list[i].GetCultureName(langFr.IsoCode));
-        }
-    }
-
-    private void WriteList(List<IContent> list)
-    {
-        foreach (var content in list)
-        {
-            Console.WriteLine(
-                "[{0}] {1} {2} {3} {4}",
-                content.Id,
-                content.Name,
-                content.GetCultureName("en-GB"),
-                content.GetCultureName("fr-FR"),
-                content.GetCultureName("da-DK"));
-        }
-
-        Console.WriteLine("-");
     }
 
     [Test]
@@ -4786,20 +4644,20 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             childKeys.Add(child.Key);
         }
 
-        int[] ChildIdsInSortOrder() => ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+        async Task<int[]> ChildIdsInSortOrder() => (await ContentService.GetChildrenAsync(root.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None))
+            .Items
             .OrderBy(child => child.SortOrder)
             .Select(child => child.Id)
             .ToArray();
 
         // Children were created in ascending sort order.
-        Assert.AreEqual(childIds.ToArray(), ChildIdsInSortOrder());
+        Assert.AreEqual(childIds.ToArray(), await ChildIdsInSortOrder());
 
         var reversedKeys = Enumerable.Reverse(childKeys).ToArray();
         var result = await ContentService.SortChildrenAsync(root.Key, reversedKeys, Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.IsTrue(result.Success);
-        Assert.AreEqual(Enumerable.Reverse(childIds).ToArray(), ChildIdsInSortOrder());
+        Assert.AreEqual(Enumerable.Reverse(childIds).ToArray(), await ChildIdsInSortOrder());
     }
 
     [Test]

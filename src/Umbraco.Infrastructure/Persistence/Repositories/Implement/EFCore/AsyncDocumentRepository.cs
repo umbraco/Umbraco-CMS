@@ -2217,13 +2217,23 @@ internal class AsyncDocumentRepository
                 versionPropertyDtos.AddRange(pubProps);
             }
 
-            IPropertyType[] compositionProperties = contentType?.CompositionPropertyTypes.ToArray() ?? [];
-            entity.Properties = new PropertyCollection(
-                await PropertyFactory.BuildEntities(
-                    compositionProperties,
-                    versionPropertyDtos,
-                    row.PublishedContentVersion?.Id ?? 0,
-                    LanguageRepository));
+            if (propertyAliases is { Length: 0 })
+            {
+                // Empty alias list means "no custom properties" - mirrors the NPoco path's short-circuit in
+                // ContentRepositoryBase.GetPropertyCollections, which skips property-slot creation entirely
+                // rather than creating slots with unset values.
+                entity.Properties = new PropertyCollection(new List<IProperty>());
+            }
+            else
+            {
+                IPropertyType[] compositionProperties = contentType?.CompositionPropertyTypes.ToArray() ?? [];
+                entity.Properties = new PropertyCollection(
+                    await PropertyFactory.BuildEntities(
+                        compositionProperties,
+                        versionPropertyDtos,
+                        row.PublishedContentVersion?.Id ?? 0,
+                        LanguageRepository));
+            }
 
             ApplyVariations(
                 entity,

@@ -34,8 +34,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.SortByFieldAsync(root.Key, field, direction, culture: null, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualChildKeys = ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+        var actualChildKeys = (await ContentService.GetChildrenAsync(root.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None)).Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -115,8 +114,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Ascending, culture, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualChildKeys = ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+        var actualChildKeys = (await ContentService.GetChildrenAsync(root.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None)).Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -187,8 +185,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.SortByFieldAsync(root.Key, ContentSortField.Name, Direction.Ascending, culture, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualChildKeys = ContentService
-            .GetPagedChildren(root.Id, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+        var actualChildKeys = (await ContentService.GetChildrenAsync(root.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None)).Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();
@@ -210,8 +207,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.SortByFieldAsync(parentKey: null, field, direction, culture: null, Constants.Security.SuperUserKey);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result);
 
-        var actualRootKeys = ContentService
-            .GetPagedChildren(Constants.System.Root, 0, 100, out _, propertyAliases: null, filter: null, ordering: null)
+        var actualRootKeys = (await ContentService.GetChildrenAsync(null, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None)).Items
             .OrderBy(c => c.SortOrder)
             .Select(c => c.Key)
             .ToArray();

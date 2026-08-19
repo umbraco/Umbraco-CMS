@@ -187,25 +187,6 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
 
     /// <summary>
-    ///     Gets child documents of a parent with optional property filtering.
-    /// </summary>
-    /// <param name="id">The parent identifier.</param>
-    /// <param name="pageIndex">The page number.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <param name="totalRecords">Total number of documents.</param>
-    /// <param name="propertyAliases">
-    ///     The property aliases to load. If null, all properties are loaded.
-    ///     If empty array, no custom properties are loaded.
-    /// </param>
-    /// <param name="filter">Query filter.</param>
-    /// <param name="ordering">Ordering infos.</param>
-    /// <param name="loadTemplates">
-    ///     Whether to load templates. Set to false for performance optimization when templates are not needed
-    ///     (e.g., collection views). Default is true.
-    /// </param>
-    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true);
-
-    /// <summary>
     ///     Gets a paged list of direct children of a document node.
     /// </summary>
     /// <param name="parentKey">The Guid key of the parent node, or <c>null</c> for the root of the content tree.</param>

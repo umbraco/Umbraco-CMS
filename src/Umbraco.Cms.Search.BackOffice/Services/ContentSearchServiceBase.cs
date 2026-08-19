@@ -17,19 +17,16 @@ namespace Umbraco.Cms.Search.BackOffice.Services;
 internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServiceBase, IContentSearchService<TContent>
     where TContent : class, IContentBase
 {
-    private readonly IIdKeyMap _idKeyMap;
     private readonly ISearcher _searcher;
     private readonly ILogger<ContentSearchServiceBase<TContent>> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentSearchServiceBase{TContent}"/> class.
     /// </summary>
-    /// <param name="idKeyMap">The map used to resolve between numeric IDs and keys.</param>
     /// <param name="searcher">The searcher used to query the search index.</param>
     /// <param name="logger">The logger used to record warnings when a parent key cannot be resolved.</param>
-    protected ContentSearchServiceBase(IIdKeyMap idKeyMap, ISearcher searcher, ILogger<ContentSearchServiceBase<TContent>> logger)
+    protected ContentSearchServiceBase(ISearcher searcher, ILogger<ContentSearchServiceBase<TContent>> logger)
     {
-        _idKeyMap = idKeyMap;
         _searcher = searcher;
         _logger = logger;
     }
@@ -47,18 +44,12 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
     /// <summary>
     /// Retrieves a page of children directly from the database, used when there is no search query.
     /// </summary>
-    /// <param name="parentId">The numeric ID of the parent, or the root ID for top-level content.</param>
+    /// <param name="parentId">The parent content item key, or null to search root-level content.</param>
     /// <param name="ordering">The ordering to apply.</param>
-    /// <param name="pageNumber">The zero-based page number.</param>
-    /// <param name="pageSize">The number of items per page.</param>
-    /// <param name="total">The total number of children, regardless of paging.</param>
-    /// <returns>The requested page of children.</returns>
-    protected abstract IEnumerable<TContent> SearchChildrenFromDatabase(
-        int parentId,
-        Ordering? ordering,
-        long pageNumber,
-        int pageSize,
-        out long total);
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The number of items to take.</param>
+    /// <returns>A paged model of children.</returns>
+    protected abstract Task<PagedModel<TContent>> SearchChildrenFromDatabaseAsync(Guid? parentId, Ordering? ordering, int skip, int take);
 
     /// <summary>
     /// Retrieves content items by key, used to hydrate search results with full items.
@@ -131,39 +122,6 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
         }
 
         return await SearchChildrenFromIndexAsync(query, parentId, ordering, skip, take);
-    }
-
-    /// <summary>
-    /// Retrieves a page of children directly from the database, resolving <paramref name="parentId"/> to its numeric ID.
-    /// </summary>
-    /// <param name="parentId">The parent content item key, or null to search root-level content.</param>
-    /// <param name="ordering">The ordering to apply.</param>
-    /// <param name="skip">The number of items to skip.</param>
-    /// <param name="take">The number of items to take.</param>
-    /// <returns>A paged model of content items, empty if <paramref name="parentId"/> could not be resolved.</returns>
-    private async Task<PagedModel<TContent>> SearchChildrenFromDatabaseAsync(Guid? parentId, Ordering? ordering, int skip, int take)
-    {
-        var parentIdAsInt = Constants.System.Root;
-        if (parentId.HasValue)
-        {
-            Attempt<int> keyToId = await _idKeyMap.GetIdForKeyAsync(parentId.Value, ObjectType);
-            if (keyToId.Success is false)
-            {
-                _logger.LogWarning("Could not obtain an ID for parent key: {parentId} (object type: {contentType}", parentId, typeof(TContent).FullName);
-                return new PagedModel<TContent>(0, []);
-            }
-
-            parentIdAsInt = keyToId.Result;
-        }
-
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
-        IEnumerable<TContent> items = SearchChildrenFromDatabase(parentIdAsInt, ordering, pageNumber, pageSize, out var total);
-        return new PagedModel<TContent>
-        {
-            Items = items,
-            Total = total,
-        };
     }
 
     /// <summary>

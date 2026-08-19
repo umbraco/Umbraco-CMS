@@ -377,7 +377,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Utils
 
         private IEnumerable<IContent> Children(IContent content)
-            => ContentService.GetPagedChildren(content.Id, 0, int.MaxValue, out _, propertyAliases: null, filter: null, ordering: null);
+            => ContentService.GetChildrenAsync(content.Key, 0, int.MaxValue, propertyAliases: null, ordering: null, CancellationToken.None).GetAwaiter().GetResult().Items;
 
         #endregion
 

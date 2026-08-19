@@ -652,7 +652,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Arrange
         var root = await CreateRootContentWithFiveChildrenAsListViewItems();
 
-        var allChildren = ContentService.GetPagedChildren(root.Id, 0, 10, out _, propertyAliases: null, filter: null, ordering: null).ToArray();
+        var allChildren = (await ContentService.GetChildrenAsync(root.Key, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)).Items.ToArray();
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
@@ -949,7 +949,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
     {
         // Arrange
         var root = await CreateRootContentWithFiveChildrenAsListViewItems();
-        var children = ContentService.GetPagedChildren(root.Id, 0, 10, out _, null, null, null, true).ToArray();
+        var children = (await ContentService.GetChildrenAsync(root.Key, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)).Items.ToArray();
         Assert.AreEqual(5, children.Length);
 
         // Create user group with Browse as default permission, start node = collection root

@@ -415,30 +415,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         GetAncestorsAsync(content.Key, skip, take, cancellationToken);
 
     /// <inheritdoc />
-    public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, string[]? propertyAliases, IQuery<IContent>? filter, Ordering? ordering, bool loadTemplates = true)
-    {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        ordering ??= Ordering.By("sortOrder");
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-
-            IQuery<IContent>? query = Query<IContent>()?.Where(x => x.ParentId == id);
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases, filter, ordering, loadTemplates);
-        }
-    }
-
-    /// <inheritdoc />
     public async Task<PagedModel<IContent>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);

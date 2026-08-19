@@ -105,7 +105,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
             indexInfo,
             UmbracoObjectTypes.Document,
             () => _contentService.GetRootContent(),
-            (pageIndex, pageSize) => _contentService.GetPagedChildren(Cms.Core.Constants.System.RecycleBinContent, pageIndex, pageSize, out _, propertyAliases: null, filter: null, ordering: null),
+            async (pageIndex, pageSize) => (await _contentService.GetChildrenWithoutTemplatesAsync(Cms.Core.Constants.System.RecycleBinContentKey, pageIndex * pageSize, pageSize, propertyAliases: null, ordering: null, cancellationToken)).Items,
             cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
@@ -118,7 +118,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
             indexInfo,
             UmbracoObjectTypes.Media,
             () => _mediaService.GetRootMedia(),
-            (pageIndex, pageSize) => _mediaService.GetPagedChildren(Cms.Core.Constants.System.RecycleBinMedia, pageIndex, pageSize, out _),
+            (pageIndex, pageSize) => Task.FromResult<IEnumerable<IContentBase>>(_mediaService.GetPagedChildren(Cms.Core.Constants.System.RecycleBinMedia, pageIndex, pageSize, out _)),
             cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
@@ -276,7 +276,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         ContentIndexInfo indexInfo,
         UmbracoObjectTypes objectType,
         Func<IEnumerable<IContentBase>> getContentAtRoot,
-        Func<int, int, IEnumerable<IContentBase>> getPagedContentAtRecycleBinRoot,
+        Func<int, int, Task<IEnumerable<IContentBase>>> getPagedContentAtRecycleBinRoot,
         CancellationToken cancellationToken)
     {
         if (indexInfo.ContainedObjectTypes.Contains(objectType) is false)
@@ -317,7 +317,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
                 break;
             }
 
-            contentInRecycleBin = getPagedContentAtRecycleBinRoot(pageIndex, ContentEnumerationPageSize).ToArray();
+            contentInRecycleBin = (await getPagedContentAtRecycleBinRoot(pageIndex, ContentEnumerationPageSize)).ToArray();
             foreach (IContentBase content in contentInRecycleBin)
             {
                 if (cancellationToken.IsCancellationRequested)
