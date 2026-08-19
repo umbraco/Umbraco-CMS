@@ -241,7 +241,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
         Assert.AreEqual(0, database.SqlCount);
     }
 
-    private IElement CreateElement(ElementRepository repository, ContentTypeRepository contentTypeRepository)
+    private static Element CreateElement(ElementRepository repository, ContentTypeRepository contentTypeRepository)
     {
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
         contentTypeRepository.Save(elementType);
@@ -705,17 +705,14 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
 
         var elements = repository.GetMany().ToArray();
         Assert.That(elements, Is.Not.Null);
-        Assert.That(elements.Any(), Is.True);
         Assert.That(elements.Length, Is.GreaterThanOrEqualTo(2));
 
         elements = repository.GetMany(elements.Select(x => x.Id).ToArray()).ToArray();
         Assert.That(elements, Is.Not.Null);
-        Assert.That(elements.Any(), Is.True);
         Assert.That(elements.Length, Is.GreaterThanOrEqualTo(2));
 
         elements = ((IReadRepository<Guid, IElement>)repository).GetMany(elements.Select(x => x.Key).ToArray()).ToArray();
         Assert.That(elements, Is.Not.Null);
-        Assert.That(elements.Any(), Is.True);
         Assert.That(elements.Length, Is.GreaterThanOrEqualTo(2));
     }
 
@@ -743,7 +740,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             Assert.AreNotEqual(0, element.VersionId);
             Assert.AreEqual(elementType.Id, element.ContentTypeId);
             Assert.That(element.Path, Is.Not.Empty);
-            Assert.That(element.Properties.Any(), Is.True);
+            Assert.That(element.Properties.Count, Is.Not.Zero);
         });
     }
 
@@ -916,7 +913,7 @@ public class ElementRepositoryTest : UmbracoIntegrationTest
             var isInvariant = i % 2 == 0;
             var name = (isInvariant ? "INV" : "VAR") + "_" + Guid.NewGuid();
 
-            IElement element = isInvariant
+            Element element = isInvariant
                 ? ElementBuilder.CreateSimpleElement(invariantElementType, name)
                 : ElementBuilder.CreateBasicElement(variantElementType);
 
