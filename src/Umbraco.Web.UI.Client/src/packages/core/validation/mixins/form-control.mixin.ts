@@ -144,6 +144,14 @@ export function UmbFormControlMixin<
 		public set pristine(value: boolean) {
 			if (this._pristine !== value) {
 				this._pristine = value;
+				if (value === false) {
+					// Loop over all connected form control elements and set their pristine state to the same value. [NL]
+					this.#formCtrlElements.forEach((el: any) => {
+						if ('pristine' in el && typeof el.pristine === 'boolean' && el.pristine !== value) {
+							el.pristine = value;
+						}
+					});
+				}
 			}
 		}
 		public get pristine(): boolean {
@@ -381,12 +389,20 @@ export function UmbFormControlMixin<
 			this.#dispatchValidationState();
 		}
 
+		#lastEventType: string | undefined = undefined;
 		#dispatchValidationState() {
-			// Do not fire validation events unless we are not pristine/'untouched'/not-in-validation-mode. [NL]
-			if (this._pristine === true) return;
-			if (this.#validity.valid) {
+			// While pristine/'untouched'/not-in-validation-mode, no invalid-feedback should be visible yet, so this
+			// reports Valid regardless of the actual validity — that isn't just suppressing the Invalid event:
+			// listeners (e.g. `umb-form-validation-message`) need the Valid event to clear a message they showed
+			// earlier, from before this control (or the dataPath it now validates) went pristine again — for
+			// instance when a property control is reused across a variant switch. [NL]
+			if (this._pristine === true || this.#validity.valid) {
+				if (this.#lastEventType === UmbValidationValidEvent.TYPE) return;
+				this.#lastEventType = UmbValidationValidEvent.TYPE;
 				this.dispatchEvent(new UmbValidationValidEvent());
 			} else {
+				if (this.#lastEventType === UmbValidationInvalidEvent.TYPE) return;
+				this.#lastEventType = UmbValidationInvalidEvent.TYPE;
 				this.dispatchEvent(new UmbValidationInvalidEvent());
 			}
 		}

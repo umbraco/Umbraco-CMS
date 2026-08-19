@@ -13,6 +13,9 @@ class UmbTestFormControlElement extends UmbFormControlMixin(UmbLitElement) {
 	public passCustomValidation() {
 		this.setCustomValidity(undefined);
 	}
+	public addChildControl(child: UmbTestFormControlElement) {
+		this.addFormControlElement(child as any);
+	}
 }
 
 describe('UmbFormControlMixin', () => {
@@ -29,10 +32,14 @@ describe('UmbFormControlMixin', () => {
 		await element.updateComplete;
 	}
 
-	beforeEach(async () => {
-		element = await fixture(html`<umb-test-form-control></umb-test-form-control>`);
+	function resetCounts() {
 		validEvents = 0;
 		invalidEvents = 0;
+	}
+
+	beforeEach(async () => {
+		element = await fixture(html`<umb-test-form-control></umb-test-form-control>`);
+		resetCounts();
 		element.addEventListener(UmbValidationValidEvent.TYPE, () => validEvents++);
 		element.addEventListener(UmbValidationInvalidEvent.TYPE, () => invalidEvents++);
 	});
@@ -60,7 +67,15 @@ describe('UmbFormControlMixin', () => {
 
 	describe('going non-pristine while no validator fails', () => {
 		it('reports Valid', async () => {
+			// Establish a known baseline first: mounting the element already reports Valid once (nothing has
+			// failed yet), and the de-duplication below (see 'does not repeat...') would otherwise silently
+			// swallow a second, identical Valid report. Driving an Invalid report first makes the transition back
+			// to Valid an actual change, so it's guaranteed to be dispatched regardless of that de-duplication.
+			element.failCustomValidation('Required');
 			await setPristine(false);
+			resetCounts();
+
+			element.passCustomValidation();
 
 			expect(element.validity.valid).to.be.true;
 			expect(validEvents).to.equal(1);
@@ -68,7 +83,6 @@ describe('UmbFormControlMixin', () => {
 	});
 
 	describe('going pristine again while still failing validation', () => {
-		// Bad comment:
 		// This is the general rule behind the fix: pristine means "no validation feedback should be visible for
 		// this control right now" — regardless of whether it happens to still be invalid underneath. A caller that
 		// resets `pristine` back to true (e.g. a validator rebinding to a dataPath that currently has no known
@@ -79,8 +93,8 @@ describe('UmbFormControlMixin', () => {
 			element.failCustomValidation('Required');
 			await setPristine(false);
 			expect(invalidEvents).to.equal(1);
+			resetCounts();
 
-			validEvents = 0;
 			await setPristine(true);
 
 			expect(element.validity.valid).to.be.false; // still genuinely invalid underneath.
@@ -88,19 +102,76 @@ describe('UmbFormControlMixin', () => {
 		});
 	});
 
-	describe('going pristine again once actually valid', () => {
-		it('reports Valid', async () => {
+	describe('going pristine again once already reporting Valid', () => {
+		it('does not need to report Valid again — the earlier report already covered it', async () => {
+			element.failCustomValidation('Required');
+			await setPristine(false);
+			expect(invalidEvents).to.equal(1);
+
+			// Becoming actually valid while still non-pristine already reports Valid once — clearing any stale
+			// feedback there and then, same as the "going non-pristine while no validator fails" case above.
+			element.passCustomValidation();
+			expect(validEvents).to.equal(1);
+			resetCounts();
+
+			// So going pristine again afterwards is correctly deduped: there is nothing new to tell listeners,
+			// since they were already told Valid a moment ago.
+			await setPristine(true);
+
+			expect(element.validity.valid).to.be.true;
+			expect(validEvents).to.equal(0);
+		});
+	});
+
+	describe('repeated reports of the same validation state', () => {
+		it('does not repeat the same event type on consecutive, unchanged reports', async () => {
+			element.failCustomValidation('Required');
+			await setPristine(false);
+			expect(invalidEvents).to.equal(1);
+
+			// Re-running validation without anything about the outcome changing (still non-pristine, still
+			// invalid, same message) must not dispatch a second Invalid event.
+			element.failCustomValidation('Required');
+
+			expect(invalidEvents).to.equal(1);
+		});
+
+		it('does dispatch again once the state actually changes back', async () => {
 			element.failCustomValidation('Required');
 			await setPristine(false);
 			expect(invalidEvents).to.equal(1);
 
 			element.passCustomValidation();
-			validEvents = 0; // reset — passCustomValidation() itself already reports Valid while still non-pristine.
+
+			expect(validEvents).to.equal(1);
+		});
+	});
+
+	describe('going non-pristine', () => {
+		it('cascades pristine=false onto nested form control elements', async () => {
+			const child = await fixture<UmbTestFormControlElement>(html`<umb-test-form-control></umb-test-form-control>`);
+			element.addChildControl(child);
+			expect(child.pristine).to.be.true;
+
+			await setPristine(false);
+
+			expect(child.pristine).to.be.false;
+		});
+	});
+
+	describe('going pristine again', () => {
+		it('does NOT cascade pristine=true onto nested form control elements', async () => {
+			// Asymmetric by design: a nested control that has already been revealed as dirty/invalid must not be
+			// silently hidden again just because its container was reset — only the container's own pristine state
+			// is under this setter's control.
+			const child = await fixture<UmbTestFormControlElement>(html`<umb-test-form-control></umb-test-form-control>`);
+			element.addChildControl(child);
+			await setPristine(false);
+			expect(child.pristine).to.be.false;
 
 			await setPristine(true);
 
-			expect(element.validity.valid).to.be.true;
-			expect(validEvents).to.equal(1);
+			expect(child.pristine).to.be.false;
 		});
 	});
 });
