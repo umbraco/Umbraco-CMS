@@ -28,9 +28,18 @@ export class UmbFormControlValidator extends UmbControllerBase implements UmbVal
 				this.#context.removeValidator(this);
 			}
 			this.#context = context;
+			/**
+			Bad comment:
+			// A message can already exist for this dataPath — e.g. a client message left behind by a validator that
+			// previously watched this same path. Seed #isValid from that reality before registering, otherwise a
+			// later, genuine transition to valid finds #isValid already (wrongly) true and skips removing it. [NL]
+			 */
+			// If a message already exists for this dataPath, then the control should not be valid.
+			// Note this can be a client validation from previously that stated invalid, or it can be an external validation message; like server validation. [NL]
+			this.#isValid = !dataPath || !context?.messages?.getHasMessagesOfPathAndDescendant(dataPath);
 			context?.addValidator(this);
 			// If we have a message already, then un-pristine the control:
-			if (dataPath && context?.messages?.getHasMessagesOfPathAndDescendant(dataPath)) {
+			if (!this.#isValid) {
 				formControl.pristine = false;
 			}
 		});
