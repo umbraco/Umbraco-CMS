@@ -8,25 +8,17 @@ import {
 	keyed,
 	nothing,
 	query,
-	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
-import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import {
-	UmbPickerContext,
-	UmbPickerModalBaseElement,
-	type UmbPickerSearchFieldElement,
-} from '@umbraco-cms/backoffice/picker';
-import { UmbTreeItemOpenEvent, UmbTreeItemPickerExpansionManager } from '@umbraco-cms/backoffice/tree';
-import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
+import { UmbTreeItemOpenEvent, UmbTreeItemPickerContext } from '@umbraco-cms/backoffice/tree';
 import type {
-	ManifestTree,
 	UmbTreeElement,
 	UmbTreeItemModel,
 	UmbTreeItemModelBase,
-	UmbTreeRepository,
+	UmbTreeItemPickerLocation,
 	UmbTreeSelectionConfiguration,
 	UmbTreeStartNode,
 } from '@umbraco-cms/backoffice/tree';
@@ -42,23 +34,7 @@ import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interact
 
 const TREE_MEMORY_UNIQUE = 'UmbTreeItemPickerTree';
 const COLLECTION_MEMORY_UNIQUE = 'UmbItemPickerCollection';
-const LOCATION_MEMORY_UNIQUE = 'UmbTreeItemPickerLocation';
 const ROOT_MEMORY_KEY = 'root';
-
-/**
- * The node currently being browsed, together with the collection it configures. The two travel as one value so the
- * renderer and the configuration can never disagree about which node they describe.
- */
-type UmbContentPickerLocation = UmbTreeStartNode & {
-	collectionUnique?: string;
-};
-
-interface UmbContentPickerBreadcrumbItem {
-	unique: string | null;
-	entityType: string;
-	name: string;
-	collectionUnique?: string;
-}
 
 /**
  * The part of a content tree item this modal reads to decide how a node's children render. A content tree that does
@@ -69,17 +45,6 @@ type UmbContentTreeItemLike = {
 		collection?: { unique: string } | null;
 	};
 };
-
-/**
- * The same composition as `UmbTreeItemPickerContext`, which cannot be imported here: it is not exported from
- * `@umbraco-cms/backoffice/tree`, and exporting it would put the tree barrel into a cycle with the picker package,
- * which already depends on this one.
- */
-class UmbContentPickerContext extends UmbPickerContext {
-	public readonly expansion = new UmbTreeItemPickerExpansionManager(this, {
-		interactionMemoryManager: this.interactionMemory,
-	});
-}
 
 /**
  * A picker that browses content, rendering a collection at any level whose node has one configured and the tree
@@ -129,10 +94,16 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 	private _collectionInteractionMemories?: Array<UmbInteractionMemoryModel>;
 
 	@state()
-	private _currentLocation?: UmbContentPickerLocation;
+	private _currentLocation?: UmbTreeItemPickerLocation;
 
+	/**
+	 * The location as `<umb-tree>` wants it: the tree root is expressed by having no start node.
+	 *
+	 * Held as state rather than derived per render, because `setStartNode` clears and reloads the tree whenever the
+	 * property changes identity — a fresh object each render would reload it on every unrelated update.
+	 */
 	@state()
-	private _breadcrumb: Array<UmbContentPickerBreadcrumbItem> = [];
+	private _treeStartNode?: UmbTreeStartNode;
 
 	@state()
 	private _hasCollection = false;
@@ -145,11 +116,6 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 
 	@state()
 	private _treeAlias?: string;
-	private _initialStartNode?: UmbTreeStartNode;
-	private _repository?: UmbTreeRepository;
-	private _breadcrumbLoaded = false;
-	private _breadcrumbLoadPromise?: Promise<void>;
-	private _rootEntityType?: string;
 
 	/**
 	 * Answers `UMB_ENTITY_CONTEXT` for the node being browsed. Without it the collection would bind to the entity of
@@ -161,7 +127,7 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 
 	#collectionMemories: Array<UmbInteractionMemoryModel> = [];
 
-	protected _pickerContext = new UmbContentPickerContext(this);
+	protected _pickerContext = new UmbTreeItemPickerContext(this);
 
 	constructor() {
 		super();
@@ -179,6 +145,7 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 		this.#observeTreeInteractionMemories();
 		this.#observeCollectionInteractionMemories();
 		this.#observeCollectionConfiguration();
+		this.#observeLocation();
 	}
 
 	override connectedCallback(): void {
@@ -232,12 +199,8 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 
 			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
 				this._treeAlias = this.data.treeAlias;
-				this._initialStartNode = this.data.startNode;
-				this._currentLocation = this.data.startNode;
-				this._breadcrumb = [];
-				this._breadcrumbLoaded = false;
-				this._breadcrumbLoadPromise = undefined;
-				this.#initRepository(this.data.treeAlias);
+				this._pickerContext.location.setStartNode(this.data.startNode);
+				this._pickerContext.location.setTreeAlias(this.data.treeAlias);
 			}
 
 			if (this.data?.treeExpansion !== undefined) {
@@ -259,102 +222,11 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 		}
 	}
 
-	#initRepository(treeAlias: string) {
-		const treeManifest = umbExtensionsRegistry.getByAlias<ManifestTree>(treeAlias);
-		const repositoryAlias = treeManifest?.meta?.repositoryAlias;
-		if (!repositoryAlias) return;
-
-		new UmbExtensionApiInitializer<ManifestRepository<UmbTreeRepository>>(
-			this,
-			umbExtensionsRegistry,
-			repositoryAlias,
-			[this],
-			async (permitted, ctrl) => {
-				this._repository = permitted ? ctrl.api : undefined;
-				if (this._repository && !this._breadcrumbLoaded) {
-					this._breadcrumbLoaded = true;
-					this._breadcrumbLoadPromise = this.#loadInitialBreadcrumb();
-					await this._breadcrumbLoadPromise;
-					await this.#restoreLocationFromMemory();
-				}
-			},
-		);
-	}
-
-	async #loadInitialBreadcrumb() {
-		if (!this._repository) return;
-
-		if (this._initialStartNode) {
-			const { data } = await this._repository.requestTreeItemAncestors({
-				treeItem: this._initialStartNode,
-			});
-			const items = data ?? [];
-			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
-			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
-			this._breadcrumb = sliced.map((item) => this.#toBreadcrumbItem(item));
-			this._currentLocation = this.#toLocation(this._initialStartNode, items);
-		} else {
-			const { data: root } = await this._repository.requestTreeRoot();
-			if (root) {
-				this._rootEntityType = root.entityType;
-				this._breadcrumb = [{ unique: null, entityType: root.entityType, name: root.name }];
-				this.#resolveLocation();
-			}
-		}
-	}
-
 	#onItemOpen = async (event: UmbTreeItemOpenEvent) => {
 		event.stopPropagation();
 		const { unique, entityType } = event;
-		await this.#navigateToLocation({ unique, entityType });
-		this.#setLocationInInteractionMemory();
+		await this._pickerContext.location.navigateTo({ unique, entityType });
 	};
-
-	async #navigateToLocation(entity: UmbTreeStartNode) {
-		if (!this._repository) {
-			this._currentLocation = entity;
-			return;
-		}
-
-		await this._breadcrumbLoadPromise;
-
-		const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
-		const items = data ?? [];
-
-		if (this._initialStartNode) {
-			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
-			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
-			this._breadcrumb = sliced.map((item) => this.#toBreadcrumbItem(item));
-		} else {
-			const root = this._breadcrumb[0];
-			this._breadcrumb = [...(root ? [root] : []), ...items.map((item) => this.#toBreadcrumbItem(item))];
-		}
-
-		// Assigned once, and only once the ancestors are known, so the renderer never shows a node under the previous
-		// node's configuration.
-		this._currentLocation = this.#toLocation(entity, items);
-	}
-
-	/**
-	 * The ancestors response ends with the requested item itself, which is where a node's own collection reference is
-	 * read from.
-	 * @param {UmbTreeStartNode} entity - The node being browsed.
-	 * @param {Array<UmbTreeItemModel>} ancestors - The ancestors response for that node.
-	 * @returns {UmbContentPickerLocation} The location to browse.
-	 */
-	#toLocation(entity: UmbTreeStartNode, ancestors: Array<UmbTreeItemModel>): UmbContentPickerLocation {
-		const self = ancestors.find((item) => item.unique === entity.unique);
-		return { ...entity, collectionUnique: this.#getCollectionUnique(self) };
-	}
-
-	#toBreadcrumbItem(item: UmbTreeItemModel): UmbContentPickerBreadcrumbItem {
-		return {
-			unique: item.unique,
-			entityType: item.entityType,
-			name: item.name,
-			collectionUnique: this.#getCollectionUnique(item),
-		};
-	}
 
 	#getCollectionUnique(item?: UmbTreeItemModel): string | undefined {
 		return (item as (UmbTreeItemModel & UmbContentTreeItemLike) | undefined)?.contentType?.collection?.unique;
@@ -367,65 +239,26 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 	#resolveLocation() {
 		const location = this._currentLocation;
 
-		this.#entityContext.setEntityType(location?.entityType ?? this._rootEntityType);
+		this.#entityContext.setEntityType(location?.entityType);
 		this.#entityContext.setUnique(location?.unique ?? null);
 
 		this.#collectionConfiguration.setUnique(location?.unique ?? null);
-		this.#collectionConfiguration.setDataTypeUnique(location?.collectionUnique);
+		this.#collectionConfiguration.setDataTypeUnique(this.#getCollectionUnique(location?.treeItem));
 
 		this.#updateCollectionInteractionMemories();
 	}
 
-	#setLocationInInteractionMemory() {
-		if (!this._currentLocation) {
-			this._pickerContext.interactionMemory.deleteMemory(LOCATION_MEMORY_UNIQUE);
-			return;
-		}
-		const memory: UmbInteractionMemoryModel = {
-			unique: LOCATION_MEMORY_UNIQUE,
-			value: {
-				entity: {
-					unique: this._currentLocation.unique,
-					entityType: this._currentLocation.entityType,
-				},
+	#observeLocation() {
+		this.observe(
+			this._pickerContext.location.currentLocation,
+			(location) => {
+				this._currentLocation = location;
+				this._treeStartNode = location?.unique
+					? { unique: location.unique, entityType: location.entityType }
+					: undefined;
 			},
-		};
-		this._pickerContext.interactionMemory.setMemory(memory);
-	}
-
-	#getLocationFromInteractionMemory(): UmbTreeStartNode | undefined {
-		const memory = this._pickerContext.interactionMemory.getMemory(LOCATION_MEMORY_UNIQUE);
-		return memory?.value?.entity;
-	}
-
-	async #restoreLocationFromMemory() {
-		const entity = this.#getLocationFromInteractionMemory();
-		if (!entity || !this._repository) return;
-
-		if (this._initialStartNode) {
-			const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
-			const isWithinStartNode = (data ?? []).some((a) => a.unique === this._initialStartNode!.unique);
-			if (!isWithinStartNode) return;
-		}
-
-		await this.#navigateToLocation(entity);
-	}
-
-	#onBreadcrumbItemClick(index: number) {
-		if (index === this._breadcrumb.length - 1) return;
-
-		const item = this._breadcrumb[index];
-		if (index === 0 && !this._initialStartNode) {
-			this._currentLocation = undefined;
-		} else {
-			this._currentLocation = {
-				unique: item.unique!,
-				entityType: item.entityType,
-				collectionUnique: item.collectionUnique,
-			};
-		}
-		this._breadcrumb = this._breadcrumb.slice(0, index + 1);
-		this.#setLocationInInteractionMemory();
+			'umbContentPickerLocationObserver',
+		);
 	}
 
 	#observePickerSelection() {
@@ -627,6 +460,9 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 	}
 
 	#renderChildren() {
+		// Which renderer a level needs is only known once the location is, and mounting the tree in the meantime would
+		// tear it down again mid-initialisation.
+		if (!this._currentLocation) return html`<umb-view-loader></umb-view-loader>`;
 		if (!this._hasCollection) return this.#renderTree();
 		// The configuration is resolved from a data type, so the collection is held back rather than briefly showing
 		// the tree in its place.
@@ -645,7 +481,7 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 					selectionConfiguration: this._selectionConfiguration,
 					filter: this.data?.filter,
 					selectableFilter: this.data?.pickableFilter,
-					startNode: this._currentLocation,
+					startNode: this._treeStartNode,
 					foldersOnly: this.data?.foldersOnly,
 					expansion: this._treeExpansion,
 					interactionMemories: this._treeInteractionMemories,
@@ -681,25 +517,7 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 	}
 
 	#renderBreadcrumb() {
-		if (!this._breadcrumb.length) return nothing;
-
-		return html`
-			<div id="breadcrumb">
-				<uui-breadcrumbs>
-					${repeat(
-						this._breadcrumb,
-						(item) => item.unique ?? ROOT_MEMORY_KEY,
-						(item, index) => html`
-							<uui-breadcrumb-item
-								?last-item=${index === this._breadcrumb.length - 1}
-								@click=${() => this.#onBreadcrumbItemClick(index)}>
-								${this.localize.string(item.name)}
-							</uui-breadcrumb-item>
-						`,
-					)}
-				</uui-breadcrumbs>
-			</div>
-		`;
+		return html`<umb-tree-item-picker-breadcrumb id="breadcrumb"></umb-tree-item-picker-breadcrumb>`;
 	}
 
 	#renderSelectionCount() {
