@@ -38,6 +38,10 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@property({ attribute: false })
 	public overrides?: Array<UmbDeepPartialObject<ManifestWorkspaceView>>;
 
+	// TODO: Verify that this is needed for this fix. [NL]
+	@property({ attribute: false })
+	public hasCustomVariantSelector?: boolean;
+
 	@property({ type: Number })
 	public set splitViewIndex(index: number) {
 		this.splitViewContext.setSplitViewIndex(index);
@@ -105,7 +109,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 				<slot id="icon" name="icon" slot="header"></slot>
 				<slot id="header" name="variant-selector" slot="header" @slotchange=${this.#onVariantSelectorSlotChanged}>
 					${when(
-						!this._variantSelectorSlotHasContent,
+						!this.hasCustomVariantSelector && !this._variantSelectorSlotHasContent,
 						() => html`<umb-workspace-split-view-variant-selector></umb-workspace-split-view-variant-selector>`,
 					)}
 				</slot>
