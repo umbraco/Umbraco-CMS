@@ -106,7 +106,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
     {
         // Arrange
         var root = await CreateRootContentWithFiveChildrenAsListViewItems();
-        var descendants = ContentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _);
+        var descendants = (await ContentService.GetDescendantsAsync(root.Key, 0, int.MaxValue, ordering: null, CancellationToken.None)).Items;
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
@@ -294,7 +294,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
     {
         // Arrange
         var root = await CreateRootContentWithFiveChildrenAndListViewProperty();
-        var descendants = ContentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _);
+        var descendants = (await ContentService.GetDescendantsAsync(root.Key, 0, int.MaxValue, ordering: null, CancellationToken.None)).Items;
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
@@ -477,7 +477,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
     {
         // Arrange
         var root = await CreateRootContentWithFiveChildrenAsListViewItems();
-        var descendants = ContentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _);
+        var descendants = (await ContentService.GetDescendantsAsync(root.Key, 0, int.MaxValue, ordering: null, CancellationToken.None)).Items;
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
@@ -521,7 +521,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
     {
         // Arrange
         var root = await CreateVariantRootContentWithFiveChildrenAsListViewItems(Constants.DataTypes.Guids.ListViewContentGuid);
-        var descendants = ContentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _);
+        var descendants = (await ContentService.GetDescendantsAsync(root.Key, 0, int.MaxValue, ordering: null, CancellationToken.None)).Items;
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
@@ -561,7 +561,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Arrange
         const string orderByField = "sortOrder";
         var root = await CreateRootContentWithFiveChildrenAndListViewProperty();
-        var descendants = ContentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _);
+        var descendants = (await ContentService.GetDescendantsAsync(root.Key, 0, int.MaxValue, ordering: null, CancellationToken.None)).Items;
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
@@ -607,7 +607,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Arrange
         const string orderByField = "price";
         var root = await CreateRootContentWithFiveChildrenAndListViewProperty();
-        var descendants = ContentService.GetPagedDescendants(root.Id, 0, int.MaxValue, out _);
+        var descendants = (await ContentService.GetDescendantsAsync(root.Key, 0, int.MaxValue, ordering: null, CancellationToken.None)).Items;
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(

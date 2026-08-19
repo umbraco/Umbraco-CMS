@@ -1,9 +1,6 @@
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Search.Core.Models.Indexing;
 
 namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
@@ -13,8 +10,6 @@ namespace Umbraco.Cms.Search.Core.Services.ContentIndexing;
 /// </summary>
 internal abstract class ContentChangeStrategyBase
 {
-    private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
-    private readonly IIdKeyMap _idKeyMap;
     private readonly ILogger<ContentChangeStrategyBase> _logger;
 
     /// <summary>
@@ -30,16 +25,9 @@ internal abstract class ContentChangeStrategyBase
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentChangeStrategyBase"/> class.
     /// </summary>
-    /// <param name="umbracoDatabaseFactory">The database factory used to build queries for paged descendant enumeration.</param>
-    /// <param name="idKeyMap">The map used to resolve a root item's key to its numeric ID.</param>
-    /// <param name="logger">The logger used to record unresolvable root IDs and rebuild cancellations.</param>
-    protected ContentChangeStrategyBase(
-        IUmbracoDatabaseFactory umbracoDatabaseFactory,
-        IIdKeyMap idKeyMap,
-        ILogger<ContentChangeStrategyBase> logger)
+    /// <param name="logger">The logger used to record rebuild cancellations.</param>
+    protected ContentChangeStrategyBase(ILogger<ContentChangeStrategyBase> logger)
     {
-        _umbracoDatabaseFactory = umbracoDatabaseFactory;
-        _idKeyMap = idKeyMap;
         _logger = logger;
     }
 
@@ -47,41 +35,26 @@ internal abstract class ContentChangeStrategyBase
     /// Pages through the descendants of a root item ordered by path, invoking <paramref name="actionToPerform"/> for each page.
     /// </summary>
     /// <typeparam name="T">The content type being enumerated.</typeparam>
-    /// <param name="objectType">The object type of the root item, used to resolve its numeric ID.</param>
     /// <param name="rootId">The key of the root item to enumerate descendants of.</param>
-    /// <param name="getPagedDescendants">Fetches a page of descendants given the root's numeric ID, page index, page size, query and ordering.</param>
+    /// <param name="getPagedDescendants">Fetches a page of descendants given the root's key, skip, take and ordering.</param>
     /// <param name="actionToPerform">The action to invoke for each page of descendants.</param>
     protected async Task EnumerateDescendantsByPath<T>(
-        UmbracoObjectTypes objectType,
         Guid rootId,
-        Func<int, int, int, IQuery<T>, Ordering, T[]> getPagedDescendants,
+        Func<Guid, int, int, Ordering, Task<T[]>> getPagedDescendants,
         Func<T[], Task> actionToPerform)
         where T : IContentBase
     {
-        Attempt<int> rootIdAttempt = await _idKeyMap.GetIdForKeyAsync(rootId, objectType);
-        if (rootIdAttempt.Success is false)
-        {
-            _logger.LogWarning("Could not resolve ID for {objectType} item {rootId} - aborting enumerations of descendants.", objectType, rootId);
-            return;
-        }
-
-        var pageIndex = 0;
-
+        var skip = 0;
         T[] descendants;
-
-        IQuery<T> query = _umbracoDatabaseFactory.SqlContext.Query<T>();
-        if (SupportsTrashedContent is false)
-        {
-            query = query.Where(content => content.Trashed == false);
-        }
+        Ordering ordering = Ordering.By("Path");
 
         do
         {
-            descendants = getPagedDescendants(rootIdAttempt.Result, pageIndex, ContentEnumerationPageSize, query, Ordering.By("Path"));
+            descendants = await getPagedDescendants(rootId, skip, ContentEnumerationPageSize, ordering);
 
-            await actionToPerform(descendants.ToArray());
+            await actionToPerform(descendants);
 
-            pageIndex++;
+            skip += ContentEnumerationPageSize;
         }
         while (descendants.Length == ContentEnumerationPageSize);
     }

@@ -417,6 +417,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <inheritdoc />
     public async Task<PagedModel<IContent>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
     {
+        ordering ??= Ordering.By("sortOrder");
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.ContentTree);
         return await _asyncDocumentRepository.GetChildrenAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
@@ -425,38 +427,35 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <inheritdoc />
     public async Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
     {
+        ordering ??= Ordering.By("sortOrder");
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(Constants.Locks.ContentTree);
         return await _asyncDocumentRepository.GetChildrenWithoutTemplatesAsync(parentKey, skip, take, propertyAliases, ordering, cancellationToken);
     }
 
     /// <inheritdoc />
-    public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IContent>? filter = null, Ordering? ordering = null)
+    public async Task<PagedModel<IContent>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true)
     {
         ordering ??= Ordering.By("Path");
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-
-            // if the id is System Root, then just get all
-            if (id != Constants.System.Root)
-            {
-                TreeEntityPath[] contentPath =
-                    _entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
-                if (contentPath.Length == 0)
-                {
-                    totalChildren = 0;
-                    return Enumerable.Empty<IContent>();
-                }
-
-                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
-            }
-
-            return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+        return await _asyncDocumentRepository.GetDescendantsAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
     }
 
+    /// <inheritdoc />
+    public async Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true)
+    {
+        ordering ??= Ordering.By("Path");
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+        return await _asyncDocumentRepository.GetDescendantsWithoutTemplatesAsync(ancestorKey, skip, take, ordering, cancellationToken, includeTrashed);
+    }
+
+    // Used only by PerformMoveLocked, which needs to find descendants by a pre-move path prefix string rather
+    // than a resolvable ancestor key - not redirectable onto GetDescendantsAsync's key-based lookup.
     private IQuery<IContent>? GetPagedDescendantQuery(string contentPath)
     {
         IQuery<IContent>? query = Query<IContent>();
@@ -839,7 +838,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
                 // important to order by Path ASC so make it explicit in case defaults change
                 // ReSharper disable once RedundantArgumentDefaultValue
-                foreach (IContent d in GetPagedDescendants(document.Id, page, pageSize, out _, ordering: Ordering.By("Path", Direction.Ascending)))
+                foreach (IContent d in GetDescendantsAsync(document.Key, page * pageSize, pageSize, Ordering.By("Path", Direction.Ascending), CancellationToken.None).GetAwaiter().GetResult().Items)
                 {
                     count++;
 
@@ -1427,8 +1426,9 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                 var total = long.MaxValue;
                 while (page * pageSize < total)
                 {
-                    IEnumerable<IContent> descendants =
-                        GetPagedDescendants(content.Id, page++, pageSize, out total);
+                    PagedModel<IContent> descendantsPage = GetDescendantsAsync(content.Key, page++ * pageSize, pageSize, ordering: null, CancellationToken.None).GetAwaiter().GetResult();
+                    IEnumerable<IContent> descendants = descendantsPage.Items;
+                    total = descendantsPage.Total;
                     foreach (IContent descendant in descendants)
                     {
                         // when copying a branch into itself, the copy of a root would be seen as a descendant
@@ -2190,8 +2190,9 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         while (total > 0)
         {
             // get descendants - ordered from deepest to shallowest
-            IEnumerable<IContent> descendants = GetPagedDescendants(content.Id, 0, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
-            foreach (IContent c in descendants)
+            PagedModel<IContent> descendantsPage = GetDescendantsAsync(content.Key, 0, pageSize, Ordering.By("Path", Direction.Descending), CancellationToken.None).GetAwaiter().GetResult();
+            total = descendantsPage.Total;
+            foreach (IContent c in descendantsPage.Items)
             {
                 DoDelete(c);
             }

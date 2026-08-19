@@ -625,6 +625,29 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task GetDescendantsAsync_WithNullOrdering_OrdersAncestorsBeforeTheirOwnDescendants()
+    {
+        var grandchild = ContentBuilder.CreateSimpleContent(ContentType, "Grandchild", Subpage.Id);
+        ContentService.Save(grandchild, -1);
+
+        // Force the grandchild's SortOrder well ahead of its own ancestor, so a fallback-to-SortOrder
+        // implementation would (wrongly) place it first — only real path ordering keeps it after Subpage.
+        grandchild.SortOrder = -100;
+        ContentService.Save(grandchild, -1);
+
+        PagedModel<IContent> result = await ContentService.GetDescendantsAsync(Textpage.Key, 0, 100, ordering: null, CancellationToken.None);
+
+        List<IContent> items = result.Items.ToList();
+        var subpageIndex = items.FindIndex(c => c.Key == Subpage.Key);
+        var grandchildIndex = items.FindIndex(c => c.Key == grandchild.Key);
+
+        Assert.That(subpageIndex, Is.GreaterThanOrEqualTo(0));
+        Assert.That(grandchildIndex, Is.GreaterThanOrEqualTo(0));
+        Assert.That(subpageIndex, Is.LessThan(grandchildIndex),
+            "Omitting ordering must default to path order, returning an ancestor before its own descendant");
+    }
+
+    [Test]
     public void Can_Remove_Property_Type()
     {
         // Arrange
@@ -720,7 +743,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         // Act
-        PagedModel<IContent> contents = await ContentService.GetByLevelAsync(2, 0, 100, null, CancellationToken.None);
+        PagedModel<IContent> contents = await ContentService.GetByLevelAsync(2, 0, 100, Ordering.By("Path"), CancellationToken.None);
 
         // Assert
         Assert.That(contents, Is.Not.Null);
@@ -1517,9 +1540,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var total = long.MaxValue;
         while (page * pageSize < total)
         {
-            var descendants =
-                ContentService.GetPagedDescendants(parent.Id, page++, pageSize, out total);
-            foreach (var x in descendants)
+            PagedModel<IContent> descendantsPage = await ContentService.GetDescendantsAsync(parent.Key, page++ * pageSize, pageSize, ordering: null, CancellationToken.None);
+            total = descendantsPage.Total;
+            foreach (var x in descendantsPage.Items)
             {
                 Console.WriteLine("          "[..x.Level] + x.Id);
             }
@@ -2443,7 +2466,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var descendants = new List<IContent>();
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
+            PagedModel<IContent> descendantsPage = await ContentService.GetDescendantsAsync(content.Key, page++ * pageSize, pageSize, ordering: null, CancellationToken.None);
+            total = descendantsPage.Total;
+            descendants.AddRange(descendantsPage.Items);
         }
 
         Assert.AreNotEqual(-20, content.ParentId);
@@ -2458,7 +2483,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         page = 0;
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(content.Id, page++, pageSize, out total));
+            PagedModel<IContent> descendantsPage = await ContentService.GetDescendantsAsync(content.Key, page++ * pageSize, pageSize, ordering: null, CancellationToken.None);
+            total = descendantsPage.Total;
+            descendants.AddRange(descendantsPage.Items);
         }
 
         Assert.AreEqual(-20, content.ParentId);
@@ -2562,7 +2589,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var total = long.MaxValue;
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(parentPage.Id, page++, pageSize, out total));
+            PagedModel<IContent> descendantsPage = await ContentService.GetDescendantsAsync(parentPage.Key, page++ * pageSize, pageSize, ordering: null, CancellationToken.None);
+            total = descendantsPage.Total;
+            descendants.AddRange(descendantsPage.Items);
         }
 
         Assert.AreEqual(3, descendants.Count);
@@ -2587,7 +2616,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         page = 0;
         while (page * pageSize < total)
         {
-            descendants.AddRange(ContentService.GetPagedDescendants(parentPage2.Id, page++, pageSize, out total));
+            PagedModel<IContent> descendantsPage = await ContentService.GetDescendantsAsync(parentPage2.Key, page++ * pageSize, pageSize, ordering: null, CancellationToken.None);
+            total = descendantsPage.Total;
+            descendants.AddRange(descendantsPage.Items);
         }
 
         Assert.AreEqual(3, descendants.Count);

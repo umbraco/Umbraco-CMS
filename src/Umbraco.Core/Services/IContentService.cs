@@ -100,9 +100,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="level">The level.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — items at the same level may belong to unrelated parents, so there is no single ordering that applies by default.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching, non-trashed documents.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
     Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
@@ -196,7 +197,7 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Optional array of property aliases to load. If <c>null</c>, all properties are loaded.
     ///     If empty, no custom properties are loaded (only system properties).
     /// </param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching children.</returns>
     Task<PagedModel<IContent>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
@@ -215,21 +216,38 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Optional array of property aliases to load. If <c>null</c>, all properties are loaded.
     ///     If empty, no custom properties are loaded (only system properties).
     /// </param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching children with <c>null</c> template IDs.</returns>
     Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets descendant documents of a given parent.
+    ///     Gets a paged list of all descendants of a document node.
     /// </summary>
-    /// <param name="id">The parent identifier.</param>
-    /// <param name="pageIndex">The page number.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <param name="totalRecords">Total number of documents.</param>
-    /// <param name="filter">Query filter.</param>
-    /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
+    /// <param name="ancestorKey">The Guid key of the ancestor node.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by path (ancestors before their own descendants).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="includeTrashed">Whether to include descendants that are currently in the recycle bin. Default is <c>true</c>.</param>
+    /// <returns>A paged result containing the matching descendants.</returns>
+    Task<PagedModel<IContent>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
+
+    /// <summary>
+    ///     Gets a paged list of all descendants of a document node, without loading template information.
+    /// </summary>
+    /// <remarks>
+    ///     Use this overload when template IDs are not required (e.g. collection/list views) to avoid the
+    ///     template-existence validation round-trip against the template repository.
+    /// </remarks>
+    /// <param name="ancestorKey">The Guid key of the ancestor node.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by path (ancestors before their own descendants).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="includeTrashed">Whether to include descendants that are currently in the recycle bin. Default is <c>true</c>.</param>
+    /// <returns>A paged result containing the matching descendants with <c>null</c> template IDs.</returns>
+    Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <summary>
     ///     Gets paged documents of a content type.

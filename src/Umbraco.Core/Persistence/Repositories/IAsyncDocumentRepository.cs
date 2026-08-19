@@ -23,9 +23,10 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     ///     Optional array of property aliases to load. If <c>null</c>, all properties are loaded.
     ///     If empty, no custom properties are loaded (only system properties).
     /// </param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching children with <c>null</c> template IDs.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
     Task<PagedModel<IContent>> GetChildrenWithoutTemplatesAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
@@ -38,10 +39,12 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     /// <param name="ancestorKey">The Guid key of the ancestor node.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="includeTrashed">Whether to include descendants that are currently in the recycle bin. Default is <c>true</c>.</param>
     /// <returns>A paged result containing the matching descendants with <c>null</c> template IDs.</returns>
-    Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <summary>
     ///     Gets a paged list of documents whose content type is one of the specified content type keys.
@@ -52,9 +55,10 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     /// <param name="contentTypeKeys">The Guid keys of the content types to filter by.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching documents.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
     Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
@@ -63,9 +67,10 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     /// <param name="level">The tree level to filter by.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching, non-trashed documents.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
     Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>

@@ -309,7 +309,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     public abstract Task<PagedModel<TEntity>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    public abstract Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+    public abstract Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <inheritdoc />
     public abstract Task<IEnumerable<TEntity>> GetRecycleBinAsync(CancellationToken cancellationToken);

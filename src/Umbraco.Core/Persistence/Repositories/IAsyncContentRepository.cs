@@ -144,9 +144,10 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     ///     Optional array of property aliases to load. If <c>null</c>, all properties are loaded.
     ///     If empty, no custom properties are loaded (only system properties).
     /// </param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching children and the total record count.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
     Task<PagedModel<TEntity>> GetChildrenAsync(Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
@@ -155,10 +156,12 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// <param name="ancestorKey">The Guid key of the ancestor node.</param>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="includeTrashed">Whether to include descendants that are currently in the recycle bin. Default is <c>true</c>.</param>
     /// <returns>A paged result containing the matching descendants and the total record count.</returns>
-    Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <summary>
     ///     Gets all content items currently in the recycle bin.
@@ -172,9 +175,10 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     /// </summary>
     /// <param name="skip">The number of items to skip.</param>
     /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="ordering">The ordering specification, or <c>null</c> for default ordering.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A paged result containing the matching recycle bin items and the total record count.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
     Task<PagedModel<TEntity>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>

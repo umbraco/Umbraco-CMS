@@ -773,7 +773,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetChildrenAsync(
-            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(2));
@@ -791,7 +791,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetChildrenAsync(
-            null, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+            null, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(2),
@@ -806,7 +806,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetChildrenAsync(
-            _textpage.Key, skip: 1, take: 1, propertyAliases: null, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 1, take: 1, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(2), "Total should be 2 regardless of paging");
@@ -820,7 +820,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetChildrenAsync(
-            Guid.NewGuid(), skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+            Guid.NewGuid(), skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(0));
@@ -834,7 +834,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetChildrenAsync(
-            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         IContent[] children = result.Items.ToArray();
@@ -850,7 +850,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetChildrenAsync(
-            _textpage.Key, skip: 0, take: 1, propertyAliases: null, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 1, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         IContent child = result.Items.First();
@@ -864,7 +864,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetChildrenAsync(
-            _textpage.Key, skip: 0, take: 1, propertyAliases: [], ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 1, propertyAliases: [], ordering: Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         IContent child = result.Items.First();
@@ -884,7 +884,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetChildrenWithoutTemplatesAsync(
-            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Items.Any(c => c.Key == content.Key), Is.True);
@@ -906,7 +906,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetChildrenAsync(
-            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("sortOrder"), CancellationToken.None);
         scope.Complete();
 
         IContent? templated = result.Items.FirstOrDefault(c => c.Key == content.Key);
@@ -922,7 +922,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetDescendantsAsync(
-            _textpage.Key, skip: 0, take: 100, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(2));
@@ -938,7 +938,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetDescendantsAsync(
-            _textpage.Key, skip: 0, take: 1, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 1, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(2), "Total should be 2 regardless of paging");
@@ -952,7 +952,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetDescendantsAsync(
-            Guid.NewGuid(), skip: 0, take: 100, ordering: null, CancellationToken.None);
+            Guid.NewGuid(), skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(0));
@@ -966,7 +966,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetDescendantsAsync(
-            _textpage.Key, skip: 0, take: 100, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         foreach (IContent descendant in result.Items)
@@ -974,6 +974,75 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             Assert.That(descendant.Properties, Is.Not.Empty,
                 $"Descendant {descendant.Key} should have properties populated");
         }
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_OrderedByPath_ReturnsAncestorsBeforeDescendants()
+    {
+        var grandchild = ContentBuilder.CreateSimpleContent(_contentType, "Grandchild", _subpage.Id);
+        ContentService.Save(grandchild, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            _textpage.Key, skip: 0, take: 100, Ordering.By("Path"), CancellationToken.None);
+        scope.Complete();
+
+        List<IContent> items = result.Items.ToList();
+        var subpageIndex = items.FindIndex(c => c.Key == _subpage.Key);
+        var grandchildIndex = items.FindIndex(c => c.Key == grandchild.Key);
+
+        Assert.That(subpageIndex, Is.GreaterThanOrEqualTo(0));
+        Assert.That(grandchildIndex, Is.GreaterThanOrEqualTo(0));
+        Assert.That(subpageIndex, Is.LessThan(grandchildIndex),
+            "Path-ascending ordering must return an ancestor before its own descendant");
+    }
+
+    [Test]
+    public void GetDescendantsAsync_WithNullOrdering_Throws()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        // The repository requires an explicit ordering — callers with no opinion should go through
+        // ContentService.GetDescendantsAsync, which applies a path-ordering default.
+        Assert.ThrowsAsync<ArgumentNullException>(() =>
+            repository.GetDescendantsAsync(_textpage.Key, skip: 0, take: 100, ordering: null, CancellationToken.None));
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_ByDefault_IncludesTrashedDescendants()
+    {
+        // trashing the ancestor itself moves the whole branch into the recycle bin, so its
+        // descendants stay nested under it (and are themselves marked trashed)
+        ContentService.MoveToRecycleBin(_textpage);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            _textpage.Key, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result.Items.Any(c => c.Key == _subpage.Key), Is.True,
+            "includeTrashed defaults to true, so a trashed descendant must still be returned");
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_WithIncludeTrashedFalse_ExcludesTrashedDescendants()
+    {
+        ContentService.MoveToRecycleBin(_textpage);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            _textpage.Key, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None, includeTrashed: false);
+        scope.Complete();
+
+        Assert.That(result.Items.Any(c => c.Key == _subpage.Key), Is.False);
+        Assert.That(result.Items.Any(c => c.Key == _subpage2.Key), Is.False);
     }
 
     [Test]
@@ -988,7 +1057,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetDescendantsWithoutTemplatesAsync(
-            _textpage.Key, skip: 0, take: 100, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Items.Any(c => c.Key == content.Key), Is.True);
@@ -1010,7 +1079,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetDescendantsAsync(
-            _textpage.Key, skip: 0, take: 100, ordering: null, CancellationToken.None);
+            _textpage.Key, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         IContent? templated = result.Items.FirstOrDefault(c => c.Key == content.Key);
@@ -1252,6 +1321,43 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         IContent[] custom = result.Items.Where(item => item.ContentType.Alias == contentType.Alias).ToArray();
         Assert.That(custom.Select(c => c.Key), Is.EqualTo(new[] { docLow.Key, docHigh.Key }),
             "Custom-field ordering must apply across the whole descendant tree, not just direct children");
+    }
+
+    [Test]
+    public async Task GetDescendantsAsync_WithIncludeTrashedFalseAndCustomFieldOrdering_DoesNotDropSubsequentNonTrashedItems()
+    {
+        IContentType contentType = await CreateIntPropertyContentTypeAsync();
+
+        var root = ContentBuilder.CreateSimpleContent(_contentType, "Priority Root", _textpage.Id);
+        ContentService.Save(root, -1);
+
+        var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(root.Id).Build();
+        docLow.SetValue("priority", 10);
+        ContentService.Save(docLow, -1);
+
+        // Trashed directly (rather than via MoveToRecycleBin) so it stays nested under root, sitting
+        // inside the page window between docLow and docHigh in priority order.
+        var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").WithParentId(root.Id).Build();
+        docMid.SetValue("priority", 20);
+        docMid.Trashed = true;
+        ContentService.Save(docMid, -1);
+
+        var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(root.Id).Build();
+        docHigh.SetValue("priority", 30);
+        ContentService.Save(docHigh, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetDescendantsAsync(
+            root.Key, skip: 0, take: 2,
+            ordering: Ordering.By("priority", isCustomField: true),
+            CancellationToken.None,
+            includeTrashed: false);
+        scope.Complete();
+
+        Assert.That(result.Items.Select(c => c.Key), Is.EqualTo(new[] { docLow.Key, docHigh.Key }),
+            "A trashed item inside the paging window must not cause the next non-trashed item to be dropped from the page");
     }
 
     [Test]
@@ -2459,9 +2565,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> firstPage = await repository.GetPagedRecycleBinAsync(
-            skip: 0, take: 2, ordering: null, CancellationToken.None);
+            skip: 0, take: 2, ordering: Ordering.By("Path"), CancellationToken.None);
         PagedModel<IContent> secondPage = await repository.GetPagedRecycleBinAsync(
-            skip: 2, take: 2, ordering: null, CancellationToken.None);
+            skip: 2, take: 2, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(firstPage.Total, Is.EqualTo(3));
@@ -3075,7 +3181,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
-            new[] { secondContentType.Key }, skip: 0, take: 100, ordering: null, CancellationToken.None);
+            new[] { secondContentType.Key }, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(1));
@@ -3095,7 +3201,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
-            new[] { _contentType.Key, secondContentType.Key }, skip: 0, take: 100, ordering: null, CancellationToken.None);
+            new[] { _contentType.Key, secondContentType.Key }, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         // 5 fixture items of _contentType (textpage, subpage, subpage2, trashed, publishedPage) + the 1 new one.
@@ -3116,7 +3222,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
-            new[] { unusedContentType.Key }, skip: 0, take: 100, ordering: null, CancellationToken.None);
+            new[] { unusedContentType.Key }, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(0));
@@ -3130,7 +3236,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
-            Array.Empty<Guid>(), skip: 0, take: 100, ordering: null, CancellationToken.None);
+            Array.Empty<Guid>(), skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(0));
@@ -3154,7 +3260,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // this is the query most at risk of a forgotten filter, since it's a structurally different,
         // independently-built count query rather than a copy of the main paged query.
         PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
-            new[] { secondContentType.Key }, skip: 0, take: 1, ordering: null, CancellationToken.None);
+            new[] { secondContentType.Key }, skip: 0, take: 1, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(result.Total, Is.EqualTo(2),
@@ -3177,9 +3283,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> firstPage = await repository.GetPagedOfContentTypesAsync(
-            new[] { secondContentType.Key }, skip: 0, take: 2, ordering: null, CancellationToken.None);
+            new[] { secondContentType.Key }, skip: 0, take: 2, ordering: Ordering.By("Path"), CancellationToken.None);
         PagedModel<IContent> secondPage = await repository.GetPagedOfContentTypesAsync(
-            new[] { secondContentType.Key }, skip: 2, take: 2, ordering: null, CancellationToken.None);
+            new[] { secondContentType.Key }, skip: 2, take: 2, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(firstPage.Total, Is.EqualTo(3));
@@ -3278,7 +3384,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // independently compute the expected Path-ascending order in C# — avoids hardcoding node IDs, which
         // depend on however many system-seeded rows already exist ahead of this test's own content.
         PagedModel<IContent> unordered = await repository.GetPagedOfContentTypesAsync(
-            new[] { contentType.Key }, skip: 0, take: 100, ordering: null, CancellationToken.None);
+            new[] { contentType.Key }, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         Guid[] expectedOrder = unordered.Items.OrderBy(c => c.Path, StringComparer.Ordinal).Select(c => c.Key).ToArray();
 
         PagedModel<IContent> result = await repository.GetPagedOfContentTypesAsync(
@@ -3300,7 +3406,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> result = await repository.GetByLevelAsync(
-            _subpage.Level, skip: 0, take: 100, ordering: null, CancellationToken.None);
+            _subpage.Level, skip: 0, take: 100, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Guid[] keys = result.Items.Select(c => c.Key).ToArray();
@@ -3322,9 +3428,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var repository = CreateRepository();
 
         PagedModel<IContent> firstPage = await repository.GetByLevelAsync(
-            _subpage.Level, skip: 0, take: 2, ordering: null, CancellationToken.None);
+            _subpage.Level, skip: 0, take: 2, ordering: Ordering.By("Path"), CancellationToken.None);
         PagedModel<IContent> secondPage = await repository.GetByLevelAsync(
-            _subpage.Level, skip: 2, take: 2, ordering: null, CancellationToken.None);
+            _subpage.Level, skip: 2, take: 2, ordering: Ordering.By("Path"), CancellationToken.None);
         scope.Complete();
 
         Assert.That(firstPage.Total, Is.EqualTo(4));

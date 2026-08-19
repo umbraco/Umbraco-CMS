@@ -537,9 +537,9 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(item.Id, 0, int.MaxValue, out _);
+        PagedModel<IContent> descendantsPage = await _contentService.GetDescendantsAsync(item.Key, 0, int.MaxValue, ordering: null, CancellationToken.None);
 
-        await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendants)
+        await CreateOrUpdateUrlSegmentsAsync(new List<IContent>(descendantsPage.Items)
         {
             item,
         });
@@ -569,8 +569,8 @@ public class DocumentUrlService : IDocumentUrlService, IMemoryCacheSizeReporter
             return;
         }
 
-        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(item.Id, 0, int.MaxValue, out _);
-        await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendants) { item }, skipDatabaseWrite: true);
+        PagedModel<IContent> descendantsPage = await _contentService.GetDescendantsAsync(item.Key, 0, int.MaxValue, ordering: null, CancellationToken.None);
+        await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendantsPage.Items) { item }, skipDatabaseWrite: true);
     }
 
     private async Task CreateOrUpdateUrlSegmentsInternalAsync(IEnumerable<IContent> documentsEnumerable, bool skipDatabaseWrite)

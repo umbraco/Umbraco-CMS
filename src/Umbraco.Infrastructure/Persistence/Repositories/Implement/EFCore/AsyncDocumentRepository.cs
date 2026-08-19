@@ -566,8 +566,11 @@ internal class AsyncDocumentRepository
         => GetChildrenCoreAsync(parentKey, skip, take, propertyAliases, ordering, loadTemplates: false, cancellationToken);
 
     private Task<PagedModel<IContent>> GetChildrenCoreAsync(
-        Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken) =>
-        AmbientScope.ExecuteWithContextAsync(async db =>
+        Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
         {
             // A null parentKey means the root of the content tree - root has no Guid identity at all
             // (Constants.System.RootKey is deliberately null), so it can't be resolved via ResolveNodeIdAsync.
@@ -763,27 +766,33 @@ internal class AsyncDocumentRepository
             }
             return new PagedModel<IContent> { Total = total, Items = items };
         });
+    }
 
     /// <inheritdoc />
     public override Task<PagedModel<IContent>> GetDescendantsAsync(
-        Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
-        => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: true, cancellationToken);
+        Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true)
+        => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: true, includeTrashed, cancellationToken);
 
     /// <inheritdoc />
     public Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(
-        Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
-        => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: false, cancellationToken);
+        Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true)
+        => GetDescendantsCoreAsync(ancestorKey, skip, take, ordering, loadTemplates: false, includeTrashed, cancellationToken);
 
     private Task<PagedModel<IContent>> GetDescendantsCoreAsync(
-        Guid ancestorKey, int skip, int take, Ordering? ordering, bool loadTemplates, CancellationToken cancellationToken) =>
-        AmbientScope.ExecuteWithContextAsync(async db =>
+        Guid ancestorKey, int skip, int take, Ordering? ordering, bool loadTemplates, bool includeTrashed, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
         {
             int parentNodeId = await ResolveNodeIdAsync(db, ancestorKey, cancellationToken);
 
             string pathMatch = parentNodeId == -1 ? "-1," : $",{parentNodeId},";
 
             int total = await db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey && EF.Functions.Like(node.Path, $"%{pathMatch}%"))
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey
+                    && EF.Functions.Like(node.Path, $"%{pathMatch}%")
+                    && (includeTrashed || node.Trashed == false))
                 .CountAsync(cancellationToken);
 
             if (total == 0)
@@ -799,7 +808,9 @@ internal class AsyncDocumentRepository
                     (contentVersion, documentVersion) => new { contentVersion, documentVersion });
 
             var baseQuery = db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey && EF.Functions.Like(node.Path, $"%{pathMatch}%"))
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey
+                    && EF.Functions.Like(node.Path, $"%{pathMatch}%")
+                    && (includeTrashed || node.Trashed == false))
                 .Join(
                     db.Documents,
                     node => node.NodeId,
@@ -856,7 +867,9 @@ internal class AsyncDocumentRepository
             async Task<IReadOnlyList<DocumentRow>> FetchCustomFieldOrdered()
             {
                 List<int> candidateNodeIds = await db.Nodes
-                    .Where(node => node.NodeObjectType == NodeObjectTypeKey && EF.Functions.Like(node.Path, $"%{pathMatch}%"))
+                    .Where(node => node.NodeObjectType == NodeObjectTypeKey
+                        && EF.Functions.Like(node.Path, $"%{pathMatch}%")
+                        && (includeTrashed || node.Trashed == false))
                     .Select(node => node.NodeId)
                     .ToListAsync(cancellationToken);
 
@@ -952,7 +965,8 @@ internal class AsyncDocumentRepository
                     idSelector: joined => joined.node.NodeId,
                     ownerSelector: joined => joined.node.UserId,
                     publishedSelector: joined => joined.documentVersion.Published,
-                    contentTypeAliasSelector: joined => joined.contentType.Alias);
+                    contentTypeAliasSelector: joined => joined.contentType.Alias,
+                    pathSelector: joined => joined.node.Path);
 
                 return await orderedQuery
                     .Skip(skip)
@@ -969,6 +983,7 @@ internal class AsyncDocumentRepository
             }
             return new PagedModel<IContent> { Total = total, Items = items };
         });
+    }
 
     /// <inheritdoc />
     public override Task<IEnumerable<IContent>> GetRecycleBinAsync(CancellationToken cancellationToken) =>
@@ -1031,8 +1046,11 @@ internal class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
-    public override Task<PagedModel<IContent>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
-        AmbientScope.ExecuteWithContextAsync(async db =>
+    public override Task<PagedModel<IContent>> GetPagedRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
         {
             int total = await db.Nodes
                 .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed)
@@ -1219,10 +1237,14 @@ internal class AsyncDocumentRepository
             }
             return new PagedModel<IContent> { Total = total, Items = items };
         });
+    }
 
     /// <inheritdoc />
-    public Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
-        AmbientScope.ExecuteWithContextAsync(async db =>
+    public Task<PagedModel<IContent>> GetByLevelAsync(int level, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
         {
             int total = await db.Nodes
                 .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed)
@@ -1407,6 +1429,7 @@ internal class AsyncDocumentRepository
             }
             return new PagedModel<IContent> { Total = total, Items = items };
         });
+    }
 
     /// <inheritdoc />
     public Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken) =>
@@ -1506,8 +1529,11 @@ internal class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
-    public Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken) =>
-        AmbientScope.ExecuteWithContextAsync(async db =>
+    public Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(ordering);
+
+        return AmbientScope.ExecuteWithContextAsync(async db =>
         {
             // Content types are themselves nodes (their own umbracoNode row), so their Guid key lives on
             // NodeDto, not on ContentTypeDto — resolve keys to the underlying node IDs that ContentDto.ContentTypeId
@@ -1714,6 +1740,7 @@ internal class AsyncDocumentRepository
             }
             return new PagedModel<IContent> { Total = total, Items = items };
         });
+    }
 
     /// <inheritdoc />
     protected override Task OnUowRefreshedEntityAsync(IContent entity, CancellationToken cancellationToken)

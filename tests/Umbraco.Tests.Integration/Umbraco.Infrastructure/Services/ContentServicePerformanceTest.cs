@@ -109,7 +109,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
             total.AddRange(ContentService.GetRootContent());
             foreach (var content in total.ToArray())
             {
-                total.AddRange(ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
+                total.AddRange((await ContentService.GetDescendantsAsync(content.Key, 0, int.MaxValue, ordering: null, CancellationToken.None)).Items);
             }
 
             TestProfiler.Disable();
