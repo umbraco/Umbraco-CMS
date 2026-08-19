@@ -1888,9 +1888,9 @@ internal class AsyncDocumentRepository
             "contenttypealias" => descending
                 ? source.OrderByDescending(contentTypeAliasSelector)
                 : source.OrderBy(contentTypeAliasSelector),
-            // Only reachable when the caller passes a pathSelector (currently just GetPagedOfContentTypesAsync) —
-            // a missing pathSelector falls through to the default arm below, exactly like every other caller
-            // that doesn't support "path" ordering today.
+            // Only reachable when the caller passes a pathSelector (GetDescendantsCoreAsync and
+            // GetPagedOfContentTypesAsync) — a missing pathSelector falls through to the default arm below,
+            // exactly like every other caller that doesn't support "path" ordering today.
             "path" when pathSelector is not null => descending
                 ? source.OrderByDescending(pathSelector)
                 : source.OrderBy(pathSelector),
