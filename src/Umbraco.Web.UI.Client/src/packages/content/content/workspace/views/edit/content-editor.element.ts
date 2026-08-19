@@ -47,7 +47,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	private _routerPath?: string;
 
 	@state()
-	private _activePath = '';
+	private _activePath?: string;
 
 	@state()
 	private _hintMap: Map<string | null, UmbVariantHint> = new Map();
@@ -239,6 +239,8 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 					.routes=${this._routes}
 					@init=${(event: UmbRouterSlotInitEvent) => {
 						this._routerPath = event.target.absoluteRouterPath;
+						// TODO: Check if this is nesecary [NL]
+						this._activePath = event.target.absoluteActiveViewPath || '';
 					}}
 					@change=${(event: UmbRouterSlotChangeEvent) => {
 						this._activePath = event.target.absoluteActiveViewPath || '';
@@ -255,6 +257,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 			fullPath === this._activePath ||
 			(!this._hasRootGroups && index === 0 && this._routerPath + '/' === this._activePath) ||
 			(this._hasRootGroups && index === 0 && path === null && this._routerPath + '/' === this._activePath);
+		console.log(active, this._activePath, hint);
 		return html`<uui-tab
 			label=${this.localize.string(name ?? '#general_unnamed')}
 			.active=${active}
