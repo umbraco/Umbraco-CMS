@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -2819,8 +2820,17 @@ public class ContentService : RepositoryService, IContentService
     #region Move, RecycleBin
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     public OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => MoveToRecycleBin(content, CancellationToken.None, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc />
+    public OperationResult MoveToRecycleBin(IContent content, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         EventMessages eventMessages = EventMessagesFactory.Get();
         var moves = new List<(IContent, string)>();
 
@@ -2845,7 +2855,7 @@ public class ContentService : RepositoryService, IContentService
             // it's NOT unpublishing, only the content is now masked - allowing us to restore it if wanted
             // if (content.HasPublishedVersion)
             // { }
-            PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, moves, true);
+            PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, moves, true, cancellationToken: cancellationToken);
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
@@ -2878,7 +2888,7 @@ public class ContentService : RepositoryService, IContentService
 #pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
     public OperationResult Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId)
 #pragma warning restore CS0618 // Type or member is obsolete
-        => Move(content, parentId, true, userId);
+        => Move(content, parentId, true, CancellationToken.None, userId);
 
     /// <summary>
     ///     Moves an <see cref="IContent" /> object to a new location by changing its parent id.
@@ -2897,10 +2907,19 @@ public class ContentService : RepositoryService, IContentService
     /// </param>
     /// <param name="userId">Optional Id of the User moving the Content.</param>
     /// <returns>The operation result.</returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
 #pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
     public OperationResult Move(IContent content, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+        => Move(content, parentId, includeDescendants, CancellationToken.None, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc />
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+    public OperationResult Move(IContent content, int parentId, bool includeDescendants, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         if (content.ParentId == parentId)
@@ -2911,7 +2930,7 @@ public class ContentService : RepositoryService, IContentService
         // if moving to the recycle bin then use the proper method
         if (parentId == Constants.System.RecycleBinContent)
         {
-            return MoveToRecycleBin(content, userId);
+            return MoveToRecycleBin(content, cancellationToken, userId);
         }
 
         var moves = new List<(IContent, string)>();
@@ -2955,7 +2974,7 @@ public class ContentService : RepositoryService, IContentService
                 content.PublishedState = PublishedState.Unpublishing;
             }
 
-            PerformMoveLocked(content, parentId, parent, userId, moves, trashed, includeDescendants);
+            PerformMoveLocked(content, parentId, parent, userId, moves, trashed, includeDescendants, cancellationToken);
 
             if (leaveDescendantsInRecycleBin)
             {
@@ -2996,7 +3015,7 @@ public class ContentService : RepositoryService, IContentService
 
     // MUST be called from within WriteLock
     // trash indicates whether we are trashing, un-trashing, or not changing anything
-    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, bool includeDescendants = true)
+    private void PerformMoveLocked(IContent content, int parentId, IContent? parent, int userId, List<(IContent Content, string OriginalPath)> moves, bool? trash, bool includeDescendants = true, CancellationToken cancellationToken = default)
     {
         content.WriterId = userId;
         content.ParentId = parentId;
@@ -3045,6 +3064,12 @@ public class ContentService : RepositoryService, IContentService
 
             foreach (IContent descendant in descendants)
             {
+                // Checked per descendant, not just at the boundary: the write lock is held and the scope stays open
+                // for the whole recursion, so this is the only point that can interrupt a long move before it commits.
+                // A break here would leave the already-moved descendants committed; throwing exits the using-scope
+                // without Complete(), rolling back everything moved so far.
+                cancellationToken.ThrowIfCancellationRequested();
+
                 moves.Add((descendant, descendant.Path)); // capture original path
 
                 if (leaveDescendantsInRecycleBin)
@@ -3196,7 +3221,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
     /// <returns>The newly created <see cref="IContent" /> object</returns>
-    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId) => Copy(content, parentId, relateToOriginal, true, userId);
+    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId) => Copy(content, parentId, relateToOriginal, true, CancellationToken.None, userId);
 
     /// <summary>
     ///     Copies an <see cref="IContent" /> object by creating a new Content object of the same type and copies all data from
@@ -3209,8 +3234,17 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="recursive">A value indicating whether to recursively copy children.</param>
     /// <param name="userId">Optional Id of the User copying the Content</param>
     /// <returns>The newly created <see cref="IContent" /> object</returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => Copy(content, parentId, relateToOriginal, recursive, CancellationToken.None, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc />
+    public IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         // keep track of updates (copied item key and parent key) for the in-memory navigation structure
@@ -3282,6 +3316,13 @@ public class ContentService : RepositoryService, IContentService
                         GetPagedDescendants(content.Id, page++, pageSize, out total);
                     foreach (IContent descendant in descendants)
                     {
+                        // Checked per descendant, not just at the boundary: the write lock is held and the scope
+                        // stays open for the whole recursion, so this is the only point that can interrupt a long
+                        // copy before it commits. A break here would leave the already-copied descendants
+                        // committed; throwing exits the using-scope without Complete(), rolling back everything
+                        // copied so far.
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         // when copying a branch into itself, the copy of a root would be seen as a descendant
                         // and would be copied again => filter it out.
                         if (descendant.Id == copy.Id)

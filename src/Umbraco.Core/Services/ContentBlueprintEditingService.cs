@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -271,7 +272,7 @@ internal sealed class ContentBlueprintEditingService
     /// Some methods from ContentEditingServiceBase are needed, so we need to inherit from it
     /// but there are others that are not required to be implemented in the case of blueprints.
     /// </remarks>
-    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId) => throw new NotImplementedException();
+    protected override OperationResult? Move(IContent content, int newParentId, bool includeDescendants, int userId, CancellationToken cancellationToken) => throw new NotImplementedException();
 
     /// <summary>
     /// Copies the specified content to a new parent. Not supported for blueprints.
@@ -283,7 +284,7 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="userId">The ID of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId) => throw new NotImplementedException();
+    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId, CancellationToken cancellationToken) => throw new NotImplementedException();
 
     /// <summary>
     /// Moves the specified content to the recycle bin. Not supported for blueprints.
@@ -292,7 +293,7 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="userId">The ID of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => throw new NotImplementedException();
+    protected override OperationResult? MoveToRecycleBin(IContent content, int userId, CancellationToken cancellationToken) => throw new NotImplementedException();
 
     /// <summary>
     /// Deletes the specified content. Not supported for blueprints.
@@ -301,7 +302,7 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="userId">The ID of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override OperationResult? Delete(IContent content, int userId) => throw new NotImplementedException();
+    protected override OperationResult? Delete(IContent content, int userId, CancellationToken cancellationToken) => throw new NotImplementedException();
 
     /// <summary>
     /// Saves a blueprint with the specified user key.

@@ -1,3 +1,4 @@
+using System.Threading;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 
@@ -205,6 +206,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// </param>
     /// <param name="userId">Id of the User moving the Media.</param>
     /// <returns>True if moving succeeded, otherwise False.</returns>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
 #pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
     Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -221,11 +223,45 @@ public interface IMediaService : IContentServiceBase<IMedia>
     }
 
     /// <summary>
+    ///     Moves an <see cref="IMedia" /> object to a new location, optionally leaving its descendants behind,
+    ///     observing a <see cref="CancellationToken" /> so a long move over many descendants can be interrupted.
+    /// </summary>
+    /// <param name="media">The <see cref="IMedia" /> to move.</param>
+    /// <param name="parentId">Id of the Media's new Parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the media along with it. When restoring media out of the recycle bin
+    ///     this can be set to <c>false</c> to restore only the media item itself, leaving its descendants in the
+    ///     recycle bin as top-level bin items.
+    /// </param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
+    /// <param name="userId">Id of the User moving the Media.</param>
+    /// <returns>True if moving succeeded, otherwise False.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
+        => Move(media, parentId, includeDescendants, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <summary>
     ///     Deletes an <see cref="IMedia" /> object by moving it to the Recycle Bin
     /// </summary>
     /// <param name="media">The <see cref="IMedia" /> to delete</param>
     /// <param name="userId">Id of the User deleting the Media</param>
+    [Obsolete("Use the overload that takes a CancellationToken instead. Scheduled for removal in Umbraco 19.")]
     Attempt<OperationResult?> MoveToRecycleBin(IMedia media, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Deletes an <see cref="IMedia" /> object by moving it to the Recycle Bin, observing a
+    ///     <see cref="CancellationToken" /> so a long move over many descendants can be interrupted.
+    /// </summary>
+    /// <param name="media">The <see cref="IMedia" /> to delete</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
+    /// <param name="userId">Id of the User deleting the Media</param>
+    // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
+#pragma warning disable CS0618 // Type or member is obsolete
+    Attempt<OperationResult?> MoveToRecycleBin(IMedia media, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
+        => MoveToRecycleBin(media, userId);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Empties the Recycle Bin by deleting all <see cref="IMedia" /> that resides in the bin

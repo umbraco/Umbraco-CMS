@@ -79,7 +79,8 @@ public class CopyDocumentController : DocumentControllerBase
             copyDocumentRequestModel.Target?.Id,
             copyDocumentRequestModel.RelateToOriginal,
             copyDocumentRequestModel.IncludeDescendants,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+            CurrentUserKey(_backOfficeSecurityAccessor),
+            cancellationToken);
 
         return result.Success
             ? CreatedAtId<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result!.Key)
