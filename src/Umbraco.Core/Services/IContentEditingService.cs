@@ -48,7 +48,22 @@ public interface IContentEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the creation result or an error status.</returns>
+    /// <remarks>
+    ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
+    ///     a publish blocked by a business rule still leaves the save in effect.
+    /// </remarks>
     // TODO (V19): Remove default implementation.
+    Task<Attempt<ContentCreateResult, ContentEditingAndPublishingStatus>> CreateAndPublishAsync(ContentCreateModel createModel, ISet<string> culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
+
+    /// <summary>
+    ///     Creates and publishes a new content item.
+    /// </summary>
+    /// <param name="createModel">The model containing the content data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the creation result or an error status.</returns>
+    [Obsolete("Use the overload taking an ISet<string> of cultures to publish, which reports the save and the publish outcome separately. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
         => throw new NotImplementedException();
 
@@ -69,7 +84,23 @@ public interface IContentEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the update result or an error status.</returns>
+    /// <remarks>
+    ///     The returned status reports the outcome of the save and the publish separately, as the two can differ:
+    ///     a publish blocked by a business rule still leaves the save in effect.
+    /// </remarks>
     // TODO (V19): Remove default implementation.
+    Task<Attempt<ContentUpdateResult, ContentEditingAndPublishingStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, ISet<string> culturesToPublish, Guid userKey)
+        => throw new NotImplementedException();
+
+    /// <summary>
+    ///     Updates and publishes an existing content item.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to update.</param>
+    /// <param name="updateModel">The model containing the updated content data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the update result or an error status.</returns>
+    [Obsolete("Use the overload taking an ISet<string> of cultures to publish, which reports the save and the publish outcome separately. Scheduled for removal in Umbraco 19.")]
     Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
         => throw new NotImplementedException();
 

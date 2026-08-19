@@ -34,6 +34,20 @@ public abstract class DocumentControllerBase : ContentControllerBase
         where TContentModelBase : ContentModelBase<DocumentValueModel, DocumentVariantRequestModel>
         => ContentEditingOperationStatusResult<TContentModelBase, DocumentValueModel, DocumentVariantRequestModel>(status, requestModel, validationResult);
 
+    /// <summary>
+    /// Maps the combined status of a save-and-publish operation onto a result, using the editing or the publishing
+    /// mapper depending on which part of the operation failed.
+    /// </summary>
+    protected IActionResult DocumentEditingAndPublishingOperationStatusResult(
+        ContentEditingAndPublishingStatus status,
+        IEnumerable<string>? invalidPropertyAliases = null)
+        => status.ContentEditingOperationStatus is not ContentEditingOperationStatus.Success
+            ? ContentEditingOperationStatusResult(status.ContentEditingOperationStatus)
+            : status.ContentPublishingOperationStatus is { } publishingStatus
+              && publishingStatus is not ContentPublishingOperationStatus.Success
+                ? DocumentPublishingOperationStatusResult(publishingStatus, invalidPropertyAliases)
+                : throw new ArgumentException("Please handle success status explicitly in the controllers", nameof(status));
+
     protected IActionResult DocumentPublishingOperationStatusResult(
         ContentPublishingOperationStatus status,
         IEnumerable<string>? invalidPropertyAliases = null,

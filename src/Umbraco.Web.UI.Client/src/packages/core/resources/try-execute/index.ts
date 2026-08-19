@@ -1,3 +1,4 @@
+export * from './api-error-was-notified.function.js';
 export * from './batch-try-execute.function.js';
 export * from './try-execute.controller.js';
 export * from './tryExecute.function.js';

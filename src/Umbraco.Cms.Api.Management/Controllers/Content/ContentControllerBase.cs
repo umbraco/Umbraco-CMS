@@ -77,6 +77,10 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid sorting options")
                 .WithDetail("The supplied sorting operations were invalid. Additional details can be found in the log.")
                 .Build()),
+            ContentEditingOperationStatus.InvalidName => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid name")
+                .WithDetail("One or more of the supplied names was too long. Names cannot exceed 255 characters.")
+                .Build()),
             ContentEditingOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid culture")
                 .WithDetail("One or more of the supplied culture codes did not match the configured languages.")
