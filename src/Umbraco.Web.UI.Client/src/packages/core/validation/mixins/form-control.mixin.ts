@@ -262,7 +262,7 @@ export function UmbFormControlMixin<
 			}
 		}
 
-		#runValidatorsCallback = () => this._runValidators;
+		#runValidatorsCallback = () => this._runValidators();
 
 		/**
 		 * @function addFormControlElement
