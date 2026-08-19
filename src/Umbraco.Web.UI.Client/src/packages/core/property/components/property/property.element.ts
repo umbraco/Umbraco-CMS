@@ -153,9 +153,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			},
 			'observeValidationState',
 		);
-		if (this._element) {
-			this.#setupControlValidation();
-		}
+		this.#setupControlValidation();
 	}
 	public get dataPath(): string | undefined {
 		return this.#propertyContext.getDataPath();
@@ -418,9 +416,20 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	/**
-	 * (Re)binds the form control validator and server-validation message binder to the current `dataPath`.
-	 * This has to be redone whenever `dataPath` changes on an already-created element, since a variant switch
-	 * can leave the same Property Editor UI element in place while the data it points to changes underneath it.
+	 * (Re)binds the form control validator and server-validation message binder to the current element and `dataPath`.
+	 * This has to be redone whenever either changes on an already-created element — a variant switch can leave the
+	 * same Property Editor UI element in place while the `dataPath` (and the data it points to) changes underneath it.
+	 *
+	 * Destroying the previous validator here — called synchronously from the `dataPath` setter — matters: it happens
+	 * before the value for the new dataPath is pushed onto the element, so the outgoing validator can't catch that
+	 * value change and misattribute it to the variant it used to represent, incorrectly clearing (or setting) that
+	 * variant's validation message.
+	 *
+	 * The new validator, symmetrically, must not reveal an already-known invalid state until the element's value
+	 * has actually caught up to `dataPath` — the value arrives asynchronously, later, via `#valueObserver` — or it
+	 * risks the element re-validating the *previous* dataPath's still-present value and misattributing that stale
+	 * verdict to this one. See `UmbFormControlValidator#syncControlPristine`, called from `#valueObserver` once the
+	 * value is confirmed current.
 	 */
 	#setupControlValidation(): void {
 		this.#controlValidator?.destroy();
