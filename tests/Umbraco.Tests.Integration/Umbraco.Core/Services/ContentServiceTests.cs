@@ -596,6 +596,31 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task GetParentAsync_Returns_Parent_Of_Content()
+    {
+        IContent? result = await ContentService.GetParentAsync(Subpage.Key, CancellationToken.None);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Key, Is.EqualTo(Textpage.Key));
+    }
+
+    [Test]
+    public async Task GetParentAsync_Returns_Null_For_Root_Content()
+    {
+        IContent? result = await ContentService.GetParentAsync(Textpage.Key, CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetParentAsync_Returns_Null_For_Unknown_Key()
+    {
+        IContent? result = await ContentService.GetParentAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
     public async Task GetChildrenAsync_Returns_Children_Of_Parent()
     {
         PagedModel<IContent> result = await ContentService.GetChildrenAsync(Textpage.Key, 0, 100, propertyAliases: null, ordering: null, CancellationToken.None);

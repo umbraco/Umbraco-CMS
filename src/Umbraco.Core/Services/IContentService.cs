@@ -109,9 +109,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Gets the parent of a document.
     /// </summary>
-    /// <param name="id">The identifier of the document.</param>
+    /// <param name="key">The Guid key of the document.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The parent document, or null if not found.</returns>
-    IContent? GetParent(int id);
+    Task<IContent?> GetParentAsync(Guid key, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets the parent of a document.

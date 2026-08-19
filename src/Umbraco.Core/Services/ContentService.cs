@@ -487,19 +487,19 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, propertyAliases: null, filter, ordering);
     }
 
-    /// <summary>
-    ///     Gets the parent of the current content as an <see cref="IContent" /> item.
-    /// </summary>
-    /// <param name="id">Id of the <see cref="IContent" /> to retrieve the parent from</param>
-    /// <returns>Parent <see cref="IContent" /> object</returns>
-    public IContent? GetParent(int id)
+    /// <inheritdoc />
+    public async Task<IContent?> GetParentAsync(Guid key, CancellationToken cancellationToken)
     {
-        // intentionally not locking
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-        IContent? content = keyAttempt.Success
-            ? GetByIdAsync(keyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
+        IContent? content = await GetByIdAsync(key, cancellationToken);
+        if (content is null || content.ParentId == Constants.System.Root || content.ParentId == Constants.System.RecycleBinContent)
+        {
+            return null;
+        }
+
+        Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.ParentId, UmbracoObjectTypes.Document);
+        return parentKeyAttempt.Success
+            ? await GetByIdAsync(parentKeyAttempt.Result, cancellationToken)
             : null;
-        return GetParent(content);
     }
 
     /// <summary>
