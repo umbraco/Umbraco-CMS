@@ -13,7 +13,7 @@ export const UMB_DOCUMENT_PICKER_MODAL = new UmbModalToken<UmbDocumentPickerModa
 	{
 		modal: {
 			type: 'sidebar',
-			size: 'small',
+			size: 'medium',
 		},
 		data: {
 			treeAlias: UMB_DOCUMENT_TREE_ALIAS,
