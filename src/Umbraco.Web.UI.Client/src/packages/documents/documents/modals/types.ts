@@ -5,5 +5,4 @@ export type UmbDocumentVariantPickerData = UmbContentVariantPickerData<UmbDocume
 export type UmbDocumentVariantPickerValue = UmbContentVariantPickerValue;
 
 export type * from './save-modal/constants.js';
-export type * from './document-content-picker-modal.token.js';
-export type * from './document-picker-modal.token.js';
+export type * from './document-picker-modal/types.js';

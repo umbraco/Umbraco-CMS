@@ -1,3 +1,2 @@
 export * from './save-modal/constants.js';
-export * from './document-content-picker-modal.token.js';
-export * from './document-picker-modal.token.js';
+export { UMB_DOCUMENT_PICKER_MODAL, UMB_DOCUMENT_PICKER_MODAL_ALIAS } from './document-picker-modal/index.js';

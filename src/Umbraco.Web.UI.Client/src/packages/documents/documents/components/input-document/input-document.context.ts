@@ -1,5 +1,5 @@
-import type { UmbDocumentContentPickerModalData, UmbDocumentContentPickerModalValue } from '../../modals/types.js';
-import { UMB_DOCUMENT_CONTENT_PICKER_MODAL, UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '../../constants.js';
+import type { UmbDocumentPickerModalData, UmbDocumentPickerModalValue } from '../../modals/types.js';
+import { UMB_DOCUMENT_PICKER_MODAL, UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '../../constants.js';
 import type { UmbDocumentItemModel } from '../../item/types.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
@@ -18,15 +18,15 @@ interface UmbDocumentPickerInputContextOpenArgs {
 export class UmbDocumentPickerInputContext extends UmbPickerInputContext<
 	UmbDocumentItemModel & { name: string }, // HACK: [LK:2025-01-01]
 	UmbDocumentTreeItemModel,
-	UmbDocumentContentPickerModalData,
-	UmbDocumentContentPickerModalValue
+	UmbDocumentPickerModalData,
+	UmbDocumentPickerModalValue
 > {
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_CONTENT_PICKER_MODAL);
+		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_PICKER_MODAL);
 	}
 
 	override async openPicker(
-		pickerData?: Partial<UmbDocumentContentPickerModalData>,
+		pickerData?: Partial<UmbDocumentPickerModalData>,
 		args?: UmbDocumentPickerInputContextOpenArgs,
 	) {
 		const combinedPickerData = {

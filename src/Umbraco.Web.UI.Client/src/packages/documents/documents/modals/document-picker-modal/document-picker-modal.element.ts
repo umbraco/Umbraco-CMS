@@ -1,5 +1,7 @@
-import { UmbContentCollectionConfigurationContext } from '../collection/configuration/content-collection-configuration.context.js';
-import type { UmbContentPickerModalData, UmbContentPickerModalValue } from './types.js';
+import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
+import type { UmbDocumentItemModel } from '../../item/types.js';
+import type { UmbDocumentPickerModalData, UmbDocumentPickerModalValue } from './types.js';
+import { UmbContentCollectionConfigurationContext } from '@umbraco-cms/backoffice/content';
 import {
 	css,
 	customElement,
@@ -16,7 +18,6 @@ import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@um
 import { UmbTreeItemOpenEvent, UmbTreeItemPickerContext } from '@umbraco-cms/backoffice/tree';
 import type {
 	UmbTreeElement,
-	UmbTreeItemModelBase,
 	UmbTreeItemPickerLocation,
 	UmbTreeSelectionConfiguration,
 	UmbTreeStartNode,
@@ -36,8 +37,8 @@ const COLLECTION_MEMORY_UNIQUE = 'UmbItemPickerCollection';
 const ROOT_MEMORY_KEY = 'root';
 
 /**
- * The part of a content tree item this modal reads to decide how a node's children render. A content tree that does
- * not map `contentType` is browsed as a tree throughout.
+ * The part of a content tree item this modal reads to decide how a node's children render. A tree that does not map
+ * `contentType` is browsed as a tree throughout.
  */
 type UmbContentTreeItemLike = {
 	contentType?: {
@@ -46,15 +47,16 @@ type UmbContentTreeItemLike = {
 };
 
 /**
- * A picker that browses content, rendering a collection at any level whose node has one configured and the tree
- * everywhere else. The node being browsed decides how its children render, so collection and tree levels interleave.
- * @element umb-content-picker-modal
+ * A picker that browses documents, rendering the document collection at any level whose node has one configured and the
+ * tree everywhere else. The node being browsed decides how its children render, so collection and tree levels
+ * interleave.
+ * @element umb-document-picker-modal
  */
-@customElement('umb-content-picker-modal')
-export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbPickerModalBaseElement<
-	TreeItemType,
-	UmbContentPickerModalData<TreeItemType>,
-	UmbContentPickerModalValue
+@customElement('umb-document-picker-modal')
+export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
+	UmbDocumentItemModel,
+	UmbDocumentPickerModalData,
+	UmbDocumentPickerModalValue
 > {
 	@state()
 	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
@@ -125,6 +127,8 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 
 	constructor() {
 		super();
+		// Which collection this picker renders follows from it being a document picker, so it is not a caller's choice.
+		this.#collectionConfiguration.setCollectionAlias(UMB_DOCUMENT_COLLECTION_ALIAS);
 		this._pickerContext.selection.setSelectable(true);
 		this.observe(
 			this._pickerContext.selection.hasSelection,
@@ -188,8 +192,6 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 				multiple,
 				selectableFilter: this.data?.pickableFilter as ((item: UmbCollectionItemModel) => boolean) | undefined,
 			};
-
-			this.#collectionConfiguration.setCollectionAlias(this.data?.collection?.alias);
 
 			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
 				this._treeAlias = this.data.treeAlias;
@@ -510,7 +512,7 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 		return keyed(
 			this.#getCollectionMemoryKey(),
 			html`<umb-collection
-				alias=${ifDefined(this.data?.collection.alias)}
+				alias=${UMB_DOCUMENT_COLLECTION_ALIAS}
 				.config=${config}
 				.interactionMemories=${this._collectionInteractionMemories}
 				@selected=${this.#onItemSelected}
@@ -598,10 +600,10 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 	`;
 }
 
-export default UmbContentPickerModalElement;
+export default UmbDocumentPickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-content-picker-modal': UmbContentPickerModalElement<UmbTreeItemModelBase>;
+		'umb-document-picker-modal': UmbDocumentPickerModalElement;
 	}
 }

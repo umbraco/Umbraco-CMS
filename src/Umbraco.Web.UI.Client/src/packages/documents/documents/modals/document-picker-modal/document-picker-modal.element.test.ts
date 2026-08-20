@@ -1,5 +1,5 @@
-import { UmbContentPickerModalElement } from './content-picker-modal.element.js';
-import type { UmbContentPickerModalData } from './types.js';
+import { UmbDocumentPickerModalElement } from './document-picker-modal.element.js';
+import type { UmbDocumentPickerModalData } from './types.js';
 import { expect, fixture, html, waitUntil } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { ignoreResizeObserverLoopErrors } from '@umbraco-cms/internal/test-utils';
@@ -10,11 +10,9 @@ import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/en
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTreeItemOpenEvent } from '@umbraco-cms/backoffice/tree';
 import type { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
-import type { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
-const TREE_ALIAS = 'Umb.Test.ContentPicker.Tree';
-const TREE_REPOSITORY_ALIAS = 'Umb.Test.ContentPicker.TreeRepository';
-const COLLECTION_ALIAS = 'Umb.Test.ContentPicker.Collection';
+const TREE_ALIAS = 'Umb.Test.DocumentPicker.Tree';
+const TREE_REPOSITORY_ALIAS = 'Umb.Test.DocumentPicker.TreeRepository';
 const OPENER_UNIQUE = 'the-opening-document';
 
 const ROOT = { unique: null, entityType: 'test-root', name: 'Root' };
@@ -56,7 +54,7 @@ class UmbTestTreeRepository {
 }
 
 /** Stands in for the element that opened the modal, so the modal's own entity context has something to shadow. */
-@customElement('test-content-picker-opener')
+@customElement('test-document-picker-opener')
 class UmbTestOpenerElement extends UmbElementMixin(HTMLElement) {
 	entityContext = new UmbEntityContext(this);
 
@@ -67,8 +65,8 @@ class UmbTestOpenerElement extends UmbElementMixin(HTMLElement) {
 	}
 }
 
-describe('UmbContentPickerModalElement', () => {
-	let element: UmbContentPickerModalElement<UmbTreeItemModelBase>;
+describe('UmbDocumentPickerModalElement', () => {
+	let element: UmbDocumentPickerModalElement;
 	let opener: UmbTestOpenerElement;
 	let restoreErrorHandler: () => void;
 
@@ -101,13 +99,12 @@ describe('UmbContentPickerModalElement', () => {
 			},
 		] as Array<never>);
 
-		opener = await fixture(html`<test-content-picker-opener></test-content-picker-opener>`);
-		element = new UmbContentPickerModalElement();
+		opener = await fixture(html`<test-document-picker-opener></test-document-picker-opener>`);
+		element = new UmbDocumentPickerModalElement();
 		element.data = {
 			treeAlias: TREE_ALIAS,
-			collection: { alias: COLLECTION_ALIAS },
 			multiple: true,
-		} as UmbContentPickerModalData<UmbTreeItemModelBase>;
+		} as UmbDocumentPickerModalData;
 		opener.appendChild(element);
 		await element.updateComplete;
 		await waitUntil(() => trail().length === 1, 'the root breadcrumb was never loaded');
@@ -194,7 +191,7 @@ describe('UmbContentPickerModalElement', () => {
 	// throws from the tree's own children and expansion managers.
 	describe('opening into a remembered collection', () => {
 		it('does not mount the tree before the location is known', async () => {
-			const remembering = new UmbContentPickerModalElement<UmbTreeItemModelBase>();
+			const remembering = new UmbDocumentPickerModalElement();
 			(
 				remembering as unknown as { _pickerContext: { interactionMemory: UmbInteractionMemoryManager } }
 			)._pickerContext.interactionMemory.setMemory({
@@ -203,8 +200,7 @@ describe('UmbContentPickerModalElement', () => {
 			});
 			remembering.data = {
 				treeAlias: TREE_ALIAS,
-				collection: { alias: COLLECTION_ALIAS },
-			} as UmbContentPickerModalData<UmbTreeItemModelBase>;
+			} as UmbDocumentPickerModalData;
 
 			opener.appendChild(remembering);
 			await remembering.updateComplete;

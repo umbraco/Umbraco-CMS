@@ -1,18 +1,7 @@
-import type { UmbTreeItemModel, UmbTreePickerModalData, UmbTreePickerModalValue } from '@umbraco-cms/backoffice/tree';
+import type { UmbDocumentItemModel } from '../../item/types.js';
+import type { UmbTreePickerModalData, UmbTreePickerModalValue } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbContentPickerModalCollectionConfig {
-	/**
-	 * The alias of the collection to render at a node whose content type has a collection configured.
-	 */
-	alias: string;
-}
-
-export interface UmbContentPickerModalData<TreeItemType = UmbTreeItemModel> extends Omit<
-	UmbTreePickerModalData<TreeItemType>,
-	'createAction'
-> {
-	collection: UmbContentPickerModalCollectionConfig;
-
+export interface UmbDocumentPickerModalData extends UmbTreePickerModalData<UmbDocumentItemModel> {
 	/**
 	 * Decides which items can be picked.
 	 *
@@ -28,8 +17,8 @@ export interface UmbContentPickerModalData<TreeItemType = UmbTreeItemModel> exte
 	 *
 	 * A `unique` of `null` means the root, which never occurs at a collection level.
 	 */
-	pickableFilter?: (item: TreeItemType) => boolean;
+	pickableFilter?: (item: UmbDocumentItemModel) => boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface UmbContentPickerModalValue extends UmbTreePickerModalValue {}
+export interface UmbDocumentPickerModalValue extends UmbTreePickerModalValue {}
