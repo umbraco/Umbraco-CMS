@@ -7,13 +7,11 @@ import { UmbPublishableVariantState } from '@umbraco-cms/backoffice/variant';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type {
-	UmbConfirmActionModalEntityReferencesConfig,
-	UmbConfirmActionModalEntityReferencesElement,
-} from '@umbraco-cms/backoffice/relations';
+import type { UmbEntityReferencesConfig, UmbEntityReferencesSummaryElement } from '@umbraco-cms/backoffice/relations';
 import type { UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 
 import '../../../variant-picker/content-variant-language-picker.element.js';
+import '@umbraco-cms/backoffice/relations';
 
 /**
  * @function isPublished
@@ -54,7 +52,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	private _isInvariant = false;
 
 	@state()
-	private _referencesConfig?: UmbConfirmActionModalEntityReferencesConfig;
+	private _referencesConfig?: UmbEntityReferencesConfig;
 
 	readonly #pickableFilter = (option: UmbEntityVariantOptionModel) => {
 		if (!option.variant) {
@@ -140,7 +138,7 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 
 	async #onReferencesChange(event: UmbChangeEvent) {
 		event.stopPropagation();
-		const target = event.target as UmbConfirmActionModalEntityReferencesElement;
+		const target = event.target as UmbEntityReferencesSummaryElement;
 		const total = target.getTotalReferencedBy() + target.getTotalDescendantsWithReferences();
 
 		if (total === 0) {
@@ -171,11 +169,11 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 	};
 
 	override render() {
+		const messageKey = this._canUnpublish ? 'prompt_confirmUnpublish' : 'prompt_cannotUnpublishWhenReferenced';
+
 		return html`
 			<uui-dialog-layout headline=${this.localize.term('content_unpublish')}>
-				<p>
-					<umb-localize key="prompt_confirmUnpublish"></umb-localize>
-				</p>
+				${when(this._canUnpublish !== undefined, () => html`<p><umb-localize key=${messageKey}></umb-localize></p>`)}
 				${when(
 					!this._isInvariant,
 					() => html`
@@ -191,10 +189,8 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 				${when(
 					this._referencesConfig,
 					() => html`
-						<umb-confirm-action-modal-entity-references
-							.config=${this._referencesConfig}
-							@change=${this.#onReferencesChange}>
-						</umb-confirm-action-modal-entity-references>
+						<umb-entity-references-summary .config=${this._referencesConfig} @change=${this.#onReferencesChange}>
+						</umb-entity-references-summary>
 					`,
 				)}
 				<div slot="actions">
@@ -219,6 +215,10 @@ export class UmbContentUnpublishModalElement extends UmbModalBaseElement<
 				display: block;
 				min-width: 600px;
 				max-width: 90vw;
+			}
+
+			umb-content-variant-language-picker {
+				margin-bottom: var(--uui-size-3);
 			}
 		`,
 	];

@@ -10,9 +10,22 @@ import {
 } from '../../workspace/context/document-workspace-context.test-utils.js';
 import { UMB_DISCARD_CHANGES_MODAL, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbDocumentPublishingServerDataSource } from '../repository/document-publishing.server.data-source.js';
-import { UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import { UMB_CONTENT_PUBLISH_MODAL, UmbContentUnpublishEntityAction } from '@umbraco-cms/backoffice/content';
+import type {
+	ManifestEntityPublishAwareness,
+	UmbEntityPublishAwarenessApi,
+} from '@umbraco-cms/backoffice/content';
+import { UmbDocumentReferenceRepository } from '../../reference/repository/document-reference.repository.js';
+import type {
+	ManifestPropertyValueEntityReference,
+	UmbPropertyValueEntityReferenceResolver,
+} from '@umbraco-cms/backoffice/property';
+import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
+const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
 const DA = UmbVariantId.Create({ culture: 'da', segment: null });
 
@@ -252,6 +265,149 @@ describe('UmbDocumentPublishingWorkspaceContext', function () {
 
 			expect(modals, 'no discard prompt').to.not.include(UMB_DISCARD_CHANGES_MODAL.toString());
 			expect(reachedUnpublish, 'went straight to unpublishing').to.be.true;
+		});
+	});
+
+	describe('save and publish — reference-awareness gating for single-variant documents', () => {
+		/**
+		 * Tracks whether UMB_CONTENT_PUBLISH_MODAL was opened while `run` executes, and immediately rejects
+		 * every modal so the flow bails out early (mirrors the cancel path) without needing full rendering.
+		 */
+		async function runSaveAndPublishTrackingModal(run: () => Promise<unknown>) {
+			let opened = false;
+			const originalOpen = UmbModalManagerContext.prototype.open;
+			UmbModalManagerContext.prototype.open = function (
+				this: UmbModalManagerContext,
+				...args: Parameters<typeof originalOpen>
+			) {
+				if (String(args[1]) === UMB_CONTENT_PUBLISH_MODAL.toString()) opened = true;
+				const modalContext = originalOpen.apply(this, args as never);
+				modalContext.reject();
+				return modalContext;
+			} as typeof originalOpen;
+
+			try {
+				await run();
+			} finally {
+				UmbModalManagerContext.prototype.open = originalOpen;
+			}
+
+			return opened;
+		}
+
+		let restores: Array<() => void> = [];
+
+		beforeEach(async () => {
+			await context.load(INVARIANT_DOCUMENT_ID);
+			await aTimeout(0);
+		});
+
+		afterEach(() => {
+			restores.forEach((restore) => restore());
+			restores = [];
+		});
+
+		it('publishes immediately, with no modal, when nothing references this document and no referenced element has pending changes', async () => {
+			let published = false;
+			const originalUpdateAndPublish = UmbDocumentPublishingServerDataSource.prototype.updateAndPublish;
+			restores.push(() => {
+				UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = originalUpdateAndPublish;
+			});
+			UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = async function (...args) {
+				published = true;
+				return originalUpdateAndPublish.apply(this, args as never);
+			};
+
+			const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+			expect(opened, 'modal opened').to.be.false;
+			expect(published, 'publish went through').to.be.true;
+		});
+
+		it('opens the modal when something references this document', async () => {
+			const original = UmbDocumentReferenceRepository.prototype.requestReferencedBy;
+			restores.push(() => {
+				UmbDocumentReferenceRepository.prototype.requestReferencedBy = original;
+			});
+			UmbDocumentReferenceRepository.prototype.requestReferencedBy = async () => ({
+				data: { items: [], total: 1 },
+			});
+
+			const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+			expect(opened, 'modal opened').to.be.true;
+		});
+
+		it('opens the modal when this document references an element that is not fully published', async () => {
+			// INVARIANT_DOCUMENT_ID's own property value is a plain `Umbraco.TextBox` — fake a
+			// `propertyValueEntityReference` resolver for it so the draft "references" a fake element, plus the
+			// `entityPublishAwareness` + item-repository plumbing that turns that reference into a real
+			// "needs attention" item.
+			const ITEM_REPOSITORY_ALIAS = 'Umb.Test.DocumentPublishingWorkspaceContext.ItemRepository';
+
+			class TestEntityReferenceResolver implements UmbPropertyValueEntityReferenceResolver {
+				async resolveEntityReferences(): Promise<Array<UmbEntityModel>> {
+					return [{ entityType: 'element', unique: 'other-element-id' }];
+				}
+				destroy(): void {}
+			}
+			class TestItemRepository implements UmbItemRepository<UmbEntityModel> {
+				async requestItems(uniques: Array<string>) {
+					return { data: uniques.map((unique) => ({ entityType: 'element', unique })) };
+				}
+				destroy(): void {}
+			}
+			class TestPublishAwarenessApi implements UmbEntityPublishAwarenessApi<UmbEntityModel> {
+				needsAttention(): boolean {
+					return true;
+				}
+				destroy(): void {}
+			}
+
+			const entityReferenceManifest: ManifestPropertyValueEntityReference = {
+				type: 'propertyValueEntityReference',
+				name: 'Test Entity Reference Resolver',
+				alias: 'Umb.Test.DocumentPublishingWorkspaceContext.EntityReferenceResolver',
+				api: TestEntityReferenceResolver,
+				forEditorAlias: 'Umbraco.TextBox',
+			};
+			const itemRepositoryManifest: ManifestApi<TestItemRepository> = {
+				type: 'repository',
+				name: 'Test Item Repository',
+				alias: ITEM_REPOSITORY_ALIAS,
+				api: TestItemRepository,
+			};
+			const publishAwarenessManifest: ManifestEntityPublishAwareness = {
+				type: 'entityPublishAwareness',
+				name: 'Test Entity Publish Awareness',
+				alias: 'Umb.Test.DocumentPublishingWorkspaceContext.PublishAwareness',
+				api: TestPublishAwarenessApi,
+				forEntityTypes: ['element'],
+				meta: { itemRepositoryAlias: ITEM_REPOSITORY_ALIAS },
+			};
+
+			umbExtensionsRegistry.register(entityReferenceManifest);
+			umbExtensionsRegistry.register(itemRepositoryManifest);
+			umbExtensionsRegistry.register(publishAwarenessManifest);
+			restores.push(() => {
+				umbExtensionsRegistry.unregister(entityReferenceManifest.alias);
+				umbExtensionsRegistry.unregister(ITEM_REPOSITORY_ALIAS);
+				umbExtensionsRegistry.unregister(publishAwarenessManifest.alias);
+			});
+
+			const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+			expect(opened, 'modal opened').to.be.true;
+		});
+
+		it('opens the modal rather than risk publishing silently when a reference count lookup fails', async () => {
+			const original = UmbDocumentReferenceRepository.prototype.requestReferencedBy;
+			restores.push(() => {
+				UmbDocumentReferenceRepository.prototype.requestReferencedBy = original;
+			});
+			UmbDocumentReferenceRepository.prototype.requestReferencedBy = async () => {
+				throw new Error('Simulated network error');
+			};
+
+			const opened = await runSaveAndPublishTrackingModal(() => publishingContext.saveAndPublish());
+			expect(opened, 'modal opened').to.be.true;
 		});
 	});
 });
