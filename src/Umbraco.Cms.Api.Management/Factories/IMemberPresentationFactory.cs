@@ -1,3 +1,4 @@
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Core.Models;
@@ -59,11 +60,21 @@ public interface IMemberPresentationFactory
     /// <param name="member">The external member identity to create the response model from.</param>
     /// <param name="currentUser">The current user performing the operation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="MemberResponseModel"/>.</returns>
+    /// <remarks>
+    /// Implementations must not disclose member account state to a user without access to sensitive data. The
+    /// default implementation builds the model from the overload that is unaware of the user and then clears
+    /// that state, so an implementation that overrides only the unaware overload still upholds the rule; an
+    /// implementation overriding this overload takes on responsibility for it.
+    /// </remarks>
     // TODO (V19): Remove the default implementation.
-    Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member, IUser currentUser)
+    async Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member, IUser currentUser)
+    {
 #pragma warning disable CS0618 // Type or member is obsolete
-        => CreateExternalMemberResponseModelAsync(member);
+        MemberResponseModel responseModel = await CreateExternalMemberResponseModelAsync(member);
 #pragma warning restore CS0618 // Type or member is obsolete
+        responseModel.ClearSensitiveValuesFor(currentUser);
+        return responseModel;
+    }
 
     /// <summary>
     /// Creates an item response model for an external-only member.
@@ -91,9 +102,19 @@ public interface IMemberPresentationFactory
     /// <param name="item">The filter item to create the response model from.</param>
     /// <param name="currentUser">The current user performing the operation.</param>
     /// <returns>A <see cref="MemberResponseModel"/> representing the filter item.</returns>
+    /// <remarks>
+    /// Implementations must not disclose member account state to a user without access to sensitive data. The
+    /// default implementation builds the model from the overload that is unaware of the user and then clears
+    /// that state, so an implementation that overrides only the unaware overload still upholds the rule; an
+    /// implementation overriding this overload takes on responsibility for it.
+    /// </remarks>
     // TODO (V19): Remove the default implementation.
     MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item, IUser currentUser)
+    {
 #pragma warning disable CS0618 // Type or member is obsolete
-        => CreateFilterItemResponseModel(item);
+        MemberResponseModel responseModel = CreateFilterItemResponseModel(item);
 #pragma warning restore CS0618 // Type or member is obsolete
+        responseModel.ClearSensitiveValuesFor(currentUser);
+        return responseModel;
+    }
 }

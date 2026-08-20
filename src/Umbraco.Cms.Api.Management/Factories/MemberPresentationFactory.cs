@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
@@ -66,9 +67,15 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
 
         // Get the member groups per role, so we can return the group keys
         responseModel.Groups = roles.Select(x => _memberGroupService.GetByName(x)).WhereNotNull().Select(x => x.Key).ToArray();
-        return currentUser.HasAccessToSensitiveData()
-            ? responseModel
-            : await RemoveSensitiveDataAsync(member, responseModel);
+
+        responseModel.ClearSensitiveValuesFor(currentUser);
+
+        if (currentUser.HasAccessToSensitiveData() is false)
+        {
+            await RemoveSensitivePropertyValuesAsync(member, responseModel);
+        }
+
+        return responseModel;
     }
 
     /// <inheritdoc/>
@@ -101,10 +108,7 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     {
         MemberResponseModel responseModel = await BuildExternalMemberResponseModelAsync(member);
 
-        if (currentUser.HasAccessToSensitiveData() is false)
-        {
-            ClearSensitiveValues(responseModel);
-        }
+        responseModel.ClearSensitiveValuesFor(currentUser);
 
         return responseModel;
     }
@@ -166,10 +170,7 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
     {
         MemberResponseModel responseModel = BuildFilterItemResponseModel(item);
 
-        if (currentUser.HasAccessToSensitiveData() is false)
-        {
-            ClearSensitiveValues(responseModel);
-        }
+        responseModel.ClearSensitiveValuesFor(currentUser);
 
         return responseModel;
     }
@@ -215,31 +216,8 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
             }
         ];
 
-    /// <summary>
-    /// Clears the member account state that is subject to "sensitive data" rules.
-    /// </summary>
-    /// <param name="responseModel">The response model to clear the values on.</param>
-    /// <remarks>
-    /// Every response model carrying member account state must be passed through this before it reaches a
-    /// user without access to sensitive data, whichever endpoint produced it. Some of the fields are not
-    /// nullable, so for those we can't do much more than force revert them to their default values - which
-    /// means a default value in a response is not evidence of the member's actual state.
-    /// </remarks>
-    private static void ClearSensitiveValues(MemberResponseModel responseModel)
+    private async Task RemoveSensitivePropertyValuesAsync(IMember member, MemberResponseModel responseModel)
     {
-        responseModel.IsApproved = false;
-        responseModel.IsLockedOut = false;
-        responseModel.IsTwoFactorEnabled = false;
-        responseModel.FailedPasswordAttempts = 0;
-        responseModel.LastLoginDate = null;
-        responseModel.LastLockoutDate = null;
-        responseModel.LastPasswordChangeDate = null;
-    }
-
-    private async Task<MemberResponseModel> RemoveSensitiveDataAsync(IMember member, MemberResponseModel responseModel)
-    {
-        ClearSensitiveValues(responseModel);
-
         IMemberType memberType = await _memberTypeService.GetAsync(member.ContentType.Key)
                                  ?? throw new InvalidOperationException($"The member type {member.ContentType.Alias} could not be found");
 
@@ -249,8 +227,6 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         responseModel.Values = responseModel.Values
             .Where(valueModel => sensitivePropertyAliases.InvariantContains(valueModel.Alias) is false)
             .ToArray();
-
-        return responseModel;
     }
 
     private MemberKind GetMemberKind(Guid key)
