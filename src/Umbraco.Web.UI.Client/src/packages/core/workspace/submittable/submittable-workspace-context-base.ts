@@ -88,11 +88,12 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	}
 
 	/**
-	 * If valid, then this resets validation state of all validation contexts in this workspace.
-	 * Call this when a workspace submittion is complete without any validation errors.
+	 * If there are no validation messages (including filtered/other-variant messages), reset validation state for all validation contexts in this workspace.
+	 * Call this when a workspace submission is complete without any validation errors.
 	 */
 	#resetValidationIfValid(): void {
-		this.#validationContexts.forEach((context) => !context.messages.getHasAnyMessages() && context.reset());
+		if (this.#validationContexts.some((context) => context.messages.getNotFilteredMessages().length > 0)) return;
+		this.#validationContexts.forEach((context) => context.reset());
 	}
 
 	public async requestSubmit(): Promise<void> {
