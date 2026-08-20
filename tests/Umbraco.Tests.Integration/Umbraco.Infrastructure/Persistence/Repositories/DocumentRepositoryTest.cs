@@ -299,6 +299,70 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Get_For_Root_Content_Populates_Null_ParentKey()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out _);
+
+        IContent? result = repository.Get(_textpage.Key);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.Null);
+    }
+
+    [Test]
+    public void Get_For_Non_Root_Content_Populates_ParentKey()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out _);
+
+        IContent? result = repository.Get(_subpage.Key);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.EqualTo(_textpage.Key));
+    }
+
+    [Test]
+    public void Get_For_Trashed_Content_Populates_RecycleBin_Sentinel_ParentKey()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out _);
+
+        IContent? result = repository.Get(_trashed.Key);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.EqualTo(Constants.System.RecycleBinContentKey));
+    }
+
+    [Test]
+    public void Get_For_Non_Root_Content_Resolves_ParentKey_Without_A_Second_Query()
+    {
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository((IScopeAccessor)provider, out _);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        // Force a fresh, uncached fetch (AppCaches.NoCache is the default used by CreateRepository here) and
+        // capture the SQL statement count for a single Get(Guid). ParentKey is resolved via a self-join in
+        // GetBaseQuery (see ContentDto.ParentUniqueId) - if that were ever replaced by a separate follow-up
+        // query, this count would go up, and the TDD-honesty revert check for this test confirms exactly that.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        IContent? result = repository.Get(_subpage.Key);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.EqualTo(_textpage.Key));
+        Assert.That(database.SqlCount, Is.EqualTo(4), "no separate query to resolve ParentKey on top of the usual content/property/template queries");
+    }
+
+    [Test]
     public async Task CreateVersions()
     {
         var provider = ScopeProvider;

@@ -35,7 +35,7 @@ public abstract class TreeEntityBase : EntityBase, ITreeEntity
 
     /// <inheritdoc />
     [DataMember]
-    public int ParentId
+    public virtual int ParentId
     {
         get
         {
@@ -87,7 +87,7 @@ public abstract class TreeEntityBase : EntityBase, ITreeEntity
     }
 
     /// <inheritdoc />
-    public void SetParent(ITreeEntity? parent)
+    public virtual void SetParent(ITreeEntity? parent)
     {
         _hasParentId = false;
         _parent = parent;

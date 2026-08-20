@@ -254,7 +254,9 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             throw new ArgumentException("No content with that id.", nameof(parentId));
         }
 
-        var content = new Content(name, parentId, contentType, userId);
+        Content content = parentId > 0
+            ? new Content(name, parent!, contentType, userId)
+            : new Content(name, parentId, contentType, userId);
 
         return content;
     }
@@ -496,10 +498,10 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             return null;
         }
 
-        Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.ParentId, UmbracoObjectTypes.Document);
-        return parentKeyAttempt.Success
-            ? await GetByIdAsync(parentKeyAttempt.Result, cancellationToken)
-            : null;
+        Guid? parentKey = content.ParentKey;
+        return parentKey is null
+            ? null
+            : await GetByIdAsync(parentKey.Value, cancellationToken);
     }
 
     /// <summary>
@@ -1121,11 +1123,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
             // changes
             MoveEventInfo<IContent>[] moveInfo = moves
-                .Select(x =>
-                {
-                    TryGetParentKey(x.Item1.ParentId, out Guid? itemParentKey);
-                    return new MoveEventInfo<IContent>(x.Item1, x.Item2, itemParentKey);
-                })
+                .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentKey))
                 .ToArray();
 
             scope.Notifications.Publish(
@@ -1144,6 +1142,12 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         content.WriterId = userId;
         content.ParentId = parentId;
+        content.ParentKey = parentId switch
+        {
+            Constants.System.Root => null,
+            Constants.System.RecycleBinContent => Constants.System.RecycleBinContentKey,
+            _ => parent?.Key,
+        };
 
         // get the level delta (old pos to new pos)
         // note that recycle bin (id:-20) level is 0!
@@ -1217,6 +1221,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         if (isDirectChild)
         {
             descendant.ParentId = Constants.System.RecycleBinContent;
+            descendant.ParentKey = Constants.System.RecycleBinContentKey;
         }
 
         PerformMoveContentLocked(descendant, userId, null);
@@ -1371,7 +1376,13 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            TryGetParentKey(parentId, out Guid? parentKey);
+            Guid? parentKey = parentId switch
+            {
+                Constants.System.Root => null,
+                Constants.System.RecycleBinContent => Constants.System.RecycleBinContentKey,
+                _ => TryGetParentKey(parentId, out Guid? realParentKey) ? realParentKey : null,
+            };
+            copy.ParentKey = parentKey;
             if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentKey, eventMessages)))
             {
                 scope.Complete();
@@ -1405,7 +1416,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             _documentRepository.Save(copy);
 
             // store navigation update information for copied item
-            navigationUpdates.Add(Tuple.Create(copy.Key, GetParent(copy)?.Key));
+            var copyHasRealParent = parentId != Constants.System.Root && parentId != Constants.System.RecycleBinContent;
+            navigationUpdates.Add(Tuple.Create(copy.Key, copyHasRealParent ? copy.ParentKey : null));
 
             // add permissions
             if (currentPermissions.Count > 0)
@@ -1417,6 +1429,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             // keep track of copies
             copies.Add(Tuple.Create(content, copy));
             var idmap = new Dictionary<int, int> { [content.Id] = copy.Id };
+            var copyIdToKeyMap = new Dictionary<int, Guid> { [copy.Id] = copy.Key };
 
             // process descendants
             if (recursive)
@@ -1446,8 +1459,9 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
                         IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
                         descendantCopy.ParentId = parentId;
+                        descendantCopy.ParentKey = copyIdToKeyMap[parentId];
 
-                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentKey, eventMessages)))
+                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, descendantCopy.ParentKey, eventMessages)))
                         {
                             continue;
                         }
@@ -1473,10 +1487,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                         _documentRepository.Save(descendantCopy);
 
                         // store navigation update information for descendants
-                        navigationUpdates.Add(Tuple.Create(descendantCopy.Key, GetParent(descendantCopy)?.Key));
+                        navigationUpdates.Add(Tuple.Create(descendantCopy.Key, descendantCopy.ParentKey));
 
                         copies.Add(Tuple.Create(descendant, descendantCopy));
                         idmap[descendant.Id] = descendantCopy.Id;
+                        copyIdToKeyMap[descendantCopy.Id] = descendantCopy.Key;
                     }
                 }
             }
@@ -1488,7 +1503,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                 new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
             foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
             {
-                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentKey, relateToOriginal, eventMessages));
+                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, x.Item2.ParentKey, relateToOriginal, eventMessages));
             }
 
             Audit(AuditType.Copy, userId, content.Id);

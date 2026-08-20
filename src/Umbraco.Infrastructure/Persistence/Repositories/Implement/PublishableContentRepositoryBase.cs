@@ -17,6 +17,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
@@ -276,6 +277,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
             TEntity c = content[i] = BuildEntity(dto, contentType);
 
+            // Root's node row exists (umbracoNode id -1) but carries RootSystemKey, not the semantic
+            // "no parent" value ParentKey contracts to - see ContentDto.ParentUniqueId's remarks.
+            c.ParentKey = dto.ContentDto.NodeDto.ParentId == Constants.System.Root
+                ? null
+                : dto.ContentDto.ParentUniqueId;
+
             // Defensive check: umbracoDocument.published = 1 but no umbracoDocumentVersion row has published = 1
             // leaves PublishedVersionDto null.
             // See https://github.com/umbraco/Umbraco-CMS/issues/22293.
@@ -364,6 +371,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
     {
         IContentType? contentType = _contentTypeRepository.GetAsync(dto.ContentDto.ContentTypeId, CancellationToken.None).GetAwaiter().GetResult();
         TEntity content = BuildEntity(dto, contentType);
+
+        // Root's node row exists (umbracoNode id -1) but carries RootSystemKey, not the semantic
+        // "no parent" value ParentKey contracts to - see ContentDto.ParentUniqueId's remarks.
+        content.ParentKey = dto.ContentDto.NodeDto.ParentId == Constants.System.Root
+            ? null
+            : dto.ContentDto.ParentUniqueId;
 
         try
         {
@@ -757,7 +770,10 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                                 r1.Select(entityVersionDto => entityVersionDto!.ContentVersionDto, "pcv")))
 
                     // select the variant name, coalesce to the invariant name, as "variantName"
-                    .AndSelect(VariantNameSqlExpression + " AS variantName");
+                    .AndSelect(VariantNameSqlExpression + " AS variantName")
+
+                    // self-join, see the "parentNode" LeftJoin below - avoids a second query to resolve ParentKey
+                    .AndSelect<NodeDto>("parentNode", x => Alias(x.UniqueId, "ParentUniqueId"));
                 break;
         }
 
@@ -796,7 +812,12 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 "ccv")
                 .On<ContentVersionDto, ContentVersionCultureVariationDto>(
                         (version, ccv) => version.Id == ccv.VersionId,
-                    aliasRight: "ccv");
+                    aliasRight: "ccv")
+
+            // self-join umbracoNode back onto itself via ParentId, to resolve ParentKey in the same query
+            // instead of a separate follow-up query - see the "ParentUniqueId" AndSelect above.
+            .LeftJoin<NodeDto>("parentNode")
+            .On<NodeDto, NodeDto>((left, right) => left.ParentId == right.NodeId, aliasRight: "parentNode");
 
         sql
             .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);

@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -78,11 +79,51 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
-    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
-        .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
-        .AddNotificationHandler<ContentCopyingNotification, ContentNotificationHandler>()
-        .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>()
-        .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>();
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        builder
+            .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentCopyingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>();
+
+        builder.Services.AddUnique<IIdKeyMap>(services => new SpyIdKeyMap(ActivatorUtilities.CreateInstance<IdKeyMap>(services)));
+    }
+
+    /// <summary>
+    ///     Wraps a real <see cref="IIdKeyMap" /> so tests can assert whether it was actually consulted - a read
+    ///     path that's supposed to resolve the parent via an already-populated <see cref="IContentBase.ParentKey" />
+    ///     could regress to calling <see cref="IIdKeyMap" /> unconditionally (e.g. via this service's own
+    ///     constructor-injected fallback for callers that pass an entity whose <see cref="IContentBase.ParentKey" />
+    ///     isn't populated) while still returning the correct value, so a test that only asserts the final value
+    ///     wouldn't catch that regression.
+    /// </summary>
+    private sealed class SpyIdKeyMap : IIdKeyMap
+    {
+        private readonly IIdKeyMap _inner;
+
+        public SpyIdKeyMap(IIdKeyMap inner) => _inner = inner;
+
+        public int GetKeyForIdAsyncCallCount { get; private set; }
+
+        public Task<Attempt<int>> GetIdForKeyAsync(Guid key, UmbracoObjectTypes umbracoObjectType) => _inner.GetIdForKeyAsync(key, umbracoObjectType);
+
+        public Task<Attempt<int>> GetIdForUdiAsync(Udi udi) => _inner.GetIdForUdiAsync(udi);
+
+        public Task<Attempt<Udi?>> GetUdiForIdAsync(int id, UmbracoObjectTypes umbracoObjectType) => _inner.GetUdiForIdAsync(id, umbracoObjectType);
+
+        public Task<Attempt<Guid>> GetKeyForIdAsync(int id, UmbracoObjectTypes umbracoObjectType)
+        {
+            GetKeyForIdAsyncCallCount++;
+            return _inner.GetKeyForIdAsync(id, umbracoObjectType);
+        }
+
+        public void ClearCache() => _inner.ClearCache();
+
+        public void ClearCache(int id) => _inner.ClearCache(id);
+
+        public void ClearCache(Guid key) => _inner.ClearCache(key);
+    }
 
     [Test]
     public async Task GetByIdAsync_ExistingContent_ReturnsContent()
@@ -618,6 +659,37 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         IContent? result = await ContentService.GetParentAsync(Guid.NewGuid(), CancellationToken.None);
 
         Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task GetParentAsync_Uses_Content_ParentKey_Without_Calling_IIdKeyMap()
+    {
+        var idKeyMapSpy = (SpyIdKeyMap)IdKeyMap;
+
+        IContent? result = await ContentService.GetParentAsync(Subpage.Key, CancellationToken.None);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Key, Is.EqualTo(Textpage.Key));
+        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.Zero, "GetParentAsync must resolve the parent via the already-populated ParentKey, not via IIdKeyMap");
+    }
+
+    [Test]
+    public async Task GetParent_Uses_Content_ParentKey_Without_Calling_IIdKeyMap()
+    {
+        var idKeyMapSpy = (SpyIdKeyMap)IdKeyMap;
+
+        // Fetch through the repository (rather than using the raw fixture instance) so ParentKey is
+        // already populated - otherwise GetParent's own catch-block fallback would call IIdKeyMap
+        // regardless of whether the already-populated-ParentKey path itself works, masking the assertion.
+        IContent? subpage = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
+        Assert.That(subpage, Is.Not.Null);
+        var callCountBeforeGetParent = idKeyMapSpy.GetKeyForIdAsyncCallCount;
+
+        IContent? result = ContentService.GetParent(subpage!);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Key, Is.EqualTo(Textpage.Key));
+        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.EqualTo(callCountBeforeGetParent), "GetParent must resolve the parent via the already-populated ParentKey, not via IIdKeyMap");
     }
 
     [Test]
@@ -2751,8 +2823,46 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Assert
         Assert.That(content.ParentId, Is.EqualTo(Textpage.Id));
+        Assert.That(content.ParentKey, Is.EqualTo(Textpage.Key));
         Assert.That(content.Trashed, Is.False);
         Assert.That(content.Published, Is.False);
+    }
+
+    [Test]
+    public async Task MoveToRecycleBin_Sets_RecycleBin_Sentinel_ParentKey()
+    {
+        var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
+
+        ContentService.MoveToRecycleBin(content);
+
+        Assert.That(content!.ParentId, Is.EqualTo(Constants.System.RecycleBinContent));
+        Assert.That(content.ParentKey, Is.EqualTo(Constants.System.RecycleBinContentKey));
+    }
+
+    [Test]
+    public async Task Move_With_Descendants_Populates_ParentKey_Without_Redundant_IIdKeyMap_Calls()
+    {
+        var idKeyMapSpy = (SpyIdKeyMap)IdKeyMap;
+
+        var destination = ContentBuilder.CreateSimpleContent(ContentType, "Move Destination");
+        ContentService.Save(destination, -1);
+
+        IContent? textpage = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
+        var callCountBeforeMove = idKeyMapSpy.GetKeyForIdAsyncCallCount;
+
+        ContentService.Move(textpage!, destination.Id);
+
+        // Resolving the new parent from its int id is the one unavoidable lookup (Move's public
+        // signature only takes an int parentId) - moving Textpage's two children must not add any
+        // further IIdKeyMap calls on top of that, regardless of how many descendants are moved.
+        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.EqualTo(callCountBeforeMove + 1));
+
+        Assert.That(textpage!.ParentKey, Is.EqualTo(destination.Key));
+
+        IContent? subpage = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
+        IContent? subpage2 = await ContentService.GetByIdAsync(Subpage2.Key, CancellationToken.None);
+        Assert.That(subpage!.ParentKey, Is.EqualTo(textpage.Key));
+        Assert.That(subpage2!.ParentKey, Is.EqualTo(textpage.Key));
     }
 
     [Test]
@@ -2768,6 +2878,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Assert
         Assert.That(copy, Is.Not.Null);
         Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
+        Assert.That(copy.ParentKey, Is.EqualTo(Textpage.Key));
         Assert.AreNotSame(content, copy);
         foreach (var property in copy.Properties)
         {
@@ -2775,6 +2886,84 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert.AreNotEqual(content.Name, copy.Name);
+    }
+
+    [Test]
+    public async Task Copy_To_Root_Populates_Null_ParentKey_Not_The_Root_Nodes_Own_Key()
+    {
+        IContent? subpage = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
+
+        // umbracoNode's own Root row (id -1) carries Constants.System.RootSystemKey, NOT the semantic
+        // "no parent" value ParentKey contracts to - Copy must not let it leak through.
+        IContent? copy = ContentService.Copy(subpage!, Constants.System.Root, false);
+
+        Assert.That(copy, Is.Not.Null);
+        Assert.That(copy!.ParentKey, Is.Null);
+    }
+
+    [Test]
+    public async Task Copy_Recursive_Populates_Descendant_ParentKey_Without_Redundant_IIdKeyMap_Calls()
+    {
+        var idKeyMapSpy = (SpyIdKeyMap)IdKeyMap;
+
+        var destination = ContentBuilder.CreateSimpleContent(ContentType, "Copy Destination");
+        ContentService.Save(destination, -1);
+
+        IContent? textpage = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
+        var callCountBeforeCopy = idKeyMapSpy.GetKeyForIdAsyncCallCount;
+
+        IContent? copy = ContentService.Copy(textpage!, destination.Id, false, true);
+
+        // Resolving the new parent from its int id is the one unavoidable lookup (Copy's public
+        // signature only takes an int parentId) - copying Textpage's two descendants must not add any
+        // further IIdKeyMap calls on top of that, regardless of how many descendants are copied.
+        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.EqualTo(callCountBeforeCopy + 1));
+
+        Assert.That(copy, Is.Not.Null);
+        Assert.That(copy!.ParentKey, Is.EqualTo(destination.Key));
+
+        PagedModel<IContent> copiedDescendants = await ContentService.GetChildrenAsync(copy.Key, 0, 10, null, null, CancellationToken.None);
+        Assert.That(copiedDescendants.Items, Is.Not.Empty);
+        foreach (IContent copiedDescendant in copiedDescendants.Items)
+        {
+            Assert.That(copiedDescendant.ParentKey, Is.EqualTo(copy.Key));
+        }
+    }
+
+    [Test]
+    public async Task Copy_Recursive_Notification_Reports_Each_Copys_Own_New_Parent_Not_The_Roots()
+    {
+        var destination = ContentBuilder.CreateSimpleContent(ContentType, "Copy Notification Destination");
+        ContentService.Save(destination, -1);
+
+        IContent? textpage = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
+
+        var reportedParentKeysByCopyKey = new Dictionary<Guid, Guid?>();
+        ContentNotificationHandler.CopiedContent = notification => reportedParentKeysByCopyKey[notification.Copy.Key] = notification.ParentKey;
+
+        IContent? copy;
+        try
+        {
+            copy = ContentService.Copy(textpage!, destination.Id, false, true);
+        }
+        finally
+        {
+            ContentNotificationHandler.CopiedContent = null;
+        }
+
+        Assert.That(copy, Is.Not.Null);
+
+        // The root copy's own new parent is the destination...
+        Assert.That(reportedParentKeysByCopyKey[copy!.Key], Is.EqualTo(destination.Key));
+
+        // ...but each descendant copy's own new parent is the root copy, not the destination the root
+        // copy moved into - descendants must not report the root copy's parent key as their own.
+        PagedModel<IContent> copiedDescendants = await ContentService.GetChildrenAsync(copy.Key, 0, 10, null, null, CancellationToken.None);
+        Assert.That(copiedDescendants.Items, Is.Not.Empty);
+        foreach (IContent copiedDescendant in copiedDescendants.Items)
+        {
+            Assert.That(reportedParentKeysByCopyKey[copiedDescendant.Key], Is.EqualTo(copy.Key));
+        }
     }
 
     /// <summary>

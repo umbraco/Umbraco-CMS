@@ -656,6 +656,12 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
             Member c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
+            // Root's node row exists (umbracoNode id -1) but carries RootSystemKey, not the semantic
+            // "no parent" value ParentKey contracts to - see ContentDto.ParentUniqueId's remarks.
+            c.ParentKey = dto.ContentDto.NodeDto.ParentId == Constants.System.Root
+                ? null
+                : dto.ContentDto.ParentUniqueId;
+
             // need properties
             var versionId = dto.ContentVersionDto.Id;
             temps.Add(new TempContent<Member>(dto.NodeId, versionId, 0, contentType, c));
@@ -683,6 +689,12 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     {
         IMemberType? memberType = _memberTypeRepository.Get(dto.ContentDto.ContentTypeId);
         Member member = ContentBaseFactory.BuildEntity(dto, memberType);
+
+        // Root's node row exists (umbracoNode id -1) but carries RootSystemKey, not the semantic
+        // "no parent" value ParentKey contracts to - see ContentDto.ParentUniqueId's remarks.
+        member.ParentKey = dto.ContentDto.NodeDto.ParentId == Constants.System.Root
+            ? null
+            : dto.ContentDto.ParentUniqueId;
 
         // get properties - indexed by version id
         var versionId = dto.ContentVersionDto.Id;
@@ -789,7 +801,10 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
                     // ContentRepositoryBase expects a variantName field to order by name
                     // so get it here, though for members it's just the plain node name
-                    .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"));
+                    .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"))
+
+                    // self-join, see the "parentNode" LeftJoin below - avoids a second query to resolve ParentKey
+                    .AndSelect<NodeDto>("parentNode", x => Alias(x.UniqueId, "ParentUniqueId"));
                 break;
         }
 
@@ -804,7 +819,12 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             // the execution plan says it doesn't so we'll go with that and in that case, it might be worth joining the content
             // types by default on the document and media repos so we can query by content type there too.
             .InnerJoin<ContentTypeDto>()
-            .On<ContentDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId);
+            .On<ContentDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId)
+
+            // self-join umbracoNode back onto itself via ParentId, to resolve ParentKey in the same query
+            // instead of a separate follow-up query.
+            .LeftJoin<NodeDto>("parentNode")
+            .On<NodeDto, NodeDto>((left, right) => left.ParentId == right.NodeId, aliasRight: "parentNode");
 
         sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 

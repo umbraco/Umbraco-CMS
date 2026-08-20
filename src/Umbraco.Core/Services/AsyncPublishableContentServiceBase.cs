@@ -576,10 +576,25 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             return null;
         }
 
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, ContentObjectType).GetAwaiter().GetResult();
-        return parentKeyAttempt.Success
-            ? GetByIdAsync(parentKeyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
-            : null;
+        // content is caller-supplied and not guaranteed to have gone through a read path that populated
+        // ParentKey (e.g. a freshly constructed, unsaved entity) - fall back to this service's own
+        // constructor-injected IIdKeyMap rather than let IContentBase.ParentKey's default implementation
+        // throw. This is the one legitimate reason to still resolve it here: everywhere else, ParentKey
+        // is expected to already be populated.
+        Guid? parentKey;
+        try
+        {
+            parentKey = content.ParentKey;
+        }
+        catch (NotSupportedException)
+        {
+            Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, ContentObjectType).GetAwaiter().GetResult();
+            parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
+        }
+
+        return parentKey is null
+            ? null
+            : GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     #endregion

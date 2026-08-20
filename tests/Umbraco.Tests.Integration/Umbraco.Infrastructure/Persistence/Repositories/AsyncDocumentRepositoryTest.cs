@@ -135,6 +135,45 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task GetAsync_ForRootContent_PopulatesNullParentKey()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent? result = await repository.GetAsync(_textpage.Key, CancellationToken.None);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.Null);
+        scope.Complete();
+    }
+
+    [Test]
+    public async Task GetAsync_ForNonRootContent_PopulatesParentKey()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent? result = await repository.GetAsync(_subpage.Key, CancellationToken.None);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.EqualTo(_textpage.Key));
+        scope.Complete();
+    }
+
+    [Test]
+    public async Task GetAsync_ForTrashedContent_PopulatesRecycleBinSentinelParentKey()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IContent? result = await repository.GetAsync(_trashed.Key, CancellationToken.None);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.EqualTo(Constants.System.RecycleBinContentKey));
+        scope.Complete();
+    }
+
+    [Test]
     public async Task GetAsync_PopulatesNodeMetadata()
     {
         using var scope = NewScopeProvider.CreateScope();
@@ -782,6 +821,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.Items.Any(c => c.Key == _subpage2.Key), Is.True);
         Assert.That(result.Items.All(c => c.ParentId == _textpage.Id), Is.True,
             "GetChildrenAsync should return only direct children, not grandchildren");
+        Assert.That(result.Items.All(c => c.ParentKey == _textpage.Key), Is.True,
+            "ParentKey must be resolved via GetChildrenCoreAsync's own parent-node join, not left unpopulated");
     }
 
     [Test]
@@ -797,6 +838,10 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.Total, Is.EqualTo(2),
             "a null parentKey must be treated as the root of the content tree, since root has no Guid identity of its own");
         Assert.That(result.Items.Select(c => c.Key), Is.EquivalentTo(new[] { _textpage.Key, _publishedPage.Key }));
+
+        // umbracoNode's own Root row (id -1) carries Constants.System.RootSystemKey, NOT the semantic
+        // "no parent" value ParentKey contracts to - the parent-node join must not let it leak through.
+        Assert.That(result.Items.All(c => c.ParentKey is null), Is.True);
     }
 
     [Test]
@@ -929,6 +974,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.Items.Count(), Is.EqualTo(2));
         Assert.That(result.Items.Any(c => c.Key == _subpage.Key), Is.True);
         Assert.That(result.Items.Any(c => c.Key == _subpage2.Key), Is.True);
+        Assert.That(result.Items.All(c => c.ParentKey == _textpage.Key), Is.True,
+            "ParentKey must be resolved via GetDescendantsCoreAsync's own parent-node join, not left unpopulated");
     }
 
     [Test]
@@ -2535,6 +2582,10 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(items.Any(c => c.Key == _trashed.Key), Is.True);
         Assert.That(items.Any(c => c.Key == deepDescendant.Key), Is.True,
             "GetRecycleBinAsync must include trashed descendants that aren't direct children of the bin");
+
+        Assert.That(items.Single(c => c.Key == _trashed.Key).ParentKey, Is.EqualTo(Constants.System.RecycleBinContentKey));
+        Assert.That(items.Single(c => c.Key == deepDescendant.Key).ParentKey, Is.EqualTo(_trashed.Key),
+            "ParentKey must be resolved via GetRecycleBinAsync's own parent-node join, not left unpopulated");
     }
 
     [Test]
@@ -2578,6 +2629,10 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Guid[] allKeys = firstPage.Items.Select(c => c.Key).Concat(secondPage.Items.Select(c => c.Key)).ToArray();
         Assert.That(allKeys, Is.EquivalentTo(new[] { _trashed.Key, _subpage.Key, _subpage2.Key }),
             "the two pages together must cover all 3 trashed items with no duplicates/omissions");
+
+        IContent trashedItem = firstPage.Items.Concat(secondPage.Items).Single(c => c.Key == _trashed.Key);
+        Assert.That(trashedItem.ParentKey, Is.EqualTo(Constants.System.RecycleBinContentKey),
+            "ParentKey must be resolved via GetPagedRecycleBinAsync's own parent-node join, not left unpopulated");
     }
 
     [Test]
@@ -3188,6 +3243,11 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         IContent[] items = result.Items.ToArray();
         Assert.That(items, Has.Length.EqualTo(1));
         Assert.That(items[0].Key, Is.EqualTo(secondTypeDoc.Key));
+
+        // secondTypeDoc sits directly under Root - umbracoNode's own Root row (id -1) carries RootSystemKey,
+        // NOT the semantic null ParentKey contracts to; GetPagedOfContentTypesAsync's parent-node join must
+        // not leak it.
+        Assert.That(items[0].ParentKey, Is.Null);
     }
 
     [Test]
@@ -3413,6 +3473,8 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(keys, Does.Contain(_subpage.Key));
         Assert.That(keys, Does.Not.Contain(_subpage2.Key),
             "GetByLevelAsync must filter out trashed content items, contrary to most other query methods");
+        Assert.That(result.Items.Single(c => c.Key == _subpage.Key).ParentKey, Is.EqualTo(_textpage.Key),
+            "ParentKey must be resolved via GetByLevelAsync's own parent-node join, not left unpopulated");
     }
 
     [Test]
@@ -3487,6 +3549,13 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.Total, Is.EqualTo(2));
         Assert.That(result.Items.Select(c => c.Key), Is.EqualTo(new[] { _textpage.Key, _subpage.Key }),
             "Ancestors must be returned root-first (textpage before subpage), and must not include the item itself");
+
+        IContent[] ancestors = result.Items.ToArray();
+        Assert.That(ancestors[0].ParentKey, Is.Null,
+            "_textpage sits directly under Root - umbracoNode's own Root row (id -1) carries RootSystemKey, " +
+            "NOT the semantic null ParentKey contracts to; GetAncestorsAsync's parent-node join must not leak it");
+        Assert.That(ancestors[1].ParentKey, Is.EqualTo(_textpage.Key),
+            "ParentKey must be resolved via GetAncestorsAsync's own parent-node join, not left unpopulated");
     }
 
     [Test]

@@ -244,6 +244,12 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
             Core.Models.Media c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
+            // Root's node row exists (umbracoNode id -1) but carries RootSystemKey, not the semantic
+            // "no parent" value ParentKey contracts to - see ContentDto.ParentUniqueId's remarks.
+            c.ParentKey = dto.NodeDto.ParentId == Constants.System.Root
+                ? null
+                : dto.ParentUniqueId;
+
             // need properties
             var versionId = dto.ContentVersionDto.Id;
             temps.Add(new TempContent<Core.Models.Media>(dto.NodeId, versionId, 0, contentType, c));
@@ -271,6 +277,12 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     {
         IMediaType? contentType = _mediaTypeRepository.Get(dto.ContentTypeId);
         Core.Models.Media media = ContentBaseFactory.BuildEntity(dto, contentType);
+
+        // Root's node row exists (umbracoNode id -1) but carries RootSystemKey, not the semantic
+        // "no parent" value ParentKey contracts to - see ContentDto.ParentUniqueId's remarks.
+        media.ParentKey = dto.NodeDto.ParentId == Constants.System.Root
+            ? null
+            : dto.ParentUniqueId;
 
         // get properties - indexed by version id
         var versionId = dto.ContentVersionDto.Id;
@@ -370,7 +382,10 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
                     // ContentRepositoryBase expects a variantName field to order by name
                     // for now, just return the plain invariant node name
-                    .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"));
+                    .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"))
+
+                    // self-join, see the "parentNode" LeftJoin below - avoids a second query to resolve ParentKey
+                    .AndSelect<NodeDto>("parentNode", x => Alias(x.UniqueId, "ParentUniqueId"));
                 break;
         }
 
@@ -378,7 +393,12 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             .From<ContentDto>()
             .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
             .InnerJoin<ContentVersionDto>()
-            .On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId);
+            .On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId)
+
+            // self-join umbracoNode back onto itself via ParentId, to resolve ParentKey in the same query
+            // instead of a separate follow-up query.
+            .LeftJoin<NodeDto>("parentNode")
+            .On<NodeDto, NodeDto>((left, right) => left.ParentId == right.NodeId, aliasRight: "parentNode");
 
         if (joinMediaVersion)
         {

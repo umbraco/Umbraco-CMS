@@ -90,6 +90,46 @@ internal sealed class MediaRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Get_For_Root_Media_Populates_Null_ParentKey()
+    {
+        var provider = ScopeProvider;
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out _);
+
+        IMedia? result = repository.Get(_testFolder.Key);
+
+        Assert.That(result, Is.Not.Null);
+
+        // umbracoNode's own Root row (id -1) carries Constants.System.RootSystemKey, NOT the semantic
+        // "no parent" value ParentKey contracts to - the self-join in GetBaseQuery must not let it leak through.
+        Assert.That(result!.ParentKey, Is.Null);
+    }
+
+    [Test]
+    public void Get_For_Non_Root_Media_Resolves_ParentKey_Without_A_Second_Query()
+    {
+        var provider = ScopeProvider;
+        var scopeAccessor = ScopeAccessor;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, out _);
+
+        var database = scopeAccessor.AmbientScope.Database;
+
+        // ParentKey is resolved via a self-join in GetBaseQuery (see ContentDto.ParentUniqueId) - if that were
+        // ever replaced by a separate follow-up query, this count would go up, and the TDD-honesty revert
+        // check for this test confirms exactly that.
+        database.EnableSqlCount = false;
+        database.EnableSqlCount = true;
+
+        IMedia? result = repository.Get(_testImage.Key);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.EqualTo(_testFolder.Key));
+        Assert.That(database.SqlCount, Is.EqualTo(4), "no separate query to resolve ParentKey on top of the usual content/property queries");
+    }
+
+    [Test]
     public void Retrievals_By_Id_And_Key_After_Save_Are_Cached()
     {
         var realCache = new AppCaches(

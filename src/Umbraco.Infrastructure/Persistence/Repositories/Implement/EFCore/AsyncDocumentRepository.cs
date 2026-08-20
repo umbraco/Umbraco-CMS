@@ -476,6 +476,14 @@ internal class AsyncDocumentRepository
                     (joined, pub) => new { joined.contentVersion, joined.node, joined.documentVersion, joined.content, joined.document, pub })
                 .OrderByDescending(joined => joined.contentVersion.Current)
                 .ThenByDescending(joined => joined.contentVersion.VersionDate)
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.contentVersion, joined.node, joined.documentVersion, joined.content, joined.document, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new { joined.contentVersion, joined.node, joined.documentVersion, joined.content, joined.document, joined.pub, parentNode })
                 .Select(joined => new DocumentRow(
                     joined.node,
                     joined.document,
@@ -483,7 +491,8 @@ internal class AsyncDocumentRepository
                     joined.contentVersion,
                     joined.documentVersion,
                     joined.pub!.contentVersion,
-                    joined.pub!.documentVersion))
+                    joined.pub!.documentVersion,
+                    joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                 .ToListAsync(cancellationToken);
 
             if (rows.Count == 0)
@@ -536,14 +545,23 @@ internal class AsyncDocumentRepository
                     (joined, pubGroup) => new { joined.contentVersion, joined.documentVersion, joined.content, joined.node, joined.document, pubGroup })
                 .SelectMany(
                     joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new DocumentRow(
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pub })
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new DocumentRow(
                         joined.node,
                         joined.document,
                         joined.content,
                         joined.contentVersion,
                         joined.documentVersion,
-                        pub!.contentVersion,
-                        pub!.documentVersion))
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion,
+                        parentNode == null ? (Guid?)null : parentNode.UniqueId))
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (row is null)
@@ -629,7 +647,15 @@ internal class AsyncDocumentRepository
                     (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
                 .SelectMany(
                     joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -672,7 +698,8 @@ internal class AsyncDocumentRepository
                             joined.contentVersion,
                             joined.documentVersion,
                             joined.pub!.contentVersion,
-                            joined.pub!.documentVersion))
+                            joined.pub!.documentVersion,
+                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
@@ -699,7 +726,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, ccvGroup
+                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
                         })
                     .SelectMany(
                         joined => joined.ccvGroup.DefaultIfEmpty(),
@@ -707,7 +734,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub,
+                            joined.contentType, joined.pub, joined.parentNode,
                             variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
                         });
 
@@ -731,7 +758,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
 
@@ -761,7 +789,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -843,7 +872,15 @@ internal class AsyncDocumentRepository
                     (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
                 .SelectMany(
                     joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -888,7 +925,8 @@ internal class AsyncDocumentRepository
                             joined.contentVersion,
                             joined.documentVersion,
                             joined.pub!.contentVersion,
-                            joined.pub!.documentVersion))
+                            joined.pub!.documentVersion,
+                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
@@ -915,7 +953,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, ccvGroup
+                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
                         })
                     .SelectMany(
                         joined => joined.ccvGroup.DefaultIfEmpty(),
@@ -923,7 +961,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub,
+                            joined.contentType, joined.pub, joined.parentNode,
                             variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
                         });
 
@@ -947,7 +985,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
 
@@ -978,7 +1017,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -1027,14 +1067,23 @@ internal class AsyncDocumentRepository
                     (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pubGroup })
                 .SelectMany(
                     joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new DocumentRow(
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pub })
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new DocumentRow(
                         joined.node,
                         joined.document,
                         joined.content,
                         joined.contentVersion,
                         joined.documentVersion,
-                        pub!.contentVersion,
-                        pub!.documentVersion))
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion,
+                        parentNode == null ? (Guid?)null : parentNode.UniqueId))
                 .ToListAsync(cancellationToken);
 
             if (rows.Count == 0)
@@ -1105,7 +1154,15 @@ internal class AsyncDocumentRepository
                     (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
                 .SelectMany(
                     joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -1148,7 +1205,8 @@ internal class AsyncDocumentRepository
                             joined.contentVersion,
                             joined.documentVersion,
                             joined.pub!.contentVersion,
-                            joined.pub!.documentVersion))
+                            joined.pub!.documentVersion,
+                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
@@ -1172,7 +1230,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, ccvGroup
+                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
                         })
                     .SelectMany(
                         joined => joined.ccvGroup.DefaultIfEmpty(),
@@ -1180,7 +1238,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub,
+                            joined.contentType, joined.pub, joined.parentNode,
                             variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
                         });
 
@@ -1204,7 +1262,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
 
@@ -1232,7 +1291,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -1299,7 +1359,15 @@ internal class AsyncDocumentRepository
                     (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
                 .SelectMany(
                     joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -1342,7 +1410,8 @@ internal class AsyncDocumentRepository
                             joined.contentVersion,
                             joined.documentVersion,
                             joined.pub!.contentVersion,
-                            joined.pub!.documentVersion))
+                            joined.pub!.documentVersion,
+                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
@@ -1366,7 +1435,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, ccvGroup
+                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
                         })
                     .SelectMany(
                         joined => joined.ccvGroup.DefaultIfEmpty(),
@@ -1374,7 +1443,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub,
+                            joined.contentType, joined.pub, joined.parentNode,
                             variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
                         });
 
@@ -1396,7 +1465,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
 
@@ -1424,7 +1494,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -1507,6 +1578,14 @@ internal class AsyncDocumentRepository
                 .SelectMany(
                     joined => joined.pubGroup.DefaultIfEmpty(),
                     (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode })
                 .Select(joined => new DocumentRow(
                     joined.node,
                     joined.document,
@@ -1514,7 +1593,8 @@ internal class AsyncDocumentRepository
                     joined.contentVersion,
                     joined.documentVersion,
                     joined.pub!.contentVersion,
-                    joined.pub!.documentVersion))
+                    joined.pub!.documentVersion,
+                    joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                 .ToListAsync(cancellationToken);
 
             // The Contains-filtered fetch above does not preserve pageNodeIds' root-first order, so
@@ -1605,7 +1685,15 @@ internal class AsyncDocumentRepository
                     (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
                 .SelectMany(
                     joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub });
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -1654,7 +1742,8 @@ internal class AsyncDocumentRepository
                             joined.contentVersion,
                             joined.documentVersion,
                             joined.pub!.contentVersion,
-                            joined.pub!.documentVersion))
+                            joined.pub!.documentVersion,
+                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
@@ -1678,7 +1767,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, ccvGroup
+                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
                         })
                     .SelectMany(
                         joined => joined.ccvGroup.DefaultIfEmpty(),
@@ -1686,7 +1775,7 @@ internal class AsyncDocumentRepository
                         {
                             joined.node, joined.document, joined.content,
                             joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub,
+                            joined.contentType, joined.pub, joined.parentNode,
                             variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
                         });
 
@@ -1706,7 +1795,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
 
@@ -1735,7 +1825,8 @@ internal class AsyncDocumentRepository
                         joined.contentVersion,
                         joined.documentVersion,
                         joined.pub!.contentVersion,
-                        joined.pub!.documentVersion))
+                        joined.pub!.documentVersion,
+                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -1834,7 +1925,8 @@ internal class AsyncDocumentRepository
         ContentVersionDto ContentVersion,
         DocumentVersionDto DocumentVersion,
         ContentVersionDto? PublishedContentVersion,
-        DocumentVersionDto? PublishedDocumentVersion);
+        DocumentVersionDto? PublishedDocumentVersion,
+        Guid? ParentUniqueId);
 
     // Applies document ordering to any anonymous intermediate query type T before it is projected
     // to DocumentRow. Ordering must happen while the anonymous type is still live — EF Core cannot
@@ -2131,14 +2223,23 @@ internal class AsyncDocumentRepository
                     (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pubGroup })
                 .SelectMany(
                     joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new DocumentRow(
+                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pub })
+                .GroupJoin(
+                    db.Nodes,
+                    joined => joined.node.ParentId,
+                    parentNode => parentNode.NodeId,
+                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.pub, parentNodeGroup })
+                .SelectMany(
+                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
+                    (joined, parentNode) => new DocumentRow(
                         joined.node,
                         joined.document,
                         joined.content,
                         joined.contentVersion,
                         joined.documentVersion,
-                        pub!.contentVersion,
-                        pub!.documentVersion))
+                        joined.pub!.contentVersion,
+                        joined.pub!.documentVersion,
+                        parentNode == null ? (Guid?)null : parentNode.UniqueId))
                 .ToListAsync();
 
             if (rows.Count == 0)
@@ -2274,6 +2375,13 @@ internal class AsyncDocumentRepository
             // dirties the entity via CultureInfos/PublishCultureInfos collection-changed notifications, so a
             // freshly-assembled entity must be reset to a clean state before being handed to the caller.
             entity.ResetDirtyProperties(false);
+
+            // Root's node row exists (umbracoNode id -1) but carries Constants.System.RootSystemKey, not
+            // the semantic "no parent" value ParentKey contracts to - row.ParentUniqueId comes straight
+            // from a join on umbracoNode and must not be trusted for Root without this override.
+            entity.ParentKey = row.Node.ParentId == Constants.System.Root
+                ? null
+                : row.ParentUniqueId;
 
             entities.Add(entity);
         }

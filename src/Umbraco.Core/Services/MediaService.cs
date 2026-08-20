@@ -1201,6 +1201,12 @@ namespace Umbraco.Cms.Core.Services
             // Needed to update the in-memory navigation structure
             var cameFromRecycleBin = media.ParentId == Constants.System.RecycleBinMedia;
             media.ParentId = parentId;
+            media.ParentKey = parentId switch
+            {
+                Constants.System.Root => null,
+                Constants.System.RecycleBinMedia => Constants.System.RecycleBinMediaKey,
+                _ => parent?.Key,
+            };
 
             // get the level delta (old pos to new pos)
             // note that recycle bin (id:-20) level is 0!
