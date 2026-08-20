@@ -48,8 +48,22 @@ public interface IMemberPresentationFactory
     /// <param name="member">The external member identity to create the response model from.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="MemberResponseModel"/>.</returns>
     // TODO (V19): Remove the default implementation.
+    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
     Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member)
         => Task.FromResult(new MemberResponseModel { Id = member.Key, Kind = MemberKind.ExternalOnly });
+
+    /// <summary>
+    /// Creates a response model for an external-only member, omitting any values the current user is not
+    /// permitted to see.
+    /// </summary>
+    /// <param name="member">The external member identity to create the response model from.</param>
+    /// <param name="currentUser">The current user performing the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="MemberResponseModel"/>.</returns>
+    // TODO (V19): Remove the default implementation.
+    Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member, IUser currentUser)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => CreateExternalMemberResponseModelAsync(member);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Creates an item response model for an external-only member.
@@ -66,6 +80,20 @@ public interface IMemberPresentationFactory
     /// <param name="item">The filter item to create the response model from.</param>
     /// <returns>A <see cref="MemberResponseModel"/> representing the filter item.</returns>
     // TODO (V19): Remove the default implementation.
+    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
     MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item)
         => new() { Id = item.Key, Kind = item.Kind };
+
+    /// <summary>
+    /// Creates a response model from a <see cref="MemberFilterItem"/> returned by the combined filter query,
+    /// omitting any values the current user is not permitted to see.
+    /// </summary>
+    /// <param name="item">The filter item to create the response model from.</param>
+    /// <param name="currentUser">The current user performing the operation.</param>
+    /// <returns>A <see cref="MemberResponseModel"/> representing the filter item.</returns>
+    // TODO (V19): Remove the default implementation.
+    MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item, IUser currentUser)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => CreateFilterItemResponseModel(item);
+#pragma warning restore CS0618 // Type or member is obsolete
 }

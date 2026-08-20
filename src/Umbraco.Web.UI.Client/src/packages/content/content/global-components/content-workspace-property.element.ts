@@ -144,7 +144,15 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 	override render() {
 		if (!this._viewable) return nothing;
 		if (!this._dataPath || this._writeable === undefined) return nothing;
-		if (!this._hasAccessToSensitiveData && this._propertyType?.isSensitive) return nothing;
+
+		if (!this._hasAccessToSensitiveData && this._propertyType?.isSensitive) {
+			return html`<umb-property-layout
+				.alias=${this._propertyType.alias ?? ''}
+				.label=${this._propertyType.name ?? ''}
+				.description=${this._propertyType.description ?? ''}>
+				<umb-sensitive-value slot="editor"></umb-sensitive-value>
+			</umb-property-layout>`;
+		}
 
 		return html`<umb-property-type-based-property
 			data-path=${this._dataPath}

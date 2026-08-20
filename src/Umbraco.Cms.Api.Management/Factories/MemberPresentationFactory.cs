@@ -92,7 +92,24 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         => CreateItemResponseModel<IMember>(entity);
 
     /// <inheritdoc/>
-    public async Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member)
+    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
+    public Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member)
+        => BuildExternalMemberResponseModelAsync(member);
+
+    /// <inheritdoc/>
+    public async Task<MemberResponseModel> CreateExternalMemberResponseModelAsync(ExternalMemberIdentity member, IUser currentUser)
+    {
+        MemberResponseModel responseModel = await BuildExternalMemberResponseModelAsync(member);
+
+        if (currentUser.HasAccessToSensitiveData() is false)
+        {
+            ClearSensitiveValues(responseModel);
+        }
+
+        return responseModel;
+    }
+
+    private async Task<MemberResponseModel> BuildExternalMemberResponseModelAsync(ExternalMemberIdentity member)
     {
         IEnumerable<string> roles = await _externalMemberService.GetRolesAsync(member.Key);
         IEnumerable<Guid> groupKeys = roles
@@ -140,7 +157,24 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         };
 
     /// <inheritdoc/>
-    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item) =>
+    [Obsolete("Please use the overload taking the current user. Scheduled for removal in Umbraco 19.")]
+    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item)
+        => BuildFilterItemResponseModel(item);
+
+    /// <inheritdoc/>
+    public MemberResponseModel CreateFilterItemResponseModel(MemberFilterItem item, IUser currentUser)
+    {
+        MemberResponseModel responseModel = BuildFilterItemResponseModel(item);
+
+        if (currentUser.HasAccessToSensitiveData() is false)
+        {
+            ClearSensitiveValues(responseModel);
+        }
+
+        return responseModel;
+    }
+
+    private static MemberResponseModel BuildFilterItemResponseModel(MemberFilterItem item) =>
         new()
         {
             Id = item.Key,
@@ -181,10 +215,18 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
             }
         ];
 
-    private async Task<MemberResponseModel> RemoveSensitiveDataAsync(IMember member, MemberResponseModel responseModel)
+    /// <summary>
+    /// Clears the member account state that is subject to "sensitive data" rules.
+    /// </summary>
+    /// <param name="responseModel">The response model to clear the values on.</param>
+    /// <remarks>
+    /// Every response model carrying member account state must be passed through this before it reaches a
+    /// user without access to sensitive data, whichever endpoint produced it. Some of the fields are not
+    /// nullable, so for those we can't do much more than force revert them to their default values - which
+    /// means a default value in a response is not evidence of the member's actual state.
+    /// </remarks>
+    private static void ClearSensitiveValues(MemberResponseModel responseModel)
     {
-        // these properties are considered sensitive; some of them are not nullable, so for
-        // those we can't do much more than force revert them to their default values.
         responseModel.IsApproved = false;
         responseModel.IsLockedOut = false;
         responseModel.IsTwoFactorEnabled = false;
@@ -192,6 +234,11 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
         responseModel.LastLoginDate = null;
         responseModel.LastLockoutDate = null;
         responseModel.LastPasswordChangeDate = null;
+    }
+
+    private async Task<MemberResponseModel> RemoveSensitiveDataAsync(IMember member, MemberResponseModel responseModel)
+    {
+        ClearSensitiveValues(responseModel);
 
         IMemberType memberType = await _memberTypeService.GetAsync(member.ContentType.Key)
                                  ?? throw new InvalidOperationException($"The member type {member.ContentType.Alias} could not be found");
