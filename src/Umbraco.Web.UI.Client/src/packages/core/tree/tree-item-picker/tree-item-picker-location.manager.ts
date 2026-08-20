@@ -106,9 +106,25 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 				this.#repository = permitted ? ctrl.api : undefined;
 				if (this.#repository && !this.#loaded) {
 					this.#loaded = true;
-					this.#loadPromise = this.#loadInitialTrail();
+
+					// A remembered location is where the picker reopens, so the start is not committed when one is going to
+					// replace it. Committing both would hand the host two locations in a row, and a host that renders a
+					// different view per location would mount one for the start and tear it down again mid-initialisation.
+					const remembered = this.#getRememberedEntity();
+
+					this.#loadPromise = this.#loadInitialTrail(!remembered);
 					await this.#loadPromise;
-					await this.#restoreFromMemory();
+
+					// An empty trail means the start itself could not be established, which `#loadInitialTrail` has already
+					// reported. There is nowhere to restore into.
+					if (remembered && this.#trail.getValue().length) {
+						await this.#restoreFromMemory(remembered);
+						// Committed here rather than by the initial trail, so a restore that did not land still leaves the
+						// picker somewhere.
+						if (this.#currentLocation.getValue() === undefined) {
+							this.#setLocationAndMemory(this.#resolveStart());
+						}
+					}
 				}
 			},
 		);
@@ -204,7 +220,11 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 		return node;
 	}
 
-	async #loadInitialTrail() {
+	/**
+	 * Establishes the trail the picker starts from, and the location with it unless a restore is going to supersede it.
+	 * @param {boolean} commitLocation - Whether to report the start as the current location.
+	 */
+	async #loadInitialTrail(commitLocation: boolean) {
 		if (!this.#repository) return;
 
 		if (this.#startNode) {
@@ -212,13 +232,15 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 			const items = data ?? [];
 			const node = items.find((item) => item.unique === this.#startNode!.unique);
 
+			// A start the tree does not have is reported whether or not a restore follows: there is no trail to restore
+			// into, so the failure is the outcome.
 			if (!node) {
 				this.#currentLocation.setValue(null);
 				return;
 			}
 
 			this.#setTrail(this.#toTrail(items));
-			this.#currentLocation.setValue(node);
+			if (commitLocation) this.#currentLocation.setValue(node);
 			return;
 		}
 
@@ -226,7 +248,7 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 		if (!root) return;
 
 		this.#setTrail([root]);
-		this.#currentLocation.setValue(root);
+		if (commitLocation) this.#currentLocation.setValue(root);
 	}
 
 	/**
@@ -277,10 +299,16 @@ export class UmbTreeItemPickerLocationManager extends UmbControllerBase {
 		this.#interactionMemoryManager?.deleteMemory(LOCATION_MEMORY_UNIQUE);
 	}
 
-	async #restoreFromMemory() {
-		const entity: UmbTreeStartNode | undefined =
-			this.#interactionMemoryManager?.getMemory(LOCATION_MEMORY_UNIQUE)?.value?.entity;
-		if (!entity || !this.#repository) return;
+	#getRememberedEntity(): UmbTreeStartNode | undefined {
+		return this.#interactionMemoryManager?.getMemory(LOCATION_MEMORY_UNIQUE)?.value?.entity;
+	}
+
+	/**
+	 * Browses to the location a previous session left behind.
+	 * @param {UmbTreeStartNode} entity - The remembered node.
+	 */
+	async #restoreFromMemory(entity: UmbTreeStartNode) {
+		if (!this.#repository) return;
 
 		if (this.#startNode) {
 			const { data } = await this.#repository.requestTreeItemAncestors({ treeItem: entity });

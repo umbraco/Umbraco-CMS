@@ -79,14 +79,18 @@ describe('UmbTreeItemPickerLocationManager', () => {
 		umbExtensionsRegistry.unregister(REPOSITORY_ALIAS);
 	});
 
+	let afterEachCleanup: Array<() => void>;
+
 	beforeEach(() => {
 		host = new UmbTestControllerHostElement();
 		document.body.appendChild(host);
 		memory = new UmbInteractionMemoryManager(host);
 		manager = new UmbTreeItemPickerLocationManager(host, { interactionMemoryManager: memory });
+		afterEachCleanup = [];
 	});
 
 	afterEach(() => {
+		afterEachCleanup.forEach((cleanup) => cleanup());
 		host.remove();
 	});
 
@@ -95,6 +99,22 @@ describe('UmbTreeItemPickerLocationManager', () => {
 	async function start(treeAlias = TREE_ALIAS) {
 		manager.setTreeAlias(treeAlias);
 		await waitUntil(() => manager.getBreadcrumb().length > 0, 'the initial trail was never loaded');
+	}
+
+	/**
+	 * Records every location the manager reports, so a test can assert the sequence rather than the outcome. Polling
+	 * cannot: a location the manager reports and immediately replaces is gone before the next sample.
+	 * @returns {() => Array<string>} The locations reported so far, the root as `root` and a dead end as `not-found`.
+	 * The starting `undefined` is left out, being the absence of a location rather than one.
+	 */
+	function recordLocations(): () => Array<string> {
+		const reported: Array<string> = [];
+		const subscription = manager.currentLocation.subscribe((location) => {
+			if (location === undefined) return;
+			reported.push(location === null ? 'not-found' : (location.unique ?? 'root'));
+		});
+		afterEachCleanup.push(() => subscription.unsubscribe());
+		return () => reported;
 	}
 
 	describe('starting from the tree root', () => {
@@ -272,6 +292,35 @@ describe('UmbTreeItemPickerLocationManager', () => {
 
 			expect(manager.getCurrentLocation()).to.eql(ROOT);
 			expect(memory.getMemory(LOCATION_MEMORY_UNIQUE)).to.be.undefined;
+		});
+
+		// A host renders per location, so a start reported on the way to a remembered node makes it mount a renderer for
+		// the start and tear it down again mid-initialisation. Only the destination may be reported.
+		it('reports only the remembered location, never the start on the way to it', async () => {
+			memory.setMemory({
+				unique: LOCATION_MEMORY_UNIQUE,
+				value: { entity: { unique: 'b', entityType: 'test-item' } },
+			});
+			const reported = recordLocations();
+
+			await start();
+			await waitUntil(() => manager.getCurrentLocation()?.unique === 'b', 'the location was never restored');
+
+			expect(reported()).to.eql(['b']);
+		});
+
+		it('reports only the remembered location when the picker has a start node', async () => {
+			memory.setMemory({
+				unique: LOCATION_MEMORY_UNIQUE,
+				value: { entity: { unique: 'c', entityType: 'test-item' } },
+			});
+			manager.setStartNode({ unique: 'b', entityType: 'test-item' });
+			const reported = recordLocations();
+
+			await start();
+			await waitUntil(() => manager.getCurrentLocation()?.unique === 'c', 'the location was never restored');
+
+			expect(reported()).to.eql(['c']);
 		});
 
 		// A picker restricted to a subtree must not be restored to somewhere outside it.
