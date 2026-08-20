@@ -10,7 +10,6 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_0_0;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -128,7 +127,7 @@ internal sealed class SetDateDefaultsToUtcNowTests : UmbracoIntegrationTest
         // go unnoticed here.
         Assert.That(result.Successful, Is.True, result.Exception?.ToString());
 
-        (string Name, string Definition)? constraint = GetDefaultConstraint();
+        DefaultConstraint? constraint = GetDefaultConstraint();
 
         Assert.Multiple(() =>
         {
@@ -147,20 +146,33 @@ internal sealed class SetDateDefaultsToUtcNowTests : UmbracoIntegrationTest
         return await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
     }
 
-    private (string Name, string Definition)? GetDefaultConstraint()
+    // Queried directly rather than through the syntax provider, so that the assertion doesn't share a code path
+    // with the migration it is verifying.
+    private DefaultConstraint? GetDefaultConstraint()
     {
         using IUmbracoDatabase db = UmbracoDatabaseFactory.CreateDatabase();
-        var syntax = (SqlServerSyntaxProvider)db.SqlContext.SqlSyntax;
 
-        return syntax.GetDefaultConstraintsPerColumn(db)
-            .Where(x => x.Item1 == TableName && x.Item2 == ColumnName)
-            .Select(x => ((string Name, string Definition)?)(x.Item3, x.Item4))
-            .FirstOrDefault();
+        return db.Fetch<DefaultConstraint>(
+            @"SELECT dc.[name] AS [Name], dc.[definition] AS [Definition]
+FROM sys.default_constraints dc
+JOIN sys.tables tbl ON tbl.object_id = dc.parent_object_id
+JOIN sys.columns col ON col.object_id = dc.parent_object_id AND col.column_id = dc.parent_column_id
+JOIN sys.schemas s ON s.[schema_id] = tbl.[schema_id]
+WHERE s.[name] = SCHEMA_NAME() AND tbl.[name] = @0 AND col.[name] = @1;",
+            TableName,
+            ColumnName).FirstOrDefault();
     }
 
     private void ExecuteNonQuery(string sql)
     {
         using IUmbracoDatabase db = UmbracoDatabaseFactory.CreateDatabase();
         db.Execute(sql);
+    }
+
+    private sealed class DefaultConstraint
+    {
+        public string Name { get; set; } = null!;
+
+        public string Definition { get; set; } = null!;
     }
 }
