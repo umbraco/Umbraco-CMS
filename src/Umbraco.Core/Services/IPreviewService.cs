@@ -15,7 +15,7 @@ public interface IPreviewService
     ///     Enters preview mode for a given user.
     /// </summary>
     /// <remarks>
-    ///     THe preview mode is persistent across sessions (requests) until terminated with <see cref="EndPreviewAsync"/>.
+    ///     The preview mode is persistent across sessions (requests) until terminated with <see cref="EndPreviewAsync"/>.
     /// </remarks>
     /// <param name="user">The user entering preview mode.</param>
     /// <returns><c>true</c> if preview mode was entered successfully; otherwise, <c>false</c>.</returns>
