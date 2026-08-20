@@ -17,8 +17,12 @@ public interface IPreviewService
     /// <remarks>
     ///     The preview mode is persistent across sessions (requests) until terminated with <see cref="EndPreviewAsync"/>.
     /// </remarks>
-    /// <param name="user">The user entering preview mode.</param>
+    /// <param name="user">The user entering preview mode; an implementation may scope the preview mode to this user.</param>
     /// <returns><c>true</c> if preview mode was entered successfully; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     The preview mode is persistent across sessions (requests) until terminated with <see cref="EndPreviewAsync"/>.
+    ///     Entering preview mode is not guaranteed to succeed, so callers must handle a <c>false</c> result.
+    /// </remarks>
     Task<bool> TryEnterPreviewAsync(IUser user);
 
     /// <summary>
