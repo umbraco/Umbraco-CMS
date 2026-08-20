@@ -128,23 +128,22 @@ public sealed class UserNotificationsHandler :
     /// <inheritdoc />
     public void Handle(ContentSortedNotification notification)
     {
-        var parentId = notification.SortedEntities.Select(x => x.ParentId).Distinct().ToList();
-        if (parentId.Count != 1)
+        var parentKeys = notification.SortedEntities.Select(x => x.ParentKey).Distinct().ToList();
+        if (parentKeys.Count != 1)
         {
             return; // this shouldn't happen, for sorting all entities will have the same parent id
         }
 
-        // in this case there's nothing to report since if the root is sorted we can't report on a fake entity.
-        // this is how it was in v7, we can't report on root changes because you can't subscribe to root changes.
-        if (parentId[0] <= 0)
+        // in this case there's nothing to report since if the root (or recycle bin) is sorted we can't
+        // report on a fake entity. this is how it was in v7, we can't report on root changes because you
+        // can't subscribe to root changes.
+        Guid? parentKey = parentKeys[0];
+        if (parentKey is null || parentKey == Constants.System.RecycleBinContentKey)
         {
             return;
         }
 
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(parentId[0], UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-        IContent? parent = parentKeyAttempt.Success
-            ? _contentService.GetByIdAsync(parentKeyAttempt.Result, CancellationToken.None).GetAwaiter().GetResult()
-            : null;
+        IContent? parent = _contentService.GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult();
         if (parent == null)
         {
             return; // this shouldn't happen

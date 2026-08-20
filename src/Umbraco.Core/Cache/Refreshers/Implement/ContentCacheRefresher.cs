@@ -498,7 +498,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // First creation
         if (ExistsInNavigation(content.Key) is false && ExistsInNavigationBin(content.Key) is false)
         {
-            _documentNavigationManagementService.Add(content.Key, content.ContentType.Key, GetParentKey(content), content.SortOrder);
+            _documentNavigationManagementService.Add(content.Key, content.ContentType.Key, content.ParentKey, content.SortOrder);
             if (content.Trashed)
             {
                 // If created as trashed, move to bin
@@ -520,7 +520,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 }
 
                 // It must have been saved. Check if parent is different
-                Guid? newParentKey = GetParentKey(content);
+                Guid? newParentKey = content.ParentKey;
                 if (oldParentKey != newParentKey)
                 {
                     _documentNavigationManagementService.Move(content.Key, newParentKey);
@@ -536,15 +536,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             if (content.Trashed is false)
             {
                 // It must have been restored
-                _documentNavigationManagementService.RestoreFromBin(content.Key, GetParentKey(content));
+                _documentNavigationManagementService.RestoreFromBin(content.Key, content.ParentKey);
             }
         }
-    }
-
-    private Guid? GetParentKey(IContent content)
-    {
-        Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-        return content.ParentId == -1 ? null : attempt.Result;
     }
 
     private bool ExistsInNavigation(Guid contentKey) => _documentNavigationQueryService.TryGetParentKey(contentKey, out _);

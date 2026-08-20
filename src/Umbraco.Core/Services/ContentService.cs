@@ -567,9 +567,19 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
 
         // not trashed and has a parent: publishable if the parent is path-published
-        IContent? parent = TryGetParentKey(content.ParentId, out Guid? parentKey)
-            ? GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult()
-            : null;
+        Guid? parentKey;
+        try
+        {
+            parentKey = content.ParentKey;
+        }
+        catch (NotSupportedException)
+        {
+            TryGetParentKey(content.ParentId, out parentKey);
+        }
+
+        IContent? parent = parentKey is null
+            ? null
+            : GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult();
         return parent == null || IsPathPublished(parent);
     }
 
