@@ -10,13 +10,14 @@ import type { UmbContentWorkspaceContext } from './content-workspace-context.int
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
 import { UmbContentDetailWorkspaceTypeTransformController } from './content-detail-workspace-type-transform.controller.js';
+import { umbGetContentPropertyValidationItems } from './content-property-validation-items.function.js';
 import {
 	appendToFrozenArray,
 	mergeObservables,
 	observeMultiple,
 	UmbArrayState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { filter, firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
@@ -49,8 +50,10 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	UMB_VALIDATION_CONTEXT,
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbDataPathPropertyValueQuery,
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
+	UmbValidationCleanUpManager,
 	UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
@@ -363,6 +366,25 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				});
 			},
 			null,
+		);
+
+		// Clean up validation messages of properties that are no longer part of the content type structure
+		// (e.g. a composition removed, or the document type edited via infinite editing while this document
+		// is open) — messages for a property that no longer resolves have no UI left to fix them otherwise. [NL]
+		new UmbValidationCleanUpManager<{ alias: string; variantId: UmbVariantId }>(
+			this,
+			this.validationContext,
+			mergeObservables(
+				[this.structure.contentTypeLoaded, this.structure.contentTypeProperties, this.variantOptions],
+				([loaded, properties, variantOptions]) => {
+					// Do not treat "not loaded yet" / mid-reload transient emptiness as "everything was
+					// removed" — see the gating note on `umbGetContentPropertyValidationItems` usage. [NL]
+					if (!loaded || properties.length === 0 || variantOptions.length === 0) return undefined;
+					return umbGetContentPropertyValidationItems(properties, variantOptions);
+				},
+			).pipe(filter((items): items is Array<{ alias: string; variantId: UmbVariantId }> => items !== undefined)),
+			({ alias, variantId }) =>
+				`$.values[${UmbDataPathPropertyValueQuery({ alias, culture: variantId.culture, segment: variantId.segment })}]`,
 		);
 
 		this.observe(
