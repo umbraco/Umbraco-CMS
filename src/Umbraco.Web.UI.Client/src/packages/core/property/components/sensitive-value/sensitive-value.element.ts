@@ -24,7 +24,7 @@ export class UmbSensitiveValueElement extends UmbLitElement {
 		</em>`;
 	}
 
-	static override styles = [
+	static override readonly styles = [
 		UmbTextStyles,
 		css`
 			:host {

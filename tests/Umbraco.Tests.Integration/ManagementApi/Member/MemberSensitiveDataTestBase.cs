@@ -46,6 +46,7 @@ public abstract class MemberSensitiveDataTestBase<T> : ManagementApiTest<T>
     /// <summary>
     /// Builds the selector for the endpoint under test, once <see cref="MemberKey"/> is known.
     /// </summary>
+    /// <returns>An expression selecting the controller method the fixture requests.</returns>
     protected abstract Expression<Func<T, object>> BuildMethodSelector();
 
     [SetUp]

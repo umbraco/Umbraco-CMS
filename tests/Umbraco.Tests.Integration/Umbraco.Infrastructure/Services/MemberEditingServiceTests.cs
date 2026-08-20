@@ -418,7 +418,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
             [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
                 new PropertyValueModel { Alias = "author", Value = "The author value" }
-            ]
+            ],
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, user);
@@ -450,7 +450,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
             [
                 new PropertyValueModel { Alias = "title", Value = "The title value" },
                 new PropertyValueModel { Alias = "author", Value = "The author value" }
-            ]
+            ],
         };
 
         var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
