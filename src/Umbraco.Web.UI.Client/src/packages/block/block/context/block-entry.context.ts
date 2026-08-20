@@ -28,7 +28,11 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
-import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN, UMB_ELEMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/element';
+import {
+	UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN,
+	UMB_ELEMENT_ENTITY_TYPE,
+	UmbElementVariantState,
+} from '@umbraco-cms/backoffice/element';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
@@ -84,6 +88,16 @@ export abstract class UmbBlockEntryContext<
 
 	#hasExpose = new UmbBooleanState(undefined);
 	readonly hasExpose = this.#hasExpose.asObservable();
+
+	readonly isExposed = mergeObservables(
+		[this.hasExpose, this.isExternalContent, this.externalContentVariantState],
+		([hasExpose, isExternalContent, variantState]) =>
+			// External content blocks use the element's variant state; local blocks use the expose entry
+			isExternalContent
+				? variantState === UmbElementVariantState.PUBLISHED ||
+					variantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
+				: hasExpose,
+	);
 
 	#actionsVisibility = new UmbBooleanState(true);
 	readonly actionsVisibility = this.#actionsVisibility.asObservable();
