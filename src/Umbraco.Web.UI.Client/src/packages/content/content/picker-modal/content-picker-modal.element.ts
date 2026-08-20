@@ -16,7 +16,6 @@ import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@um
 import { UmbTreeItemOpenEvent, UmbTreeItemPickerContext } from '@umbraco-cms/backoffice/tree';
 import type {
 	UmbTreeElement,
-	UmbTreeItemModel,
 	UmbTreeItemModelBase,
 	UmbTreeItemPickerLocation,
 	UmbTreeSelectionConfiguration,
@@ -93,15 +92,10 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 	@state()
 	private _collectionInteractionMemories?: Array<UmbInteractionMemoryModel>;
 
+	/** Tri-state, as the location manager reports it: undefined until established, null for a node the tree does not have. */
 	@state()
-	private _currentLocation?: UmbTreeItemPickerLocation;
+	private _currentLocation?: UmbTreeItemPickerLocation | null;
 
-	/**
-	 * The location as `<umb-tree>` wants it: the tree root is expressed by having no start node.
-	 *
-	 * Held as state rather than derived per render, because `setStartNode` clears and reloads the tree whenever the
-	 * property changes identity — a fresh object each render would reload it on every unrelated update.
-	 */
 	@state()
 	private _treeStartNode?: UmbTreeStartNode;
 
@@ -228,8 +222,9 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 		await this._pickerContext.location.navigateTo({ unique, entityType });
 	};
 
-	#getCollectionUnique(item?: UmbTreeItemModel): string | undefined {
-		return (item as (UmbTreeItemModel & UmbContentTreeItemLike) | undefined)?.contentType?.collection?.unique;
+	#getCollectionUnique(location?: UmbTreeItemPickerLocation | null): string | undefined {
+		return (location as (UmbTreeItemPickerLocation & UmbContentTreeItemLike) | undefined)?.contentType?.collection
+			?.unique;
 	}
 
 	/**
@@ -243,7 +238,7 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 		this.#entityContext.setUnique(location?.unique ?? null);
 
 		this.#collectionConfiguration.setUnique(location?.unique ?? null);
-		this.#collectionConfiguration.setDataTypeUnique(this.#getCollectionUnique(location?.treeItem));
+		this.#collectionConfiguration.setDataTypeUnique(this.#getCollectionUnique(location));
 
 		this.#updateCollectionInteractionMemories();
 	}
@@ -462,11 +457,19 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 	#renderChildren() {
 		// Which renderer a level needs is only known once the location is, and mounting the tree in the meantime would
 		// tear it down again mid-initialisation.
-		if (!this._currentLocation) return html`<umb-view-loader></umb-view-loader>`;
+		if (this._currentLocation === undefined) return html`<umb-view-loader></umb-view-loader>`;
+		// A level the tree cannot describe has no renderer, so neither the tree nor the collection stands in for it.
+		if (this._currentLocation === null) return this.#renderNotFound();
 		if (!this._hasCollection) return this.#renderTree();
 		// The configuration is resolved from a data type, so the collection is held back rather than briefly showing
 		// the tree in its place.
 		return this._collectionConfig ? this.#renderCollection() : html`<umb-view-loader></umb-view-loader>`;
+	}
+
+	#renderNotFound() {
+		return html`<div id="not-found" class="uui-text">
+			<h4>${this.localize.term('general_notFound')}</h4>
+		</div>`;
 	}
 
 	#renderTree() {
@@ -555,6 +558,11 @@ export class UmbContentPickerModalElement<TreeItemType extends UmbTreeItemModelB
 
 		#breadcrumb {
 			margin-bottom: var(--uui-size-space-4);
+		}
+
+		#not-found {
+			text-align: center;
+			padding: var(--uui-size-layout-1);
 		}
 
 		/* A collection lays itself out inside its own body layout, so the main padding is dropped for it and only the

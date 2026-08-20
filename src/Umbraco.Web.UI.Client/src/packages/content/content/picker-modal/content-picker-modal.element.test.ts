@@ -124,6 +124,7 @@ describe('UmbContentPickerModalElement', () => {
 	const getBreadcrumb = () => element.shadowRoot?.querySelector('umb-tree-item-picker-breadcrumb');
 	const getTree = () => element.shadowRoot?.querySelector('umb-tree');
 	const getCollection = () => element.shadowRoot?.querySelector('umb-collection');
+	const getNotFound = () => element.shadowRoot?.querySelector('#not-found');
 	const trail = () =>
 		[...(getBreadcrumb()?.shadowRoot?.querySelectorAll('uui-breadcrumb-item') ?? [])].map((crumb) =>
 			crumb.textContent!.trim(),
@@ -211,6 +212,35 @@ describe('UmbContentPickerModalElement', () => {
 			expect(remembering.shadowRoot?.querySelector('umb-tree')).to.not.exist;
 
 			remembering.remove();
+		});
+	});
+
+	// A level the tree cannot describe has no renderer, so the modal has to say so rather than fall back to a level the
+	// user did not browse to.
+	describe('browsing to a node the tree does not have', () => {
+		beforeEach(async () => {
+			await browseTo('without-collection');
+
+			element.dispatchEvent(new UmbTreeItemOpenEvent({ unique: 'gone', entityType: 'test-item' }));
+			await waitUntil(() => !!getNotFound(), 'the not-found state was never rendered');
+			await element.updateComplete;
+		});
+
+		it('renders neither the tree nor the collection', () => {
+			expect(getTree()).to.not.exist;
+			expect(getCollection()).to.not.exist;
+		});
+
+		// The trail is the way back out of a dead end, so it has to survive one.
+		it('keeps the trail the user came from', () => {
+			expect(trail()).to.eql(['Root', 'Without Collection']);
+		});
+
+		it('recovers when the user browses back through the breadcrumb', async () => {
+			await clickBreadcrumb(0);
+
+			expect(getNotFound()).to.not.exist;
+			expect(getTree()).to.exist;
 		});
 	});
 

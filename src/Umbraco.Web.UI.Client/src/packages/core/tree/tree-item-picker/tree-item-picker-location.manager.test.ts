@@ -105,12 +105,8 @@ describe('UmbTreeItemPickerLocationManager', () => {
 		});
 
 		// The root is a place like any other, which is what lets an undefined location mean only "not established yet".
-		it('reports the root as the location', () => {
-			expect(manager.getCurrentLocation()).to.eql({ unique: null, entityType: 'test-root' });
-		});
-
-		it('carries no tree item at the root', () => {
-			expect(manager.getCurrentLocation()?.treeItem).to.be.undefined;
+		it('reports the tree root as the location', () => {
+			expect(manager.getCurrentLocation()).to.eql(ROOT);
 		});
 	});
 
@@ -124,9 +120,10 @@ describe('UmbTreeItemPickerLocationManager', () => {
 			expect(trail()).to.eql(['Root', 'A', 'B', 'C']);
 		});
 
-		it('reports the node together with the tree item it was resolved from', () => {
-			expect(manager.getCurrentLocation()).to.include({ unique: 'c', entityType: 'test-item' });
-			expect(manager.getCurrentLocation()?.treeItem?.name).to.equal('C');
+		// The location is the tree's own model of the node, so anything a host derives from it — an icon, a content type,
+		// a collection — describes the node being browsed and cannot describe another.
+		it('reports the tree item of the node', () => {
+			expect(manager.getCurrentLocation()).to.eql(C);
 		});
 
 		it('remembers where it is', () => {
@@ -149,19 +146,19 @@ describe('UmbTreeItemPickerLocationManager', () => {
 			expect(trail()).to.eql(['Root', 'A']);
 		});
 
-		// The item has to come back with the node, or a host deriving anything from it describes the wrong node.
-		it('reports the step it returns to together with its tree item', async () => {
+		// A step taken from the trail has to carry the same item a freshly resolved one would, or a host deriving anything
+		// from it describes the wrong node.
+		it('reports the tree item of the step it returns to', async () => {
 			await manager.navigateTo({ unique: 'b', entityType: 'test-item' });
 
-			expect(manager.getCurrentLocation()).to.include({ unique: 'b', entityType: 'test-item' });
-			expect(manager.getCurrentLocation()?.treeItem?.name).to.equal('B');
+			expect(manager.getCurrentLocation()).to.eql(B);
 		});
 
 		it('is back at the root when it returns to it', async () => {
 			await manager.navigateTo();
 
 			expect(trail()).to.eql(['Root']);
-			expect(manager.getCurrentLocation()).to.eql({ unique: null, entityType: 'test-root' });
+			expect(manager.getCurrentLocation()).to.eql(ROOT);
 		});
 
 		it('forgets where it was when it returns to the root', async () => {
@@ -170,12 +167,41 @@ describe('UmbTreeItemPickerLocationManager', () => {
 			expect(memory.getMemory(LOCATION_MEMORY_UNIQUE)).to.be.undefined;
 		});
 
-		it('rebuilds the trail for a node that is not in it', async () => {
-			await manager.navigateTo({ unique: 'not-in-the-trail', entityType: 'test-item' });
+		it('rebuilds the trail for a node in another branch', async () => {
+			await manager.navigateTo({ unique: 'elsewhere', entityType: 'test-item' });
 
-			// The test tree knows no such node, so the trail collapses to the root it was built from.
-			expect(trail()).to.eql(['Root']);
-			expect(manager.getCurrentLocation()?.unique).to.equal('not-in-the-trail');
+			expect(trail()).to.eql(['Root', 'Elsewhere']);
+			expect(manager.getCurrentLocation()).to.eql(ELSEWHERE);
+		});
+	});
+
+	// A location the tree cannot describe is worse than no location at all: a host would render a level it knows nothing
+	// about. So the location is dropped and the reason reported instead.
+	describe('browsing to a node the tree does not have', () => {
+		beforeEach(async () => {
+			await start();
+			await manager.navigateTo({ unique: 'c', entityType: 'test-item' });
+			await manager.navigateTo({ unique: 'gone', entityType: 'test-item' });
+		});
+
+		// Null rather than undefined: something is wrong, which a host must not read as still loading.
+		it('reports the location as null', () => {
+			expect(manager.getCurrentLocation()).to.be.null;
+		});
+
+		// The trail is what tells the user where they came from, so it is the one thing worth keeping.
+		it('keeps the trail it came from', () => {
+			expect(trail()).to.eql(['Root', 'A', 'B', 'C']);
+		});
+
+		it('forgets the node so the next session does not open on it', () => {
+			expect(memory.getMemory(LOCATION_MEMORY_UNIQUE)).to.be.undefined;
+		});
+
+		it('recovers once somewhere else is browsed', async () => {
+			await manager.navigateTo({ unique: 'a', entityType: 'test-item' });
+
+			expect(manager.getCurrentLocation()).to.eql(A);
 		});
 	});
 
@@ -234,6 +260,20 @@ describe('UmbTreeItemPickerLocationManager', () => {
 			expect(trail()).to.eql(['B', 'C']);
 		});
 
+		// Opening a picker is not a request for the remembered node, so its disappearance is not reported as one.
+		it('opens at the start rather than reporting a dead end when the remembered node is gone', async () => {
+			memory.setMemory({
+				unique: LOCATION_MEMORY_UNIQUE,
+				value: { entity: { unique: 'gone', entityType: 'test-item' } },
+			});
+
+			await start();
+			await aTimeout(RESTORE_WAIT);
+
+			expect(manager.getCurrentLocation()).to.eql(ROOT);
+			expect(memory.getMemory(LOCATION_MEMORY_UNIQUE)).to.be.undefined;
+		});
+
 		// A picker restricted to a subtree must not be restored to somewhere outside it.
 		it('refuses a remembered location outside the start node', async () => {
 			memory.setMemory({
@@ -251,13 +291,12 @@ describe('UmbTreeItemPickerLocationManager', () => {
 	});
 
 	describe('when the tree has no repository', () => {
-		it('still reports the node so a host has something to render', async () => {
+		it('reports the node as not found rather than guessing at it', async () => {
 			manager.setTreeAlias(UNRESOLVABLE_TREE_ALIAS);
 
 			await manager.navigateTo({ unique: 'a', entityType: 'test-item' });
 
-			expect(manager.getCurrentLocation()).to.eql({ unique: 'a', entityType: 'test-item' });
-			expect(manager.getCurrentLocation()?.treeItem).to.be.undefined;
+			expect(manager.getCurrentLocation()).to.be.null;
 		});
 	});
 });

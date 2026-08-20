@@ -1,4 +1,4 @@
-import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
+import { UmbTreeItemPickerContext, type UmbTreeItemPickerLocation } from '../tree-item-picker/index.js';
 import type { UmbTreeElement } from '../tree.element.js';
 import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbTreeStartNode } from '../types.js';
 import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
@@ -52,8 +52,12 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _treeInteractionMemories?: Array<UmbInteractionMemoryModel>;
 
+	/** Tri-state, as the location manager reports it: undefined until established, null for a node the tree does not have. */
 	@state()
-	private _currentLocation?: UmbTreeStartNode;
+	private _currentLocation?: UmbTreeItemPickerLocation | null;
+
+	@state()
+	private _treeStartNode?: UmbTreeStartNode;
 
 	@query('umb-picker-search-field')
 	private _searchField?: UmbPickerSearchFieldElement;
@@ -142,8 +146,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this.observe(
 			this._pickerContext.location.currentLocation,
 			(location) => {
-				// `<umb-tree>` roots itself at a node, so the tree root is expressed by having no start node.
-				this._currentLocation = location?.unique
+				this._currentLocation = location;
+				this._treeStartNode = location?.unique
 					? { unique: location.unique, entityType: location.entityType }
 					: undefined;
 			},
@@ -320,6 +324,14 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#renderTree() {
+		// A level the tree cannot describe has no renderer, so the tree does not stand in for it.
+		if (this._currentLocation === null) {
+			return html`${this.#renderBreadcrumb()}
+				<div id="not-found" class="uui-text">
+					<h4>${this.localize.term('general_notFound')}</h4>
+				</div>`;
+		}
+
 		return html`
 			${this.#renderBreadcrumb()}
 			<umb-tree
@@ -332,7 +344,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					selectionConfiguration: this._selectionConfiguration,
 					filter: this.data?.filter,
 					selectableFilter: this.data?.pickableFilter,
-					startNode: this._currentLocation,
+					startNode: this._treeStartNode,
 					foldersOnly: this.data?.foldersOnly,
 					expansion: this._treeExpansion,
 					interactionMemories: this._treeInteractionMemories,
@@ -385,6 +397,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 		#breadcrumb {
 			margin-bottom: var(--uui-size-space-4);
+		}
+
+		#not-found {
+			text-align: center;
+			padding: var(--uui-size-layout-1);
 		}
 
 		#selection-info {
