@@ -266,6 +266,7 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="newParentId">The ID of the new parent.</param>
     /// <param name="includeDescendants">Whether to move the descendants along with the content. Not supported for blueprints.</param>
     /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     /// <remarks>
@@ -282,6 +283,7 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
     /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the copy.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId, CancellationToken cancellationToken) => throw new NotImplementedException();
@@ -291,6 +293,7 @@ internal sealed class ContentBlueprintEditingService
     /// </summary>
     /// <param name="content">The content to move to recycle bin.</param>
     /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     protected override OperationResult? MoveToRecycleBin(IContent content, int userId, CancellationToken cancellationToken) => throw new NotImplementedException();
@@ -300,6 +303,7 @@ internal sealed class ContentBlueprintEditingService
     /// </summary>
     /// <param name="content">The content to delete.</param>
     /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="cancellationToken">A token that can be used to request cancellation of the deletion.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
     protected override OperationResult? Delete(IContent content, int userId, CancellationToken cancellationToken) => throw new NotImplementedException();

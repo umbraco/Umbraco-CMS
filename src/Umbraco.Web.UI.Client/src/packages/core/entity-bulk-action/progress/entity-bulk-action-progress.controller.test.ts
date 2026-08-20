@@ -243,7 +243,7 @@ describe('UmbEntityBulkActionProgressController', () => {
 
 				// Only a microtask has elapsed - nowhere near the 1000ms delay - yet the factory has already run.
 				await aTimeout(0);
-				expect(calledImmediately).to.be.true;
+				expect(calledImmediately).to.equal(true);
 
 				await resultPromise;
 			});
@@ -287,7 +287,7 @@ describe('UmbEntityBulkActionProgressController', () => {
 					delayMs: 10,
 				});
 
-				expect(openArgs[0].data.cancellable).to.be.false;
+				expect(openArgs[0].data.cancellable).to.equal(false);
 			});
 		});
 	});

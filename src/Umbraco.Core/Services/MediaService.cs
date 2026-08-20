@@ -1314,6 +1314,7 @@ namespace Umbraco.Cms.Core.Services
         ///     Whether to move the descendants along with the media. When <c>false</c> during a restore out of the recycle
         ///     bin, the descendants are left trashed - the item's direct children are re-homed to the recycle bin root.
         /// </param>
+        /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
         /// <remarks>
         ///     MUST be called from within WriteLock.
         ///     The trash parameter indicates whether we are trashing, un-trashing, or not changing anything.

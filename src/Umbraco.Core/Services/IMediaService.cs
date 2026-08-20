@@ -254,9 +254,10 @@ public interface IMediaService : IContentServiceBase<IMedia>
     ///     Deletes an <see cref="IMedia" /> object by moving it to the Recycle Bin, observing a
     ///     <see cref="CancellationToken" /> so a long move over many descendants can be interrupted.
     /// </summary>
-    /// <param name="media">The <see cref="IMedia" /> to delete</param>
+    /// <param name="media">The <see cref="IMedia" /> to delete.</param>
     /// <param name="cancellationToken">A token that can be used to request cancellation of the move.</param>
-    /// <param name="userId">Id of the User deleting the Media</param>
+    /// <param name="userId">Id of the User deleting the Media.</param>
+    /// <returns>An attempt containing the operation result.</returns>
     // TODO (V19): Remove the default implementation when the obsolete overload without a CancellationToken is removed.
 #pragma warning disable CS0618 // Type or member is obsolete
     Attempt<OperationResult?> MoveToRecycleBin(IMedia media, CancellationToken cancellationToken, int userId = Constants.Security.SuperUserId)
