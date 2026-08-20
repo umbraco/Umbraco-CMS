@@ -19,6 +19,7 @@ public static class SearchManagementBuilderExtensions
     {
         // Add examine service
         builder.Services.AddTransient<IExamineManagerService, ExamineManagerService>();
+        builder.Services.AddTransient<IMemberIndexAuthorizer, MemberIndexAuthorizer>();
 
         // TODO (V19): Revert to simple AddTransient<IIndexingRebuilderService, IndexingRebuilderService>()
         // when the obsolete constructors in IndexingRebuilderService are removed.
