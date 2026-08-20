@@ -1,7 +1,7 @@
-import type { UmbDocumentItemModel } from '../../item/types.js';
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbDocumentPickerModalData extends UmbTreePickerModalData<UmbDocumentItemModel> {
+export interface UmbDocumentPickerModalData extends UmbTreePickerModalData<UmbDocumentTreeItemModel> {
 	/**
 	 * Decides which items can be picked.
 	 *
@@ -17,7 +17,7 @@ export interface UmbDocumentPickerModalData extends UmbTreePickerModalData<UmbDo
 	 *
 	 * A `unique` of `null` means the root, which never occurs at a collection level.
 	 */
-	pickableFilter?: (item: UmbDocumentItemModel) => boolean;
+	pickableFilter?: (item: UmbDocumentTreeItemModel) => boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
-import type { UmbDocumentItemModel } from '../../item/types.js';
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import type { UmbDocumentPickerModalData, UmbDocumentPickerModalValue } from './types.js';
 import { UmbContentCollectionConfigurationContext } from '@umbraco-cms/backoffice/content';
 import {
@@ -54,7 +54,7 @@ type UmbContentTreeItemLike = {
  */
 @customElement('umb-document-picker-modal')
 export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
-	UmbDocumentItemModel,
+	UmbDocumentTreeItemModel,
 	UmbDocumentPickerModalData,
 	UmbDocumentPickerModalValue
 > {
