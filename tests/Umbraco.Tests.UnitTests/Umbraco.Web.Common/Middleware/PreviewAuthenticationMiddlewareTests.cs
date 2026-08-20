@@ -129,7 +129,7 @@ public class PreviewAuthenticationMiddlewareTests
         };
 
         httpContext.Request.Path = "/previewed-page";
-        httpContext.Request.Headers.Append("Cookie", $"{Constants.Web.PreviewCookieName}=preview");
+        httpContext.Request.Headers.Append("Cookie", $"{Constants.Web.PreviewCookieName}={Constants.Web.PreviewCookieValue}");
 
         return httpContext;
     }

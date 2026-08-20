@@ -47,7 +47,7 @@ public class PreviewService : IPreviewService
         var secure = _globalSettings.UseHttps || _requestAccessor.GetRequestUrl()?.Scheme == Uri.UriSchemeHttps;
         _cookieManager.SetCookieValue(
             Constants.Web.PreviewCookieName,
-            "preview",
+            Constants.Web.PreviewCookieValue,
             httpOnly: true,
             secure: secure,
             sameSiteMode: secure ? "None" : "Lax");
