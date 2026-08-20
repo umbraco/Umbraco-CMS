@@ -133,7 +133,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 		validationMethod().then(
 			async () => {
 				onValid().then(() => {
-					// Reset validation state if the onValid fallback was successful. [NL]
+					// Reset validation state if the onValid callback was successful. [NL]
 					this.#resetValidationIfValid();
 					this.#completeSubmit();
 				}, this.#rejectSubmit);
