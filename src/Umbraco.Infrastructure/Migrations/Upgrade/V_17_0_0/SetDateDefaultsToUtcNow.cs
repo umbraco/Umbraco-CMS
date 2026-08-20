@@ -9,6 +9,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_0_0;
 /// </summary>
 public class SetDateDefaultsToUtcNow : UnscopedMigrationBase
 {
+    private const string CreateDateColumnName = "createDate";
+    private const string UpdateDateColumnName = "updateDate";
     private readonly IScopeProvider _scopeProvider;
 
     /// <summary>
@@ -46,25 +48,25 @@ public class SetDateDefaultsToUtcNow : UnscopedMigrationBase
         using IDisposable notificationSuppression = scope.Notifications.Suppress();
         ScopeDatabase(scope);
 
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Access, "createDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Access, "updateDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.AccessRule, "createDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.AccessRule, "updateDate");
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Access, CreateDateColumnName);
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Access, UpdateDateColumnName);
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.AccessRule, CreateDateColumnName);
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.AccessRule, UpdateDateColumnName);
         ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.AuditEntry, "eventDateUtc");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Consent, "createDate");
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Consent, CreateDateColumnName);
         ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.ContentVersion, "versionDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.CreatedPackageSchema, "updateDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.ExternalLogin, "createDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.ExternalLoginToken, "createDate");
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.CreatedPackageSchema, UpdateDateColumnName);
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.ExternalLogin, CreateDateColumnName);
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.ExternalLoginToken, CreateDateColumnName);
         ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.KeyValue, "updated");
         ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Log, "Datestamp");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Node, "createDate");
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Node, CreateDateColumnName);
         ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Relation, "datetime");
         ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.Server, "registeredDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.User, "createDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.User, "updateDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.UserGroup, "createDate");
-        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.UserGroup, "updateDate");
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.User, CreateDateColumnName);
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.User, UpdateDateColumnName);
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.UserGroup, CreateDateColumnName);
+        ModifySqlServerDefaultDateConstraint(Core.Constants.DatabaseSchema.Tables.UserGroup, UpdateDateColumnName);
 
         Context.Complete();
 
