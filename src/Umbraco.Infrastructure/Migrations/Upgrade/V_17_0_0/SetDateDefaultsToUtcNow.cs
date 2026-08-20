@@ -11,6 +11,7 @@ public class SetDateDefaultsToUtcNow : UnscopedMigrationBase
 {
     private const string CreateDateColumnName = "createDate";
     private const string UpdateDateColumnName = "updateDate";
+
     private readonly IScopeProvider _scopeProvider;
 
     /// <summary>
@@ -21,6 +22,7 @@ public class SetDateDefaultsToUtcNow : UnscopedMigrationBase
     public SetDateDefaultsToUtcNow(IMigrationContext context, IScopeProvider scopeProvider)
         : base(context) => _scopeProvider = scopeProvider;
 
+    /// <inheritdoc/>
     protected override void Migrate()
     {
         if (DatabaseType == DatabaseType.SQLite)

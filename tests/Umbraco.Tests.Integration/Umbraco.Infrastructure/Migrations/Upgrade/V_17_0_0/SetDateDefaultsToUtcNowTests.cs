@@ -146,12 +146,12 @@ internal sealed class SetDateDefaultsToUtcNowTests : UmbracoIntegrationTest
         return await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
     }
 
-    // Queried directly rather than through the syntax provider, so that the assertion doesn't share a code path
-    // with the migration it is verifying.
     private DefaultConstraint? GetDefaultConstraint()
     {
         using IUmbracoDatabase db = UmbracoDatabaseFactory.CreateDatabase();
 
+        // Queried directly rather than through the syntax provider, so that the assertion doesn't share a code path
+        // with the migration it is verifying.
         return db.Fetch<DefaultConstraint>(
             @"SELECT dc.[name] AS [Name], dc.[definition] AS [Definition]
 FROM sys.default_constraints dc
