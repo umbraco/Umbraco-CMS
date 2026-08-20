@@ -56,7 +56,12 @@ public abstract class DocumentControllerBase : ContentControllerBase
             return DocumentPublishingOperationStatusResult(publishingStatus, invalidPropertyAliases);
         }
 
-        throw new ArgumentException("Please handle success status explicitly in the controllers", nameof(status));
+        throw new ArgumentException(
+            "The operation did not fail, so there are no problem details to report: the save reported "
+            + $"'{status.ContentEditingOperationStatus}' and the publish reported "
+            + $"'{status.ContentPublishingOperationStatus?.ToString() ?? "not attempted"}'. "
+            + "Please handle a successful status explicitly in the controllers.",
+            nameof(status));
     }
 
     protected IActionResult DocumentPublishingOperationStatusResult(

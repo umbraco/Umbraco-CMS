@@ -612,6 +612,10 @@ internal sealed class ContentEditingService
     ///     Projects a combined status onto the editing status alone, for the save-only operations and for the obsolete
     ///     overloads that predate the combined status.
     /// </summary>
+    // TODO (V19): Remove the collapse to "unknown" below when the obsolete CreateAndPublishAsync and
+    // UpdateAndPublishAsync overloads taking a string[] of cultures to publish are removed. The remaining callers -
+    // CreateAsync and UpdateAsync - do not publish, so their publishing status is always null and this method
+    // reduces to projecting the editing status.
     private static Attempt<TResult, ContentEditingOperationStatus> ToEditingAttempt<TResult>(Attempt<TResult, ContentEditingAndPublishingStatus> attempt)
     {
         if (attempt.Success)
