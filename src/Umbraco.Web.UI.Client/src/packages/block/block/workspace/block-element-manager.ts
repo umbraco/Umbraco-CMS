@@ -1,4 +1,5 @@
 import type { UmbBlockDataModel, UmbBlockDataValueModel, UmbBlockLayoutBaseModel } from '../types.js';
+import { UmbDataPathGeneratorForBlockElementData } from '../validation/data-path-generator-for-element-data.function.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
 import type { UmbBlockWorkspaceContext } from './block-workspace.context.js';
 import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -130,7 +131,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 			this.unique,
 			(key) => {
 				if (key) {
-					this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key == '${key}')]`);
+					this.validation.setDataPath(UmbDataPathGeneratorForBlockElementData(dataPathPropertyName, { key }));
 				}
 			},
 			null,
