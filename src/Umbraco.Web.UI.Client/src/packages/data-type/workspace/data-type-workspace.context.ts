@@ -21,6 +21,7 @@ import type {
 } from '@umbraco-cms/backoffice/property-editor';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestPropertyEditorDataSource } from '@umbraco-cms/backoffice/property-editor-data-source';
+import { UmbDataPathPropertyValueQuery, UmbValidationCleanUpManager } from '@umbraco-cms/backoffice/validation';
 
 type EntityType = UmbDataTypeDetailModel;
 
@@ -89,6 +90,15 @@ export class UmbDataTypeWorkspaceContext
 		this.#observePropertyEditorSchemaAlias();
 		this.#observePropertyEditorUIAlias();
 		this.#observePropertyEditorDataSourceAlias();
+
+		// Clean up validation messages for config properties that are no longer part of the Property
+		// Editor UI's schema, e.g. when the user switches to a different Property Editor UI. [NL]
+		new UmbValidationCleanUpManager<PropertyEditorSettingsProperty>(
+			this,
+			this.validationContext,
+			this.properties,
+			(property) => `$.values[${UmbDataPathPropertyValueQuery(property)}]`,
+		);
 
 		this.routes.setRoutes([
 			{
