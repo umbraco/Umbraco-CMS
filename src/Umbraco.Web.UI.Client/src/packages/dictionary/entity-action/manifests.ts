@@ -1,7 +1,7 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as moveManifests } from './move-to/manifests.js';
-import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -19,8 +19,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DICTIONARY_ENTITY_TYPE,
+				operation: 'create',
 			},
 		],
 	},
@@ -53,8 +54,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DICTIONARY_ENTITY_TYPE,
+				operation: 'create',
 			},
 		],
 	},
@@ -70,8 +72,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DICTIONARY_ENTITY_TYPE,
+				operation: 'delete',
 			},
 		],
 	},

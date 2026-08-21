@@ -1,18 +1,20 @@
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from './data-type-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_LOCKDOWN_CONTEXT } from '@umbraco-cms/backoffice/schema-lockdown';
 /**
  * @element umb-data-type-workspace-editor
  * @description - Element for displaying the Data Type Workspace edit route.
  */
 @customElement('umb-data-type-workspace-editor')
 export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
-	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	// Restricted until the schema lockdown matrix confirms the operation is allowed (safe default).
 	@state()
 	private _isRestricted = true;
 
 	#datasetContext?: { setReadOnly?: (value: boolean) => void };
+	#schemaLockdownContext?: typeof UMB_SCHEMA_LOCKDOWN_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -24,15 +26,16 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 			this.#updateReadOnly();
 		});
 
-		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this.observe(context?.isProductionMode, (isProductionMode) => {
-				this._isRestricted = isProductionMode !== false;
+		this.consumeContext(UMB_SCHEMA_LOCKDOWN_CONTEXT, (context) => {
+			this.#schemaLockdownContext = context;
+			this.observe(context?.state, () => {
+				this._isRestricted = this.#schemaLockdownContext?.isAllowed(UMB_DATA_TYPE_ENTITY_TYPE, 'update') !== true;
 				this.#updateReadOnly();
 			});
 		});
 	}
 
-	// In production runtime mode the data type is read-only. Setting the property dataset context
+	// When the schema is locked down the data type is read-only. Setting the property dataset context
 	// read-only cascades to every config property editor without wiring each one individually.
 	#updateReadOnly() {
 		this.#datasetContext?.setReadOnly?.(this._isRestricted);

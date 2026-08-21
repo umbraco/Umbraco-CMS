@@ -139,6 +139,12 @@ export type ConsentLevelPresentationModel = {
     description: string;
 };
 
+export enum ContentSortFieldModel {
+    NAME = 'Name',
+    CREATE_DATE = 'CreateDate',
+    UPDATE_DATE = 'UpdateDate'
+}
+
 export type CopyDataTypeRequestModel = {
     target?: ReferenceByIdModel | null;
 };
@@ -2477,6 +2483,18 @@ export type ServerInformationResponseModel = {
     runtimeMode: RuntimeModeModel;
 };
 
+export type ServerSchemaLockdownEntityTypeResponseModel = {
+    entityType: string;
+    create: boolean;
+    update: boolean;
+    delete: boolean;
+};
+
+export type ServerSchemaLockdownResponseModel = {
+    enabled: boolean;
+    entityTypes: Array<ServerSchemaLockdownEntityTypeResponseModel>;
+};
+
 export type ServerStatusResponseModel = {
     serverStatus: RuntimeLevelModel;
 };
@@ -2491,6 +2509,17 @@ export type SetAvatarRequestModel = {
 
 export type SignalRClientSettingsResponseModel = {
     skipNegotiation: boolean;
+};
+
+export type SortDocumentChildrenByFieldRequestModel = {
+    field: ContentSortFieldModel;
+    direction: DirectionModel;
+    culture?: string | null;
+};
+
+export type SortMediaChildrenByFieldRequestModel = {
+    field: ContentSortFieldModel;
+    direction: DirectionModel;
 };
 
 export type SortingRequestModel = {
@@ -7301,6 +7330,43 @@ export type GetDocumentByIdReferencedDescendantsResponses = {
 
 export type GetDocumentByIdReferencedDescendantsResponse = GetDocumentByIdReferencedDescendantsResponses[keyof GetDocumentByIdReferencedDescendantsResponses];
 
+export type PutDocumentByIdSortChildrenData = {
+    body?: SortDocumentChildrenByFieldRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/sort-children';
+};
+
+export type PutDocumentByIdSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutDocumentByIdSortChildrenError = PutDocumentByIdSortChildrenErrors[keyof PutDocumentByIdSortChildrenErrors];
+
+export type PutDocumentByIdSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PutDocumentByIdUnpublishData = {
     body?: UnpublishDocumentRequestModel;
     path: {
@@ -7503,6 +7569,37 @@ export type PostDocumentCreateAndPublishResponses = {
      * Created
      */
     201: unknown;
+};
+
+export type PutDocumentRootSortChildrenData = {
+    body?: SortDocumentChildrenByFieldRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/document/root/sort-children';
+};
+
+export type PutDocumentRootSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PutDocumentRootSortChildrenError = PutDocumentRootSortChildrenErrors[keyof PutDocumentRootSortChildrenErrors];
+
+export type PutDocumentRootSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
 };
 
 export type PutDocumentSortData = {
@@ -10551,6 +10648,43 @@ export type GetMediaByIdReferencedDescendantsResponses = {
 
 export type GetMediaByIdReferencedDescendantsResponse = GetMediaByIdReferencedDescendantsResponses[keyof GetMediaByIdReferencedDescendantsResponses];
 
+export type PutMediaByIdSortChildrenData = {
+    body?: SortMediaChildrenByFieldRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/media/{id}/sort-children';
+};
+
+export type PutMediaByIdSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutMediaByIdSortChildrenError = PutMediaByIdSortChildrenErrors[keyof PutMediaByIdSortChildrenErrors];
+
+export type PutMediaByIdSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PutMediaByIdValidateData = {
     body?: UpdateMediaRequestModel;
     path: {
@@ -10645,6 +10779,37 @@ export type GetMediaConfigurationResponses = {
 };
 
 export type GetMediaConfigurationResponse = GetMediaConfigurationResponses[keyof GetMediaConfigurationResponses];
+
+export type PutMediaRootSortChildrenData = {
+    body?: SortMediaChildrenByFieldRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/media/root/sort-children';
+};
+
+export type PutMediaRootSortChildrenErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type PutMediaRootSortChildrenError = PutMediaRootSortChildrenErrors[keyof PutMediaRootSortChildrenErrors];
+
+export type PutMediaRootSortChildrenResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type PutMediaSortData = {
     body?: SortingRequestModel;
@@ -14799,6 +14964,29 @@ export type GetServerInformationResponses = {
 };
 
 export type GetServerInformationResponse = GetServerInformationResponses[keyof GetServerInformationResponses];
+
+export type GetServerSchemaLockdownData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/server/schema-lockdown';
+};
+
+export type GetServerSchemaLockdownErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetServerSchemaLockdownResponses = {
+    /**
+     * OK
+     */
+    200: ServerSchemaLockdownResponseModel;
+};
+
+export type GetServerSchemaLockdownResponse = GetServerSchemaLockdownResponses[keyof GetServerSchemaLockdownResponses];
 
 export type GetServerStatusData = {
     body?: never;

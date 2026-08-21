@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -19,7 +18,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 /// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDataTypes)]
-[DenyInRuntimeModeProduction]
 public class CreateDataTypeController : DataTypeControllerBase
 {
     private readonly IDataTypeService _dataTypeService;

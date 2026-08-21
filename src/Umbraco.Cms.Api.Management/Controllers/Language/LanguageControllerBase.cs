@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -12,6 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language;
 /// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Language)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Language))]
+[EntityType(Constants.UdiEntityType.Language)]
 public abstract class LanguageControllerBase : ManagementApiControllerBase
 {
     protected IActionResult LanguageOperationStatusResult(LanguageOperationStatus status) =>

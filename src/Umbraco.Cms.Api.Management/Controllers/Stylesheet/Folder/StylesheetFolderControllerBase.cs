@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -14,6 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Stylesheet}/folder")]
 [ApiExplorerSettings(GroupName = "Stylesheet")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]
+[EntityType(Constants.UdiEntityType.Stylesheet)]
 public class StylesheetFolderControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult OperationStatusResult(StylesheetFolderOperationStatus status) =>

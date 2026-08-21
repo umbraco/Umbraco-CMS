@@ -1,12 +1,12 @@
-import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../../entity.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import {
 	UMB_WORKSPACE_CONDITION_ALIAS,
-	UmbProductionModeWorkspaceActionApi,
-	UmbProductionModeWorkspaceActionElement,
+	UmbSchemaLockdownWorkspaceActionApi,
+	UmbSchemaLockdownWorkspaceActionElement,
 	UmbSubmitWorkspaceAction,
 } from '@umbraco-cms/backoffice/workspace';
-import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -36,25 +36,28 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS,
 			},
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+				operation: 'update',
 			},
 		],
 	},
 	{
 		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.DataType.Folder.ProductionMode',
-		name: 'Data Type Folder Production Mode Workspace Action',
-		api: UmbProductionModeWorkspaceActionApi,
-		element: UmbProductionModeWorkspaceActionElement,
+		alias: 'Umb.WorkspaceAction.DataType.Folder.SchemaLockdown',
+		name: 'Data Type Folder Schema Lockdown Workspace Action',
+		api: UmbSchemaLockdownWorkspaceActionApi,
+		element: UmbSchemaLockdownWorkspaceActionElement,
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS,
 			},
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: true,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+				operation: 'update',
+				match: false,
 			},
 		],
 	},

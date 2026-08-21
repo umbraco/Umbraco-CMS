@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -12,7 +11,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 /// Provides API endpoints for creating folders used to organize data types in the system.
 /// </summary>
 [ApiVersion("1.0")]
-[DenyInRuntimeModeProduction]
 public class CreateDataTypeFolderController : DataTypeFolderControllerBase
 {
     /// <summary>

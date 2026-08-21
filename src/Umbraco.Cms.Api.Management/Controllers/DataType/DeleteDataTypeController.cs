@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -17,7 +16,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 /// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDataTypes)]
-[DenyInRuntimeModeProduction]
 public class DeleteDataTypeController : DataTypeControllerBase
 {
     private readonly IDataTypeService _dataTypeService;

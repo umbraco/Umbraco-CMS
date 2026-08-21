@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
-using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.Stylesheet;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -20,7 +19,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 /// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]
-[DenyInRuntimeModeProduction]
 public class UpdateStylesheetController : StylesheetControllerBase
 {
     private readonly IStylesheetService _stylesheetService;

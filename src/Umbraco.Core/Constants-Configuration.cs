@@ -313,6 +313,11 @@ public static partial class Constants
         public const string ConfigSignalR = ConfigPrefix + "SignalR";
 
         /// <summary>
+        ///     The configuration key for schema lockdown settings.
+        /// </summary>
+        public const string ConfigSchemaLockdown = ConfigPrefix + "SchemaLockdown";
+
+        /// <summary>
         ///     Contains constants for named options used in configuration.
         /// </summary>
         public static class NamedOptions

@@ -48,6 +48,8 @@ internal sealed class UmbracoCmsSchema
 
         public required RuntimeSettings Runtime { get; set; }
 
+        public required SchemaLockdownSettings SchemaLockdown { get; set; }
+
         public required SecuritySettings Security { get; set; }
 
         public required TypeFinderSettings TypeFinder { get; set; }

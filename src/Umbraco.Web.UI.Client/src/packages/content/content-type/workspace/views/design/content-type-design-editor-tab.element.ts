@@ -12,7 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_LOCKDOWN_CONTEXT } from '@umbraco-cms/backoffice/schema-lockdown';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
 import './content-type-design-editor-properties.element.js';
@@ -198,24 +198,21 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	@state()
 	private _editContentTypePath?: string;
 
-	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	// Restricted until the schema lockdown matrix confirms the operation is allowed (safe default).
 	@state()
 	private _isRestricted = true;
 
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 	#contentTypeWorkspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
+	#schemaLockdownContext?: typeof UMB_SCHEMA_LOCKDOWN_CONTEXT.TYPE;
+	#entityType?: string;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this.observe(
-				context?.isProductionMode,
-				(isProductionMode) => {
-					this._isRestricted = isProductionMode !== false;
-				},
-				'_observeProductionMode',
-			);
+		this.consumeContext(UMB_SCHEMA_LOCKDOWN_CONTEXT, (context) => {
+			this.#schemaLockdownContext = context;
+			this.observe(context?.state, () => this.#updateIsRestricted(), '_observeSchemaLockdown');
 		});
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
@@ -223,6 +220,8 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			this.#groupStructureHelper.setStructureManager(context?.structure);
 
 			const entityType = context?.getEntityType();
+			this.#entityType = entityType;
+			this.#updateIsRestricted();
 
 			this.#workspaceModal?.destroy();
 			this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
@@ -262,6 +261,12 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			},
 			null,
 		);
+	}
+
+	#updateIsRestricted() {
+		this._isRestricted = this.#entityType
+			? this.#schemaLockdownContext?.isAllowed(this.#entityType, 'update') !== true
+			: true;
 	}
 
 	#onAddGroup = () => {

@@ -1,6 +1,7 @@
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../../../entity.js';
 import { UMB_MEDIA_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -14,8 +15,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_MEDIA_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 			},
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+				operation: 'create',
 			},
 		],
 	},

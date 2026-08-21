@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
-using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.Services.OperationStatus;
@@ -16,7 +15,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 /// Provides API endpoints for importing dictionary items into the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
-[DenyInRuntimeModeProduction]
 public class ImportDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemImportService _dictionaryItemImportService;

@@ -30,7 +30,7 @@ import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_LOCKDOWN_CONTEXT } from '@umbraco-cms/backoffice/schema-lockdown';
 
 import '@umbraco-cms/backoffice/components';
 
@@ -101,6 +101,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	});
 
 	#workspaceContext?: (typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT)['TYPE'];
+	#schemaLockdownContext?: typeof UMB_SCHEMA_LOCKDOWN_CONTEXT.TYPE;
+	#entityType?: string;
 	#designContext = new UmbContentTypeDesignEditorContext(this);
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 	#currentTabComponent?: UmbContentTypeDesignEditorTabElement;
@@ -135,7 +137,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	@state()
 	private _sortModeActive?: boolean;
 
-	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	// Restricted until the schema lockdown matrix confirms the operation is allowed (safe default).
 	@state()
 	private _isRestricted = true;
 
@@ -143,16 +145,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		super();
 
 		this.#sorter.disable();
-
-		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this.observe(
-				context?.isProductionMode,
-				(isProductionMode) => {
-					this._isRestricted = isProductionMode !== false;
-				},
-				'_observeProductionMode',
-			);
-		});
 
 		this.observe(
 			this.#designContext.isSorting,
@@ -184,9 +176,17 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			'observeRootProperties',
 		);
 
+		this.consumeContext(UMB_SCHEMA_LOCKDOWN_CONTEXT, (context) => {
+			this.#schemaLockdownContext = context;
+			this.observe(context?.state, () => this.#updateIsRestricted(), '_observeSchemaLockdown');
+		});
+
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 			if (!workspaceContext) return;
+
+			this.#entityType = workspaceContext.getEntityType();
+			this.#updateIsRestricted();
 
 			// The router-slot does not re-match the URL when its routes are replaced, so the
 			// initial route set must reflect real data. Awaiting the structure load here ensures
@@ -208,6 +208,12 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 	#toggleSortMode() {
 		this.#designContext?.setIsSorting(!this._sortModeActive);
+	}
+
+	#updateIsRestricted() {
+		this._isRestricted = this.#entityType
+			? this.#schemaLockdownContext?.isAllowed(this.#entityType, 'update') !== true
+			: true;
 	}
 
 	async #observeRootGroups() {
@@ -494,15 +500,15 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		window.history.replaceState(null, '', path);
 	}
 
-	#renderProductionModeNotice() {
+	#renderSchemaLockdownNotice() {
 		if (!this._isRestricted) return nothing;
 		return html`
-			<uui-box id="production-mode-notice">
+			<uui-box id="schema-lockdown-notice">
 				<div class="notice">
 					<umb-icon name="icon-info"></umb-icon>
 					<div>
-						<strong><umb-localize key="general_productionMode">Production Mode</umb-localize></strong>
-						<p><umb-localize key="general_runtimeModeProductionSchema"></umb-localize></p>
+						<strong><umb-localize key="schemaLockdown_headline">Schema Locked</umb-localize></strong>
+						<p><umb-localize key="schemaLockdown_notice"></umb-localize></p>
 					</div>
 				</div>
 			</uui-box>
@@ -516,7 +522,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					<div id="container-list">${this.renderTabsNavigation()}</div>
 					${this.#renderActions()}
 				</div>
-				${this.#renderProductionModeNotice()}
+				${this.#renderSchemaLockdownNotice()}
 				${this._routes
 					? html`<umb-router-slot
 							.routes=${this._routes}
@@ -733,27 +739,27 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				--uui-tab-background: var(--uui-color-surface);
 			}
 
-			#production-mode-notice {
+			#schema-lockdown-notice {
 				display: block;
 				margin-bottom: var(--uui-size-layout-1);
 				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
 				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);
 			}
 
-			#production-mode-notice .notice {
+			#schema-lockdown-notice .notice {
 				display: flex;
 				gap: var(--uui-size-space-4);
 				align-items: flex-start;
 			}
 
-			#production-mode-notice umb-icon {
+			#schema-lockdown-notice umb-icon {
 				flex: 0 0 auto;
 				font-size: var(--uui-size-6);
 				margin-top: 2px;
 				color: var(--uui-color-warning-standalone, #f0ac00);
 			}
 
-			#production-mode-notice p {
+			#schema-lockdown-notice p {
 				margin: var(--uui-size-space-2) 0 0;
 			}
 

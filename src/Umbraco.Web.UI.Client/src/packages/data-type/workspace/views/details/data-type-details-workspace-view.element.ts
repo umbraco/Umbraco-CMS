@@ -1,4 +1,5 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../../entity.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_MISSING_PROPERTY_EDITOR_UI_ALIAS } from '@umbraco-cms/backoffice/property-editor';
@@ -6,7 +7,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_LOCKDOWN_CONTEXT } from '@umbraco-cms/backoffice/schema-lockdown';
 
 @customElement('umb-data-type-details-workspace-view')
 export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -31,11 +32,12 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	@state()
 	private _supportedDataSourceTypes: Array<string> = [];
 
-	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	// Restricted until the schema lockdown matrix confirms the operation is allowed (safe default).
 	@state()
 	private _isRestricted = true;
 
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
+	#schemaLockdownContext?: typeof UMB_SCHEMA_LOCKDOWN_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -45,9 +47,10 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 			this.#observeDataType();
 		});
 
-		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this.observe(context?.isProductionMode, (isProductionMode) => {
-				this._isRestricted = isProductionMode !== false;
+		this.consumeContext(UMB_SCHEMA_LOCKDOWN_CONTEXT, (context) => {
+			this.#schemaLockdownContext = context;
+			this.observe(context?.state, () => {
+				this._isRestricted = this.#schemaLockdownContext?.isAllowed(UMB_DATA_TYPE_ENTITY_TYPE, 'update') !== true;
 			});
 		});
 	}
@@ -93,15 +96,15 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		this.#workspaceContext?.setPropertyEditorDataSourceAlias(value || undefined);
 	}
 
-	#renderProductionModeNotice() {
+	#renderSchemaLockdownNotice() {
 		if (!this._isRestricted) return nothing;
 		return html`
-			<uui-box id="production-mode-notice">
+			<uui-box id="schema-lockdown-notice">
 				<div class="notice">
 					<umb-icon name="icon-info"></umb-icon>
 					<div>
-						<strong><umb-localize key="general_productionMode">Production Mode</umb-localize></strong>
-						<p><umb-localize key="general_runtimeModeProductionSchema"></umb-localize></p>
+						<strong><umb-localize key="schemaLockdown_headline">Schema Locked</umb-localize></strong>
+						<p><umb-localize key="schemaLockdown_notice"></umb-localize></p>
 					</div>
 				</div>
 			</uui-box>
@@ -110,7 +113,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 
 	override render() {
 		return html`
-			${this.#renderProductionModeNotice()}
+			${this.#renderSchemaLockdownNotice()}
 			<uui-box>
 				<umb-property-layout
 					data-mark="property:editorUiAlias"
@@ -184,25 +187,25 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 				margin-top: var(--uui-size-layout-1);
 			}
 
-			#production-mode-notice {
+			#schema-lockdown-notice {
 				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
 				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);
 			}
 
-			#production-mode-notice .notice {
+			#schema-lockdown-notice .notice {
 				display: flex;
 				gap: var(--uui-size-space-4);
 				align-items: flex-start;
 			}
 
-			#production-mode-notice umb-icon {
+			#schema-lockdown-notice umb-icon {
 				flex: 0 0 auto;
 				font-size: var(--uui-size-6);
 				margin-top: 2px;
 				color: var(--uui-color-warning-standalone, #f0ac00);
 			}
 
-			#production-mode-notice p {
+			#schema-lockdown-notice p {
 				margin: var(--uui-size-space-2) 0 0;
 			}
 

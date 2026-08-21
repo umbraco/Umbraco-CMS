@@ -1,12 +1,13 @@
 import { UMB_MEMBER_TYPE_COMPOSITION_REPOSITORY_ALIAS, UMB_MEMBER_TYPE_WORKSPACE_ALIAS } from '../constants.js';
+import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../entity.js';
 import {
 	UMB_WORKSPACE_CONDITION_ALIAS,
-	UmbProductionModeInfoAppElement,
-	UmbProductionModeWorkspaceActionApi,
-	UmbProductionModeWorkspaceActionElement,
+	UmbSchemaLockdownInfoAppElement,
+	UmbSchemaLockdownWorkspaceActionApi,
+	UmbSchemaLockdownWorkspaceActionElement,
 	UmbSubmitWorkspaceAction,
 } from '@umbraco-cms/backoffice/workspace';
-import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -54,33 +55,36 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
 			},
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
+				operation: 'update',
 			},
 		],
 	},
 	{
 		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.MemberType.ProductionMode',
-		name: 'Member Type Production Mode Workspace Action',
-		api: UmbProductionModeWorkspaceActionApi,
-		element: UmbProductionModeWorkspaceActionElement,
+		alias: 'Umb.WorkspaceAction.MemberType.SchemaLockdown',
+		name: 'Member Type Schema Lockdown Workspace Action',
+		api: UmbSchemaLockdownWorkspaceActionApi,
+		element: UmbSchemaLockdownWorkspaceActionElement,
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
 			},
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: true,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
+				operation: 'update',
+				match: false,
 			},
 		],
 	},
 	{
 		type: 'workspaceInfoApp',
-		alias: 'Umb.WorkspaceInfoApp.MemberType.ProductionMode',
-		name: 'Member Type Production Mode Notice',
-		element: UmbProductionModeInfoAppElement,
+		alias: 'Umb.WorkspaceInfoApp.MemberType.SchemaLockdown',
+		name: 'Member Type Schema Lockdown Notice',
+		element: UmbSchemaLockdownInfoAppElement,
 		weight: 1000,
 		conditions: [
 			{
@@ -88,8 +92,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
 			},
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: true,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
+				operation: 'update',
+				match: false,
 			},
 		],
 	},

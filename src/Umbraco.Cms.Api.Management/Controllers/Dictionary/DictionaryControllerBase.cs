@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.SchemaLockdown;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -14,6 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 [VersionedApiBackOfficeRoute("dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionary)]
+[EntityType(Constants.UdiEntityType.DictionaryItem)]
 public abstract class DictionaryControllerBase : ManagementApiControllerBase
 {
     protected IActionResult DictionaryItemOperationStatusResult(DictionaryItemOperationStatus status) =>

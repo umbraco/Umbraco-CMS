@@ -6,7 +6,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/icon';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbBindToValidation } from '@umbraco-cms/backoffice/validation';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_LOCKDOWN_CONTEXT } from '@umbraco-cms/backoffice/schema-lockdown';
 
 @customElement('umb-content-type-workspace-editor-header')
 export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
@@ -25,11 +25,12 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 	@state()
 	private _isNew?: boolean;
 
-	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	// Restricted until the schema lockdown matrix confirms the operation is allowed (safe default).
 	@state()
 	private _isRestricted = true;
 
 	#workspaceContext?: typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT.TYPE;
+	#schemaLockdownContext?: typeof UMB_SCHEMA_LOCKDOWN_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -37,17 +38,18 @@ export class UmbContentTypeWorkspaceEditorHeaderElement extends UmbLitElement {
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeContentType();
+			this.#updateIsRestricted();
 		});
 
-		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this.observe(
-				context?.isProductionMode,
-				(isProductionMode) => {
-					this._isRestricted = isProductionMode !== false;
-				},
-				'_observeProductionMode',
-			);
+		this.consumeContext(UMB_SCHEMA_LOCKDOWN_CONTEXT, (context) => {
+			this.#schemaLockdownContext = context;
+			this.observe(context?.state, () => this.#updateIsRestricted(), '_observeSchemaLockdown');
 		});
+	}
+
+	#updateIsRestricted() {
+		const entityType = this.#workspaceContext?.getEntityType();
+		this._isRestricted = entityType ? this.#schemaLockdownContext?.isAllowed(entityType, 'update') !== true : true;
 	}
 
 	#observeContentType() {

@@ -30839,6 +30839,40 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/server/schema-lockdown": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "summary": "Gets the schema lockdown state.",
+        "description": "Gets which schema operations are permitted for each entity type.",
+        "operationId": "GetServerSchemaLockdown",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerSchemaLockdownResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/server/status": {
       "get": {
         "tags": [
@@ -50972,6 +51006,53 @@
           },
           "runtimeMode": {
             "$ref": "#/components/schemas/RuntimeModeModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ServerSchemaLockdownEntityTypeResponseModel": {
+        "required": [
+          "create",
+          "delete",
+          "entityType",
+          "update"
+        ],
+        "type": "object",
+        "properties": {
+          "entityType": {
+            "type": "string"
+          },
+          "create": {
+            "type": "boolean"
+          },
+          "update": {
+            "type": "boolean"
+          },
+          "delete": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ServerSchemaLockdownResponseModel": {
+        "required": [
+          "enabled",
+          "entityTypes"
+        ],
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "entityTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ServerSchemaLockdownEntityTypeResponseModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false

@@ -1,5 +1,11 @@
-import { UmbSubmitWorkspaceAction, UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
-import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_WORKSPACE_CONDITION_ALIAS,
+	UmbSchemaLockdownWorkspaceActionApi,
+	UmbSchemaLockdownWorkspaceActionElement,
+	UmbSubmitWorkspaceAction,
+} from '@umbraco-cms/backoffice/workspace';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const UMB_STYLESHEET_WORKSPACE_ALIAS = 'Umb.Workspace.Stylesheet';
 
@@ -49,27 +55,28 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: UMB_STYLESHEET_WORKSPACE_ALIAS,
 			},
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_STYLESHEET_ENTITY_TYPE,
+				operation: 'update',
 			},
 		],
 	},
 	{
 		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.Stylesheet.ProductionMode',
-		name: 'Stylesheet Production Mode Workspace Action',
-		api: () =>
-			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
-		element: () =>
-			import('../../local-components/production-mode-workspace-action/production-mode-workspace-action.js'),
+		alias: 'Umb.WorkspaceAction.Stylesheet.SchemaLockdown',
+		name: 'Stylesheet Schema Lockdown Workspace Action',
+		api: UmbSchemaLockdownWorkspaceActionApi,
+		element: UmbSchemaLockdownWorkspaceActionElement,
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: UMB_STYLESHEET_WORKSPACE_ALIAS,
 			},
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: true,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_STYLESHEET_ENTITY_TYPE,
+				operation: 'update',
+				match: false,
 			},
 		],
 	},

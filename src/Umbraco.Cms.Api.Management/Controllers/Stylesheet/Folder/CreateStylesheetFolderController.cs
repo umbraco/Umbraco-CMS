@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
-using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.Stylesheet.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -16,7 +15,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 /// Controller for creating stylesheet folders via the Umbraco CMS Management API.
 /// </summary>
 [ApiVersion("1.0")]
-[DenyInRuntimeModeProduction]
 public class CreateStylesheetFolderController : StylesheetFolderControllerBase
 {
     private readonly IStylesheetFolderService _stylesheetFolderService;

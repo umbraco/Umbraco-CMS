@@ -1,7 +1,7 @@
-import { UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as modalManifests } from './modal/manifests.js';
-import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -18,8 +18,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+				operation: 'create',
 			},
 		],
 	},

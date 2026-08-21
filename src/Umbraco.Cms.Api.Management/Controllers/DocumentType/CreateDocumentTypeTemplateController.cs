@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Template;
-using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
@@ -15,7 +14,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 /// Controller responsible for handling requests to create templates for document types in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
-[DenyInRuntimeModeProduction]
 public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;

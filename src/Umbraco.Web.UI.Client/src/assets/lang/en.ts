@@ -1047,11 +1047,8 @@ export default {
 		},
 		clipboard: 'Clipboard',
 		productionMode: 'Production Mode',
-		runtimeModeProduction: 'This is not editable while the runtime mode is set to <code>Production</code>.',
 		runtimeModeProductionSchema:
 			'This environment runs in production runtime mode, so it is read-only here. Make your changes in a local development environment and deploy them to this environment.',
-		runtimeModeProductionDictionary:
-			'Adding and removing dictionary items is disabled while the runtime mode is set to <code>Production</code>. Make those changes in a local development environment and deploy them. Editing the translations of existing items is still available here.',
 	},
 	colors: {
 		black: 'Black',
@@ -3027,6 +3024,11 @@ export default {
 		emptyDate: 'Please select a date',
 		emptyTimeZone: 'Please select a time zone',
 		invalidTimeZone: 'The selected time zone is not valid',
+	},
+	schemaLockdown: {
+		headline: 'Schema Locked',
+		notice:
+			"This environment's schema is currently locked, so it is read-only here. Make your changes in a local development environment and deploy them to this environment.",
 	},
 	uiCulture: {
 		ar: 'العربية',

@@ -1,11 +1,11 @@
-import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DATA_TYPE_ROOT_WORKSPACE_ALIAS } from '../../data-type-root/index.js';
 import { UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from './repository/index.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { UMB_DATA_TYPE_FOLDER_WORKSPACE_ALIAS } from './workspace/index.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
-import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/schema-lockdown';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -19,8 +19,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+				operation: 'update',
 			},
 		],
 	},
@@ -35,8 +36,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
-				match: false,
+				alias: UMB_SCHEMA_OPERATION_ALLOWED_CONDITION_ALIAS,
+				entityType: UMB_DATA_TYPE_ENTITY_TYPE,
+				operation: 'delete',
 			},
 		],
 	},

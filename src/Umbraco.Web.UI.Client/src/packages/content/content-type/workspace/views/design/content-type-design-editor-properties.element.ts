@@ -14,7 +14,7 @@ import {
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_LOCKDOWN_CONTEXT } from '@umbraco-cms/backoffice/schema-lockdown';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -197,16 +197,19 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 	@state()
 	private _sortModeActive?: boolean;
 
-	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	// Restricted until the schema lockdown matrix confirms the operation is allowed (safe default).
 	@state()
 	private _isRestricted = true;
+
+	#schemaLockdownContext?: typeof UMB_SCHEMA_LOCKDOWN_CONTEXT.TYPE;
+	#entityType?: string;
 
 	constructor() {
 		super();
 
 		//this.#sorter.disable();
 
-		this.#observeProductionMode();
+		this.#observeSchemaLockdown();
 
 		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
@@ -222,6 +225,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 			if (workspaceContext) {
 				this.#propertyStructureHelper.setStructureManager(workspaceContext.structure);
 			}
+
+			this.#entityType = workspaceContext?.getEntityType();
+			this.#updateIsRestricted();
 
 			this._ownerContentTypeUnique = workspaceContext?.structure.getOwnerContentTypeUnique();
 			this.#createPropertyTypeWorkspaceRoutes();
@@ -257,15 +263,16 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		});
 	}
 
-	#observeProductionMode() {
-		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
-			this.observe(
-				context?.isProductionMode,
-				(isProductionMode) => {
-					this._isRestricted = isProductionMode !== false;
-				},
-				'_observeProductionMode',
-			);
+	#updateIsRestricted() {
+		this._isRestricted = this.#entityType
+			? this.#schemaLockdownContext?.isAllowed(this.#entityType, 'update') !== true
+			: true;
+	}
+
+	#observeSchemaLockdown() {
+		this.consumeContext(UMB_SCHEMA_LOCKDOWN_CONTEXT, (context) => {
+			this.#schemaLockdownContext = context;
+			this.observe(context?.state, () => this.#updateIsRestricted(), '_observeSchemaLockdown');
 		});
 	}
 

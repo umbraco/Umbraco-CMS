@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
-using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -16,7 +15,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 /// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]
-[DenyInRuntimeModeProduction]
 public class DeleteStylesheetController : StylesheetControllerBase
 {
     private readonly IStylesheetService _stylesheetService;

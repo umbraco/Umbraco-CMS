@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -14,7 +13,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary;
 /// Controller responsible for handling requests to delete dictionary items in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
-[DenyInRuntimeModeProduction]
 public class DeleteDictionaryController : DictionaryControllerBase
 {
     private readonly IDictionaryItemService _dictionaryItemService;

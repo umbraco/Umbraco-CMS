@@ -101,6 +101,7 @@
 		"./resources": "./dist-cms/packages/core/resources/index.js",
 		"./router": "./dist-cms/packages/core/router/index.js",
 		"./rte": "./dist-cms/packages/rte/index.js",
+		"./schema-lockdown": "./dist-cms/packages/core/schema-lockdown/index.js",
 		"./script": "./dist-cms/packages/templating/scripts/index.js",
 		"./section": "./dist-cms/packages/core/section/index.js",
 		"./segment": "./dist-cms/packages/segment/index.js",

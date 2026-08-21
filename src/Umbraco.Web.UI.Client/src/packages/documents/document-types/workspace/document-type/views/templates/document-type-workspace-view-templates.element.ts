@@ -1,10 +1,11 @@
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '../../document-type-workspace.context-token.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../../../../entity.js';
 import type { UmbInputTemplateElement } from '@umbraco-cms/backoffice/template';
 import { css, html, customElement, state, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { UMB_SCHEMA_LOCKDOWN_CONTEXT } from '@umbraco-cms/backoffice/schema-lockdown';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: This is needed to register the <umb-input-template> element, but it should be done in a better way without importing the whole module. [JOV]
@@ -23,22 +24,22 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 	@state()
 	private _allowedTemplateIds?: Array<string>;
 
-	// Restricted until the server confirms it is not in production runtime mode (safe default).
+	// Restricted until the schema lockdown matrix confirms the operation is allowed (safe default).
 	@state()
 	private _isRestricted = true;
 
 	constructor() {
 		super();
-		// In production runtime mode the schema is read-only. Making the whole view inert disables every
+		// When the schema is locked down the view is read-only. Making the whole view inert disables every
 		// input/toggle/button at once without wiring each one, and the dimmed styling signals it is read-only.
-		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+		this.consumeContext(UMB_SCHEMA_LOCKDOWN_CONTEXT, (context) => {
 			this.observe(
-				context?.isProductionMode,
-				(isProductionMode) => {
-					this._isRestricted = isProductionMode !== false;
+				context?.state,
+				() => {
+					this._isRestricted = context?.isAllowed(UMB_DOCUMENT_TYPE_ENTITY_TYPE, 'update') !== true;
 					this.inert = this._isRestricted;
 				},
-				'_observeProductionMode',
+				'_observeSchemaLockdown',
 			);
 		});
 
@@ -92,15 +93,15 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 		this.#workspaceContext?.setDefaultTemplate(input.defaultUnique ? { id: input.defaultUnique } : null);
 	}
 
-	#renderProductionModeNotice() {
+	#renderSchemaLockdownNotice() {
 		if (!this._isRestricted) return nothing;
 		return html`
-			<uui-box id="production-mode-notice">
+			<uui-box id="schema-lockdown-notice">
 				<div class="notice">
 					<umb-icon name="icon-info"></umb-icon>
 					<div>
-						<strong><umb-localize key="general_productionMode">Production Mode</umb-localize></strong>
-						<p><umb-localize key="general_runtimeModeProductionSchema"></umb-localize></p>
+						<strong><umb-localize key="schemaLockdown_headline">Schema Locked</umb-localize></strong>
+						<p><umb-localize key="schemaLockdown_notice"></umb-localize></p>
 					</div>
 				</div>
 			</uui-box>
@@ -109,7 +110,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 
 	override render() {
 		return html`
-			${this.#renderProductionModeNotice()} ${this._isElementType ? this.#renderUnsupported() : this.#renderTemplates()}
+			${this.#renderSchemaLockdownNotice()} ${this._isElementType ? this.#renderUnsupported() : this.#renderTemplates()}
 		`;
 	}
 
@@ -149,26 +150,26 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			:host([inert]) > :not(#production-mode-notice) {
+			:host([inert]) > :not(#schema-lockdown-notice) {
 				opacity: 0.6;
 			}
-			#production-mode-notice {
+			#schema-lockdown-notice {
 				--uui-box-default-padding: var(--uui-size-space-4) var(--uui-size-space-5);
 				border-left: 4px solid var(--uui-color-warning-standalone, #f0ac00);
 				margin-bottom: var(--uui-size-layout-1);
 			}
-			#production-mode-notice .notice {
+			#schema-lockdown-notice .notice {
 				display: flex;
 				gap: var(--uui-size-space-4);
 				align-items: flex-start;
 			}
-			#production-mode-notice umb-icon {
+			#schema-lockdown-notice umb-icon {
 				flex: 0 0 auto;
 				font-size: var(--uui-size-6);
 				margin-top: 2px;
 				color: var(--uui-color-warning-standalone, #f0ac00);
 			}
-			#production-mode-notice p {
+			#schema-lockdown-notice p {
 				margin: var(--uui-size-space-2) 0 0;
 			}
 			:host {
