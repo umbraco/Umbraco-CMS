@@ -4,6 +4,7 @@
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Text.Json;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
@@ -58,6 +59,119 @@ public class OpenIdDictApplicationManagerBaseTests
         _mockApplicationManager
             .Setup(x => x.GetSettingsAsync(_storedApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(ImmutableDictionary<string, string>.Empty);
+
+        _mockApplicationManager
+            .Setup(x => x.GetConsentTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        _mockApplicationManager
+            .Setup(x => x.GetApplicationTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+
+        _mockApplicationManager
+            .Setup(x => x.GetRequirementsAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray<string>.Empty);
+
+        _mockApplicationManager
+            .Setup(x => x.GetDisplayNamesAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<CultureInfo, string>.Empty);
+
+        _mockApplicationManager
+            .Setup(x => x.GetPropertiesAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty);
+    }
+
+    /// <summary>
+    /// A descriptor that clears a value the store still holds is a change, so it must be written.
+    /// </summary>
+    /// <remarks>
+    /// Treating an unset value as "nothing to compare" leaves the stored value in place and ignores
+    /// the removal, which is silent because the caller sees a successful call either way.
+    /// </remarks>
+    [TestCase(OpenIddictConstants.ConsentTypes.Explicit, null, TestName = "ConsentType cleared")]
+    [TestCase(null, OpenIddictConstants.ConsentTypes.Explicit, TestName = "ConsentType added")]
+    public async Task CreateOrUpdate_ConsentTypeDiffersFromStored_Updates(string? stored, string? descriptorValue)
+    {
+        _mockApplicationManager
+            .Setup(x => x.GetConsentTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(stored);
+
+        OpenIddictApplicationDescriptor descriptor = MatchingDescriptor();
+        descriptor.ConsentType = descriptorValue;
+
+        var sut = new TestApplicationManager(_mockApplicationManager.Object);
+        await sut.CreateOrUpdateAsync(descriptor);
+
+        VerifyUpdated(Times.Once());
+    }
+
+    /// <summary>
+    /// The same, for the remaining readable metadata: state the store holds and the descriptor does
+    /// not is a removal, and a removal is a change.
+    /// </summary>
+    [TestCaseSource(nameof(MetadataHeldByTheStoreButNotTheDescriptor))]
+    public async Task CreateOrUpdate_StoredMetadataAbsentFromDescriptor_Updates(
+        Action<Mock<IOpenIddictApplicationManager>, object> stubStoredValue)
+    {
+        stubStoredValue(_mockApplicationManager, _storedApplication);
+        var sut = new TestApplicationManager(_mockApplicationManager.Object);
+
+        await sut.CreateOrUpdateAsync(MatchingDescriptor());
+
+        VerifyUpdated(Times.Once());
+    }
+
+    private static IEnumerable<TestCaseData> MetadataHeldByTheStoreButNotTheDescriptor()
+    {
+        yield return Case(
+            "Requirements",
+            (mock, stored) => mock
+                .Setup(x => x.GetRequirementsAsync(stored, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ImmutableArray.Create(OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange)));
+
+        yield return Case(
+            "DisplayNames",
+            (mock, stored) => mock
+                .Setup(x => x.GetDisplayNamesAsync(stored, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ImmutableDictionary<CultureInfo, string>.Empty
+                    .Add(CultureInfo.GetCultureInfo("da-DK"), "Testprogram")));
+
+        yield return Case(
+            "Properties",
+            (mock, stored) => mock
+                .Setup(x => x.GetPropertiesAsync(stored, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty
+                    .Add("custom", JsonDocument.Parse("\"value\"").RootElement)));
+
+        static TestCaseData Case(string name, Action<Mock<IOpenIddictApplicationManager>, object> stubStoredValue)
+            => new TestCaseData(stubStoredValue).SetName(name);
+    }
+
+    /// <summary>
+    /// Every property on the descriptor is either compared, used to find the application, or
+    /// deliberately treated as always-write.
+    /// </summary>
+    /// <remarks>
+    /// This asserts a count rather than behaviour on purpose. A package bump that adds a property
+    /// lands it in none of those buckets, where the comparison would treat it as matching and skip
+    /// a write the caller asked for. That failure is silent, so this fails the build instead and
+    /// forces the new property to be classified.
+    ///
+    /// If this fails after an OpenIddict upgrade, decide which bucket the new property belongs in,
+    /// add it to the comparison or to <c>HasStateThatCannotBeCompared</c>, then update the count.
+    /// </remarks>
+    [Test]
+    public void OpenIddictApplicationDescriptor_HasTheExpectedNumberOfProperties()
+    {
+        const int classifiedProperties = 14;
+
+        var actual = typeof(OpenIddictApplicationDescriptor).GetProperties().Length;
+
+        Assert.That(
+            actual,
+            Is.EqualTo(classifiedProperties),
+            $"OpenIddictApplicationDescriptor now has {actual} properties rather than {classifiedProperties}. "
+            + "Classify the new property in OpenIdDictApplicationManagerBase before updating this count.");
     }
 
     /// <summary>
@@ -223,7 +337,7 @@ public class OpenIdDictApplicationManagerBaseTests
     private sealed class TestApplicationManager : OpenIdDictApplicationManagerBase
     {
         public TestApplicationManager(IOpenIddictApplicationManager applicationManager)
-            : base(applicationManager)
+            : base(applicationManager, NullLogger.Instance)
         {
         }
 
