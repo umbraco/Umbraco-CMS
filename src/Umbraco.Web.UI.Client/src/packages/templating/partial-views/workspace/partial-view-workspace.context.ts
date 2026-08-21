@@ -19,8 +19,7 @@ import { PartialViewService } from '@umbraco-cms/backoffice/external/backend-api
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbServerFileRenameWorkspaceRedirectController } from '@umbraco-cms/backoffice/server-file-system';
 
-export interface UmbPartialViewWorkspaceContextCreateArgs
-	extends UmbEntityDetailWorkspaceContextCreateArgs<UmbPartialViewDetailModel> {
+export interface UmbPartialViewWorkspaceContextCreateArgs extends UmbEntityDetailWorkspaceContextCreateArgs<UmbPartialViewDetailModel> {
 	snippet: { unique: string } | null;
 }
 

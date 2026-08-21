@@ -27,21 +27,25 @@ export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TIPTAP_STATUSBAR_CONFIGURATION_CONTEXT);
 
-		this.observe(umbExtensionsRegistry.byType('tiptapStatusbarExtension'), (extensions) => {
-			const _extensions = extensions
-				.sort((a, b) => a.alias.localeCompare(b.alias))
-				.map((ext) => ({
-					kind: 'default',
-					alias: ext.alias,
-					label: ext.meta.label,
-					icon: ext.meta.icon,
-					dependencies: ext.forExtensions,
-				}));
+		this.observe(
+			umbExtensionsRegistry.byType('tiptapStatusbarExtension'),
+			(extensions) => {
+				const _extensions = extensions
+					.sort((a, b) => a.alias.localeCompare(b.alias))
+					.map((ext) => ({
+						kind: 'default',
+						alias: ext.alias,
+						label: ext.meta.label,
+						icon: ext.meta.icon,
+						dependencies: ext.forExtensions,
+					}));
 
-			this.#extensions.setValue(_extensions);
+				this.#extensions.setValue(_extensions);
 
-			this.#lookup = new Map(_extensions.map((ext) => [ext.alias, ext]));
-		});
+				this.#lookup = new Map(_extensions.map((ext) => [ext.alias, ext]));
+			},
+			null,
+		);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (dataset) => {
 			this.observe(
@@ -164,9 +168,17 @@ export class UmbTiptapStatusbarConfigurationContext extends UmbContextBase {
 		}
 
 		this.#extensionsInUse.clear();
-		value.forEach((area) => area.forEach((alias) => this.#extensionsInUse.add(alias)));
 
-		const statusbar = value.map((area) => ({ unique: UmbId.new(), data: area }));
+		// An extension can only be used once, so any repeat occurrence is dropped rather than carried along. (#23524)
+		const statusbar = value.map((area) => {
+			const aliases: Array<string> = [];
+			for (const alias of area) {
+				if (this.#extensionsInUse.has(alias)) continue;
+				this.#extensionsInUse.add(alias);
+				aliases.push(alias);
+			}
+			return { unique: UmbId.new(), data: aliases };
+		});
 
 		this.#statusbar.setValue(statusbar);
 	}

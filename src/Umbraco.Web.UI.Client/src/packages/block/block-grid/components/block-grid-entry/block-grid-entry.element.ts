@@ -496,7 +496,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						this._invalidLocation,
 						() => html`
 							<uui-tag id="invalidLocation" color="danger">
-								<umb-localize key="blockEditor_invalidDropPosition" .args=${[this._label]}></umb-localize>
+								<umb-localize
+									key="blockEditor_invalidDropPosition"
+									.args=${[
+										this._contentTypeName ?? this.localize.term('blockEditor_unsupportedBlockName'),
+									]}></umb-localize>
 							</uui-tag>
 						`,
 					)}
@@ -716,6 +720,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			uui-badge {
 				z-index: 2;
+			}
+
+			.umb-block-grid__block {
+				--umb-block-scale-handler-opacity: 0;
+
+				&:hover,
+				&:focus-within {
+					--umb-block-scale-handler-opacity: 1;
+				}
 			}
 		`,
 	];

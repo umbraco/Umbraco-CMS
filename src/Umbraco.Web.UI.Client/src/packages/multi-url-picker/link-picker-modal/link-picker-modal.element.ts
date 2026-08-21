@@ -6,6 +6,7 @@ import type {
 	UmbLinkPickerModalValue,
 } from './link-picker-modal.token.js';
 import { css, customElement, html, nothing, query, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import {
 	umbBindToValidation,
 	UmbObserveValidationStateController,
@@ -19,13 +20,25 @@ import {
 	UmbDocumentUrlsDataResolver,
 	type UmbDocumentItemModel,
 } from '@umbraco-cms/backoffice/document';
-import { UmbMediaItemRepository, UmbMediaPickerFolderFilter, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
+import {
+	UmbMediaItemRepository,
+	UmbMediaPickerFolderFilter,
+	UmbMediaUrlRepository,
+} from '@umbraco-cms/backoffice/media';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
+import {
+	UmbInteractionMemoryManager,
+	UmbModalInteractionMemoryController,
+	type UmbInteractionMemoryModel,
+} from '@umbraco-cms/backoffice/interaction-memory';
 
 type UmbInputPickerEvent = CustomEvent & { target: { value?: string; culture?: string } };
+
+const MODAL_MEMORY_UNIQUE = 'UmbLinkPickerModal';
+const MEDIA_MEMORY_UNIQUE = 'UmbLinkPickerMedia';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
@@ -49,6 +62,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	@state()
 	private _documentItem?: UmbDocumentItemModel;
 
+	@state()
+	private _mediaInteractionMemories: Array<UmbInteractionMemoryModel> = [];
+
 	#variantContext = new UmbVariantContext(this).inherit();
 	#documentItemDataResolver?: UmbDocumentItemDataResolver<UmbDocumentItemModel>;
 	#documentItemRepository?: UmbDocumentItemRepository;
@@ -57,12 +73,38 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	#mediaItemRepository?: UmbMediaItemRepository;
 	#mediaUrlRepository?: UmbMediaUrlRepository;
 
+	#interactionMemory = new UmbInteractionMemoryManager(this);
+
 	constructor() {
 		super();
 
 		new UmbObserveValidationStateController(this, '$.type', (invalid) => {
 			this._missingType = invalid;
 		});
+
+		new UmbModalInteractionMemoryController(this, {
+			memory: this.#interactionMemory,
+			unique: MODAL_MEMORY_UNIQUE,
+		});
+
+		this.observe(
+			this.#interactionMemory.memory(MEDIA_MEMORY_UNIQUE),
+			(memory) => {
+				this._mediaInteractionMemories = memory?.memories ?? [];
+			},
+			null,
+		);
+	}
+
+	#onMediaInteractionMemoriesChange(event: Event) {
+		const target = event.target as UmbInputMediaElement;
+		const memories = target.interactionMemories ?? [];
+
+		if (memories.length > 0) {
+			this.#interactionMemory.setMemory({ unique: MEDIA_MEMORY_UNIQUE, memories });
+		} else {
+			this.#interactionMemory.deleteMemory(MEDIA_MEMORY_UNIQUE);
+		}
 	}
 
 	override async firstUpdated() {
@@ -394,7 +436,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		await umbConfirmModal(this, {
 			color: 'danger',
 			headline: `#actions_remove?`,
-			content: `#defaultdialogs_confirmremove ${name}?`,
+			content: this.localize.term('defaultdialogs_confirmRemoveItem', escapeHTML(name)),
 			confirmLabel: '#actions_remove',
 		});
 
@@ -415,7 +457,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					.max=${1}
 					folder-filter=${UmbMediaPickerFolderFilter.FILES_ONLY}
 					.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
-					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>
+					.interactionMemories=${this._mediaInteractionMemories}
+					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}
+					@interaction-memories-change=${this.#onMediaInteractionMemoriesChange}></umb-input-media>
 			</umb-property-layout>
 		`;
 	}

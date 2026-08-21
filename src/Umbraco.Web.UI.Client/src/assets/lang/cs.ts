@@ -301,6 +301,8 @@ export default {
 		createFromClipboard: 'Paste from clipboard',
 		nodeIsInTrash: 'This item is in the Recycle Bin',
 		saveModalTitle: 'Uložit',
+		saveAndPublishDescendantsModalTitle: 'Uložit a publikovat s potomky',
+		saveAndScheduleModalTitle: 'Uložit a naplánovat publikování',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Vytvořit novou šablonu obsahu z <em>%0%</em>',
@@ -314,6 +316,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikněte pro nahrání',
+		browseFilesAction: 'Procházet soubory',
+		dropFilesOr: 'Přetáhněte média sem<br />nebo',
 		orClickHereToUpload: 'nebo kliknutím sem vyberte soubory',
 		disallowedFileType: 'Tento soubor nelze nahrát, nemá povolený typ souboru',
 		maxFileSize: 'Maximální velikost souboru je',
@@ -695,6 +699,8 @@ export default {
 		new: 'Nový',
 		next: 'Následující',
 		no: 'Ne',
+		noResults: 'Žádné výsledky',
+		noResultsFor: (query: string) => `Nebyl nalezen žádný výsledek pro "${query}".`,
 		of: 'z',
 		off: 'Vypnuto',
 		ok: 'OK',
@@ -1411,8 +1417,10 @@ export default {
 		tabHasNoSortOrder: 'záložka nemá žádné řazení',
 		compositionUsageHeading: 'Kde se toto složení používá?',
 		compositionUsageSpecification: 'Toto složení se v současnosti používá ve složení následujících typů obsahu:',
-		compositionUsageSpecificationMediaType: 'Toto složení se v současnosti používá ve složení následujících typů média:',
-		compositionUsageSpecificationMemberType: 'Toto složení se v současnosti používá ve složení následujících typů člena:',
+		compositionUsageSpecificationMediaType:
+			'Toto složení se v současnosti používá ve složení následujících typů média:',
+		compositionUsageSpecificationMemberType:
+			'Toto složení se v současnosti používá ve složení následujících typů člena:',
 		variantsHeading: 'Povolit různé jazyky',
 		variantsDescription: 'Povolit editorům vytvářet obsah tohoto typu v různých jazycích.',
 		allowVaryByCulture: 'Povolit různé jazyky',
@@ -1546,6 +1554,10 @@ export default {
 		thirdPartyGroup: 'Třetí strana',
 		userPermissions: 'Oprávnění uživatele',
 		userTypes: 'Typy uživatelů',
+	},
+	picker: {
+		browseTab: 'Procházet',
+		searchTab: 'Hledat',
 	},
 	update: {
 		updateAvailable: 'Nová aktualizace je připrvena',

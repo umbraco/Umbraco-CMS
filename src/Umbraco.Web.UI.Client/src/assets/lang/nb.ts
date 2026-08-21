@@ -227,6 +227,8 @@ export default {
 		routeError: 'Dette dokumentet er publisert, men URL-en kolliderer med innhold %0%',
 		routeErrorCannotRoute: 'Dette dokumentet er publisert, men URL-en kan ikke rutes',
 		saveModalTitle: 'Lagre',
+		saveAndPublishDescendantsModalTitle: 'Lagre og publiser med undersider',
+		saveAndScheduleModalTitle: 'Lagre og planlegg publisering',
 		schedulePublishHelp: 'Velg dato og tid for å publisere og/eller avpublisere innholdselementet.',
 		scheduledPublishDocumentation:
 			'<a href="https://docs.umbraco.com/umbraco-cms/fundamentals/data/scheduled-publishing#timezones" target="_blank" rel="noopener">Hva betyr dette?</a>',
@@ -262,6 +264,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klikk for å laste opp',
+		browseFilesAction: 'Bla gjennom filer',
+		dropFilesOr: 'Dra og slipp medier her<br />eller',
 	},
 	member: {
 		createNewMember: 'Opprett et nytt medlem',
@@ -532,6 +536,8 @@ export default {
 		no: 'Nei',
 		noItemsInList: 'Ingen elementer er lagt til',
 		nodeName: 'Nodenavn',
+		noResults: 'Ingen resultater',
+		noResultsFor: (query: string) => `Ingen resultater for "${query}".`,
 		of: 'av',
 		off: 'Av',
 		ok: 'OK',
@@ -1325,5 +1331,10 @@ export default {
 		tabClipboard: 'Utklippstavle',
 		tabCreateEmpty: 'Opprett tomt',
 		thumbnail: 'Miniatyrbilde',
+	},
+	picker: {
+		browseTab: 'Bla gjennom',
+		searchTab: 'Søk',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'element' : 'elementer'} valgt`,
 	},
 } as UmbLocalizationDictionary;

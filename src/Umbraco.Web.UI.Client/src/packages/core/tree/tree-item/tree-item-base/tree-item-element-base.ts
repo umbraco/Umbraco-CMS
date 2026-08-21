@@ -21,6 +21,8 @@ export abstract class UmbTreeItemElementBase<
 > extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	set item(newVal: TreeItemModelType) {
+		if (newVal === this._item) return;
+
 		this._item = newVal;
 		this._extractFlags(newVal);
 
@@ -38,7 +40,7 @@ export abstract class UmbTreeItemElementBase<
 	protected _noAccess: boolean = false;
 
 	/**
-	 * @param item - The item from which to extract flags.
+	 * @param {TreeItemModelType | undefined} item - The item from which to extract flags.
 	 * @description This method is called whenever the `item` property is set. It extracts the flags from the item and assigns them to the `_flags` state property.
 	 * This method is in some cases overridden in subclasses to customize how flags are extracted!
 	 */
@@ -313,7 +315,7 @@ export abstract class UmbTreeItemElementBase<
 			${this._childItems
 				? repeat(
 						this._childItems,
-						(item, index) => item.name + '___' + index,
+						(item) => `${item.entityType}:${item.unique}`,
 						(item) => html`
 							<umb-tree-item
 								.entityType=${item.entityType}

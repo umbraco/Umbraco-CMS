@@ -114,9 +114,13 @@ export class UmbPropertyEditorUIMediaPickerElement
 			this.observe(context?.variantId, (variantId) => (this._variantId = variantId?.toString() || 'invariant'));
 		});
 
-		this.observe(this.#interactionMemoryManager.memoriesForPropertyEditor, (interactionMemories) => {
-			this._interactionMemories = interactionMemories ?? [];
-		});
+		this.observe(
+			this.#interactionMemoryManager.memoriesForPropertyEditor,
+			(interactionMemories) => {
+				this._interactionMemories = interactionMemories ?? [];
+			},
+			null,
+		);
 
 		this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (context) => {
 			this.#clipboardContext = context;

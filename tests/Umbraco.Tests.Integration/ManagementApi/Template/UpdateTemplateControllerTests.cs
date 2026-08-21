@@ -16,11 +16,6 @@ public class UpdateTemplateControllerTests : ManagementApiUserGroupTestBase<Upda
         ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
-    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
-    {
-        ExpectedStatusCode = HttpStatusCode.NotFound
-    };
-
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
@@ -29,11 +24,6 @@ public class UpdateTemplateControllerTests : ManagementApiUserGroupTestBase<Upda
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
-    };
-
-    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
-    {
-        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

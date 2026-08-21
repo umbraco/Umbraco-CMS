@@ -35,7 +35,6 @@ import { mergeObservables, UmbStringState } from '@umbraco-cms/backoffice/observ
  * paste value translators. The alias is derived from the surrounding property context, so callers inside a
  * property editor can omit it; callers acting on behalf of another property editor — blocks, for instance —
  * pass it explicitly.
- * @export
  * @class UmbClipboardPropertyContext
  * @augments {UmbContextBase}
  */
@@ -143,8 +142,8 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 
 	/**
 	 * Write a clipboard entry for a property. The property value will be translated to the clipboard entry values
-	 * @param args - Arguments for writing a clipboard entry
-	 * @param {any} args.propertyValue - The property value to write
+	 * @param {object} args - Arguments for writing a clipboard entry
+	 * @param {unknown} args.propertyValue - The property value to write
 	 * @param {string} [args.name] - The name of the clipboard entry. Defaults to the location of the property
 	 * @param {string} [args.itemName] - The label of a single item within the property value, appended to the derived name
 	 * @param {string} [args.icon] - The icon of the clipboard entry. Defaults to the icon of the property editor
@@ -197,11 +196,11 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 
 	/**
 	 * Pick a clipboard entry for a property. The entry will be translated to the property editor value
-	 * @param args - Arguments for picking a clipboard entry
+	 * @param {object} args - Arguments for picking a clipboard entry
 	 * @param {boolean} args.multiple - Allow multiple clipboard entries to be picked
 	 * @param {string} [args.propertyEditorUiAlias] - The alias of the property editor to match. Defaults to the surrounding property editor
 	 * @param {() => Promise<boolean>} args.filter - A filter function to filter clipboard entries
-	 * @returns { Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<any> }> }
+	 * @returns { Promise<{ selection: Array<UmbEntityUnique>; propertyValues: Array<unknown> }> } The selected entries and their translated property values.
 	 */
 	async pick(args: {
 		multiple: boolean;

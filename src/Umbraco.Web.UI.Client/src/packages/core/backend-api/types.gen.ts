@@ -1339,13 +1339,13 @@ export type InviteUserRequestModel = {
 };
 
 export type IPermissionPresentationModel = ({
-    $type?: 'DocumentPermissionPresentationModel';
+    $type: 'DocumentPermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPermissionPresentationModel) | ({
-    $type?: 'DocumentPropertyValuePermissionPresentationModel';
+    $type: 'DocumentPropertyValuePermissionPresentationModel';
 } & IPermissionPresentationModelDocumentPropertyValuePermissionPresentationModel) | ({
-    $type?: 'ElementPermissionPresentationModel';
+    $type: 'ElementPermissionPresentationModel';
 } & IPermissionPresentationModelElementPermissionPresentationModel) | ({
-    $type?: 'UnknownTypePermissionPresentationModel';
+    $type: 'UnknownTypePermissionPresentationModel';
 } & IPermissionPresentationModelUnknownTypePermissionPresentationModel);
 
 export type IPermissionPresentationModelDocumentPermissionPresentationModel = {
@@ -1374,23 +1374,23 @@ export type IPermissionPresentationModelUnknownTypePermissionPresentationModel =
 };
 
 export type IReferenceResponseModel = ({
-    $type?: 'DefaultReferenceResponseModel';
+    $type: 'DefaultReferenceResponseModel';
 } & IReferenceResponseModelDefaultReferenceResponseModel) | ({
-    $type?: 'DocumentReferenceResponseModel';
+    $type: 'DocumentReferenceResponseModel';
 } & IReferenceResponseModelDocumentReferenceResponseModel) | ({
-    $type?: 'DocumentTypePropertyTypeReferenceResponseModel';
+    $type: 'DocumentTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelDocumentTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'ElementContainerReferenceResponseModel';
+    $type: 'ElementContainerReferenceResponseModel';
 } & IReferenceResponseModelElementContainerReferenceResponseModel) | ({
-    $type?: 'ElementReferenceResponseModel';
+    $type: 'ElementReferenceResponseModel';
 } & IReferenceResponseModelElementReferenceResponseModel) | ({
-    $type?: 'MediaReferenceResponseModel';
+    $type: 'MediaReferenceResponseModel';
 } & IReferenceResponseModelMediaReferenceResponseModel) | ({
-    $type?: 'MediaTypePropertyTypeReferenceResponseModel';
+    $type: 'MediaTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMediaTypePropertyTypeReferenceResponseModel) | ({
-    $type?: 'MemberReferenceResponseModel';
+    $type: 'MemberReferenceResponseModel';
 } & IReferenceResponseModelMemberReferenceResponseModel) | ({
-    $type?: 'MemberTypePropertyTypeReferenceResponseModel';
+    $type: 'MemberTypePropertyTypeReferenceResponseModel';
 } & IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel);
 
 export type IReferenceResponseModelDefaultReferenceResponseModel = {
@@ -1463,9 +1463,7 @@ export type IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel 
     name?: null | string;
 };
 
-export type ISetupTwoFactorModel = {
-    $type?: 'NoopSetupTwoFactorModel';
-} & ISetupTwoFactorModelNoopSetupTwoFactorModel;
+export type ISetupTwoFactorModel = ISetupTwoFactorModelNoopSetupTwoFactorModel;
 
 export type ISetupTwoFactorModelNoopSetupTwoFactorModel = {
     $type: 'NoopSetupTwoFactorModel';
@@ -3542,7 +3540,7 @@ export type WebhookLogResponseModel = {
     key: string;
     webhookKey: string;
     statusCode: string;
-    httpStatusCode?: number;
+    httpStatusCode?: null | number;
     isSuccessStatusCode: boolean;
     date: string;
     eventAlias: string;
@@ -4804,7 +4802,7 @@ export type GetTreeDictionaryRootResponses = {
 
 export type GetTreeDictionaryRootResponse = GetTreeDictionaryRootResponses[keyof GetTreeDictionaryRootResponses];
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
+export type PutDocumentByIdValidateData = {
     body: ValidateUpdateDocumentRequestModel;
     path: {
         id: string;
@@ -4813,7 +4811,7 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
     url: '/umbraco/management/api/v1.1/document/{id}/validate';
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
+export type PutDocumentByIdValidateErrors = {
     /**
      * Bad Request
      */
@@ -4832,9 +4830,9 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {
     404: ProblemDetails;
 };
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Error = PutUmbracoManagementApiV11DocumentByIdValidate11Errors[keyof PutUmbracoManagementApiV11DocumentByIdValidate11Errors];
+export type PutDocumentByIdValidateError = PutDocumentByIdValidateErrors[keyof PutDocumentByIdValidateErrors];
 
-export type PutUmbracoManagementApiV11DocumentByIdValidate11Responses = {
+export type PutDocumentByIdValidateResponses = {
     /**
      * OK
      */
@@ -10356,6 +10354,10 @@ export type GetIndexerErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerResponses = {
@@ -10385,6 +10387,10 @@ export type GetIndexerByIndexNameErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerByIndexNameError = GetIndexerByIndexNameErrors[keyof GetIndexerByIndexNameErrors];
@@ -10416,6 +10422,10 @@ export type PostIndexerByIndexNameRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -15769,6 +15779,10 @@ export type PostPublishedCacheRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheRebuildResponses = {
@@ -15790,6 +15804,10 @@ export type GetPublishedCacheRebuildStatusErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetPublishedCacheRebuildStatusResponses = {
@@ -15813,6 +15831,10 @@ export type PostPublishedCacheReloadErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheReloadResponses = {
@@ -16559,6 +16581,10 @@ export type GetSearcherErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetSearcherResponses = {
@@ -16588,6 +16614,10 @@ export type GetSearcherBySearcherNameQueryErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
