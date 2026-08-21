@@ -194,11 +194,11 @@ public abstract class OpenIdDictApplicationManagerBase
         ImmutableDictionary<CultureInfo, string> displayNames = await ApplicationManager.GetDisplayNamesAsync(client, cancellationToken);
         ImmutableDictionary<string, JsonElement> properties = await ApplicationManager.GetPropertiesAsync(client, cancellationToken);
 
-        // These two are compared only when the descriptor specifies a value: the store substitutes its
-        // own default when none was set, so an unset descriptor value cannot be told apart from a
-        // cleared one, and comparing against the default would report a change on every call. Clearing
-        // them is therefore not expressible. The other three are stored as given, so an absent value
-        // there is a genuine removal and is compared as one.
+        // ConsentType and ApplicationType are compared only when the descriptor specifies a value: the
+        // store substitutes its own default when none was set, so an unset descriptor value cannot be
+        // told apart from a cleared one, and comparing against the default would report a change on
+        // every call. Clearing those two is therefore not expressible. Requirements, DisplayNames and
+        // Properties are stored as given, so an absent value there is a genuine removal.
         return (clientDescriptor.ConsentType is null
                 || string.Equals(consentType, clientDescriptor.ConsentType, StringComparison.OrdinalIgnoreCase))
                && (clientDescriptor.ApplicationType is null
