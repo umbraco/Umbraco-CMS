@@ -1,4 +1,5 @@
 import { Link } from '../../externals.js';
+import { isLocalLinkHref } from './link-attributes.function.js';
 
 export const UmbLink = Link.extend({
 	name: 'umbLink',
@@ -10,7 +11,15 @@ export const UmbLink = Link.extend({
 			'data-culture': { default: null },
 			target: { default: null },
 			title: { default: null },
-			type: { default: 'external' },
+			// `type` carries the entity type of a local link, which the server needs to resolve it to a URL and
+			// strips from the rendered markup afterwards. On any other href nothing strips it and it reaches the
+			// front end, where `<a type>` is invalid unless it holds a MIME type (#23648) — so only serialize it
+			// onto a local link.
+			type: {
+				default: null,
+				renderHTML: (attributes) =>
+					attributes.type && isLocalLinkHref(attributes.href) ? { type: attributes.type } : {},
+			},
 		};
 	},
 
@@ -75,7 +84,7 @@ declare module '@tiptap/core' {
 	interface Commands<ReturnType> {
 		umbLink: {
 			ensureUmbLink: (attributes: {
-				type: string;
+				type?: string | null;
 				href: string;
 				'data-anchor'?: string | null;
 				target?: string | null;
@@ -83,7 +92,7 @@ declare module '@tiptap/core' {
 			}) => ReturnType;
 
 			setUmbLink: (attributes: {
-				type: string;
+				type?: string | null;
 				href: string;
 				'data-anchor'?: string | null;
 				target?: string | null;
