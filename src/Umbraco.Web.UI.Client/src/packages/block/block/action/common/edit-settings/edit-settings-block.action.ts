@@ -4,6 +4,7 @@ import { UmbBlockActionBase } from '../../block-action-base.js';
 import { UmbDataPathBlockElementDataQuery } from '../../../validation/data-path-element-data-query.function.js';
 import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../context/block-entry.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Block action that navigates to the block's settings editor workspace.
@@ -27,17 +28,18 @@ export class UmbEditSettingsBlockAction extends UmbBlockActionBase<MetaBlockActi
 		});
 	}
 
-	override async getHref() {
+	async getHrefObservable(): Promise<Observable<string | undefined> | undefined> {
 		await this.#contextReady;
-		const path = await this.observe(this.#context?.workspaceEditSettingsPath)?.asPromise();
-		return path || undefined;
+		return this.#context?.workspaceEditSettingsPath;
 	}
 
-	override async getValidationDataPath() {
+	async getValidationDataPathObservable(): Promise<Observable<string | undefined> | undefined> {
 		await this.#contextReady;
-		const settingsKey = await this.observe(this.#context?.settingsKey)?.asPromise();
-		if (!settingsKey) return undefined;
-		return `$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`;
+		if (!this.#context) return undefined;
+		return mergeObservables([this.#context.settingsKey], ([settingsKey]) => {
+			if (!settingsKey) return undefined;
+			return `$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`;
+		});
 	}
 }
 
