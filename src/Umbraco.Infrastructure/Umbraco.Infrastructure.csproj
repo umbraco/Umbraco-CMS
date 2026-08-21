@@ -47,6 +47,8 @@
     <!-- Take top-level dependency on these Microsoft.CodeAnalysis.* packages due to conflicts when installing Microsoft.EntityFrameworkCore.Design -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+    <!-- Take top-level dependency on Microsoft.Build.Tasks.Core, because Microsoft.CodeAnalysis.Workspaces.MSBuild depends on a vulnerable version -->
+    <PackageReference Include="Microsoft.Build.Tasks.Core" />
   </ItemGroup>
 
   <ItemGroup>
