@@ -2889,6 +2889,24 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task Copy_Of_Trashed_Content_Is_Not_Trashed()
+    {
+        // Arrange
+        ContentService.MoveToRecycleBin(Subpage);
+        Assert.That(Subpage.Trashed, Is.True);
+
+        // Act
+        var copy = ContentService.Copy(Subpage, Textpage.Id, false);
+
+        // Assert
+        Assert.That(copy, Is.Not.Null);
+        Assert.That(copy.Trashed, Is.False);
+
+        PagedModel<IContent> recycleBinContents = await ContentService.GetPagedContentInRecycleBinAsync(0, int.MaxValue, ordering: null, CancellationToken.None);
+        Assert.That(recycleBinContents.Items.Any(c => c.Key == copy.Key), Is.False);
+    }
+
+    [Test]
     public async Task Copy_To_Root_Populates_Null_ParentKey_Not_The_Root_Nodes_Own_Key()
     {
         IContent? subpage = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
