@@ -76,9 +76,9 @@ export class UmbDocumentTreeItemCardElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.observe(this.#item.name, (name) => (this._name = name ?? ''), '_observeName');
-		this.observe(this.#item.icon, (icon) => (this._icon = icon), '_observeIcon');
-		this.observe(this.#item.state, (state) => (this._state = state), '_observeState');
+		this.observe(this.#item.name, (name) => (this._name = name ?? ''), null);
+		this.observe(this.#item.icon, (icon) => (this._icon = icon), null);
+		this.observe(this.#item.state, (state) => (this._state = state), null);
 	}
 
 	#onSelected(e: CustomEvent) {

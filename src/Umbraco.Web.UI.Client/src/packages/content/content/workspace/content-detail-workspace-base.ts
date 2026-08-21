@@ -1,5 +1,5 @@
 import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
-import { UmbContentCollectionManager } from '../collection/index.js';
+import { UmbContentCollectionConfigurationContext, UmbContentCollectionManager } from '../collection/index.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
 import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '../variant-picker/index.js';
@@ -164,6 +164,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	readonly collection: UmbContentCollectionManager;
 
+	readonly #collectionConfiguration = new UmbContentCollectionConfigurationContext(this);
+
 	/* Variant Options */
 	// TODO: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
@@ -235,6 +237,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.varies = this.structure.ownerContentTypeObservablePart((x) =>
 			x ? x.variesByCulture || x.variesBySegment : undefined,
 		);
+
+		this.#collectionConfiguration.setCollectionAlias(args.collectionAlias);
+		this.observe(
+			this.structure.ownerContentTypeObservablePart((x) => x?.collection?.unique),
+			(dataTypeUnique) => this.#collectionConfiguration.setDataTypeUnique(dataTypeUnique ?? undefined),
+			null,
+		);
+		this.observe(this.unique, (unique) => this.#collectionConfiguration.setUnique(unique ?? null), null);
 
 		this.collection = new UmbContentCollectionManager<ContentTypeDetailModelType>(
 			this,

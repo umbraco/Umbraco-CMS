@@ -54,6 +54,12 @@ export class UmbMediaTreeServerDataSource
 	}
 
 	#mapItem(item: MediaTreeItemResponseModel): UmbMediaTreeItemModel {
+		const contentType = {
+			unique: item.mediaType.id,
+			icon: item.mediaType.icon,
+			collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
+		};
+
 		return {
 			unique: item.id,
 			parent: {
@@ -65,11 +71,9 @@ export class UmbMediaTreeServerDataSource
 			noAccess: item.noAccess,
 			isTrashed: item.isTrashed,
 			isFolder: false,
-			mediaType: {
-				unique: item.mediaType.id,
-				icon: item.mediaType.icon,
-				collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
-			},
+			contentType,
+			// TODO (V20): remove when the deprecated `mediaType` field is removed.
+			mediaType: contentType,
 			name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 			variants: item.variants.map((variant) => {
 				return {

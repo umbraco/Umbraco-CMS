@@ -44,6 +44,18 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		([hasCollection, noAccess]) => hasCollection && !noAccess,
 	);
 
+	/**
+	 * Whether the collection replaces expansion for this item.
+	 *
+	 * Entering a collection needs somewhere to enter it: the menu navigates to the Collection view by path, and a host
+	 * that enters items takes the user into it. A tree with neither can do no more than expand, so it keeps the expand
+	 * caret and its children — the subtree would otherwise be unreachable.
+	 */
+	public readonly canEnterCollection = mergeObservables(
+		[this.#collapsibleCollection, this.isMenu, this.canEnterItems],
+		([collapsibleCollection, isMenu, canEnterItems]) => collapsibleCollection && (isMenu || canEnterItems),
+	);
+
 	override setIsMenu(isMenu: boolean) {
 		super.setIsMenu(isMenu);
 		if (isMenu) {
@@ -95,7 +107,9 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		super.setTreeItem(treeItem);
 		this.#item.setData(treeItem);
 
-		const documentTypeUnique = treeItem?.documentType.unique;
+		// TODO (V20): drop the `documentType` fallback when the deprecated field is removed.
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		const documentTypeUnique = (treeItem?.contentType ?? treeItem?.documentType)?.unique;
 
 		this.#entityContentTypeContext.setEntityType(documentTypeUnique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
 		this.#entityContentTypeContext.setUnique(documentTypeUnique);
@@ -106,7 +120,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override showChildren() {
-		if (this.#getCollapsibleCollection()) {
+		if (this.#getCanEnterCollection()) {
 			this.#activateCollection();
 			return;
 		}
@@ -114,7 +128,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override hideChildren() {
-		if (this.#getCollapsibleCollection()) {
+		if (this.#getCanEnterCollection()) {
 			this.#activateCollection();
 			return;
 		}
@@ -122,7 +136,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	// Collections cannot be expanded/collapsed. In a menu we navigate to the Collection view via the path;
-	// elsewhere (e.g. a picker) we emit the open event so the host can enter the Collection.
+	// elsewhere we ask the host to enter the item, which only happens where the host declared that it does.
 	#activateCollection() {
 		if (this.getIsMenu()) {
 			this.#openCollection();
@@ -133,6 +147,10 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 
 	#getCollapsibleCollection(): boolean {
 		return this.#item.getHasCollection() && this.getTreeItem()?.noAccess !== true;
+	}
+
+	#getCanEnterCollection(): boolean {
+		return this.#getCollapsibleCollection() && (this.getIsMenu() || this.getCanEnterItems());
 	}
 
 	#openCollection() {
