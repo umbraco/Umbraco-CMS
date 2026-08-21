@@ -5,6 +5,7 @@ import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection
 import { LanguageService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source that fetches the language collection data from the server.
@@ -25,11 +26,13 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 
 	/**
 	 * Gets the language collection filtered by the given filter.
-	 * @param {UmbLanguageCollectionFilterModel} filter
-	 * @returns {*}
+	 * @param {UmbLanguageCollectionFilterModel} filter The filter to apply to the collection.
+	 * @returns {UmbDataSourceResponse<UmbPagedModel<UmbLanguageCollectionItemModel>>} The language collection.
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbLanguageCollectionFilterModel) {
+	async getCollection(
+		filter: UmbLanguageCollectionFilterModel,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<UmbLanguageCollectionItemModel>>> {
 		const { data, error } = await tryExecute(
 			this.#host,
 			LanguageService.getLanguage({ query: { skip: filter.skip, take: filter.take } }),

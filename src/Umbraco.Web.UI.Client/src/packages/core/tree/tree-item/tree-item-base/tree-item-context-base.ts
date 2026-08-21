@@ -43,12 +43,12 @@ export abstract class UmbTreeItemContextBase<
 	constructor(host: UmbControllerHost) {
 		super(host);
 		// TODO: Get take size from Tree context
-		this._treeItemChildrenManager.setTakeSize(50);
+		this._treeItemChildrenManager.setTakeSize(100);
 	}
 
 	/**
 	 * Returns the manifest.
-	 * @returns {ManifestCollection}
+	 * @returns {ManifestType | undefined} The tree item manifest
 	 * @memberof UmbTreeItemContextBase
 	 * @deprecated Use the `.manifest` property instead.
 	 */

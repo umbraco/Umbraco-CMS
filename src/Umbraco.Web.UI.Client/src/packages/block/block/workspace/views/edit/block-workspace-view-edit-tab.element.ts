@@ -6,7 +6,7 @@ import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './block-workspace-view-edit-properties.element.js';
-// eslint-disable-next-line import/order
+// eslint-disable-next-line import-x/order
 import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
 
 @customElement('umb-block-workspace-view-edit-tab')
