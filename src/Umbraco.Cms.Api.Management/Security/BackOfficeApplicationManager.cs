@@ -64,7 +64,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         IOptions<SecuritySettings> securitySettings,
         IRuntimeState runtimeState,
         ILogger<BackOfficeApplicationManager> logger)
-        : base(applicationManager)
+        : base(applicationManager, logger)
     {
         _webHostEnvironment = webHostEnvironment;
         _runtimeState = runtimeState;

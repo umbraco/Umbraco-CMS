@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Globalization;
+using System.Text.Json;
 using Moq;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
@@ -558,6 +560,22 @@ public class BackOfficeApplicationManagerTests
         _mockApplicationManager
             .Setup(x => x.GetSettingsAsync(mockApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(ImmutableDictionary<string, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetConsentTypeAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+        _mockApplicationManager
+            .Setup(x => x.GetApplicationTypeAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+        _mockApplicationManager
+            .Setup(x => x.GetRequirementsAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray<string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetDisplayNamesAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<CultureInfo, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetPropertiesAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty);
+
 
         var sut = CreateDefaultMockedBackofficeApplicationManager();
 
@@ -613,6 +631,21 @@ public class BackOfficeApplicationManagerTests
         _mockApplicationManager
             .Setup(x => x.GetSettingsAsync(storedApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(ImmutableDictionary<string, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetConsentTypeAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+        _mockApplicationManager
+            .Setup(x => x.GetApplicationTypeAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+        _mockApplicationManager
+            .Setup(x => x.GetRequirementsAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray<string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetDisplayNamesAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<CultureInfo, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetPropertiesAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty);
     }
 
     private BackOfficeApplicationManager CreateDefaultMockedBackofficeApplicationManager() =>

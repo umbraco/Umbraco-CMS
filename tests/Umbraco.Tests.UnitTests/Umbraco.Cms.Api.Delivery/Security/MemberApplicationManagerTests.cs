@@ -2,6 +2,9 @@
 // See LICENSE for more details.
 
 using System.Collections.Immutable;
+using Microsoft.Extensions.Logging.Abstractions;
+using System.Globalization;
+using System.Text.Json;
 using Moq;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
@@ -69,6 +72,22 @@ public class MemberApplicationManagerTests
         _mockApplicationManager
             .Setup(x => x.GetSettingsAsync(_storedApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(ImmutableDictionary<string, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetConsentTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+        _mockApplicationManager
+            .Setup(x => x.GetApplicationTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string?)null);
+        _mockApplicationManager
+            .Setup(x => x.GetRequirementsAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray<string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetDisplayNamesAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<CultureInfo, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetPropertiesAsync(_storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty);
+
     }
 
     /// <summary>
@@ -78,7 +97,7 @@ public class MemberApplicationManagerTests
     [Test]
     public async Task EnsureMemberApplicationAsync_StoredApplicationMatchesDescriptor_DoesNotUpdate()
     {
-        var sut = new MemberApplicationManager(_mockApplicationManager.Object, _mockRuntimeState.Object);
+        var sut = new MemberApplicationManager(_mockApplicationManager.Object, _mockRuntimeState.Object, NullLogger<MemberApplicationManager>.Instance);
 
         await sut.EnsureMemberApplicationAsync([_loginRedirectUrl], [_logoutRedirectUrl]);
 
@@ -93,7 +112,7 @@ public class MemberApplicationManagerTests
     [Test]
     public async Task EnsureMemberApplicationAsync_AdditionalRedirectUrl_Updates()
     {
-        var sut = new MemberApplicationManager(_mockApplicationManager.Object, _mockRuntimeState.Object);
+        var sut = new MemberApplicationManager(_mockApplicationManager.Object, _mockRuntimeState.Object, NullLogger<MemberApplicationManager>.Instance);
 
         await sut.EnsureMemberApplicationAsync(
             [_loginRedirectUrl, new Uri("https://other-client.local/callback")],

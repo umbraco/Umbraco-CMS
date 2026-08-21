@@ -1,5 +1,10 @@
 using System.Collections.Immutable;
+using System.Globalization;
+using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.Security;
 
@@ -8,12 +13,28 @@ namespace Umbraco.Cms.Infrastructure.Security;
 /// </summary>
 public abstract class OpenIdDictApplicationManagerBase
 {
-    private const int MaxCreateOrUpdateAttempts = 3;
+    private const int MaxCreateOrUpdateAttempts = 5;
+    private const int RetryBackoffBaseMilliseconds = 50;
+
+    private readonly ILogger _logger;
 
     protected IOpenIddictApplicationManager ApplicationManager { get; }
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     protected OpenIdDictApplicationManagerBase(IOpenIddictApplicationManager applicationManager)
-        => ApplicationManager = applicationManager;
+        : this(
+            applicationManager,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<OpenIdDictApplicationManagerBase>>())
+    {
+    }
+
+    protected OpenIdDictApplicationManagerBase(
+        IOpenIddictApplicationManager applicationManager,
+        ILogger logger)
+    {
+        ApplicationManager = applicationManager;
+        _logger = logger;
+    }
 
     protected Task CreateOrUpdate(OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
         => CreateOrUpdate(_ => Task.FromResult(clientDescriptor), cancellationToken);
@@ -36,6 +57,14 @@ public abstract class OpenIdDictApplicationManagerBase
             catch (OpenIddictExceptions.ConcurrencyException) when (attempt < MaxCreateOrUpdateAttempts)
             {
                 // Another instance wrote first, so rebuild the descriptor from current state and retry.
+                // The delay is randomised because every loser of the race throws at the same moment:
+                // retrying in lockstep collides again, letting only one instance through per attempt.
+                var backoff = RetryBackoffBaseMilliseconds * (1 << (attempt - 1));
+                _logger.LogDebug(
+                    "Concurrent write registering OpenIddict application, retrying (attempt {Attempt} of {MaxAttempts}).",
+                    attempt,
+                    MaxCreateOrUpdateAttempts);
+                await Task.Delay(Random.Shared.Next(backoff / 2, backoff + 1), cancellationToken);
             }
         }
     }
@@ -71,33 +100,22 @@ public abstract class OpenIdDictApplicationManagerBase
 
         return await MatchesRegistrationAsync(client, clientDescriptor, cancellationToken)
                && await MatchesRedirectUrisAsync(client, clientDescriptor, cancellationToken)
-               && await MatchesSettingsAsync(client, clientDescriptor, cancellationToken);
+               && await MatchesSettingsAsync(client, clientDescriptor, cancellationToken)
+               && await MatchesMetadataAsync(client, clientDescriptor, cancellationToken);
     }
 
     /// <summary>
-    /// Descriptor state that is not compared is treated as a change, so a derived manager setting it
-    /// never has its write silently skipped. Secrets are stored hashed and can never be compared.
+    /// State that cannot be read back from the store, so a descriptor carrying it is always written.
     /// </summary>
+    /// <remarks>
+    /// Only two qualify. Secrets are stored hashed, so a supplied secret can never be compared and
+    /// skipping it would silently discard a rotated one. <see cref="JsonWebKeySet"/> has no value
+    /// equality, and comparing a serialised form would be sensitive to key ordering and formatting.
+    /// Everything else the descriptor carries is readable through the manager and is compared, so
+    /// clearing a value is recognised as a change rather than skipped.
+    /// </remarks>
     private static bool HasStateThatCannotBeCompared(OpenIddictApplicationDescriptor clientDescriptor)
-    {
-        object?[] uncomparableValues =
-        [
-            clientDescriptor.ClientSecret,
-            clientDescriptor.ConsentType,
-            clientDescriptor.ApplicationType,
-            clientDescriptor.JsonWebKeySet,
-        ];
-
-        int[] uncomparableCounts =
-        [
-            clientDescriptor.Requirements.Count,
-            clientDescriptor.DisplayNames.Count,
-            clientDescriptor.Properties.Count,
-        ];
-
-        return uncomparableValues.Any(value => value is not null)
-               || uncomparableCounts.Any(count => count > 0);
-    }
+        => clientDescriptor.ClientSecret is not null || clientDescriptor.JsonWebKeySet is not null;
 
     private async Task<bool> MatchesRegistrationAsync(object client, OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
     {
@@ -128,6 +146,47 @@ public abstract class OpenIdDictApplicationManagerBase
                    clientDescriptor.Settings.TryGetValue(setting.Key, out var value)
                    && string.Equals(setting.Value, value, StringComparison.Ordinal));
     }
+
+    /// <summary>
+    /// Compares the descriptor state that is readable but not part of the core registration.
+    /// </summary>
+    /// <remarks>
+    /// Compared rather than assumed to match, so a descriptor that clears one of these is recognised
+    /// as a change. Treating an unset value as "nothing to compare" would leave the stored value in
+    /// place and silently ignore the removal.
+    /// </remarks>
+    private async Task<bool> MatchesMetadataAsync(object client, OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
+    {
+        var consentType = await ApplicationManager.GetConsentTypeAsync(client, cancellationToken);
+        var applicationType = await ApplicationManager.GetApplicationTypeAsync(client, cancellationToken);
+        ImmutableArray<string> requirements = await ApplicationManager.GetRequirementsAsync(client, cancellationToken);
+        ImmutableDictionary<CultureInfo, string> displayNames = await ApplicationManager.GetDisplayNamesAsync(client, cancellationToken);
+        ImmutableDictionary<string, JsonElement> properties = await ApplicationManager.GetPropertiesAsync(client, cancellationToken);
+
+        return string.Equals(consentType, clientDescriptor.ConsentType, StringComparison.OrdinalIgnoreCase)
+               && string.Equals(applicationType, clientDescriptor.ApplicationType, StringComparison.OrdinalIgnoreCase)
+               && SetEquals(requirements, clientDescriptor.Requirements)
+               && DictionaryEquals(displayNames, clientDescriptor.DisplayNames, string.Equals)
+               && DictionaryEquals(properties, clientDescriptor.Properties, JsonElementEquals);
+    }
+
+    private static bool DictionaryEquals<TKey, TValue>(
+        ImmutableDictionary<TKey, TValue>? stored,
+        IDictionary<TKey, TValue> expected,
+        Func<TValue, TValue, bool> valueEquals)
+        where TKey : notnull
+    {
+        // An unset collection can come back null rather than empty depending on the store, and the
+        // two mean the same thing here.
+        ImmutableDictionary<TKey, TValue> storedOrEmpty = stored ?? ImmutableDictionary<TKey, TValue>.Empty;
+
+        return storedOrEmpty.Count == expected.Count
+               && storedOrEmpty.All(entry => expected.TryGetValue(entry.Key, out TValue? value) && valueEquals(entry.Value, value));
+    }
+
+    // JsonElement has no value equality, and the raw text preserves what was actually stored.
+    private static bool JsonElementEquals(JsonElement stored, JsonElement expected)
+        => string.Equals(stored.GetRawText(), expected.GetRawText(), StringComparison.Ordinal);
 
     private static bool SetEquals(ImmutableArray<string> stored, ICollection<string> expected)
         => AsSet(stored, StringComparer.Ordinal).SetEquals(expected);
