@@ -56,11 +56,9 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 		item.execute?.();
 
 		if (!popoverId) {
-			setTimeout(() => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				this.hidePopover();
-			}, 100);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			this.hidePopover();
 		}
 	}
 
