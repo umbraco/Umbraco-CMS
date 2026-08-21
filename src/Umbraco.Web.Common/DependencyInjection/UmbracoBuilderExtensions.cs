@@ -255,7 +255,7 @@ public static partial class UmbracoBuilderExtensions
             var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.HttpClients.Headers.UserAgentProductName, productVersion));
         });
-        builder.Services.AddHttpClient(Constants.HttpClients.NewsDashboard, client =>
+        builder.Services.AddHttpClient(Constants.HttpClients.News, client =>
         {
             client.DefaultRequestHeaders.UserAgent.TryParseAdd(Constants.HttpClients.Headers.UserAgentProductName);
             client.Timeout = TimeSpan.FromSeconds(20);

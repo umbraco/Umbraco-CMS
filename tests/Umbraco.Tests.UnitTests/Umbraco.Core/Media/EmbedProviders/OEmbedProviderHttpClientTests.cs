@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Media.EmbedProviders;
 public class OEmbedProviderHttpClientTests
 {
     [Test]
-    public void GetHttpClient_Returns_The_Shared_Instance_By_Default()
+    public void Can_Get_Default_Shared_HttpClient_Instance()
     {
         var provider = new TestOEmbedProvider(Mock.Of<IJsonSerializer>());
 
@@ -26,7 +26,7 @@ public class OEmbedProviderHttpClientTests
     }
 
     [Test]
-    public void GetHttpClient_Can_Be_Overridden_By_A_Provider()
+    public void Can_Override_HttpClient_In_Provider()
     {
         using var httpClient = new HttpClient();
         var provider = new CustomHttpClientOEmbedProvider(Mock.Of<IJsonSerializer>(), httpClient);

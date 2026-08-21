@@ -24,7 +24,7 @@ public static partial class Constants
         /// <summary>
         ///     Name for http client which requests the back office news dashboard content.
         /// </summary>
-        public const string NewsDashboard = "Umbraco:HttpClients:NewsDashboard";
+        public const string News = "Umbraco:HttpClients:News";
 
         /// <summary>
         ///     Contains HTTP header constants for Umbraco HTTP clients.

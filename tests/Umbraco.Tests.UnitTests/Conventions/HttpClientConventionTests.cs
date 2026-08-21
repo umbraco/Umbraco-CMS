@@ -1,15 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using NUnit.Framework;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings;
+namespace Umbraco.Cms.Tests.UnitTests.Conventions;
 
 [TestFixture]
 public class HttpClientConventionTests
@@ -37,8 +32,7 @@ public class HttpClientConventionTests
         Assert.That(
             offenders,
             Is.Empty,
-            "Static HttpClient fields must be readonly and fully configured on assignment. Use SharedHttpClient "
-            + "for existing call sites that cannot take a dependency, or inject IHttpClientFactory in new code.");
+            "Static HttpClient fields must be readonly and fully configured on assignment. Use SharedHttpClient for existing call sites that cannot take a dependency, or inject IHttpClientFactory in new code.");
     }
 
     private static Assembly[] GetUmbracoAssemblies()

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Net;
 public class SharedHttpClientTests
 {
     [Test]
-    public void Instance_Is_Configured_With_The_Umbraco_User_Agent()
+    public void Can_Get_Instance_Configured_With_Umbraco_User_Agent()
     {
         HttpClient client = SharedHttpClient.Instance;
 
@@ -25,5 +25,5 @@ public class SharedHttpClientTests
     }
 
     [Test]
-    public void Instance_Is_Reused() => Assert.That(SharedHttpClient.Instance, Is.SameAs(SharedHttpClient.Instance));
+    public void Can_Reuse_Same_Instance() => Assert.That(SharedHttpClient.Instance, Is.SameAs(SharedHttpClient.Instance));
 }
