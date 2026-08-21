@@ -368,7 +368,6 @@ export function UmbFormControlMixin<
 					for (key in formCtrlEl.validity) {
 						if (key !== 'valid' && formCtrlEl.validity[key]) {
 							this.#validity[key] = true;
-							//messages.add(formCtrlEl.validationMessage);
 							message = formCtrlEl.validationMessage;
 							innerFormControlEl ??= formCtrlEl;
 							return true;
@@ -391,17 +390,13 @@ export function UmbFormControlMixin<
 
 		#lastEventType: string | undefined = undefined;
 		#dispatchValidationState() {
-			// While pristine/'untouched'/not-in-validation-mode, no invalid-feedback should be visible yet, so this
-			// reports Valid regardless of the actual validity — that isn't just suppressing the Invalid event:
-			// listeners (e.g. `umb-form-validation-message`) need the Valid event to clear a message they showed
-			// earlier, from before this control (or the dataPath it now validates) went pristine again — for
-			// instance when a property control is reused across a variant switch. [NL]
-			if (this._pristine === true || this.#validity.valid) {
+			if (this.#validity.valid) {
 				if (this.#lastEventType === UmbValidationValidEvent.TYPE) return;
 				this.#lastEventType = UmbValidationValidEvent.TYPE;
 				this.dispatchEvent(new UmbValidationValidEvent());
-			} else {
-				if (this.#lastEventType === UmbValidationInvalidEvent.TYPE) return;
+			} else if (this._pristine === false) {
+				// Only fire invalid events when the form control is not pristine, as we do not want to show validation messages for untouched form controls. [NL]
+				// Always fire an Invalid event when the validity is invalid, even if the last event was also Invalid, as the message might have changed. [NL]
 				this.#lastEventType = UmbValidationInvalidEvent.TYPE;
 				this.dispatchEvent(new UmbValidationInvalidEvent());
 			}
