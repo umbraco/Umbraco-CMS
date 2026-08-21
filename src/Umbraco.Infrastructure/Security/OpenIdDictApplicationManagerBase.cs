@@ -18,8 +18,15 @@ public abstract class OpenIdDictApplicationManagerBase
 
     private readonly ILogger _logger;
 
+    /// <summary>
+    /// Gets the OpenIddict application manager used to read and write application registrations.
+    /// </summary>
     protected IOpenIddictApplicationManager ApplicationManager { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OpenIdDictApplicationManagerBase"/> class.
+    /// </summary>
+    /// <param name="applicationManager">The OpenIddict application manager.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     protected OpenIdDictApplicationManagerBase(IOpenIddictApplicationManager applicationManager)
         : this(
@@ -28,6 +35,11 @@ public abstract class OpenIdDictApplicationManagerBase
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OpenIdDictApplicationManagerBase"/> class.
+    /// </summary>
+    /// <param name="applicationManager">The OpenIddict application manager.</param>
+    /// <param name="logger">The logger used to report contention while registering an application.</param>
     protected OpenIdDictApplicationManagerBase(
         IOpenIddictApplicationManager applicationManager,
         ILogger logger)
@@ -36,6 +48,11 @@ public abstract class OpenIdDictApplicationManagerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Creates or updates an application from a fixed descriptor.
+    /// </summary>
+    /// <param name="clientDescriptor">The descriptor to apply.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
     protected Task CreateOrUpdate(OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
         => CreateOrUpdate(_ => Task.FromResult(clientDescriptor), cancellationToken);
 
@@ -217,6 +234,11 @@ public abstract class OpenIdDictApplicationManagerBase
     private static HashSet<string> AsSet(ImmutableArray<string> values, StringComparer comparer)
         => values.IsDefaultOrEmpty ? new HashSet<string>(comparer) : values.ToHashSet(comparer);
 
+    /// <summary>
+    /// Deletes the application with the given client identifier, if it exists.
+    /// </summary>
+    /// <param name="identifier">The client identifier of the application to delete.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
     protected async Task Delete(string identifier, CancellationToken cancellationToken)
     {
         var client = await ApplicationManager.FindByClientIdAsync(identifier, cancellationToken);
