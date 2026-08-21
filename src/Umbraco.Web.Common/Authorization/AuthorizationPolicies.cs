@@ -51,6 +51,7 @@ public static class AuthorizationPolicies
     public const string TreeAccessLanguages = nameof(TreeAccessLanguages);
     public const string TreeAccessMemberGroups = nameof(TreeAccessMemberGroups);
     public const string TreeAccessDocumentTypes = nameof(TreeAccessDocumentTypes);
+    public const string TreeAccessDocumentBlueprints = nameof(TreeAccessDocumentBlueprints);
     public const string TreeAccessMemberTypes = nameof(TreeAccessMemberTypes);
     public const string TreeAccessScripts = nameof(TreeAccessScripts);
     public const string TreeAccessStylesheets = nameof(TreeAccessStylesheets);

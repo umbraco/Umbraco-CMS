@@ -110,5 +110,13 @@ public static partial class Constants
         ///     The entire element tree, i.e. all element items.
         /// </summary>
         public const int ElementTree = -349;
+
+        /// <summary>
+        ///     All data types.
+        /// </summary>
+        /// <remarks>
+        ///     Acquire before <see cref="ContentTypes" /> if both are needed, as content types reference data types.
+        /// </remarks>
+        public const int DataTypes = -350;
     }
 }

@@ -1871,6 +1871,12 @@ export class UiBaseLocators extends BasePage {
     await this.clickEntityActionWithName("MoveTo");
   }
 
+  async moveToFolder(folderName: string) {
+    await this.clickMoveToActionMenuOption();
+    await this.click(this.sidebarModal.getByText(folderName, {exact: true}));
+    await this.click(this.chooseModalBtn);
+  }
+
   async clickCreateBlueprintActionMenuOption() {
     await this.clickEntityActionWithName("CreateBlueprint");
   }
