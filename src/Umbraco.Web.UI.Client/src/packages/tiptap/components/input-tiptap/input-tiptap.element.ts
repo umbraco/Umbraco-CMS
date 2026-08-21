@@ -11,6 +11,7 @@ import {
 	customElement,
 	html,
 	property,
+	query,
 	repeat,
 	state,
 	unsafeCSS,
@@ -117,6 +118,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	@state()
 	private _statusbar: UmbTiptapStatusbarValue = [[], []];
 
+	@query('#editor')
+	private _editorElement?: HTMLDivElement;
+
+	@query('umb-tiptap-toolbar')
+	private _toolbarElement?: HTMLElement;
+
 	constructor() {
 		super();
 
@@ -132,12 +139,15 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this.#observeStylesheetRootPath();
 		await this.#loadExtensions();
 		await this.#loadEditor();
+		await this.updateComplete;
+		this.#syncToolbarScrolling();
 	}
 
 	protected override updated(changedProperties: Map<string, unknown>) {
 		super.updated(changedProperties);
 		if (changedProperties.has('readonly')) {
 			this._editor?.setEditable(!this.readonly);
+			this.#syncToolbarScrolling();
 		}
 	}
 
@@ -263,12 +273,20 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this.#context.setEditor(this._editor);
 	}
 
+	#onEditorScroll = () => this.#syncToolbarScrolling();
+
+	#syncToolbarScrolling() {
+		const toolbar = this._toolbarElement;
+		if (!toolbar) return;
+		toolbar.toggleAttribute('scrolling', (this._editorElement?.scrollTop ?? 0) > 0);
+	}
+
 	override render() {
 		const loading = !this._editor && !this._extensions?.length;
 		return html`
 			${when(loading, () => html`<div id="loader"><uui-loader></uui-loader></div>`)}
 			${when(!loading, () => html`${this.#renderStyles()}${this.#renderToolbar()}`)}
-			<div id="editor" data-mark="input:tiptap-rte" ?data-loaded=${!loading}></div>
+			<div id="editor" data-mark="input:tiptap-rte" ?data-loaded=${!loading} @scroll=${this.#onEditorScroll}></div>
 			${when(!loading, () => this.#renderStatusbar())}
 		`;
 	}
