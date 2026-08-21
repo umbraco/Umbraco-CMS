@@ -121,14 +121,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     #endregion
 
-    #region Static queries
-
-    // lazy-constructed because when the ctor runs, the query factory may not be ready
-    private IQuery<IContent> QueryNotTrashed =>
-        _queryNotTrashed ??= Query<IContent>().Where(x => x.Trashed == false);
-
-    #endregion
-
     #region Permissions
 
     /// <summary>
