@@ -38,7 +38,9 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	@property({ attribute: false })
 	public overrides?: Array<UmbDeepPartialObject<ManifestWorkspaceView>>;
 
-	// TODO: Verify that this is needed for this fix. [NL]
+	/**
+	 * Set this to true if you provide a custom variant selector in the header slot, do this to avoid the default variant selector being rendered shortly.
+	 */
 	@property({ attribute: false })
 	public hasCustomVariantSelector?: boolean;
 
