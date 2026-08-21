@@ -164,6 +164,13 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Task<PagedModel<TEntity>> GetDescendantsAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <summary>
+    ///     Gets the content items that reside at the root of the content tree.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The content items at the root of the tree.</returns>
+    Task<IEnumerable<TEntity>> GetRootContentAsync(CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets all content items currently in the recycle bin.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>

@@ -390,7 +390,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: when a content is saved,
             // - repository : refresh u=u
             // - content cache : refresh newest
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
 
             ResetEvents();
@@ -413,7 +413,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: when a content is saved,
             // - repository : refresh (u)
             // - content cache :: refresh newest
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
@@ -449,7 +449,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: when a content is saved,
             // - repository : refresh (u)
             // - content cache :: refresh newest
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
@@ -485,7 +485,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: when a content is saved,
             // - repository : refresh (u)
             // - content cache :: refresh newest
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
@@ -521,7 +521,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: when a content is saved&published,
             // - repository : refresh (p)
             // - content cache :: refresh published, newest
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
 
             ResetEvents();
@@ -546,7 +546,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: when a content is saved&published,
             // - repository : refresh (p)
             // - content cache :: refresh published, newest
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
@@ -575,7 +575,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // note: whenever the published cache is refreshed, subscribers must
             // assume that the unpublished cache is also refreshed, with the same
             // values, and deal with it.
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
 
             content.Name = "changed";
@@ -599,7 +599,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: when a content is unpublished,
             // - repository : refresh (u)
             // - content cache :: refresh newest, remove published
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
@@ -622,7 +622,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: when a content is unpublished,
             // - repository : refresh (u)
             // - content cache :: refresh newest, remove published
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
             content.Name = "changed";
@@ -2058,7 +2058,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [LongRunning]
         public void ContentRemembers()
         {
-            IContent content = ContentService.GetRootContent().FirstOrDefault();
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
             Assert.IsNotNull(content);
 
             ContentService.Save(content);

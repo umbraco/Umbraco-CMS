@@ -504,18 +504,14 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             : await GetByIdAsync(parentKey.Value, cancellationToken);
     }
 
-    /// <summary>
-    ///     Gets a collection of <see cref="IContent" /> objects, which reside at the first level / root
-    /// </summary>
-    /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    public IEnumerable<IContent> GetRootContent()
+    /// <inheritdoc />
+    public async Task<IEnumerable<IContent>> GetRootContentAsync(CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
-            return _documentRepository.Get(query);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IEnumerable<IContent> result = await _asyncDocumentRepository.GetRootContentAsync(cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>

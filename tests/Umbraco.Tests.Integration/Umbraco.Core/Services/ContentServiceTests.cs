@@ -926,11 +926,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Get_Root_Content()
+    public async Task Can_Get_Root_Content()
     {
         // Arrange
         // Act
-        var contents = ContentService.GetRootContent().ToList();
+        var contents = (await ContentService.GetRootContentAsync(CancellationToken.None)).ToList();
 
         // Assert
         Assert.That(contents, Is.Not.Null);
@@ -2511,7 +2511,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Act
         ContentService.DeleteOfType(contentType.Id);
-        var rootContent = ContentService.GetRootContent();
+        var rootContent = await ContentService.GetRootContentAsync(CancellationToken.None);
         var contents = ContentService.GetPagedOfType(contentType.Id, 0, int.MaxValue, out var _);
 
         // Assert

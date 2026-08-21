@@ -11,7 +11,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindAllRootsWithoutQuery()
     {
-        IContent[] contentAtRoot = ContentService.GetRootContent().OrderBy(content => content.SortOrder).ToArray();
+        IContent[] contentAtRoot = (await ContentService.GetRootContentAsync(CancellationToken.None)).OrderBy(content => content.SortOrder).ToArray();
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, null, null);
 
         Assert.Multiple(() =>
@@ -29,7 +29,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindAllChildrenWithoutQuery()
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(null, root.Key, null);
 
         Assert.Multiple(() =>
@@ -44,7 +44,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindAllRootsByNonDistinctQuery()
     {
-        IContent[] contentAtRoot = ContentService.GetRootContent().OrderBy(content => content.SortOrder).ToArray();
+        IContent[] contentAtRoot = (await ContentService.GetRootContentAsync(CancellationToken.None)).OrderBy(content => content.SortOrder).ToArray();
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("title", null, null);
 
         Assert.Multiple(() =>
@@ -62,7 +62,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindAllChildrenByQuery()
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("title", root.Key, null);
 
         Assert.Multiple(() =>
@@ -104,7 +104,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindSingleChildByQuery()
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("single3child", root.Key, null);
 
         Assert.Multiple(() =>
@@ -118,7 +118,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindMultipleChildrenByQuery()
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync("triple2child", root.Key, null);
 
         Assert.Multiple(() =>
@@ -135,7 +135,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindRootByIdQuery()
     {
-        IContent root = ContentService.GetRootContent().First();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).First();
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(root.Key.AsKeyword(), null, null);
 
         Assert.Multiple(() =>
@@ -148,7 +148,7 @@ public partial class ContentSearchServiceTests
     [Test]
     public async Task Content_CanFindChildByIdQuery()
     {
-        IContent root = ContentService.GetRootContent().First();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).First();
         IContent child = (await ContentService.GetChildrenAsync(root.Key, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)).Items.First();
         PagedModel<IContent> result = await ContentSearchService.SearchChildrenAsync(child.Key.AsKeyword(), root.Key, null);
 
@@ -163,7 +163,7 @@ public partial class ContentSearchServiceTests
     [TestCase(Direction.Descending)]
     public async Task Content_CanSortAllChildrenByNameWithoutQuery(Direction direction)
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         IEnumerable<IContent> children = (await ContentService.GetChildrenAsync(root.Key, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)).Items;
         Guid[] expectedChildrenKeys = (direction is Direction.Ascending
                 ? children.OrderBy(child => child.Name)
@@ -184,7 +184,7 @@ public partial class ContentSearchServiceTests
     [TestCase(Direction.Descending)]
     public async Task Content_CanSortAllChildrenByUpdateDateWithoutQuery(Direction direction)
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         IEnumerable<IContent> children = (await ContentService.GetChildrenAsync(root.Key, 0, 10, propertyAliases: null, ordering: null, CancellationToken.None)).Items;
         Guid[] expectedChildrenKeys = (direction is Direction.Ascending
                 ? children.OrderBy(child => child.UpdateDate)
@@ -205,7 +205,7 @@ public partial class ContentSearchServiceTests
     [TestCase(Direction.Descending)]
     public async Task Content_CanSortChildrenByNameWithQuery(Direction direction)
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         var expectedChildrenOrder = new[] { "Child 1", "Child 3", "Child 5", "Child 7", "Child 9" };
         if (direction is Direction.Descending)
         {
@@ -226,7 +226,7 @@ public partial class ContentSearchServiceTests
     [TestCase(Direction.Descending)]
     public async Task Content_CanSortChildrenByUpdateDateWithQuery(Direction direction)
     {
-        IContent root = ContentService.GetRootContent().Last();
+        IContent root = (await ContentService.GetRootContentAsync(CancellationToken.None)).Last();
         var expectedChildrenOrder = new[] { "Child 0", "Child 2", "Child 4", "Child 6", "Child 8" };
         if (direction is Direction.Descending)
         {

@@ -43,7 +43,7 @@ public abstract class ApiContentRequestTestBase : UmbracoIntegrationTest
     public async Task CleanUpAfterTest()
     {
         var domainService = GetRequiredService<IDomainService>();
-        foreach (var content in ContentService.GetRootContent())
+        foreach (var content in await ContentService.GetRootContentAsync(CancellationToken.None))
         {
             await domainService.UpdateDomainsAsync(content.Key, new DomainsUpdateModel { Domains = [] });
         }

@@ -160,8 +160,9 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Gets root-level documents.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The root-level documents.</returns>
-    IEnumerable<IContent> GetRootContent();
+    Task<IEnumerable<IContent>> GetRootContentAsync(CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets documents having an expiration date before (lower than, or equal to) a specified date.

@@ -26,7 +26,7 @@ public class ContentTelemetryProvider : IDetailedTelemetryProvider
     /// </returns>
     public IEnumerable<UsageInformation> GetInformation()
     {
-        IEnumerable<IContent> rootNodes = _contentService.GetRootContent();
+        IEnumerable<IContent> rootNodes = _contentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult();
         var nodes = rootNodes.Count();
         yield return new UsageInformation(Constants.Telemetry.RootCount, nodes);
     }

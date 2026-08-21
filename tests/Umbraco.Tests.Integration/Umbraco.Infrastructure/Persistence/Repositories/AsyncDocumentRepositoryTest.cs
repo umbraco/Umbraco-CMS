@@ -2631,6 +2631,26 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task GetRootContentAsync_ReturnsOnlyRootLevelItems()
+    {
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        IEnumerable<IContent> result = await repository.GetRootContentAsync(CancellationToken.None);
+        scope.Complete();
+
+        IContent[] items = result.ToArray();
+        Assert.That(items.Any(c => c.Key == _textpage.Key), Is.True);
+        Assert.That(items.Any(c => c.Key == _publishedPage.Key), Is.True);
+        Assert.That(items.Any(c => c.Key == _subpage.Key), Is.False,
+            "_subpage is a child of _textpage, not a root-level item");
+        Assert.That(items.Any(c => c.Key == _subpage2.Key), Is.False,
+            "_subpage2 is a child of _textpage, not a root-level item");
+        Assert.That(items.Any(c => c.Key == _trashed.Key), Is.False,
+            "_trashed is parented under the recycle bin (-20), not the tree root");
+    }
+
+    [Test]
     public async Task GetRecycleBinAsync_ReturnsAllTrashedItemsRegardlessOfDepth()
     {
         // _trashed (from SetUpData) is already Trashed=true with ParentId = -20 (a direct child of the

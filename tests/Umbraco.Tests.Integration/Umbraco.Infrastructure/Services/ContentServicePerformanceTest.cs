@@ -106,7 +106,7 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         using (GetTestProfilingLogger().TraceDuration<ContentServicePerformanceTest>("Getting all content in site"))
         {
             TestProfiler.Enable();
-            total.AddRange(ContentService.GetRootContent());
+            total.AddRange(await ContentService.GetRootContentAsync(CancellationToken.None));
             foreach (var content in total.ToArray())
             {
                 total.AddRange((await ContentService.GetDescendantsAsync(content.Key, 0, int.MaxValue, ordering: null, CancellationToken.None)).Items);

@@ -39,7 +39,7 @@ public partial class ContentEditingServiceTests
     [TestCase(false)]
     public async Task Can_Sort_Root_Content(bool useRootKeyForSorting)
     {
-        var existingRoots = ContentService.GetRootContent();
+        var existingRoots = await ContentService.GetRootContentAsync(CancellationToken.None);
         foreach (var existingRoot in existingRoots)
         {
             ContentService.Delete(existingRoot);

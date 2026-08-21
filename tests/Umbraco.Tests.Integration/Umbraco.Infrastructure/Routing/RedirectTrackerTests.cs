@@ -33,7 +33,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     {
         await base.CreateTestDataAsync();
 
-        var rootContent = ContentService.GetRootContent().First();
+        var rootContent = (await ContentService.GetRootContentAsync(CancellationToken.None)).First();
         _rootPage = rootContent;
         var subPages = (await ContentService.GetChildrenAsync(rootContent.Key, 0, 3, propertyAliases: null, ordering: null, CancellationToken.None)).Items.ToList();
         _testPage = subPages[0];

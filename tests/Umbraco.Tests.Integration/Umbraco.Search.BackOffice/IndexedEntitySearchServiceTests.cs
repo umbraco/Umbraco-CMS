@@ -19,7 +19,7 @@ public partial class IndexedEntitySearchServiceTests : BackOfficeTestBase
             return;
         }
 
-        IContent[] contentAtRoot = ContentService.GetRootContent().OrderBy(content => content.SortOrder).ToArray();
+        IContent[] contentAtRoot = (await ContentService.GetRootContentAsync(CancellationToken.None)).OrderBy(content => content.SortOrder).ToArray();
         ContentService.MoveToRecycleBin(contentAtRoot.Last());
 
         IMedia[] mediaAtRoot = MediaService.GetRootMedia().OrderBy(media => media.SortOrder).ToArray();

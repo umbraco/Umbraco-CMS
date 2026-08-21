@@ -666,6 +666,23 @@ internal class AsyncDocumentRepository
     }
 
     /// <inheritdoc />
+    public override Task<IEnumerable<IContent>> GetRootContentAsync(CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync<IEnumerable<IContent>>(async db =>
+        {
+            List<DocumentRow> rows = await BuildBaseQuery(
+                    db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == Constants.System.Root))
+                .Select(ToDocumentRow)
+                .ToListAsync(cancellationToken);
+
+            if (rows.Count == 0)
+            {
+                return Enumerable.Empty<IContent>();
+            }
+
+            return await AssembleEntitiesAsync(rows, db);
+        });
+
+    /// <inheritdoc />
     public override Task<IEnumerable<IContent>> GetRecycleBinAsync(CancellationToken cancellationToken) =>
         AmbientScope.ExecuteWithContextAsync<IEnumerable<IContent>>(async db =>
         {

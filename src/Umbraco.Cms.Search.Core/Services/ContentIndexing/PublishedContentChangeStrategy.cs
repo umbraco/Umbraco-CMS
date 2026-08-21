@@ -124,7 +124,7 @@ internal sealed class PublishedContentChangeStrategy : ContentChangeStrategyBase
 
         if (indexInfo.ContainedObjectTypes.Contains(UmbracoObjectTypes.Document))
         {
-            foreach (IContent content in _contentService.GetRootContent())
+            foreach (IContent content in await _contentService.GetRootContentAsync(cancellationToken))
             {
                 if (cancellationToken.IsCancellationRequested)
                 {

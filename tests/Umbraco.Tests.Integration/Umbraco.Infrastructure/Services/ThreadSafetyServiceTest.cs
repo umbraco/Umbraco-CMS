@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             if (exceptions.Count == 0)
             {
                 // now look up all items, there should be 40!
-                IEnumerable<IContent> items = contentService.GetRootContent();
+                IEnumerable<IContent> items = contentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult();
                 Assert.AreEqual(2 * MaxThreadCount, items.Count());
             }
             else

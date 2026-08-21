@@ -111,7 +111,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         await RebuildAsync(
             indexInfo,
             UmbracoObjectTypes.Document,
-            () => _contentService.GetRootContent(),
+            async () => await _contentService.GetRootContentAsync(cancellationToken),
             async (pageIndex, pageSize) => (await _contentService.GetChildrenWithoutTemplatesAsync(Cms.Core.Constants.System.RecycleBinContentKey, pageIndex * pageSize, pageSize, propertyAliases: null, ordering: null, cancellationToken)).Items,
             cancellationToken);
 
@@ -124,7 +124,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
         await RebuildAsync(
             indexInfo,
             UmbracoObjectTypes.Media,
-            () => _mediaService.GetRootMedia(),
+            () => Task.FromResult<IEnumerable<IContentBase>>(_mediaService.GetRootMedia()),
             (pageIndex, pageSize) => Task.FromResult<IEnumerable<IContentBase>>(_mediaService.GetPagedChildren(Cms.Core.Constants.System.RecycleBinMedia, pageIndex, pageSize, out _)),
             cancellationToken);
 
@@ -293,7 +293,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
     private async Task RebuildAsync(
         ContentIndexInfo indexInfo,
         UmbracoObjectTypes objectType,
-        Func<IEnumerable<IContentBase>> getContentAtRoot,
+        Func<Task<IEnumerable<IContentBase>>> getContentAtRoot,
         Func<int, int, Task<IEnumerable<IContentBase>>> getPagedContentAtRecycleBinRoot,
         CancellationToken cancellationToken)
     {
@@ -310,7 +310,7 @@ internal sealed class DraftContentChangeStrategy : ContentChangeStrategyBase, ID
 
         ContentIndexInfo[] indexInfos = [indexInfo];
 
-        foreach (IContentBase rootContent in getContentAtRoot())
+        foreach (IContentBase rootContent in await getContentAtRoot())
         {
             if (cancellationToken.IsCancellationRequested)
             {

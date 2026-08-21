@@ -258,7 +258,7 @@ public partial class ContentEditingServiceTests
 
     private async Task<Guid[]> CreateRootContentForFieldSorting()
     {
-        foreach (var existingRoot in ContentService.GetRootContent())
+        foreach (var existingRoot in await ContentService.GetRootContentAsync(CancellationToken.None))
         {
             ContentService.Delete(existingRoot);
         }
