@@ -610,6 +610,30 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task GetVersionAsync_ForRootContent_PopulatesNullParentKey()
+    {
+        // Root's own umbracoNode row carries Constants.System.RootSystemKey as its UniqueId, a real
+        // non-null Guid - NOT the semantic null ParentKey contracts to. GetVersionAsync's shared
+        // parent-node join (via BuildBaseQuery/ToDocumentRow) must not let it leak through.
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        Guid versionKey = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(db =>
+            db.ContentVersions
+                .Where(contentVersion => contentVersion.NodeId == _publishedPage.Id && contentVersion.Current)
+                .Select(contentVersion => contentVersion.Key)
+                .FirstOrDefaultAsync());
+
+        IContent? result = await repository.GetVersionAsync(versionKey, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.ParentKey, Is.Null);
+    }
+
+    [Test]
     public async Task GetVersionAsync_WithNonExistentVersionKey_ReturnsNull()
     {
         using var scope = NewScopeProvider.CreateScope();
@@ -823,6 +847,51 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             "GetChildrenAsync should return only direct children, not grandchildren");
         Assert.That(result.Items.All(c => c.ParentKey == _textpage.Key), Is.True,
             "ParentKey must be resolved via GetChildrenCoreAsync's own parent-node join, not left unpopulated");
+    }
+
+    [Test]
+    public async Task GetChildrenAsync_OrderedByContentTypeAlias_SortsByContentTypeAlias()
+    {
+        // Exercises ApplyDocumentOrdering's "contenttypealias" arm specifically. The ContentType join
+        // became a LEFT JOIN (DocumentJoinRow.ContentType is nullable) when the per-method join chains
+        // were consolidated, so the selector is now a null-guarded ternary rather than a guaranteed-non-null
+        // property access - this is the one arm no other test in this file or AsyncDocumentRepositoryOrderingTests
+        // exercises, so a regression here (e.g. simplifying the ternary to `?.`, which cannot appear inside
+        // an Expression<Func<...>> tree) would go unnoticed without this test.
+        // "zzzSecondType" sorts alphabetically AFTER _contentType's alias ("umbTextpage") but is created
+        // FIRST, so its SortOrder/creation-order position is the opposite of its alias-order position -
+        // if the "contenttypealias" case were missing and silently fell through to the SortOrder default,
+        // this test would still see items in creation order and fail to notice, exactly the coincidental-pass
+        // trap this repo's own testing discipline calls out. Creating second-type-then-first-type here
+        // means SortOrder order (second, first) and alias order (first, second) actually disagree.
+        var secondContentType = ContentTypeBuilder.CreateSimpleContentType("zzzSecondType", "ZType", defaultTemplateId: _template.Id);
+        secondContentType.Key = Guid.NewGuid();
+        await ContentTypeService.CreateAsync(secondContentType, Constants.Security.SuperUserKey);
+
+        IContent docWithSecondType = new ContentBuilder()
+            .WithContentType(secondContentType)
+            .WithName("Doc With Second Type")
+            .WithParentId(_textpage.Id)
+            .Build();
+        ContentService.Save(docWithSecondType, -1);
+        IContent docWithFirstType = ContentBuilder.CreateSimpleContent(_contentType, "Doc With First Type", _textpage.Id);
+        ContentService.Save(docWithFirstType, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+
+        PagedModel<IContent> result = await repository.GetChildrenAsync(
+            _textpage.Key, skip: 0, take: 100, propertyAliases: null, ordering: Ordering.By("contentTypeAlias"), CancellationToken.None);
+        scope.Complete();
+
+        IContent[] items = result.Items
+            .Where(c => c.Key == docWithFirstType.Key || c.Key == docWithSecondType.Key)
+            .ToArray();
+        Assert.That(items, Has.Length.EqualTo(2));
+
+        string[] expectedAliasOrder = new[] { _contentType.Alias, secondContentType.Alias }.OrderBy(alias => alias, StringComparer.Ordinal).ToArray();
+        Assert.That(items.Select(c => c.ContentType.Alias), Is.EqualTo(expectedAliasOrder),
+            "items must sort by ascending content-type alias, proving the null-guarded ContentType join is actually used for ordering, not silently ignored");
     }
 
     [Test]

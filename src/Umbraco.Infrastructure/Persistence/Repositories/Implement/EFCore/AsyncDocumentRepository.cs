@@ -434,65 +434,13 @@ internal class AsyncDocumentRepository
         AmbientScope.ExecuteWithContextAsync(async db =>
         {
             // All versions for the node, no Current filter — mirrors NPoco GetBaseQuery(current: false).
-            // Published LEFT JOIN is keyed on NodeId so every version row carries the same published-version
-            // context (which template is live, etc.), exactly as NPoco does.
-            // Ordering must happen on the anonymous intermediate type before projecting into DocumentRow —
-            // EF Core cannot translate member access on a record constructor call.
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
-            List<DocumentRow> rows = await db.ContentVersions
-                .Join(
+            List<DocumentRow> rows = await BuildBaseQuery(
+                    db,
                     db.Nodes.Where(node => node.UniqueId == nodeKey && node.NodeObjectType == NodeObjectTypeKey),
-                    contentVersion => contentVersion.NodeId,
-                    node => node.NodeId,
-                    (contentVersion, node) => new { contentVersion, node })
-                .Join(
-                    db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.contentVersion, joined.node, documentVersion })
-                .Join(
-                    db.Content,
-                    joined => joined.contentVersion.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.contentVersion, joined.node, joined.documentVersion, content })
-                .Join(
-                    db.Documents,
-                    joined => joined.node.NodeId,
-                    document => document.NodeId,
-                    (joined, document) => new { joined.contentVersion, joined.node, joined.documentVersion, joined.content, document })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.contentVersion, joined.node, joined.documentVersion, joined.content, joined.document, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.contentVersion, joined.node, joined.documentVersion, joined.content, joined.document, pub })
-                .OrderByDescending(joined => joined.contentVersion.Current)
-                .ThenByDescending(joined => joined.contentVersion.VersionDate)
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.contentVersion, joined.node, joined.documentVersion, joined.content, joined.document, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new { joined.contentVersion, joined.node, joined.documentVersion, joined.content, joined.document, joined.pub, parentNode })
-                .Select(joined => new DocumentRow(
-                    joined.node,
-                    joined.document,
-                    joined.content,
-                    joined.contentVersion,
-                    joined.documentVersion,
-                    joined.pub!.contentVersion,
-                    joined.pub!.documentVersion,
-                    joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                    contentVersionFilter: contentVersion => true)
+                .OrderByDescending(joined => joined.ContentVersion.Current)
+                .ThenByDescending(joined => joined.ContentVersion.VersionDate)
+                .Select(ToDocumentRow)
                 .ToListAsync(cancellationToken);
 
             if (rows.Count == 0)
@@ -509,59 +457,11 @@ internal class AsyncDocumentRepository
         {
             // Filter by the version GUID key; no Current filter — historical versions are valid targets.
             // The Nodes join guards against returning versions that belong to a different object type.
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
-            DocumentRow? row = await db.ContentVersions
-                .Where(contentVersion => contentVersion.Key == versionKey)
-                .Join(
-                    db.DocumentVersions,
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion })
-                .Join(
-                    db.Content,
-                    joined => joined.contentVersion.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.contentVersion, joined.documentVersion, content })
-                .Join(
+            DocumentRow? row = await BuildBaseQuery(
+                    db,
                     db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey),
-                    joined => joined.contentVersion.NodeId,
-                    node => node.NodeId,
-                    (joined, node) => new { joined.contentVersion, joined.documentVersion, joined.content, node })
-                .Join(
-                    db.Documents,
-                    joined => joined.node.NodeId,
-                    document => document.NodeId,
-                    (joined, document) => new { joined.contentVersion, joined.documentVersion, joined.content, joined.node, document })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.contentVersion, joined.documentVersion, joined.content, joined.node, joined.document, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pub })
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        parentNode == null ? (Guid?)null : parentNode.UniqueId))
+                    contentVersionFilter: contentVersion => contentVersion.Key == versionKey)
+                .Select(ToDocumentRow)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (row is null)
@@ -605,57 +505,8 @@ internal class AsyncDocumentRepository
                 return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
             }
 
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
-            // The ContentTypes JOIN is always included so contentTypeAlias is available for ordering.
-            var baseQuery = db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId)
-                .Join(
-                    db.Documents,
-                    node => node.NodeId,
-                    document => document.NodeId,
-                    (node, document) => new { node, document })
-                .Join(
-                    db.Content,
-                    joined => joined.node.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.node, joined.document, content })
-                .Join(
-                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
-                    joined => joined.node.NodeId,
-                    contentVersion => contentVersion.NodeId,
-                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
-                .Join(
-                    db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
-                .Join(
-                    db.ContentTypes,
-                    joined => joined.content.ContentTypeId,
-                    contentType => contentType.NodeId,
-                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
+            IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(
+                db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == parentNodeId));
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -690,107 +541,25 @@ internal class AsyncDocumentRepository
                     skip,
                     take,
                     pageNodeIds => baseQuery
-                        .Where(joined => pageNodeIds.Contains(joined.node.NodeId))
-                        .Select(joined => new DocumentRow(
-                            joined.node,
-                            joined.document,
-                            joined.content,
-                            joined.contentVersion,
-                            joined.documentVersion,
-                            joined.pub!.contentVersion,
-                            joined.pub!.documentVersion,
-                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToDocumentRow)
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
 
-            async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
-            {
-                // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
-                // An unknown culture yields languageId = 0, which matches no CCV rows, so
-                // variantName falls back to node.Text for every row (graceful degradation).
-                int languageId = await db.Language
-                    .Where(lang => lang.IsoCode == ordering!.Culture)
-                    .Select(lang => lang.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                // LEFT JOIN ContentVersionCultureVariations filtered to the resolved language.
-                // Join key is the current (draft) version ID, mirroring the NPoco CCV join condition.
-                // variantName = COALESCE(ccv.Name, node.Text) — mirrors NPoco's VariantNameSqlExpression.
-                var withVariantName = baseQuery
-                    .GroupJoin(
-                        db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
-                        joined => joined.contentVersion.Id,
-                        ccv => ccv.VersionId,
-                        (joined, ccvGroup) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
-                        })
-                    .SelectMany(
-                        joined => joined.ccvGroup.DefaultIfEmpty(),
-                        (joined, ccv) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode,
-                            variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
-                        });
-
-                bool descending = ordering!.Direction == Direction.Descending;
-
-                // ThenBy NodeId breaks ties in variantName (e.g. many nodes sharing a fallback node.Text)
-                // so paged results stay stable/non-duplicated across separate fetches — mirrors NPoco's
-                // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY
-                // umbracoNode.id" after any user ordering (see http://issues.umbraco.org/issue/U4-8831).
-                var ordered = descending
-                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
-                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
-
-                return await ordered
-                    .Skip(skip)
-                    .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
-                    .ToListAsync(cancellationToken);
-            }
+            Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(baseQuery, db, ordering!, skip, take, cancellationToken);
 
             async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
             {
-                // Invariant name ordering falls through here: textSelector = node.Text,
-                // equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
-                var orderedQuery = ApplyDocumentOrdering(
-                    baseQuery,
-                    ordering,
-                    sortOrderSelector: joined => joined.node.SortOrder,
-                    textSelector: joined => joined.node.Text,
-                    createDateSelector: joined => joined.node.CreateDate,
-                    versionDateSelector: joined => joined.contentVersion.VersionDate,
-                    idSelector: joined => joined.node.NodeId,
-                    ownerSelector: joined => joined.node.UserId,
-                    publishedSelector: joined => joined.documentVersion.Published,
-                    contentTypeAliasSelector: joined => joined.contentType.Alias);
+                // Invariant name ordering falls through here: ApplyDocumentOrdering's default "name"
+                // arm uses node.Text, equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, ordering);
 
                 return await orderedQuery
                     .Skip(skip)
                     .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                    .Select(ToDocumentRow)
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -829,58 +598,11 @@ internal class AsyncDocumentRepository
                 return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
             }
 
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
-            var baseQuery = db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey
+            IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(
+                db,
+                db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey
                     && EF.Functions.Like(node.Path, $"%{pathMatch}%")
-                    && (includeTrashed || node.Trashed == false))
-                .Join(
-                    db.Documents,
-                    node => node.NodeId,
-                    document => document.NodeId,
-                    (node, document) => new { node, document })
-                .Join(
-                    db.Content,
-                    joined => joined.node.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.node, joined.document, content })
-                .Join(
-                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
-                    joined => joined.node.NodeId,
-                    contentVersion => contentVersion.NodeId,
-                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
-                .Join(
-                    db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
-                .Join(
-                    db.ContentTypes,
-                    joined => joined.content.ContentTypeId,
-                    contentType => contentType.NodeId,
-                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
+                    && (includeTrashed || node.Trashed == false)));
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -917,108 +639,26 @@ internal class AsyncDocumentRepository
                     skip,
                     take,
                     pageNodeIds => baseQuery
-                        .Where(joined => pageNodeIds.Contains(joined.node.NodeId))
-                        .Select(joined => new DocumentRow(
-                            joined.node,
-                            joined.document,
-                            joined.content,
-                            joined.contentVersion,
-                            joined.documentVersion,
-                            joined.pub!.contentVersion,
-                            joined.pub!.documentVersion,
-                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToDocumentRow)
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
 
-            async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
-            {
-                // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
-                // An unknown culture yields languageId = 0, which matches no CCV rows, so
-                // variantName falls back to node.Text for every row (graceful degradation).
-                int languageId = await db.Language
-                    .Where(lang => lang.IsoCode == ordering!.Culture)
-                    .Select(lang => lang.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                // LEFT JOIN ContentVersionCultureVariations filtered to the resolved language.
-                // Join key is the current (draft) version ID, mirroring the NPoco CCV join condition.
-                // variantName = COALESCE(ccv.Name, node.Text) — mirrors NPoco's VariantNameSqlExpression.
-                var withVariantName = baseQuery
-                    .GroupJoin(
-                        db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
-                        joined => joined.contentVersion.Id,
-                        ccv => ccv.VersionId,
-                        (joined, ccvGroup) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
-                        })
-                    .SelectMany(
-                        joined => joined.ccvGroup.DefaultIfEmpty(),
-                        (joined, ccv) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode,
-                            variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
-                        });
-
-                bool descending = ordering!.Direction == Direction.Descending;
-
-                // ThenBy NodeId breaks ties in variantName (e.g. many nodes sharing a fallback node.Text)
-                // so paged results stay stable/non-duplicated across separate fetches — mirrors NPoco's
-                // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY
-                // umbracoNode.id" after any user ordering (see http://issues.umbraco.org/issue/U4-8831).
-                var ordered = descending
-                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
-                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
-
-                return await ordered
-                    .Skip(skip)
-                    .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
-                    .ToListAsync(cancellationToken);
-            }
+            Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(baseQuery, db, ordering!, skip, take, cancellationToken);
 
             async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
             {
-                // Invariant name ordering falls through here: textSelector = node.Text,
-                // equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
-                var orderedQuery = ApplyDocumentOrdering(
-                    baseQuery,
-                    ordering,
-                    sortOrderSelector: joined => joined.node.SortOrder,
-                    textSelector: joined => joined.node.Text,
-                    createDateSelector: joined => joined.node.CreateDate,
-                    versionDateSelector: joined => joined.contentVersion.VersionDate,
-                    idSelector: joined => joined.node.NodeId,
-                    ownerSelector: joined => joined.node.UserId,
-                    publishedSelector: joined => joined.documentVersion.Published,
-                    contentTypeAliasSelector: joined => joined.contentType.Alias,
-                    pathSelector: joined => joined.node.Path);
+                // Invariant name ordering falls through here: ApplyDocumentOrdering's default "name"
+                // arm uses node.Text, equivalent to COALESCE(NULL, node.Text) in NPoco's invariant path.
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(
+                    baseQuery, ordering, pathSelector: joined => joined.Node.Path);
 
                 return await orderedQuery
                     .Skip(skip)
                     .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                    .Select(ToDocumentRow)
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -1031,59 +671,9 @@ internal class AsyncDocumentRepository
         {
             // Mirrors NPoco's ContentRepositoryBase.GetRecycleBin: every trashed node of this object type,
             // regardless of tree depth — not just the direct children of the recycle bin folder itself.
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
-            List<DocumentRow> rows = await db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed)
-                .Join(
-                    db.Documents,
-                    node => node.NodeId,
-                    document => document.NodeId,
-                    (node, document) => new { node, document })
-                .Join(
-                    db.Content,
-                    joined => joined.node.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.node, joined.document, content })
-                .Join(
-                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
-                    joined => joined.node.NodeId,
-                    contentVersion => contentVersion.NodeId,
-                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
-                .Join(
-                    db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pub })
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        parentNode == null ? (Guid?)null : parentNode.UniqueId))
+            List<DocumentRow> rows = await BuildBaseQuery(
+                    db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed))
+                .Select(ToDocumentRow)
                 .ToListAsync(cancellationToken);
 
             if (rows.Count == 0)
@@ -1110,59 +700,8 @@ internal class AsyncDocumentRepository
                 return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
             }
 
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
-            // The ContentTypes JOIN is always included so contentTypeAlias is available for ordering,
-            // mirroring GetChildrenCoreAsync/GetDescendantsCoreAsync — only the leading node predicate
-            // (Trashed instead of ParentId/Path) differs from those two.
-            var baseQuery = db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed)
-                .Join(
-                    db.Documents,
-                    node => node.NodeId,
-                    document => document.NodeId,
-                    (node, document) => new { node, document })
-                .Join(
-                    db.Content,
-                    joined => joined.node.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.node, joined.document, content })
-                .Join(
-                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
-                    joined => joined.node.NodeId,
-                    contentVersion => contentVersion.NodeId,
-                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
-                .Join(
-                    db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
-                .Join(
-                    db.ContentTypes,
-                    joined => joined.content.ContentTypeId,
-                    contentType => contentType.NodeId,
-                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
+            IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(
+                db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Trashed));
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -1197,102 +736,23 @@ internal class AsyncDocumentRepository
                     skip,
                     take,
                     pageNodeIds => baseQuery
-                        .Where(joined => pageNodeIds.Contains(joined.node.NodeId))
-                        .Select(joined => new DocumentRow(
-                            joined.node,
-                            joined.document,
-                            joined.content,
-                            joined.contentVersion,
-                            joined.documentVersion,
-                            joined.pub!.contentVersion,
-                            joined.pub!.documentVersion,
-                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToDocumentRow)
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
 
-            async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
-            {
-                // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
-                // An unknown culture yields languageId = 0, which matches no CCV rows, so
-                // variantName falls back to node.Text for every row (graceful degradation).
-                int languageId = await db.Language
-                    .Where(lang => lang.IsoCode == ordering!.Culture)
-                    .Select(lang => lang.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                var withVariantName = baseQuery
-                    .GroupJoin(
-                        db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
-                        joined => joined.contentVersion.Id,
-                        ccv => ccv.VersionId,
-                        (joined, ccvGroup) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
-                        })
-                    .SelectMany(
-                        joined => joined.ccvGroup.DefaultIfEmpty(),
-                        (joined, ccv) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode,
-                            variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
-                        });
-
-                bool descending = ordering!.Direction == Direction.Descending;
-
-                // ThenBy NodeId breaks ties in variantName (e.g. many nodes sharing a fallback node.Text)
-                // so paged results stay stable/non-duplicated across separate fetches — mirrors NPoco's
-                // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY
-                // umbracoNode.id" after any user ordering (see http://issues.umbraco.org/issue/U4-8831).
-                var ordered = descending
-                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
-                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
-
-                return await ordered
-                    .Skip(skip)
-                    .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
-                    .ToListAsync(cancellationToken);
-            }
+            Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(baseQuery, db, ordering!, skip, take, cancellationToken);
 
             async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
             {
-                var orderedQuery = ApplyDocumentOrdering(
-                    baseQuery,
-                    ordering,
-                    sortOrderSelector: joined => joined.node.SortOrder,
-                    textSelector: joined => joined.node.Text,
-                    createDateSelector: joined => joined.node.CreateDate,
-                    versionDateSelector: joined => joined.contentVersion.VersionDate,
-                    idSelector: joined => joined.node.NodeId,
-                    ownerSelector: joined => joined.node.UserId,
-                    publishedSelector: joined => joined.documentVersion.Published,
-                    contentTypeAliasSelector: joined => joined.contentType.Alias);
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, ordering);
 
                 return await orderedQuery
                     .Skip(skip)
                     .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                    .Select(ToDocumentRow)
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -1315,59 +775,11 @@ internal class AsyncDocumentRepository
                 return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
             }
 
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
             // Mirrors GetPagedRecycleBinAsync — only the leading node predicate (Level == level plus the
             // same !Trashed exclusion the old sync ContentService.GetByLevel documented — "contrary to most
             // methods, this method filters out trashed content items") differs from that method.
-            var baseQuery = db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed)
-                .Join(
-                    db.Documents,
-                    node => node.NodeId,
-                    document => document.NodeId,
-                    (node, document) => new { node, document })
-                .Join(
-                    db.Content,
-                    joined => joined.node.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.node, joined.document, content })
-                .Join(
-                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
-                    joined => joined.node.NodeId,
-                    contentVersion => contentVersion.NodeId,
-                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
-                .Join(
-                    db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
-                .Join(
-                    db.ContentTypes,
-                    joined => joined.content.ContentTypeId,
-                    contentType => contentType.NodeId,
-                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
+            IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(
+                db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Level == level && !node.Trashed));
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -1402,100 +814,23 @@ internal class AsyncDocumentRepository
                     skip,
                     take,
                     pageNodeIds => baseQuery
-                        .Where(joined => pageNodeIds.Contains(joined.node.NodeId))
-                        .Select(joined => new DocumentRow(
-                            joined.node,
-                            joined.document,
-                            joined.content,
-                            joined.contentVersion,
-                            joined.documentVersion,
-                            joined.pub!.contentVersion,
-                            joined.pub!.documentVersion,
-                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToDocumentRow)
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
 
-            async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
-            {
-                // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
-                // An unknown culture yields languageId = 0, which matches no CCV rows, so
-                // variantName falls back to node.Text for every row (graceful degradation).
-                int languageId = await db.Language
-                    .Where(lang => lang.IsoCode == ordering!.Culture)
-                    .Select(lang => lang.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                var withVariantName = baseQuery
-                    .GroupJoin(
-                        db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
-                        joined => joined.contentVersion.Id,
-                        ccv => ccv.VersionId,
-                        (joined, ccvGroup) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
-                        })
-                    .SelectMany(
-                        joined => joined.ccvGroup.DefaultIfEmpty(),
-                        (joined, ccv) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode,
-                            variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
-                        });
-
-                bool descending = ordering!.Direction == Direction.Descending;
-
-                // ThenBy NodeId breaks ties in variantName so paged results stay stable/non-duplicated
-                // across separate fetches — mirrors GetPagedRecycleBinAsync's identical tiebreak.
-                var ordered = descending
-                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
-                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
-
-                return await ordered
-                    .Skip(skip)
-                    .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
-                    .ToListAsync(cancellationToken);
-            }
+            Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(baseQuery, db, ordering!, skip, take, cancellationToken);
 
             async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
             {
-                var orderedQuery = ApplyDocumentOrdering(
-                    baseQuery,
-                    ordering,
-                    sortOrderSelector: joined => joined.node.SortOrder,
-                    textSelector: joined => joined.node.Text,
-                    createDateSelector: joined => joined.node.CreateDate,
-                    versionDateSelector: joined => joined.contentVersion.VersionDate,
-                    idSelector: joined => joined.node.NodeId,
-                    ownerSelector: joined => joined.node.UserId,
-                    publishedSelector: joined => joined.documentVersion.Published,
-                    contentTypeAliasSelector: joined => joined.contentType.Alias);
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(baseQuery, ordering);
 
                 return await orderedQuery
                     .Skip(skip)
                     .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                    .Select(ToDocumentRow)
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -1536,65 +871,9 @@ internal class AsyncDocumentRepository
                 return new PagedModel<IContent> { Total = total, Items = Enumerable.Empty<IContent>() };
             }
 
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
-            List<DocumentRow> rows = await db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey && pageNodeIds.Contains(node.NodeId))
-                .Join(
-                    db.Documents,
-                    node => node.NodeId,
-                    document => document.NodeId,
-                    (node, document) => new { node, document })
-                .Join(
-                    db.Content,
-                    joined => joined.node.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.node, joined.document, content })
-                .Join(
-                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
-                    joined => joined.node.NodeId,
-                    contentVersion => contentVersion.NodeId,
-                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
-                .Join(
-                    db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
-                .Join(
-                    db.ContentTypes,
-                    joined => joined.content.ContentTypeId,
-                    contentType => contentType.NodeId,
-                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode })
-                .Select(joined => new DocumentRow(
-                    joined.node,
-                    joined.document,
-                    joined.content,
-                    joined.contentVersion,
-                    joined.documentVersion,
-                    joined.pub!.contentVersion,
-                    joined.pub!.documentVersion,
-                    joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+            List<DocumentRow> rows = await BuildBaseQuery(
+                    db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey && pageNodeIds.Contains(node.NodeId)))
+                .Select(ToDocumentRow)
                 .ToListAsync(cancellationToken);
 
             // The Contains-filtered fetch above does not preserve pageNodeIds' root-first order, so
@@ -1639,61 +918,14 @@ internal class AsyncDocumentRepository
                 return new PagedModel<IContent> { Total = 0, Items = Enumerable.Empty<IContent>() };
             }
 
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
-            // The ContentTypes JOIN is always included so contentTypeAlias is available for ordering,
-            // mirroring GetChildrenCoreAsync/GetDescendantsCoreAsync/GetPagedRecycleBinAsync — the content-type
-            // filter is inserted right after the Content join, since ContentTypeId only becomes available
-            // there (unlike those three, whose leading predicate is a plain NodeDto property).
-            var baseQuery = db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey)
-                .Join(
-                    db.Documents,
-                    node => node.NodeId,
-                    document => document.NodeId,
-                    (node, document) => new { node, document })
-                .Join(
-                    db.Content,
-                    joined => joined.node.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.node, joined.document, content })
-                .Where(joined => contentTypeIdsList.Contains(joined.content.ContentTypeId))
-                .Join(
-                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
-                    joined => joined.node.NodeId,
-                    contentVersion => contentVersion.NodeId,
-                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
-                .Join(
-                    db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
-                .Join(
-                    db.ContentTypes,
-                    joined => joined.content.ContentTypeId,
-                    contentType => contentType.NodeId,
-                    (joined, contentType) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, contentType })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, pub })
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.contentType, joined.pub, parentNode });
+            // The content-type filter is applied as an ordinary Where() on the shared join tail's
+            // output, rather than injected mid-chain — Content.ContentTypeId is exposed on every
+            // DocumentJoinRow, and every join after Content in the shared tail is cardinality-preserving
+            // for a given (Node, Content) pair (current-version join is 1:1 under the "one current
+            // version per node" invariant every method in this file already relies on; both LEFT JOINs
+            // are 0-or-1), so the predicate commutes freely regardless of where it's written.
+            IQueryable<DocumentJoinRow> baseQuery = BuildBaseQuery(db, db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey))
+                .Where(joined => contentTypeIdsList.Contains(joined.Content.ContentTypeId));
 
             bool isCustomFieldOrdering = ordering?.IsCustomField == true;
             bool isCultureNameOrdering =
@@ -1734,99 +966,24 @@ internal class AsyncDocumentRepository
                     skip,
                     take,
                     pageNodeIds => baseQuery
-                        .Where(joined => pageNodeIds.Contains(joined.node.NodeId))
-                        .Select(joined => new DocumentRow(
-                            joined.node,
-                            joined.document,
-                            joined.content,
-                            joined.contentVersion,
-                            joined.documentVersion,
-                            joined.pub!.contentVersion,
-                            joined.pub!.documentVersion,
-                            joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                        .Where(joined => pageNodeIds.Contains(joined.Node.NodeId))
+                        .Select(ToDocumentRow)
                         .ToListAsync(cancellationToken),
                     cancellationToken);
             }
 
-            async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered()
-            {
-                // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
-                // An unknown culture yields languageId = 0, which matches no CCV rows, so
-                // variantName falls back to node.Text for every row (graceful degradation).
-                int languageId = await db.Language
-                    .Where(lang => lang.IsoCode == ordering!.Culture)
-                    .Select(lang => lang.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                var withVariantName = baseQuery
-                    .GroupJoin(
-                        db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
-                        joined => joined.contentVersion.Id,
-                        ccv => ccv.VersionId,
-                        (joined, ccvGroup) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode, ccvGroup
-                        })
-                    .SelectMany(
-                        joined => joined.ccvGroup.DefaultIfEmpty(),
-                        (joined, ccv) => new
-                        {
-                            joined.node, joined.document, joined.content,
-                            joined.contentVersion, joined.documentVersion,
-                            joined.contentType, joined.pub, joined.parentNode,
-                            variantName = ccv != null ? ccv.Name ?? joined.node.Text : joined.node.Text,
-                        });
-
-                bool descending = ordering!.Direction == Direction.Descending;
-
-                var ordered = descending
-                    ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.node.NodeId)
-                    : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.node.NodeId);
-
-                return await ordered
-                    .Skip(skip)
-                    .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
-                    .ToListAsync(cancellationToken);
-            }
+            Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrdered() =>
+                FetchCultureNameOrderedAsync(baseQuery, db, ordering!, skip, take, cancellationToken);
 
             async Task<IReadOnlyList<DocumentRow>> FetchDefaultOrdered()
             {
-                var orderedQuery = ApplyDocumentOrdering(
-                    baseQuery,
-                    ordering,
-                    sortOrderSelector: joined => joined.node.SortOrder,
-                    textSelector: joined => joined.node.Text,
-                    createDateSelector: joined => joined.node.CreateDate,
-                    versionDateSelector: joined => joined.contentVersion.VersionDate,
-                    idSelector: joined => joined.node.NodeId,
-                    ownerSelector: joined => joined.node.UserId,
-                    publishedSelector: joined => joined.documentVersion.Published,
-                    contentTypeAliasSelector: joined => joined.contentType.Alias,
-                    pathSelector: joined => joined.node.Path);
+                IOrderedQueryable<DocumentJoinRow> orderedQuery = ApplyDocumentOrdering(
+                    baseQuery, ordering, pathSelector: joined => joined.Node.Path);
 
                 return await orderedQuery
                     .Skip(skip)
                     .Take(take)
-                    .Select(joined => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        joined.parentNode == null ? (Guid?)null : joined.parentNode.UniqueId))
+                    .Select(ToDocumentRow)
                     .ToListAsync(cancellationToken);
             }
             return new PagedModel<IContent> { Total = total, Items = items };
@@ -1914,10 +1071,84 @@ internal class AsyncDocumentRepository
                 node => node.NodeObjectType == NodeObjectTypeKey && node.ParentId == Constants.System.RecycleBinContent,
                 cancellationToken));
 
+    // Shared join shape spanning Nodes/Documents/Content/ContentVersions/DocumentVersions, the
+    // LEFT JOINed ContentType, published version, and parent node. Built via object-initializer
+    // syntax only (never a positional constructor call) - EF Core cannot translate member access
+    // into a type built from a constructor call when a subsequent OrderBy targets it (see the note
+    // on ApplyDocumentOrdering below), but member-init projections translate and order correctly.
+    // Internal (not private), matching ApplyDocumentOrdering below, so AsyncDocumentRepositoryOrderingTests
+    // can construct real instances to exercise ordering directly.
+    internal sealed class DocumentJoinRow
+    {
+        public NodeDto Node { get; set; } = null!;
+
+        public DocumentDto Document { get; set; } = null!;
+
+        public ContentDto Content { get; set; } = null!;
+
+        public ContentVersionDto ContentVersion { get; set; } = null!;
+
+        public DocumentVersionDto DocumentVersion { get; set; } = null!;
+
+        // No FK is declared from Content.ContentTypeId to ContentTypeDto in the EF model, so nothing
+        // guarantees every row resolves one - LEFT JOINed and nullable rather than assumed present.
+        public ContentTypeDto? ContentType { get; set; }
+
+        public ContentVersionDto? PublishedContentVersion { get; set; }
+
+        public DocumentVersionDto? PublishedDocumentVersion { get; set; }
+
+        public NodeDto? ParentNode { get; set; }
+    }
+
+    // Builds the shared join tail every document query needs: Node -> ContentVersion (filtered by
+    // contentVersionFilter, defaulting to "current") -> Document/Content/DocumentVersion -> the
+    // LEFT JOINed ContentType, published version, and parent node. Callers supply their own
+    // distinguishing filter via filteredNodes; everything after that is identical for every caller.
+    private static IQueryable<DocumentJoinRow> BuildBaseQuery(
+        UmbracoDbContext db,
+        IQueryable<NodeDto> filteredNodes,
+        Expression<Func<ContentVersionDto, bool>>? contentVersionFilter = null)
+    {
+        IQueryable<ContentVersionDto> filteredVersions = contentVersionFilter is null
+            ? db.ContentVersions.Where(contentVersion => contentVersion.Current)
+            : db.ContentVersions.Where(contentVersionFilter);
+
+        var publishedSubquery = db.ContentVersions
+            .Join(
+                db.DocumentVersions.Where(documentVersion => documentVersion.Published),
+                contentVersion => contentVersion.Id,
+                documentVersion => documentVersion.Id,
+                (contentVersion, documentVersion) => new { contentVersion, documentVersion });
+
+        return filteredNodes
+            .Join(filteredVersions, node => node.NodeId, contentVersion => contentVersion.NodeId, (node, contentVersion) => new { node, contentVersion })
+            .Join(db.Documents, joined => joined.node.NodeId, document => document.NodeId, (joined, document) => new { joined.node, joined.contentVersion, document })
+            .Join(db.Content, joined => joined.node.NodeId, content => content.NodeId, (joined, content) => new { joined.node, joined.contentVersion, joined.document, content })
+            .Join(db.DocumentVersions, joined => joined.contentVersion.Id, documentVersion => documentVersion.Id, (joined, documentVersion) => new { joined.node, joined.contentVersion, joined.document, joined.content, documentVersion })
+            .GroupJoin(db.ContentTypes, joined => joined.content.ContentTypeId, contentType => contentType.NodeId, (joined, contentTypeGroup) => new { joined.node, joined.contentVersion, joined.document, joined.content, joined.documentVersion, contentTypeGroup })
+            .SelectMany(joined => joined.contentTypeGroup.DefaultIfEmpty(), (joined, contentType) => new { joined.node, joined.contentVersion, joined.document, joined.content, joined.documentVersion, contentType })
+            .GroupJoin(publishedSubquery, joined => joined.node.NodeId, pub => pub.contentVersion.NodeId, (joined, pubGroup) => new { joined.node, joined.contentVersion, joined.document, joined.content, joined.documentVersion, joined.contentType, pubGroup })
+            .SelectMany(joined => joined.pubGroup.DefaultIfEmpty(), (joined, pub) => new { joined.node, joined.contentVersion, joined.document, joined.content, joined.documentVersion, joined.contentType, pub })
+            .GroupJoin(db.Nodes, joined => joined.node.ParentId, parentNode => parentNode.NodeId, (joined, parentNodeGroup) => new { joined.node, joined.contentVersion, joined.document, joined.content, joined.documentVersion, joined.contentType, joined.pub, parentNodeGroup })
+            .SelectMany(joined => joined.parentNodeGroup.DefaultIfEmpty(), (joined, parentNode) => new { joined.node, joined.contentVersion, joined.document, joined.content, joined.documentVersion, joined.contentType, joined.pub, parentNode })
+            .Select(joined => new DocumentJoinRow
+            {
+                Node = joined.node,
+                Document = joined.document,
+                Content = joined.content,
+                ContentVersion = joined.contentVersion,
+                DocumentVersion = joined.documentVersion,
+                ContentType = joined.contentType,
+                PublishedContentVersion = joined.pub != null ? joined.pub.contentVersion : null,
+                PublishedDocumentVersion = joined.pub != null ? joined.pub.documentVersion : null,
+                ParentNode = joined.parentNode,
+            });
+    }
+
     // Projects a database row spanning Nodes/Documents/Content/ContentVersions/DocumentVersions
     // plus the optional published version (LEFT JOINed by NodeId) into a single typed record,
-    // allowing entity assembly to be shared across PerformGetRangeAsync, GetVersionAsync and
-    // GetAllVersionsAsync without anonymous-type boundaries.
+    // allowing entity assembly to be shared across every document query in this file.
     private sealed record DocumentRow(
         NodeDto Node,
         DocumentDto Document,
@@ -1928,58 +1159,59 @@ internal class AsyncDocumentRepository
         DocumentVersionDto? PublishedDocumentVersion,
         Guid? ParentUniqueId);
 
-    // Applies document ordering to any anonymous intermediate query type T before it is projected
-    // to DocumentRow. Ordering must happen while the anonymous type is still live — EF Core cannot
-    // translate member access on named record-type constructor calls in OrderBy key selectors.
-    // The typed Expression<Func<T, TKey>> selectors allow EF Core to generate correct SQL ORDER BY
-    // clauses through the anonymous type, which it can trace back to the original DTO columns.
+    // The single shared projection from DocumentJoinRow into the final row shape - every migrated
+    // caller ends its query with .Select(ToDocumentRow) instead of restating this construction.
+    private static readonly Expression<Func<DocumentJoinRow, DocumentRow>> ToDocumentRow = joined => new DocumentRow(
+        joined.Node,
+        joined.Document,
+        joined.Content,
+        joined.ContentVersion,
+        joined.DocumentVersion,
+        joined.PublishedContentVersion,
+        joined.PublishedDocumentVersion,
+        joined.ParentNode == null ? (Guid?)null : joined.ParentNode.UniqueId);
+
     /// <summary>
     ///     Applies document paging/ordering to a query, breaking ties on node id for stable paging.
     /// </summary>
     /// <remarks>
     ///     Internal (not private) so AsyncDocumentRepositoryOrderingTests can exercise the tiebreak logic
-    ///     directly against an in-memory sequence, decoupling it from a real database's incidental row order.
+    ///     directly, decoupling it from a real database's incidental row order.
     /// </remarks>
-    internal static IOrderedQueryable<T> ApplyDocumentOrdering<T>(
-        IQueryable<T> source,
+    internal static IOrderedQueryable<DocumentJoinRow> ApplyDocumentOrdering(
+        IQueryable<DocumentJoinRow> source,
         Ordering? ordering,
-        Expression<Func<T, int>> sortOrderSelector,
-        Expression<Func<T, string?>> textSelector,
-        Expression<Func<T, DateTime>> createDateSelector,
-        Expression<Func<T, DateTime>> versionDateSelector,
-        Expression<Func<T, int>> idSelector,
-        Expression<Func<T, int?>> ownerSelector,
-        Expression<Func<T, bool>> publishedSelector,
-        Expression<Func<T, string?>> contentTypeAliasSelector,
-        Expression<Func<T, string?>>? pathSelector = null)
+        Expression<Func<DocumentJoinRow, string?>>? pathSelector = null)
     {
         bool descending = ordering?.Direction == Direction.Descending;
         string? orderBy = ordering?.OrderBy?.ToLowerInvariant();
-        IOrderedQueryable<T> ordered = orderBy switch
+        IOrderedQueryable<DocumentJoinRow> ordered = orderBy switch
         {
             // Invariant name ordering (node.Text). Culture-specific name ordering is handled
             // by the callers via a ContentVersionCultureVariation JOIN before reaching this method.
             "name" => descending
-                ? source.OrderByDescending(textSelector)
-                : source.OrderBy(textSelector),
+                ? source.OrderByDescending(joined => joined.Node.Text)
+                : source.OrderBy(joined => joined.Node.Text),
             "createdate" => descending
-                ? source.OrderByDescending(createDateSelector)
-                : source.OrderBy(createDateSelector),
+                ? source.OrderByDescending(joined => joined.Node.CreateDate)
+                : source.OrderBy(joined => joined.Node.CreateDate),
             "versiondate" or "updatedate" => descending
-                ? source.OrderByDescending(versionDateSelector)
-                : source.OrderBy(versionDateSelector),
+                ? source.OrderByDescending(joined => joined.ContentVersion.VersionDate)
+                : source.OrderBy(joined => joined.ContentVersion.VersionDate),
             "id" => descending
-                ? source.OrderByDescending(idSelector)
-                : source.OrderBy(idSelector),
+                ? source.OrderByDescending(joined => joined.Node.NodeId)
+                : source.OrderBy(joined => joined.Node.NodeId),
             "owner" => descending
-                ? source.OrderByDescending(ownerSelector)
-                : source.OrderBy(ownerSelector),
+                ? source.OrderByDescending(joined => joined.Node.UserId)
+                : source.OrderBy(joined => joined.Node.UserId),
             "published" => descending
-                ? source.OrderByDescending(publishedSelector)
-                : source.OrderBy(publishedSelector),
+                ? source.OrderByDescending(joined => joined.DocumentVersion.Published)
+                : source.OrderBy(joined => joined.DocumentVersion.Published),
+            // Null-propagating operators aren't valid inside an Expression<Func<...>> tree - use a
+            // conditional instead of ContentType?.Alias.
             "contenttypealias" => descending
-                ? source.OrderByDescending(contentTypeAliasSelector)
-                : source.OrderBy(contentTypeAliasSelector),
+                ? source.OrderByDescending(joined => joined.ContentType == null ? null : joined.ContentType.Alias)
+                : source.OrderBy(joined => joined.ContentType == null ? null : joined.ContentType.Alias),
             // Only reachable when the caller passes a pathSelector (GetDescendantsCoreAsync and
             // GetPagedOfContentTypesAsync) — a missing pathSelector falls through to the default arm below,
             // exactly like every other caller that doesn't support "path" ordering today.
@@ -1989,15 +1221,15 @@ internal class AsyncDocumentRepository
             // Custom-field ordering (ordering.IsCustomField) is intercepted by callers before reaching
             // this method — see ResolveCustomFieldOrderedNodeIdsAsync.
             _ => descending
-                ? source.OrderByDescending(sortOrderSelector)
-                : source.OrderBy(sortOrderSelector),
+                ? source.OrderByDescending(joined => joined.Node.SortOrder)
+                : source.OrderBy(joined => joined.Node.SortOrder),
         };
 
         // Break ties on node id so paged results stay stable/non-duplicated across separate fetches —
         // mirrors NPoco's ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY
         // umbracoNode.id" after any user ordering (see http://issues.umbraco.org/issue/U4-8831). Skipped
         // when already ordering by id, since that's already unique.
-        return orderBy == "id" ? ordered : ordered.ThenBy(idSelector);
+        return orderBy == "id" ? ordered : ordered.ThenBy(joined => joined.Node.NodeId);
     }
 
     // The four typed PropertyData value columns, plus the SortableValue override some property editors
@@ -2085,10 +1317,10 @@ internal class AsyncDocumentRepository
             .ToList();
     }
 
-    // Shared by both GetChildrenCoreAsync and GetDescendantsCoreAsync's custom-field ordering path: resolves
-    // the full ordered candidate ID list, pages it, and fetches+re-sequences the page's rows. Callers differ
-    // only in how candidateNodeIds is filtered (children vs. descendants) and how fetchRowsForPageNodeIds
-    // queries baseQuery (a distinct anonymous-typed query per caller) — everything else is identical.
+    // Shared by every branching method's custom-field ordering path: resolves the full ordered candidate
+    // ID list, pages it, and fetches+re-sequences the page's rows. Callers differ only in how
+    // candidateNodeIds is filtered and how fetchRowsForPageNodeIds queries baseQuery — everything else
+    // is identical.
     private async Task<IReadOnlyList<DocumentRow>> FetchCustomFieldOrderedPageAsync(
         UmbracoDbContext db,
         List<int> candidateNodeIds,
@@ -2109,6 +1341,59 @@ internal class AsyncDocumentRepository
 
         List<DocumentRow> unorderedRows = await fetchRowsForPageNodeIds(pageNodeIds);
         return ReorderRowsByNodeIds(unorderedRows, pageNodeIds);
+    }
+
+    // Shared by every branching method's culture-specific name-ordering path. LEFT JOINs
+    // ContentVersionCultureVariations filtered to the resolved language; variantName = COALESCE(ccv.Name,
+    // node.Text) — mirrors NPoco's VariantNameSqlExpression. The whole DocumentJoinRow is carried forward
+    // as one nested member through the GroupJoin/SelectMany so it can be unwrapped again for ordering and
+    // fed straight into the shared ToDocumentRow projection.
+    private async Task<IReadOnlyList<DocumentRow>> FetchCultureNameOrderedAsync(
+        IQueryable<DocumentJoinRow> baseQuery,
+        UmbracoDbContext db,
+        Ordering ordering,
+        int skip,
+        int take,
+        CancellationToken cancellationToken)
+    {
+        // Pre-fetch the language ID — the Language table is tiny (bounded by configured languages).
+        // An unknown culture yields languageId = 0, which matches no CCV rows, so variantName falls
+        // back to node.Text for every row (graceful degradation).
+        int languageId = await db.Language
+            .Where(lang => lang.IsoCode == ordering.Culture)
+            .Select(lang => lang.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var withVariantName = baseQuery
+            .GroupJoin(
+                db.ContentVersionCultureVariations.Where(ccv => ccv.LanguageId == languageId),
+                joined => joined.ContentVersion.Id,
+                ccv => ccv.VersionId,
+                (joined, ccvGroup) => new { joined, ccvGroup })
+            .SelectMany(
+                joined => joined.ccvGroup.DefaultIfEmpty(),
+                (joined, ccv) => new
+                {
+                    joined.joined,
+                    variantName = ccv != null ? ccv.Name ?? joined.joined.Node.Text : joined.joined.Node.Text,
+                });
+
+        bool descending = ordering.Direction == Direction.Descending;
+
+        // ThenBy NodeId breaks ties in variantName (e.g. many nodes sharing a fallback node.Text) so
+        // paged results stay stable/non-duplicated across separate fetches — mirrors NPoco's
+        // ContentRepositoryBase.PreparePageSql, which unconditionally appends "ORDER BY umbracoNode.id"
+        // after any user ordering (see http://issues.umbraco.org/issue/U4-8831).
+        var ordered = descending
+            ? withVariantName.OrderByDescending(joined => joined.variantName).ThenBy(joined => joined.joined.Node.NodeId)
+            : withVariantName.OrderBy(joined => joined.variantName).ThenBy(joined => joined.joined.Node.NodeId);
+
+        return await ordered
+            .Skip(skip)
+            .Take(take)
+            .Select(joined => joined.joined)
+            .Select(ToDocumentRow)
+            .ToListAsync(cancellationToken);
     }
 
     // Nodes without a value sort first ascending / last descending, matching both SQL Server's and
@@ -2183,63 +1468,8 @@ internal class AsyncDocumentRepository
                 nodeQuery = nodeQuery.Where(node => keyList.Contains(node.UniqueId));
             }
 
-            // Published version pairs: ContentVersion + DocumentVersion where Published = true.
-            // Used as the inner side of the LEFT JOIN below so the published version is fetched
-            // in the same round-trip as the current version (mirrors NPoco's nested LEFT JOIN in GetBaseQuery).
-            var publishedSubquery = db.ContentVersions
-                .Join(
-                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
-                    contentVersion => contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
-
-            // Single round-trip: current version rows with the published version LEFT JOINed inline.
-            // publishedContentVersion / publishedDocumentVersion are null for unpublished documents.
-            List<DocumentRow> rows = await nodeQuery
-                .Join(
-                    db.Documents,
-                    node => node.NodeId,
-                    document => document.NodeId,
-                    (node, document) => new { node, document })
-                .Join(
-                    db.Content,
-                    joined => joined.node.NodeId,
-                    content => content.NodeId,
-                    (joined, content) => new { joined.node, joined.document, content })
-                .Join(
-                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
-                    joined => joined.node.NodeId,
-                    contentVersion => contentVersion.NodeId,
-                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
-                .Join(
-                    db.DocumentVersions,
-                    joined => joined.contentVersion.Id,
-                    documentVersion => documentVersion.Id,
-                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
-                .GroupJoin(
-                    publishedSubquery,
-                    joined => joined.node.NodeId,
-                    pub => pub.contentVersion.NodeId,
-                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pubGroup })
-                .SelectMany(
-                    joined => joined.pubGroup.DefaultIfEmpty(),
-                    (joined, pub) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pub })
-                .GroupJoin(
-                    db.Nodes,
-                    joined => joined.node.ParentId,
-                    parentNode => parentNode.NodeId,
-                    (joined, parentNodeGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, joined.pub, parentNodeGroup })
-                .SelectMany(
-                    joined => joined.parentNodeGroup.DefaultIfEmpty(),
-                    (joined, parentNode) => new DocumentRow(
-                        joined.node,
-                        joined.document,
-                        joined.content,
-                        joined.contentVersion,
-                        joined.documentVersion,
-                        joined.pub!.contentVersion,
-                        joined.pub!.documentVersion,
-                        parentNode == null ? (Guid?)null : parentNode.UniqueId))
+            List<DocumentRow> rows = await BuildBaseQuery(db, nodeQuery)
+                .Select(ToDocumentRow)
                 .ToListAsync();
 
             if (rows.Count == 0)

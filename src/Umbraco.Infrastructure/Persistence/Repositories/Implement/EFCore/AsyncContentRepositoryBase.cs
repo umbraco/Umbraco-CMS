@@ -293,10 +293,17 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     // Joins Nodes → Content → ContentTypes filtered by NodeObjectTypeKey and content type alias,
     // projecting back to NodeDto so callers can compose further predicates before counting.
     private IQueryable<NodeDto> NodesFilteredByContentTypeAlias(UmbracoDbContext db, string contentTypeAlias) =>
-        db.Nodes
+        FilterByContentTypeAlias(db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey), db, contentTypeAlias);
+
+    // Joins the given Nodes query onward through Content → ContentTypes filtered by content type
+    // alias, projecting back to NodeDto. Protected (not folded into NodesFilteredByContentTypeAlias
+    // above) so AsyncPublishableContentRepositoryBase.CountPublishedAsync can reuse this tail on top
+    // of its own Published/Trashed-filtered query instead of duplicating the join inline.
+    protected static IQueryable<NodeDto> FilterByContentTypeAlias(IQueryable<NodeDto> nodes, UmbracoDbContext db, string contentTypeAlias) =>
+        nodes
             .Join(db.Content, node => node.NodeId, content => content.NodeId, (node, content) => new { node, content })
             .Join(db.ContentTypes, joined => joined.content.ContentTypeId, contentType => contentType.NodeId, (joined, contentType) => new { joined.node, contentType })
-            .Where(joined => joined.node.NodeObjectType == NodeObjectTypeKey && joined.contentType.Alias == contentTypeAlias)
+            .Where(joined => joined.contentType.Alias == contentTypeAlias)
             .Select(joined => joined.node);
 
     protected static Task<int> ResolveNodeIdAsync(UmbracoDbContext db, Guid key, CancellationToken cancellationToken) =>

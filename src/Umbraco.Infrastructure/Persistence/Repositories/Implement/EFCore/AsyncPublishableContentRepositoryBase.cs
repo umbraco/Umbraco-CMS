@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -211,7 +212,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         {
             await db.ContentSchedules
                 .Where(cs => cs.Date <= date)
-                .Where(cs => db.Nodes.Any(n => n.NodeId == cs.NodeId && n.NodeObjectType == NodeObjectTypeKey))
+                .Where(IsForThisObjectType(db))
                 .ExecuteDeleteAsync(cancellationToken);
         });
 
@@ -222,7 +223,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             string actionString = action.ToString();
             await db.ContentSchedules
                 .Where(cs => cs.Date <= date && cs.Action == actionString)
-                .Where(cs => db.Nodes.Any(n => n.NodeId == cs.NodeId && n.NodeObjectType == NodeObjectTypeKey))
+                .Where(IsForThisObjectType(db))
                 .ExecuteDeleteAsync(cancellationToken);
         });
 
@@ -240,8 +241,14 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             string actionString = action.ToString();
             return db.ContentSchedules
                 .Where(cs => cs.Action == actionString && cs.Date <= date)
-                .AnyAsync(cs => db.Nodes.Any(n => n.NodeId == cs.NodeId && n.NodeObjectType == NodeObjectTypeKey), cancellationToken);
+                .AnyAsync(IsForThisObjectType(db), cancellationToken);
         });
+
+    // Shared by ClearScheduleAsync (both overloads) and HasScheduledContentAsync - guards a
+    // ContentScheduleDto against belonging to this repository's entity kind, since ContentSchedules
+    // itself carries no object-type column of its own.
+    private Expression<Func<ContentScheduleDto, bool>> IsForThisObjectType(UmbracoDbContext db) =>
+        cs => db.Nodes.Any(n => n.NodeId == cs.NodeId && n.NodeObjectType == NodeObjectTypeKey);
 
     /// <inheritdoc />
     public virtual Task<IEnumerable<TEntity>> GetContentForExpirationAsync(DateTime date, CancellationToken cancellationToken) =>
@@ -281,11 +288,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
             if (!string.IsNullOrWhiteSpace(contentTypeAlias))
             {
-                query = query
-                    .Join(db.Content, n => n.NodeId, c => c.NodeId, (n, c) => new { n, c })
-                    .Join(db.ContentTypes, joined => joined.c.ContentTypeId, contentType => contentType.NodeId, (joined, contentType) => new { joined.n, contentType })
-                    .Where(joined => joined.contentType.Alias == contentTypeAlias)
-                    .Select(joined => joined.n);
+                query = FilterByContentTypeAlias(query, db, contentTypeAlias);
             }
 
             return await query.CountAsync(cancellationToken);
