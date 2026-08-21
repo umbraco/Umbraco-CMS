@@ -1854,7 +1854,7 @@ export default {
 		tabDirectPropertiesDropZone: 'Drag properties here to place directly on the tab',
 		usingEditor: 'using this editor will get updated with the new settings.',
 		historyCleanupHeading: 'Historikoprydning',
-		historyCleanupDescription: 'Tillad tilsidesættelse af de globale indstillinger for historikoprydning.',
+		historyCleanupDescription: 'Tilsidesæt de globale indstillinger for historikoprydning.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Behold alle versioner nyere end antal dage',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Behold den seneste version pr. dag i antal dage',
 		historyCleanupPreventCleanup: 'Forhindre oprydning',
