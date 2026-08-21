@@ -39,6 +39,7 @@ import type {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
+import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type {
 	UUIInputEvent,
 	UUIPaginationEvent,
@@ -110,6 +111,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	@state()
 	private _searching: boolean = false;
+
+	@state()
+	private _openClipboard = false;
 
 	@query('#dropzone')
 	private _dropzone!: UmbDropzoneMediaElement;
@@ -310,11 +314,11 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			const existingSelection = this.value?.selection ?? [];
 			const newSelection = [...new Set([...existingSelection, ...completedUniques])];
 			this._isSelectionMode = newSelection.length > 0;
-			this.modalContext?.setValue({ selection: newSelection });
+			this.updateValue({ selection: newSelection });
 		} else {
 			// Single selection: select the first uploaded item
 			this._isSelectionMode = true;
-			this.modalContext?.setValue({ selection: [completedUniques[0]] });
+			this.updateValue({ selection: [completedUniques[0]] });
 		}
 	}
 
@@ -366,13 +370,13 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#onSelected(unique: string) {
 		const selection = this.data?.multiple ? [...this.value.selection, unique] : [unique];
 		this._isSelectionMode = selection.length > 0;
-		this.modalContext?.setValue({ selection });
+		this.updateValue({ selection });
 	}
 
 	#onDeselected(unique: string) {
 		const selection = this.value.selection.filter((value) => value !== unique);
 		this._isSelectionMode = selection.length > 0;
-		this.modalContext?.setValue({ selection });
+		this.updateValue({ selection });
 	}
 
 	// TODO: move to search manager in context
@@ -525,7 +529,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('defaultdialogs_chooseMedia')}>
-				${this.#renderBody()} ${this.#renderBreadcrumb()}
+				${this.#renderNavigation()}
+				${this._openClipboard ? this.#renderClipboard() : html`${this.#renderBody()} ${this.#renderBreadcrumb()}`}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -535,6 +540,41 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 						@click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
+		`;
+	}
+
+	#renderNavigation() {
+		if (!this.data?.clipboard?.enabled) return nothing;
+		return html`
+			<uui-tab-group slot="navigation">
+				<uui-tab
+					label=${this.localize.term('general_choose')}
+					?active=${!this._openClipboard}
+					@click=${() => (this._openClipboard = false)}>
+					<umb-icon slot="icon" name="icon-picture"></umb-icon>
+					${this.localize.term('general_choose')}
+				</uui-tab>
+				<uui-tab
+					label=${this.localize.term('general_clipboard')}
+					?active=${this._openClipboard}
+					@click=${() => (this._openClipboard = true)}>
+					<umb-icon slot="icon" name="icon-clipboard"></umb-icon>
+					${this.localize.term('general_clipboard')}
+				</uui-tab>
+			</uui-tab-group>
+		`;
+	}
+
+	#renderClipboard() {
+		return html`
+			<umb-clipboard-entry-picker
+				.selection=${this.value?.clipboard?.selection ?? []}
+				.config=${{
+					multiple: this.data?.multiple ?? false,
+					entryTypes: this.data?.clipboard?.types ?? [],
+					pickableFilter: this.data?.clipboard?.pickableFilter,
+				}}
+				@selection-change=${this.#onClipboardSelectionChange}></umb-clipboard-entry-picker>
 		`;
 	}
 
@@ -651,6 +691,15 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 		`;
 	}
 
+	#onClipboardSelectionChange(event: UmbSelectionChangeEvent) {
+		const target = event.target as HTMLElement & { selection?: Array<string | null> };
+		const selection = (target.selection ?? []).filter(
+			(unique): unique is string => typeof unique === 'string' && unique.length > 0,
+		);
+
+		this.updateValue({ clipboard: { selection } });
+	}
+
 	#renderCard(item: UmbMediaTreeItemModel | UmbMediaSearchItemModel) {
 		const canNavigate = this.#allowNavigateToMedia(item);
 		const selectable = this._selectableFilter(item);
@@ -764,6 +813,12 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	static override styles = [
 		css`
+			uui-tab-group {
+				--uui-tab-divider: var(--uui-color-border);
+				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
+			}
+
 			#toolbar {
 				display: flex;
 				gap: var(--uui-size-6);
