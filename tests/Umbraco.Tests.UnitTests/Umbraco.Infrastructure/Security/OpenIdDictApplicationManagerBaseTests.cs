@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
@@ -145,6 +146,34 @@ public class OpenIdDictApplicationManagerBaseTests
 
         static TestCaseData Case(string name, Action<Mock<IOpenIddictApplicationManager>, object> stubStoredValue)
             => new TestCaseData(stubStoredValue).SetName(name);
+    }
+
+    /// <summary>
+    /// The other direction: state the descriptor carries and the store does not is an addition, and
+    /// an addition is a change.
+    /// </summary>
+    [TestCaseSource(nameof(MetadataHeldByTheDescriptorButNotTheStore))]
+    public async Task CreateOrUpdate_DescriptorMetadataAbsentFromStore_Updates(Action<OpenIddictApplicationDescriptor> mutate)
+    {
+        OpenIddictApplicationDescriptor descriptor = MatchingDescriptor();
+        mutate(descriptor);
+
+        var sut = new TestApplicationManager(_mockApplicationManager.Object);
+
+        await sut.CreateOrUpdateAsync(descriptor);
+
+        VerifyUpdated(Times.Once());
+    }
+
+    private static IEnumerable<TestCaseData> MetadataHeldByTheDescriptorButNotTheStore()
+    {
+        yield return Case("ApplicationType", d => d.ApplicationType = OpenIddictConstants.ApplicationTypes.Web);
+        yield return Case("Requirements", d => d.Requirements.Add(OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange));
+        yield return Case("DisplayNames", d => d.DisplayNames[CultureInfo.GetCultureInfo("da-DK")] = "Testprogram");
+        yield return Case("Properties", d => d.Properties["custom"] = JsonDocument.Parse("\"value\"").RootElement);
+
+        static TestCaseData Case(string name, Action<OpenIddictApplicationDescriptor> mutate)
+            => new TestCaseData(mutate).SetArgDisplayNames(name);
     }
 
     /// <summary>
@@ -299,11 +328,7 @@ public class OpenIdDictApplicationManagerBaseTests
     private static IEnumerable<TestCaseData> UncomparableDescriptorStateCases()
     {
         yield return Case("ClientSecret", d => d.ClientSecret = "a-secret");
-        yield return Case("Requirements", d => d.Requirements.Add("ft:pkce"));
-        yield return Case("ConsentType", d => d.ConsentType = OpenIddictConstants.ConsentTypes.Explicit);
-        yield return Case("ApplicationType", d => d.ApplicationType = OpenIddictConstants.ApplicationTypes.Web);
-        yield return Case("DisplayNames", d => d.DisplayNames[CultureInfo.GetCultureInfo("da-DK")] = "Testprogram");
-        yield return Case("Properties", d => d.Properties["custom"] = JsonDocument.Parse("\"value\"").RootElement);
+        yield return Case("JsonWebKeySet", d => d.JsonWebKeySet = new JsonWebKeySet());
 
         static TestCaseData Case(string name, Action<OpenIddictApplicationDescriptor> mutate)
             => new TestCaseData(mutate).SetArgDisplayNames(name);
