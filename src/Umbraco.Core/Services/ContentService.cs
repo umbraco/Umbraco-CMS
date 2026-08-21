@@ -506,21 +506,16 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return result;
     }
 
-    /// <summary>
-    ///     Gets a collection of an <see cref="IContent" /> objects, which resides in the Recycle Bin
-    /// </summary>
-    /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    public IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null)
+    /// <inheritdoc />
+    public async Task<PagedModel<IContent>> GetPagedContentInRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            ordering ??= Ordering.By("Path");
+        ordering ??= Ordering.By("Path");
 
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent>? query = Query<IContent>()?
-                .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, propertyAliases: null, filter, ordering);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        PagedModel<IContent> result = await _asyncDocumentRepository.GetPagedRecycleBinAsync(skip, take, ordering, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>

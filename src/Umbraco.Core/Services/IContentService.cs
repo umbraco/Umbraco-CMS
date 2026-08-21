@@ -185,9 +185,14 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     IEnumerable<IContent> GetContentForRelease(DateTime date);
 
     /// <summary>
-    ///     Gets documents in the recycle bin.
+    ///     Gets a paged list of documents in the recycle bin.
     /// </summary>
-    IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by path.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching recycle bin items.</returns>
+    Task<PagedModel<IContent>> GetPagedContentInRecycleBinAsync(int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a paged list of direct children of a document node.

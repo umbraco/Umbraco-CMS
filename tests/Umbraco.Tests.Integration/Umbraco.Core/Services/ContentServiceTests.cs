@@ -995,11 +995,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Get_Content_In_RecycleBin()
+    public async Task Can_Get_Content_In_RecycleBin()
     {
         // Arrange
         // Act
-        var contents = ContentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
+        var contents = (await ContentService.GetPagedContentInRecycleBinAsync(0, int.MaxValue, ordering: null, CancellationToken.None)).Items.ToList();
 
         // Assert
         Assert.That(contents, Is.Not.Null);
@@ -2592,17 +2592,17 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.True(descendants.All(x => x.Trashed));
 
         ContentService.EmptyRecycleBin();
-        var trashed = ContentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
+        var trashed = (await ContentService.GetPagedContentInRecycleBinAsync(0, int.MaxValue, ordering: null, CancellationToken.None)).Items.ToList();
         Assert.IsEmpty(trashed);
     }
 
     [Test]
-    public void Can_Empty_RecycleBin()
+    public async Task Can_Empty_RecycleBin()
     {
         // Arrange
         // Act
         ContentService.EmptyRecycleBin();
-        var contents = ContentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
+        var contents = (await ContentService.GetPagedContentInRecycleBinAsync(0, int.MaxValue, ordering: null, CancellationToken.None)).Items.ToList();
 
         // Assert
         Assert.That(contents.Any(), Is.False);
@@ -2806,7 +2806,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Act
         ContentService.MoveToRecycleBin(content1);
         ContentService.EmptyRecycleBin();
-        var contents = ContentService.GetPagedContentInRecycleBin(0, int.MaxValue, out var _).ToList();
+        var contents = (await ContentService.GetPagedContentInRecycleBinAsync(0, int.MaxValue, ordering: null, CancellationToken.None)).Items.ToList();
 
         // Assert
         Assert.That(contents.Any(), Is.False);
