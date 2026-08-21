@@ -389,15 +389,21 @@ export function UmbFormControlMixin<
 		}
 
 		#lastEventType: string | undefined = undefined;
+		#lastMessage: string | undefined = undefined;
 		#dispatchValidationState() {
 			if (this.#validity.valid) {
 				if (this.#lastEventType === UmbValidationValidEvent.TYPE) return;
 				this.#lastEventType = UmbValidationValidEvent.TYPE;
+				this.#lastMessage = this.validationMessage;
 				this.dispatchEvent(new UmbValidationValidEvent());
 			} else if (this._pristine === false) {
+				if (this.#lastEventType === UmbValidationInvalidEvent.TYPE && this.#lastMessage === this.validationMessage) {
+					return;
+				}
 				// Only fire invalid events when the form control is not pristine, as we do not want to show validation messages for untouched form controls. [NL]
 				// Always fire an Invalid event when the validity is invalid, even if the last event was also Invalid, as the message might have changed. [NL]
 				this.#lastEventType = UmbValidationInvalidEvent.TYPE;
+				this.#lastMessage = this.validationMessage;
 				this.dispatchEvent(new UmbValidationInvalidEvent());
 			}
 		}
@@ -433,6 +439,8 @@ export function UmbFormControlMixin<
 			this.#hadFocus = false;
 			this.value = this.getInitialValue() ?? this.getDefaultValue();
 			this.#valueOnFocus = undefined;
+			this.#lastEventType = undefined;
+			this.#lastMessage = undefined;
 		}
 
 		protected getDefaultValue(): DefaultValueType {

@@ -98,7 +98,7 @@ describe('UmbFormControlMixin', () => {
 			await setPristine(true);
 
 			expect(element.validity.valid).to.be.false; // still genuinely invalid underneath.
-			expect(validEvents).to.equal(1); // ...but a Valid event was still dispatched, to clear stale feedback.
+			expect(validEvents).to.equal(0); // ...no Valid event was dispatched, because the field is still invalid.
 		});
 	});
 
