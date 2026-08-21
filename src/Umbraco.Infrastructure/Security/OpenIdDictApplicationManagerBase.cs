@@ -49,19 +49,32 @@ public abstract class OpenIdDictApplicationManagerBase
     {
         for (var attempt = 1; ; attempt++)
         {
+            OpenIddictApplicationDescriptor clientDescriptor = await clientDescriptorFactory(cancellationToken);
+
             try
             {
-                await CreateOrUpdateOnce(clientDescriptorFactory, cancellationToken);
+                await CreateOrUpdateOnce(clientDescriptor, cancellationToken);
                 return;
             }
-            catch (OpenIddictExceptions.ConcurrencyException) when (attempt < MaxCreateOrUpdateAttempts)
+            catch (OpenIddictExceptions.ConcurrencyException exception)
             {
-                // Another instance wrote first, so rebuild the descriptor from current state and retry.
-                // The delay is randomised because every loser of the race throws at the same moment:
-                // retrying in lockstep collides again, letting only one instance through per attempt.
+                if (attempt >= MaxCreateOrUpdateAttempts)
+                {
+                    _logger.LogError(
+                        exception,
+                        "Could not register the OpenIddict application {ClientId} after {MaxAttempts} attempts, as another instance wrote to it on every attempt.",
+                        clientDescriptor.ClientId,
+                        MaxCreateOrUpdateAttempts);
+                    throw;
+                }
+
+                // Another instance wrote first, so retry, when we will rebuild the descriptor from current state.
+                // The delay is randomised because every loser of the race throws at the same moment and we avoid
+                // retrying in lockstep.
                 var backoff = RetryBackoffBaseMilliseconds * (1 << (attempt - 1));
                 _logger.LogDebug(
-                    "Concurrent write registering OpenIddict application, retrying (attempt {Attempt} of {MaxAttempts}).",
+                    "Concurrent write registering OpenIddict application {ClientId}, retrying (attempt {Attempt} of {MaxAttempts}).",
+                    clientDescriptor.ClientId,
                     attempt,
                     MaxCreateOrUpdateAttempts);
                 await Task.Delay(Random.Shared.Next(backoff / 2, backoff + 1), cancellationToken);
@@ -69,9 +82,8 @@ public abstract class OpenIdDictApplicationManagerBase
         }
     }
 
-    private async Task CreateOrUpdateOnce(Func<CancellationToken, Task<OpenIddictApplicationDescriptor>> clientDescriptorFactory, CancellationToken cancellationToken)
+    private async Task CreateOrUpdateOnce(OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
     {
-        OpenIddictApplicationDescriptor clientDescriptor = await clientDescriptorFactory(cancellationToken);
         var identifier = clientDescriptor.ClientId ??
                          throw new ApplicationException($"ClientId is missing for application: {clientDescriptor.DisplayName ?? "(no name)"}");
         var client = await ApplicationManager.FindByClientIdAsync(identifier, cancellationToken);
@@ -109,7 +121,7 @@ public abstract class OpenIdDictApplicationManagerBase
     /// </summary>
     /// <remarks>
     /// Only two qualify. Secrets are stored hashed, so a supplied secret can never be compared and
-    /// skipping it would silently discard a rotated one. <see cref="JsonWebKeySet"/> has no value
+    /// skipping it would silently discard a rotated one. <see cref="OpenIddictApplicationDescriptor.JsonWebKeySet"/> has no value
     /// equality, and comparing a serialised form would be sensitive to key ordering and formatting.
     /// Everything else the descriptor carries is readable through the manager and is compared, so
     /// clearing a value is recognised as a change rather than skipped.
