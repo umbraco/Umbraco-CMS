@@ -163,8 +163,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         bool calculatedPreview = preview ?? GetPreview();
 
         // Capture the generation once before any backing-store read so a concurrent publish/refresh
-        // landing mid-fetch makes us skip the write-back rather than clobber fresher entries — the
-        // same stale-set guard GetNodeAsync applies per key, here applied once for the whole set.
+        // landing mid-fetch makes us skip the write-back rather than clobber fresher entries — applied
+        // once for the whole set, and more conservatively than GetNodeAsync (which exempts HybridCache
+        // hits from the guard, applying it only to the database read).
         var generation = Interlocked.Read(ref _cacheGeneration);
 
         return await TieredResolver.ResolveAsync<Guid, IPublishedContent>(
@@ -189,7 +190,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     }
 
     // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss is
-    // deferred to the single batched database read below.
+    // deferred to the single batched database read below. Keys are probed one at a time: with an
+    // in-memory-only L1 this is N cheap dictionary lookups, but with a distributed L2 (e.g. Redis)
+    // configured, this becomes N serial network round-trips per batch for a partially-warm set.
     private async Task ResolveHybridCacheTierAsync(IReadOnlyCollection<Guid> batchKeys, bool preview, long generation, IDictionary<Guid, IPublishedContent> results)
     {
         foreach (Guid key in batchKeys)
