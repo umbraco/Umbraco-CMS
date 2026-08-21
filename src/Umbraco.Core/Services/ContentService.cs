@@ -515,19 +515,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     /// <summary>
-    ///     Gets all published content items
-    /// </summary>
-    /// <returns></returns>
-    internal IEnumerable<IContent> GetAllPublished()
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.Get(QueryNotTrashed);
-        }
-    }
-
-    /// <summary>
     ///     Gets a collection of an <see cref="IContent" /> objects, which resides in the Recycle Bin
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
