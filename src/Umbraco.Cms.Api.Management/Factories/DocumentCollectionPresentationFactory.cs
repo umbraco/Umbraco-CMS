@@ -1,8 +1,10 @@
 using Lucene.Net.Util;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -16,7 +18,6 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class DocumentCollectionPresentationFactory : ContentCollectionPresentationFactory<IContent, DocumentCollectionResponseModel, DocumentValueResponseModel, DocumentVariantResponseModel>, IDocumentCollectionPresentationFactory
 {
     private readonly IPublicAccessService _publicAccessService;
-    private readonly IEntityService _entityService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentCollectionPresentationFactory"/> class,
@@ -28,11 +29,8 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
     /// <param name="entityService">The service used to interact with Umbraco entities.</param>
     /// <param name="userService">The service used to manage user information and permissions.</param>
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService, IUserService userService)
-        : base(mapper, flagProviders, userService)
-    {
-        _publicAccessService = publicAccessService;
-        _entityService = entityService;
-    }
+        : base(mapper, flagProviders, userService, entityService)
+        => _publicAccessService = publicAccessService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.DocumentCollectionPresentationFactory"/> class.
@@ -43,10 +41,13 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
     /// <param name="entityService">Service for interacting with Umbraco entities.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IPublicAccessService publicAccessService, IEntityService entityService)
-        : base(mapper, flagProviders)
+        : this(
+            mapper,
+            flagProviders,
+            publicAccessService,
+            entityService,
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
     {
-        _publicAccessService = publicAccessService;
-        _entityService = entityService;
     }
 
     /// <summary>
@@ -57,10 +58,12 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
     /// <param name="entityService">Service for interacting with Umbraco entities.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DocumentCollectionPresentationFactory(IUmbracoMapper mapper, IPublicAccessService publicAccessService, IEntityService entityService)
-        : base(mapper)
+        : this(
+            mapper,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+            publicAccessService,
+            entityService)
     {
-        _publicAccessService = publicAccessService;
-        _entityService = entityService;
     }
 
     /// <inheritdoc/>
@@ -86,7 +89,7 @@ public class DocumentCollectionPresentationFactory : ContentCollectionPresentati
             }
 
             item.IsProtected = IsProtected(matchingContentItem, protectedNodeIds);
-            sharedAncestors ??= _entityService.GetPathKeys(matchingContentItem, omitSelf: true)
+            sharedAncestors ??= EntityService.GetPathKeys(matchingContentItem, omitSelf: true)
                 .Select(x => new ReferenceByIdModel(x))
                 .ToArray();
             item.Ancestors = sharedAncestors;

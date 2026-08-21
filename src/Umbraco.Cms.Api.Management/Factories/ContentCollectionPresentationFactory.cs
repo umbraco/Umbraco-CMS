@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -25,16 +26,49 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     private readonly IUmbracoMapper _mapper;
     private readonly IUserService _userService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCollectionPresentationFactory{TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel}"/> class.
+    /// </summary>
+    /// <param name="mapper">The mapper used to map content items to collection response models.</param>
+    /// <param name="flagProviderCollection">The collection of flag providers used to populate flags on the response models.</param>
+    /// <param name="userService">The service used to resolve the names of the creating and updating users.</param>
+    /// <param name="entityService">The service used to resolve which items have children.</param>
     protected ContentCollectionPresentationFactory(
         IUmbracoMapper mapper,
         FlagProviderCollection flagProviderCollection,
-        IUserService userService)
+        IUserService userService,
+        IEntityService entityService)
     {
         _mapper = mapper;
         _flagProviderCollection = flagProviderCollection;
         _userService = userService;
+        EntityService = entityService;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCollectionPresentationFactory{TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel}"/> class.
+    /// </summary>
+    /// <param name="mapper">The mapper used to map content items to collection response models.</param>
+    /// <param name="flagProviderCollection">The collection of flag providers used to populate flags on the response models.</param>
+    /// <param name="userService">The service used to resolve the names of the creating and updating users.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    protected ContentCollectionPresentationFactory(
+        IUmbracoMapper mapper,
+        FlagProviderCollection flagProviderCollection,
+        IUserService userService)
+        : this(
+            mapper,
+            flagProviderCollection,
+            userService,
+            StaticServiceProvider.Instance.GetRequiredService<IEntityService>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCollectionPresentationFactory{TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel}"/> class.
+    /// </summary>
+    /// <param name="mapper">The mapper used to map content items to collection response models.</param>
+    /// <param name="flagProviderCollection">The collection of flag providers used to populate flags on the response models.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     protected ContentCollectionPresentationFactory(
         IUmbracoMapper mapper,
@@ -46,6 +80,10 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentCollectionPresentationFactory{TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel}"/> class.
+    /// </summary>
+    /// <param name="mapper">The mapper used to map content items to collection response models.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     protected ContentCollectionPresentationFactory(IUmbracoMapper mapper)
         : this(
@@ -53,6 +91,11 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
             StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
     {
     }
+
+    /// <summary>
+    /// Gets the service used to interact with Umbraco entities.
+    /// </summary>
+    protected IEntityService EntityService { get; }
 
     /// <summary>
     /// Asynchronously creates a list of collection response models from the specified paged content collection.
@@ -82,12 +125,56 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
 
         await SetUnmappedProperties(contentCollection, collectionResponseModels);
 
+        PopulateHasChildren(collectionResponseModels);
+
         await PopulateFlags(collectionResponseModels);
 
         return collectionResponseModels;
     }
 
     protected virtual Task SetUnmappedProperties(ListViewPagedModel<TContent> contentCollection, List<TCollectionResponseModel> collectionResponseModels) => Task.CompletedTask;
+
+    /// <summary>
+    /// Gets the object type of the items in the collection, used to resolve whether each item has children.
+    /// </summary>
+    /// <remarks>
+    /// When this resolves to <see cref="UmbracoObjectTypes.Unknown" />, items are left reporting no children.
+    /// </remarks>
+    protected virtual UmbracoObjectTypes ItemObjectType => typeof(TContent) switch
+    {
+        Type type when typeof(IContent).IsAssignableFrom(type) => UmbracoObjectTypes.Document,
+        Type type when typeof(IMedia).IsAssignableFrom(type) => UmbracoObjectTypes.Media,
+        Type type when typeof(IMember).IsAssignableFrom(type) => UmbracoObjectTypes.Member,
+        _ => UmbracoObjectTypes.Unknown,
+    };
+
+    private void PopulateHasChildren(List<TCollectionResponseModel> models)
+    {
+        UmbracoObjectTypes itemObjectType = ItemObjectType;
+        if (itemObjectType == UmbracoObjectTypes.Unknown)
+        {
+            return;
+        }
+
+        (Guid Key, IHasChildren Target)[] targets = models
+            .Where(model => model is IHasChildren)
+            .Select(model => (model.Id, (IHasChildren)model))
+            .ToArray();
+
+        if (targets.Length == 0)
+        {
+            return;
+        }
+
+        ISet<Guid> keysWithChildren = EntityService.GetKeysWithChildren(
+            itemObjectType,
+            targets.Select(target => target.Key));
+
+        foreach ((Guid key, IHasChildren target) in targets)
+        {
+            target.HasChildren = keysWithChildren.Contains(key);
+        }
+    }
 
     private async Task PopulateFlags(IEnumerable<TCollectionResponseModel> models)
     {

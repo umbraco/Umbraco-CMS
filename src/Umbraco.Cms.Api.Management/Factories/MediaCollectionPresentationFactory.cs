@@ -18,6 +18,19 @@ public class MediaCollectionPresentationFactory : ContentCollectionPresentationF
     /// <param name="mapper">An <see cref="IUmbracoMapper"/> instance used to map domain objects to presentation models.</param>
     /// <param name="flagProviders">A collection of <see cref="FlagProviderCollection"/> used to provide additional flags or metadata for media items.</param>
     /// <param name="userService">An <see cref="IUserService"/> used to perform user-related operations, such as permissions checks.</param>
+    /// <param name="entityService">An <see cref="IEntityService"/> used to resolve which items have children.</param>
+    public MediaCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IUserService userService, IEntityService entityService)
+        : base(mapper, flagProviders, userService, entityService)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaCollectionPresentationFactory"/> class, which is responsible for creating media collection presentation models.
+    /// </summary>
+    /// <param name="mapper">An <see cref="IUmbracoMapper"/> instance used to map domain objects to presentation models.</param>
+    /// <param name="flagProviders">A collection of <see cref="FlagProviderCollection"/> used to provide additional flags or metadata for media items.</param>
+    /// <param name="userService">An <see cref="IUserService"/> used to perform user-related operations, such as permissions checks.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public MediaCollectionPresentationFactory(IUmbracoMapper mapper, FlagProviderCollection flagProviders, IUserService userService)
         : base(mapper, flagProviders, userService)
     {
