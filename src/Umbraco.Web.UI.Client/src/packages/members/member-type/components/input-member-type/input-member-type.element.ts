@@ -1,7 +1,7 @@
 import { UmbMemberTypePickerInputContext } from './input-member-type.context.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { isBelowMinItemCount, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbTreeItemModel } from '@umbraco-cms/backoffice/tree';
@@ -88,7 +88,7 @@ export class UmbInputMemberTypeElement extends UmbFormControlMixin<string | unde
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isBelowMinItemCount(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

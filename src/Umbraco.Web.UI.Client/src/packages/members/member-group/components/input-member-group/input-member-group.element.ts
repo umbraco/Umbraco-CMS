@@ -7,7 +7,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import {
+	isBelowMinItemCount,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+} from '@umbraco-cms/backoffice/validation';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import '@umbraco-cms/backoffice/entity-item';
 
@@ -160,7 +164,7 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isBelowMinItemCount(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

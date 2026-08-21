@@ -4,6 +4,7 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { isBelowMinItemCount } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-stylesheet-input')
 export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -81,7 +82,7 @@ export class UmbStylesheetInputElement extends UUIFormControlMixin(UmbLitElement
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+			() => isBelowMinItemCount(this.#pickerContext.getSelection().length, this.min),
 		);
 
 		this.addValidator(

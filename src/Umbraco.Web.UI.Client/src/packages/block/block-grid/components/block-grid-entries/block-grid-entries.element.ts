@@ -18,7 +18,7 @@ import {
 	getInterpolatedIndexOfPositionInWeightMap,
 	isWithinRect,
 } from '@umbraco-cms/backoffice/utils';
-import { UmbFormControlMixin, UmbFormControlValidator } from '@umbraco-cms/backoffice/validation';
+import { isBelowMinItemCount, UmbFormControlMixin, UmbFormControlValidator } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -316,7 +316,7 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 						(rangeLimit!.min ?? 0) - this._layoutEntries.length,
 					);
 				},
-				() => this._layoutEntries.length < (rangeLimit?.min ?? 0),
+				() => isBelowMinItemCount(this._layoutEntries.length, rangeLimit?.min),
 			);
 		}
 

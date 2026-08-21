@@ -1,6 +1,7 @@
 using System.Globalization;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -13,6 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class EntityDataPickerPropertyValueEditorTests
 {
+    [TestCase(0, true)]
     [TestCase(1, false)]
     [TestCase(2, true)]
     [TestCase(3, true)]
@@ -65,6 +67,39 @@ public class EntityDataPickerPropertyValueEditorTests
         }
     }
 
+    [TestCase(null)]
+    [TestCase("{\"ids\":[]}")]
+    public void Can_Validate_Empty_Value_When_Minimum_Configured_And_Not_Mandatory(string? value)
+    {
+        var editor = CreateValueEditor();
+
+        var result = editor.Validate(value, false, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(result);
+    }
+
+    [TestCase(null, Constants.Validation.ErrorMessages.Properties.Missing)]
+    [TestCase("{\"ids\":[]}", Constants.Validation.ErrorMessages.Properties.Empty)]
+    public void Cannot_Validate_Empty_Value_When_Mandatory(string? value, string expectedErrorMessage)
+    {
+        var editor = CreateValueEditor();
+
+        var result = editor.Validate(value, true, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(expectedErrorMessage, result.First().ErrorMessage);
+    }
+
+    [Test]
+    public void Can_Validate_Populated_Value_When_Mandatory()
+    {
+        var editor = CreateValueEditor();
+
+        var result = editor.Validate("{\"ids\":[\"1\",\"2\"]}", true, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(result);
+    }
+
     private static EntityDataPickerPropertyEditor.EntityDataPickerPropertyValueEditor CreateValueEditor()
     {
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
@@ -78,7 +113,7 @@ public class EntityDataPickerPropertyValueEditorTests
             Mock.Of<IShortStringHelper>(),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias"),
+            new DataEditorAttribute("alias") { ValueType = ValueTypes.Json },
             localizedTextServiceMock.Object)
         {
             ConfigurationObject = new EntityDataPickerConfiguration

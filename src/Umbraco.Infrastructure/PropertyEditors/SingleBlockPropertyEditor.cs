@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PropertyEditors;
@@ -132,6 +133,9 @@ public class SingleBlockPropertyEditor : DataEditor
             Validators.Add(new BlockEditorValidator<SingleBlockValue, SingleBlockLayoutItem>(propertyValidationService, BlockEditorValues, elementTypeCache));
             Validators.Add(new SingleBlockValidator(BlockEditorValues, textService));
         }
+
+        /// <inheritdoc />
+        public override IValueRequiredValidator RequiredValidator => new BlockEditorValueRequiredValidator<SingleBlockValue>(JsonSerializer);
 
         protected override SingleBlockValue CreateWithLayout(IEnumerable<SingleBlockLayoutItem> layout) =>
             new(layout.Single());
