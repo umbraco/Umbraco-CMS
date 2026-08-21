@@ -82,6 +82,11 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				}
 
 				const element = await createExtensionElement(manifest);
+
+				// Views are imported on demand, so a slow import must not replace the view that became the current one
+				// while it was in flight.
+				if (manifest.alias !== this.#collectionContext?.view.getCurrentView()?.alias) return;
+
 				if (element) {
 					element.setAttribute('data-mark', `collection-view:${manifest.alias}`);
 					(element as UmbCollectionViewElementBase).manifest = manifest;
