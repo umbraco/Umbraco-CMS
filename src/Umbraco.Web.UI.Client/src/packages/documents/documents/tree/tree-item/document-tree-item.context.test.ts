@@ -5,9 +5,21 @@ import { UmbDefaultTreeContext, UmbTreeItemOpenEvent } from '@umbraco-cms/backof
 import { aTimeout, expect, oneEvent } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-test-document-tree-item-host')
 class UmbTestDocumentTreeItemHostElement extends UmbElementMixin(HTMLElement) {}
+
+/**
+ * Reads the current value of an observable synchronously.
+ * @param {Observable<T>} observable - The observable to read.
+ * @returns {T} Its current value.
+ */
+function observeOnce<T>(observable: Observable<T>): T {
+	let value!: T;
+	observable.subscribe((next) => (value = next)).unsubscribe();
+	return value;
+}
 
 function createTreeItem(
 	hasCollection: boolean,
@@ -110,7 +122,9 @@ describe('UmbDocumentTreeItemContext', () => {
 
 	describe('collection item in a picker', () => {
 		beforeEach(async () => {
-			// A picker is not a menu.
+			// A picker is not a menu, but it does enter opened items — which is what makes entering a collection possible
+			// at all.
+			treeContext.setCanEnterItems(true);
 			context.setTreeItem(createTreeItem(true));
 			await aTimeout(0);
 		});
@@ -136,6 +150,34 @@ describe('UmbDocumentTreeItemContext', () => {
 			expect(event.unique).to.equal('document-unique-id');
 			expect(event.entityType).to.equal(UMB_DOCUMENT_ENTITY_TYPE);
 			expect(collapseCalls).to.equal(0);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+	});
+
+	// Opening asks the host to enter the item, so where the host does not, it does nothing. Entering a collection there
+	// would replace the expand caret with an affordance that cannot act, leaving the whole subtree unreachable.
+	describe('collection item in a tree that cannot enter items', () => {
+		beforeEach(async () => {
+			context.setTreeItem(createTreeItem(true));
+			await aTimeout(0);
+		});
+
+		it('does not offer to be entered', () => {
+			expect(context.getCanEnterItems()).to.be.false;
+			expect(observeOnce(context.canEnterCollection)).to.be.false;
+		});
+
+		it('expands its children on showChildren', () => {
+			context.showChildren();
+
+			expect(expandCalls).to.equal(1);
+			expect(pushStateCalls.length).to.equal(0);
+		});
+
+		it('collapses its children on hideChildren', () => {
+			context.hideChildren();
+
+			expect(collapseCalls).to.equal(1);
 			expect(pushStateCalls.length).to.equal(0);
 		});
 	});
@@ -187,6 +229,8 @@ describe('UmbDocumentTreeItemContext', () => {
 		});
 
 		it('expands its children in a picker instead of emitting the open event', async () => {
+			// Declared browsable, so it is the no-access rule being tested and not the absence of a browsing host.
+			treeContext.setCanEnterItems(true);
 			context.setTreeItem(createTreeItem(true, { noAccess: true }));
 			await aTimeout(0);
 

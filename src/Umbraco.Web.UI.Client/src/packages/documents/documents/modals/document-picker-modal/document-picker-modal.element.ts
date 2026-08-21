@@ -480,6 +480,7 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 				alias=${ifDefined(this.data?.treeAlias)}
 				.props=${{
 					showToolbar: true,
+					canEnterItems: true,
 					hideTreeItemActions: true,
 					hideTreeRoot: this.data?.hideTreeRoot,
 					expandTreeRoot: this.data?.expandTreeRoot,
