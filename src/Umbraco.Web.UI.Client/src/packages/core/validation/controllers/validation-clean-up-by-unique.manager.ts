@@ -2,7 +2,7 @@ import { extractJsonQueryProps } from '../utils/extract-json-query-properties.fu
 import { umbGetFirstJsonPathBracket } from '../utils/first-json-path-bracket.function.js';
 import type { UmbValidationController } from './validation.controller.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
@@ -14,7 +14,6 @@ export type UmbValidationCleanUpGetUniqueMethod = (queryParams: Record<string, s
 
 /**
  * Removes the validation messages of items based on observation of uniques.
- *
  * @example
  * ```ts
  * new UmbValidationCleanUpByUniqueManager(
@@ -41,9 +40,10 @@ export class UmbValidationCleanUpByUniqueManager extends UmbControllerBase {
 	 * Creates an instance of UmbValidationCleanUpByUniqueManager.
 	 * @param {UmbControllerHost} host - The host of this controller.
 	 * @param {UmbValidationController} validationController - The Validation Context to remove messages from.
-	 * @param {string} scopePath - The JSON-Path prefix to scan for messages, e.g. `$.values`.
+	 * @param {string} scopePath - The JSON-Path prefix to scan for messages, e.g. `$.values`. Must not contain a bracket itself, as the first bracket found under it is assumed to be the item's own.
 	 * @param {Observable<Array<string>>} uniques - An Observable of the currently known unique identifiers.
 	 * @param {UmbValidationCleanUpGetUniqueMethod} getUniqueMethod - Resolves the unique identifier of a message's first-bracket query parameters.
+	 * @param {UmbControllerAlias} [controllerAlias] - An optional controller alias, enables replacing this manager with a new one.
 	 */
 	constructor(
 		host: UmbControllerHost,
@@ -51,8 +51,9 @@ export class UmbValidationCleanUpByUniqueManager extends UmbControllerBase {
 		scopePath: string,
 		uniques: Observable<Array<string> | undefined>,
 		getUniqueMethod: UmbValidationCleanUpGetUniqueMethod,
+		controllerAlias?: UmbControllerAlias,
 	) {
-		super(host);
+		super(host, controllerAlias ?? `validation-clean-up-by-unique-manager[${scopePath}]`);
 		this.#validation = validationController;
 		this.#scopePath = scopePath;
 		this.#getUniqueMethod = getUniqueMethod;

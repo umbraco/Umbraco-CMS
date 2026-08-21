@@ -2,7 +2,6 @@ import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockExposeModel } from '../types.js';
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME } from '../constants.js';
-import { UmbDataPathGeneratorForBlockElementData } from '../validation/data-path-generator-for-element-data.function.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -30,7 +29,7 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import {
 	UMB_VALIDATION_CONTEXT,
-	UmbValidationCleanUpManager,
+	UmbValidationCleanUpByUniqueManager,
 	type UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
 
@@ -84,9 +83,11 @@ export abstract class UmbBlockManagerContext<
 
 	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly contents = this.#contents.asObservable();
+	readonly #contentKeys = this.#contents.asObservablePart((x) => x.map((y) => y.key));
 
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
+	readonly #settingsKeys = this.#settings.asObservablePart((x) => x.map((y) => y.key));
 
 	// TODO: This is a bad seperation of concerns, this should be self initializing, not defined from the outside. [NL]
 	public readonly readOnlyState = new UmbReadOnlyVariantGuardManager(this);
@@ -207,18 +208,20 @@ export abstract class UmbBlockManagerContext<
 			return;
 		}
 
-		new UmbValidationCleanUpManager<UmbBlockDataModel>(
+		new UmbValidationCleanUpByUniqueManager(
 			this,
 			context,
-			this.contents,
-			(content) => UmbDataPathGeneratorForBlockElementData(UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME, content),
+			`$.${UMB_BLOCK_CONTENT_DATA_PATH_PROPERTY_NAME}`,
+			this.#contentKeys,
+			(queryParams) => queryParams.key,
 			UMB_CONTENT_VALIDATION_CLEAN_UP_ALIAS,
 		);
-		new UmbValidationCleanUpManager<UmbBlockDataModel>(
+		new UmbValidationCleanUpByUniqueManager(
 			this,
 			context,
-			this.settings,
-			(settings) => UmbDataPathGeneratorForBlockElementData(UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME, settings),
+			`$.${UMB_BLOCK_SETTINGS_DATA_PATH_PROPERTY_NAME}`,
+			this.#settingsKeys,
+			(queryParams) => queryParams.key,
 			UMB_SETTINGS_VALIDATION_CLEAN_UP_ALIAS,
 		);
 	}

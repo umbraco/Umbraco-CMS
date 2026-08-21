@@ -23,11 +23,11 @@ export type UmbValidationDataPathResolver<ItemType> = (item: ItemType) => string
  * what was removed before this manager began observing.
  * @example
  * ```ts
- * new UmbValidationCleanUpManager<UmbBlockDataModel>(
+ * new UmbValidationCleanUpManager<PropertyEditorSettingsProperty>(
  * 	this,
- * 	validationContext,
- * 	this.contents,
- * 	(content) => `$.contentData[?(@.key == '${content.key}')]`,
+ * 	this.validationContext,
+ * 	this.properties,
+ * 	(property) => `$.values[${UmbDataPathPropertyValueQuery(property)}]`,
  * );
  * ```
  */

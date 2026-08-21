@@ -160,6 +160,47 @@ describe('UmbValidationCleanUpByUniqueManager', () => {
 		expect(() => uniques.removeOne('title')).to.not.throw();
 	});
 
+	it('replaces a previous manager registered under the same controllerAlias', async () => {
+		const alias = Symbol();
+		const otherUniques = new UmbArrayState<string>([], (x) => x);
+
+		validation.messages.addMessage('server', propertyPath('title'), 'error-title');
+		uniques.setValue(['title']);
+		otherUniques.setValue(['heading']);
+
+		new UmbValidationCleanUpByUniqueManager(host, validation, '$.values', uniques.asObservable(), byAlias, alias);
+		// Registering a second manager under the same alias replaces the first: [NL]
+		new UmbValidationCleanUpByUniqueManager(host, validation, '$.values', otherUniques.asObservable(), byAlias, alias);
+
+		uniques.removeOne('title');
+
+		expect(validation.messages.getHasAnyMessages()).to.be.true;
+	});
+
+	it('cleans up a Block-shaped scope, matching only the Block whose key was removed', async () => {
+		const contentDataPath = (key: string) => `$.contentData[?(@.key == '${key}')]`;
+		const byKey = (queryParams: Record<string, string>) => queryParams.key;
+
+		validation.messages.addMessage(
+			'server',
+			`${contentDataPath('a')}.values[?(@.alias == 'headline')].value`,
+			'error-a',
+		);
+		validation.messages.addMessage(
+			'server',
+			`${contentDataPath('b')}.values[?(@.alias == 'headline')].value`,
+			'error-b',
+		);
+		uniques.setValue(['a', 'b']);
+
+		new UmbValidationCleanUpByUniqueManager(host, validation, '$.contentData', uniques.asObservable(), byKey);
+
+		uniques.removeOne('a');
+
+		expect(validation.messages.getMessages()?.length).to.equal(1);
+		expect(validation.messages.getMessages()?.[0].body).to.equal('error-b');
+	});
+
 	it('works with a getUniqueMethod resolving a different query field, e.g. an id (Content-Type property convention)', async () => {
 		const idPath = (id: string) => `$.properties[?(@.id == '${id}')].name`;
 		validation.messages.addMessage('server', idPath('11111111-1111-1111-1111-111111111111'), 'error-name');
