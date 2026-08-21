@@ -83,11 +83,12 @@ public class OpenIdDictApplicationManagerBaseTests
     }
 
     /// <summary>
-    /// A descriptor that clears a value the store still holds is a change, so it must be written.
+    /// A descriptor asking for a value the store does not hold is a change, so it must be written.
     /// </summary>
     /// <remarks>
-    /// Treating an unset value as "nothing to compare" leaves the stored value in place and ignores
-    /// the removal, which is silent because the caller sees a successful call either way.
+    /// Only the descriptor-specifies-a-value direction is asserted. The store substitutes a default
+    /// for an unset consent type, so a descriptor that leaves it unset is not expressing a removal
+    /// and there is no cleared case to assert.
     /// </remarks>
     [TestCase(null, OpenIddictConstants.ConsentTypes.Explicit, TestName = "ConsentType added")]
     public async Task CreateOrUpdate_ConsentTypeDiffersFromStored_Updates(string? stored, string? descriptorValue)
