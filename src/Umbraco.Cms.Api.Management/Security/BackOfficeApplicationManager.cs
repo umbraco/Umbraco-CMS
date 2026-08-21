@@ -40,14 +40,13 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         IWebHostEnvironment webHostEnvironment,
         IOptions<SecuritySettings> securitySettings,
         IRuntimeState runtimeState)
-        : base(applicationManager)
+        : this(
+            applicationManager,
+            webHostEnvironment,
+            securitySettings,
+            runtimeState,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<BackOfficeApplicationManager>>())
     {
-        _webHostEnvironment = webHostEnvironment;
-        _runtimeState = runtimeState;
-        _backOfficeHost = securitySettings.Value.BackOfficeHost;
-        _authorizeCallbackPathName = securitySettings.Value.AuthorizeCallbackPathName;
-        _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
-        _logger = StaticServiceProvider.Instance.GetRequiredService<ILogger<BackOfficeApplicationManager>>();
     }
 
     /// <summary>
