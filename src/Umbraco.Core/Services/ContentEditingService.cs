@@ -225,14 +225,13 @@ internal sealed class ContentEditingService
             }
         }
 
-        // if the property varies by culture, simply overwrite the edited property value with the current property value for every culture
+        // If the property varies by culture, simply overwrite the edited property value with the current property value
+        // for every culture.
         foreach (IProperty property in variantProperties)
         {
             foreach (var culture in disallowedCultures)
             {
-                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
-                        .GetValue(culture, null, false);
-                    property.SetValue(currentValue, culture, null);
+                RestoreExistingPropertyValues(property, existingContent, culture);
             }
         }
 
@@ -241,9 +240,7 @@ internal sealed class ContentEditingService
         {
             foreach (IProperty property in invariantProperties)
             {
-                var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
-                    .GetValue(null, null, false);
-                property.SetValue(currentValue, null, null);
+                RestoreExistingPropertyValues(property, existingContent, null);
             }
         }
 
@@ -251,23 +248,62 @@ internal sealed class ContentEditingService
         // we need perform a merge between the edited property value and the current property value
         foreach ((IProperty Property, IDataEditor DataEditor) propertyWithEditor in invariantWithVariantSupportProperties)
         {
-            var currentValue = existingContent?.Properties.First(x => x.Alias == propertyWithEditor.Property.Alias)
-                .GetValue(null, null, false);
-            var editedValue = contentWithPotentialUnallowedChanges.Properties
-                .First(x => x.Alias == propertyWithEditor.Property.Alias).GetValue(null, null, false);
+            IProperty property = propertyWithEditor.Property;
+            IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
 
-            // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
-            var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
-                currentValue,
-                editedValue,
-                ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
-                allowedCultures);
+            // The property may vary by segment, in which case each segment holds its own value to merge.
+            foreach (var segment in GetSegmentsToRestore(property, existingProperty, null))
+            {
+                var currentValue = existingProperty?.GetValue(null, segment, false);
+                var editedValue = property.GetValue(null, segment, false);
 
-            propertyWithEditor.Property.SetValue(mergedValue, null, null);
+                // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
+                var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
+                    currentValue,
+                    editedValue,
+                    ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
+                    allowedCultures);
+
+                property.SetValue(mergedValue, null, segment);
+            }
         }
 
         return contentWithPotentialUnallowedChanges;
     }
+
+    /// <summary>
+    /// Overwrites the edited values of a property for one culture with the values held by the existing content.
+    /// </summary>
+    /// <remarks>
+    /// The property may vary by segment, so every segment of the culture has to be restored, not only its
+    /// segment-less value - including any segment the edit added, which is restored to no value.
+    /// </remarks>
+    private static void RestoreExistingPropertyValues(IProperty property, IContent? existingContent, string? culture)
+    {
+        IProperty? existingProperty = existingContent?.Properties.First(x => x.Alias == property.Alias);
+
+        foreach (var segment in GetSegmentsToRestore(property, existingProperty, culture))
+        {
+            property.SetValue(existingProperty?.GetValue(culture, segment, false), culture, segment);
+        }
+    }
+
+    /// <summary>
+    /// Gets every segment of a culture held by either the edited or the existing property, along with the
+    /// segment-less value, so all of them can be restored or merged.
+    /// </summary>
+    /// <remarks>
+    /// Materialized because writing to a segment can add a property value, which would otherwise modify the
+    /// collection being enumerated.
+    /// </remarks>
+    private static string?[] GetSegmentsToRestore(IProperty property, IProperty? existingProperty, string? culture)
+        => property.Values
+            .Concat(existingProperty?.Values ?? [])
+            .Where(value => culture.InvariantEquals(value.Culture))
+            .Select(value => value.Segment)
+            .Append(null)
+            .Distinct()
+            .ToArray();
 
     private async Task<HashSet<string>> GetAllowedCulturesForEditingUser(Guid userKey)
     {
