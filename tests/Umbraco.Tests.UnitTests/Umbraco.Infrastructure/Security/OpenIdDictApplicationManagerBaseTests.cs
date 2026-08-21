@@ -106,15 +106,14 @@ public class OpenIdDictApplicationManagerBaseTests
     }
 
     /// <summary>
-    /// The same, for the remaining readable metadata.
+    /// The same, for the remaining readable metadata: state the store holds and the descriptor does
+    /// not is a removal, and a removal is a change.
     /// </summary>
-    [Test]
-    public async Task CreateOrUpdate_RequirementsClearedOnDescriptor_Updates()
+    [TestCaseSource(nameof(MetadataHeldByTheStoreButNotTheDescriptor))]
+    public async Task CreateOrUpdate_StoredMetadataAbsentFromDescriptor_Updates(
+        Action<Mock<IOpenIddictApplicationManager>, object> stubStoredValue)
     {
-        _mockApplicationManager
-            .Setup(x => x.GetRequirementsAsync(_storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(ImmutableArray.Create(OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange));
-
+        stubStoredValue(_mockApplicationManager, _storedApplication);
         var sut = new TestApplicationManager(_mockApplicationManager.Object);
 
         await sut.CreateOrUpdateAsync(MatchingDescriptor());
@@ -122,34 +121,30 @@ public class OpenIdDictApplicationManagerBaseTests
         VerifyUpdated(Times.Once());
     }
 
-    [Test]
-    public async Task CreateOrUpdate_DisplayNamesClearedOnDescriptor_Updates()
+    private static IEnumerable<TestCaseData> MetadataHeldByTheStoreButNotTheDescriptor()
     {
-        _mockApplicationManager
-            .Setup(x => x.GetDisplayNamesAsync(_storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(ImmutableDictionary<CultureInfo, string>.Empty
-                .Add(CultureInfo.GetCultureInfo("da-DK"), "Testprogram"));
+        yield return Case(
+            "Requirements",
+            (mock, stored) => mock
+                .Setup(x => x.GetRequirementsAsync(stored, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ImmutableArray.Create(OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange)));
 
-        var sut = new TestApplicationManager(_mockApplicationManager.Object);
+        yield return Case(
+            "DisplayNames",
+            (mock, stored) => mock
+                .Setup(x => x.GetDisplayNamesAsync(stored, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ImmutableDictionary<CultureInfo, string>.Empty
+                    .Add(CultureInfo.GetCultureInfo("da-DK"), "Testprogram")));
 
-        await sut.CreateOrUpdateAsync(MatchingDescriptor());
+        yield return Case(
+            "Properties",
+            (mock, stored) => mock
+                .Setup(x => x.GetPropertiesAsync(stored, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty
+                    .Add("custom", JsonDocument.Parse("\"value\"").RootElement)));
 
-        VerifyUpdated(Times.Once());
-    }
-
-    [Test]
-    public async Task CreateOrUpdate_PropertiesClearedOnDescriptor_Updates()
-    {
-        _mockApplicationManager
-            .Setup(x => x.GetPropertiesAsync(_storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty
-                .Add("custom", JsonDocument.Parse("\"value\"").RootElement));
-
-        var sut = new TestApplicationManager(_mockApplicationManager.Object);
-
-        await sut.CreateOrUpdateAsync(MatchingDescriptor());
-
-        VerifyUpdated(Times.Once());
+        static TestCaseData Case(string name, Action<Mock<IOpenIddictApplicationManager>, object> stubStoredValue)
+            => new TestCaseData(stubStoredValue).SetName(name);
     }
 
     /// <summary>
