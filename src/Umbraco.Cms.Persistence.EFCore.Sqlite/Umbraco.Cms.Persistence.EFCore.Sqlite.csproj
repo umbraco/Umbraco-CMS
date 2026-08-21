@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <!-- Take top-level dependency on SQLitePCLRaw.lib.e_sqlite3, because Microsoft.EntityFrameworkCore.Sqlite depends on a vulnerable version -->
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" />
   </ItemGroup>
 
   <ItemGroup>
