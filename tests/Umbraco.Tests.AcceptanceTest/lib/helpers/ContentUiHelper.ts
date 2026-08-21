@@ -325,7 +325,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.documentNotificationsModal = page.locator('umb-document-notifications-modal');
     this.documentNotificationsSaveBtn = this.documentNotificationsModal.getByLabel('Save', {exact: true});
     this.emptyRecycleBinBtn = page.getByTestId('entity-action:Umb.EntityAction.Document.RecycleBin.Empty').locator('#button');
-    this.confirmEmptyRecycleBinBtn = page.locator('#confirm').getByLabel('Empty recycle bin', {exact: true});
+    this.confirmEmptyRecycleBinBtn = page.locator('umb-confirm-modal').locator('#confirm');
     this.duplicateToBtn = page.getByRole('button', {name: 'Duplicate to'});
     this.moveToBtn = page.getByRole('button', {name: 'Move to'});
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
@@ -1296,10 +1296,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickConfirmEmptyRecycleBinButton() {
-    // The confirm dialog can re-render after opening, detaching the button; retry the click until it lands.
-    await expect(async () => {
-      await this.click(this.confirmEmptyRecycleBinBtn, {force: true, timeout: ConstantHelper.timeout.short});
-    }).toPass({timeout: ConstantHelper.timeout.medium});
+    await this.click(this.confirmEmptyRecycleBinBtn);
   }
 
   async isDocumentPropertyEditable(propertyName: string, isEditable: boolean = true) {
