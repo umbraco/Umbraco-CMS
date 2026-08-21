@@ -2319,7 +2319,7 @@ export class ElementService {
     /**
      * Gets multiple elements.
      *
-     * Gets multiple elements identified by the provided Ids.
+     * Gets multiple elements identified by the provided Ids. Ids the current user is not authorized to browse are omitted from the result.
      */
     public static getElementBatch<ThrowOnError extends boolean = true>(options?: Options<GetElementBatchData, ThrowOnError>) {
         return (options?.client ?? client).get<GetElementBatchResponses, GetElementBatchErrors, ThrowOnError>({

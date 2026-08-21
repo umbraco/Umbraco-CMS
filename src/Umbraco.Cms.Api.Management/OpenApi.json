@@ -13530,7 +13530,7 @@
           "Element"
         ],
         "summary": "Gets multiple elements.",
-        "description": "Gets multiple elements identified by the provided Ids.",
+        "description": "Gets multiple elements identified by the provided Ids. Ids the current user is not authorized to browse are omitted from the result.",
         "operationId": "GetElementBatch",
         "parameters": [
           {
@@ -13558,9 +13558,6 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
           }
         },
         "security": [

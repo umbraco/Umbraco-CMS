@@ -418,6 +418,100 @@ public class ElementPermissionServiceTests
     }
 
     [Test]
+    public async Task FilterAuthorizedAccessAsync_ExcludesKey_WithoutPathAccess()
+    {
+        // Arrange
+        var keyA = Guid.NewGuid();
+        var keyB = Guid.NewGuid();
+        var user = CreateUser(startElementId: UserStartNodeId);
+
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)), It.Is<Guid[]>(keys => keys.Contains(keyA) && keys.Contains(keyB))))
+            .Returns(
+            [
+                CreateTreeEntityPath(keyA, ElementNodeId, ElementNodePath),
+                CreateTreeEntityPath(keyB, UnrelatedStartNodeId, $"-1,{UnrelatedStartNodeId}"),
+            ]);
+
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
+            .Returns([CreateTreeEntityPath(Guid.NewGuid(), UserStartNodeId, UserStartNodePath)]);
+
+        SetupBatchPermissions(user, [ElementNodeId, UserStartNodeId, Constants.System.Root], ["A"]);
+
+        // Act
+        ISet<Guid> result = await _sut.FilterAuthorizedAccessAsync(user, [keyA, keyB], new HashSet<string> { "A" });
+
+        // Assert - keyB's path (under an unrelated node) is denied before permissions are even considered.
+        CollectionAssert.AreEquivalent(new[] { keyA }, result);
+    }
+
+    [Test]
+    public async Task FilterAuthorizedAccessAsync_ExcludesKey_WithoutRequiredPermission()
+    {
+        // Arrange
+        const int OtherElementNodeId = 4321;
+        var keyA = Guid.NewGuid();
+        var keyB = Guid.NewGuid();
+        var user = CreateUser();
+
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)), It.Is<Guid[]>(keys => keys.Contains(keyA) && keys.Contains(keyB))))
+            .Returns(
+            [
+                CreateTreeEntityPath(keyA, ElementNodeId, ElementNodePath),
+                CreateTreeEntityPath(keyB, OtherElementNodeId, $"-1,{OtherElementNodeId}"),
+            ]);
+
+        var permissions = new EntityPermissionCollection
+        {
+            new(9876, ElementNodeId, new HashSet<string> { "F" }),
+            new(9876, OtherElementNodeId, new HashSet<string> { "X" }),
+        };
+        _userServiceMock.Setup(x => x.GetPermissions(user, It.IsAny<int[]>())).Returns(permissions);
+
+        // Act
+        ISet<Guid> result = await _sut.FilterAuthorizedAccessAsync(user, [keyA, keyB], new HashSet<string> { "F" });
+
+        // Assert - keyB has path access (default user has root access) but lacks the "F" permission.
+        CollectionAssert.AreEquivalent(new[] { keyA }, result);
+    }
+
+    [Test]
+    public async Task FilterAuthorizedAccessAsync_ExcludesNonExistentKey()
+    {
+        // Arrange
+        var keyA = Guid.NewGuid();
+        var bogusKey = Guid.NewGuid();
+        var user = CreateUser();
+
+        _entityServiceMock
+            .Setup(x => x.GetAllPaths(It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)), It.Is<Guid[]>(keys => keys.Contains(keyA) && keys.Contains(bogusKey))))
+            .Returns([CreateTreeEntityPath(keyA, ElementNodeId, ElementNodePath)]);
+
+        SetupBatchPermissions(user, [ElementNodeId, UserStartNodeId, Constants.System.Root], ["A"]);
+
+        // Act
+        ISet<Guid> result = await _sut.FilterAuthorizedAccessAsync(user, [keyA, bogusKey], new HashSet<string> { "A" });
+
+        // Assert
+        CollectionAssert.AreEquivalent(new[] { keyA }, result);
+    }
+
+    [Test]
+    public async Task FilterAuthorizedAccessAsync_ReturnsEmptySet_ForEmptyKeys()
+    {
+        // Arrange
+        var user = CreateUser();
+
+        // Act
+        ISet<Guid> result = await _sut.FilterAuthorizedAccessAsync(user, [], new HashSet<string> { "A" });
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
     public async Task Can_Pass_Through_Fallback_Permissions_Unchanged()
     {
         // Arrange

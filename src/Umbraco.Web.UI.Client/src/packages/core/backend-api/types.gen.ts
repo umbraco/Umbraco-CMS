@@ -9002,10 +9002,6 @@ export type GetElementBatchErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
 };
 
 export type GetElementBatchResponses = {

@@ -214,6 +214,73 @@ internal sealed class ElementPermissionService : IElementPermissionService
     public Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
         => Task.FromResult(fallbackPermissions);
 
+    /// <inheritdoc/>
+    public Task<ISet<Guid>> FilterAuthorizedAccessAsync(
+        IUser user,
+        IEnumerable<Guid> elementKeys,
+        ISet<string> permissionsToCheck)
+    {
+        Guid[] keysArray = [.. elementKeys];
+
+        if (keysArray.Length == 0)
+        {
+            return Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+        }
+
+        // Retrieve paths in a single database query for all keys.
+        TreeEntityPath[] entityPaths = [.. _entityService.GetAllPaths([UmbracoObjectTypes.Element], keysArray)];
+
+        if (entityPaths.Length == 0)
+        {
+            return Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+        }
+
+        var authorizedKeys = new HashSet<Guid>();
+        int[]? startNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
+
+        // Check path access and collect all unique node IDs across all paths.
+        var pathDataByKey = new Dictionary<Guid, int[]>();
+        var allUniqueNodeIds = new HashSet<int>();
+
+        foreach (TreeEntityPath entityPath in entityPaths)
+        {
+            if (ContentPermissions.HasPathAccess(entityPath.Path, startNodeIds, Constants.System.RecycleBinElement) == false)
+            {
+                continue;
+            }
+
+            int[] pathIds = entityPath.Path.GetIdsFromPathReversed();
+            pathDataByKey[entityPath.Key] = pathIds;
+            allUniqueNodeIds.UnionWith(pathIds);
+        }
+
+        if (pathDataByKey.Count == 0)
+        {
+            return Task.FromResult<ISet<Guid>>(authorizedKeys);
+        }
+
+        // Single batch query for permissions on ALL unique node IDs across all paths.
+        EntityPermissionCollection allPermissions = _userService.GetPermissions(user, [.. allUniqueNodeIds]);
+
+        // Resolve permissions per entity using the batch results.
+        foreach ((Guid key, int[] pathIds) in pathDataByKey)
+        {
+            var pathNodeIdSet = new HashSet<int>(pathIds);
+            EntityPermission[] relevantPermissions = allPermissions
+                .Where(p => pathNodeIdSet.Contains(p.EntityId))
+                .ToArray();
+
+            EntityPermissionSet permissionSet = UserService.CalculatePermissionsForPathForUser(relevantPermissions, pathIds);
+            ISet<string> permissionSetPermissions = permissionSet.GetAllPermissions();
+            if (permissionsToCheck.All(p => permissionSetPermissions.Contains(p)))
+            {
+                authorizedKeys.Add(key);
+            }
+        }
+
+        return Task.FromResult<ISet<Guid>>(authorizedKeys);
+    }
+
     /// <summary>
     ///     Check the implicit/inherited permissions of a user for given element items.
     /// </summary>
