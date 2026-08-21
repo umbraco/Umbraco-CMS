@@ -1,5 +1,5 @@
 import type { UmbDocumentTreeItemModel, UmbDocumentTreeRootModel } from '../types.js';
-import { UmbDocumentItemDataResolver } from '../../item/index.js';
+import { UmbDocumentTreeItemDataResolver } from '../document-tree-item-data-resolver.js';
 import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
@@ -17,7 +17,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#ancestorsContext = new UmbAncestorsEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
-	#item = new UmbDocumentItemDataResolver(this);
+	#item = new UmbDocumentTreeItemDataResolver(this);
 
 	readonly name = this.#item.name;
 	readonly icon = this.#item.icon;
@@ -106,20 +106,29 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override showChildren() {
-		if (this.getIsMenu() && this.#getCollapsibleCollection()) {
-			// Collections cannot be expanded via a menu, instead we open the Collection for the user.
-			this.#openCollection();
+		if (this.#getCollapsibleCollection()) {
+			this.#activateCollection();
 			return;
 		}
 		super.showChildren();
 	}
 
 	public override hideChildren() {
-		if (this.getIsMenu() && this.#getCollapsibleCollection()) {
-			// Collections in a menu will collapse when already showing children, and instead we open the Collection for the user.
-			this.#openCollection();
+		if (this.#getCollapsibleCollection()) {
+			this.#activateCollection();
+			return;
 		}
 		super.hideChildren();
+	}
+
+	// Collections cannot be expanded/collapsed. In a menu we navigate to the Collection view via the path;
+	// elsewhere (e.g. a picker) we emit the open event so the host can enter the Collection.
+	#activateCollection() {
+		if (this.getIsMenu()) {
+			this.#openCollection();
+		} else {
+			this.open();
+		}
 	}
 
 	#getCollapsibleCollection(): boolean {
