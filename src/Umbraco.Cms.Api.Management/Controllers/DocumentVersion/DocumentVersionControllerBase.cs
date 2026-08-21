@@ -26,6 +26,10 @@ public abstract class DocumentVersionControllerBase : ManagementApiControllerBas
                 .WithTitle("The requested document could not be found")
                 .Build()),
             ContentVersionOperationStatus.InvalidSkipTake => SkipTakeToPagingProblem(),
+            ContentVersionOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid culture")
+                .WithDetail("The specified culture is not supported by the content item.")
+                .Build()),
             ContentVersionOperationStatus.RollBackFailed => BadRequest(problemDetailsBuilder
                 .WithTitle("Rollback failed")
                 .WithDetail("An unspecified error occurred while rolling back the requested version. Please check the logs for additional information.")),
