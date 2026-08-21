@@ -11,9 +11,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'menuItem',
-		kind: 'tree',
 		alias: UMB_MEDIA_MENU_ITEM_ALIAS,
 		name: 'Media Menu Item',
+		element: () => import('./media-menu-item.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Media',
