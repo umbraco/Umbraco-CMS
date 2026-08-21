@@ -18,7 +18,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
-import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UmbPropertyValuePresetVariantBuilderController,
 	type UmbPropertyTypePresetModel,
@@ -622,7 +622,17 @@ export abstract class UmbBlockManagerContext<
 		}
 	}
 
+	/**
+	 * @deprecated Use removeOneContent instead. This method will be removed in a future version.
+	 * @param {string} contentKey - The content key of the layout element to delete.
+	 * @internal
+	 */
 	protected removeBlockKey(contentKey: string) {
-		this.#contents.removeOne(contentKey);
+		new UmbDeprecation({
+			deprecated: 'removeBlockKey is deprecated.',
+			removeInVersion: '20.0.0',
+			solution: 'Use removeOneContent instead.',
+		}).warn();
+		this.removeOneContent(contentKey);
 	}
 }
