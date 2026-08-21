@@ -74,10 +74,10 @@ public class MemberApplicationManagerTests
             .ReturnsAsync(ImmutableDictionary<string, string>.Empty);
         _mockApplicationManager
             .Setup(x => x.GetConsentTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ConsentTypes.Explicit);
         _mockApplicationManager
             .Setup(x => x.GetApplicationTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ApplicationTypes.Web);
         _mockApplicationManager
             .Setup(x => x.GetRequirementsAsync(_storedApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(ImmutableArray<string>.Empty);

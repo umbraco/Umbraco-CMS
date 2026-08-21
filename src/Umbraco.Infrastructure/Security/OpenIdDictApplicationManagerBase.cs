@@ -192,8 +192,15 @@ public abstract class OpenIdDictApplicationManagerBase
         ImmutableDictionary<CultureInfo, string> displayNames = await ApplicationManager.GetDisplayNamesAsync(client, cancellationToken);
         ImmutableDictionary<string, JsonElement> properties = await ApplicationManager.GetPropertiesAsync(client, cancellationToken);
 
-        return string.Equals(consentType, clientDescriptor.ConsentType, StringComparison.OrdinalIgnoreCase)
-               && string.Equals(applicationType, clientDescriptor.ApplicationType, StringComparison.OrdinalIgnoreCase)
+        // Compared only when the descriptor actually specifies a value. OpenIddict stores a default
+        // for both of these and returns it, "explicit" and "web", so a descriptor that leaves them
+        // unset is not asking for a change and comparing null against that default would never
+        // match. That is not hypothetical: it made MatchesAsync always false, so every registration
+        // wrote and the concurrency token rotated exactly as it did before this fix.
+        return (clientDescriptor.ConsentType is null
+                || string.Equals(consentType, clientDescriptor.ConsentType, StringComparison.OrdinalIgnoreCase))
+               && (clientDescriptor.ApplicationType is null
+                   || string.Equals(applicationType, clientDescriptor.ApplicationType, StringComparison.OrdinalIgnoreCase))
                && SetEquals(requirements, clientDescriptor.Requirements)
                && DictionaryEquals(displayNames, clientDescriptor.DisplayNames, string.Equals)
                && DictionaryEquals(properties, clientDescriptor.Properties, JsonElementEquals);

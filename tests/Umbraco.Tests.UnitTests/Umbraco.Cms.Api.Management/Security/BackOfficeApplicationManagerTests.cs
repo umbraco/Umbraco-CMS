@@ -562,10 +562,10 @@ public class BackOfficeApplicationManagerTests
             .ReturnsAsync(ImmutableDictionary<string, string>.Empty);
         _mockApplicationManager
             .Setup(x => x.GetConsentTypeAsync(mockApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ConsentTypes.Explicit);
         _mockApplicationManager
             .Setup(x => x.GetApplicationTypeAsync(mockApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ApplicationTypes.Web);
         _mockApplicationManager
             .Setup(x => x.GetRequirementsAsync(mockApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(ImmutableArray<string>.Empty);
@@ -633,10 +633,10 @@ public class BackOfficeApplicationManagerTests
             .ReturnsAsync(ImmutableDictionary<string, string>.Empty);
         _mockApplicationManager
             .Setup(x => x.GetConsentTypeAsync(storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ConsentTypes.Explicit);
         _mockApplicationManager
             .Setup(x => x.GetApplicationTypeAsync(storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ApplicationTypes.Web);
         _mockApplicationManager
             .Setup(x => x.GetRequirementsAsync(storedApplication, It.IsAny<CancellationToken>()))
             .ReturnsAsync(ImmutableArray<string>.Empty);

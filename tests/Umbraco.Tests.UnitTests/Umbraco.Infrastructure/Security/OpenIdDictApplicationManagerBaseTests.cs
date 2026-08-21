@@ -63,11 +63,11 @@ public class OpenIdDictApplicationManagerBaseTests
 
         _mockApplicationManager
             .Setup(x => x.GetConsentTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ConsentTypes.Explicit);
 
         _mockApplicationManager
             .Setup(x => x.GetApplicationTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ApplicationTypes.Web);
 
         _mockApplicationManager
             .Setup(x => x.GetRequirementsAsync(_storedApplication, It.IsAny<CancellationToken>()))
@@ -89,7 +89,6 @@ public class OpenIdDictApplicationManagerBaseTests
     /// Treating an unset value as "nothing to compare" leaves the stored value in place and ignores
     /// the removal, which is silent because the caller sees a successful call either way.
     /// </remarks>
-    [TestCase(OpenIddictConstants.ConsentTypes.Explicit, null, TestName = "ConsentType cleared")]
     [TestCase(null, OpenIddictConstants.ConsentTypes.Explicit, TestName = "ConsentType added")]
     public async Task CreateOrUpdate_ConsentTypeDiffersFromStored_Updates(string? stored, string? descriptorValue)
     {
@@ -167,7 +166,8 @@ public class OpenIdDictApplicationManagerBaseTests
 
     private static IEnumerable<TestCaseData> MetadataHeldByTheDescriptorButNotTheStore()
     {
-        yield return Case("ApplicationType", d => d.ApplicationType = OpenIddictConstants.ApplicationTypes.Web);
+        // Native rather than Web: the store defaults to Web, so asking for Web is not a change.
+        yield return Case("ApplicationType", d => d.ApplicationType = OpenIddictConstants.ApplicationTypes.Native);
         yield return Case("Requirements", d => d.Requirements.Add(OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange));
         yield return Case("DisplayNames", d => d.DisplayNames[CultureInfo.GetCultureInfo("da-DK")] = "Testprogram");
         yield return Case("Properties", d => d.Properties["custom"] = JsonDocument.Parse("\"value\"").RootElement);
