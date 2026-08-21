@@ -102,7 +102,8 @@
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="5.2.3" />
     <!-- Microsoft.Data.Sqlite/Microsoft.EntityFrameworkCore.Sqlite bring in a vulnerable version of SQLitePCLRaw.lib.e_sqlite3 -->
     <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
-    <!-- Microsoft.CodeAnalysis.Workspaces.MSBuild brings in a vulnerable version of Microsoft.Build.Tasks.Core -->
+    <!-- Microsoft.CodeAnalysis.Workspaces.MSBuild brings in a vulnerable version of Microsoft.Build.Tasks.Core (MSBuild ships these as a version-matched set, so keep Microsoft.Build aligned) -->
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.8.43" />
+    <PackageVersion Include="Microsoft.Build" Version="17.8.43" />
   </ItemGroup>
 </Project>
