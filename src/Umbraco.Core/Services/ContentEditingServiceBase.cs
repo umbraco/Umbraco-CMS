@@ -35,6 +35,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly ContentTypeFilterCollection _contentTypeFilters;
 
     /// <summary>
+    /// The maximum length of a content name, matching the length of the backing database column.
+    /// </summary>
+    private const int MaxNameLength = 255;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ContentEditingServiceBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
     /// </summary>
     /// <param name="contentService">The content service.</param>
@@ -172,6 +177,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<TContentCreateResult, ContentEditingOperationStatus>> MapCreate<TContentCreateResult>(ContentCreationModelBase contentCreationModelBase)
         where TContentCreateResult : ContentCreateResultBase<TContent>, new()
     {
+        if (HasValidNames(contentCreationModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidName, new TContentCreateResult());
+        }
+
         TContentType? contentType = TryGetAndValidateContentType(contentCreationModelBase.ContentTypeKey, contentCreationModelBase, out ContentEditingOperationStatus validationOperationStatus);
         if (contentType == null)
         {
@@ -210,6 +220,11 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected async Task<Attempt<TContentUpdateResult, ContentEditingOperationStatus>> MapUpdate<TContentUpdateResult>(TContent content, ContentEditingModelBase contentEditingModelBase)
         where TContentUpdateResult : ContentUpdateResultBase<TContent>, new()
     {
+        if (HasValidNames(contentEditingModelBase) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidName, new TContentUpdateResult { Content = content });
+        }
+
         TContentType? contentType = TryGetAndValidateContentType(content.ContentType.Key, contentEditingModelBase, out ContentEditingOperationStatus operationStatus);
         if (contentType == null)
         {
@@ -226,6 +241,17 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         return Attempt.SucceedWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationResult = validationResult.Result });
     }
+
+    /// <summary>
+    /// Determines whether every supplied variant name is within the maximum length the persistence layer accepts.
+    /// </summary>
+    /// <remarks>
+    /// Checked here rather than left to the content service, which signals an over-long name by throwing. Every
+    /// variant is checked, not just the one that becomes the entity name, so the reason is reported for whichever
+    /// culture carries it.
+    /// </remarks>
+    private static bool HasValidNames(ContentEditingModelBase contentEditingModelBase)
+        => contentEditingModelBase.Variants.All(variant => variant.Name.Length <= MaxNameLength);
 
     /// <summary>
     /// Validates the cultures in the content editing model.
