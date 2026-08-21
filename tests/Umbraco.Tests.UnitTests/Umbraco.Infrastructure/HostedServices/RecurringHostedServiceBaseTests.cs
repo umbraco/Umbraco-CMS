@@ -606,7 +606,7 @@ public class RecurringHostedServiceBaseTests
         {
             try
             {
-                await WhenWaiting(afterWaitCount).WaitAsync(TimeSpan.FromSeconds(30));
+                await WhenWaiting(afterWaitCount).WaitAsync(TimeSpan.FromSeconds(5));
             }
             catch (TimeoutException)
             {
@@ -687,6 +687,9 @@ public class RecurringHostedServiceBaseTests
                 timeProvider.OnTimerArmed();
             }
 
+            // Re-arming through Change is deliberately not counted as a new wait: the loop creates a fresh timeout
+            // CancellationTokenSource - and so a fresh timer - for every wait cycle. Should that ever change, the
+            // afterWaitCount overload will fail on its timeout and the parameterless one will stop synchronising at all.
             public bool Change(TimeSpan dueTime, TimeSpan period) => _timer.Change(dueTime, period);
 
             public void Dispose()
