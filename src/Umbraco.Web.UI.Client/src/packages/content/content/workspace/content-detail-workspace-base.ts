@@ -51,6 +51,7 @@ import {
 	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 	UmbDataPathVariantQuery,
 	UmbServerModelValidatorContext,
+	UmbValidationCleanUpByUniqueManager,
 	UmbValidationController,
 } from '@umbraco-cms/backoffice/validation';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
@@ -363,6 +364,26 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				});
 			},
 			null,
+		);
+
+		// Clean up validation messages of properties that are no longer part of the content type structure
+		// (e.g. a composition removed, or the document type edited via infinite editing while this document is
+		// open) — messages for a property that no longer resolves have no UI left to fix them otherwise.
+		// Matches on alias only: removing a property clears its messages across every variant. Deliberately does
+		// not depend on variantOptions — a property's existence is a content-type concern, not a variant one,
+		// and enumerating every (property, variant) combination doesn't scale with variant-option count. [NL]
+		new UmbValidationCleanUpByUniqueManager(
+			this,
+			this.validationContext,
+			'$.values',
+			mergeObservables(
+				[this.structure.contentTypeLoaded, this.structure.contentTypePropertyAliases],
+				([loaded, aliases]) => {
+					if (!loaded || aliases.length === 0) return undefined;
+					return aliases.map((alias) => alias);
+				},
+			),
+			(queryParams) => queryParams.alias,
 		);
 
 		this.observe(

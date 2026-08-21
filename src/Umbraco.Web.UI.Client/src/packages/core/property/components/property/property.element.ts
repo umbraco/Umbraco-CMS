@@ -144,10 +144,18 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String, attribute: 'data-path' })
 	public set dataPath(dataPath: string | undefined) {
+		this.#dismantleControlValidation();
 		this.#propertyContext.setDataPath(dataPath);
-		new UmbObserveValidationStateController(this, dataPath, (invalid) => {
-			this._invalid = invalid;
-		});
+		new UmbObserveValidationStateController(
+			this,
+			dataPath,
+			(invalid) => {
+				this._invalid = invalid;
+			},
+			'observeValidationState',
+		);
+
+		this.#setupControlValidation();
 	}
 	public get dataPath(): string | undefined {
 		return this.#propertyContext.getDataPath();
@@ -346,7 +354,6 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#valueObserver?.destroy();
 			this.#configObserver?.destroy();
 			this.#validationMessageObserver?.destroy();
-			this.#controlValidator?.destroy();
 			oldElement?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 			/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 18. [LK] */
 			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
@@ -398,19 +405,7 @@ export class UmbPropertyElement extends UmbLitElement {
 					null,
 				);
 
-				if ('checkValidity' in this._element) {
-					const dataPath = this.dataPath;
-					this.#controlValidator = new UmbFormControlValidator(this, this._element as any, dataPath);
-					// We trust blindly that the dataPath will be present at this stage and not arrive later than this moment. [NL]
-					if (dataPath) {
-						this.#validationMessageBinder = new UmbBindServerValidationToFormControl(
-							this,
-							this._element as any,
-							dataPath,
-						);
-						this.#validationMessageBinder.value = this.#propertyContext.getValue();
-					}
-				}
+				this.#setupControlValidation();
 
 				this._element.readonly = this._isReadOnly;
 				this._element.toggleAttribute('readonly', this._isReadOnly);
@@ -419,6 +414,49 @@ export class UmbPropertyElement extends UmbLitElement {
 			}
 
 			this.requestUpdate('element', oldElement);
+		}
+	}
+
+	/**
+	 * Destroys the current form control validator and server-validation message binder, if any.
+	 *
+	 * Called synchronously, immediately, wherever `dataPath` or the element itself may have changed — before the
+	 * value for a new dataPath is pushed onto the element — so the outgoing validator can't catch that value change
+	 * and misattribute it to the variant it used to represent, incorrectly clearing (or setting) that variant's
+	 * validation message.
+	 */
+	#dismantleControlValidation(): void {
+		this.#controlValidator?.destroy();
+		this.#controlValidator = undefined;
+		this.#validationMessageBinder?.destroy();
+		this.#validationMessageBinder = undefined;
+	}
+
+	/**
+	 * (Re)binds the form control validator and server-validation message binder to the current element and `dataPath`.
+	 *
+	 * Must not run until the element's value is confirmed current for `dataPath` — a variant switch can leave the
+	 * same Property Editor UI element in place while `dataPath` changes underneath it, and the value for the new
+	 * `dataPath` only arrives later, asynchronously. Calling this before then risks the element re-validating the
+	 * previous dataPath's still-present value and misattributing that stale verdict to this one.
+	 *
+	 * Called from the `#propertyContext.variantId` observer (constructor) rather than eagerly from the `dataPath`
+	 * setter: a variant switch provides a brand new dataset context, so `variantId` is a fresh subscription each
+	 * time and reliably fires on every genuine switch — unlike the value itself, whose own change-notification can
+	 * be silently skipped if two different variants happen to hold an identical value. By the time `variantId`
+	 * fires, `#propertyContext.getValue()` is already correct: `UmbPropertyContext` resolves and writes its value
+	 * state unconditionally and synchronously, right alongside resolving variantId, before either is notified out.
+	 * Also called from `_gotEditorUI()` for a brand-new element, which has no stale state to guard against. [NL]
+	 */
+	#setupControlValidation(): void {
+		this.#dismantleControlValidation();
+		if (!this._element || !('checkValidity' in this._element)) return;
+
+		const dataPath = this.dataPath;
+		this.#controlValidator = new UmbFormControlValidator(this, this._element as any, dataPath);
+		if (dataPath) {
+			this.#validationMessageBinder = new UmbBindServerValidationToFormControl(this, this._element as any, dataPath);
+			this.#validationMessageBinder.value = this.#propertyContext.getValue();
 		}
 	}
 

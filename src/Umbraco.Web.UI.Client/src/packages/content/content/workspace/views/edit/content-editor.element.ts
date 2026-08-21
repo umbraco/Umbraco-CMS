@@ -47,7 +47,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 	private _routerPath?: string;
 
 	@state()
-	private _activePath = '';
+	private _activePath?: string;
 
 	@state()
 	private _hintMap: Map<string | null, UmbVariantHint> = new Map();
@@ -170,7 +170,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 
 			if (viewAlias === null) {
 				// for the root tab, we need to filter hints, so in this case we do accept everything that is not in a tab: [NL]
-				view.hints.setPathFilter((paths) => paths[0].includes('tab/') === false);
+				view.hints.setPathFilter((paths) => paths[0]?.includes('tab/') === false);
 			}
 
 			view.setTitle(tabName);
@@ -239,6 +239,8 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 					.routes=${this._routes}
 					@init=${(event: UmbRouterSlotInitEvent) => {
 						this._routerPath = event.target.absoluteRouterPath;
+						// TODO: Check if this is nesecary [NL]
+						this._activePath = event.target.absoluteActiveViewPath || '';
 					}}
 					@change=${(event: UmbRouterSlotChangeEvent) => {
 						this._activePath = event.target.absoluteActiveViewPath || '';
