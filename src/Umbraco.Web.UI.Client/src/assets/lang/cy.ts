@@ -1970,6 +1970,7 @@ export default {
 		stateLockedOut: 'Wedi cloi allan',
 		stateInvited: 'Wedi gwahodd',
 		stateInactive: 'Anactif',
+		type: 'Math',
 		sortNameAscending: 'Enw (A-Y)',
 		sortNameDescending: 'Enw (Y-A)',
 		sortCreateDateAscending: 'Hynaf',

@@ -1865,6 +1865,7 @@ export default {
 		stateApproved: 'Odobren',
 		stateInvited: 'Pozvan',
 		stateInactive: 'Neaktivan',
+		type: 'Vrsta',
 		sortNameAscending: 'Naziv (A-Z)',
 		sortNameDescending: 'Naziv (Z-A)',
 		sortCreateDateAscending: 'Najstarije',

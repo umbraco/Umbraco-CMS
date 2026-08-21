@@ -35010,6 +35010,16 @@
             }
           },
           {
+            "name": "userKinds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/UserKindModel"
+              }
+            }
+          },
+          {
             "name": "filter",
             "in": "query",
             "schema": {

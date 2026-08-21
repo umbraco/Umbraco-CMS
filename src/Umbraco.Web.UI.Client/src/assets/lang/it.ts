@@ -1855,6 +1855,7 @@ export default {
 		stateLockedOut: 'Bloccati',
 		stateInvited: 'Invitati',
 		stateInactive: 'Inattivi',
+		type: 'Tipo',
 		sortNameAscending: 'Nome (A-Z)',
 		sortNameDescending: 'Nome (Z-A)',
 		sortCreateDateAscending: 'Più vecchi',
