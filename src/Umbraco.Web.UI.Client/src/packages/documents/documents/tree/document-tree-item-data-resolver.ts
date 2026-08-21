@@ -5,6 +5,10 @@ import { UmbBasicState, UmbObjectState } from '@umbraco-cms/backoffice/observabl
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 
+// TODO (V20): drop the `documentType` fallback when the deprecated field is removed.
+// eslint-disable-next-line @typescript-eslint/no-deprecated
+const contentTypeOf = (item: UmbDocumentTreeItemModel | undefined) => item?.contentType ?? item?.documentType;
+
 /**
  * A controller for resolving data for a document tree item
  * @exports
@@ -20,10 +24,10 @@ export class UmbDocumentTreeItemDataResolver
 
 	public readonly entityType = this.#data.asObservablePart((x) => x?.entityType);
 	public readonly unique = this.#data.asObservablePart((x) => x?.unique);
-	public readonly icon = this.#data.asObservablePart((x) => x?.contentType?.icon);
-	public readonly typeUnique = this.#data.asObservablePart((x) => x?.contentType?.unique);
+	public readonly icon = this.#data.asObservablePart((x) => contentTypeOf(x)?.icon);
+	public readonly typeUnique = this.#data.asObservablePart((x) => contentTypeOf(x)?.unique);
 	public readonly isTrashed = this.#data.asObservablePart((x) => x?.isTrashed);
-	public readonly hasCollection = this.#data.asObservablePart((x) => !!x?.contentType?.collection);
+	public readonly hasCollection = this.#data.asObservablePart((x) => !!contentTypeOf(x)?.collection);
 
 	public readonly name = this.#variant.name;
 	public readonly state = this.#variant.state;
@@ -140,6 +144,6 @@ export class UmbDocumentTreeItemDataResolver
 	 * @memberof UmbDocumentTreeItemDataResolver
 	 */
 	getHasCollection(): boolean {
-		return this.getData()?.contentType?.collection != undefined;
+		return contentTypeOf(this.getData())?.collection != undefined;
 	}
 }

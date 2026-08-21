@@ -103,5 +103,27 @@ describe('UmbDocumentTreeItemDataResolver', () => {
 			resolver.setData(makeTreeItem({ contentType: { unique: 'dt-1', icon: 'icon-article', collection: null } }));
 			expect(await resolver.getIcon()).to.equal('icon-article');
 		});
+
+		// TODO (V20): remove when the deprecated `documentType` field is removed.
+		it('resolves the icon from the deprecated content type field when the current one is absent', async () => {
+			resolver.setData(
+				makeTreeItem({
+					contentType: undefined,
+					documentType: { unique: 'dt-1', icon: 'icon-article', collection: null },
+				}),
+			);
+			expect(await resolver.getIcon()).to.equal('icon-article');
+		});
+
+		// TODO (V20): remove when the deprecated `documentType` field is removed.
+		it('detects a collection from the deprecated content type field when the current one is absent', async () => {
+			resolver.setData(
+				makeTreeItem({
+					contentType: undefined,
+					documentType: { unique: 'dt-1', icon: 'icon-document', collection: { unique: 'collection-1' } },
+				}),
+			);
+			expect(resolver.getHasCollection()).to.be.true;
+		});
 	});
 });

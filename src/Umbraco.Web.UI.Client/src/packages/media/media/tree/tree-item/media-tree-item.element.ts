@@ -10,7 +10,7 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 			<div id="icon-container" slot="icon">
 				<umb-entity-sign-bundle .entityType=${this._item?.entityType} .entityFlags=${this._flags}>
 					${when(
-						this.item?.contentType?.icon,
+						this.#contentType?.icon,
 						(icon) => html`<umb-icon id="icon" name=${this._getIconToRender(icon)}></umb-icon>`,
 					)}
 				</umb-entity-sign-bundle>
@@ -25,8 +25,14 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 		</span> `;
 	}
 
+	// TODO (V20): drop the `mediaType` fallback when the deprecated field is removed.
+	get #contentType() {
+		// eslint-disable-next-line @typescript-eslint/no-deprecated
+		return this.item?.contentType ?? this.item?.mediaType;
+	}
+
 	#renderStateIcon() {
-		if (this.item?.contentType?.collection) {
+		if (this.#contentType?.collection) {
 			return this.#renderIsCollectionIcon();
 		}
 
