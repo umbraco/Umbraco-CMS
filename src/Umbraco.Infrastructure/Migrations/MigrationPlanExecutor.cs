@@ -171,7 +171,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                 // The warning is necessary as even if the problem is fixed and the plan runs successfully to completion
                 // on a second attempt, the step that requested the rebuild may have completed and will not be run again.
                 _logger.LogWarning(
-                    "Skipping the cache rebuild requested by plan {PlanName} as it did not run to completion. Rebuild the published cache once the upgrade has completed successfully.",
+                    "Skipping the cache rebuild requested by plan {PlanName} as it did not run to completion - the published cache should be rebuilt manually once the upgrade completes",
                     plan.Name);
             }
         }
