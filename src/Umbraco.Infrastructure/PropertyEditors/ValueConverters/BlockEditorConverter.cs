@@ -51,7 +51,22 @@ public sealed class BlockEditorConverter
     /// <returns>
     /// An <see cref="IPublishedElement"/> representing the converted block if the conversion is successful and the data is valid; otherwise, <c>null</c> if the content type is not found, is not an element type, or the key is missing or invalid.
     /// </returns>
+    [Obsolete("Please use the overload that takes the culture of the owning property value. Scheduled for removal in Umbraco 19.")]
     public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
+        => ConvertToElement(owner, data, referenceCacheLevel, preview, owningPropertyCulture: null);
+
+    /// <summary>
+    /// Converts a <see cref="BlockItemData"/> instance into an <see cref="IPublishedElement"/> for use in the block editor.
+    /// </summary>
+    /// <param name="owner">The parent <see cref="IPublishedElement"/> that owns the block element, used for context such as culture and segment variations.</param>
+    /// <param name="data">The <see cref="BlockItemData"/> representing the block to convert.</param>
+    /// <param name="referenceCacheLevel">The <see cref="PropertyCacheLevel"/> to use for resolving references during conversion.</param>
+    /// <param name="preview">If <c>true</c>, conversion is performed in preview mode; otherwise, in published mode.</param>
+    /// <param name="owningPropertyCulture">The culture of the stored property value <paramref name="data"/> was loaded from, or <c>null</c> when the property holding the block value does not vary by culture.</param>
+    /// <returns>
+    /// An <see cref="IPublishedElement"/> representing the converted block if the conversion is successful and the data is valid; otherwise, <c>null</c> if the content type is not found, is not an element type, or the key is missing or invalid.
+    /// </returns>
+    public IPublishedElement? ConvertToElement(IPublishedElement owner, BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview, string? owningPropertyCulture)
     {
         // Only convert element types - content types will cause an exception when PublishedModelFactory creates the model
         IPublishedContentType? publishedContentType = _publishedContentTypeCache.Get(PublishedItemType.Element, data.ContentTypeKey);
@@ -66,32 +81,18 @@ public sealed class BlockEditorConverter
             .PropertyTypes
             .ToDictionary(propertyType => propertyType.Alias);
 
+        // if changes have been made to the content or element type variation since the parent content was published,
+        // we need to align those changes for the block properties - unlike for root level properties, where these
+        // things are handled when a content type is saved.
+        IList<BlockPropertyValue> alignedProperties = _blockEditorVarianceHandler
+            .AlignedPropertyVarianceAsync(data.Values, publishedContentType, owner, owningPropertyCulture)
+            .GetAwaiter().GetResult();
+
         var propertyValues = new Dictionary<string, object?>();
-        foreach (BlockPropertyValue property in data.Values)
+        foreach (BlockPropertyValue alignedProperty in alignedProperties)
         {
-            if (!propertyTypesByAlias.TryGetValue(property.Alias, out IPublishedPropertyType? propertyType))
-            {
-                continue;
-            }
-
-            // if case changes have been made to the content or element type variation since the parent content was published,
-            // we need to align those changes for the block properties - unlike for root level properties, where these
-            // things are handled when a content type is saved.
-            BlockPropertyValue? alignedProperty = _blockEditorVarianceHandler.AlignedPropertyVarianceAsync(property, propertyType, owner).GetAwaiter().GetResult();
-            if (alignedProperty is null)
-            {
-                continue;
-            }
-
-            var expectedCulture = owner.ContentType.VariesByCulture() && publishedContentType.VariesByCulture() && propertyType.VariesByCulture()
-                ? variationContext.Culture
-                : null;
-            var expectedSegment = owner.ContentType.VariesBySegment() && publishedContentType.VariesBySegment() && propertyType.VariesBySegment()
-                ? variationContext.Segment
-                : null;
-
-            if (alignedProperty.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
-                && alignedProperty.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull()))
+            if (propertyTypesByAlias.TryGetValue(alignedProperty.Alias, out IPublishedPropertyType? propertyType)
+                && IsRenderedVariation(alignedProperty, propertyType, owner, publishedContentType, variationContext))
             {
                 propertyValues[alignedProperty.Alias] = alignedProperty.Value;
             }
@@ -131,4 +132,26 @@ public sealed class BlockEditorConverter
 
         return typeof(IPublishedElement);
     }
+
+    /// <summary>
+    /// Determines whether a block property value is the one to render for the current variation context.
+    /// </summary>
+    private static bool IsRenderedVariation(
+        BlockPropertyValue blockPropertyValue,
+        IPublishedPropertyType propertyType,
+        IPublishedElement owner,
+        IPublishedContentType elementType,
+        VariationContext variationContext)
+    {
+        var expectedCulture = owner.ContentType.VariesByCulture() && elementType.VariesByCulture() && propertyType.VariesByCulture()
+            ? variationContext.Culture
+            : null;
+        var expectedSegment = owner.ContentType.VariesBySegment() && elementType.VariesBySegment() && propertyType.VariesBySegment()
+            ? variationContext.Segment
+            : null;
+
+        return blockPropertyValue.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
+               && blockPropertyValue.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull());
+    }
+
 }

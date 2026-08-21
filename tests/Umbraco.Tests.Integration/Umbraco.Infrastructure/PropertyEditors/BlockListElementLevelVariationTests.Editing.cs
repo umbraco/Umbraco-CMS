@@ -1158,7 +1158,7 @@ internal partial class BlockListElementLevelVariationTests
             .WithVariations(ContentVariation.Nothing)
             .Done()
             .Build();
-        ContentTypeService.Save(rootElementType);
+        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
         var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
@@ -1310,7 +1310,7 @@ internal partial class BlockListElementLevelVariationTests
             false);
 
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1369,7 +1369,7 @@ internal partial class BlockListElementLevelVariationTests
 
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1430,7 +1430,7 @@ internal partial class BlockListElementLevelVariationTests
 
         elementType.Variations = ContentVariation.Nothing;
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // re-fetch content
         content = ContentService.GetById(content.Key);
@@ -1458,6 +1458,88 @@ internal partial class BlockListElementLevelVariationTests
             Assert.IsNull(invariantValue.Culture);
             Assert.IsNull(variantValue.Culture);
             Assert.AreEqual("Variant settings in English", variantValue.Value);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.Expose.Count);
+            Assert.IsNull(blockListValue.Expose.First().Culture);
+        });
+    }
+
+    [TestCase("en-US", "Variant content in English", "Variant settings in English")]
+    [TestCase("da-DK", "Variant content in Danish", "Variant settings in Danish")]
+    public async Task Can_Turn_Variant_Element_Invariant_For_Variant_Block_Property(string culture, string expectedContentValue, string expectedSettingsValue)
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+
+        // each culture of a variant block property is stored separately. the client presets a value for every language
+        // when a block is created, so a culture's stored value also carries (empty) values for the other cultures.
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new[]
+            {
+                new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "The invariant content value" },
+                        new() { Alias = "variantText", Value = "Variant content in English", Culture = "en-US" },
+                        new() { Alias = "variantText", Value = null, Culture = "da-DK" },
+                    },
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "The invariant settings value" },
+                        new() { Alias = "variantText", Value = "Variant settings in English", Culture = "en-US" },
+                        new() { Alias = "variantText", Value = null, Culture = "da-DK" },
+                    },
+                    "en-US",
+                    null),
+                new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "The invariant content value" },
+                        new() { Alias = "variantText", Value = null, Culture = "en-US" },
+                        new() { Alias = "variantText", Value = "Variant content in Danish", Culture = "da-DK" },
+                    },
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "The invariant settings value" },
+                        new() { Alias = "variantText", Value = null, Culture = "en-US" },
+                        new() { Alias = "variantText", Value = "Variant settings in Danish", Culture = "da-DK" },
+                    },
+                    "da-DK",
+                    null),
+            },
+            false);
+
+        elementType.Variations = ContentVariation.Nothing;
+        elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        // re-fetch content
+        content = ContentService.GetById(content.Key);
+
+        var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
+
+        var blockListValue = valueEditor.ToEditor(content!.Properties["blocks"]!, culture) as BlockListValue;
+        Assert.IsNotNull(blockListValue);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.ContentData.Count);
+            Assert.AreEqual(2, blockListValue.ContentData.First().Values.Count);
+            var variantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(variantValue.Culture);
+            Assert.AreEqual(expectedContentValue, variantValue.Value);
+        });
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(1, blockListValue.SettingsData.Count);
+            Assert.AreEqual(2, blockListValue.SettingsData.First().Values.Count);
+            var variantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "variantText");
+            Assert.IsNull(variantValue.Culture);
+            Assert.AreEqual(expectedSettingsValue, variantValue.Value);
         });
         Assert.Multiple(() =>
         {
