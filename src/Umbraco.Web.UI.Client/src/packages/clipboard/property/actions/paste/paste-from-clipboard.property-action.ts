@@ -10,7 +10,7 @@ import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-
 
 export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<MetaPropertyActionPasteFromClipboardKind> {
 	#init: Promise<unknown>;
-	#propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
+	protected _propertyContext?: typeof UMB_PROPERTY_CONTEXT.TYPE;
 	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
 	readonly #localize = new UmbLocalizationController(this);
 
@@ -19,7 +19,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-				this.#propertyContext = context;
+				this._propertyContext = context;
 			}).asPromise({ preventTimeout: true }),
 
 			this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (context) => {
@@ -33,12 +33,24 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 		return true;
 	}
 
+	/**
+	 * Adjusts the translated value before it is written to the property. Property editors whose value
+	 * needs context that the clipboard entry cannot carry — such as the active variant — override this.
+	 * @param {*} value The translated property value.
+	 * @returns {Promise<*>} The value to write to the property.
+	 * @protected
+	 * @memberof UmbPasteFromClipboardPropertyAction
+	 */
+	protected async _prepareValue(value: any): Promise<any> {
+		return value;
+	}
+
 	override async execute() {
 		await this.#init;
 		if (!this.#clipboardContext) throw new Error('Clipboard context not found');
-		if (!this.#propertyContext) throw new Error('Property context not found');
+		if (!this._propertyContext) throw new Error('Property context not found');
 
-		const propertyEditorManifest = this.#propertyContext.getEditorManifest();
+		const propertyEditorManifest = this._propertyContext.getEditorManifest();
 
 		if (!propertyEditorManifest) {
 			throw new Error('Property editor manifest not found');
@@ -61,7 +73,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 			throw new Error('No property value found');
 		}
 
-		const hasCurrentPropertyValue = this.#propertyContext.getValue();
+		const hasCurrentPropertyValue = this._propertyContext.getValue();
 
 		if (hasCurrentPropertyValue) {
 			const clipboardEntryItemRepository = new UmbClipboardEntryItemRepository(this);
@@ -80,7 +92,7 @@ export class UmbPasteFromClipboardPropertyAction extends UmbPropertyActionBase<M
 			});
 		}
 
-		this.#propertyContext?.setValue(propertyValue);
+		this._propertyContext?.setValue(await this._prepareValue(propertyValue));
 	}
 }
 export { UmbPasteFromClipboardPropertyAction as api };
