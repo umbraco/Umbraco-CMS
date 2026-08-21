@@ -121,12 +121,41 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
         "Resize": {
           "MaxWidth": 5000,
           "MaxHeight": 5000
+        },
+        "Memory": {
+          "MaximumPoolSizeMegabytes": 0,
+          "MaximumConcurrentProcessing": 0
         }
       }
     }
   }
 }
 ```
+
+### Memory Settings (`ImagingMemorySettings`)
+
+Both values default to `0`, meaning "derive from the memory available to the process"
+(`GC.GetGCMemoryInfo().TotalAvailableMemoryBytes`, which honours a container limit).
+
+| Setting | Purpose | Derived default |
+|---------|---------|-----------------|
+| `MaximumPoolSizeMegabytes` | Caps the unmanaged buffer pool ImageSharp retains between requests | available / 32, clamped to 16-64 MB |
+| `MaximumConcurrentProcessing` | Caps how many images are processed at once | (available / 2) / 64 MB, capped at processor count |
+
+**Why these exist**: a source image is decoded at full resolution before any processor runs, and
+`ImageSharpMiddleware` only de-duplicates concurrent requests for the *same* URL. A page of distinct
+thumbnails therefore decodes every source in parallel, so peak memory is
+`concurrent requests x decoded source size` — measured at ~60 MB for one 300x300 thumbnail of a
+4000x3000 JPEG. Unbounded, that exhausts a container limit and the process is killed (exit 137).
+
+`ImageProcessingThrottleMiddleware` (registered ahead of `UseImageSharp()` in the pre-pipeline)
+applies the concurrency cap. Requests over the limit wait rather than being rejected, and only
+requests whose path has a file extension *and* whose query contains a registered processor command
+are gated.
+
+ImageSharp's own pool default is an eighth of available memory, released only on a gen2 collection
+and then at most 50% per minute, which leaves a container sitting well above its working set at
+rest. This memory is unmanaged, so no `DOTNET_GC*` setting governs it.
 
 ### Security: Max Dimension Limits
 

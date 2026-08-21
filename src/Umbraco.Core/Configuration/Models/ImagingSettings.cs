@@ -29,4 +29,9 @@ public class ImagingSettings
     /// Gets or sets a value for imaging resize settings.
     /// </summary>
     public ImagingResizeSettings Resize { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets a value for the memory used while processing images.
+    /// </summary>
+    public ImagingMemorySettings Memory { get; set; } = new();
 }
