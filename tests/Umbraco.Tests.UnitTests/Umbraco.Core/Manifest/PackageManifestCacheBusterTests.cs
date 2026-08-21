@@ -10,8 +10,23 @@ public class PackageManifestCacheBusterTests
     public void ComputeCacheBuster_CombinesVersionWithShortHostHash()
     {
         var result = PackageManifestCacheBuster.ComputeCacheBuster("1.2.3", "deploy-1");
-        Assert.That(result, Is.EqualTo("1.2.3-deploy-1"));
+        Assert.That(result, Is.EqualTo("1.2.3-7bb8e1f"));
     }
+
+    [Test]
+    public void ComputeCacheBuster_HashesAwayCharactersNeedingEscaping()
+    {
+        // The host cache-buster is often an informational version, which the .NET SDK stamps with the commit
+        // sha after a '+'. Hashing keeps it out of the (publicly served) asset URLs (#23641).
+        var result = PackageManifestCacheBuster.ComputeCacheBuster("17.0.0", "1.0.0+abc123");
+        Assert.That(result, Is.EqualTo("17.0.0-d7adb85"));
+    }
+
+    [Test]
+    public void ComputeCacheBuster_ProducesDifferentHashes_ForDifferentHostCacheBusters()
+        => Assert.That(
+            PackageManifestCacheBuster.ComputeCacheBuster("1.2.3", "deploy-1"),
+            Is.Not.EqualTo(PackageManifestCacheBuster.ComputeCacheBuster("1.2.3", "deploy-2")));
 
     [TestCase(null)]
     [TestCase("")]
@@ -21,7 +36,7 @@ public class PackageManifestCacheBusterTests
 
     [Test]
     public void ComputeCacheBuster_UsesShortHashAlone_WhenNoVersion()
-        => Assert.That(PackageManifestCacheBuster.ComputeCacheBuster(null, "deploy-1"), Is.EqualTo("deploy-1"));
+        => Assert.That(PackageManifestCacheBuster.ComputeCacheBuster(null, "deploy-1"), Is.EqualTo("7bb8e1f"));
 
     [Test]
     public void ComputeCacheBuster_ReturnsNull_WhenNoVersionAndNoHostCacheBuster()
