@@ -3,28 +3,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Services.NewsDashboard;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings;
 
 [TestFixture]
 public class HttpClientConventionTests
 {
-    private static readonly Assembly[] Assemblies =
-    [
-        typeof(Constants).Assembly,
-        typeof(NewsDashboardService).Assembly,
-    ];
-
     [Test]
     public void Cannot_Declare_Mutable_Static_HttpClient_Field()
     {
-        var offenders = Assemblies
+        Assembly[] assemblies = GetUmbracoAssemblies();
+
+        // Guard against the discovery silently covering nothing if the output layout ever changes.
+        Assert.That(assemblies, Is.Not.Empty, "No Umbraco assemblies were discovered to check.");
+
+        var offenders = assemblies
             .SelectMany(GetLoadableTypes)
             .SelectMany(type => type.GetFields(
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
@@ -41,6 +39,26 @@ public class HttpClientConventionTests
             Is.Empty,
             "Static HttpClient fields must be readonly and fully configured on assignment. Use SharedHttpClient "
             + "for existing call sites that cannot take a dependency, or inject IHttpClientFactory in new code.");
+    }
+
+    private static Assembly[] GetUmbracoAssemblies()
+        => Directory
+            .EnumerateFiles(AppContext.BaseDirectory, "Umbraco.*.dll")
+            .Where(path => Path.GetFileName(path).StartsWith("Umbraco.Tests.", StringComparison.Ordinal) is false)
+            .Select(TryLoad)
+            .Where(assembly => assembly is not null)
+            .ToArray()!;
+
+    private static Assembly? TryLoad(string path)
+    {
+        try
+        {
+            return Assembly.LoadFrom(path);
+        }
+        catch (Exception exception) when (exception is BadImageFormatException or FileLoadException)
+        {
+            return null;
+        }
     }
 
     private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
