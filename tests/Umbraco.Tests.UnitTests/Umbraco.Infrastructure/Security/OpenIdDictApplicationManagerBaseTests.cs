@@ -145,7 +145,7 @@ public class OpenIdDictApplicationManagerBaseTests
                     .Add("custom", JsonDocument.Parse("\"value\"").RootElement)));
 
         static TestCaseData Case(string name, Action<Mock<IOpenIddictApplicationManager>, object> stubStoredValue)
-            => new TestCaseData(stubStoredValue).SetName(name);
+            => new TestCaseData(stubStoredValue).SetArgDisplayNames(name);
     }
 
     /// <summary>
