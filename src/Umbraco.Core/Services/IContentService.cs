@@ -526,17 +526,19 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Gets a value indicating whether a document is path-publishable.
     /// </summary>
     /// <param name="content">The document.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns><c>true</c> if the document is path-publishable; otherwise, <c>false</c>.</returns>
     /// <remarks>A document is path-publishable when all its ancestors are published.</remarks>
-    bool IsPathPublishable(IContent content);
+    Task<bool> IsPathPublishableAsync(IContent content, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a value indicating whether a document is path-published.
     /// </summary>
     /// <param name="content">The document.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns><c>true</c> if the document is path-published; otherwise, <c>false</c>.</returns>
     /// <remarks>A document is path-published when all its ancestors, and the document itself, are published.</remarks>
-    bool IsPathPublished(IContent content);
+    Task<bool> IsPathPublishedAsync(IContent content, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Saves a document and raises the "sent to publication" events.

@@ -1409,7 +1409,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void IsPublishable()
+    public async Task IsPublishable()
     {
         // Arrange
         var parent = ContentService.Create("parent", Constants.System.Root, "umbTextpage");
@@ -1419,9 +1419,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var content = ContentService.Create("child", parent, "umbTextpage");
         ContentService.Save(content);
 
-        Assert.IsTrue(ContentService.IsPathPublishable(content));
+        Assert.IsTrue(await ContentService.IsPathPublishableAsync(content, CancellationToken.None));
         ContentService.Unpublish(parent);
-        Assert.IsFalse(ContentService.IsPathPublishable(content));
+        Assert.IsFalse(await ContentService.IsPathPublishableAsync(content, CancellationToken.None));
     }
 
     [Test]

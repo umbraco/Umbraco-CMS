@@ -549,18 +549,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <returns>True if the content has any children otherwise False</returns>
     public bool HasChildren(int id) => CountChildren(id) > 0;
 
-    /// <summary>
-    /// Checks if the <see cref="TContent"/> and all its ancestors are published.
-    /// </summary>
-    /// <param name="content">The content to check.</param>
-    /// <returns><c>true</c> if the content and all its ancestors are published; otherwise, <c>false</c>.</returns>
-    public bool IsPathPublished(TContent? content)
+    /// <inheritdoc />
+    public async Task<bool> IsPathPublishedAsync(TContent? content, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.IsPathPublished(content);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        bool result = await _asyncContentRepository.IsPathPublishedAsync(content, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
@@ -2072,7 +2068,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             // check if the content can be path-published
             // root content can be published
             // else check ancestors - we know we are not trashed
-            var pathIsOk = content.ParentId == Constants.System.Root || IsPathPublished(GetParent(content));
+            var pathIsOk = content.ParentId == Constants.System.Root || IsPathPublishedAsync(GetParent(content), CancellationToken.None).GetAwaiter().GetResult();
             if (!pathIsOk)
             {
                 Logger.LogInformation(

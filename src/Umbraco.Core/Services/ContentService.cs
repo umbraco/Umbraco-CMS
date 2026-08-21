@@ -518,12 +518,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return result;
     }
 
-    /// <summary>
-    ///     Checks if the passed in <see cref="IContent" /> can be published based on the ancestors publish state.
-    /// </summary>
-    /// <param name="content"><see cref="IContent" /> to check if ancestors are published</param>
-    /// <returns>True if the Content can be published, otherwise False</returns>
-    public bool IsPathPublishable(IContent content)
+    /// <inheritdoc />
+    public async Task<bool> IsPathPublishableAsync(IContent content, CancellationToken cancellationToken)
     {
         // fast
         if (content.ParentId == Constants.System.Root)
@@ -549,8 +545,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         IContent? parent = parentKey is null
             ? null
-            : GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult();
-        return parent == null || IsPathPublished(parent);
+            : await GetByIdAsync(parentKey.Value, cancellationToken);
+        return parent is null || await IsPathPublishedAsync(parent, cancellationToken);
     }
 
     /// <summary>

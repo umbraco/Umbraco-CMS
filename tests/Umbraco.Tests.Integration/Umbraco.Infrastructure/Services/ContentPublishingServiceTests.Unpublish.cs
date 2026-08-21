@@ -69,9 +69,9 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(Subpage2.Key);
         VerifyIsPublished(Subpage3.Key);
         // ... but should no longer be routable because the parent is unpublished
-        Assert.IsFalse(ContentService.IsPathPublished(Subpage));
-        Assert.IsFalse(ContentService.IsPathPublished(Subpage2));
-        Assert.IsFalse(ContentService.IsPathPublished(Subpage3));
+        Assert.IsFalse(await ContentService.IsPathPublishedAsync(Subpage, CancellationToken.None));
+        Assert.IsFalse(await ContentService.IsPathPublishedAsync(Subpage2, CancellationToken.None));
+        Assert.IsFalse(await ContentService.IsPathPublishedAsync(Subpage3, CancellationToken.None));
     }
 
     [Test]
