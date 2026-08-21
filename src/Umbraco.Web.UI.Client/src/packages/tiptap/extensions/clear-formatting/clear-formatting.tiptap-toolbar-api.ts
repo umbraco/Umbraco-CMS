@@ -3,11 +3,22 @@ import { UmbTiptapToolbarElementApiBase } from '../tiptap-toolbar-element-api-ba
 
 export default class UmbTiptapToolbarClearFormattingExtensionApi extends UmbTiptapToolbarElementApiBase {
 	override execute(editor?: Editor) {
+		if (!editor) return;
+
 		const unsetAttrs: (props: CommandProps) => boolean = ({ commands }) => {
 			commands.unsetClassName?.();
 			commands.unsetStyles?.();
 			return true;
 		};
-		editor?.chain().focus()?.clearNodes().unsetAllMarks().command(unsetAttrs).run();
+
+		const marksToClear = Object.keys(editor.schema.marks).filter((markName) => markName !== 'umbLink' && markName !== 'link');
+
+		const chain = editor.chain().focus().clearNodes();
+
+		for (const markName of marksToClear) {
+			chain.unsetMark(markName);
+		}
+
+		chain.command(unsetAttrs).run();
 	}
 }
