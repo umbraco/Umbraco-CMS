@@ -69,36 +69,64 @@ public class DocumentPublishStatusService :
 
     /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey)
-        => HasPublishedAncestorPathInternal(contentKey, culture: null);
+        => WhereAncestorPathPublished([contentKey], culture: null).Any();
 
     /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey, string culture)
-        => HasPublishedAncestorPathInternal(contentKey, culture);
+        => WhereAncestorPathPublished([contentKey], culture).Any();
 
-    private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture)
+    /// <inheritdoc/>
+    public IEnumerable<Guid> WhereAncestorPathPublished(IEnumerable<Guid> contentKeys, string? culture)
     {
-        var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
-        if (success is false)
+        var memo = new Dictionary<Guid, bool>();
+
+        // "Are ALL ancestors of key published (in the requested culture)?" Only the ancestors we walk
+        // through are memoised - they are shared across many candidates - while the candidate keys
+        // themselves are not, keeping the dictionary off the usually far more numerous leaves. Hence
+        // memoise is false for the top-level candidate call and true for the recursive ancestor calls.
+        bool AncestorsPublished(Guid key, bool memoise)
         {
-            // This might happen in certain cases, since notifications are not ordered, for instance, if you save and publish a content node in the same scope.
-            // In this case we'll try and update the node in the cache even though it hasn't been updated in the document navigation cache yet.
-            // It's okay to just return false here, since the node will be loaded later when it's actually requested.
-            return false;
+            if (memo.TryGetValue(key, out var cached))
+            {
+                return cached;
+            }
+
+            bool result;
+            if (_documentNavigationQueryService.TryGetParentKey(key, out Guid? parentKey) is false)
+            {
+                // Node not (yet) in navigation - notifications are not ordered, so a node can reach the
+                // publish-status cache before the navigation cache. Treat it as having no published path;
+                // it will be re-evaluated once it is actually requested.
+                result = false;
+            }
+            else if (parentKey is null)
+            {
+                // Root: no ancestors, so the ancestor path is vacuously published.
+                result = true;
+            }
+            else
+            {
+                bool parentPublished = culture is null
+                    ? IsPublishedInAnyCulture(parentKey.Value)
+                    : IsPublished(parentKey.Value, culture);
+                result = parentPublished && AncestorsPublished(parentKey.Value, memoise: true);
+            }
+
+            if (memoise)
+            {
+                memo[key] = result;
+            }
+
+            return result;
         }
 
-        foreach (Guid key in keys)
+        foreach (Guid key in contentKeys)
         {
-            var isPublished = culture is null
-                ? IsPublishedInAnyCulture(key)
-                : IsPublished(key, culture);
-
-            if (isPublished is false)
+            if (AncestorsPublished(key, memoise: false))
             {
-                return false;
+                yield return key;
             }
         }
-
-        return true;
     }
 
     /// <inheritdoc/>

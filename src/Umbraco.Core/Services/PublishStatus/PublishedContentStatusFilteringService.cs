@@ -52,9 +52,9 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         var preview = _previewService.IsInPreview();
         candidateKeys = preview
             ? candidateKeysAsArray
-            : candidateKeysAsArray.Where(key =>
-                _publishStatusQueryService.IsPublished(key, culture)
-                && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
+            : _publishStatusQueryService.WhereAncestorPathPublished(
+                candidateKeysAsArray.Where(key => _publishStatusQueryService.IsPublished(key, culture)),
+                culture);
 
         // Returned lazily so consumers like .FirstOrDefault() / .Take(n) can short-circuit
         // without materialising the full result. Callers that need to enumerate the result

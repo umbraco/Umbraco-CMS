@@ -47,6 +47,15 @@ public interface IDocumentPublishStatusQueryService
     bool HasPublishedAncestorPath(Guid documentKey);
 
     /// <summary>
+    /// Filters a set of document keys down to those whose ancestor path is fully published,
+    /// sharing a single ancestor walk across the whole set.
+    /// </summary>
+    /// <param name="contentKeys">The document keys to filter.</param>
+    /// <param name="culture">The culture to check, or <c>null</c> to accept any published culture.</param>
+    /// <returns>The subset of <paramref name="contentKeys"/> that have a published ancestor path.</returns>
+    IEnumerable<Guid> WhereAncestorPathPublished(IEnumerable<Guid> contentKeys, string? culture);
+
+    /// <summary>
     /// Verifies if a document has a published ancestor path (i.e. all ancestors are themselves published in the specified culture).
     /// </summary>
     /// <param name="documentKey">The document's key.</param>

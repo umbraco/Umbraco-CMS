@@ -389,8 +389,8 @@ public class PublishedContentStatusFilteringServiceTests
             .Setup(s => s.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns((Guid key, string _) => items.TryGetValue(key, out IPublishedContent? item) && item.Id % 2 == 0);
         statusMock
-            .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
-            .Returns(true);
+            .Setup(s => s.WhereAncestorPathPublished(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string?>()))
+            .Returns((IEnumerable<Guid> keys, string? _) => keys);
 
         var previewService = new Mock<IPreviewService>();
         previewService.Setup(p => p.IsInPreview()).Returns(forPreview);
@@ -555,8 +555,9 @@ public class PublishedContentStatusFilteringServiceTests
                                                    && idIsPublished(item.Id)
                                                    && (culture == Constants.System.InvariantCulture || item.ContentType.VariesByCulture() is false || item.Cultures.ContainsKey(culture)));
         publishStatusQueryService
-            .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
-            .Returns((Guid key, string culture) => hasPublishedAncestorPath?.Invoke(key, culture, items) ?? true);
+            .Setup(s => s.WhereAncestorPathPublished(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string?>()))
+            .Returns((IEnumerable<Guid> keys, string? culture) =>
+                keys.Where(key => hasPublishedAncestorPath?.Invoke(key, culture ?? string.Empty, items) ?? true));
         return publishStatusQueryService.Object;
     }
 
