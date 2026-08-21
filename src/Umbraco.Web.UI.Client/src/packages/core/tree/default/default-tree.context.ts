@@ -305,6 +305,7 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setHideTreeRoot(hideTreeRoot: boolean) {
+		if (this.getHideTreeRoot() === hideTreeRoot) return;
 		this.#hideTreeRoot.setValue(hideTreeRoot);
 		// we need to reset the tree if this config changes
 		this.#clearTree();
@@ -326,6 +327,9 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setStartNode(startNode: UmbTreeStartNode | undefined) {
+		const current = this.getStartNode();
+		if (current?.unique === startNode?.unique && current?.entityType === startNode?.entityType) return;
+
 		this.#treeItemChildrenManager.setStartNode(startNode);
 		if (startNode) {
 			this.#entityContext.setEntityType(startNode.entityType);
@@ -351,6 +355,7 @@ export class UmbDefaultTreeContext<
 	 * @memberof UmbDefaultTreeContext
 	 */
 	setFoldersOnly(foldersOnly: boolean) {
+		if (this.getFoldersOnly() === foldersOnly) return;
 		this.#treeItemChildrenManager.setFoldersOnly(foldersOnly);
 		// we need to reset the tree if this config changes
 		this.#clearTree();
