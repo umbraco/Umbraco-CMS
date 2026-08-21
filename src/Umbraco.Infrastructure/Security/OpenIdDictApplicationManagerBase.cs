@@ -141,7 +141,9 @@ public abstract class OpenIdDictApplicationManagerBase
     /// skipping it would silently discard a rotated one. <see cref="OpenIddictApplicationDescriptor.JsonWebKeySet"/> has no value
     /// equality, and comparing a serialised form would be sensitive to key ordering and formatting.
     /// Everything else the descriptor carries is readable through the manager and is compared, so
-    /// clearing a value is recognised as a change rather than skipped.
+    /// clearing a value is recognised as a change rather than skipped — except where the store
+    /// substitutes a default for a value that was never set, which makes a removal indistinguishable
+    /// from an unset value and so leaves it out of scope for comparison.
     /// </remarks>
     private static bool HasStateThatCannotBeCompared(OpenIddictApplicationDescriptor clientDescriptor)
         => clientDescriptor.ClientSecret is not null || clientDescriptor.JsonWebKeySet is not null;
@@ -180,9 +182,9 @@ public abstract class OpenIdDictApplicationManagerBase
     /// Compares the descriptor state that is readable but not part of the core registration.
     /// </summary>
     /// <remarks>
-    /// Compared rather than assumed to match, so a descriptor that clears one of these is recognised
-    /// as a change. Treating an unset value as "nothing to compare" would leave the stored value in
-    /// place and silently ignore the removal.
+    /// Read back from the store and compared, so a descriptor that clears one of these is recognised
+    /// as a change rather than silently ignored. Values for which the store substitutes a default are
+    /// the exception, and are compared only when the descriptor specifies one; see below.
     /// </remarks>
     private async Task<bool> MatchesMetadataAsync(object client, OpenIddictApplicationDescriptor clientDescriptor, CancellationToken cancellationToken)
     {
@@ -192,8 +194,15 @@ public abstract class OpenIdDictApplicationManagerBase
         ImmutableDictionary<CultureInfo, string> displayNames = await ApplicationManager.GetDisplayNamesAsync(client, cancellationToken);
         ImmutableDictionary<string, JsonElement> properties = await ApplicationManager.GetPropertiesAsync(client, cancellationToken);
 
-        return string.Equals(consentType, clientDescriptor.ConsentType, StringComparison.OrdinalIgnoreCase)
-               && string.Equals(applicationType, clientDescriptor.ApplicationType, StringComparison.OrdinalIgnoreCase)
+        // ConsentType and ApplicationType are compared only when the descriptor specifies a value: the
+        // store substitutes its own default when none was set, so an unset descriptor value cannot be
+        // told apart from a cleared one, and comparing against the default would report a change on
+        // every call. Clearing those two is therefore not expressible. Requirements, DisplayNames and
+        // Properties are stored as given, so an absent value there is a genuine removal.
+        return (clientDescriptor.ConsentType is null
+                || string.Equals(consentType, clientDescriptor.ConsentType, StringComparison.OrdinalIgnoreCase))
+               && (clientDescriptor.ApplicationType is null
+                   || string.Equals(applicationType, clientDescriptor.ApplicationType, StringComparison.OrdinalIgnoreCase))
                && SetEquals(requirements, clientDescriptor.Requirements)
                && DictionaryEquals(displayNames, clientDescriptor.DisplayNames, string.Equals)
                && DictionaryEquals(properties, clientDescriptor.Properties, JsonElementEquals);

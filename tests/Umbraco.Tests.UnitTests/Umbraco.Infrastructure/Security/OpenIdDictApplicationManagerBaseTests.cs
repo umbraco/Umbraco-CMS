@@ -63,11 +63,11 @@ public class OpenIdDictApplicationManagerBaseTests
 
         _mockApplicationManager
             .Setup(x => x.GetConsentTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ConsentTypes.Explicit);
 
         _mockApplicationManager
             .Setup(x => x.GetApplicationTypeAsync(_storedApplication, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((string?)null);
+            .ReturnsAsync(OpenIddictConstants.ApplicationTypes.Web);
 
         _mockApplicationManager
             .Setup(x => x.GetRequirementsAsync(_storedApplication, It.IsAny<CancellationToken>()))
@@ -83,13 +83,13 @@ public class OpenIdDictApplicationManagerBaseTests
     }
 
     /// <summary>
-    /// A descriptor that clears a value the store still holds is a change, so it must be written.
+    /// A descriptor asking for a value the store does not hold is a change, so it must be written.
     /// </summary>
     /// <remarks>
-    /// Treating an unset value as "nothing to compare" leaves the stored value in place and ignores
-    /// the removal, which is silent because the caller sees a successful call either way.
+    /// Only the descriptor-specifies-a-value direction is asserted. The store substitutes a default
+    /// for an unset consent type, so a descriptor that leaves it unset is not expressing a removal
+    /// and there is no cleared case to assert.
     /// </remarks>
-    [TestCase(OpenIddictConstants.ConsentTypes.Explicit, null, TestName = "ConsentType cleared")]
     [TestCase(null, OpenIddictConstants.ConsentTypes.Explicit, TestName = "ConsentType added")]
     public async Task CreateOrUpdate_ConsentTypeDiffersFromStored_Updates(string? stored, string? descriptorValue)
     {
@@ -167,7 +167,8 @@ public class OpenIdDictApplicationManagerBaseTests
 
     private static IEnumerable<TestCaseData> MetadataHeldByTheDescriptorButNotTheStore()
     {
-        yield return Case("ApplicationType", d => d.ApplicationType = OpenIddictConstants.ApplicationTypes.Web);
+        // Native rather than Web: the store defaults to Web, so asking for Web is not a change.
+        yield return Case("ApplicationType", d => d.ApplicationType = OpenIddictConstants.ApplicationTypes.Native);
         yield return Case("Requirements", d => d.Requirements.Add(OpenIddictConstants.Requirements.Features.ProofKeyForCodeExchange));
         yield return Case("DisplayNames", d => d.DisplayNames[CultureInfo.GetCultureInfo("da-DK")] = "Testprogram");
         yield return Case("Properties", d => d.Properties["custom"] = JsonDocument.Parse("\"value\"").RootElement);
