@@ -33,6 +33,7 @@ import type {
 	UmbSaveableWorkspaceContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
+	UmbEntityCreatedEvent,
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -1092,10 +1093,24 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this.#applyPersistedData(persisted, variantIds);
 		this.setIsNew(false);
 
-		await this.#dispatchActionEvents(
+		const events: Array<UmbEntityActionEvent> = [
 			new UmbRequestReloadStructureForEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
 			new UmbRequestReloadChildrenOfEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
-		);
+		];
+
+		const unique = this.getUnique();
+		if (unique) {
+			events.push(
+				new UmbEntityCreatedEvent({
+					unique,
+					entityType: this.getEntityType(),
+					eventUnique: this._workspaceEventUnique,
+					variantIds,
+				}),
+			);
+		}
+
+		await this.#dispatchActionEvents(...events);
 	}
 
 	async #update(
@@ -1116,7 +1131,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const entityType = this.getEntityType();
 		await this.#dispatchActionEvents(
 			new UmbRequestReloadStructureForEntityEvent({ unique, entityType }),
-			new UmbEntityUpdatedEvent({ unique, entityType, eventUnique: this._workspaceEventUnique }),
+			new UmbEntityUpdatedEvent({ unique, entityType, eventUnique: this._workspaceEventUnique, variantIds }),
 		);
 	}
 
