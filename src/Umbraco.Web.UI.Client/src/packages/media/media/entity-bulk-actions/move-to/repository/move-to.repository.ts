@@ -7,13 +7,22 @@ import type { UmbRepositoryErrorResponse } from '@umbraco-cms/backoffice/reposit
 export class UmbBulkMoveToMediaRepository extends UmbRepositoryBase implements UmbBulkMoveToRepository {
 	#moveSource = new UmbMoveMediaServerDataSource(this);
 
-	async requestBulkMoveTo(args: UmbBulkMoveToRequestArgs): Promise<UmbRepositoryErrorResponse> {
+	async requestBulkMoveTo(
+		args: UmbBulkMoveToRequestArgs,
+		abortSignal?: AbortSignal,
+	): Promise<UmbRepositoryErrorResponse> {
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		let count = 0;
 
 		const destination = args.destination;
 		for (const unique of args.uniques) {
-			const { error } = await this.#moveSource.moveTo({ unique, destination });
+			if (abortSignal?.aborted) break;
+
+			const { error } = await this.#moveSource.moveTo({ unique, destination }, abortSignal);
+
+			// Cancelling aborts the in-flight request, which surfaces as an error here - do not report that as a
+			// failed move, and stop before starting the next item.
+			if (abortSignal?.aborted) break;
 
 			if (error) {
 				const notification = { data: { message: error.message } };

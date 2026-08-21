@@ -11,7 +11,7 @@ export interface UmbRecycleBinDataSourceConstructor {
 }
 
 export interface UmbRecycleBinDataSource {
-	trash(args: UmbRecycleBinTrashRequestArgs): Promise<UmbDataSourceResponse>;
+	trash(args: UmbRecycleBinTrashRequestArgs, abortSignal?: AbortSignal): Promise<UmbDataSourceResponse>;
 	restore(args: UmbRecycleBinRestoreRequestArgs): Promise<UmbDataSourceResponse>;
 	empty(): Promise<UmbDataSourceResponse>;
 	getOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs): Promise<UmbDataSourceResponse>;

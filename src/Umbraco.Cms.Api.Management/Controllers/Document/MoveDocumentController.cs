@@ -78,7 +78,8 @@ public class MoveDocumentController : DocumentControllerBase
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.MoveAsync(
             id,
             moveDocumentRequestModel.Target?.Id,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+            CurrentUserKey(_backOfficeSecurityAccessor),
+            cancellationToken);
 
         return result.Success
             ? Ok()
