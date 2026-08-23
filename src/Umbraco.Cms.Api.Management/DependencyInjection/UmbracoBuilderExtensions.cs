@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Core;
@@ -28,7 +27,6 @@ public static partial class UmbracoBuilderExtensions
         IServiceCollection services = builder.Services;
         builder.Services.AddSingleton<BackOfficeAreaRoutes>();
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
-        builder.Services.AddSingleton<SchemaLockdownConvention>();
         builder.Services.AddSingleton<IManagementApiRouteBuilder, ManagementApiRouteBuilder>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.AddUmbracoApiOpenApiUI();
@@ -98,7 +96,6 @@ public static partial class UmbracoBuilderExtensions
 
             services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
             services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>();
-            services.ConfigureOptions<SchemaLockdownMvcConfigureOptions>();
 
             services.Configure<UmbracoPipelineOptions>(options =>
             {
