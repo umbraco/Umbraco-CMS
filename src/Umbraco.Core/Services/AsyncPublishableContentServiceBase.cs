@@ -455,13 +455,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         return result;
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<int> GetVersionIds(int id, int maxRows)
+    /// <inheritdoc />
+    public async Task<IEnumerable<int>> GetVersionIdsAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _contentRepository.GetVersionIds(id, maxRows);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<int> result = await _asyncContentRepository.GetVersionIdsAsync(contentKey, skip, take, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>

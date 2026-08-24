@@ -50,17 +50,17 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Task<IEnumerable<TEntity>> GetAllVersionsSlimAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Retrieves the Guid keys of all versions for the specified node, with the current version first, followed by
+    ///     Retrieves the ids of versions for the specified node, with the current version first, followed by
     ///     previous versions in descending order by version date.
     /// </summary>
-    /// <param name="nodeKey">The Guid key of the content node whose version keys are to be retrieved.</param>
-    /// <param name="maxRows">The maximum number of version keys to return.</param>
+    /// <param name="nodeKey">The Guid key of the content node whose version ids are to be retrieved.</param>
+    /// <param name="skip">The number of versions to skip.</param>
+    /// <param name="take">The maximum number of version ids to return.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
-    ///     Up to <paramref name="maxRows" /> version keys, ordered with the current version first and older versions
-    ///     following in descending order by date.
+    ///     A page of version ids, ordered with the current version first and older versions following in descending order by date.
     /// </returns>
-    Task<IEnumerable<Guid>> GetVersionKeysAsync(Guid nodeKey, int maxRows, CancellationToken cancellationToken);
+    Task<IEnumerable<int>> GetVersionIdsAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a specific version of a content node by its Guid key.

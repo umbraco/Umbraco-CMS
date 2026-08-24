@@ -590,13 +590,24 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return Task.FromResult(result);
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<int> GetVersionIds(int id, int maxRows)
+    /// <inheritdoc />
+    public Task<IEnumerable<int>> GetVersionIdsAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType).GetAwaiter().GetResult();
+        if (idAttempt.Success is false)
         {
-            return _contentRepository.GetVersionIds(id, maxRows);
+            return Task.FromResult(Enumerable.Empty<int>());
         }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+
+        // The underlying NPoco query only supports a maximum row count, not an offset, so over-fetch
+        // and skip in memory - version counts per node are small, this never approaches query-size limits.
+        int maxRows = skip > int.MaxValue - take ? int.MaxValue : skip + take;
+        IEnumerable<int> result = _contentRepository.GetVersionIds(idAttempt.Result, maxRows).Skip(skip);
+        scope.Complete();
+        return Task.FromResult(result);
     }
 
     /// <summary>

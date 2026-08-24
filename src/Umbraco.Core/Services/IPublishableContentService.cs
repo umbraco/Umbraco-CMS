@@ -127,15 +127,6 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Gets top versions of content.
-    /// </summary>
-    /// <param name="id">The identifier of the content.</param>
-    /// <param name="topRows">The number of top versions to get.</param>
-    /// <returns>The version identifiers.</returns>
-    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-    IEnumerable<int> GetVersionIds(int id, int topRows);
-
-    /// <summary>
     ///     Rolls back the content to a specific version.
     /// </summary>
     /// <param name="id">The id of the content node.</param>

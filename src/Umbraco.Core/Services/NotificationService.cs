@@ -138,7 +138,7 @@ public class NotificationService : INotificationService
 
                 if (prevVersionDictionary.ContainsKey(entityForNotification.Id) == false)
                 {
-                    prevVersionDictionary[entityForNotification.Id] = GetPreviousVersion(entityForNotification.Id);
+                    prevVersionDictionary[entityForNotification.Id] = GetPreviousVersion(entityForNotification.Key);
                 }
 
                 // queue notification
@@ -288,14 +288,14 @@ public class NotificationService : INotificationService
     /// <summary>
     ///     Gets the previous version to the latest version of the content item if there is one
     /// </summary>
-    /// <param name="contentId"></param>
+    /// <param name="contentKey"></param>
     /// <returns></returns>
-    private IContentBase? GetPreviousVersion(int contentId)
+    private IContentBase? GetPreviousVersion(Guid contentKey)
     {
         // Regarding this: http://issues.umbraco.org/issue/U4-5180
         // we know they are descending from the service so we know that newest is first
         // we are only selecting the top 2 rows since that is all we need
-        var allVersions = _contentService.GetVersionIds(contentId, 2).ToList();
+        var allVersions = _contentService.GetVersionIdsAsync(contentKey, 0, 2, CancellationToken.None).GetAwaiter().GetResult().ToList();
         var prevVersionIndex = allVersions.Count > 1 ? 1 : 0;
         return _contentService.GetVersionAsync(allVersions[prevVersionIndex], CancellationToken.None).GetAwaiter().GetResult();
     }

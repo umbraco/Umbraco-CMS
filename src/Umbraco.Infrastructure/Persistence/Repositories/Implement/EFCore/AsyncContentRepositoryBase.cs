@@ -176,16 +176,17 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     }
 
     /// <inheritdoc />
-    public virtual async Task<IEnumerable<Guid>> GetVersionKeysAsync(Guid nodeKey, int maxRows, CancellationToken cancellationToken) =>
-        await AmbientScope.ExecuteWithContextAsync<IEnumerable<Guid>>(async db =>
+    public virtual async Task<IEnumerable<int>> GetVersionIdsAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken) =>
+        await AmbientScope.ExecuteWithContextAsync<IEnumerable<int>>(async db =>
         {
             return await db.ContentVersions
                 .Join(db.Nodes, version => version.NodeId, node => node.NodeId, (version, node) => new { version, node })
-                .Where(x => x.node.UniqueId == nodeKey)
-                .OrderByDescending(x => x.version.Current)
-                .ThenByDescending(x => x.version.VersionDate)
-                .Take(maxRows)
-                .Select(x => x.version.Key)
+                .Where(joined => joined.node.UniqueId == nodeKey)
+                .OrderByDescending(joined => joined.version.Current)
+                .ThenByDescending(joined => joined.version.VersionDate)
+                .Skip(skip)
+                .Take(take)
+                .Select(joined => joined.version.Id)
                 .ToListAsync(cancellationToken);
         });
 

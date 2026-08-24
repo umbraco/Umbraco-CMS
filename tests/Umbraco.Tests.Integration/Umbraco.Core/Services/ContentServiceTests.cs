@@ -478,7 +478,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public void Get_Top_Version_Ids()
+    public async Task Get_Top_Version_Ids()
     {
         // Arrange
         // Act
@@ -491,10 +491,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert
-        var allVersions = ContentService.GetVersionIds(content.Id, int.MaxValue);
+        var allVersions = await ContentService.GetVersionIdsAsync(content.Key, 0, int.MaxValue, CancellationToken.None);
         Assert.AreEqual(21, allVersions.Count());
 
-        var topVersions = ContentService.GetVersionIds(content.Id, 4);
+        var topVersions = await ContentService.GetVersionIdsAsync(content.Key, 0, 4, CancellationToken.None);
         Assert.AreEqual(4, topVersions.Count());
     }
 
