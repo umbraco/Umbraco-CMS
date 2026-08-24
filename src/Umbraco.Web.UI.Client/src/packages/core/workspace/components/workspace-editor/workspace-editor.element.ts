@@ -1,7 +1,7 @@
 import { UMB_WORKSPACE_VIEW_PATH_PATTERN } from '../../paths.js';
 import type { ManifestWorkspaceView } from '../../types.js';
+import type { UmbWorkspaceViewController } from '../index.js';
 import { UmbWorkspaceEditorContext } from './workspace-editor.context.js';
-import type { UmbWorkspaceViewContext } from './workspace-view.context.js';
 import {
 	css,
 	customElement,
@@ -80,7 +80,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	@state()
-	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
+	private _workspaceViews: Array<UmbWorkspaceViewController> = [];
 
 	@state()
 	private _hintMap: Map<string, UmbVariantHint> = new Map();
@@ -134,7 +134,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	#currentProvidedView?: UmbWorkspaceViewContext;
+	#currentProvidedView?: UmbWorkspaceViewController;
 	#createRoutes() {
 		const newRoutes: UmbRoute[] = [];
 
