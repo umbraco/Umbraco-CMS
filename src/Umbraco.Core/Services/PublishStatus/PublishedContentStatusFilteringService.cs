@@ -84,6 +84,9 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull();
     }
 
+    // GetByKeysAsync probes L0 again for whatever this tier missed, which it has to: it cannot assume
+    // its callers probed. The duplicate probe is what buys the fully synchronous all-L0-hit chunk, so
+    // this tier stays even though it looks redundant from here.
     private void ResolveCachedItems(IReadOnlyCollection<Guid> batchKeys, bool preview, IDictionary<Guid, IPublishedContent> results)
     {
         foreach (Guid key in batchKeys)

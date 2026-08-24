@@ -32,7 +32,7 @@ internal static class ChunkedTieredResolver
     /// <remarks>
     /// Chunk size starts at 1 and doubles up to <see cref="MaxChunkSize"/>. So a <c>FirstOrDefault()</c>
     /// materialises a single item, a full enumeration of N items uses O(log N + N / cap) chunks, and cold
-    /// over-fetch on a predicate short-circuit is bounded to roughly twice what the consumer draws. A
+    /// over-fetch when a consumer stops early is bounded to roughly twice what it draws. A
     /// chunk fully resolved by an earlier tier skips the later ones entirely — identical to the per-key
     /// warm path when everything is cached.
     /// </remarks>

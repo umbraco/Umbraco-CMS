@@ -46,6 +46,9 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
         => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull();
 
+    // GetByKeysAsync probes L0 again for whatever this tier missed, which it has to: it cannot assume
+    // its callers probed. The duplicate probe is what buys the fully synchronous all-L0-hit chunk, so
+    // this tier stays even though it looks redundant from here.
     private void ResolveCachedItems(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
     {
         foreach (Guid key in batchKeys)
