@@ -1912,7 +1912,7 @@ export default {
 			'Removing a child node will limit the editors options to create different content types beneath a node.',
 		usingEditor: 'using this editor will get updated with the new settings.',
 		historyCleanupHeading: 'History cleanup',
-		historyCleanupDescription: 'Allow overriding the global History Cleanup settings.',
+		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
 		historyCleanupPreventCleanup: 'Prevent cleanup',
