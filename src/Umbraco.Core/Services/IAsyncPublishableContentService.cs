@@ -50,4 +50,25 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
     Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a version of content.
+    /// </summary>
+    /// <remarks>
+    ///     Int-keyed rather than Guid-keyed: unlike content items, versions have no Guid key resolvable
+    ///     from a caller-facing identifier today, so this takes the version's raw database id directly.
+    /// </remarks>
+    /// <param name="versionId">The version identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The content version, or <c>null</c> if not found.</returns>
+    Task<TContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets all versions of content.
+    /// </summary>
+    /// <param name="contentKey">The Guid key of the content.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The content versions.</returns>
+    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
+    Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken);
 }

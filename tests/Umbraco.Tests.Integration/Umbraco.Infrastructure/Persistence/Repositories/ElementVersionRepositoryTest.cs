@@ -64,7 +64,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         ElementService.Publish(content, Array.Empty<string>());
         // At this point content has 5 versions, 3 historic versions, a draft version and a published version.
 
-        var allVersions = ElementService.GetVersions(content.Id);
+        var allVersions = await ElementService.GetVersionsAsync(content.Key, CancellationToken.None);
         Debug.Assert(allVersions.Count() == 5); // Sanity check
 
         using (var scope = ScopeProvider.CreateScope())

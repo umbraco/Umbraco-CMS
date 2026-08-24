@@ -297,7 +297,7 @@ public class NotificationService : INotificationService
         // we are only selecting the top 2 rows since that is all we need
         var allVersions = _contentService.GetVersionIds(contentId, 2).ToList();
         var prevVersionIndex = allVersions.Count > 1 ? 1 : 0;
-        return _contentService.GetVersion(allVersions[prevVersionIndex]);
+        return _contentService.GetVersionAsync(allVersions[prevVersionIndex], CancellationToken.None).GetAwaiter().GetResult();
     }
 
     private IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)

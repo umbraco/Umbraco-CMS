@@ -859,7 +859,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.IsFalse(content.Published);
-        var versions = ContentService.GetVersions(Subpage.Id).ToList();
+        var versions = (await ContentService.GetVersionsAsync(Subpage.Key, CancellationToken.None)).ToList();
         Assert.AreEqual(1, versions.Count);
 
         var version1 = content.VersionId;
@@ -893,7 +893,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual("John Farr", content1.GetValue("author"));
         Assert.AreEqual("Bob Hope", content1.GetValue("author", published: true));
 
-        versions = ContentService.GetVersions(Subpage.Id).ToList();
+        versions = (await ContentService.GetVersionsAsync(Subpage.Key, CancellationToken.None)).ToList();
         Assert.AreEqual(3, versions.Count);
 
         // versions come with most recent first
@@ -2465,7 +2465,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual("new author text", content.GetValue("author"));
 
         // make sure that the published version remained the same
-        var publishedContent = ContentService.GetVersion(content.PublishedVersionId);
+        var publishedContent = await ContentService.GetVersionAsync(content.PublishedVersionId, CancellationToken.None);
         Assert.AreEqual("another title of mine", publishedContent.GetValue("title"));
         Assert.IsNull(publishedContent.GetValue("bodyText"));
         Assert.AreEqual("new author", publishedContent.GetValue("author"));
@@ -3248,7 +3248,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var content = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.IsFalse(content.Published);
 
-        var versions = ContentService.GetVersions(Subpage.Id).ToList();
+        var versions = (await ContentService.GetVersionsAsync(Subpage.Key, CancellationToken.None)).ToList();
         Assert.AreEqual(1, versions.Count);
 
         var version1 = content.VersionId;
@@ -3307,7 +3307,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // rollback all values to version1
         var rollback = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
-        var rollto = ContentService.GetVersion(version1);
+        var rollto = await ContentService.GetVersionAsync(version1, CancellationToken.None);
         rollback.CopyFrom(rollto);
         rollback.Name = rollto.Name; // must do it explicitly
         ContentService.Save(rollback);
@@ -3331,7 +3331,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // rollback all values to current version
         // special because... current has edits... this really is equivalent to rolling back to version2
         var rollback2 = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
-        var rollto2 = ContentService.GetVersion(version3);
+        var rollto2 = await ContentService.GetVersionAsync(version3, CancellationToken.None);
         rollback2.CopyFrom(rollto2);
         rollback2.Name = rollto2.PublishName; // must do it explicitely AND must pick the publish one!
         ContentService.Save(rollback2);
@@ -3353,7 +3353,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.SetValue("author", "Bob Doe");
         ContentService.Save(content);
         Assert.IsTrue(content.Edited);
-        rollto = ContentService.GetVersion(content.VersionId);
+        rollto = await ContentService.GetVersionAsync(content.VersionId, CancellationToken.None);
         content.CopyFrom(rollto);
         content.Name = rollto.PublishName; // must do it explicitely AND must pick the publish one!
         ContentService.Save(content);
@@ -3438,7 +3438,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var versionId4 = page.VersionId;
 
         // now get all versions
-        var versions = ContentService.GetVersions(page.Id).ToArray();
+        var versions = (await ContentService.GetVersionsAsync(page.Key, CancellationToken.None)).ToArray();
 
         Assert.AreEqual(5, versions.Length);
 
@@ -3538,7 +3538,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(page);
         var versionId5 = page.VersionId;
 
-        versions = ContentService.GetVersions(page.Id).ToArray();
+        versions = (await ContentService.GetVersionsAsync(page.Key, CancellationToken.None)).ToArray();
 
         // we just update the current version
         Assert.AreEqual(5, versions.Length);
@@ -3983,7 +3983,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
-        var versions = ContentService.GetVersions(content.Id);
+        var versions = (await ContentService.GetVersionsAsync(content.Key, CancellationToken.None)).ToList();
         Assert.AreEqual(1, versions.Count());
 
         // publish content
@@ -3999,7 +3999,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(content.Published);
         Assert.IsFalse(content.Edited);
 
-        versions = ContentService.GetVersions(content.Id);
+        versions = (await ContentService.GetVersionsAsync(content.Key, CancellationToken.None)).ToList();
         Assert.AreEqual(2, versions.Count());
 
         Assert.AreEqual("foo", content.GetValue("title", published: true));
@@ -4035,7 +4035,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.AreEqual("foo", content.GetValue("title", published: true)); // still there
         Assert.AreEqual("foo", content.GetValue("title"));
 
-        versions = ContentService.GetVersions(content.Id);
+        versions = (await ContentService.GetVersionsAsync(content.Key, CancellationToken.None)).ToList();
         Assert.AreEqual(2, versions.Count());
 
         // ah - we have a problem here - since we're not published we don't have published values

@@ -231,7 +231,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             : null;
 
         // Get the version
-        TContent? version = GetVersion(versionId);
+        TContent? version = GetVersionAsync(versionId, CancellationToken.None).GetAwaiter().GetResult();
 
         // Good old null checks
         if (content == null || version == null || content.Trashed)
@@ -425,24 +425,24 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         return result;
     }
 
-    /// <inheritdoc/>
-    public TContent? GetVersion(int versionId)
+    /// <inheritdoc />
+    public async Task<TContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetVersion(versionId);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        TContent? result = await _asyncContentRepository.GetVersionAsync(versionId, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<TContent> GetVersions(int id)
+    /// <inheritdoc />
+    public async Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetAllVersions(id);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = await _asyncContentRepository.GetAllVersionsAsync(contentKey, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc/>
@@ -1696,7 +1696,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
             if (deletePriorVersions)
             {
-                TContent? content = GetVersion(versionId);
+                TContent? content = GetVersionAsync(versionId, CancellationToken.None).GetAwaiter().GetResult();
                 DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
             }
 

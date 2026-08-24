@@ -2037,7 +2037,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Console.WriteLine(v3);
 
             ResetEvents();
-            content.CopyFrom(ContentService.GetVersion(v2));
+            content.CopyFrom(ContentService.GetVersionAsync(v2, CancellationToken.None).GetAwaiter().GetResult());
             ContentService.Save(content);
 
             Assert.AreEqual(2, _msgCount);

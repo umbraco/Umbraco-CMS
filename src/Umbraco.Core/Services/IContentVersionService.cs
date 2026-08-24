@@ -36,8 +36,9 @@ public interface IContentVersionService
     ///     Gets a specific content version by its unique identifier.
     /// </summary>
     /// <param name="versionId">The unique identifier of the version.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An attempt containing the content version or an error status.</returns>
-    Task<Attempt<IContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId);
+    Task<Attempt<IContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Sets whether a content version should be prevented from automatic cleanup.

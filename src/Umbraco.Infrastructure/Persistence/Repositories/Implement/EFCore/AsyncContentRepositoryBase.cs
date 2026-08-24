@@ -193,6 +193,9 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     public abstract Task<TEntity?> GetVersionAsync(Guid versionKey, CancellationToken cancellationToken);
 
     /// <inheritdoc />
+    public abstract Task<TEntity?> GetVersionAsync(int versionId, CancellationToken cancellationToken);
+
+    /// <inheritdoc />
     public virtual async Task DeleteVersionAsync(Guid versionKey, CancellationToken cancellationToken)
     {
         var versionId = await AmbientScope.ExecuteWithContextAsync(async db =>

@@ -71,6 +71,18 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Task<TEntity?> GetVersionAsync(Guid versionKey, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Gets a specific version of a content node by its version id.
+    /// </summary>
+    /// <remarks>
+    ///     Int-keyed rather than Guid-keyed: unlike content nodes, versions have no Guid key resolvable
+    ///     from a caller-facing identifier today, so this takes the version's raw database id directly.
+    /// </remarks>
+    /// <param name="versionId">The id of the version.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The content entity at the specified version, or <c>null</c> if not found.</returns>
+    Task<TEntity?> GetVersionAsync(int versionId, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Deletes a specific version by its Guid key.
     /// </summary>
     /// <param name="versionKey">The Guid key of the version to delete.</param>

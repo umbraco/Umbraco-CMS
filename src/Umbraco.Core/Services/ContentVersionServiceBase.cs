@@ -24,6 +24,7 @@ internal abstract class ContentVersionServiceBase<TContent>
     private readonly ILanguageRepository _languageRepository;
     private readonly IEntityService _entityService;
     private readonly IPublishableContentService<TContent> _contentService;
+    private readonly IAsyncPublishableContentService<TContent> _asyncContentService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly ILogger<ContentVersionServiceBase<TContent>> _logger;
     private readonly IOptionsMonitor<ContentSettings> _contentSettings;
@@ -41,6 +42,7 @@ internal abstract class ContentVersionServiceBase<TContent>
         ILanguageRepository languageRepository,
         IEntityService entityService,
         IPublishableContentService<TContent> contentService,
+        IAsyncPublishableContentService<TContent> asyncContentService,
         IUserIdKeyResolver userIdKeyResolver,
         IOptionsMonitor<ContentSettings> contentSettings)
     {
@@ -53,6 +55,7 @@ internal abstract class ContentVersionServiceBase<TContent>
         _languageRepository = languageRepository;
         _entityService = entityService;
         _contentService = contentService;
+        _asyncContentService = asyncContentService;
         _userIdKeyResolver = userIdKeyResolver;
         _contentSettings = contentSettings;
     }
@@ -102,15 +105,15 @@ internal abstract class ContentVersionServiceBase<TContent>
             ContentVersionOperationStatus.Success, new PagedModel<ContentVersionMeta>(total, versions)));
     }
 
-    public Task<Attempt<TContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId)
+    public async Task<Attempt<TContent?, ContentVersionOperationStatus>> GetAsync(Guid versionId, CancellationToken cancellationToken)
     {
-        TContent? version = _contentService.GetVersion(versionId.ToInt());
+        TContent? version = await _asyncContentService.GetVersionAsync(versionId.ToInt(), cancellationToken);
         if (version is null)
         {
-            return Task.FromResult(Attempt<TContent?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound));
+            return Attempt<TContent?, ContentVersionOperationStatus>.Fail(ContentVersionOperationStatus.NotFound);
         }
 
-        return Task.FromResult(Attempt<TContent?, ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success, version));
+        return Attempt<TContent?, ContentVersionOperationStatus>.Succeed(ContentVersionOperationStatus.Success, version);
     }
 
     public async Task<Attempt<ContentVersionOperationStatus>> SetPreventCleanupAsync(Guid versionId, bool preventCleanup, Guid userKey)

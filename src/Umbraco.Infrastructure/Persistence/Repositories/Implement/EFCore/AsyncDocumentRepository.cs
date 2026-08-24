@@ -474,6 +474,28 @@ internal class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
+    public override Task<IContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            // Filter by the version's own id; no Current filter — historical versions are valid targets.
+            // The Nodes join guards against returning versions that belong to a different object type.
+            DocumentRow? row = await BuildBaseQuery(
+                    db,
+                    db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey),
+                    contentVersionFilter: contentVersion => contentVersion.Id == versionId)
+                .Select(ToDocumentRow)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (row is null)
+            {
+                return null;
+            }
+
+            List<IContent> entities = await AssembleEntitiesAsync([row], db);
+            return entities.FirstOrDefault();
+        });
+
+    /// <inheritdoc />
     public override Task<PagedModel<IContent>> GetChildrenAsync(
         Guid? parentKey, int skip, int take, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken)
         => GetChildrenCoreAsync(parentKey, skip, take, propertyAliases, ordering, loadTemplates: true, cancellationToken);
@@ -1584,9 +1606,20 @@ internal class AsyncDocumentRepository
             if (propertyDtosByVersionId.TryGetValue(row.ContentVersion.Id, out List<PropertyDataDto>? currentProps))
             {
                 versionPropertyDtos.AddRange(currentProps);
+
+                // A fetched version can itself be the node's published version (e.g. fetching a specific,
+                // still-published version by id). PropertyFactory.BuildEntities classifies a dto as published
+                // purely by VersionId == publishedVersionId, so without a distinct draft-side entry every
+                // value would be published-only, leaving the unqualified (draft) accessor empty. Mirrors the
+                // "dirty corner case" handled the same way in ContentRepositoryBase.GetPropertyCollections.
+                if (row.ContentVersion.Id == row.PublishedContentVersion?.Id)
+                {
+                    versionPropertyDtos.AddRange(currentProps.Select(dto => dto.Clone(-1)));
+                }
             }
 
             if (row.PublishedContentVersion is not null &&
+                row.PublishedContentVersion.Id != row.ContentVersion.Id &&
                 propertyDtosByVersionId.TryGetValue(row.PublishedContentVersion.Id, out List<PropertyDataDto>? pubProps))
             {
                 versionPropertyDtos.AddRange(pubProps);

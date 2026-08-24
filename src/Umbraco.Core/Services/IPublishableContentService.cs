@@ -130,14 +130,6 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     ///     Gets all versions of content.
     /// </summary>
     /// <param name="id">The identifier of the content.</param>
-    /// <returns>The content versions.</returns>
-    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-    IEnumerable<TContent> GetVersions(int id);
-
-    /// <summary>
-    ///     Gets all versions of content.
-    /// </summary>
-    /// <param name="id">The identifier of the content.</param>
     /// <param name="skip">The number of versions to skip.</param>
     /// <param name="take">The number of versions to take.</param>
     /// <returns>The content versions.</returns>
@@ -152,13 +144,6 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     /// <returns>The version identifiers.</returns>
     /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
     IEnumerable<int> GetVersionIds(int id, int topRows);
-
-    /// <summary>
-    ///     Gets a version of content.
-    /// </summary>
-    /// <param name="versionId">The version identifier.</param>
-    /// <returns>The content version, or null if not found.</returns>
-    TContent? GetVersion(int versionId);
 
     /// <summary>
     ///     Rolls back the content to a specific version.

@@ -335,8 +335,8 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var publishedVersionId = reloadedDraft.PublishedVersionId;
         IPublishableContentBase? publishedVersion = isElement
-            ? ElementService.GetVersions(instance.Id).FirstOrDefault(v => v.VersionId == publishedVersionId)
-            : ContentService.GetVersions(instance.Id).FirstOrDefault(v => v.VersionId == publishedVersionId);
+            ? (await ElementService.GetVersionsAsync(instance.Key, CancellationToken.None)).FirstOrDefault(v => v.VersionId == publishedVersionId)
+            : (await ContentService.GetVersionsAsync(instance.Key, CancellationToken.None)).FirstOrDefault(v => v.VersionId == publishedVersionId);
         Assert.IsNotNull(publishedVersion, "Expected the originally-published version to still exist after the variance change.");
         Assert.AreEqual("published value", publishedVersion!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
         Assert.IsNull(publishedVersion.GetValue<string>(VarianceTestPropertyAlias));

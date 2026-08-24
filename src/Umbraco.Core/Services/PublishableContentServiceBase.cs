@@ -39,6 +39,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IIdKeyMap _idKeyMap;
 
+    /// <summary>
+    ///     Gets the id/key map used to resolve between int ids and Guid keys.
+    /// </summary>
+    protected IIdKeyMap IdKeyMap => _idKeyMap;
+
     protected PublishableContentServiceBase(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -219,7 +224,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         TContent? content = GetById(id);
 
         // Get the version
-        TContent? version = GetVersion(versionId);
+        TContent? version = GetVersionAsync(versionId, CancellationToken.None).GetAwaiter().GetResult();
 
         // Good old null checks
         if (content == null || version == null || content.Trashed)
@@ -543,24 +548,30 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         }
     }
 
-    /// <inheritdoc/>
-    public TContent? GetVersion(int versionId)
+    /// <inheritdoc />
+    public Task<TContent?> GetVersionAsync(int versionId, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetVersion(versionId);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        TContent? result = _contentRepository.GetVersion(versionId);
+        scope.Complete();
+        return Task.FromResult(result);
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<TContent> GetVersions(int id)
+    /// <inheritdoc />
+    public Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType).GetAwaiter().GetResult();
+        if (idAttempt.Success is false)
         {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetAllVersions(id);
+            return Task.FromResult(Enumerable.Empty<TContent>());
         }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = _contentRepository.GetAllVersions(idAttempt.Result);
+        scope.Complete();
+        return Task.FromResult(result);
     }
 
     /// <inheritdoc/>
@@ -1877,7 +1888,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
             if (deletePriorVersions)
             {
-                TContent? content = GetVersion(versionId);
+                TContent? content = GetVersionAsync(versionId, CancellationToken.None).GetAwaiter().GetResult();
                 DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
             }
 

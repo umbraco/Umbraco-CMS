@@ -51,6 +51,7 @@ internal sealed class ContentVersionService : ContentVersionServiceBase<IContent
             languageRepository,
             entityService,
             contentService,
+            contentService,
             userIdKeyResolver,
             contentSettings)
     {
