@@ -9,7 +9,7 @@ import type { Observable } from '@umbraco-cms/backoffice/observable-api';
  * otherwise it would look like the item was removed and a new one added in its place.
  * Return undefined for items that should be ignored entirely.
  */
-export type UmbValidationDataPathResolver<ItemType> = (item: ItemType) => string | undefined;
+export type UmbValidationCleanUpByDataPathDataPathResolver<ItemType> = (item: ItemType) => string | undefined;
 
 /**
  * Removes the validation messages of items that disappear from an observed array of items.
@@ -23,7 +23,7 @@ export type UmbValidationDataPathResolver<ItemType> = (item: ItemType) => string
  * what was removed before this manager began observing.
  * @example
  * ```ts
- * new UmbValidationCleanUpManager<PropertyEditorSettingsProperty>(
+ * new UmbValidationCleanUpByPathManager<PropertyEditorSettingsProperty>(
  * 	this,
  * 	this.validationContext,
  * 	this.properties,
@@ -31,9 +31,9 @@ export type UmbValidationDataPathResolver<ItemType> = (item: ItemType) => string
  * );
  * ```
  */
-export class UmbValidationCleanUpManager<ItemType = unknown> extends UmbControllerBase {
+export class UmbValidationCleanUpByPathManager<ItemType = unknown> extends UmbControllerBase {
 	readonly #validation: UmbValidationController;
-	readonly #dataPathResolver: UmbValidationDataPathResolver<ItemType>;
+	readonly #dataPathResolver: UmbValidationCleanUpByDataPathDataPathResolver<ItemType>;
 
 	/**
 	 * The data paths of the items of the latest emission.
@@ -42,18 +42,18 @@ export class UmbValidationCleanUpManager<ItemType = unknown> extends UmbControll
 	#currentDataPaths?: Set<string>;
 
 	/**
-	 * Creates an instance of UmbValidationCleanUpManager.
+	 * Creates an instance of UmbValidationCleanUpByPathManager.
 	 * @param {UmbControllerHost} host - The host of this controller.
 	 * @param {UmbValidationController} validationController - The Validation Context to remove messages from.
 	 * @param {Observable<Array<ItemType>>} items - An Observable of the items to observe for removals.
-	 * @param {UmbValidationDataPathResolver<ItemType>} dataPathResolver - Resolves the validation data path of a given item.
+	 * @param {UmbValidationCleanUpByDataPathDataPathResolver<ItemType>} dataPathResolver - Resolves the validation data path of a given item.
 	 * @param {UmbControllerAlias} [controllerAlias] - An optional controller alias, enables replacing this manager with a new one.
 	 */
 	constructor(
 		host: UmbControllerHost,
 		validationController: UmbValidationController,
 		items: Observable<Array<ItemType>>,
-		dataPathResolver: UmbValidationDataPathResolver<ItemType>,
+		dataPathResolver: UmbValidationCleanUpByDataPathDataPathResolver<ItemType>,
 		controllerAlias?: UmbControllerAlias,
 	) {
 		super(host, controllerAlias);

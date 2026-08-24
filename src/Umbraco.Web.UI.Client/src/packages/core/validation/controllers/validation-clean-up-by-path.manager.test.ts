@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { UmbValidationController } from './validation.controller.js';
-import { UmbValidationCleanUpManager } from './validation-clean-up.manager.js';
+import { UmbValidationCleanUpByPathManager } from './validation-clean-up-by-path.manager.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -17,7 +17,7 @@ interface TestItem {
 const dataPathOfKey = (key: string) => `$.contentData[?(@.key == '${key}')]`;
 const dataPathResolver = (item: TestItem) => dataPathOfKey(item.key);
 
-describe('UmbValidationCleanUpManager', () => {
+describe('UmbValidationCleanUpByPathManager', () => {
 	let host: UmbControllerHostElementElement;
 	let validation: UmbValidationController;
 	let items: UmbArrayState<TestItem>;
@@ -36,7 +36,7 @@ describe('UmbValidationCleanUpManager', () => {
 		validation.messages.addMessage('server', dataPathOfKey('missing'), 'error');
 		items.setValue([{ key: 'a' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
 
 		expect(validation.messages.getHasAnyMessages()).to.be.true;
 	});
@@ -46,7 +46,7 @@ describe('UmbValidationCleanUpManager', () => {
 		validation.messages.addMessage('server', dataPathOfKey('b'), 'error-b');
 		items.setValue([{ key: 'a' }, { key: 'b' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
 
 		items.removeOne('a');
 
@@ -63,7 +63,7 @@ describe('UmbValidationCleanUpManager', () => {
 		);
 		items.setValue([{ key: 'a' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
 
 		items.removeOne('a');
 
@@ -76,7 +76,7 @@ describe('UmbValidationCleanUpManager', () => {
 		validation.messages.addMessage('server', dataPathOfKey('b'), 'error-b');
 		items.setValue([{ key: 'a' }, { key: 'b' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
 
 		items.removeOne('a');
 
@@ -88,7 +88,7 @@ describe('UmbValidationCleanUpManager', () => {
 		validation.messages.addMessage('server', dataPathOfKey('a2'), 'error-a2');
 		items.setValue([{ key: 'a' }, { key: 'a2' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
 
 		items.removeOne('a');
 
@@ -101,7 +101,7 @@ describe('UmbValidationCleanUpManager', () => {
 		validation.messages.addMessage('server', dataPathOfKey('c'), 'error-c');
 		items.setValue([{ key: 'a' }, { key: 'b' }, { key: 'c' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
 
 		let emissionCount = 0;
 		validation.messages.messages.subscribe(() => emissionCount++);
@@ -119,7 +119,7 @@ describe('UmbValidationCleanUpManager', () => {
 		validation.messages.addMessage('server', dataPathOfKey('b'), 'error-b');
 		items.setValue([{ key: 'a' }, { key: 'b' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
 
 		items.setValue([{ key: 'b' }, { key: 'a' }]); // reorder
 		items.updateOne('a', { name: 'renamed' }); // field update
@@ -132,7 +132,7 @@ describe('UmbValidationCleanUpManager', () => {
 		validation.messages.addMessage('server', dataPathOfKey('a'), 'error-a');
 		items.setValue([{ key: 'a' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
 
 		items.setValue([]);
 
@@ -143,11 +143,8 @@ describe('UmbValidationCleanUpManager', () => {
 		validation.messages.addMessage('server', dataPathOfKey('a'), 'error-a');
 		items.setValue([{ key: 'a' }, { key: '' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(
-			host,
-			validation,
-			items.asObservable(),
-			(item) => (item.key ? dataPathOfKey(item.key) : undefined),
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), (item) =>
+			item.key ? dataPathOfKey(item.key) : undefined,
 		);
 
 		items.removeOne('a');
@@ -160,7 +157,12 @@ describe('UmbValidationCleanUpManager', () => {
 		validation.messages.addMessage('server', dataPathOfKey('a'), 'error-a');
 		items.setValue([{ key: 'a' }]);
 
-		const manager = new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		const manager = new UmbValidationCleanUpByPathManager<TestItem>(
+			host,
+			validation,
+			items.asObservable(),
+			dataPathResolver,
+		);
 		manager.destroy();
 
 		items.removeOne('a');
@@ -171,7 +173,7 @@ describe('UmbValidationCleanUpManager', () => {
 	it('does not throw when the Validation Context has already been destroyed', async () => {
 		items.setValue([{ key: 'a' }]);
 
-		new UmbValidationCleanUpManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
+		new UmbValidationCleanUpByPathManager<TestItem>(host, validation, items.asObservable(), dataPathResolver);
 
 		validation.destroy();
 
