@@ -574,6 +574,30 @@ const rawData: Array<
 					labelOnTop: false,
 				},
 			},
+			{
+				id: 'pt-155',
+				container: {
+					id: '38c46685-f235-4584-b245-11553d500484',
+				},
+				alias: 'contentPickerDefaultConfigNotFound',
+				name: 'Content Picker - Default Config - Not Found',
+				description: null,
+				dataType: {
+					id: '1bd0d68f-8fe9-4906-bb5e-e33eafa83aa3',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 4,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{
@@ -1654,6 +1678,30 @@ const rawData: Array<
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'pt-156',
+				container: {
+					id: 'f516f9ea-e299-4f9d-892e-46c39d93489c',
+				},
+				alias: 'memberPickerNotFound',
+				name: 'Member Picker - Not Found',
+				description: null,
+				dataType: {
+					id: '2555acc6-6adf-4cc3-b0bd-86a2dfdcc7b1',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -3263,6 +3311,30 @@ const rawData: Array<
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'pt-157',
+				container: {
+					id: 'b439bb1f-215f-4dcc-9db5-d27354ad61ef',
+				},
+				alias: 'userPickerNotFound',
+				name: 'User Picker - Not Found',
+				description: null,
+				dataType: {
+					id: '3387e5da-4e32-43dc-b4dc-840fcbc468f9',
+				},
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
