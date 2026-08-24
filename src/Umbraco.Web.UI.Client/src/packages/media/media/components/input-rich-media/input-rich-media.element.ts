@@ -47,6 +47,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		},
 		identifier: 'Umb.SorterIdentifier.InputRichMedia',
 		itemSelector: 'uui-card-media',
+		disabledItemSelector: '[error]',
 		containerSelector: '.container',
 		resolvePlacement: UmbSorterResolvePlacementAsGrid,
 		onChange: ({ model }) => {
@@ -389,7 +390,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		return html`
 			${repeat(
 				this._cards,
-				(item) => item.unique,
+				// Re-key on not-found state so the sorter re-evaluates `disabledItemSelector` when an item settles
+				// into "not found" — the sorter only checks this when an element is first mounted.
+				(item) => `${item.unique}:${item.isNotFound ?? false}`,
 				(item) => this.#renderItem(item),
 			)}
 		`;

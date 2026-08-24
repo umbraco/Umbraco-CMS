@@ -36,6 +36,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		},
 		identifier: 'Umb.SorterIdentifier.InputMedia',
 		itemSelector: 'uui-card-media',
+		disabledItemSelector: '[error]',
 		containerSelector: '.container',
 		resolvePlacement: UmbSorterResolvePlacementAsGrid,
 		onChange: ({ model }) => {
@@ -223,7 +224,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		return html`
 			${repeat(
 				this._statuses,
-				(status) => status.unique,
+				// Re-key on error state so the sorter re-evaluates `disabledItemSelector` when an item settles
+				// into "not found" — the sorter only checks this when an element is first mounted.
+				(status) => `${status.unique}:${status.state.type === 'error'}`,
 				(status) => this.#renderItem(status),
 			)}
 		`;
