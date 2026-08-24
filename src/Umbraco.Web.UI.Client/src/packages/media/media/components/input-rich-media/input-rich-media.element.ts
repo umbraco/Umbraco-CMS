@@ -14,6 +14,7 @@ import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 
 import '@umbraco-cms/backoffice/imaging';
@@ -28,6 +29,7 @@ type UmbRichMediaCardModel = {
 	icon?: string;
 	isTrashed?: boolean;
 	isLoading?: boolean;
+	isNotFound?: boolean;
 };
 
 @customElement('umb-input-rich-media')
@@ -166,6 +168,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 	private _cards: Array<UmbRichMediaCardModel> = [];
 
 	@state()
+	private _statuses: Array<UmbRepositoryItemsStatus> = [];
+
+	@state()
 	private _routeBuilder?: UmbModalRouteBuilder;
 
 	readonly #itemManager = new UmbRepositoryItemsManager<UmbMediaItemModel>(this, UMB_MEDIA_ITEM_REPOSITORY_ALIAS);
@@ -182,6 +187,15 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this.observe(
 			this.#itemManager.items,
 			() => {
+				this.#populateCards();
+			},
+			null,
+		);
+
+		this.observe(
+			this.#itemManager.statuses,
+			(statuses) => {
+				this._statuses = statuses;
 				this.#populateCards();
 			},
 			null,
@@ -278,13 +292,15 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		this._cards =
 			this.value?.map((item) => {
 				const media = mediaItems.find((x) => x.unique === item.mediaKey);
+				const isNotFound = this._statuses.find((x) => x.unique === item.mediaKey)?.state.type === 'error';
 				return {
 					unique: item.key,
 					media: item.mediaKey,
 					name: media?.name ?? '',
 					icon: media?.mediaType?.icon,
 					isTrashed: media?.isTrashed ?? false,
-					isLoading: !media,
+					isLoading: !media && !isNotFound,
+					isNotFound,
 				};
 			}) ?? [];
 	}
@@ -401,6 +417,11 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 
 	#renderItem(item: UmbRichMediaCardModel) {
 		if (!item.unique) return nothing;
+
+		if (item.isNotFound) {
+			return this.#renderNotFoundItem(item);
+		}
+
 		const href = this.readonly ? undefined : this._routeBuilder?.({ key: item.unique });
 
 		return html`
@@ -412,6 +433,15 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					.externalLoading=${item.isLoading ?? false}></umb-media-thumbnail>
 
 				${this.#renderIsTrashed(item)} ${this.#renderActions(item)}
+			</uui-card-media>
+		`;
+	}
+
+	#renderNotFoundItem(item: UmbRichMediaCardModel) {
+		return html`
+			<uui-card-media id=${item.unique} error disabled name=${this.localize.string('#general_notFound')}>
+				<umb-icon name="icon-alert"></umb-icon>
+				${this.#renderActions(item)}
 			</uui-card-media>
 		`;
 	}
