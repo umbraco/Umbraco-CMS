@@ -159,12 +159,13 @@ export class UmbPropertyElement extends UmbLitElement {
 			'observeValidationState',
 		);
 
-		this.#setupControlValidation();
-
 		// If the dataPath changes, it means that the variant this property has switched (a property that doesn't vary by culture/segment never reaches this, as its dataPath stays put).
 		// Re-create the Property Editor UI element for that unless it has declared it keeps itself up to date on its own, so it always initializes fresh element for each variant. [NL]
 		if (oldDataPath !== undefined && dataPath !== oldDataPath && this.#manifest?.meta.supportsVariantChange !== true) {
 			this.#initiateEditor();
+		} else {
+			// If not re-creating the element, we can just setup the validation: [NL]
+			this.#setupControlValidation();
 		}
 	}
 	public get dataPath(): string | undefined {
