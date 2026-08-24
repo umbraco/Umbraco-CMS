@@ -105,17 +105,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     private void TruncateContent()
-    {
-        if (Database.DatabaseType == DatabaseType.SqlServer2012)
-        {
-            Database.Execute($"TRUNCATE TABLE cmsContentNu");
-        }
-
-        if (Database.DatabaseType == DatabaseType.SQLite)
-        {
-            Database.Execute($"DELETE FROM cmsContentNu");
-        }
-    }
+        => Database.TruncateTable(SqlSyntax, Constants.DatabaseSchema.Tables.NodeData);
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
