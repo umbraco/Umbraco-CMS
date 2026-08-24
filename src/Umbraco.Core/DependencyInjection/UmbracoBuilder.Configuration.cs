@@ -58,7 +58,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<SecuritySettings>, SecuritySettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<ScheduledPublishingSettings>, ScheduledPublishingSettingsValidator>();
-        builder.Services.AddSingleton<IValidateOptions<SchemaLockdownSettings>, SchemaLockdownSettingsValidator>();
 
         // Register configuration sections.
         // TODO (V18): Remove the registrations of UserPasswordConfigurationSettings and MemberPasswordConfigurationSettings.
@@ -89,7 +88,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<NuCacheSettings>()
             .AddUmbracoOptions<RequestHandlerSettings>()
             .AddUmbracoOptions<RuntimeSettings>()
-            .AddUmbracoOptions<SchemaLockdownSettings>(options => options.ValidateOnStart())
             .AddUmbracoOptions<SecuritySettings>()
             .AddUmbracoOptions<TypeFinderSettings>()
             .AddUmbracoOptions<UserPasswordConfigurationSettings>()

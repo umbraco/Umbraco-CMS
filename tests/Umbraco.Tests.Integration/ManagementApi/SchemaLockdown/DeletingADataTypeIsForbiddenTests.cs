@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
@@ -15,10 +15,12 @@ public class DeletingADataTypeIsForbiddenTests : ManagementApiTest<DeleteDataTyp
     protected override Expression<Func<DeleteDataTypeController, object>> MethodSelector { get; set; }
         = x => x.Delete(CancellationToken.None, Guid.Empty);
 
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+        => builder.SchemaLockdownConfigurators().Append<LockDataTypesConfigurator>();
+
     [SetUp]
     public override void Setup()
     {
-        InMemoryConfiguration[$"{Constants.Configuration.ConfigSchemaLockdown}:Enabled"] = "true";
         InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
         base.Setup();
         AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true).GetAwaiter().GetResult();

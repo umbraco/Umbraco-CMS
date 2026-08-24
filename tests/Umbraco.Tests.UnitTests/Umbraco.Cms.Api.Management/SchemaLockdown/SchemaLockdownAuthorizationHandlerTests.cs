@@ -7,12 +7,10 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Services;
 
@@ -33,11 +31,17 @@ public class SchemaLockdownAuthorizationHandlerTests
         }
     }
 
-    private static SchemaLockdownAuthorizationHandler CreateHandler(bool enabled, RuntimeLevel runtimeLevel)
+    private sealed class LockDocumentTypes : ISchemaLockdownConfigurator
     {
+        public void Configure(SchemaLockdownMatrix matrix)
+            => matrix.BlockMutations(Constants.UdiEntityType.DocumentType);
+    }
+
+    private static SchemaLockdownAuthorizationHandler CreateHandler(bool lockDocumentTypes, RuntimeLevel runtimeLevel)
+    {
+        ISchemaLockdownConfigurator[] configurators = lockDocumentTypes ? [new LockDocumentTypes()] : [];
         var accessor = new SchemaLockdownMatrixAccessor(
-            Options.Create(new SchemaLockdownSettings { Enabled = enabled }),
-            new SchemaLockdownConfiguratorCollection(() => []));
+            new SchemaLockdownConfiguratorCollection(() => configurators));
 
         var runtimeState = new Mock<IRuntimeState>();
         runtimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
@@ -93,7 +97,7 @@ public class SchemaLockdownAuthorizationHandlerTests
         SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(HttpMethods.Get));
 
-        await CreateHandler(enabled: true, RuntimeLevel.Run).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
 
         Assert.That(context.HasSucceeded, Is.True);
     }
@@ -106,7 +110,7 @@ public class SchemaLockdownAuthorizationHandlerTests
         SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(httpMethod));
 
-        await CreateHandler(enabled: false, RuntimeLevel.Run).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: false, RuntimeLevel.Run).HandleAsync(context);
 
         Assert.That(context.HasSucceeded, Is.True);
     }
@@ -119,7 +123,7 @@ public class SchemaLockdownAuthorizationHandlerTests
         SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(httpMethod));
 
-        await CreateHandler(enabled: true, RuntimeLevel.Run).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
 
         Assert.Multiple(() =>
         {
@@ -139,8 +143,8 @@ public class SchemaLockdownAuthorizationHandlerTests
         AuthorizationHandlerContext lockedContext = CreateContext(locked, CreateHttpContext(HttpMethods.Post));
         AuthorizationHandlerContext unlockedContext = CreateContext(unlocked, CreateHttpContext(HttpMethods.Post));
 
-        await CreateHandler(enabled: true, RuntimeLevel.Run).HandleAsync(lockedContext);
-        await CreateHandler(enabled: true, RuntimeLevel.Run).HandleAsync(unlockedContext);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(lockedContext);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(unlockedContext);
 
         Assert.Multiple(() =>
         {
@@ -157,7 +161,7 @@ public class SchemaLockdownAuthorizationHandlerTests
             requirement,
             CreateHttpContext(HttpMethods.Post, nameof(DocumentTypeController.PostButReadOnly)));
 
-        await CreateHandler(enabled: true, RuntimeLevel.Run).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
 
         Assert.That(context.HasSucceeded, Is.True);
     }
@@ -170,7 +174,7 @@ public class SchemaLockdownAuthorizationHandlerTests
             requirement,
             CreateFilterContext(CreateHttpContext(HttpMethods.Post)));
 
-        await CreateHandler(enabled: true, RuntimeLevel.Run).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
 
         Assert.Multiple(() =>
         {
@@ -187,7 +191,7 @@ public class SchemaLockdownAuthorizationHandlerTests
             requirement,
             CreateFilterContext(CreateHttpContext(HttpMethods.Get)));
 
-        await CreateHandler(enabled: true, RuntimeLevel.Run).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
 
         Assert.That(context.HasSucceeded, Is.True);
     }
@@ -202,7 +206,7 @@ public class SchemaLockdownAuthorizationHandlerTests
             requirement,
             actionName is null ? null : CreateEndpoint(actionName));
 
-        await CreateHandler(enabled: true, RuntimeLevel.Run).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
 
         Assert.Multiple(() =>
         {
@@ -220,7 +224,7 @@ public class SchemaLockdownAuthorizationHandlerTests
             requirement,
             CreateEndpoint(nameof(DocumentTypeController.PostButReadOnly)));
 
-        await CreateHandler(enabled: true, RuntimeLevel.Run).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
 
         Assert.That(context.HasSucceeded, Is.True);
     }
@@ -231,7 +235,7 @@ public class SchemaLockdownAuthorizationHandlerTests
         SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(HttpMethods.Post));
 
-        await CreateHandler(enabled: true, RuntimeLevel.Upgrade).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Upgrade).HandleAsync(context);
 
         Assert.Multiple(() =>
         {
@@ -250,7 +254,7 @@ public class SchemaLockdownAuthorizationHandlerTests
         SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(HttpMethods.Post));
 
-        await CreateHandler(enabled: true, runtimeLevel).HandleAsync(context);
+        await CreateHandler(lockDocumentTypes: true, runtimeLevel).HandleAsync(context);
 
         Assert.Multiple(() =>
         {

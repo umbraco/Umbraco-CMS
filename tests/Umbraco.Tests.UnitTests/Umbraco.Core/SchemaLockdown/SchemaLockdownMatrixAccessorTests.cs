@@ -1,7 +1,5 @@
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.SchemaLockdown;
@@ -21,54 +19,48 @@ public class SchemaLockdownMatrixAccessorTests
             => matrix.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete);
     }
 
-    private static SchemaLockdownMatrixAccessor CreateAccessor(bool enabled, params ISchemaLockdownConfigurator[] configurators)
-        => CreateAccessor(new SchemaLockdownSettings { Enabled = enabled }, configurators);
-
-    private static SchemaLockdownMatrixAccessor CreateAccessor(
-        SchemaLockdownSettings settings,
-        params ISchemaLockdownConfigurator[] configurators)
+    private sealed class LockDocumentTypes : ISchemaLockdownConfigurator
     {
-        var collection = new SchemaLockdownConfiguratorCollection(() => configurators);
-        return new SchemaLockdownMatrixAccessor(Options.Create(settings), collection);
+        public void Configure(SchemaLockdownMatrix matrix)
+            => matrix.BlockMutations(Constants.UdiEntityType.DocumentType);
     }
 
-    [Test]
-    public void Everything_Allowed_When_Disabled()
-    {
-        SchemaLockdownMatrix matrix = CreateAccessor(enabled: false).Matrix;
-
-        Assert.That(matrix.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.True);
-    }
+    private static SchemaLockdownMatrixAccessor CreateAccessor(params ISchemaLockdownConfigurator[] configurators)
+        => new(new SchemaLockdownConfiguratorCollection(() => configurators));
 
     [Test]
-    public void Governed_Types_Block_Everything_But_Read_When_Enabled()
+    public void Nothing_Is_Locked_When_No_Configurator_Is_Registered()
     {
-        SchemaLockdownMatrix matrix = CreateAccessor(enabled: true).Matrix;
+        SchemaLockdownMatrix matrix = CreateAccessor().Matrix;
 
         Assert.Multiple(() =>
         {
-            Assert.That(matrix.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Read), Is.True);
-            Assert.That(matrix.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.False);
-            Assert.That(matrix.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Unknown), Is.False);
-            Assert.That(matrix.IsAllowed(Constants.UdiEntityType.Webhook, SchemaOperation.Create), Is.True);
+            foreach (var entityType in SchemaEntityTypes.All)
+            {
+                Assert.That(matrix.IsAllowed(entityType, SchemaOperation.Create), Is.True);
+                Assert.That(matrix.IsAllowed(entityType, SchemaOperation.Update), Is.True);
+                Assert.That(matrix.IsAllowed(entityType, SchemaOperation.Delete), Is.True);
+            }
         });
     }
 
     [Test]
-    public void Configured_Entity_Type_Governs_Whatever_Case_It_Was_Written_In()
+    public void Only_The_Entity_Types_A_Configurator_Names_Are_Locked()
     {
-        var settings = new SchemaLockdownSettings { Enabled = true };
-        settings.LockedEntityTypes.Add("WebHook");
+        SchemaLockdownMatrix matrix = CreateAccessor(new LockDocumentTypes()).Matrix;
 
-        SchemaLockdownMatrix matrix = CreateAccessor(settings).Matrix;
-
-        Assert.That(matrix.IsAllowed(Constants.UdiEntityType.Webhook, SchemaOperation.Create), Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(matrix.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.False);
+            Assert.That(matrix.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Read), Is.True);
+            Assert.That(matrix.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Create), Is.True);
+        });
     }
 
     [Test]
     public void Configurators_Run_In_Order_And_Later_Writes_Win()
     {
-        SchemaLockdownMatrix matrix = CreateAccessor(enabled: true, new AllowDeletes(), new BlockDeletes()).Matrix;
+        SchemaLockdownMatrix matrix = CreateAccessor(new AllowDeletes(), new BlockDeletes()).Matrix;
 
         Assert.That(matrix.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.False);
     }
@@ -76,7 +68,7 @@ public class SchemaLockdownMatrixAccessorTests
     [Test]
     public void Matrix_Is_Frozen_And_Cached()
     {
-        SchemaLockdownMatrixAccessor accessor = CreateAccessor(enabled: true);
+        SchemaLockdownMatrixAccessor accessor = CreateAccessor(new LockDocumentTypes());
 
         Assert.Multiple(() =>
         {

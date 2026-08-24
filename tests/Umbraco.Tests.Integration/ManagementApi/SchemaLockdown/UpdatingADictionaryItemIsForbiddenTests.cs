@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -22,10 +23,12 @@ public class UpdatingADictionaryItemIsForbiddenTests : ManagementApiTest<UpdateD
 
     protected override Expression<Func<UpdateDictionaryController, object>> MethodSelector { get; set; }
 
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+        => builder.SchemaLockdownConfigurators().Append<LockDictionaryItemsConfigurator>();
+
     [SetUp]
     public override void Setup()
     {
-        InMemoryConfiguration[$"{Constants.Configuration.ConfigSchemaLockdown}:Enabled"] = "true";
         InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
         base.Setup();
         CreateDictionaryItem().GetAwaiter().GetResult();
