@@ -16,18 +16,11 @@ internal static class SchemaOperationResolver
     /// <returns>The resolved operation.</returns>
     /// <remarks>
     /// <see cref="SchemaOperation.Read"/> is only ever produced by an explicit allowlist of safe verbs. Anything
-    /// unrecognised resolves to <see cref="SchemaOperation.Unknown"/>, which the default policy blocks, so a new
-    /// or custom verb cannot bypass lockdown.
+    /// unrecognised resolves to <see cref="SchemaOperation.Unknown"/>, which <see cref="SchemaLockdownRules.BlockMutations"/>
+    /// denies alongside the operations it names, so a new or custom verb cannot bypass lockdown.
     /// </remarks>
-    public static SchemaOperation Resolve(string? httpMethod, SchemaOperationAttribute? declared)
-    {
-        if (declared is not null)
-        {
-            return declared.Operation;
-        }
-
-        return httpMethod is null ? SchemaOperation.Unknown : FromVerb(httpMethod);
-    }
+    public static SchemaOperation Resolve(string? httpMethod, SchemaOperation? declared)
+        => declared ?? (httpMethod is null ? SchemaOperation.Unknown : FromVerb(httpMethod));
 
     private static SchemaOperation FromVerb(string httpMethod)
     {

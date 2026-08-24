@@ -9,11 +9,11 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 public class LockEverythingButWebhooksConfigurator : ISchemaLockdownConfigurator
 {
     /// <inheritdoc />
-    public void Configure(SchemaLockdownMatrix matrix)
+    public void Configure(SchemaLockdownRules rules)
     {
         foreach (var entityType in SchemaEntityTypes.All.Where(entityType => entityType != Constants.UdiEntityType.Webhook))
         {
-            matrix.BlockMutations(entityType);
+            rules.BlockMutations(entityType);
         }
     }
 }

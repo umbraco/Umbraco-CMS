@@ -29,6 +29,6 @@ public class SchemaOperationResolverTests
     [Test]
     public void Declared_Operation_Wins_Over_Verb()
         => Assert.That(
-            SchemaOperationResolver.Resolve("POST", new SchemaOperationAttribute(SchemaOperation.Read)),
+            SchemaOperationResolver.Resolve("POST", SchemaOperation.Read),
             Is.EqualTo(SchemaOperation.Read));
 }

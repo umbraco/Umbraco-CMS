@@ -5,16 +5,16 @@ namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 
 /// <summary>
 /// Declares which schema entity type a controller manages, and thereby authorizes every action on that controller
-/// against the schema lockdown decision matrix.
+/// against the schema lockdown rules.
 /// </summary>
 /// <remarks>
 /// Declaring the entity type is all a controller has to do: because the requirement is carried as authorization
 /// metadata, a newly added endpoint is governed without anyone having to remember to tag it. Whether the entity type
-/// is actually locked down is still decided by configuration and by the registered
-/// <see cref="ISchemaLockdownConfigurator"/> instances, never by this attribute.
+/// is actually locked down is decided solely by the registered <see cref="ISchemaLockdownConfigurator"/> instances,
+/// never by this attribute.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class, Inherited = true)]
-public sealed class EntityTypeAttribute : Attribute, IAuthorizationRequirementData
+public sealed class EntityTypeAttribute : Attribute, IAuthorizationRequirementData, IAuthorizationRequirement
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="EntityTypeAttribute"/> class.
@@ -34,6 +34,6 @@ public sealed class EntityTypeAttribute : Attribute, IAuthorizationRequirementDa
     /// <inheritdoc />
     public IEnumerable<IAuthorizationRequirement> GetRequirements()
     {
-        yield return new SchemaLockdownEntityTypeRequirement(EntityType);
+        yield return this;
     }
 }

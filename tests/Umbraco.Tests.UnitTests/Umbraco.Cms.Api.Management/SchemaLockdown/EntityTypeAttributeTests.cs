@@ -27,17 +27,14 @@ public class EntityTypeAttributeTests
             Is.EqualTo(Constants.UdiEntityType.MediaType));
 
     [Test]
-    public void Yields_A_Single_Requirement_Carrying_The_Declared_Entity_Type()
+    public void Yields_Itself_As_The_Single_Requirement()
     {
         var attribute = new EntityTypeAttribute(Constants.UdiEntityType.DocumentType);
 
         IAuthorizationRequirement[] requirements = attribute.GetRequirements().ToArray();
 
         Assert.That(requirements, Has.Length.EqualTo(1));
-        Assert.That(requirements[0], Is.TypeOf<SchemaLockdownEntityTypeRequirement>());
-        Assert.That(
-            ((SchemaLockdownEntityTypeRequirement)requirements[0]).EntityType,
-            Is.EqualTo(Constants.UdiEntityType.DocumentType));
+        Assert.That(requirements[0], Is.SameAs(attribute));
     }
 
     // The framework only reaches GetRequirements through this interface, so losing the implementation would silently

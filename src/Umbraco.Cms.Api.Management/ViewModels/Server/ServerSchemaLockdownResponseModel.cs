@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Server;
 
 /// <summary>
-/// Describes which schema operations the current configuration permits.
+/// Describes which schema operations are permitted.
 /// </summary>
 public class ServerSchemaLockdownResponseModel
 {
@@ -9,9 +9,8 @@ public class ServerSchemaLockdownResponseModel
     /// Gets or sets a value indicating whether any operation on any entity type is blocked.
     /// </summary>
     /// <remarks>
-    /// Derived from <see cref="EntityTypes"/> rather than from configuration, so it also reports lockdown that a
-    /// configurator introduced without the top-level setting being on. It is a summary for presentation only -
-    /// <see cref="EntityTypes"/> is what any allow/deny decision must be taken from.
+    /// Derived from <see cref="EntityTypes"/>, which is the only source there is. It is a summary for presentation
+    /// only - <see cref="EntityTypes"/> is what any allow/deny decision must be taken from.
     /// </remarks>
     public bool Enabled { get; set; }
 

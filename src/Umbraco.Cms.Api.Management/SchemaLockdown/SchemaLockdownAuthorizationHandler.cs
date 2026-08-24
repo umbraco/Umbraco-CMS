@@ -1,7 +1,6 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Cms.Api.Management.Security.Authorization;
@@ -12,28 +11,28 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 
 /// <summary>
-///     Authorizes that the current configuration permits the requested change to schema.
+///     Authorizes that the schema lockdown rules permit the requested change to schema.
 /// </summary>
-internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequirementAuthorizationHandler<SchemaLockdownEntityTypeRequirement>
+internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequirementAuthorizationHandler<EntityTypeAttribute>
 {
-    private readonly ISchemaLockdownMatrixAccessor _matrixAccessor;
+    private readonly SchemaLockdownRules _rules;
     private readonly IRuntimeState _runtimeState;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SchemaLockdownAuthorizationHandler"/> class.
     /// </summary>
-    /// <param name="matrixAccessor">Provides the frozen decision matrix.</param>
+    /// <param name="rules">The frozen decision table.</param>
     /// <param name="runtimeState">The runtime state.</param>
     public SchemaLockdownAuthorizationHandler(
-        ISchemaLockdownMatrixAccessor matrixAccessor,
+        SchemaLockdownRules rules,
         IRuntimeState runtimeState)
     {
-        _matrixAccessor = matrixAccessor;
+        _rules = rules;
         _runtimeState = runtimeState;
     }
 
     /// <inheritdoc />
-    protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, SchemaLockdownEntityTypeRequirement requirement)
+    protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, EntityTypeAttribute requirement)
     {
         // Authorization runs ahead of every MVC filter, so a runtime that is not serving requests normally has to be
         // left to the parts of the pipeline that answer for it - denying here would mask their response.
@@ -44,39 +43,21 @@ internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequiremen
 
         SchemaOperation operation = ResolveOperation(context.Resource);
 
-        if (operation == SchemaOperation.Read)
-        {
-            return Task.FromResult(true);
-        }
-
-        return Task.FromResult(_matrixAccessor.Matrix.IsAllowed(requirement.EntityType, operation));
+        return Task.FromResult(_rules.IsAllowed(requirement.EntityType, operation));
     }
 
     private static SchemaOperation ResolveOperation(object? resource)
     {
-        HttpContext? httpContext = null;
-        Endpoint? endpoint = null;
-
-        switch (resource)
+        HttpContext? httpContext = resource switch
         {
-            case DefaultHttpContext defaultHttpContext:
-                httpContext = defaultHttpContext;
-                break;
+            HttpContext resourceHttpContext => resourceHttpContext,
+            AuthorizationFilterContext authorizationFilterContext => authorizationFilterContext.HttpContext,
+            _ => null,
+        };
 
-            case AuthorizationFilterContext authorizationFilterContext:
-                httpContext = authorizationFilterContext.HttpContext;
-                break;
-
-            case Endpoint resourceEndpoint:
-                endpoint = resourceEndpoint;
-                break;
-        }
-
-        endpoint ??= httpContext?.Features.Get<IEndpointFeature>()?.Endpoint;
-
-        SchemaOperationAttribute? declared = endpoint?.Metadata
+        SchemaOperation? declared = httpContext?.GetEndpoint()?.Metadata
             .GetMetadata<ControllerActionDescriptor>()?.MethodInfo
-            .GetCustomAttribute<SchemaOperationAttribute>();
+            .GetCustomAttribute<SchemaOperationAttribute>()?.Operation;
 
         // An authorization call carrying no request has no verb to infer from, which the resolver reports as an
         // unclassified operation rather than as a read.

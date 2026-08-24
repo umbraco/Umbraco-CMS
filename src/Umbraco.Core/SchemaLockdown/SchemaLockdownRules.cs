@@ -4,10 +4,11 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// The decision table for schema lockdown, mapping each entity type and operation to whether it is permitted.
 /// </summary>
 /// <remarks>
-/// Built and mutated during start-up, then frozen. Freezing is what allows the same instance to be both consulted
-/// by the request filter and served to the backoffice without the two being able to disagree.
+/// Every registered <see cref="ISchemaLockdownConfigurator"/> writes to it while it is being constructed, after which
+/// it is frozen. Freezing is what allows the same instance to be both consulted by the authorization handler and
+/// served to the backoffice without the two being able to disagree.
 /// </remarks>
-public sealed class SchemaLockdownMatrix
+public sealed class SchemaLockdownRules
 {
     private static readonly DelegateEqualityComparer<(string EntityType, SchemaOperation Operation)> CellKeyComparer =
         new(
@@ -16,7 +17,21 @@ public sealed class SchemaLockdownMatrix
             x => HashCode.Combine(StringComparer.OrdinalIgnoreCase.GetHashCode(x.EntityType), x.Operation));
 
     private readonly Dictionary<(string EntityType, SchemaOperation Operation), bool> _cells = new(CellKeyComparer);
-    private bool _frozen;
+    private readonly bool _frozen;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SchemaLockdownRules"/> class.
+    /// </summary>
+    /// <param name="configurators">The registered configurators.</param>
+    public SchemaLockdownRules(SchemaLockdownConfiguratorCollection configurators)
+    {
+        foreach (ISchemaLockdownConfigurator configurator in configurators)
+        {
+            configurator.Configure(this);
+        }
+
+        _frozen = true;
+    }
 
     /// <summary>
     /// Permits the supplied operation on the supplied entity type.
@@ -54,32 +69,21 @@ public sealed class SchemaLockdownMatrix
     public bool IsAllowed(string entityType, SchemaOperation operation)
         => _cells.TryGetValue((entityType, operation), out var allowed) is false || allowed;
 
-    /// <summary>
-    /// Prevents any further mutation.
-    /// </summary>
-    /// <remarks>
-    /// Only <see cref="SchemaLockdownMatrixAccessor"/> calls this, after every configurator has run. If an
-    /// <see cref="ISchemaLockdownConfigurator"/> could call it too, one configurator could freeze the matrix before
-    /// later configurators in the same build get a chance to configure it.
-    /// </remarks>
-    internal void Freeze() => _frozen = true;
-
-    /// <summary>
-    /// Gets the full decision table.
-    /// </summary>
-    internal IReadOnlyDictionary<string, IReadOnlyDictionary<SchemaOperation, bool>> Snapshot()
-        => SchemaEntityTypes.All.ToDictionary(
-            entityType => entityType,
-            entityType => (IReadOnlyDictionary<SchemaOperation, bool>)Enum.GetValues<SchemaOperation>()
-                .ToDictionary(operation => operation, operation => IsAllowed(entityType, operation)));
-
+    // Reads are never governed, so a read cell would never be consulted. Refusing to record one - ahead of the frozen
+    // check, so that it holds whenever the write is attempted - keeps that a structural guarantee rather than leaving
+    // behind a cell that looks meaningful and is not.
     private void Set(string entityType, SchemaOperation operation, bool allowed)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(entityType);
 
+        if (operation == SchemaOperation.Read)
+        {
+            return;
+        }
+
         if (_frozen)
         {
-            throw new InvalidOperationException("The schema lockdown matrix cannot be modified after it has been frozen.");
+            throw new InvalidOperationException("The schema lockdown rules cannot be modified after they have been built.");
         }
 
         _cells[(entityType, operation)] = allowed;

@@ -33,23 +33,22 @@ public class SchemaLockdownAuthorizationHandlerTests
 
     private sealed class LockDocumentTypes : ISchemaLockdownConfigurator
     {
-        public void Configure(SchemaLockdownMatrix matrix)
-            => matrix.BlockMutations(Constants.UdiEntityType.DocumentType);
+        public void Configure(SchemaLockdownRules rules)
+            => rules.BlockMutations(Constants.UdiEntityType.DocumentType);
     }
 
     private static SchemaLockdownAuthorizationHandler CreateHandler(bool lockDocumentTypes, RuntimeLevel runtimeLevel)
     {
         ISchemaLockdownConfigurator[] configurators = lockDocumentTypes ? [new LockDocumentTypes()] : [];
-        var accessor = new SchemaLockdownMatrixAccessor(
-            new SchemaLockdownConfiguratorCollection(() => configurators));
+        var rules = new SchemaLockdownRules(new SchemaLockdownConfiguratorCollection(() => configurators));
 
         var runtimeState = new Mock<IRuntimeState>();
         runtimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
 
-        return new SchemaLockdownAuthorizationHandler(accessor, runtimeState.Object);
+        return new SchemaLockdownAuthorizationHandler(rules, runtimeState.Object);
     }
 
-    private static SchemaLockdownEntityTypeRequirement CreateRequirement(
+    private static EntityTypeAttribute CreateRequirement(
         string entityType = Constants.UdiEntityType.DocumentType)
         => new(entityType);
 
@@ -82,7 +81,7 @@ public class SchemaLockdownAuthorizationHandlerTests
     }
 
     private static AuthorizationHandlerContext CreateContext(
-        SchemaLockdownEntityTypeRequirement requirement,
+        EntityTypeAttribute requirement,
         object? resource)
         => new([requirement], user: null!, resource);
 
@@ -94,7 +93,7 @@ public class SchemaLockdownAuthorizationHandlerTests
     [Test]
     public async Task Read_Request_Succeeds_Even_While_Locked_Down()
     {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
+        EntityTypeAttribute requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(HttpMethods.Get));
 
         await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
@@ -107,7 +106,7 @@ public class SchemaLockdownAuthorizationHandlerTests
     [TestCase("DELETE")]
     public async Task Mutating_Request_Succeeds_When_The_Cell_Is_Allowed(string httpMethod)
     {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
+        EntityTypeAttribute requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(httpMethod));
 
         await CreateHandler(lockDocumentTypes: false, RuntimeLevel.Run).HandleAsync(context);
@@ -120,7 +119,7 @@ public class SchemaLockdownAuthorizationHandlerTests
     [TestCase("DELETE")]
     public async Task Mutating_Request_Fails_When_The_Cell_Is_Blocked(string httpMethod)
     {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
+        EntityTypeAttribute requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(httpMethod));
 
         await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
@@ -137,8 +136,8 @@ public class SchemaLockdownAuthorizationHandlerTests
     [Test]
     public async Task Mutating_Request_Is_Decided_By_The_Requirement_Entity_Type()
     {
-        SchemaLockdownEntityTypeRequirement locked = CreateRequirement();
-        SchemaLockdownEntityTypeRequirement unlocked = CreateRequirement(Constants.UdiEntityType.Webhook);
+        EntityTypeAttribute locked = CreateRequirement();
+        EntityTypeAttribute unlocked = CreateRequirement(Constants.UdiEntityType.Webhook);
 
         AuthorizationHandlerContext lockedContext = CreateContext(locked, CreateHttpContext(HttpMethods.Post));
         AuthorizationHandlerContext unlockedContext = CreateContext(unlocked, CreateHttpContext(HttpMethods.Post));
@@ -156,7 +155,7 @@ public class SchemaLockdownAuthorizationHandlerTests
     [Test]
     public async Task Declared_Read_Operation_Overrides_The_Post_Verb()
     {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
+        EntityTypeAttribute requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(
             requirement,
             CreateHttpContext(HttpMethods.Post, nameof(DocumentTypeController.PostButReadOnly)));
@@ -169,7 +168,7 @@ public class SchemaLockdownAuthorizationHandlerTests
     [Test]
     public async Task Blocked_Request_Fails_When_The_Resource_Is_An_Authorization_Filter_Context()
     {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
+        EntityTypeAttribute requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(
             requirement,
             CreateFilterContext(CreateHttpContext(HttpMethods.Post)));
@@ -186,7 +185,7 @@ public class SchemaLockdownAuthorizationHandlerTests
     [Test]
     public async Task Read_Request_Succeeds_When_The_Resource_Is_An_Authorization_Filter_Context()
     {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
+        EntityTypeAttribute requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(
             requirement,
             CreateFilterContext(CreateHttpContext(HttpMethods.Get)));
@@ -196,12 +195,14 @@ public class SchemaLockdownAuthorizationHandlerTests
         Assert.That(context.HasSucceeded, Is.True);
     }
 
-    // A resource carrying no request cannot be classified, so it is treated as a mutation.
+    // A resource that is not a request cannot be classified, so it is treated as a mutation. A declared operation
+    // does not rescue it: the declaration is only reachable through the endpoint a request routed to.
     [TestCase(null)]
     [TestCase(nameof(DocumentTypeController.Post))]
-    public async Task Resource_Without_A_Request_Fails_While_Locked_Down(string? actionName)
+    [TestCase(nameof(DocumentTypeController.PostButReadOnly))]
+    public async Task Resource_That_Is_Not_A_Request_Fails_While_Locked_Down(string? actionName)
     {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
+        EntityTypeAttribute requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(
             requirement,
             actionName is null ? null : CreateEndpoint(actionName));
@@ -215,24 +216,10 @@ public class SchemaLockdownAuthorizationHandlerTests
         });
     }
 
-    // Without a request there is no verb, so the declared operation is all there is to go on.
-    [Test]
-    public async Task Declared_Read_Operation_Applies_To_A_Resource_Without_A_Request()
-    {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
-        AuthorizationHandlerContext context = CreateContext(
-            requirement,
-            CreateEndpoint(nameof(DocumentTypeController.PostButReadOnly)));
-
-        await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Run).HandleAsync(context);
-
-        Assert.That(context.HasSucceeded, Is.True);
-    }
-
     [Test]
     public async Task Blocked_Request_Still_Fails_While_Awaiting_An_Attended_Upgrade()
     {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
+        EntityTypeAttribute requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(HttpMethods.Post));
 
         await CreateHandler(lockDocumentTypes: true, RuntimeLevel.Upgrade).HandleAsync(context);
@@ -251,7 +238,7 @@ public class SchemaLockdownAuthorizationHandlerTests
     [TestCase(RuntimeLevel.BootFailed)]
     public async Task Blocked_Request_Succeeds_When_The_Runtime_Is_Not_Serving_Requests_Normally(RuntimeLevel runtimeLevel)
     {
-        SchemaLockdownEntityTypeRequirement requirement = CreateRequirement();
+        EntityTypeAttribute requirement = CreateRequirement();
         AuthorizationHandlerContext context = CreateContext(requirement, CreateHttpContext(HttpMethods.Post));
 
         await CreateHandler(lockDocumentTypes: true, runtimeLevel).HandleAsync(context);

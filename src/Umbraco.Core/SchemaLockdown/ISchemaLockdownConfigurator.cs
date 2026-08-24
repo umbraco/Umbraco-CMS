@@ -1,11 +1,11 @@
 namespace Umbraco.Cms.Core.SchemaLockdown;
 
 /// <summary>
-/// Adjusts the schema lockdown matrix while it is being built at start-up.
+/// Adjusts the schema lockdown rules while they are being built at start-up.
 /// </summary>
 /// <remarks>
 /// Registering a configurator is the only way an entity type comes under lockdown: nothing is locked until one
-/// says so. Every registered configurator runs, in collection order, against the same matrix. Later writes to a
+/// says so. Every registered configurator runs, in collection order, against the same rules. Later writes to a
 /// cell win, so registering last is how a rule is made authoritative.
 /// </remarks>
 /// <example>
@@ -14,11 +14,11 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// <![CDATA[
 /// public class LockAllSchemaConfigurator : ISchemaLockdownConfigurator
 /// {
-///     public void Configure(SchemaLockdownMatrix matrix)
+///     public void Configure(SchemaLockdownRules rules)
 ///     {
 ///         foreach (string entityType in SchemaEntityTypes.All)
 ///         {
-///             matrix.BlockMutations(entityType);
+///             rules.BlockMutations(entityType);
 ///         }
 ///     }
 /// }
@@ -34,8 +34,8 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 public interface ISchemaLockdownConfigurator
 {
     /// <summary>
-    /// Adjusts the supplied matrix.
+    /// Adjusts the supplied rules.
     /// </summary>
-    /// <param name="matrix">The matrix being built.</param>
-    void Configure(SchemaLockdownMatrix matrix);
+    /// <param name="rules">The rules being built.</param>
+    void Configure(SchemaLockdownRules rules);
 }
