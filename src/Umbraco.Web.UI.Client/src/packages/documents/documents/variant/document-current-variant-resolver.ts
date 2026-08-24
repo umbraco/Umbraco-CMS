@@ -1,5 +1,10 @@
 import { UmbDocumentVariantState } from '../variant-state.js';
-import { UmbArrayState, UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbArrayState,
+	UmbStringState,
+	createObservablePart,
+	mergeObservables,
+} from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantResolver } from '@umbraco-cms/backoffice/variant';
 import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
@@ -37,17 +42,14 @@ export class UmbDocumentCurrentVariantResolver<
 	#itemFlags: Array<UmbEntityFlag> = [];
 	#hasVariants = false;
 
-	#currentVariant = new UmbObjectState<VariantModel | undefined>(undefined);
-	public readonly currentVariant = this.#currentVariant.asObservable();
+	public readonly currentVariant: Observable<VariantModel | undefined>;
 
 	#name = new UmbStringState(undefined);
 	public readonly name = this.#name.asObservable();
 
-	#state = new UmbStringState<UmbDocumentVariantState | null | undefined>(undefined);
-	public readonly state = this.#state.asObservable() as Observable<UmbDocumentVariantState | null | undefined>;
+	public readonly state: Observable<UmbDocumentVariantState>;
 
-	#isDraft = new UmbBooleanState(undefined);
-	public readonly isDraft = this.#isDraft.asObservable();
+	public readonly isDraft: Observable<boolean>;
 
 	#flags = new UmbArrayState<UmbEntityFlag>([], (data) => data.alias);
 	public readonly flags = this.#flags.asObservable();
@@ -56,6 +58,21 @@ export class UmbDocumentCurrentVariantResolver<
 		super(host);
 
 		this.#variantResolver = new UmbVariantResolver<VariantModel>(this);
+
+		this.currentVariant = mergeObservables(
+			[this.#variantResolver.variant, this.#variantResolver.fallbackVariant],
+			([variant, fallbackVariant]) => variant ?? fallbackVariant,
+		);
+
+		this.state = createObservablePart(
+			this.#variantResolver.variant,
+			(variant) => variant?.state || UmbDocumentVariantState.NOT_CREATED,
+		);
+
+		this.isDraft = createObservablePart(
+			this.#variantResolver.variant,
+			(variant) => variant?.state === UmbDocumentVariantState.DRAFT || false,
+		);
 
 		// Recompute when either the ambient culture or the resolved variant changes. Observing the cultures
 		// triggers a recompute when a culture arrives even if the matched variant is unchanged (clearing the
@@ -102,10 +119,7 @@ export class UmbDocumentCurrentVariantResolver<
 		if (!this.#variantResolver.getFallbackCulture()) return;
 		if (!this.#hasVariants) return;
 		this.#setName();
-		this.#setIsDraft();
-		this.#setState();
 		this.#setFlags();
-		this.#currentVariant.setValue(this.getCurrentVariant());
 	}
 
 	#setName() {
@@ -125,18 +139,6 @@ export class UmbDocumentCurrentVariantResolver<
 		}
 
 		this.#name.setValue('(Untitled)');
-	}
-
-	#setIsDraft() {
-		const variant = this.#variantResolver.getVariant();
-		const isDraft = variant?.state === UmbDocumentVariantState.DRAFT || false;
-		this.#isDraft.setValue(isDraft);
-	}
-
-	#setState() {
-		const variant = this.#variantResolver.getVariant();
-		const state = variant?.state || UmbDocumentVariantState.NOT_CREATED;
-		this.#state.setValue(state);
 	}
 
 	#setFlags() {
