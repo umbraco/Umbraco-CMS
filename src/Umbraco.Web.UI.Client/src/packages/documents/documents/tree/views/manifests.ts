@@ -12,13 +12,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	},
 	{
 		type: 'treeView',
-		kind: 'card',
-		alias: 'Umb.TreeView.Document.Card',
-		name: 'Document Card Tree View',
-		forTrees: [UMB_DOCUMENT_TREE_ALIAS],
-	},
-	{
-		type: 'treeView',
 		kind: 'table',
 		alias: 'Umb.TreeView.Document.Table',
 		name: 'Document Table Tree View',
