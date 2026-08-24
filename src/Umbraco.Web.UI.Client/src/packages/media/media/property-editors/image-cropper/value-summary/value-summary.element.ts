@@ -1,6 +1,6 @@
+import type { UmbImageCropperPropertyEditorValue } from '../../../components/index.js';
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
-import type { UmbImageCropperPropertyEditorValue } from '../../../components/index.js';
 
 @customElement('umb-image-cropper-property-editor-value-summary')
 export class UmbImageCropperPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<UmbImageCropperPropertyEditorValue> {

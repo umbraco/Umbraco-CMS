@@ -11,7 +11,7 @@ import type {
 /**
  * A server data source for sorting children of a Media
  * @class UmbSortChildrenOfMediaServerDataSource
- * @implements {RepositoryDetailDataSource}
+ * @implements {UmbSortChildrenOfDataSource}
  */
 export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOfDataSource {
 	#host: UmbControllerHost;
@@ -27,7 +27,7 @@ export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOf
 
 	/**
 	 * Creates the Public Access for the given Media unique
-	 * @param {UmbSortChildrenOfArgs} args
+	 * @param {UmbSortChildrenOfArgs} args - The sorting request arguments
 	 * @memberof UmbSortChildrenOfMediaServerDataSource
 	 */
 	async sortChildrenOf(args: UmbSortChildrenOfArgs) {

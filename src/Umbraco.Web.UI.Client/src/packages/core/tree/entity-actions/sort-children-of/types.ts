@@ -41,8 +41,7 @@ export interface UmbSortChildrenByFieldOption {
 	label: string;
 }
 
-export interface ManifestEntityActionSortChildrenOfKind
-	extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
+export interface ManifestEntityActionSortChildrenOfKind extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
 	type: 'entityAction';
 	kind: 'sortChildrenOf';
 }

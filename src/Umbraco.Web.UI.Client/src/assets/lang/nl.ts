@@ -320,6 +320,8 @@ export default {
 		createFromClipboard: 'Plakken vanaf het klembord',
 		nodeIsInTrash: 'Dit item is in de prullenbak',
 		saveModalTitle: 'Opslaan',
+		saveAndPublishDescendantsModalTitle: 'Opslaan en publiceren met onderliggende nodes',
+		saveAndScheduleModalTitle: 'Opslaan en publicatie plannen',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Nieuw Inhoudssjabloon aanmaken voor <em>%0%</em>',
@@ -333,6 +335,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klik om te uploaden',
+		browseFilesAction: 'Blader door bestanden',
+		dropFilesOr: 'Sleep media hierheen<br />of',
 		orClickHereToUpload: 'Of klik hier om bestanden te kiezen',
 		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype',
 		maxFileSize: 'Maximale bestandsgrootte is',
@@ -741,6 +745,8 @@ export default {
 		new: 'Nieuw',
 		next: 'Volgende',
 		no: 'Nee',
+		noResults: 'Geen resultaten',
+		noResultsFor: (query: string) => `Geen resultaat voor "${query}".`,
 		of: 'of',
 		off: 'Uit',
 		ok: 'OK',
@@ -2193,5 +2199,10 @@ export default {
 		manageHeadline: 'Hoe beheer ik Inhoudssjablonen?',
 		manageDescription:
 			'U kunt Inhoudssjablonen bewerken en verwijderen vanuit de boomstructuur\n      "inhoudssjablonen" in de sectie Instellingen. Vouw het documenttype uit waarop de Inhoudssjabloon is gebaseerd en\n      klik erop om het te bewerken of te verwijderen.\n    ',
+	},
+	picker: {
+		browseTab: 'Bladeren',
+		searchTab: 'Zoeken',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
 	},
 } as UmbLocalizationDictionary;

@@ -52,8 +52,7 @@ export interface MetaTiptapToolbarMenuExtension extends MetaTiptapToolbarExtensi
 	look?: 'icon' | 'text';
 }
 
-export interface ManifestTiptapToolbarExtensionMenuKind
-	extends ManifestTiptapToolbarExtension<MetaTiptapToolbarMenuExtension> {
+export interface ManifestTiptapToolbarExtensionMenuKind extends ManifestTiptapToolbarExtension<MetaTiptapToolbarMenuExtension> {
 	type: 'tiptapToolbarExtension';
 	kind: 'menu';
 	items?: Array<MetaTiptapToolbarMenuItem>;
@@ -62,8 +61,7 @@ export interface ManifestTiptapToolbarExtensionMenuKind
 
 export type MetaTiptapToolbarStyleMenuItem = MetaTiptapToolbarMenuItem<{ tag?: string; class?: string; id?: string }>;
 
-export interface ManifestTiptapToolbarExtensionStyleMenuKind
-	extends ManifestTiptapToolbarExtension<MetaTiptapToolbarMenuExtension> {
+export interface ManifestTiptapToolbarExtensionStyleMenuKind extends ManifestTiptapToolbarExtension<MetaTiptapToolbarMenuExtension> {
 	type: 'tiptapToolbarExtension';
 	kind: 'styleMenu';
 	items: Array<MetaTiptapToolbarStyleMenuItem>;

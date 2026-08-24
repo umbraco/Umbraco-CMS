@@ -268,6 +268,169 @@ public class ContentTypeTests
     }
 
     [Test]
+    public void Can_Move_PropertyType_To_No_Group()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+
+        Assert.IsTrue(contentType.MovePropertyType("title", null));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.PropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
+            Assert.That(contentType.NoGroupPropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
+            Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void Can_Move_PropertyType_From_No_Group_Into_Group()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+        contentType.AddPropertyType(new PropertyTypeBuilder().WithAlias("noGroup").WithName("No Group").Build());
+
+        Assert.IsTrue(contentType.MovePropertyType("noGroup", "content"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
+            Assert.That(
+                contentType.PropertyGroups["content"].PropertyTypes!.Select(x => x.Alias),
+                Is.EquivalentTo(new[] { "title", "noGroup" }));
+        });
+    }
+
+    [Test]
+    public void Can_Move_PropertyType_Between_Groups()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+        contentType.AddPropertyGroup("meta", "Meta");
+
+        Assert.IsTrue(contentType.MovePropertyType("title", "meta"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
+            Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Is.Empty);
+            Assert.That(
+                contentType.PropertyGroups["meta"].PropertyTypes!.Select(x => x.Alias),
+                Is.EquivalentTo(new[] { "title" }));
+        });
+    }
+
+    [Test]
+    public void Can_Move_PropertyType_Into_Group_With_Uninitialised_PropertyTypes()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+        contentType.AddPropertyGroup("meta", "Meta");
+        contentType.PropertyGroups["meta"].PropertyTypes = null;
+
+        Assert.IsTrue(contentType.MovePropertyType("title", "meta"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                contentType.PropertyTypes.Select(x => x.Alias),
+                Is.EquivalentTo(new[] { "title" }),
+                "the property type should not be orphaned");
+            Assert.That(
+                contentType.PropertyGroups["meta"].PropertyTypes?.Select(x => x.Alias),
+                Is.EquivalentTo(new[] { "title" }));
+            Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void Can_Move_Already_Ungrouped_PropertyType_To_No_Group()
+    {
+        var contentType = BuildContentTypeWithUngroupedProperty();
+        Assert.That(contentType.NoGroupPropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
+
+        // Moving a property that is already un-grouped is a no-op, and must not duplicate it.
+        Assert.IsTrue(contentType.MovePropertyType("title", null));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.PropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
+            Assert.That(contentType.NoGroupPropertyTypes.Select(x => x.Alias), Is.EquivalentTo(new[] { "title" }));
+            Assert.That(contentType.PropertyGroups["content"].PropertyTypes, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void Cannot_Move_PropertyType_To_Unknown_Group()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+
+        Assert.IsFalse(contentType.MovePropertyType("title", "noSuchGroup"));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
+            Assert.That(
+                contentType.PropertyGroups["content"].PropertyTypes!.Select(x => x.Alias),
+                Is.EquivalentTo(new[] { "title" }));
+        });
+    }
+
+    [Test]
+    public void Cannot_Move_Unknown_PropertyType()
+    {
+        var contentType = BuildContentTypeWithSingleGroup();
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(contentType.MovePropertyType("noSuchProperty", null));
+            Assert.IsFalse(contentType.MovePropertyType("noSuchProperty", "content"));
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(contentType.NoGroupPropertyTypes, Is.Empty);
+            Assert.That(
+                contentType.PropertyGroups["content"].PropertyTypes!.Select(x => x.Alias),
+                Is.EquivalentTo(new[] { "title" }));
+        });
+    }
+
+    private static ContentType BuildContentTypeWithSingleGroup() =>
+        (ContentType)new ContentTypeBuilder()
+            .WithAlias("textPage")
+            .WithName("Text Page")
+            .WithPropertyTypeIdsIncrementingFrom(200)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .AddPropertyType()
+                    .WithAlias("title")
+                    .WithName("Title")
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+
+    /// <remarks>
+    ///     A property type added at the builder root belongs to no group, so this yields an empty
+    ///     property group alongside an un-grouped property type.
+    /// </remarks>
+    private static ContentType BuildContentTypeWithUngroupedProperty() =>
+        (ContentType)new ContentTypeBuilder()
+            .WithAlias("textPage")
+            .WithName("Text Page")
+            .WithPropertyTypeIdsIncrementingFrom(200)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .Done()
+            .AddPropertyType()
+                .WithAlias("title")
+                .WithName("Title")
+                .WithSortOrder(1)
+                .Done()
+            .Build();
+
+    [Test]
     public void Can_Deep_Clone_Media_Type()
     {
         // Arrange

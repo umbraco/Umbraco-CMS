@@ -3,7 +3,6 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-
 export type UmbRadioButtonItem = { label: string; value: string; invalid?: boolean };
 
 @customElement('umb-input-radio-button-list')
