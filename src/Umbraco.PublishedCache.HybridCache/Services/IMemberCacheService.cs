@@ -20,7 +20,6 @@ public interface IMemberCacheService
     /// published cache database table, so there is nothing to rebuild.
     /// </summary>
     /// <param name="contentTypeIds">The member type ids. Ignored.</param>
-    // TODO (V19): remove this method.
     [Obsolete("Members are not stored in the published cache database table, so this does nothing. Scheduled for removal in Umbraco 19.")]
     void Rebuild(IReadOnlyCollection<int> contentTypeIds)
     {
