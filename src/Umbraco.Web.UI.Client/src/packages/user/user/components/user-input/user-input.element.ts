@@ -215,7 +215,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 				.errorMessage=${status.state.error}
 				.errorDetail=${isError ? unique : undefined}
 				?standalone=${this.max === 1}
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly || isError}>
 				<uui-action-bar slot="actions">
 					<uui-button
 						label=${this.localize.term('general_remove')}

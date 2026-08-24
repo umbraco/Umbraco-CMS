@@ -235,7 +235,7 @@ export class UmbInputDocumentElement extends UmbFormControlMixin<string, typeof 
 								?error=${isError}
 								.errorMessage=${status.state.error}
 								.errorDetail=${isError ? unique : undefined}
-								?readonly=${this.readonly}
+								?readonly=${this.readonly || isError}
 								?standalone=${this.max === 1 && this._statuses?.length === 1}>
 								${when(
 									!this.readonly,

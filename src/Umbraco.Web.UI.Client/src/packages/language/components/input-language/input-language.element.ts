@@ -189,7 +189,7 @@ export class UmbInputLanguageElement extends UUIFormControlMixin(UmbLitElement, 
 								?error=${isError}
 								.errorMessage=${status.state.error}
 								.errorDetail=${isError ? unique : undefined}
-								?readonly=${this.readonly}
+								?readonly=${this.readonly || isError}
 								?standalone=${this.max === 1}>
 								${when(
 									!this.readonly,
