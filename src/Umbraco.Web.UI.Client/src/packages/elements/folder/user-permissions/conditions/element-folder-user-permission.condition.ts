@@ -3,17 +3,9 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import type { ReferenceByIdModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { IPermissionPresentationModelElementContainerPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-
-// TODO: Once `IPermissionPresentationModelElementContainerPermissionPresentationModel` is available from the backend API,
-// we should import it from there instead of defining it here. [LK]
-type IPermissionPresentationModelElementContainerPermissionPresentationModel = {
-	$type: string;
-	elementContainer: ReferenceByIdModel;
-	verbs: Array<string>;
-};
 
 export class UmbElementFolderUserPermissionCondition
 	extends UmbConditionBase<UmbElementFolderUserPermissionConditionConfig>
