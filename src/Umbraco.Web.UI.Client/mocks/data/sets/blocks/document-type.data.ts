@@ -20,6 +20,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: true,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -36,6 +37,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		// Every level carries its own tab, and the tab names differ per level so a tab of one level can
@@ -48,6 +50,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: false,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
@@ -120,6 +123,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: NESTED_BLOCK_LIST_OUTER_ELEMENT_TYPE_ID,
@@ -130,6 +134,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: false,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
@@ -222,6 +227,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: NESTED_BLOCK_LIST_DOCUMENT_TYPE_ID,
@@ -232,6 +238,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: true,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -269,5 +276,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 ];
