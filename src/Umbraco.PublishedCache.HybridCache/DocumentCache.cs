@@ -50,11 +50,9 @@ public sealed class DocumentCache : IPublishedContentCache
     /// <inheritdoc/>
     public IPublishedContent? GetById(bool preview, Guid contentId)
     {
-        // Sync fast path: when the converted-content L0 cache already holds the item we can
-        // return it without spinning up an async state machine. This is the dominant case on a warm
-        // site for the per-key callers that remain — Unfiltered() and the picker value converters;
-        // FilterAvailable() probes the same L0 cache directly. On a miss we fall through to the async
-        // path which handles HybridCache (L1/L2) and database lookups.
+        // Sync fast path: when the converted-content L0 cache already holds the item we can return it
+        // without spinning up an async state machine — the dominant case on a warm site. On a miss we
+        // fall through to the async path which handles HybridCache (L1/L2) and database lookups.
         if (_documentCacheService.TryGetCached(contentId, preview, out IPublishedContent? cached))
         {
             return cached;
