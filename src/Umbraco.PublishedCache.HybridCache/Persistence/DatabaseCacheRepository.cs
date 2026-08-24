@@ -1816,20 +1816,22 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 if (Debugger.IsAttached)
                 {
                     throw new InvalidOperationException("Missing cmsContentNu edited content for node " + dto.Id +
-                                                        ", consider rebuilding.");
+                                                        " (key " + dto.Key + "), consider rebuilding.");
                 }
 
                 _logger.LogWarning(
-                    "Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.",
-                    dto.Id);
+                    "Missing cmsContentNu edited content for node {NodeId} (key {NodeKey}), consider rebuilding.",
+                    dto.Id,
+                    dto.Key);
                 return null;
             }
 
             if (dto.EditName is null)
             {
                 _logger.LogError(
-                    "Node {NodeId} has edited data but EditName is null, indicating an inconsistent database state. Skipping node.",
-                    dto.Id);
+                    "Node {NodeId} (key {NodeKey}) has edited data but EditName is null, indicating an inconsistent database state. Skipping node.",
+                    dto.Id,
+                    dto.Key);
                 return null;
             }
 
@@ -1865,20 +1867,22 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             if (Debugger.IsAttached)
             {
                 throw new InvalidOperationException("Missing cmsContentNu published content for node " + dto.Id +
-                                                    ", consider rebuilding.");
+                                                    " (key " + dto.Key + "), consider rebuilding.");
             }
 
             _logger.LogWarning(
-                "Missing cmsContentNu published content for node {NodeId}, consider rebuilding.",
-                dto.Id);
+                "Missing cmsContentNu published content for node {NodeId} (key {NodeKey}), consider rebuilding.",
+                dto.Id,
+                dto.Key);
             return null;
         }
 
         if (dto.PubName is null)
         {
             _logger.LogError(
-                "Node {NodeId} has published data but PubName is null, indicating an inconsistent database state. Consider republishing or rebuilding the cache. Skipping node.",
-                dto.Id);
+                "Node {NodeId} (key {NodeKey}) has published data but PubName is null, indicating an inconsistent database state. Consider republishing or rebuilding the cache. Skipping node.",
+                dto.Id,
+                dto.Key);
             return null;
         }
 
