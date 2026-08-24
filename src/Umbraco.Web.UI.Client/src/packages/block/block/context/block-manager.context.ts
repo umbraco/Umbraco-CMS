@@ -32,6 +32,7 @@ export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseMo
 	content: UmbBlockDataModel;
 	settings?: UmbBlockDataModel;
 };
+
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
@@ -623,7 +624,7 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
-	 * @deprecated Use removeOneContent instead. This method will be removed in a future version.
+	 * @deprecated Use `removeOneContent` instead. Scheduled for removal in Umbraco 20.
 	 * @param {string} contentKey - The content key of the layout element to delete.
 	 * @internal
 	 */

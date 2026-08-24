@@ -3,9 +3,9 @@ import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
 import type { UmbBlockDataModel } from '../../block/types.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 import '../components/block-rte-entry/index.js';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A implementation of the Block Manager specifically for the Rich Text Editor.
@@ -86,7 +86,7 @@ export class UmbBlockRteManagerContext<
 	}
 
 	/**
-	 * @deprecated Use removeOneContent instead. This method will be removed in a future version.
+	 * @deprecated Use `removeOneContent` instead. Scheduled for removal in Umbraco 20.
 	 * @param {string} contentKey - The content key of the layout element to delete.
 	 * @internal
 	 */
