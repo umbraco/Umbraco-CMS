@@ -20,6 +20,7 @@ import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-c
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/media-type';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 import '@umbraco-cms/backoffice/imaging';
@@ -39,20 +40,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		resolvePlacement: UmbSorterResolvePlacementAsGrid,
 		onChange: ({ model }) => {
 			this.selection = model;
-			this.#sortCards(model);
 			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
-
-	#sortCards(model: Array<string>) {
-		const idToIndexMap: { [unique: string]: number } = {};
-		model.forEach((item, index) => {
-			idToIndexMap[item] = index;
-		});
-
-		const cards = [...this._cards];
-		this._cards = cards.sort((a, b) => idToIndexMap[a.unique] - idToIndexMap[b.unique]);
-	}
 
 	/**
 	 * This is a minimum amount of selected items in this input.
@@ -162,7 +152,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	private _editMediaPath = '';
 
 	@state()
-	private _cards: Array<UmbMediaCardItemModel> = [];
+	private _items: Array<UmbMediaCardItemModel> = [];
+
+	@state()
+	private _statuses: Array<UmbRepositoryItemsStatus> = [];
 
 	#pickerInputContext = new UmbMediaPickerInputContext(this);
 	#interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
@@ -184,16 +177,9 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')), null);
 
-		this.observe(
-			this.#pickerInputContext.selectedItems,
-			async (selectedItems) => {
-				const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
-				if (selectedItems?.length && !missingCards.length) return;
+		this.observe(this.#pickerInputContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
 
-				this._cards = selectedItems ?? [];
-			},
-			null,
-		);
+		this.observe(this.#pickerInputContext.statuses, (statuses) => (this._statuses = statuses), null);
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -224,9 +210,8 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		);
 	}
 
-	async #onRemove(item: UmbMediaCardItemModel) {
-		await this.#pickerInputContext.requestRemoveItem(item.unique);
-		this._cards = this._cards.filter((x) => x.unique !== item.unique);
+	async #onRemove(unique: string) {
+		await this.#pickerInputContext.requestRemoveItem(unique);
 	}
 
 	override render() {
@@ -234,20 +219,20 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#renderItems() {
-		if (!this._cards?.length) return nothing;
+		if (!this._statuses.length) return nothing;
 		return html`
 			${repeat(
-				this._cards,
-				(item) => item.unique,
-				(item) => this.#renderItem(item),
+				this._statuses,
+				(status) => status.unique,
+				(status) => this.#renderItem(status),
 			)}
 		`;
 	}
 
 	#renderAddButton() {
 		// TODO: Stop preventing adding more, instead implement proper validation for user feedback. [NL]
-		if (this._cards && this.max && this._cards.length >= this.max) return nothing;
-		if (this.readonly && this._cards.length > 0) {
+		if (this.max && this.selection.length >= this.max) return nothing;
+		if (this.readonly && this.selection.length > 0) {
 			return nothing;
 		} else {
 			return html`
@@ -264,7 +249,16 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		}
 	}
 
-	#renderItem(item: UmbMediaCardItemModel) {
+	#renderItem(status: UmbRepositoryItemsStatus) {
+		const unique = status.unique;
+
+		if (status.state.type === 'error') {
+			return this.#renderErrorItem(unique, status.state.error);
+		}
+
+		const item = this._items.find((x) => x.unique === unique);
+		if (!item) return nothing;
+
 		// No `_editMediaPath` means the modal route registration couldn't reach a parent route context
 		// (e.g. this input is rendered inside a non-routable modal). Skip the href and mark the card
 		// disabled so its open-part isn't styled as clickable. `uui-card-media` doesn't honour `readonly`,
@@ -284,15 +278,28 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				?disabled=${!this._editMediaPath}>
 				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
+				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(unique)}</uui-action-bar>
 			</uui-card-media>
 		`;
 	}
 
-	#renderRemoveAction(item: UmbMediaCardItemModel) {
+	#renderErrorItem(unique: string, errorMessage?: string | null) {
+		return html`
+			<uui-card-media
+				error
+				disabled
+				name=${this.localize.string(errorMessage ?? '#general_notFound')}
+				data-mark="${unique}">
+				<umb-icon name="icon-alert"></umb-icon>
+				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(unique)}</uui-action-bar>
+			</uui-card-media>
+		`;
+	}
+
+	#renderRemoveAction(unique: string) {
 		if (this.readonly) return nothing;
 		return html`
-			<uui-button label=${this.localize.term('general_remove')} look="secondary" @click=${() => this.#onRemove(item)}>
+			<uui-button label=${this.localize.term('general_remove')} look="secondary" @click=${() => this.#onRemove(unique)}>
 				<uui-icon name="icon-trash"></uui-icon>
 			</uui-button>
 		`;
