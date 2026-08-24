@@ -952,7 +952,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Act
         Thread.Sleep(new TimeSpan(0, 0, 0, 2));
-        var contents = ContentService.GetContentForExpiration(DateTime.UtcNow).ToList();
+        var contents = (await ContentService.GetContentForExpirationAsync(DateTime.UtcNow, CancellationToken.None)).ToList();
 
         // Assert
         Assert.That(contents, Is.Not.Null);
@@ -981,11 +981,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Get_Content_For_Release()
+    public async Task Can_Get_Content_For_Release()
     {
         // Arrange
         // Act
-        var contents = ContentService.GetContentForRelease(DateTime.UtcNow).ToList();
+        var contents = (await ContentService.GetContentForReleaseAsync(DateTime.UtcNow, CancellationToken.None)).ToList();
 
         // Assert
         Assert.That(DateTime.UtcNow.AddMinutes(-5) <= DateTime.UtcNow);

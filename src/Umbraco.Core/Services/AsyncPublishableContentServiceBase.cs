@@ -468,35 +468,39 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <summary>
     ///     Gets content having an expiration date before (lower than, or equal to) a specified date.
     /// </summary>
+    /// <param name="date">The date to check expiration against.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An Enumerable list of <see cref="TContent" /> objects</returns>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
-    public IEnumerable<TContent> GetContentForExpiration(DateTime date)
+    public async Task<IEnumerable<TContent>> GetContentForExpirationAsync(DateTime date, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetContentForExpiration(date);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = await _asyncContentRepository.GetContentForExpirationAsync(date, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
     ///     Gets content having a release date before (lower than, or equal to) a specified date.
     /// </summary>
+    /// <param name="date">The date to check release against.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An Enumerable list of <see cref="TContent" /> objects.</returns>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IPublishableContentBase, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
-    public IEnumerable<TContent> GetContentForRelease(DateTime date)
+    public async Task<IEnumerable<TContent>> GetContentForReleaseAsync(DateTime date, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetContentForRelease(date);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = await _asyncContentRepository.GetContentForReleaseAsync(date, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>

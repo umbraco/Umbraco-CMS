@@ -275,8 +275,20 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
             // PerformGetManyAsync is the same abstract hydration hook the public GetManyAsync uses
             // (declared on AsyncEntityRepositoryBase), reused directly here rather than duplicating the
-            // concrete repository's multi-join entity-assembly logic.
-            return await PerformGetManyAsync(keys.ToArray()) ?? Enumerable.Empty<TEntity>();
+            // concrete repository's multi-join entity-assembly logic. Batched since a site can have
+            // arbitrarily many items due at once, and the hook's underlying query builds one SQL
+            // parameter per key.
+            var entities = new List<TEntity>();
+            foreach (IEnumerable<Guid> batch in keys.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                IEnumerable<TEntity>? batchEntities = await PerformGetManyAsync(batch.ToArray());
+                if (batchEntities is not null)
+                {
+                    entities.AddRange(batchEntities);
+                }
+            }
+
+            return entities;
         });
 
     /// <inheritdoc />

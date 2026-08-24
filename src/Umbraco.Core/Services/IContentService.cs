@@ -167,22 +167,26 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Gets documents having an expiration date before (lower than, or equal to) a specified date.
     /// </summary>
+    /// <param name="date">The date to check expiration against.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
-    IEnumerable<IContent> GetContentForExpiration(DateTime date);
+    Task<IEnumerable<IContent>> GetContentForExpirationAsync(DateTime date, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets documents having a release date before (lower than, or equal to) a specified date.
     /// </summary>
+    /// <param name="date">The date to check release against.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
-    IEnumerable<IContent> GetContentForRelease(DateTime date);
+    Task<IEnumerable<IContent>> GetContentForReleaseAsync(DateTime date, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a paged list of documents in the recycle bin.
