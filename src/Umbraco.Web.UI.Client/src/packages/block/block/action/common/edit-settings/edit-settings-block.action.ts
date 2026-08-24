@@ -1,8 +1,8 @@
 import type { MetaBlockActionDefaultKind } from '../../default/types.js';
 import type { UmbBlockActionArgs } from '../../types.js';
 import { UmbBlockActionBase } from '../../block-action-base.js';
-import { UmbDataPathBlockElementDataQuery } from '../../../validation/data-path-element-data-query.function.js';
 import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../context/block-entry.context-token.js';
+import { UmbDataPathGeneratorForBlockElementData } from '../../../validation/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { mergeObservables, type Observable } from '@umbraco-cms/backoffice/observable-api';
 
@@ -28,34 +28,17 @@ export class UmbEditSettingsBlockAction extends UmbBlockActionBase<MetaBlockActi
 		});
 	}
 
-	/*
-	override async getHref() {
-		await this.#contextReady;
-		const path = await this.observe(this.#context?.workspaceEditSettingsPath)?.asPromise();
-		return path || undefined;
-	}
-	*/
-
 	async getHrefObservable(): Promise<Observable<string | undefined> | undefined> {
 		await this.#contextReady;
 		return this.#context?.workspaceEditSettingsPath;
 	}
-
-	/*
-	override async getValidationDataPath() {
-		await this.#contextReady;
-		const settingsKey = await this.observe(this.#context?.settingsKey)?.asPromise();
-		if (!settingsKey) return undefined;
-		return `$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`;
-	}
-	*/
 
 	async getValidationDataPathObservable(): Promise<Observable<string | undefined> | undefined> {
 		await this.#contextReady;
 		if (!this.#context) return undefined;
 		return mergeObservables([this.#context.settingsKey], ([settingsKey]) => {
 			if (!settingsKey) return undefined;
-			return `$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]`;
+			return UmbDataPathGeneratorForBlockElementData('settingsData', { key: settingsKey });
 		});
 	}
 }
