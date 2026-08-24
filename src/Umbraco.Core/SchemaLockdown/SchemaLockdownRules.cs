@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// it is frozen. Freezing is what allows the same instance to be both consulted by the authorization handler and
 /// served to the backoffice without the two being able to disagree.
 /// </remarks>
-public sealed class SchemaLockdownRules
+public sealed class SchemaLockdownRules : ISchemaLockdownConfigurableRules
 {
     private static readonly DelegateEqualityComparer<(string EntityType, SchemaOperation Operation)> CellKeyComparer =
         new(
@@ -33,25 +33,13 @@ public sealed class SchemaLockdownRules
         _frozen = true;
     }
 
-    /// <summary>
-    /// Permits the supplied operation on the supplied entity type.
-    /// </summary>
+    /// <inheritdoc />
     public void Allow(string entityType, SchemaOperation operation) => Set(entityType, operation, true);
 
-    /// <summary>
-    /// Denies the supplied operation on the supplied entity type.
-    /// </summary>
+    /// <inheritdoc />
     public void Block(string entityType, SchemaOperation operation) => Set(entityType, operation, false);
 
-    /// <summary>
-    /// Denies every operation on the supplied entity type that is not a read.
-    /// </summary>
-    /// <remarks>
-    /// This is the way an <see cref="ISchemaLockdownConfigurator"/> should lock an entity type. Denying
-    /// <see cref="SchemaOperation.Create"/>, <see cref="SchemaOperation.Update"/> and
-    /// <see cref="SchemaOperation.Delete"/> individually leaves <see cref="SchemaOperation.Unknown"/> permitted,
-    /// so an endpoint whose operation could not be classified would still get through.
-    /// </remarks>
+    /// <inheritdoc />
     public void BlockMutations(string entityType)
     {
         foreach (SchemaOperation operation in Enum.GetValues<SchemaOperation>())
@@ -63,9 +51,7 @@ public sealed class SchemaLockdownRules
         }
     }
 
-    /// <summary>
-    /// Gets a value indicating whether the supplied operation is permitted on the supplied entity type.
-    /// </summary>
+    /// <inheritdoc />
     public bool IsAllowed(string entityType, SchemaOperation operation)
         => _cells.TryGetValue((entityType, operation), out var allowed) is false || allowed;
 
