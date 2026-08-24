@@ -92,20 +92,23 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             ContentCacheDataSerializerEntityType.Document
             | ContentCacheDataSerializerEntityType.Media);
 
-        // Both collections non-null but empty means every row this method writes is about to be replaced, so
-        // truncating beats deleting per object type.
+        // Both collections non-null but empty means every row this method writes is about to be replaced,
+        // so clear the whole table in one statement rather than once per object type.
         if (contentTypeIds is not null && contentTypeIds.Count == 0 &&
             mediaTypeIds is not null && mediaTypeIds.Count == 0)
         {
-            TruncateContent();
+            ClearContent();
         }
 
         RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds, executeStep);
         RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds, executeStep);
     }
 
-    private void TruncateContent()
-        => Database.TruncateTable(SqlSyntax, Constants.DatabaseSchema.Tables.NodeData);
+    // Deletes rather than truncates. Truncating needs ALTER permission on the table where deleting needs
+    // only DELETE, and this runs from a backoffice action on sites whose runtime database user may have
+    // been reduced to read/write.
+    private void ClearContent()
+        => Database.Execute($"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.NodeData)}");
 
     /// <inheritdoc/>
     public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
