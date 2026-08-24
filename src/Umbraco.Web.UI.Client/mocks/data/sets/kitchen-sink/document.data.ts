@@ -1378,6 +1378,14 @@ const rawData = [
 						crops: [],
 						focalPoint: null,
 					},
+					{
+						// Intentionally references a media key that doesn't exist, to exercise the "not found" state.
+						key: 'a1e9b8f4-3f2a-4b0a-9c8e-6d9f7b2a5c31',
+						mediaKey: 'deadbeef-0000-4000-8000-000000000000',
+						mediaTypeAlias: 'Image',
+						crops: [],
+						focalPoint: null,
+					},
 				],
 			},
 			{
@@ -1854,6 +1862,8 @@ const rawData = [
 					{ type: 'document', unique: '80954b94-1d32-4edd-9c01-105561a7415d' },
 					{ type: 'document', unique: 'a3a37004-139f-4254-ba56-3ed381b3007c' },
 					{ type: 'document', unique: '17149c1e-44a8-4882-a088-6a1d84e0e86a' },
+					// Intentionally references a document key that doesn't exist, to exercise the "not found" state.
+					{ type: 'document', unique: 'deadbeef-0000-4000-8000-000000000001' },
 				],
 			},
 			{
@@ -1912,6 +1922,8 @@ const rawData = [
 				value: [
 					{ type: 'media', unique: 'b44956af-620a-4e17-bbce-3987446fb2f1' },
 					{ type: 'media', unique: 'f06adb91-8cdd-408d-83dd-f7b833fc393c' },
+					// Intentionally references a media key that doesn't exist, to exercise the "not found" state.
+					{ type: 'media', unique: 'deadbeef-0000-4000-8000-000000000000' },
 				],
 			},
 			{
@@ -1919,7 +1931,7 @@ const rawData = [
 				alias: 'multinodeTreepickerMediaFullyConfigured',
 				culture: null,
 				segment: null,
-				value: [{ type: 'media', unique: 'a0651d98-14a9-4d92-8133-336f59b248d31' }],
+				value: [{ type: 'media', unique: 'a0651d98-14a9-4d92-8133-36f59b248d31' }],
 			},
 			{
 				editorAlias: 'Umbraco.MultiNodeTreePicker',
@@ -1929,6 +1941,8 @@ const rawData = [
 				value: [
 					{ type: 'member', unique: 'e93b2557-5fcb-4495-bbb3-9f5fd87055a8' },
 					{ type: 'member', unique: 'd74d2bd0-f55a-4a06-beb8-d8e931fc726b' },
+					// Intentionally references a member key that doesn't exist, to exercise the "not found" state.
+					{ type: 'member', unique: 'deadbeef-0000-4000-8000-000000000002' },
 				],
 			},
 			{
