@@ -910,6 +910,53 @@ internal partial class BlockListElementLevelVariationTests
     }
 
     [Test]
+    public async Task Can_Publish_Segment_Variant_Blocks_On_Culture_Varying_Document_Type()
+    {
+        // Regression test for #23553: the "blocks" property here varies by segment only, while the
+        // document type it lives on varies by culture (as well as segment, since a property's variation
+        // must be a subset of its content type's - see ContentTypeRepositoryBase.ValidateVariations).
+        // Publishing used to route the property through the culture-only partial publish merge path
+        // (because it doesn't vary by culture), which only ever publishes the default segment and
+        // silently discards every other segment's value.
+        var elementType = await CreateElementType(ContentVariation.Nothing);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Segment);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new[]
+            {
+                new BlockProperty(
+                    new List<BlockPropertyValue> { new() { Alias = "invariantText", Value = "The first content value" } },
+                    [],
+                    null,
+                    null),
+                new BlockProperty(
+                    new List<BlockPropertyValue> { new() { Alias = "invariantText", Value = "The first content value (Segment 1)" } },
+                    [],
+                    null,
+                    "s1"),
+            },
+            true);
+
+        AssertPropertyValues(null, "The first content value");
+        AssertPropertyValues("s1", "The first content value (Segment 1)");
+
+        void AssertPropertyValues(string? segment, string expectedContentValue)
+        {
+            SetVariationContext("en-US", segment);
+            var publishedContent = GetPublishedContent(content.Key);
+
+            var value = publishedContent.Value<BlockListModel>("blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(1, value.Count);
+
+            Assert.AreEqual(expectedContentValue, value.First().Content.Value<string>("invariantText"));
+        }
+    }
+
+    [Test]
     public async Task Can_Publish_With_Blocks_Removed()
     {
         var elementType = await CreateElementType(ContentVariation.Culture);

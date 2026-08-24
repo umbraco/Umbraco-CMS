@@ -68,7 +68,7 @@ public class SingleBlockPropertyEditor : DataEditor
         DataValueEditorFactory.Create<SingleBlockEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
 
     /// <inheritdoc />
-    public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false;
+    public override bool CanMergePartialPropertyValues(IPropertyType propertyType) => propertyType.VariesByCulture() is false && propertyType.VariesBySegment() is false;
 
     /// <inheritdoc />
     public override object? MergePartialPropertyValueForCulture(object? sourceValue, object? targetValue, string? culture)

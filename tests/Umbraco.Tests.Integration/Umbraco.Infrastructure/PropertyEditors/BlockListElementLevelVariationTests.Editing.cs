@@ -1466,6 +1466,99 @@ internal partial class BlockListElementLevelVariationTests
         });
     }
 
+    /// <summary>
+    /// Tests that culture-based edit permission enforcement treats a segment-only-varying block property as a single
+    /// atomic unit, rather than leaking per-culture merge behaviour into it.
+    /// </summary>
+    /// <remarks>
+    /// Regression test related to #23553: <see cref="ContentEditingServiceBase{TContent,TContentType,TContentService,TContentTypeService}.EnsureOnlyAllowedFieldsAreUpdated{TPublishableContent}"/>
+    /// shares the same <see cref="IDataEditor.CanMergePartialPropertyValues"/> gate that caused the publish bug. Before the fix, a
+    /// segment-only-varying block property (which doesn't vary by culture) was still incorrectly classified as a culture-mergeable
+    /// invariant property, routing its default segment slot through culture-oriented merge logic. That logic selectively preserves
+    /// a limited user's edits to block-internal values tagged with a culture the user has access to (e.g. "da-DK" here) - even
+    /// though culture permissions are meaningless for a property that doesn't vary by culture at all. After the fix, the property
+    /// is correctly excluded from that merge path, so a limited user's edit to the default segment is rejected wholesale, exactly
+    /// like any other property they aren't allowed to touch. Since a property's variation must be a subset of its content type's
+    /// (see ContentTypeRepositoryBase.ValidateVariations), the content type here varies by both culture and segment.
+    /// </remarks>
+    /// <param name="updateWithLimitedUserAccess">true => user only has access to "da-DK", not the default culture. false => admin (all languages).</param>
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Handle_Limited_User_Access_To_Languages_For_Segment_Variant_Blocks(bool updateWithLimitedUserAccess)
+    {
+        var userKey = updateWithLimitedUserAccess
+            ? (await CreateLimitedUser()).Key
+            : Constants.Security.SuperUserKey;
+
+        var elementType = await CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Segment);
+        var content = CreateContent(contentType, elementType, [], false);
+
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "invariantText", Value = "Original invariant value" },
+                    new() { Alias = "variantText", Value = "Original English value", Culture = "en-US" },
+                    new() { Alias = "variantText", Value = "Original Danish value", Culture = "da-DK" },
+                },
+                [],
+                null,
+                null));
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue), culture: null, segment: null);
+        ContentService.Save(content);
+
+        blockListValue.ContentData[0].Values.Single(v => v.Alias == "invariantText" && v.Culture == null).Value = "Attempted new invariant value";
+        blockListValue.ContentData[0].Values.Single(v => v.Alias == "variantText" && v.Culture == "en-US").Value = "Attempted new English value";
+        blockListValue.ContentData[0].Values.Single(v => v.Alias == "variantText" && v.Culture == "da-DK").Value = "Attempted new Danish value";
+
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = new[]
+            {
+                new PropertyValueModel { Alias = "blocks", Value = JsonSerializer.Serialize(blockListValue), Segment = null },
+            },
+            Variants = new[]
+            {
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+            }
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
+        Assert.IsTrue(result.Success);
+
+        content = ContentService.GetById(content.Key);
+        var savedBlocksValue = content?.Properties["blocks"]?.GetValue(culture: null, segment: null)?.ToString();
+        Assert.NotNull(savedBlocksValue);
+        var savedValues = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue).ContentData.Single().Values;
+
+        Assert.Multiple(() =>
+        {
+            // a limited user without default-culture access must never be able to change the invariant value
+            Assert.AreEqual(
+                updateWithLimitedUserAccess ? "Original invariant value" : "Attempted new invariant value",
+                savedValues.Single(v => v.Alias == "invariantText" && v.Culture == null).Value);
+
+            // "en-US" is not in the limited user's allowed cultures, so it must remain protected too
+            Assert.AreEqual(
+                updateWithLimitedUserAccess ? "Original English value" : "Attempted new English value",
+                savedValues.Single(v => v.Alias == "variantText" && v.Culture == "en-US").Value);
+
+            // "da-DK" IS in the limited user's allowed cultures - but since the outer property varies by segment,
+            // not culture, culture permissions must not selectively let this value through: the whole default
+            // segment is one atomic unit for a limited user without default-culture access, same as "en-US" above.
+            Assert.AreEqual(
+                updateWithLimitedUserAccess ? "Original Danish value" : "Attempted new Danish value",
+                savedValues.Single(v => v.Alias == "variantText" && v.Culture == "da-DK").Value);
+        });
+    }
+
     private async Task<IUser> CreateLimitedUser()
     {
         var userGroupService = GetRequiredService<IUserGroupService>();
