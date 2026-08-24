@@ -4,8 +4,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbNamableWorkspaceContext, UmbSubmittableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export interface UmbContentTypeWorkspaceContext<ContentTypeType extends UmbContentTypeModel = UmbContentTypeModel>
-	extends UmbSubmittableWorkspaceContext,
-		UmbNamableWorkspaceContext {
+	extends UmbSubmittableWorkspaceContext, UmbNamableWorkspaceContext {
 	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT: true;
 
 	readonly alias: Observable<string | undefined>;

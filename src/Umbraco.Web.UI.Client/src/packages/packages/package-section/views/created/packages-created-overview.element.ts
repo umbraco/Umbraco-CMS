@@ -147,9 +147,6 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 				display: flex;
 				justify-content: space-around;
 			}
-			uui-pagination {
-				display: inline-block;
-			}
 
 			.container {
 				display: flex;

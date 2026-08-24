@@ -3,7 +3,12 @@ import type {
 	UmbContentTypeStructureDataSource,
 	UmbContentTypeStructureDataSourceConstructor,
 } from './content-type-structure-data-source.interface.js';
-import { fetchAllPages, UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import {
+	fetchAllPages,
+	UmbRepositoryBase,
+	type UmbDataSourceResponse,
+	type UmbPagedModel,
+} from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
@@ -34,7 +39,7 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 		unique: string | null,
 		parentContentUnique: string | null,
 		paging?: UmbOffsetPaginationRequestModel,
-	) {
+	): Promise<UmbDataSourceResponse<UmbPagedModel<ItemType>>> {
 		return this._dataSource.getAllowedChildrenOf(unique, parentContentUnique, paging);
 	}
 

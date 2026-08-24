@@ -31,7 +31,6 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-
 	#submit() {
 		switch (this._pickedSection) {
 			case TemplatingSectionType.renderChildTemplate:
@@ -81,8 +80,8 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			selectOnly
 			.selected=${this._pickedSection === TemplatingSectionType.renderChildTemplate}
 			label=${this.localize.term('template_renderBody')}
-			@selected=${() => this._pickedSection = TemplatingSectionType.renderChildTemplate}
-  			@deselected=${() => this._pickedSection = undefined}>
+			@selected=${() => (this._pickedSection = TemplatingSectionType.renderChildTemplate)}
+			@deselected=${() => (this._pickedSection = undefined)}>
 			<h3><umb-localize key="template_renderBody">Render Child Template</umb-localize></h3>
 			<p>
 				<umb-localize key="template_renderBodyDesc">
@@ -98,8 +97,8 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			selectOnly
 			.selected=${this._pickedSection === TemplatingSectionType.renderANamedSection}
 			label=${this.localize.term('template_renderSection')}
-			@selected=${() => this._pickedSection = TemplatingSectionType.renderANamedSection}
-  			@deselected=${() => this._pickedSection = undefined}>
+			@selected=${() => (this._pickedSection = TemplatingSectionType.renderANamedSection)}
+			@deselected=${() => (this._pickedSection = undefined)}>
 			<h3><umb-localize key="template_renderSection">Render a named section</umb-localize></h3>
 			<p>
 				<umb-localize key="template_renderSectionDesc">
@@ -113,14 +112,19 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 						<uui-label for="render-named-section-name" required>
 							<umb-localize key="template_sectionName">Section Name</umb-localize>
 						</uui-label>
-						<uui-input ${umbFocus()} id="render-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
+						<uui-input
+							${umbFocus()}
+							id="render-named-section-name"
+							label=${this.localize.term('template_sectionName')}></uui-input>
 						<uui-checkbox
 							id="render-named-section-is-mandatory"
 							label=${this.localize.term('template_sectionMandatory')}
 							@click=${(e: Event) => e.stopPropagation()}
 							@keydown=${(e: KeyboardEvent) => {
-        					if (e.key === 'Enter') {
-            				(e.target as HTMLElement).click();}}}></uui-checkbox>
+								if (e.key === 'Enter') {
+									(e.target as HTMLElement).click();
+								}
+							}}></uui-checkbox>
 						<small>
 							<umb-localize key="template_sectionMandatoryDesc">
 								If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is
@@ -138,8 +142,8 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			selectOnly
 			.selected=${this._pickedSection === TemplatingSectionType.defineANamedSection}
 			label=${this.localize.term('template_defineSection')}
-			@selected=${() => this._pickedSection = TemplatingSectionType.defineANamedSection}
-  			@deselected=${() => this._pickedSection = undefined}>
+			@selected=${() => (this._pickedSection = TemplatingSectionType.defineANamedSection)}
+			@deselected=${() => (this._pickedSection = undefined)}>
 			<h3><umb-localize key="template_defineSection">Define a named section</umb-localize></h3>
 			<p>
 				<umb-localize key="template_defineSectionDesc">
@@ -152,7 +156,10 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 						<uui-label for="define-named-section-name" required>
 							<umb-localize key="template_sectionName">Section Name</umb-localize>
 						</uui-label>
-						<uui-input ${umbFocus()} id="define-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
+						<uui-input
+							${umbFocus()}
+							id="define-named-section-name"
+							label=${this.localize.term('template_sectionName')}></uui-input>
 					</div>`
 				: ''}
 		</uui-card>`;

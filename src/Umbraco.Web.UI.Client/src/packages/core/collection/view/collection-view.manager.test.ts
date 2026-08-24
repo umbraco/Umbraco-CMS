@@ -1,10 +1,14 @@
 import type { ManifestCollectionView } from './collection-view.extension.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbCollectionViewManager } from './collection-view.manager.js';
-import { expect } from '@open-wc/testing';
+import { aTimeout, expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+
+const CURRENT_VIEW_MEMORY_UNIQUE = 'UmbCollectionCurrentView';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -92,6 +96,66 @@ describe('UmbCollectionViewManager', () => {
 					done();
 				}, 60);
 			});
+		});
+	});
+
+	describe('Interaction memory', () => {
+		let hostElement: UmbTestControllerHostElement;
+		let interactionMemory: UmbInteractionMemoryManager;
+
+		const getMemorizedViewAlias = () => interactionMemory.getMemory(CURRENT_VIEW_MEMORY_UNIQUE)?.value?.alias;
+
+		const createManager = () => {
+			const memorizingManager = new UmbCollectionViewManager(hostElement, {
+				interactionMemoryManager: interactionMemory,
+			});
+			memorizingManager.setConfig(config);
+			return memorizingManager;
+		};
+
+		const getLandingViewAlias = async (memorizingManager: UmbCollectionViewManager) => {
+			let routes: Array<UmbRoute> = [];
+			const subscription = memorizingManager.routes.subscribe((value) => (routes = value));
+			await aTimeout(100);
+			subscription.unsubscribe();
+			return routes.find((route) => route.path === '')?.unique;
+		};
+
+		beforeEach(() => {
+			hostElement = new UmbTestControllerHostElement();
+			interactionMemory = new UmbInteractionMemoryManager(hostElement);
+		});
+
+		it('remembers the current view', () => {
+			createManager().setCurrentView(views[0]);
+			expect(getMemorizedViewAlias()).to.equal(VIEW_1_ALIAS);
+		});
+
+		it('lands on the remembered view instead of the configured default view', async () => {
+			interactionMemory.setMemory({
+				unique: CURRENT_VIEW_MEMORY_UNIQUE,
+				value: { alias: VIEW_1_ALIAS },
+			});
+			expect(await getLandingViewAlias(createManager())).to.equal(VIEW_1_ALIAS);
+		});
+
+		it('lands on the configured default view when nothing is remembered', async () => {
+			expect(await getLandingViewAlias(createManager())).to.equal(VIEW_2_ALIAS);
+		});
+
+		it('lands on the remembered view when it is remembered after the views have loaded', async () => {
+			const memorizingManager = createManager();
+			await aTimeout(100);
+			interactionMemory.setMemory({
+				unique: CURRENT_VIEW_MEMORY_UNIQUE,
+				value: { alias: VIEW_1_ALIAS },
+			});
+			expect(await getLandingViewAlias(memorizingManager)).to.equal(VIEW_1_ALIAS);
+		});
+
+		it('does not remember a view when no interaction memory is given', () => {
+			manager.setCurrentView(views[0]);
+			expect(getMemorizedViewAlias()).to.be.undefined;
 		});
 	});
 

@@ -28,8 +28,7 @@ export interface UmbContentTypeStructureServerDataSourceBaseArgs<
 export abstract class UmbContentTypeStructureServerDataSourceBase<
 	ServerItemType extends AllowedContentTypeBaseModel,
 	ClientItemType extends UmbEntityModel,
-> implements UmbContentTypeStructureDataSource<ClientItemType>
-{
+> implements UmbContentTypeStructureDataSource<ClientItemType> {
 	#host;
 	#getAllowedChildrenOf;
 	#mapper;
@@ -37,8 +36,8 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	/**
 	 * Creates an instance of UmbContentTypeStructureServerDataSourceBase.
 	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
-	 * @param args
-	 * @memberof UmbItemServerDataSourceBase
+	 * @param {UmbContentTypeStructureServerDataSourceBaseArgs} args - The arguments for this data source
+	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
 	constructor(
 		host: UmbControllerHost,
@@ -54,7 +53,7 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	 * @param {string | null} unique - The content type to get the allowed children of, or `null` for the root.
 	 * @param {string | null} parentContentUnique - The content item the children will be created under, if any.
 	 * @param {UmbOffsetPaginationRequestModel} paging - The page to return.
-	 * @returns {*}
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<ClientItemType>>>} The allowed children of the content type.
 	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
 	async getAllowedChildrenOf(

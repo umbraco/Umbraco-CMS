@@ -1468,6 +1468,11 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hoverAndClick(this.blockListEntry, this.deleteBlockEntryBtn);
   }
 
+  async clickDeleteBlockListBlockButtonAtIndex(index: number) {
+    const blockEntry = this.blockListEntry.nth(index);
+    await this.hoverAndClick(blockEntry, blockEntry.locator('[label="Delete"]'));
+  }
+
   async clickCopyBlockListBlockButton(groupName: string, propertyName: string, blockName: string, index: number = 0) {
     const blockListBlock = this.workspaceEditTab.filter({hasText: groupName}).locator(this.workspaceEditProperties).filter({hasText: propertyName}).locator(this.blockListEntry).nth(index).filter({hasText: blockName});
     await this.hoverAndClick(blockListBlock, blockListBlock.locator(this.copyBlockEntryBtn), {force: true});
