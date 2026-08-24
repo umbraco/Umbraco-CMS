@@ -28,27 +28,10 @@ export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActio
 		});
 	}
 
-	/*
-	override async getHref() {
-		await this.#contextReady;
-		const path = await this.observe(this.#context?.workspaceEditContentPath)?.asPromise();
-		return path || undefined;
-	}
-	*/
-
 	async getHrefObservable(): Promise<Observable<string | undefined> | undefined> {
 		await this.#contextReady;
 		return this.#context?.workspaceEditContentPath;
 	}
-
-	/*
-	override async getValidationDataPath() {
-		await this.#contextReady;
-		const contentKey = await this.observe(this.#context?.contentKey)?.asPromise();
-		if (!contentKey) return undefined;
-		return `$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`;
-	}
-	*/
 
 	async getValidationDataPathObservable(): Promise<Observable<string | undefined> | undefined> {
 		await this.#contextReady;
