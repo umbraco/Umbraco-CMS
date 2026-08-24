@@ -574,14 +574,20 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         return Task.FromResult(result);
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<TContent> GetVersionsSlim(int id, int skip, int take)
+    /// <inheritdoc />
+    public Task<IEnumerable<TContent>> GetVersionsSlimAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        Attempt<int> idAttempt = IdKeyMap.GetIdForKeyAsync(contentKey, ContentObjectType).GetAwaiter().GetResult();
+        if (idAttempt.Success is false)
         {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetAllVersionsSlim(id, skip, take);
+            return Task.FromResult(Enumerable.Empty<TContent>());
         }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = _contentRepository.GetAllVersionsSlim(idAttempt.Result, skip, take);
+        scope.Complete();
+        return Task.FromResult(result);
     }
 
     /// <inheritdoc/>

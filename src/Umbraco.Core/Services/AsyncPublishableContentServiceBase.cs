@@ -445,14 +445,14 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         return result;
     }
 
-    /// <inheritdoc/>
-    public IEnumerable<TContent> GetVersionsSlim(int id, int skip, int take)
+    /// <inheritdoc />
+    public async Task<IEnumerable<TContent>> GetVersionsSlimAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetAllVersionsSlim(id, skip, take);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        IEnumerable<TContent> result = await _asyncContentRepository.GetAllVersionsSlimAsync(contentKey, skip, take, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc/>

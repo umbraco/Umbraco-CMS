@@ -71,4 +71,15 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     /// <returns>The content versions.</returns>
     /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
     Task<IEnumerable<TContent>> GetVersionsAsync(Guid contentKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a page of versions of content.
+    /// </summary>
+    /// <param name="contentKey">The Guid key of the content.</param>
+    /// <param name="skip">The number of versions to skip.</param>
+    /// <param name="take">The number of versions to take.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The content versions.</returns>
+    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
+    Task<IEnumerable<TContent>> GetVersionsSlimAsync(Guid contentKey, int skip, int take, CancellationToken cancellationToken);
 }

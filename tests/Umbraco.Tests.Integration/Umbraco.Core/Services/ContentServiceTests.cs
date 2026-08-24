@@ -3554,7 +3554,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         Console.WriteLine("-");
 
-        var versionsSlim = ContentService.GetVersionsSlim(page.Id, 0, 50).ToArray();
+        var versionsSlim = (await ContentService.GetVersionsSlimAsync(page.Key, 0, 50, CancellationToken.None)).ToArray();
         Assert.AreEqual(5, versionsSlim.Length);
 
         for (var i = 0; i < 5; i++)

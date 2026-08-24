@@ -127,16 +127,6 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     PublishResult Unpublish(TContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Gets all versions of content.
-    /// </summary>
-    /// <param name="id">The identifier of the content.</param>
-    /// <param name="skip">The number of versions to skip.</param>
-    /// <param name="take">The number of versions to take.</param>
-    /// <returns>The content versions.</returns>
-    /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-    IEnumerable<TContent> GetVersionsSlim(int id, int skip, int take);
-
-    /// <summary>
     ///     Gets top versions of content.
     /// </summary>
     /// <param name="id">The identifier of the content.</param>
