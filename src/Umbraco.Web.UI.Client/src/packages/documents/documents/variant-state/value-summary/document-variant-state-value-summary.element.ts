@@ -16,7 +16,7 @@ export class UmbDocumentVariantStateValueSummaryElement extends UmbValueSummaryE
 
 	constructor() {
 		super();
-		this.observe(this.#variantResolver.variant, (variant) => (this._state = variant?.state));
+		this.observe(this.#variantResolver.variant, (variant) => (this._state = variant?.state), null);
 	}
 
 	override willUpdate(changedProperties: PropertyValues) {
