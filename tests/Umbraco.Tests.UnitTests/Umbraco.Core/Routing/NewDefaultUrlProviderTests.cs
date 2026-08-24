@@ -502,7 +502,7 @@ public class NewDefaultUrlProviderTests
     /// logging is disabled, so it costs nothing on the URL resolution path.
     /// </summary>
     [Test]
-    public void Cannot_Resolve_Key_For_Unroutable_Content_When_Debug_Logging_Disabled()
+    public void Does_Not_Resolve_Key_For_Unroutable_Content_When_Debug_Logging_Disabled()
     {
         var ctx = new TestContext();
         ctx.Logger.Setup(x => x.IsEnabled(LogLevel.Debug)).Returns(false);
