@@ -101,7 +101,10 @@ internal static class ChunkedTieredResolver
         where TKey : notnull
     {
         var resolvedByKey = new Dictionary<TKey, TItem>(chunk.Count);
-        TKey[] pending = chunk.Distinct().ToArray();
+
+        // A single-key chunk has nothing to deduplicate, and it is the one every enumeration starts
+        // with and the only one a FirstOrDefault()/Take(1) consumer ever draws.
+        TKey[] pending = chunk.Count == 1 ? [chunk[0]] : [.. chunk.Distinct()];
 
         foreach (ResolveItemsDelegate<TKey, TItem> resolveTier in resolveItems)
         {
@@ -110,9 +113,17 @@ internal static class ChunkedTieredResolver
                 break;
             }
 
+            var resolvedBefore = resolvedByKey.Count;
             resolveTier(pending, resolvedByKey);
 
-            pending = pending.Where(key => !resolvedByKey.ContainsKey(key)).ToArray();
+            // A tier that resolved nothing leaves every key pending, so the current array still holds
+            // exactly what the next tier needs.
+            if (resolvedByKey.Count == resolvedBefore)
+            {
+                continue;
+            }
+
+            pending = [.. pending.Where(key => resolvedByKey.ContainsKey(key) is false)];
         }
 
         var resolved = new List<TItem>(chunk.Count);
