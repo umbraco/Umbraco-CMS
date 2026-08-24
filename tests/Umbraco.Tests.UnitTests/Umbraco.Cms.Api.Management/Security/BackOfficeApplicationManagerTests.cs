@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Globalization;
+using System.Text.Json;
 using Moq;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
@@ -430,6 +432,220 @@ public class BackOfficeApplicationManagerTests
 
         var redirectUriStrings = capturedDescriptor.RedirectUris.Select(u => u.ToString()).ToList();
         Assert.That(redirectUriStrings, Does.Contain("https://server1.local/umbraco/oauth_complete"));
+    }
+
+    /// <summary>
+    /// Tests that a stored application already matching the descriptor is not written again.
+    /// Every instance in a load balanced setup merges the existing hosts back into its descriptor,
+    /// so the write it would issue changes nothing but the concurrency token (#23544).
+    /// </summary>
+    [Test]
+    public async Task EnsureBackOfficeApplicationAsync_StoredApplicationMatchesDescriptor_DoesNotUpdate()
+    {
+        // Arrange
+        var mockApplication = new object();
+        SetUpStoredBackOfficeApplication(mockApplication, "https://server1.local");
+
+        _mockWebHostEnvironment.Setup(x => x.EnvironmentName).Returns("Production");
+
+        var sut = CreateDefaultMockedBackofficeApplicationManager();
+
+        // Act
+        await sut.EnsureBackOfficeApplicationAsync([new Uri("https://server1.local/")]);
+
+        // Assert
+        _mockApplicationManager.Verify(
+            x => x.UpdateAsync(It.IsAny<object>(), It.IsAny<OpenIddictApplicationDescriptor>(), It.IsAny<CancellationToken>()),
+            Times.Never,
+            "An unchanged descriptor must not be written, otherwise concurrent instances contend over the concurrency token");
+    }
+
+    /// <summary>
+    /// Tests that a retry after a concurrency conflict re-reads the stored hosts. Replaying the
+    /// descriptor built before the conflict would drop the host the winning instance just registered,
+    /// leaving that server unable to complete a back-office login (#23544).
+    /// </summary>
+    [Test]
+    public async Task EnsureBackOfficeApplicationAsync_UpdateConflicts_MergesHostsRegisteredByTheWinningInstance()
+    {
+        // Arrange
+        var mockApplication = new object();
+        var storedRedirectUris = new List<string> { "https://server1.local/umbraco/oauth_complete" };
+
+        _mockApplicationManager
+            .Setup(x => x.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockApplication);
+
+        _mockApplicationManager
+            .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .Returns(() => ValueTask.FromResult(storedRedirectUris.ToImmutableArray()));
+
+        var writes = new List<OpenIddictApplicationDescriptor>();
+        _mockApplicationManager
+            .Setup(x => x.UpdateAsync(mockApplication, It.IsAny<OpenIddictApplicationDescriptor>(), It.IsAny<CancellationToken>()))
+            .Returns((object _, OpenIddictApplicationDescriptor descriptor, CancellationToken _) =>
+            {
+                writes.Add(descriptor);
+                if (writes.Count > 1)
+                {
+                    return ValueTask.CompletedTask;
+                }
+
+                // Another instance wins the race and registers itself before this write lands.
+                storedRedirectUris.Add("https://server3.local/umbraco/oauth_complete");
+                throw new OpenIddictExceptions.ConcurrencyException("conflict");
+            });
+
+        _mockWebHostEnvironment.Setup(x => x.EnvironmentName).Returns("Production");
+
+        var sut = CreateDefaultMockedBackofficeApplicationManager();
+
+        // Act
+        await sut.EnsureBackOfficeApplicationAsync([new Uri("https://server2.local/")]);
+
+        // Assert
+        Assert.That(writes, Has.Count.EqualTo(2), "The conflicting write should be retried");
+
+        var retriedUris = writes[1].RedirectUris.Select(uri => uri.ToString()).ToList();
+        Assert.Multiple(() =>
+        {
+            Assert.That(retriedUris, Does.Contain("https://server1.local/umbraco/oauth_complete"));
+            Assert.That(retriedUris, Does.Contain("https://server2.local/umbraco/oauth_complete"));
+            Assert.That(
+                retriedUris,
+                Does.Contain("https://server3.local/umbraco/oauth_complete"),
+                "The retry must re-read the stored hosts, otherwise the winning instance's host is discarded");
+        });
+    }
+
+    /// <summary>
+    /// Tests that an application carrying a client secret is always written. OpenIddict stores secrets
+    /// hashed, so a supplied secret can never be compared against the stored one and a rotated secret
+    /// would otherwise be silently discarded (#23544).
+    /// </summary>
+    [Test]
+    public async Task EnsureBackOfficeClientCredentialsApplicationAsync_EverythingElseMatches_StillUpdates()
+    {
+        // Arrange
+        const string ClientId = "my-client";
+        var mockApplication = new object();
+
+        _mockApplicationManager
+            .Setup(x => x.FindByClientIdAsync(ClientId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockApplication);
+
+        _mockApplicationManager
+            .Setup(x => x.GetDisplayNameAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync($"Umbraco client credentials back-office access: {ClientId}");
+
+        _mockApplicationManager
+            .Setup(x => x.GetClientTypeAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(OpenIddictConstants.ClientTypes.Confidential);
+
+        _mockApplicationManager
+            .Setup(x => x.GetPermissionsAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray.Create(
+                OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.Endpoints.Revocation,
+                OpenIddictConstants.Permissions.GrantTypes.ClientCredentials));
+
+        _mockApplicationManager
+            .Setup(x => x.GetRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray<string>.Empty);
+
+        _mockApplicationManager
+            .Setup(x => x.GetPostLogoutRedirectUrisAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray<string>.Empty);
+
+        _mockApplicationManager
+            .Setup(x => x.GetSettingsAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<string, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetConsentTypeAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(OpenIddictConstants.ConsentTypes.Explicit);
+        _mockApplicationManager
+            .Setup(x => x.GetApplicationTypeAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(OpenIddictConstants.ApplicationTypes.Web);
+        _mockApplicationManager
+            .Setup(x => x.GetRequirementsAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray<string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetDisplayNamesAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<CultureInfo, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetPropertiesAsync(mockApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty);
+
+
+        var sut = CreateDefaultMockedBackofficeApplicationManager();
+
+        // Act
+        await sut.EnsureBackOfficeClientCredentialsApplicationAsync(ClientId, "rotated-secret");
+
+        // Assert
+        _mockApplicationManager.Verify(
+            x => x.UpdateAsync(mockApplication, It.IsAny<OpenIddictApplicationDescriptor>(), It.IsAny<CancellationToken>()),
+            Times.Once,
+            "A descriptor carrying a client secret must always be written, because the stored secret is hashed and cannot be compared");
+    }
+
+    /// <summary>
+    /// Sets up the mocked application manager to return a stored back-office application whose
+    /// state matches what <see cref="BackOfficeApplicationManager"/> builds for the given host.
+    /// </summary>
+    private void SetUpStoredBackOfficeApplication(object storedApplication, string authority)
+    {
+        _mockApplicationManager
+            .Setup(x => x.FindByClientIdAsync(Constants.OAuthClientIds.BackOffice, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(storedApplication);
+
+        _mockApplicationManager
+            .Setup(x => x.GetRedirectUrisAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray.Create($"{authority}/umbraco/oauth_complete"));
+
+        _mockApplicationManager
+            .Setup(x => x.GetPostLogoutRedirectUrisAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray.Create(
+                $"{authority}/umbraco/oauth_complete",
+                $"{authority}/umbraco/logout"));
+
+        _mockApplicationManager
+            .Setup(x => x.GetDisplayNameAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("Umbraco back-office access");
+
+        _mockApplicationManager
+            .Setup(x => x.GetClientTypeAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(OpenIddictConstants.ClientTypes.Public);
+
+        _mockApplicationManager
+            .Setup(x => x.GetPermissionsAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray.Create(
+                OpenIddictConstants.Permissions.Endpoints.Authorization,
+                OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.Endpoints.EndSession,
+                OpenIddictConstants.Permissions.Endpoints.Revocation,
+                OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                OpenIddictConstants.Permissions.ResponseTypes.Code));
+
+        _mockApplicationManager
+            .Setup(x => x.GetSettingsAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<string, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetConsentTypeAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(OpenIddictConstants.ConsentTypes.Explicit);
+        _mockApplicationManager
+            .Setup(x => x.GetApplicationTypeAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(OpenIddictConstants.ApplicationTypes.Web);
+        _mockApplicationManager
+            .Setup(x => x.GetRequirementsAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableArray<string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetDisplayNamesAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<CultureInfo, string>.Empty);
+        _mockApplicationManager
+            .Setup(x => x.GetPropertiesAsync(storedApplication, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ImmutableDictionary<string, JsonElement>.Empty);
     }
 
     private BackOfficeApplicationManager CreateDefaultMockedBackofficeApplicationManager() =>
