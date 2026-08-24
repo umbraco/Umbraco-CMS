@@ -72,7 +72,7 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 
 	#renderLink() {
 		return html`
-			<a id="open-part" aria-label="Open ${this.name}" href=${ifDefined(this.href)}>${this.#renderContent()}</a>
+			<a id="open-part" aria-label="Open ${this.name}" tabindex=${ifDefined(!this.disabled ? 0 : undefined)} href=${ifDefined(!this.disabled ? this.href : undefined)}>${this.#renderContent()}</a>
 		`;
 	}
 
