@@ -80,8 +80,6 @@ internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequiremen
 
         // An authorization call carrying no request has no verb to infer from, which the resolver reports as an
         // unclassified operation rather than as a read.
-        string[] httpMethods = httpContext is null ? [] : [httpContext.Request.Method];
-
-        return SchemaOperationResolver.Resolve(httpMethods, declared);
+        return SchemaOperationResolver.Resolve(httpContext?.Request.Method, declared);
     }
 }

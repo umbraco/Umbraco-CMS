@@ -11,7 +11,7 @@ internal static class SchemaOperationResolver
     /// <summary>
     /// Resolves the operation, preferring an explicit declaration over inference from the HTTP verb.
     /// </summary>
-    /// <param name="httpMethods">The HTTP methods the action responds to.</param>
+    /// <param name="httpMethod">The HTTP method the action responds to.</param>
     /// <param name="declared">The declared operation, if any.</param>
     /// <returns>The resolved operation.</returns>
     /// <remarks>
@@ -19,18 +19,14 @@ internal static class SchemaOperationResolver
     /// unrecognised resolves to <see cref="SchemaOperation.Unknown"/>, which the default policy blocks, so a new
     /// or custom verb cannot bypass lockdown.
     /// </remarks>
-    public static SchemaOperation Resolve(IEnumerable<string>? httpMethods, SchemaOperationAttribute? declared)
+    public static SchemaOperation Resolve(string? httpMethod, SchemaOperationAttribute? declared)
     {
         if (declared is not null)
         {
             return declared.Operation;
         }
 
-        var operations = (httpMethods ?? []).Select(FromVerb).ToArray();
-
-        return operations.Length == 0
-            ? SchemaOperation.Unknown
-            : operations.MaxBy(Restrictiveness);
+        return httpMethod is null ? SchemaOperation.Unknown : FromVerb(httpMethod);
     }
 
     private static SchemaOperation FromVerb(string httpMethod)
@@ -57,13 +53,4 @@ internal static class SchemaOperationResolver
 
         return SchemaOperation.Unknown;
     }
-
-    private static int Restrictiveness(SchemaOperation operation) => operation switch
-    {
-        SchemaOperation.Read => 0,
-        SchemaOperation.Create => 1,
-        SchemaOperation.Update => 2,
-        SchemaOperation.Delete => 3,
-        _ => 4,
-    };
 }
