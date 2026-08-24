@@ -293,10 +293,11 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Counts child documents of a given parent, of a given document type.
     /// </summary>
-    /// <param name="parentId">The parent identifier.</param>
-    /// <param name="documentTypeAlias">The document type alias, or null for all types.</param>
+    /// <param name="parentKey">The Guid key of the parent.</param>
+    /// <param name="contentTypeAlias">The document type alias, or null for all types.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The child document count.</returns>
-    int CountChildren(int parentId, string? documentTypeAlias = null);
+    Task<int> CountChildrenAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Counts descendant documents of a given parent, of a given document type.
@@ -309,9 +310,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Gets a value indicating whether a document has children.
     /// </summary>
-    /// <param name="id">The document identifier.</param>
+    /// <param name="key">The Guid key of the document.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns><c>true</c> if the document has children; otherwise, <c>false</c>.</returns>
-    bool HasChildren(int id);
+    Task<bool> HasChildrenAsync(Guid key, CancellationToken cancellationToken);
 
     #endregion
 

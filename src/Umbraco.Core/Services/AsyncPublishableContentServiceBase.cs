@@ -310,16 +310,19 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <summary>
     /// Gets the count of child <see cref="TContent"/> items under a specified parent.
     /// </summary>
-    /// <param name="parentId">The ID of the parent content.</param>
+    /// <param name="parentKey">The Guid key of the parent content.</param>
     /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The count of child content items.</returns>
-    public int CountChildren(int parentId, string? contentTypeAlias = null)
+    public async Task<int> CountChildrenAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.CountChildren(parentId, contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        int result = contentTypeAlias is null
+            ? await _asyncContentRepository.CountChildrenAsync(parentKey, cancellationToken)
+            : await _asyncContentRepository.CountChildrenAsync(parentKey, contentTypeAlias, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
@@ -506,9 +509,11 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <summary>
     ///     Checks whether an <see cref="TContent" /> item has any children
     /// </summary>
-    /// <param name="id">Id of the <see cref="TContent" /></param>
+    /// <param name="key">Guid key of the <see cref="TContent" /></param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>True if the content has any children otherwise False</returns>
-    public bool HasChildren(int id) => CountChildren(id) > 0;
+    public async Task<bool> HasChildrenAsync(Guid key, CancellationToken cancellationToken) =>
+        await CountChildrenAsync(key, null, cancellationToken) > 0;
 
     /// <inheritdoc />
     public async Task<bool> IsPathPublishedAsync(TContent? content, CancellationToken cancellationToken)
@@ -1534,7 +1539,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
                 // it was not published and now is... descendants that were 'published' (but
                 // had an unpublished ancestor) are 're-published' ie not explicitly published
                 // but back as 'published' nevertheless
-                if (!branchOne && isNew == false && previouslyPublished == false && HasChildren(content.Id))
+                if (!branchOne && isNew == false && previouslyPublished == false && HasChildrenAsync(content.Key, CancellationToken.None).GetAwaiter().GetResult())
                 {
                     TContent[] descendants = GetPublishedDescendantsLocked(content).ToArray();
                     scope.Notifications.Publish(

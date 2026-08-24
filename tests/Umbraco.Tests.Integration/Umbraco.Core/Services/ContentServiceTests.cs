@@ -573,7 +573,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert
-        Assert.AreEqual(20, ContentService.CountChildren(parent.Id));
+        Assert.AreEqual(20, await ContentService.CountChildrenAsync(parent.Key, null, CancellationToken.None));
     }
 
     [Test]
@@ -3133,7 +3133,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Arrange
         var temp = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.AreEqual("Textpage", temp.Name);
-        Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
+        Assert.AreEqual(3, await ContentService.CountChildrenAsync(temp.Key, null, CancellationToken.None));
 
         // Act
         var copy = ContentService.Copy(temp, temp.ParentId, false, true);
@@ -3143,7 +3143,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.That(copy, Is.Not.Null);
         Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
         Assert.AreNotSame(content, copy);
-        Assert.AreEqual(3, ContentService.CountChildren(copy.Id));
+        Assert.AreEqual(3, await ContentService.CountChildrenAsync(copy.Key, null, CancellationToken.None));
 
         var child = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         var childCopy = (await ContentService.GetChildrenAsync(copy.Key, 0, 500, propertyAliases: null, ordering: null, CancellationToken.None)).Items.First();
@@ -3158,7 +3158,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Arrange
         var temp = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
         Assert.AreEqual("Textpage", temp.Name);
-        Assert.AreEqual(3, ContentService.CountChildren(temp.Id));
+        Assert.AreEqual(3, await ContentService.CountChildrenAsync(temp.Key, null, CancellationToken.None));
 
         // Act
         var copy = ContentService.Copy(temp, temp.ParentId, false, false);
@@ -3168,7 +3168,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.That(copy, Is.Not.Null);
         Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
         Assert.AreNotSame(content, copy);
-        Assert.AreEqual(0, ContentService.CountChildren(copy.Id));
+        Assert.AreEqual(0, await ContentService.CountChildrenAsync(copy.Key, null, CancellationToken.None));
     }
 
     [Test]
