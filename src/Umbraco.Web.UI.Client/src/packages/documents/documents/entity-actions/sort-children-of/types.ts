@@ -7,7 +7,7 @@ import type { UmbSortChildrenByFieldOption, UmbSortChildrenOfByFieldArgs } from 
  */
 export interface UmbSortChildrenOfDocumentByFieldArgs extends UmbSortChildrenOfByFieldArgs {
 	/**
-	 * The culture to sort by. Defaults to the current backoffice culture when omitted.
+	 * The culture whose variant name to sort by. Omitted to sort by the invariant name.
 	 */
 	culture?: string;
 }
