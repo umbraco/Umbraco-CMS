@@ -252,6 +252,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	#renderItem(status: UmbRepositoryItemsStatus) {
 		const unique = status.unique;
 
+		if (status.state.type === 'loading') {
+			return this.#renderLoadingItem(unique);
+		}
+
 		if (status.state.type === 'error') {
 			return this.#renderErrorItem(unique, status.state.error);
 		}
@@ -279,6 +283,14 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(unique)}</uui-action-bar>
+			</uui-card-media>
+		`;
+	}
+
+	#renderLoadingItem(unique: string) {
+		return html`
+			<uui-card-media disabled data-mark="media:${unique}">
+				<umb-media-thumbnail unique=${unique} .externalLoading=${true}></umb-media-thumbnail>
 			</uui-card-media>
 		`;
 	}
