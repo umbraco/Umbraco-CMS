@@ -1,6 +1,8 @@
 import { UmbSortChildrenOfMediaServerDataSource } from './sort-children-of.server.data.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { ContentSortFieldModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
+	UmbSortChildrenByFieldOption,
 	UmbSortChildrenOfArgs,
 	UmbSortChildrenOfByFieldArgs,
 	UmbSortChildrenOfRepository,
@@ -20,6 +22,14 @@ export class UmbSortChildrenOfMediaRepository extends UmbControllerBase implemen
 		if (args.unique === undefined) throw new Error('Unique is missing');
 
 		return this.#dataSource.sortChildrenOfByField(args);
+	}
+
+	getSortByFieldOptions(): Array<UmbSortChildrenByFieldOption> {
+		return [
+			{ value: ContentSortFieldModel.NAME, label: '#sort_sortByFieldNameOption' },
+			{ value: ContentSortFieldModel.CREATE_DATE, label: '#sort_sortByFieldCreateDateOption' },
+			{ value: ContentSortFieldModel.UPDATE_DATE, label: '#sort_sortByFieldUpdateDateOption' },
+		];
 	}
 }
 

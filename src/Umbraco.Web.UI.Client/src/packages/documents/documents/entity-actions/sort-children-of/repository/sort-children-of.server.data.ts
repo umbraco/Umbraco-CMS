@@ -48,7 +48,7 @@ export class UmbSortChildrenOfDocumentServerDataSource implements UmbSortChildre
 
 	/**
 	 * Sorts the children of the given Document by a field
-	 * @param {UmbSortChildrenOfByFieldArgs} args
+	 * @param {UmbSortChildrenOfByFieldArgs} args - The sort request arguments
 	 * @memberof UmbSortChildrenOfDocumentServerDataSource
 	 */
 	async sortChildrenOfByField(args: UmbSortChildrenOfByFieldArgs) {

@@ -48,7 +48,7 @@ export class UmbSortChildrenOfMediaServerDataSource implements UmbSortChildrenOf
 
 	/**
 	 * Sorts the children of the given Media by a field
-	 * @param {UmbSortChildrenOfByFieldArgs} args
+	 * @param {UmbSortChildrenOfByFieldArgs} args - The sort request arguments
 	 * @memberof UmbSortChildrenOfMediaServerDataSource
 	 */
 	async sortChildrenOfByField(args: UmbSortChildrenOfByFieldArgs) {

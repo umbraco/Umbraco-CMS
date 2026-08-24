@@ -1,4 +1,4 @@
-import type { UmbSortChildrenOfArgs, UmbSortChildrenOfByFieldArgs } from './types.js';
+import type { UmbSortChildrenByFieldOption, UmbSortChildrenOfArgs, UmbSortChildrenOfByFieldArgs } from './types.js';
 import type { UmbRepositoryErrorResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
@@ -17,4 +17,11 @@ export interface UmbSortChildrenOfRepository extends UmbApi {
 	 * @returns {Promise<UmbRepositoryErrorResponse>} the result of the operation
 	 */
 	sortChildrenOfByField?(args: UmbSortChildrenOfByFieldArgs): Promise<UmbRepositoryErrorResponse>;
+
+	/**
+	 * Gets the fields the children of an entity can be sorted by on the server.
+	 * Optional: only implemented by repositories whose entity supports server-side field sorting.
+	 * @returns {Array<UmbSortChildrenByFieldOption>} the available fields
+	 */
+	getSortByFieldOptions?(): Array<UmbSortChildrenByFieldOption>;
 }

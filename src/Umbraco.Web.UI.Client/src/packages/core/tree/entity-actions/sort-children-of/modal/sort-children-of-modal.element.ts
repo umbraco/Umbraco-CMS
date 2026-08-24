@@ -101,15 +101,6 @@ export class UmbSortChildrenOfModalElement<
 	}
 
 	/**
-	 * The fields offered by the "Sort by field" view. Returns an empty array by default, which hides the view.
-	 * Override in an entity-specific subclass to enable server-side sorting by field.
-	 * @returns {Array<UmbSortChildrenByFieldOption>} the available fields
-	 */
-	protected _getSortByFieldOptions(): Array<UmbSortChildrenByFieldOption> {
-		return [];
-	}
-
-	/**
 	 * The culture to sort by when sorting by field. Undefined for invariant sorting.
 	 * @returns {string | undefined} the culture
 	 */
@@ -127,17 +118,14 @@ export class UmbSortChildrenOfModalElement<
 	}
 
 	async #initSortByField() {
-		this._sortByFieldOptions = this._getSortByFieldOptions();
-		this._selectedField = this._sortByFieldOptions[0]?.value;
-
-		if (this._sortByFieldOptions.length === 0) {
-			this._supportsSortByField = false;
-			return;
-		}
-
 		try {
 			const repository = await this.#getSortChildrenOfRepository();
-			this._supportsSortByField = typeof repository.sortChildrenOfByField === 'function';
+
+			if (!repository.sortChildrenOfByField || !repository.getSortByFieldOptions) return;
+
+			this._sortByFieldOptions = repository.getSortByFieldOptions();
+			this._selectedField = this._sortByFieldOptions[0]?.value;
+			this._supportsSortByField = this._sortByFieldOptions.length > 0;
 		} catch {
 			this._supportsSortByField = false;
 		}
@@ -372,7 +360,7 @@ export class UmbSortChildrenOfModalElement<
 
 	#renderSortByFieldView() {
 		const fieldOptions = this._sortByFieldOptions.map((option) => ({
-			name: option.label,
+			name: this.localize.string(option.label),
 			value: option.value,
 			selected: option.value === this._selectedField,
 		}));

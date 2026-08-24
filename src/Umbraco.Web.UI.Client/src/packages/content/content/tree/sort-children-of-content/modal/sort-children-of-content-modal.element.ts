@@ -2,9 +2,7 @@ import type { UmbContentTreeItemModel } from '../../types.js';
 import type { UmbSortChildrenOfContentModalData } from './sort-children-of-content-modal.token.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSortChildrenOfModalElement } from '@umbraco-cms/backoffice/tree';
-import type { UmbSortChildrenByFieldOption } from '@umbraco-cms/backoffice/tree';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
-import { ContentSortFieldModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-sort-children-of-content-modal')
 export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModalElement<UmbContentTreeItemModel> {
@@ -27,14 +25,6 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 
 	protected override _getSortCulture(): string | undefined {
 		return this.#appCulture;
-	}
-
-	protected override _getSortByFieldOptions(): Array<UmbSortChildrenByFieldOption> {
-		return [
-			{ value: ContentSortFieldModel.NAME, label: this.localize.term('sort_sortByFieldNameOption') },
-			{ value: ContentSortFieldModel.CREATE_DATE, label: this.localize.term('sort_sortByFieldCreateDateOption') },
-			{ value: ContentSortFieldModel.UPDATE_DATE, label: this.localize.term('sort_sortByFieldUpdateDateOption') },
-		];
 	}
 
 	protected override _setTableColumns() {

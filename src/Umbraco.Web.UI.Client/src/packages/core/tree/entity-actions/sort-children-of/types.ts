@@ -36,7 +36,7 @@ export interface UmbSortChildrenByFieldOption {
 	 */
 	value: string;
 	/**
-	 * The localized label shown to the user.
+	 * The label shown to the user. Localization keys prefixed with `#` are resolved before display.
 	 */
 	label: string;
 }
