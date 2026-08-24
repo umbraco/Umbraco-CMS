@@ -118,8 +118,9 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Gets the parent of a document.
     /// </summary>
     /// <param name="content">The document.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The parent document, or null if not found.</returns>
-    IContent? GetParent(IContent content);
+    Task<IContent?> GetParentAsync(IContent? content, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets ancestor documents of a document.

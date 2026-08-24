@@ -674,22 +674,22 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public async Task GetParent_Uses_Content_ParentKey_Without_Calling_IIdKeyMap()
+    public async Task GetParentAsync_ByEntity_Uses_Content_ParentKey_Without_Calling_IIdKeyMap()
     {
         var idKeyMapSpy = (SpyIdKeyMap)IdKeyMap;
 
         // Fetch through the repository (rather than using the raw fixture instance) so ParentKey is
-        // already populated - otherwise GetParent's own catch-block fallback would call IIdKeyMap
+        // already populated - otherwise GetParentAsync's own catch-block fallback would call IIdKeyMap
         // regardless of whether the already-populated-ParentKey path itself works, masking the assertion.
         IContent? subpage = await ContentService.GetByIdAsync(Subpage.Key, CancellationToken.None);
         Assert.That(subpage, Is.Not.Null);
         var callCountBeforeGetParent = idKeyMapSpy.GetKeyForIdAsyncCallCount;
 
-        IContent? result = ContentService.GetParent(subpage!);
+        IContent? result = await ContentService.GetParentAsync(subpage!, CancellationToken.None);
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.Key, Is.EqualTo(Textpage.Key));
-        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.EqualTo(callCountBeforeGetParent), "GetParent must resolve the parent via the already-populated ParentKey, not via IIdKeyMap");
+        Assert.That(idKeyMapSpy.GetKeyForIdAsyncCallCount, Is.EqualTo(callCountBeforeGetParent), "GetParentAsync must resolve the parent via the already-populated ParentKey, not via IIdKeyMap");
     }
 
     [Test]

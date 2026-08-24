@@ -524,8 +524,9 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     ///     Gets the parent of the current content as an <see cref="TContent" /> item.
     /// </summary>
     /// <param name="content"><see cref="TContent" /> to retrieve the parent from</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Parent <see cref="TContent" /> object</returns>
-    public TContent? GetParent(TContent? content)
+    public async Task<TContent?> GetParentAsync(TContent? content, CancellationToken cancellationToken)
     {
         if (content?.ParentId == Constants.System.Root || content?.ParentId == Constants.System.RecycleBinContent ||
             content is null)
@@ -545,13 +546,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
         catch (NotSupportedException)
         {
-            Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(content.ParentId, ContentObjectType).GetAwaiter().GetResult();
+            Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(content.ParentId, ContentObjectType);
             parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
         }
 
         return parentKey is null
             ? null
-            : GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult();
+            : await GetByIdAsync(parentKey.Value, cancellationToken);
     }
 
     #endregion
@@ -2029,7 +2030,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             // check if the content can be path-published
             // root content can be published
             // else check ancestors - we know we are not trashed
-            var pathIsOk = content.ParentId == Constants.System.Root || IsPathPublishedAsync(GetParent(content), CancellationToken.None).GetAwaiter().GetResult();
+            var pathIsOk = content.ParentId == Constants.System.Root || IsPathPublishedAsync(GetParentAsync(content, CancellationToken.None).GetAwaiter().GetResult(), CancellationToken.None).GetAwaiter().GetResult();
             if (!pathIsOk)
             {
                 Logger.LogInformation(
