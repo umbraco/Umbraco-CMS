@@ -596,7 +596,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert
-        Assert.AreEqual(20, ContentService.CountDescendants(parent.Id));
+        Assert.AreEqual(20, await ContentService.CountDescendantsAsync(parent.Key, null, CancellationToken.None));
     }
 
     [Test]

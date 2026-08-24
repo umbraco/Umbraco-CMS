@@ -331,16 +331,19 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <summary>
     /// Gets the count of descendant <see cref="TContent"/> items under a specified parent.
     /// </summary>
-    /// <param name="parentId">The ID of the parent content.</param>
+    /// <param name="parentKey">The Guid key of the parent content.</param>
     /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The count of descendant content items.</returns>
-    public int CountDescendants(int parentId, string? contentTypeAlias = null)
+    public async Task<int> CountDescendantsAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.CountDescendants(parentId, contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        int result = contentTypeAlias is null
+            ? await _asyncContentRepository.CountDescendantsAsync(parentKey, cancellationToken)
+            : await _asyncContentRepository.CountDescendantsAsync(parentKey, contentTypeAlias, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     #endregion

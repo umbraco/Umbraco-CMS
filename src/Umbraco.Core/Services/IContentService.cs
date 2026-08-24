@@ -303,10 +303,11 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Counts descendant documents of a given parent, of a given document type.
     /// </summary>
-    /// <param name="parentId">The parent identifier.</param>
-    /// <param name="documentTypeAlias">The document type alias, or null for all types.</param>
+    /// <param name="parentKey">The Guid key of the parent.</param>
+    /// <param name="contentTypeAlias">The document type alias, or null for all types.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The descendant document count.</returns>
-    int CountDescendants(int parentId, string? documentTypeAlias = null);
+    Task<int> CountDescendantsAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a value indicating whether a document has children.
