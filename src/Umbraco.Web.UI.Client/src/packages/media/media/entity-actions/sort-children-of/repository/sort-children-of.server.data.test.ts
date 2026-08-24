@@ -50,7 +50,6 @@ describe('UmbSortChildrenOfMediaServerDataSource', () => {
 			unique: 'media-id',
 			field: ContentSortFieldModel.UPDATE_DATE,
 			direction: UmbDirection.DESCENDING as UmbDirectionType,
-			culture: 'da',
 		});
 
 		expect(error).to.be.undefined;

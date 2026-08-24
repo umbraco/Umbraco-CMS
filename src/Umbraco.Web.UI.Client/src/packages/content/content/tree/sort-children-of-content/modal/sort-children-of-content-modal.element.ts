@@ -2,7 +2,6 @@ import type { UmbContentTreeItemModel } from '../../types.js';
 import type { UmbSortChildrenOfContentModalData } from './sort-children-of-content-modal.token.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSortChildrenOfModalElement } from '@umbraco-cms/backoffice/tree';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-sort-children-of-content-modal')
 export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModalElement<UmbContentTreeItemModel> {
@@ -13,19 +12,6 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		hour: 'numeric',
 		minute: '2-digit',
 	};
-
-	#appCulture?: string;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
-			this.#appCulture = instance?.getAppCulture();
-		});
-	}
-
-	protected override _getSortCulture(): string | undefined {
-		return this.#appCulture;
-	}
 
 	protected override _setTableColumns() {
 		this._tableColumns = [

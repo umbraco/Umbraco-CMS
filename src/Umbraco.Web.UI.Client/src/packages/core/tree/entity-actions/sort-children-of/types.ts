@@ -21,10 +21,6 @@ export interface UmbSortChildrenOfByFieldArgs {
 	 */
 	field: string;
 	direction: UmbDirectionType;
-	/**
-	 * The culture to sort by, for variant entities. Omitted or null for invariant sorting.
-	 */
-	culture?: string | null;
 }
 
 /**

@@ -13,7 +13,7 @@ export interface UmbSortChildrenOfRepository extends UmbApi {
 	/**
 	 * Sorts the children of an entity by a single field on the server.
 	 * Optional: only implemented by repositories whose entity supports server-side field sorting.
-	 * @param {UmbSortChildrenOfByFieldArgs} args - the parent, field, direction and optional culture
+	 * @param {UmbSortChildrenOfByFieldArgs} args - the parent, field and direction
 	 * @returns {Promise<UmbRepositoryErrorResponse>} the result of the operation
 	 */
 	sortChildrenOfByField?(args: UmbSortChildrenOfByFieldArgs): Promise<UmbRepositoryErrorResponse>;

@@ -100,14 +100,6 @@ export class UmbSortChildrenOfModalElement<
 		];
 	}
 
-	/**
-	 * The culture to sort by when sorting by field. Undefined for invariant sorting.
-	 * @returns {string | undefined} the culture
-	 */
-	protected _getSortCulture(): string | undefined {
-		return undefined;
-	}
-
 	protected override async firstUpdated(
 		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
 	): Promise<void> {
@@ -234,7 +226,6 @@ export class UmbSortChildrenOfModalElement<
 			unique: this.data!.unique,
 			field: this._selectedField!,
 			direction: this._selectedDirection,
-			culture: this._getSortCulture(),
 		});
 	}
 

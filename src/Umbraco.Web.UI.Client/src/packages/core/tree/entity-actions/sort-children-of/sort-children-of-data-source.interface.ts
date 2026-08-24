@@ -12,7 +12,7 @@ export interface UmbSortChildrenOfDataSource {
 	/**
 	 * Sorts the children of an entity by a single field on the server.
 	 * Optional: only implemented by data sources whose entity supports server-side field sorting.
-	 * @param {UmbSortChildrenOfByFieldArgs} args - the parent, field, direction and optional culture
+	 * @param {UmbSortChildrenOfByFieldArgs} args - the parent, field and direction
 	 * @returns {Promise<UmbDataSourceErrorResponse>} the result of the operation
 	 */
 	sortChildrenOfByField?(args: UmbSortChildrenOfByFieldArgs): Promise<UmbDataSourceErrorResponse>;
