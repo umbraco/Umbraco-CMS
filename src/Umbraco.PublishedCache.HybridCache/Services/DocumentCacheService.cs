@@ -168,53 +168,100 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         // hits from the guard, applying it only to the database read).
         var generation = Interlocked.Read(ref _cacheGeneration);
 
-        return await TieredResolver.ResolveAsync<Guid, IPublishedContent>(
-            keys,
-            (batchKeys, results) => ResolveCachedTierAsync(batchKeys, calculatedPreview, results),
-            (batchKeys, results) => ResolveHybridCacheTierAsync(batchKeys, calculatedPreview, generation, results),
-            (missedKeys, results) => ResolveDatabaseTierAsync(missedKeys, calculatedPreview, generation, results));
+        var resolved = new Dictionary<Guid, IPublishedContent>(keys.Count);
+
+        // Three tiers, each handed only the keys the previous one could not account for: the synchronous
+        // L0 probe, the L1/L2 probe, then a single batched database read.
+        List<Guid> pending = ProbeConvertedCache(keys, calculatedPreview, resolved);
+        if (pending.Count > 0)
+        {
+            pending = await ProbeHybridCacheAsync(pending, calculatedPreview, generation, resolved);
+        }
+
+        if (pending.Count > 0)
+        {
+            await ReadFromDatabaseAsync(pending, calculatedPreview, generation, resolved);
+        }
+
+        // Return in input order; keys that resolved to nothing (missing/unpublished) are omitted. A key
+        // repeated in the input resolves to the same item at every occurrence, having only been looked
+        // up once.
+        var ordered = new List<IPublishedContent>(resolved.Count);
+        foreach (Guid key in keys)
+        {
+            if (resolved.TryGetValue(key, out IPublishedContent? content))
+            {
+                ordered.Add(content);
+            }
+        }
+
+        return ordered;
     }
 
     // L0 (converted) fast path — published only, mirroring GetNodeAsync (via the shared TryGetCached).
-    private Task ResolveCachedTierAsync(IReadOnlyCollection<Guid> batchKeys, bool preview, IDictionary<Guid, IPublishedContent> results)
+    private List<Guid> ProbeConvertedCache(IReadOnlyCollection<Guid> keys, bool preview, Dictionary<Guid, IPublishedContent> resolved)
     {
-        foreach (Guid key in batchKeys)
+        var pending = new List<Guid>(keys.Count);
+        var seen = new HashSet<Guid>(keys.Count);
+
+        foreach (Guid key in keys)
         {
+            if (seen.Add(key) is false)
+            {
+                continue;
+            }
+
             if (TryGetCached(key, preview, out IPublishedContent? cached) && cached is not null)
             {
-                results[key] = cached;
+                resolved[key] = cached;
+            }
+            else
+            {
+                pending.Add(key);
             }
         }
 
-        return Task.CompletedTask;
+        return pending;
     }
 
-    // L1/L2 probe without a database hit (same primitive GetNodeAsync uses); a genuine miss is
-    // deferred to the single batched database read below. Keys are probed one at a time: with an
+    // L1/L2 probe without a database hit (same primitive GetNodeAsync uses). An entry holding a null
+    // node is a cached "this key resolves to nothing", which GetNodeAsync writes deliberately, so it
+    // accounts for its key and is not passed on to the database read — re-reading such a key on every
+    // request is the regression reported in #18869. Keys are probed one at a time: with an
     // in-memory-only L1 this is N cheap dictionary lookups, but with a distributed L2 (e.g. Redis)
     // configured, this becomes N serial network round-trips per batch for a partially-warm set.
-    private async Task ResolveHybridCacheTierAsync(IReadOnlyCollection<Guid> batchKeys, bool preview, long generation, IDictionary<Guid, IPublishedContent> results)
+    private async Task<List<Guid>> ProbeHybridCacheAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved)
     {
-        foreach (Guid key in batchKeys)
+        var pending = new List<Guid>(keys.Count);
+
+        foreach (Guid key in keys)
         {
             var cacheKey = GetCacheKey(key, preview);
             (bool exists, ContentCacheNode? node) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
-            if (exists && node is not null)
+            if (exists is false)
             {
-                ResolveNode(key, node, preview, generation, results);
+                pending.Add(key);
+                continue;
+            }
+
+            if (node is not null)
+            {
+                ResolveNode(key, node, preview, generation, resolved);
             }
         }
+
+        return pending;
     }
 
     // The single batched database read for whatever L0 and L1/L2 missed. A database-read node
     // additionally gets the published-ancestor guard applied (mirroring GetNodeAsync's read-through
     // result) and, once resolved, is promoted into L1 — an L1/L2 hit is already there.
-    private async Task ResolveDatabaseTierAsync(IReadOnlyCollection<Guid> missedKeys, bool preview, long generation, IDictionary<Guid, IPublishedContent> results)
+    private async Task ReadFromDatabaseAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved)
     {
         IReadOnlyCollection<ContentCacheNode> coldNodes;
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
-            coldNodes = (await _databaseCacheRepository.GetContentSourcesAsync(missedKeys, preview)).ToArray();
+            coldNodes = (await _databaseCacheRepository.GetContentSourcesAsync(keys, preview)).ToArray();
         }
 
         foreach (ContentCacheNode node in coldNodes)
@@ -224,7 +271,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
                 continue;
             }
 
-            if (ResolveNode(node.Key, node, preview, generation, results)
+            if (ResolveNode(node.Key, node, preview, generation, resolved)
                 && preview is false && IsCacheGenerationCurrent(generation))
             {
                 await _hybridCache.SetAsync(GetCacheKey(node.Key, preview), node, GetEntryOptions(node.Key, preview), GenerateTags(node));
@@ -232,10 +279,10 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         }
     }
 
-    // Converts a resolved cache node to IPublishedContent, writes it into results, and — when our
-    // snapshot is still current — populates L0. Returns whether conversion succeeded, so a caller that
-    // also needs L1 (only the database tier does) knows whether there's anything worth promoting.
-    private bool ResolveNode(Guid key, ContentCacheNode node, bool preview, long generation, IDictionary<Guid, IPublishedContent> results)
+    // Converts a resolved cache node to IPublishedContent, writes it into the resolved set and — when
+    // our snapshot is still current — populates L0. Returns whether conversion succeeded, so a caller
+    // that also needs L1 (only the database read does) knows whether there's anything worth promoting.
+    private bool ResolveNode(Guid key, ContentCacheNode node, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved)
     {
         IPublishedContent? content = _publishedContentFactory.ToIPublishedContent(node, preview).CreateModel(_publishedModelFactory);
         if (content is null)
@@ -243,7 +290,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             return false;
         }
 
-        results[key] = content;
+        resolved[key] = content;
 
         if (preview is false && IsCacheGenerationCurrent(generation))
         {
