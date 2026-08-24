@@ -20,7 +20,7 @@ import { firstValueFrom, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
-import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import {
 	notifyWorkspaceActionStarting,
 	UmbEntityDetailWorkspaceContextBase,
@@ -38,7 +38,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import {
 	UmbPropertyValueFlatMapperController,
 	UmbPropertyValuePresetVariantBuilderController,
@@ -165,8 +165,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	readonly collection: UmbContentCollectionManager;
 
 	/* Variant Options */
-	// TODO: Optimize this so it uses either a App Language Context? [NL]
-	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	/**
 	 * @private
@@ -408,13 +406,22 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			null,
 		);
 
-		this.loadLanguages();
+		// Languages are requested once per app session by UMB_APP_LANGUAGE_CONTEXT; every workspace observes
+		// that shared state instead of each issuing its own request for the full language collection.
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
+			this.observe(appLanguageContext?.languages, (languages) => this.#languages.setValue(languages ?? []), null);
+		});
 	}
 
+	/**
+	 * @deprecated No need to call loadLanguages, will be removed in v.20.
+	 */
 	public async loadLanguages() {
-		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
-		const { data } = await this.#languageRepository.requestAllItems();
-		this.#languages.setValue(data?.items ?? []);
+		new UmbDeprecation({
+			deprecated: 'UmbContentDetailWorkspaceContextBase.loadLanguages is deprecated.',
+			removeInVersion: '20.0.0',
+			solution: 'No need to call loadLanguages.',
+		}).warn();
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1189,7 +1196,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public override destroy(): void {
 		this.structure.destroy();
-		this.#languageRepository.destroy();
 		super.destroy();
 	}
 }

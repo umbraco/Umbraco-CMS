@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentTypeEditing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -87,5 +88,30 @@ internal sealed partial class MediaTypeEditingServiceTests
                 Enumerable.Empty<string>());
 
         Assert.IsFalse(availableCompositions.Any(compositionsResult => compositionsResult.Composition.Key == result2.Result!.Key));
+    }
+
+    [Test]
+    public async Task Parent_With_Inheriting_Child_Has_Available_Compositions()
+    {
+        var parent = MediaTypeCreateModel("Parent", "parent");
+        var parentResult = await MediaTypeEditingService.CreateAsync(parent, Constants.Security.SuperUserKey);
+
+        var child = MediaTypeCreateModel(
+            "Child",
+            "child",
+            compositions: [new Composition { CompositionType = CompositionType.Inheritance, Key = parentResult.Result!.Key }]);
+        await MediaTypeEditingService.CreateAsync(child, Constants.Security.SuperUserKey);
+
+        var other = MediaTypeCreateModel("Other", "other");
+        var otherResult = await MediaTypeEditingService.CreateAsync(other, Constants.Security.SuperUserKey);
+
+        IEnumerable<ContentTypeAvailableCompositionsResult> availableCompositions =
+            await MediaTypeEditingService.GetAvailableCompositionsAsync(
+                parentResult.Result!.Key,
+                Enumerable.Empty<Guid>(),
+                Enumerable.Empty<string>());
+
+        // Being inherited from by "Child" must not lock "Parent" out of having its own compositions
+        Assert.IsTrue(availableCompositions.Any(x => x.Composition.Key == otherResult.Result!.Key && x.Allowed));
     }
 }
