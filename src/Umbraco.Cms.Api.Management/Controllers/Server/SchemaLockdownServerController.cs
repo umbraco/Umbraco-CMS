@@ -12,13 +12,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Server;
 [ApiVersion("1.0")]
 public class SchemaLockdownServerController : ServerControllerBase
 {
-    private readonly ISchemaLockdownRules _rules;
+    private readonly IReadOnlySchemaLockdownRules _rules;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SchemaLockdownServerController"/> class, which provides the schema lockdown endpoint for the Umbraco management API.
     /// </summary>
     /// <param name="rules">The frozen decision table.</param>
-    public SchemaLockdownServerController(ISchemaLockdownRules rules)
+    public SchemaLockdownServerController(IReadOnlySchemaLockdownRules rules)
         => _rules = rules;
 
     /// <summary>

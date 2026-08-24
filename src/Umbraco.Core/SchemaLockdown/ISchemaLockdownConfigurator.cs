@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// <![CDATA[
 /// public class LockAllSchemaConfigurator : ISchemaLockdownConfigurator
 /// {
-///     public void Configure(ISchemaLockdownConfigurableRules rules)
+///     public void Configure(ISchemaLockdownRules rules)
 ///     {
 ///         foreach (string entityType in SchemaEntityTypes.All)
 ///         {
@@ -37,5 +37,5 @@ public interface ISchemaLockdownConfigurator
     /// Adjusts the supplied rules.
     /// </summary>
     /// <param name="rules">The rules being built.</param>
-    void Configure(ISchemaLockdownConfigurableRules rules);
+    void Configure(ISchemaLockdownRules rules);
 }

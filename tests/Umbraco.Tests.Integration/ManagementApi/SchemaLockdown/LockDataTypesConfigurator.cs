@@ -9,6 +9,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 public class LockDataTypesConfigurator : ISchemaLockdownConfigurator
 {
     /// <inheritdoc />
-    public void Configure(ISchemaLockdownConfigurableRules rules)
+    public void Configure(ISchemaLockdownRules rules)
         => rules.BlockMutations(Constants.UdiEntityType.DataType);
 }

@@ -1,16 +1,33 @@
 namespace Umbraco.Cms.Core.SchemaLockdown;
 
 /// <summary>
-/// Answers whether schema lockdown permits a given operation on a given entity type.
+/// The writable view of the schema lockdown rules, handed to each <see cref="ISchemaLockdownConfigurator"/> while
+/// the rules are being built.
 /// </summary>
 /// <remarks>
-/// This is the read-only view of the decision table, which is what anything consulting the rules needs. The rules
-/// are built once at start-up and frozen, so every consumer is answered from the same decisions.
+/// It extends <see cref="IReadOnlySchemaLockdownRules"/> because a configurator may consult the decisions already made by
+/// the configurators that ran before it, and only then decide what to write.
 /// </remarks>
-public interface ISchemaLockdownRules
+public interface ISchemaLockdownRules : IReadOnlySchemaLockdownRules
 {
     /// <summary>
-    /// Gets a value indicating whether the supplied operation is permitted on the supplied entity type.
+    /// Permits the supplied operation on the supplied entity type.
     /// </summary>
-    bool IsAllowed(string entityType, SchemaOperation operation);
+    void Allow(string entityType, SchemaOperation operation);
+
+    /// <summary>
+    /// Denies the supplied operation on the supplied entity type.
+    /// </summary>
+    void Block(string entityType, SchemaOperation operation);
+
+    /// <summary>
+    /// Denies every operation on the supplied entity type that is not a read.
+    /// </summary>
+    /// <remarks>
+    /// This is the way an <see cref="ISchemaLockdownConfigurator"/> should lock an entity type. Denying
+    /// <see cref="SchemaOperation.Create"/>, <see cref="SchemaOperation.Update"/> and
+    /// <see cref="SchemaOperation.Delete"/> individually leaves <see cref="SchemaOperation.Unknown"/> permitted,
+    /// so an endpoint whose operation could not be classified would still get through.
+    /// </remarks>
+    void BlockMutations(string entityType);
 }

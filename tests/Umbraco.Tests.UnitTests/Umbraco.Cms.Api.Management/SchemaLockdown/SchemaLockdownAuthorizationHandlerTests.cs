@@ -33,7 +33,7 @@ public class SchemaLockdownAuthorizationHandlerTests
 
     private sealed class LockDocumentTypes : ISchemaLockdownConfigurator
     {
-        public void Configure(ISchemaLockdownConfigurableRules rules)
+        public void Configure(ISchemaLockdownRules rules)
             => rules.BlockMutations(Constants.UdiEntityType.DocumentType);
     }
 

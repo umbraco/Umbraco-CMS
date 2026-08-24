@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 /// </summary>
 internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequirementAuthorizationHandler<EntityTypeAttribute>
 {
-    private readonly ISchemaLockdownRules _rules;
+    private readonly IReadOnlySchemaLockdownRules _rules;
     private readonly IRuntimeState _runtimeState;
 
     /// <summary>
@@ -24,7 +24,7 @@ internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequiremen
     /// <param name="rules">The frozen decision table.</param>
     /// <param name="runtimeState">The runtime state.</param>
     public SchemaLockdownAuthorizationHandler(
-        ISchemaLockdownRules rules,
+        IReadOnlySchemaLockdownRules rules,
         IRuntimeState runtimeState)
     {
         _rules = rules;

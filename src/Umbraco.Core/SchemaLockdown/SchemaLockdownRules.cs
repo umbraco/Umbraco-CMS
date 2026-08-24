@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// it is frozen. Freezing is what allows the same instance to be both consulted by the authorization handler and
 /// served to the backoffice without the two being able to disagree.
 /// </remarks>
-public sealed class SchemaLockdownRules : ISchemaLockdownConfigurableRules
+public sealed class SchemaLockdownRules : ISchemaLockdownRules
 {
     private static readonly DelegateEqualityComparer<(string EntityType, SchemaOperation Operation)> CellKeyComparer =
         new(
