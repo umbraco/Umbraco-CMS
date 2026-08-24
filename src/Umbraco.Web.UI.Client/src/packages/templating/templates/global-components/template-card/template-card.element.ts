@@ -18,6 +18,12 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 	@property({ type: Boolean, reflect: true })
 	default = false;
 
+	/**
+	 * The URL to navigate to when the template card is opened.
+	 * @type {string}
+	 * @attr href
+	 * @default undefined
+	 */
 	@property({ type: String })
 	href?: string;
 
