@@ -4,23 +4,22 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 
 /// <summary>
-/// Resolves the <see cref="SchemaOperation"/> an action performs.
+/// Infers the <see cref="SchemaOperation"/> implied by an HTTP verb.
 /// </summary>
 internal static class SchemaOperationResolver
 {
     /// <summary>
-    /// Resolves the operation, preferring an explicit declaration over inference from the HTTP verb.
+    /// Resolves the operation inferred from an HTTP verb.
     /// </summary>
     /// <param name="httpMethod">The HTTP method the action responds to.</param>
-    /// <param name="declared">The declared operation, if any.</param>
     /// <returns>The resolved operation.</returns>
     /// <remarks>
     /// <see cref="SchemaOperation.Read"/> is only ever produced by an explicit allowlist of safe verbs. Anything
-    /// unrecognised resolves to <see cref="SchemaOperation.Unknown"/>, which <see cref="SchemaLockdownRules.BlockMutations"/>
+    /// unrecognised, or absent, resolves to <see cref="SchemaOperation.Unknown"/>, which <see cref="SchemaLockdownRules.BlockMutations"/>
     /// denies alongside the operations it names, so a new or custom verb cannot bypass lockdown.
     /// </remarks>
-    public static SchemaOperation Resolve(string? httpMethod, SchemaOperation? declared)
-        => declared ?? (httpMethod is null ? SchemaOperation.Unknown : FromVerb(httpMethod));
+    public static SchemaOperation Resolve(string? httpMethod)
+        => httpMethod is null ? SchemaOperation.Unknown : FromVerb(httpMethod);
 
     private static SchemaOperation FromVerb(string httpMethod)
     {

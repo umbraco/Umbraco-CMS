@@ -15,20 +15,14 @@ public class SchemaOperationResolverTests
     [TestCase("PATCH", SchemaOperation.Update)]
     [TestCase("DELETE", SchemaOperation.Delete)]
     public void Infers_Operation_From_Verb(string verb, SchemaOperation expected)
-        => Assert.That(SchemaOperationResolver.Resolve(verb, declared: null), Is.EqualTo(expected));
+        => Assert.That(SchemaOperationResolver.Resolve(verb), Is.EqualTo(expected));
 
     [TestCase("TRACE")]
     [TestCase("LOCK")]
     public void Unrecognised_Verb_Is_Unknown(string verb)
-        => Assert.That(SchemaOperationResolver.Resolve(verb, declared: null), Is.EqualTo(SchemaOperation.Unknown));
+        => Assert.That(SchemaOperationResolver.Resolve(verb), Is.EqualTo(SchemaOperation.Unknown));
 
     [Test]
     public void No_Verb_Is_Unknown()
-        => Assert.That(SchemaOperationResolver.Resolve(httpMethod: null, declared: null), Is.EqualTo(SchemaOperation.Unknown));
-
-    [Test]
-    public void Declared_Operation_Wins_Over_Verb()
-        => Assert.That(
-            SchemaOperationResolver.Resolve("POST", SchemaOperation.Read),
-            Is.EqualTo(SchemaOperation.Read));
+        => Assert.That(SchemaOperationResolver.Resolve(httpMethod: null), Is.EqualTo(SchemaOperation.Unknown));
 }
