@@ -520,7 +520,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Count_All()
+    public async Task Count_All()
     {
         // Arrange
         // Act
@@ -530,7 +530,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert
-        Assert.AreEqual(25, ContentService.Count());
+        Assert.AreEqual(25, await ContentService.CountAsync(null, CancellationToken.None));
     }
 
     [Test]
@@ -551,7 +551,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         }
 
         // Assert
-        Assert.AreEqual(20, ContentService.Count("umbBlah"));
+        Assert.AreEqual(20, await ContentService.CountAsync("umbBlah", CancellationToken.None));
     }
 
     [Test]

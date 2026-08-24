@@ -297,14 +297,17 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// Gets the count of all <see cref="TContent"/> items.
     /// </summary>
     /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The count of content items.</returns>
-    public int Count(string? contentTypeAlias = null)
+    public async Task<int> CountAsync(string? contentTypeAlias, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.Count(contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        int result = contentTypeAlias is null
+            ? await _asyncContentRepository.CountAsync(cancellationToken)
+            : await _asyncContentRepository.CountAsync(contentTypeAlias, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <summary>

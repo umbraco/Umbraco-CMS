@@ -2075,7 +2075,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
-        public void HasInitialContent() => Assert.AreEqual(5, ContentService.Count());
+        public async Task HasInitialContent() => Assert.AreEqual(5, await ContentService.CountAsync(null, CancellationToken.None));
 
         #endregion
 
