@@ -69,13 +69,13 @@ export class UmbRouterSlotElement extends UmbLitElement {
 			this._routerPath = newAbsolutePath;
 			this.#routeContext._internal_routerGotBasePath(this._routerPath);
 			this.dispatchEvent(new UmbRouterSlotInitEvent());
+		}
 
-			const newActiveLocalPath = this._constructLocalRouterPath();
-			if (this._activeLocalPath !== newActiveLocalPath) {
-				this._activeLocalPath = newActiveLocalPath;
-				this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
-				this.dispatchEvent(new UmbRouterSlotChangeEvent());
-			}
+		const newActiveLocalPath = this._constructLocalRouterPath();
+		if (this._activeLocalPath !== newActiveLocalPath) {
+			this._activeLocalPath = newActiveLocalPath;
+			this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
+			this.dispatchEvent(new UmbRouterSlotChangeEvent());
 		}
 	};
 

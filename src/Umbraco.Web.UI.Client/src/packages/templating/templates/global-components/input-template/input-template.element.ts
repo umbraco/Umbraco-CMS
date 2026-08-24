@@ -73,7 +73,9 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 	private _pickedTemplates: UmbTemplateItemModel[] = [];
 
 	#templateItemRepository = new UmbTemplateItemRepository(this);
-	#templatePath = '';
+
+	@state()
+	private _templatePath?: string;
 
 	constructor() {
 		super();
@@ -84,7 +86,7 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 				return { data: { entityType: 'template', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this.#templatePath = routeBuilder({});
+				this._templatePath = routeBuilder({});
 			});
 	}
 
@@ -172,7 +174,12 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 						.id=${template.unique}
 						.name=${template.name}
 						@change=${this.#onCardChange}
-						@open=${() => window.history.pushState({}, '', this.#templatePath + 'edit/' + template.unique)}
+						@open=${() => {
+							if (this._templatePath) {
+								window.history.pushState({}, '', this._templatePath + 'edit/' + template.unique);
+							}
+						}}
+						.href=${this._templatePath ? this._templatePath + 'edit/' + template.unique : undefined}
 						?default=${template.unique === this.defaultUnique}>
 						<uui-button
 							slot="actions"

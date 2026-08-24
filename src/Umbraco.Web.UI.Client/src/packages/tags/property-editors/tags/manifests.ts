@@ -8,6 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Tags Property Editor UI',
 		element: () => import('./property-editor-ui-tags.element.js'),
 		meta: {
+			supportsVariantChange: true,
 			label: 'Tags',
 			propertyEditorSchemaAlias: 'Umbraco.Tags',
 			icon: 'icon-tags',

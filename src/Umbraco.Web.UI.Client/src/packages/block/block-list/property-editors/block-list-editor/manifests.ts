@@ -9,6 +9,7 @@ const propertyEditorUi: UmbExtensionManifest = {
 	name: 'Block List Property Editor UI',
 	element: () => import('./property-editor-ui-block-list.element.js'),
 	meta: {
+		supportsVariantChange: true,
 		label: 'Block List',
 		propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-thumbnail-list',
