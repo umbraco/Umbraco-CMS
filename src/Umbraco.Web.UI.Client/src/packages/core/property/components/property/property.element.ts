@@ -31,6 +31,8 @@ import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
  */
 @customElement('umb-property')
 export class UmbPropertyElement extends UmbLitElement {
+	#manifest?: ManifestPropertyEditorUi;
+
 	/**
 	 * Label. Name of the property
 	 * @type {string}
@@ -144,6 +146,8 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String, attribute: 'data-path' })
 	public set dataPath(dataPath: string | undefined) {
+		const oldDataPath = this.dataPath;
+
 		this.#dismantleControlValidation();
 		this.#propertyContext.setDataPath(dataPath);
 		new UmbObserveValidationStateController(
@@ -156,6 +160,12 @@ export class UmbPropertyElement extends UmbLitElement {
 		);
 
 		this.#setupControlValidation();
+
+		// If the dataPath changes, it means that the variant this property has switched (a property that doesn't vary by culture/segment never reaches this, as its dataPath stays put).
+		// Re-create the Property Editor UI element for that unless it has declared it keeps itself up to date on its own, so it always initializes fresh element for each variant. [NL]
+		if (oldDataPath !== undefined && dataPath !== oldDataPath && this.#manifest?.meta.supportsVariantChange !== true) {
+			this.#initiateEditor();
+		}
 	}
 	public get dataPath(): string | undefined {
 		return this.#propertyContext.getDataPath();
@@ -323,19 +333,16 @@ export class UmbPropertyElement extends UmbLitElement {
 						this._observePropertyEditorUI();
 						return;
 					}
-					this._gotEditorUI(manifest);
+					this.#manifest = manifest;
+					this.#initiateEditor();
 				},
 				'_observePropertyEditorUI',
 			);
 		}
 	}
 
-	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {
-		if (this._element && this._element.manifest === manifest) {
-			// If we already have an element and the manifest haven't changed, we don't need to do anything.
-			return;
-		}
-
+	async #initiateEditor(): Promise<void> {
+		const manifest = this.#manifest;
 		this.#extensionsController?.destroy();
 		this.#propertyContext.setEditor(undefined);
 		this.#propertyContext.setEditorManifest(manifest ?? undefined);
@@ -435,18 +442,13 @@ export class UmbPropertyElement extends UmbLitElement {
 	/**
 	 * (Re)binds the form control validator and server-validation message binder to the current element and `dataPath`.
 	 *
-	 * Must not run until the element's value is confirmed current for `dataPath` — a variant switch can leave the
-	 * same Property Editor UI element in place while `dataPath` changes underneath it, and the value for the new
-	 * `dataPath` only arrives later, asynchronously. Calling this before then risks the element re-validating the
-	 * previous dataPath's still-present value and misattributing that stale verdict to this one.
-	 *
-	 * Called from the `#propertyContext.variantId` observer (constructor) rather than eagerly from the `dataPath`
-	 * setter: a variant switch provides a brand new dataset context, so `variantId` is a fresh subscription each
-	 * time and reliably fires on every genuine switch — unlike the value itself, whose own change-notification can
-	 * be silently skipped if two different variants happen to hold an identical value. By the time `variantId`
-	 * fires, `#propertyContext.getValue()` is already correct: `UmbPropertyContext` resolves and writes its value
-	 * state unconditionally and synchronously, right alongside resolving variantId, before either is notified out.
-	 * Also called from `_gotEditorUI()` for a brand-new element, which has no stale state to guard against. [NL]
+	 * Called eagerly from the `dataPath` setter on every change, and again from `_gotEditorUI()` once a (possibly
+	 * brand new) element is in place. For a Property Editor UI that hasn't declared `meta.supportVariantChange`, a
+	 * variant switch drives `#reinitializeEditorElement()`, which replaces the element outright — so it's the call
+	 * from `_gotEditorUI()` that ends up binding against the value for the new `dataPath`. For one that has declared
+	 * it keeps itself up to date on its own, the existing element is left in place, and the eager call from the
+	 * `dataPath` setter is what re-binds validation ahead of the corresponding value, which arrives asynchronously.
+	 * [NL]
 	 */
 	#setupControlValidation(): void {
 		this.#dismantleControlValidation();
