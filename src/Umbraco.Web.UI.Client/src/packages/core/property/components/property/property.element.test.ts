@@ -88,7 +88,7 @@ describe('UmbPropertyElement', () => {
 			expect(firstInstance.destroyed).to.be.true;
 		});
 
-		it('keeps the same Property Editor UI element when the manifest declares supportVariantChange: true', async () => {
+		it('keeps the same Property Editor UI element when the manifest declares supportsVariantChange: true', async () => {
 			element.propertyEditorUiAlias = ALIAS_SUPPORTS_VARIANT_CHANGE;
 			element.dataPath = DATA_PATH_EN_US;
 			const firstInstance = await getEditorElement();
