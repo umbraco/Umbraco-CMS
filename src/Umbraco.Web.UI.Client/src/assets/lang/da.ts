@@ -1485,6 +1485,8 @@ export default {
 		sortByFieldCreateDateOption: 'Oprettet',
 		sortByFieldUpdateDateOption: 'Sidst redigeret',
 		sortIndividuallyHeadline: 'Sortér individuelt',
+		sortByFieldCultureSentence: 'på',
+		sortByFieldCultureLabel: 'Sprog',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% af %1% dokumenter udgivet.',

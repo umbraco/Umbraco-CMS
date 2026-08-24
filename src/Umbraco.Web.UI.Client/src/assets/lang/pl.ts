@@ -904,6 +904,8 @@ export default {
 		sortByFieldCreateDateOption: 'Utworzono',
 		sortByFieldUpdateDateOption: 'Ostatnia edycja',
 		sortIndividuallyHeadline: 'Sortuj pojedynczo',
+		sortByFieldCultureSentence: 'w języku',
+		sortByFieldCultureLabel: 'Język',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Walidacja',

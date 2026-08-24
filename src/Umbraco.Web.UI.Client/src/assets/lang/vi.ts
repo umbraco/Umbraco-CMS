@@ -1465,6 +1465,8 @@ export default {
 		sortByFieldCreateDateOption: 'Ngày tạo',
 		sortByFieldUpdateDateOption: 'Chỉnh sửa lần cuối',
 		sortIndividuallyHeadline: 'Sắp xếp riêng lẻ',
+		sortByFieldCultureSentence: 'bằng',
+		sortByFieldCultureLabel: 'Ngôn ngữ',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Xác thực',

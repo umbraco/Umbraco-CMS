@@ -1174,6 +1174,8 @@ export default {
 		sortByFieldCreateDateOption: 'Créé',
 		sortByFieldUpdateDateOption: 'Dernière modification',
 		sortIndividuallyHeadline: 'Trier individuellement',
+		sortByFieldCultureSentence: 'en',
+		sortByFieldCultureLabel: 'Langue',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validation',

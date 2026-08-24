@@ -1540,6 +1540,8 @@ export default {
 		sortByFieldCreateDateOption: 'Created',
 		sortByFieldUpdateDateOption: 'Last edited',
 		sortIndividuallyHeadline: 'Sort individually',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Language',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validation',

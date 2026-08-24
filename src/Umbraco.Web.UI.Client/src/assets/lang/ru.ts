@@ -1119,6 +1119,8 @@ export default {
 		sortByFieldCreateDateOption: 'Создано',
 		sortByFieldUpdateDateOption: 'Последнее изменение',
 		sortIndividuallyHeadline: 'Сортировать по отдельности',
+		sortByFieldCultureSentence: 'на языке',
+		sortByFieldCultureLabel: 'Язык',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Процесс публикации был отменен установленным пакетом дополнений.',

@@ -1117,6 +1117,8 @@ export default {
 		sortByFieldCreateDateOption: 'Створено',
 		sortByFieldUpdateDateOption: 'Останнє редагування',
 		sortIndividuallyHeadline: 'Сортувати окремо',
+		sortByFieldCultureSentence: 'мовою',
+		sortByFieldCultureLabel: 'Мова',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Процес публікації скасовано встановленим пакетом доповнень.',

@@ -785,6 +785,8 @@ export default {
 		sortByFieldCreateDateOption: '作成日',
 		sortByFieldUpdateDateOption: '最終編集',
 		sortIndividuallyHeadline: '個別に並べ替え',
+		sortByFieldCultureSentence: '言語:',
+		sortByFieldCultureLabel: '言語',
 	},
 	speechBubbles: {
 		validationFailedHeader: '検証',

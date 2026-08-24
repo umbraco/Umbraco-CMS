@@ -592,6 +592,8 @@ export default {
 		sortByFieldCreateDateOption: 'נוצר',
 		sortByFieldUpdateDateOption: 'עריכה אחרונה',
 		sortIndividuallyHeadline: 'מיון פרטני',
+		sortByFieldCultureSentence: 'בשפה',
+		sortByFieldCultureLabel: 'שפה',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'הפירסום בוטל על ידי תוסף צד שלישי',

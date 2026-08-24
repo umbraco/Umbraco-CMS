@@ -1305,6 +1305,8 @@ export default {
 		sortByFieldCreateDateOption: 'تاريخ الإنشاء',
 		sortByFieldUpdateDateOption: 'آخر تعديل',
 		sortIndividuallyHeadline: 'الفرز الفردي',
+		sortByFieldCultureSentence: 'باللغة',
+		sortByFieldCultureLabel: 'اللغة',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'التحقق',

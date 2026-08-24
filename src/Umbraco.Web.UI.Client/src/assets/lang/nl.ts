@@ -1221,6 +1221,8 @@ export default {
 		sortByFieldCreateDateOption: 'Aangemaakt',
 		sortByFieldUpdateDateOption: 'Laatst bewerkt',
 		sortIndividuallyHeadline: 'Individueel sorteren',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Taal',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validatie',

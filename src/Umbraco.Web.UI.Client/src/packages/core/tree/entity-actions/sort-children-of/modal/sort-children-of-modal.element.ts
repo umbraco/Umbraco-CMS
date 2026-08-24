@@ -1,5 +1,5 @@
 import type { UmbSortChildrenOfRepository, UmbTreeItemModel } from '../../../types.js';
-import type { UmbSortChildrenByFieldOption } from '../types.js';
+import type { UmbSortChildrenByFieldOption, UmbSortChildrenOfByFieldArgs } from '../types.js';
 import type { UmbTreeRepository } from '../../../data/index.js';
 import type { UmbSortChildrenOfModalData, UmbSortChildrenOfModalValue } from './sort-children-of-modal.token.js';
 import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
@@ -8,7 +8,7 @@ import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbDirection, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbDirectionType } from '@umbraco-cms/backoffice/utils';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbTableColumn,
@@ -62,10 +62,10 @@ export class UmbSortChildrenOfModalElement<
 	private _supportsSortByField = false;
 
 	@state()
-	private _sortByFieldOptions: Array<UmbSortChildrenByFieldOption> = [];
+	protected _sortByFieldOptions: Array<UmbSortChildrenByFieldOption> = [];
 
 	@state()
-	private _selectedField?: string;
+	protected _selectedField?: string;
 
 	@state()
 	private _selectedDirection: UmbDirectionType = UmbDirection.ASCENDING as UmbDirectionType;
@@ -98,6 +98,28 @@ export class UmbSortChildrenOfModalElement<
 				allowSorting: true,
 			},
 		];
+	}
+
+	/**
+	 * The arguments used when sorting by field.
+	 * Override in an entity-specific subclass to supply further arguments accepted by its repository.
+	 * @returns {UmbSortChildrenOfByFieldArgs} the sort arguments
+	 */
+	protected _getSortByFieldArgs(): UmbSortChildrenOfByFieldArgs {
+		return {
+			unique: this.data!.unique,
+			field: this._selectedField!,
+			direction: this._selectedDirection,
+		};
+	}
+
+	/**
+	 * Additional controls rendered at the end of the "Sort by field" sentence.
+	 * Override in an entity-specific subclass to offer the further arguments its repository accepts.
+	 * @returns {TemplateResult | typeof nothing} the rendered controls
+	 */
+	protected _renderAdditionalSortByFieldOptions(): TemplateResult | typeof nothing {
+		return nothing;
 	}
 
 	protected override async firstUpdated(
@@ -222,11 +244,7 @@ export class UmbSortChildrenOfModalElement<
 
 	#sortByField(repository: UmbSortChildrenOfRepository) {
 		if (!repository.sortChildrenOfByField) throw new Error('sortChildrenOfByField is not supported');
-		return repository.sortChildrenOfByField({
-			unique: this.data!.unique,
-			field: this._selectedField!,
-			direction: this._selectedDirection,
-		});
+		return repository.sortChildrenOfByField(this._getSortByFieldArgs());
 	}
 
 	#getSortOrderOfSortedItems() {
@@ -381,6 +399,7 @@ export class UmbSortChildrenOfModalElement<
 						label=${this.localize.term('sort_sortByFieldDirectionLabel')}
 						.options=${directionOptions}
 						@change=${this.#onDirectionChange}></uui-select>
+					${this._renderAdditionalSortByFieldOptions()}
 				</div>
 			</uui-box>
 		`;

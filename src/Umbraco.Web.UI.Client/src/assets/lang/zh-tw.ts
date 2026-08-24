@@ -748,6 +748,8 @@ export default {
 		sortByFieldCreateDateOption: '建立時間',
 		sortByFieldUpdateDateOption: '最後編輯',
 		sortIndividuallyHeadline: '個別排序',
+		sortByFieldCultureSentence: '語言：',
+		sortByFieldCultureLabel: '語言',
 	},
 	speechBubbles: {
 		validationFailedHeader: '驗證',

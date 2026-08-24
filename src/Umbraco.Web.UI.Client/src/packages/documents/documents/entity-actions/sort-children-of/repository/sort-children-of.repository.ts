@@ -1,13 +1,9 @@
-import type { UmbSortChildrenOfDocumentByFieldArgs } from '../types.js';
+import type { UmbSortChildrenOfDocumentByFieldArgs, UmbSortChildrenOfDocumentByFieldOption } from '../types.js';
 import { UmbSortChildrenOfDocumentServerDataSource } from './sort-children-of.server.data.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { ContentSortFieldModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
-import type {
-	UmbSortChildrenByFieldOption,
-	UmbSortChildrenOfArgs,
-	UmbSortChildrenOfRepository,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbSortChildrenOfArgs, UmbSortChildrenOfRepository } from '@umbraco-cms/backoffice/tree';
 
 export class UmbSortChildrenOfDocumentRepository extends UmbControllerBase implements UmbSortChildrenOfRepository {
 	#dataSource = new UmbSortChildrenOfDocumentServerDataSource(this);
@@ -32,9 +28,9 @@ export class UmbSortChildrenOfDocumentRepository extends UmbControllerBase imple
 		return context?.getAppCulture();
 	}
 
-	getSortByFieldOptions(): Array<UmbSortChildrenByFieldOption> {
+	getSortByFieldOptions(): Array<UmbSortChildrenOfDocumentByFieldOption> {
 		return [
-			{ value: ContentSortFieldModel.NAME, label: '#sort_sortByFieldNameOption' },
+			{ value: ContentSortFieldModel.NAME, label: '#sort_sortByFieldNameOption', variesByCulture: true },
 			{ value: ContentSortFieldModel.CREATE_DATE, label: '#sort_sortByFieldCreateDateOption' },
 			{ value: ContentSortFieldModel.UPDATE_DATE, label: '#sort_sortByFieldUpdateDateOption' },
 		];

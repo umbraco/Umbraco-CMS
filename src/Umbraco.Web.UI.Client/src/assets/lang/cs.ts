@@ -1154,6 +1154,8 @@ export default {
 		sortByFieldCreateDateOption: 'Vytvořeno',
 		sortByFieldUpdateDateOption: 'Naposledy upraveno',
 		sortIndividuallyHeadline: 'Seřadit jednotlivě',
+		sortByFieldCultureSentence: 'v jazyce',
+		sortByFieldCultureLabel: 'Jazyk',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validace',

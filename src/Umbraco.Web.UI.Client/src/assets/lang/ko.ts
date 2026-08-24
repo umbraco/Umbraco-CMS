@@ -592,6 +592,8 @@ export default {
 		sortByFieldCreateDateOption: '생성일',
 		sortByFieldUpdateDateOption: '마지막 편집',
 		sortIndividuallyHeadline: '개별 정렬',
+		sortByFieldCultureSentence: '언어:',
+		sortByFieldCultureLabel: '언어',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: '3rd party add-in 때문에 발행이 취소되었습니다.',

@@ -1163,6 +1163,8 @@ export default {
 		sortByFieldCreateDateOption: 'Oluşturuldu',
 		sortByFieldUpdateDateOption: 'Son düzenleme',
 		sortIndividuallyHeadline: 'Tek tek sırala',
+		sortByFieldCultureSentence: 'dil:',
+		sortByFieldCultureLabel: 'Dil',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Doğrulama',

@@ -1336,6 +1336,8 @@ export default {
 		sortByFieldCreateDateOption: 'Erstellt',
 		sortByFieldUpdateDateOption: 'Zuletzt bearbeitet',
 		sortIndividuallyHeadline: 'Einzeln sortieren',
+		sortByFieldCultureSentence: 'in',
+		sortByFieldCultureLabel: 'Sprache',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% von %1% Dokumenten veröffentlicht.',

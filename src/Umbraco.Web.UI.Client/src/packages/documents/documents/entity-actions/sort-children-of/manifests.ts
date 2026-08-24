@@ -5,13 +5,18 @@ import { UMB_DOCUMENT_TREE_REPOSITORY_ALIAS } from '../../tree/index.js';
 import { UMB_USER_PERMISSION_DOCUMENT_SORT } from '../../user-permissions/document/constants.js';
 import { UMB_SORT_CHILDREN_OF_DOCUMENT_REPOSITORY_ALIAS } from './repository/constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { manifests as modalManifests } from './modal/manifests.js';
+import { manifest as sortChildrenOfDocumentKindManifest } from './sort-children-of-document.action.kind.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+	sortChildrenOfDocumentKindManifest,
 	...repositoryManifests,
+	...modalManifests,
 	{
 		type: 'entityAction',
-		kind: 'sortChildrenOfContent',
+		kind: 'sortChildrenOfDocument',
 		alias: 'Umb.EntityAction.Document.SortChildrenOf',
 		name: 'Sort Children Of Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],

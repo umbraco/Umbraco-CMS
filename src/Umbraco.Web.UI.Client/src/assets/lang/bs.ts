@@ -1256,6 +1256,8 @@ export default {
 		sortByFieldCreateDateOption: 'Kreirano',
 		sortByFieldUpdateDateOption: 'Zadnja izmjena',
 		sortIndividuallyHeadline: 'Sortiraj pojedinačno',
+		sortByFieldCultureSentence: 'na jeziku',
+		sortByFieldCultureLabel: 'Jezik',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validacija',

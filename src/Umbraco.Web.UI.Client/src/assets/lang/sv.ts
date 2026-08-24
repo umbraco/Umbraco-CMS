@@ -982,6 +982,8 @@ export default {
 		sortByFieldCreateDateOption: 'Skapad',
 		sortByFieldUpdateDateOption: 'Senast ändrad',
 		sortIndividuallyHeadline: 'Sortera individuellt',
+		sortByFieldCultureSentence: 'på',
+		sortByFieldCultureLabel: 'Språk',
 	},
 	speechBubbles: {
 		editMultiContentPublishedPartialText: '%0% av %1% dokument publicerade.',

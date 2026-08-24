@@ -1351,6 +1351,8 @@ export default {
 		sortByFieldCreateDateOption: 'Crëwyd',
 		sortByFieldUpdateDateOption: 'Golygwyd ddiwethaf',
 		sortIndividuallyHeadline: 'Trefnu yn unigol',
+		sortByFieldCultureSentence: 'yn',
+		sortByFieldCultureLabel: 'Iaith',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Dilysiad',

@@ -416,6 +416,8 @@ export default {
 		sortByFieldCreateDateOption: 'Criado',
 		sortByFieldUpdateDateOption: 'Última edição',
 		sortIndividuallyHeadline: 'Classificar individualmente',
+		sortByFieldCultureSentence: 'em',
+		sortByFieldCultureLabel: 'Idioma',
 	},
 	speechBubbles: {
 		contentPublishedFailedByEvent: 'Publicação foi cancelada por add-in de terceiros',

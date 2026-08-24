@@ -50,6 +50,16 @@ describe('UmbSortChildrenOfDocumentRepository', () => {
 		expect(byIdOptions?.body?.culture).to.equal('da-DK');
 	});
 
+	it('offers the culture-dependent fields as varying by culture', async () => {
+		const options = repository.getSortByFieldOptions();
+
+		expect(options.find((option) => option.value === ContentSortFieldModel.NAME)?.variesByCulture).to.be.true;
+		expect(options.find((option) => option.value === ContentSortFieldModel.CREATE_DATE)?.variesByCulture).to.be
+			.undefined;
+		expect(options.find((option) => option.value === ContentSortFieldModel.UPDATE_DATE)?.variesByCulture).to.be
+			.undefined;
+	});
+
 	it('sorts by an explicitly given culture', async () => {
 		await repository.sortChildrenOfByField({
 			unique: 'document-id',

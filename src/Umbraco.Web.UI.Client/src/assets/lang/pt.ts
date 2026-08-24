@@ -1455,6 +1455,8 @@ export default {
 		sortByFieldCreateDateOption: 'Criado',
 		sortByFieldUpdateDateOption: 'Última edição',
 		sortIndividuallyHeadline: 'Ordenar individualmente',
+		sortByFieldCultureSentence: 'em',
+		sortByFieldCultureLabel: 'Idioma',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Validação',

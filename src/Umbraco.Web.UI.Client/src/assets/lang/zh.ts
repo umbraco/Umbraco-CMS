@@ -746,6 +746,8 @@ export default {
 		sortByFieldCreateDateOption: '创建时间',
 		sortByFieldUpdateDateOption: '最后编辑',
 		sortIndividuallyHeadline: '单独排序',
+		sortByFieldCultureSentence: '语言：',
+		sortByFieldCultureLabel: '语言',
 	},
 	speechBubbles: {
 		validationFailedHeader: '验证',
