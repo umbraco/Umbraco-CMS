@@ -185,8 +185,8 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
         // Return in input order; keys that resolved to nothing (missing/unpublished) are omitted. A key
         // repeated in the input resolves to the same item at every occurrence, having only been looked
-        // up once.
-        var ordered = new List<IPublishedContent>(resolved.Count);
+        // up once — so the input count, not the resolved count, is the upper bound on the result.
+        var ordered = new List<IPublishedContent>(keys.Count);
         foreach (Guid key in keys)
         {
             if (resolved.TryGetValue(key, out IPublishedContent? content))

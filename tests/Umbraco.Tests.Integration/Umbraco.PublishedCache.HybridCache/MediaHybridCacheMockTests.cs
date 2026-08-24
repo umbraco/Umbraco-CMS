@@ -125,4 +125,21 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Once);
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourceAsync(It.IsAny<Guid>()), Times.Never);
     }
+
+    [Test]
+    public async Task GetByKeysAsync_HonoursCachedNull_WithoutQueryingDatabase()
+    {
+        Guid missingKey = Guid.NewGuid();
+
+        // Arranged by hand: unlike documents, the media read-through never writes a null node, so this
+        // pins the probe's contract rather than a state media can reach today. The two probes are kept
+        // identical deliberately, and this is what stops the media one drifting out of step.
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.SetAsync<ContentCacheNode?>($"{missingKey}", null);
+
+        IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync([missingKey]);
+
+        Assert.IsEmpty(result);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
+    }
 }
