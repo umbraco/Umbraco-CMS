@@ -6,7 +6,7 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	/**
 	 * Optional, but recommended, observable for the href location, the action will act as a link.
 	 * The `execute` method will not be called.
-	 * @returns {Promise<string | undefined>}
+	 * @returns {Promise<Observable<string | undefined> | undefined> | undefined}
 	 */
 	getHrefObservable?: () => Promise<Observable<string | undefined> | undefined> | undefined;
 

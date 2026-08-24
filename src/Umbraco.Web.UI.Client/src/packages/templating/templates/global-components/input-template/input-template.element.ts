@@ -174,7 +174,11 @@ export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, 
 						.id=${template.unique}
 						.name=${template.name}
 						@change=${this.#onCardChange}
-						@open=${() => window.history.pushState({}, '', this._templatePath + 'edit/' + template.unique)}
+						@open=${() => {
+							if (this._templatePath) {
+								window.history.pushState({}, '', this._templatePath + 'edit/' + template.unique);
+							}
+						}}
 						.href=${this._templatePath ? this._templatePath + 'edit/' + template.unique : undefined}
 						?default=${template.unique === this.defaultUnique}>
 						<uui-button

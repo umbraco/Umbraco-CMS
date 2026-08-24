@@ -239,8 +239,6 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 					.routes=${this._routes}
 					@init=${(event: UmbRouterSlotInitEvent) => {
 						this._routerPath = event.target.absoluteRouterPath;
-						// TODO: Check if this is nesecary [NL]
-						this._activePath = event.target.absoluteActiveViewPath || '';
 					}}
 					@change=${(event: UmbRouterSlotChangeEvent) => {
 						this._activePath = event.target.absoluteActiveViewPath || '';

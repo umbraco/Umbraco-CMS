@@ -378,7 +378,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				[this.structure.contentTypeLoaded, this.structure.contentTypePropertyAliases],
 				([loaded, aliases]) => {
 					if (!loaded || aliases.length === 0) return undefined;
-					return aliases.map((alias) => alias);
+					return aliases;
 				},
 			),
 			(queryParams) => queryParams.alias,

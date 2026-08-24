@@ -44,7 +44,7 @@ describe('forEachBlockLayoutEntryOf', () => {
 		});
 
 		expect(visited).to.have.members(['child1', 'child2', 'grandchild']);
-		expect(visited.length).to.equal(3);
+		expect(visited).to.have.lengthOf(3);
 	});
 
 	it("passes each descendant's own contentKey and settingsKey, not the root's", async () => {
