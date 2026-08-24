@@ -280,6 +280,29 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetByKeysAsync_HonoursCachedNull_WithoutQueryingDatabase()
+    {
+        Guid missingKey = Guid.NewGuid();
+
+        // Nothing in the database for this key, so the per-key read-through caches a null against it.
+        _mockDatabaseCacheRepository.Setup(x => x.GetContentSourceAsync(missingKey, false)).ReturnsAsync((ContentCacheNode?)null);
+        _mockDatabaseCacheRepository
+            .Setup(x => x.GetContentSourcesAsync(It.Is<IEnumerable<Guid>>(keys => keys.Contains(missingKey)), false))
+            .ReturnsAsync(Array.Empty<ContentCacheNode>());
+
+        Assert.IsNull(await _documentCacheService.GetByKeyAsync(missingKey, false));
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(missingKey, false), Times.Once);
+
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync([missingKey], false);
+
+        // A cached null means "already known to resolve to nothing", so the batched path has to serve it
+        // from the cache as the per-key path does. Re-reading such a key on every request is the
+        // regression reported in #18869.
+        Assert.IsEmpty(result);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
     public async Task RefreshMemoryCache_Fetches_Draft_And_Published()
     {
         // Arrange
