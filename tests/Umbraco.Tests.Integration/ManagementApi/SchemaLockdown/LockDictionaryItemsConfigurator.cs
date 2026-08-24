@@ -9,6 +9,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 public class LockDictionaryItemsConfigurator : ISchemaLockdownConfigurator
 {
     /// <inheritdoc />
-    public void Configure(SchemaLockdownRules rules)
+    public void Configure(ISchemaLockdownConfigurableRules rules)
         => rules.BlockMutations(Constants.UdiEntityType.DictionaryItem);
 }

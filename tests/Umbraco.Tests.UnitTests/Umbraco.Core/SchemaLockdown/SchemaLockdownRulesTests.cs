@@ -9,14 +9,14 @@ public class SchemaLockdownRulesTests
 {
     private sealed class DelegateConfigurator : ISchemaLockdownConfigurator
     {
-        private readonly Action<SchemaLockdownRules> _configure;
+        private readonly Action<ISchemaLockdownConfigurableRules> _configure;
 
-        public DelegateConfigurator(Action<SchemaLockdownRules> configure) => _configure = configure;
+        public DelegateConfigurator(Action<ISchemaLockdownConfigurableRules> configure) => _configure = configure;
 
-        public void Configure(SchemaLockdownRules rules) => _configure(rules);
+        public void Configure(ISchemaLockdownConfigurableRules rules) => _configure(rules);
     }
 
-    private static SchemaLockdownRules CreateRules(params Action<SchemaLockdownRules>[] configure)
+    private static SchemaLockdownRules CreateRules(params Action<ISchemaLockdownConfigurableRules>[] configure)
         => new(new SchemaLockdownConfiguratorCollection(
             () => configure.Select(ISchemaLockdownConfigurator (x) => new DelegateConfigurator(x))));
 
