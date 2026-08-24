@@ -414,36 +414,15 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
-    public IEnumerable<TContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<TContent>? filter, Ordering? ordering = null)
+    public async Task<PagedModel<TContent>> GetPagedOfTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
     {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
         ordering ??= Ordering.By("sortOrder");
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            // Need to use a List here because the expression tree cannot convert the array when used in Contains.
-            // See ExpressionTests.Sql_In().
-            List<int> contentTypeIdsAsList = [.. contentTypeIds];
-
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetPage(
-                Query<TContent>()?.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId)),
-                pageIndex,
-                pageSize,
-                out totalRecords,
-                null,
-                filter,
-                ordering);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        PagedModel<TContent> result = await _asyncContentRepository.GetPagedOfContentTypesAsync(contentTypeKeys, skip, take, ordering, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc/>

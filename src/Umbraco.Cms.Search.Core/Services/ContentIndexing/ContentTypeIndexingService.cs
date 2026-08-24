@@ -56,9 +56,9 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
 
     /// <inheritdoc />
     public void ReindexByContentTypes(Guid[] contentTypeKeys, UmbracoObjectTypes objectType, string origin)
-        => _backgroundTaskQueue.QueueBackgroundWorkItem(async _ =>
+        => _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
         {
-            Guid[] contentKeys = await GetContentKeysByContentTypesAsync(contentTypeKeys, objectType);
+            Guid[] contentKeys = await GetContentKeysByContentTypesAsync(contentTypeKeys, objectType, cancellationToken);
             if (contentKeys.Length == 0)
             {
                 return;
@@ -70,16 +70,16 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
             _contentIndexingService.Handle(changes, origin);
         });
 
-    private async Task<Guid[]> GetContentKeysByContentTypesAsync(Guid[] contentTypeKeys, UmbracoObjectTypes objectType)
+    private async Task<Guid[]> GetContentKeysByContentTypesAsync(Guid[] contentTypeKeys, UmbracoObjectTypes objectType, CancellationToken cancellationToken)
         => objectType switch
         {
-            UmbracoObjectTypes.Document => await GetDocumentKeysByContentTypesAsync(contentTypeKeys),
+            UmbracoObjectTypes.Document => await GetDocumentKeysByContentTypesAsync(contentTypeKeys, cancellationToken),
             UmbracoObjectTypes.Media => GetMediaKeysByMediaTypes(contentTypeKeys),
             UmbracoObjectTypes.Member => GetMemberKeysByMemberTypes(contentTypeKeys),
             _ => [],
         };
 
-    private async Task<Guid[]> GetDocumentKeysByContentTypesAsync(Guid[] contentTypeKeys)
+    private async Task<Guid[]> GetDocumentKeysByContentTypesAsync(Guid[] contentTypeKeys, CancellationToken cancellationToken)
     {
         int[] directContentTypeIds = (await _contentTypeService.GetManyAsync(contentTypeKeys))
             .Select(ct => ct.Id)
@@ -91,18 +91,21 @@ internal sealed class ContentTypeIndexingService : IContentTypeIndexingService
         }
 
         int[] allContentTypeIds = await ExpandWithDependentContentTypesAsync(directContentTypeIds);
+        Guid[] allContentTypeKeys = (await _contentTypeService.GetManyAsync(allContentTypeIds))
+            .Select(ct => ct.Key)
+            .ToArray();
 
         var keys = new List<Guid>();
-        var pageIndex = 0L;
+        var skip = 0;
+        const int take = 1000;
 
         while (true)
         {
-            IContent[] page = _contentService.GetPagedOfTypes(
-                allContentTypeIds, pageIndex, 1000, out long totalRecords, null, null).ToArray();
-            keys.AddRange(page.Select(c => c.Key));
-            pageIndex++;
+            PagedModel<IContent> page = await _contentService.GetPagedOfTypesAsync(allContentTypeKeys, skip, take, ordering: null, cancellationToken);
+            keys.AddRange(page.Items.Select(c => c.Key));
+            skip += take;
 
-            if (keys.Count >= totalRecords)
+            if (keys.Count >= page.Total)
             {
                 break;
             }
