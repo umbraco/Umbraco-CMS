@@ -905,7 +905,7 @@ internal class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
-    public Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    public override Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(ordering);
 

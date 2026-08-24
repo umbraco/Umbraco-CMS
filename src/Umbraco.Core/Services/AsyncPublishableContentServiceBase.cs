@@ -391,6 +391,18 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     }
 
     /// <inheritdoc />
+    public async Task<PagedModel<TContent>> GetPagedOfTypeAsync(Guid contentTypeKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken)
+    {
+        ordering ??= Ordering.By("sortOrder");
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        PagedModel<TContent> result = await _asyncContentRepository.GetPagedOfContentTypesAsync([contentTypeKey], skip, take, ordering, cancellationToken);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
     public void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection contentSchedule)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -398,41 +410,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             scope.WriteLock(WriteLockIds);
             _contentRepository.PersistContentSchedule(content, contentSchedule);
             scope.Complete();
-        }
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<TContent> GetPagedOfType(
-        int contentTypeId,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<TContent>? filter = null,
-        Ordering? ordering = null)
-    {
-        if (pageIndex < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex));
-        }
-
-        if (pageSize <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize));
-        }
-
-        ordering ??= Ordering.By("sortOrder");
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return _contentRepository.GetPage(
-                Query<TContent>()?.Where(x => x.ContentTypeId == contentTypeId),
-                pageIndex,
-                pageSize,
-                out totalRecords,
-                null,
-                filter,
-                ordering);
         }
     }
 

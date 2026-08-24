@@ -187,7 +187,7 @@ public class LoadTestController : Controller
                 return null;
             }
 
-            var container = _contentService.GetPagedOfType(containerType.Id, 0, 100, out _, null).FirstOrDefault();
+            var container = _contentService.GetPagedOfTypeAsync(containerType.Key, 0, 100, ordering: null, CancellationToken.None).GetAwaiter().GetResult().Items.FirstOrDefault();
             if (container == null)
             {
                 return ContentHtml("Panic! Container is missing.");

@@ -257,16 +257,15 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <summary>
-    ///     Gets paged documents of a content type.
+    ///     Gets a paged list of documents of a given content type.
     /// </summary>
-    /// <param name="contentTypeId">The content type identifier.</param>
-    /// <param name="pageIndex">The page number.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <param name="totalRecords">Total number of documents.</param>
-    /// <param name="filter">Query filter.</param>
-    /// <param name="ordering">Ordering infos.</param>
-    /// <returns>The paged documents.</returns>
-    IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter, Ordering? ordering = null);
+    /// <param name="contentTypeKey">The Guid key of the content type.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification, or <c>null</c> to order by sort order.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching documents.</returns>
+    Task<PagedModel<IContent>> GetPagedOfTypeAsync(Guid contentTypeKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets paged documents for specified content types.

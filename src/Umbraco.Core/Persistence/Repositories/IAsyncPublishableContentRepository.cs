@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
@@ -104,4 +105,19 @@ public interface IAsyncPublishableContentRepository<TContent> : IAsyncContentRep
     ///     A dictionary keyed by content Guid, where each value is the collection of schedules for that node.
     /// </returns>
     Task<IDictionary<Guid, IEnumerable<ContentSchedule>>> GetContentSchedulesByKeysAsync(Guid[] contentKeys, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets a paged list of content items whose content type is one of the specified content type keys.
+    /// </summary>
+    /// <remarks>
+    ///     Trashed items are included — callers that need to exclude them must filter the result.
+    /// </remarks>
+    /// <param name="contentTypeKeys">The Guid keys of the content types to filter by.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The maximum number of items to return.</param>
+    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A paged result containing the matching content items.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
+    Task<PagedModel<TContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
 }

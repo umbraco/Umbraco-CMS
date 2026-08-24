@@ -2512,11 +2512,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Act
         ContentService.DeleteOfType(contentType.Id);
         var rootContent = await ContentService.GetRootContentAsync(CancellationToken.None);
-        var contents = ContentService.GetPagedOfType(contentType.Id, 0, int.MaxValue, out var _);
+        PagedModel<IContent> contents = await ContentService.GetPagedOfTypeAsync(contentType.Key, 0, int.MaxValue, ordering: null, CancellationToken.None);
 
         // Assert
         Assert.That(rootContent.Any(), Is.False);
-        Assert.That(contents.Any(x => !x.Trashed), Is.False);
+        Assert.That(contents.Items.Any(x => !x.Trashed), Is.False);
     }
 
     [Test]

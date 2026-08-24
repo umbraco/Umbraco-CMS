@@ -47,21 +47,6 @@ public interface IAsyncDocumentRepository : IAsyncPublishableContentRepository<I
     Task<PagedModel<IContent>> GetDescendantsWithoutTemplatesAsync(Guid ancestorKey, int skip, int take, Ordering? ordering, CancellationToken cancellationToken, bool includeTrashed = true);
 
     /// <summary>
-    ///     Gets a paged list of documents whose content type is one of the specified content type keys.
-    /// </summary>
-    /// <remarks>
-    ///     Trashed documents are included — callers that need to exclude them must filter the result.
-    /// </remarks>
-    /// <param name="contentTypeKeys">The Guid keys of the content types to filter by.</param>
-    /// <param name="skip">The number of items to skip.</param>
-    /// <param name="take">The maximum number of items to return.</param>
-    /// <param name="ordering">The ordering specification. Must not be <c>null</c> — callers that don't have an opinion should use a service-layer facade that applies a default.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A paged result containing the matching documents.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="ordering" /> is <c>null</c>.</exception>
-    Task<PagedModel<IContent>> GetPagedOfContentTypesAsync(Guid[] contentTypeKeys, int skip, int take, Ordering? ordering, CancellationToken cancellationToken);
-
-    /// <summary>
     ///     Gets a paged list of documents at a given tree level, excluding trashed documents.
     /// </summary>
     /// <param name="level">The tree level to filter by.</param>
