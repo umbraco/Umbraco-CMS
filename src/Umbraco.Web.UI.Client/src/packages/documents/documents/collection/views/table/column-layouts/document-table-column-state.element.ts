@@ -1,8 +1,8 @@
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
+import { UmbDocumentVariantState } from '../../../../variant-state.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
-import { UmbDocumentVariantState } from '../../../../variant-state.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';

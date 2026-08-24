@@ -298,6 +298,8 @@ export default {
 		createEmpty: 'Créer nouveau',
 		createFromClipboard: 'Copier du clipboard',
 		saveModalTitle: 'Sauver',
+		saveAndPublishDescendantsModalTitle: 'Sauver et publier avec les descendants',
+		saveAndScheduleModalTitle: 'Sauver et planifier la publication',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Créer un nouveau Modèle de Contenu à partir de <em>%0%</em>',
@@ -311,6 +313,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Cliquez pour télécharger',
+		browseFilesAction: 'Parcourir les fichiers',
+		dropFilesOr: 'Glissez-déposez des médias ici<br />ou',
 		orClickHereToUpload: 'ou cliquez ici pour choisir un fichier',
 		disallowedFileType: "Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé",
 		invalidFileName: "Ce fichier ne peut pas être chargé, le nom du fichier n'est pas valide",
@@ -720,6 +724,8 @@ export default {
 		new: 'Nouveau',
 		next: 'Suivant',
 		no: 'Non',
+		noResults: 'Aucun résultat',
+		noResultsFor: (query: string) => `Aucun résultat pour "${query}".`,
 		of: 'de',
 		off: 'Inactif',
 		ok: 'OK',
@@ -1961,5 +1967,10 @@ export default {
 	treeSearch: {
 		searchResult: 'élément retrouvé',
 		searchResults: 'éléments retrouvés',
+	},
+	picker: {
+		browseTab: 'Parcourir',
+		searchTab: 'Rechercher',
+		selectedCount: (count: number) => `${count} ${count > 1 ? 'éléments sélectionnés' : 'élément sélectionné'}`,
 	},
 } as UmbLocalizationDictionary;

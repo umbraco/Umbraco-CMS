@@ -103,7 +103,11 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 
 	override willUpdate(changedProperties: PropertyValues) {
 		super.willUpdate(changedProperties);
-		if (changedProperties.has('_selectable') || changedProperties.has('_multiple') || changedProperties.has('_selectOnly')) {
+		if (
+			changedProperties.has('_selectable') ||
+			changedProperties.has('_multiple') ||
+			changedProperties.has('_selectOnly')
+		) {
 			this.#tableConfig = {
 				allowSelection: this._selectable,
 				allowSelectAll: this._multiple,
