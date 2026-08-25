@@ -49,7 +49,7 @@ internal sealed class MemberCacheServiceTests : UmbracoIntegrationTestWithConten
         await base.CreateTestDataAsync();
 
         // Create and Save Member "MemberItem" based on "Member" member type
-        MemberType = MemberTypeService.Get("Member")!;
+        MemberType = (await MemberTypeService.GetAsync("Member"))!;
         Member = new MemberBuilder()
             .WithMemberType(MemberType)
             .WithLogin("testmember", "password123")

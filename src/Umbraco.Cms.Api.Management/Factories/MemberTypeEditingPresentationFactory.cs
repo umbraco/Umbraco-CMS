@@ -14,7 +14,7 @@ internal sealed class MemberTypeEditingPresentationFactory : ContentTypeEditingP
     /// <param name="memberTypeService">The service used to manage and retrieve member types.</param>
     /// <param name="containerService">The service used to retrieve member type containers (folders).</param>
     public MemberTypeEditingPresentationFactory(IMemberTypeService memberTypeService, IMemberTypeContainerService containerService)
-        : base(containerService, () => memberTypeService.GetAll())
+        : base(containerService, () => memberTypeService.GetAllAsync().GetAwaiter().GetResult())
     {
     }
 

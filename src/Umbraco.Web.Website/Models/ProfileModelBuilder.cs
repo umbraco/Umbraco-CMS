@@ -79,7 +79,7 @@ public class ProfileModelBuilder : MemberModelBuilderBase
             return model;
         }
 
-        IMemberType? memberType = member.MemberTypeAlias is null ? null : MemberTypeService.Get(member.MemberTypeAlias);
+        IMemberType? memberType = member.MemberTypeAlias is null ? null : await MemberTypeService.GetAsync(member.MemberTypeAlias);
         if (memberType == null)
         {
             throw new InvalidOperationException($"Could not find a member type with alias: {member.MemberTypeAlias}.");

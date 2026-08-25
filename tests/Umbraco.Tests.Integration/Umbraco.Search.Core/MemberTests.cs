@@ -83,7 +83,7 @@ public class MemberTests : ContentBaseTestBase
     public async Task AllMembers_DoesNotIndexSensitiveProperties()
     {
         IMemberTypeService memberTypeService = GetRequiredService<IMemberTypeService>();
-        IMemberType? memberType = memberTypeService.Get("myMemberType");
+        IMemberType? memberType = await memberTypeService.GetAsync("myMemberType");
         Assert.That(memberType, Is.Not.Null);
 
         memberType.SetIsSensitiveProperty("organization", true);
@@ -148,9 +148,9 @@ public class MemberTests : ContentBaseTestBase
     }
 
     [Test]
-    public void Can_Index_More_Than_Content_Enumeration_Page_Size()
+    public async Task Can_Index_More_Than_Content_Enumeration_Page_Size()
     {
-        IMemberType memberType = MemberTypeService.GetAll().First();
+        IMemberType memberType = (await MemberTypeService.GetAllAsync()).First();
         foreach (var count in Enumerable.Range(1, ContentChangeStrategyBase.ContentEnumerationPageSize))
         {
             MemberService.Save(

@@ -347,7 +347,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 docTypeElements.ToList(),
                 true,
                 userId,
-                _memberTypeService,
+                new MemberTypeImportService(_memberTypeService),
                 out entityContainersInstalled);
 
         #endregion
@@ -2521,6 +2521,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 => _inner.CreateAsync(item, performingUserKey);
 
             public Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(IContentType item, Guid performingUserKey)
+                => _inner.UpdateAsync(item, performingUserKey);
+        }
+
+        // Adapter over the asynchronous member-type service.
+        private sealed class MemberTypeImportService : IContentTypeImportService<IMemberType>
+        {
+            private readonly IMemberTypeService _inner;
+
+            public MemberTypeImportService(IMemberTypeService inner) => _inner = inner;
+
+            public IMemberType? Get(string alias) => _inner.GetAsync(alias).GetAwaiter().GetResult();
+
+            public Task<Attempt<ContentTypeOperationStatus>> CreateAsync(IMemberType item, Guid performingUserKey)
+                => _inner.CreateAsync(item, performingUserKey);
+
+            public Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(IMemberType item, Guid performingUserKey)
                 => _inner.UpdateAsync(item, performingUserKey);
         }
     }
