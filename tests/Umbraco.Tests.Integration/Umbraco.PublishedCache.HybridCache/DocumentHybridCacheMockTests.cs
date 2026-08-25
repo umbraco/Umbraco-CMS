@@ -303,6 +303,69 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
     }
 
     [Test]
+    public async Task GetByKeysAsync_EmptyInput_ReturnsEmpty()
+    {
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(Array.Empty<Guid>(), false);
+
+        Assert.IsEmpty(result);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<bool>()), Times.Never);
+        _mockDatabaseCacheRepository.Verify(x => x.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_DuplicateKeys_ResolveToSameItemAtEveryOccurrence()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+
+        // A batched lookup preserves input multiplicity rather than collapsing duplicates, while only
+        // looking the key up once against the database.
+        var keys = new[] { Textpage.Key, Textpage.Key };
+
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(keys, false);
+
+        Assert.AreEqual(2, result.Count);
+        Assert.AreEqual(Textpage.Key, result[0].Key);
+        Assert.AreEqual(Textpage.Key, result[1].Key);
+
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetContentSourcesAsync(It.Is<IEnumerable<Guid>>(k => k.Count() == 1 && k.Contains(Textpage.Key)), false),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_PreservesInputOrder_AcrossMixedCacheHits()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{Textpage.Key}");
+        await hybridCache.RemoveAsync($"{Subpage.Key}");
+        await hybridCache.RemoveAsync($"{Subpage2.Key}");
+
+        var nodesByKey = new Dictionary<Guid, ContentCacheNode>
+        {
+            [Textpage.Key] = BuildCacheNode(Textpage),
+            [Subpage.Key] = BuildCacheNode(Subpage),
+            [Subpage2.Key] = BuildCacheNode(Subpage2),
+        };
+
+        _mockDatabaseCacheRepository
+            .Setup(x => x.GetContentSourceAsync(It.IsAny<Guid>(), false))
+            .ReturnsAsync((Guid key, bool _) => nodesByKey.GetValueOrDefault(key));
+        _mockDatabaseCacheRepository
+            .Setup(x => x.GetContentSourcesAsync(It.IsAny<IEnumerable<Guid>>(), false))
+            .ReturnsAsync((IEnumerable<Guid> keys, bool _) => keys.Where(nodesByKey.ContainsKey).Select(k => nodesByKey[k]));
+
+        // Warm Subpage into L0 ahead of time; Textpage and Subpage2 stay cold, so the batched call below
+        // resolves a mix of tiers in one go.
+        _ = await _documentCacheService.GetByKeyAsync(Subpage.Key, false);
+
+        Guid[] requestOrder = [Subpage2.Key, Subpage.Key, Textpage.Key];
+        IReadOnlyList<IPublishedContent> result = await _documentCacheService.GetByKeysAsync(requestOrder, false);
+
+        CollectionAssert.AreEqual(requestOrder, result.Select(x => x.Key));
+    }
+
+    [Test]
     public async Task RefreshMemoryCache_Fetches_Draft_And_Published()
     {
         // Arrange
@@ -392,6 +455,28 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
         // hit the database again and return the content.
         Assert.IsNotNull(secondResult, "Second call should return content because null should not have been cached when ancestor check failed");
     }
+
+    private static ContentCacheNode BuildCacheNode(Content content) =>
+        new()
+        {
+            ContentTypeId = content.ContentTypeId,
+            CreatorId = content.CreatorId,
+            CreateDate = content.CreateDate,
+            Id = content.Id,
+            Key = content.Key,
+            SortOrder = content.SortOrder,
+            Data = new ContentData(
+                content.Name,
+                null,
+                1,
+                content.UpdateDate,
+                content.CreatorId,
+                -1,
+                false,
+                new Dictionary<string, PropertyData[]>(),
+                null),
+            IsDraft = false,
+        };
 
     private void AssertTextPage(IPublishedContent textPage)
     {
