@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -72,6 +73,28 @@ public class RazorRuntimeCompilationValidatorTests
         RazorRuntimeCompilationValidator sut = CreateSut(InMemoryAuto, liveFactoryEnabled: false, modelsModeConfigured: true);
 
         Assert.DoesNotThrow(() => sut.Handle(Notification));
+    }
+
+    [Test]
+    public void Can_Be_Resolved_From_A_Validating_Container()
+    {
+        // The obsolete constructor kept for binary compatibility gives the type two public constructors, and
+        // container activation with validation enabled is where an ambiguous choice between them would surface.
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
+        services.AddSingleton(Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(
+            m => m.CurrentValue == new ModelsBuilderSettings()));
+        services.AddSingleton(Mock.Of<IPublishedModelFactory>());
+        services.AddTransient<RazorRuntimeCompilationValidator>();
+
+        using ServiceProvider provider = services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateOnBuild = true,
+            ValidateScopes = true,
+        });
+
+        Assert.DoesNotThrow(() => provider.GetRequiredService<RazorRuntimeCompilationValidator>());
     }
 
     private static UmbracoApplicationStartedNotification Notification => new(false);
