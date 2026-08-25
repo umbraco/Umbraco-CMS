@@ -21,9 +21,9 @@ namespace Umbraco.Cms.Core.Services;
 ///     functionality such as handling sensitive property access control.
 /// </remarks>
 internal sealed class MemberContentEditingService
-    : ContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>, IMemberContentEditingService
+    : AsyncContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>, IMemberContentEditingService
 {
-    private readonly ILogger<ContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>> _logger;
+    private readonly ILogger<AsyncContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>> _logger;
     private readonly IUserService _userService;
 
     /// <summary>
@@ -46,7 +46,7 @@ internal sealed class MemberContentEditingService
         IMemberTypeService contentTypeService,
         PropertyEditorCollection propertyEditorCollection,
         IDataTypeService dataTypeService,
-        ILogger<ContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>> logger,
+        ILogger<AsyncContentEditingServiceBase<IMember, IMemberType, IMemberService, IMemberTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         IMemberValidationService memberValidationService,
