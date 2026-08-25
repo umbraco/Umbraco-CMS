@@ -6,8 +6,8 @@ import './table-insert.element.js';
 
 @customElement('umb-tiptap-table-toolbar-menu')
 export class UmbTiptapTableToolbarMenuElement extends UmbTiptapToolbarMenuElement {
-	protected override willUpdate(changedProperties: PropertyValues) {
-		super.willUpdate(changedProperties);
+	protected override updated(changedProperties: PropertyValues) {
+		super.updated(changedProperties);
 
 		if (changedProperties.has('isActive') && !this.isActive) {
 			const popover = this.shadowRoot?.getElementById('popover-menu');
