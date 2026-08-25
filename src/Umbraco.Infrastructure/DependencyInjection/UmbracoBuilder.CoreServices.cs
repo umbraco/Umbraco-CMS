@@ -104,7 +104,8 @@ public static partial class UmbracoBuilderExtensions
             .Add<JITOptimizerValidator>()
             .Add<UmbracoApplicationUrlValidator>()
             .Add<UseHttpsValidator>()
-            .Add<ModelsBuilderModeValidator>();
+            .Add<ModelsBuilderModeValidator>()
+            .Add<InMemoryModelsBuilderModeValidator>();
 
         // composers
         builder

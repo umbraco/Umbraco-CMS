@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Options;
-using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
 
 namespace Umbraco.Extensions;
@@ -56,8 +55,6 @@ public static class UmbracoBuilderDependencyInjectionExtensions
         builder.Services.AddSingleton<ModelsGenerationError>();
 
         builder.Services.ConfigureOptions<ConfigurePropertySettingsOptions>();
-
-        builder.AddNotificationHandler<UmbracoApplicationStartedNotification, RazorRuntimeCompilationValidator>();
 
         return builder;
     }
