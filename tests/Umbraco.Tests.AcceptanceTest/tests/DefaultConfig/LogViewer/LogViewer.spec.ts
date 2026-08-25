@@ -151,7 +151,7 @@ test('can sort logs by timestamp', async ({umbracoUi}) => {
   }).toBe(true);
 });
 
-test('can use pagination', async ({umbracoUi}) => {
+test('can use pagination', async ({umbracoUi, page}) => {
   // Act
   await umbracoUi.logViewer.clickSearchButton();
   // The instance keeps writing log entries, so comparing against an API snapshot races with the UI.
@@ -163,9 +163,7 @@ test('can use pagination', async ({umbracoUi}) => {
   // Poll rather than read once: the message element can re-render in place, so a plain visibility
   // wait can be satisfied by the still-stale page-1 content before the page-2 fetch resolves.
   await expect.poll(() => umbracoUi.logViewer.getFirstLogMessage()).not.toEqual(firstLogOnFirstPage);
-  // TODO: Remove the comment below when the issue is resolved.
-  // At the time this test was created, the UI only highlights page 1. Uncomment the line below when the issue is resolved.
-  // await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
+  await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
 });
 
 test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
