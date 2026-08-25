@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                 // reports the event as : "ContentRepository/Remove/X:Y"
                 // where
-                // X is the event content ID
+                // X is the event content key
                 // Y is the event content version GUID
                 var e = new EventInstance
                 {
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     Sender = "ContentRepository",
                     EventArgs = null, // Notification has no args
                     Name = "RemoveVersion",
-                    Args = $"{notification.Id}:{notification.SpecificVersion}"
+                    Args = $"{notification.Key}:{notification.SpecificVersion}"
                 };
                 _events.Add(e);
             }

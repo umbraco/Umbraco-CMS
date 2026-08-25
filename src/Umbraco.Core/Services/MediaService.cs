@@ -1,5 +1,7 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -29,6 +31,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly MediaFileManager _mediaFileManager;
         private readonly IMediaPathScheme _mediaPathScheme;
         private readonly ILogger<MediaService> _logger;
+        private readonly IIdKeyMap _idKeyMap;
 
         #region Constructors
 
@@ -45,6 +48,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
         /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
         /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
+        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
         public MediaService(
             ICoreScopeProvider provider,
             MediaFileManager mediaFileManager,
@@ -58,6 +62,53 @@ namespace Umbraco.Cms.Core.Services
             IUserIdKeyResolver userIdKeyResolver,
             IMediaPathScheme mediaPathScheme,
             ILogger<MediaService> logger)
+            : this(
+                provider,
+                mediaFileManager,
+                loggerFactory,
+                eventMessagesFactory,
+                mediaRepository,
+                auditService,
+                mediaTypeRepository,
+                entityRepository,
+                shortStringHelper,
+                userIdKeyResolver,
+                mediaPathScheme,
+                logger,
+                StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MediaService"/> class.
+        /// </summary>
+        /// <param name="provider">The <see cref="ICoreScopeProvider"/> for database scope management.</param>
+        /// <param name="mediaFileManager">The <see cref="MediaFileManager"/> for media file operations.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> for creating loggers.</param>
+        /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
+        /// <param name="mediaRepository">The <see cref="IMediaRepository"/> for media persistence.</param>
+        /// <param name="auditService">The <see cref="IAuditService"/> for audit logging.</param>
+        /// <param name="mediaTypeRepository">The <see cref="IMediaTypeRepository"/> for media type persistence.</param>
+        /// <param name="entityRepository">The <see cref="IEntityRepository"/> for entity operations.</param>
+        /// <param name="shortStringHelper">The <see cref="IShortStringHelper"/> for string operations.</param>
+        /// <param name="userIdKeyResolver">The <see cref="IUserIdKeyResolver"/> for resolving user IDs.</param>
+        /// <param name="mediaPathScheme">The <see cref="IMediaPathScheme"/> for media path resolution.</param>
+        /// <param name="logger">The <see cref="ILogger{MediaService}"/> for logging.</param>
+        /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> for resolving between int ids and Guid keys.</param>
+        public MediaService(
+            ICoreScopeProvider provider,
+            MediaFileManager mediaFileManager,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMediaRepository mediaRepository,
+            IAuditService auditService,
+            IMediaTypeRepository mediaTypeRepository,
+            IEntityRepository entityRepository,
+            IShortStringHelper shortStringHelper,
+            IUserIdKeyResolver userIdKeyResolver,
+            IMediaPathScheme mediaPathScheme,
+            ILogger<MediaService> logger,
+            IIdKeyMap idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _mediaFileManager = mediaFileManager;
@@ -69,6 +120,7 @@ namespace Umbraco.Cms.Core.Services
             _userIdKeyResolver = userIdKeyResolver;
             _mediaPathScheme = mediaPathScheme;
             _logger = logger;
+            _idKeyMap = idKeyMap;
         }
 
         #endregion
@@ -978,6 +1030,13 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">The identifier of the user performing the delete operation.</param>
         private void DeleteVersions(ICoreScope scope, bool wlock, int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
         {
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
+            if (keyAttempt.Success is false)
+            {
+                return;
+            }
+
+            Guid key = keyAttempt.Result;
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             if (wlock)
@@ -985,7 +1044,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(Constants.Locks.MediaTree);
             }
 
-            var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
+            var deletingVersionsNotification = new MediaDeletingVersionsNotification(key, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 return;
@@ -993,7 +1052,7 @@ namespace Umbraco.Cms.Core.Services
 
             _mediaRepository.DeleteVersions(id, versionDate);
 
-            scope.Notifications.Publish(new MediaDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(deletingVersionsNotification));
+            scope.Notifications.Publish(new MediaDeletedVersionsNotification(key, evtMsgs, dateToRetain: versionDate).WithStateFrom(deletingVersionsNotification));
             Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version date");
         }
 
@@ -1007,12 +1066,19 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
         public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
         {
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
+            if (keyAttempt.Success is false)
+            {
+                return;
+            }
+
+            Guid key = keyAttempt.Result;
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.WriteLock(Constants.Locks.MediaTree);
 
-            var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
+            var deletingVersionsNotification = new MediaDeletingVersionsNotification(key, evtMsgs, specificVersion: versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 scope.Complete();
@@ -1030,7 +1096,7 @@ namespace Umbraco.Cms.Core.Services
 
             _mediaRepository.DeleteVersion(versionId);
 
-            scope.Notifications.Publish(new MediaDeletedVersionsNotification(id, evtMsgs, specificVersion: versionId).WithStateFrom(deletingVersionsNotification));
+            scope.Notifications.Publish(new MediaDeletedVersionsNotification(key, evtMsgs, specificVersion: versionId).WithStateFrom(deletingVersionsNotification));
             Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version");
 
             scope.Complete();

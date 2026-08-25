@@ -60,9 +60,9 @@ internal abstract class ContentVersionServiceBase<TContent>
         _contentSettings = contentSettings;
     }
 
-    protected abstract DeletingVersionsNotification<TContent> DeletingVersionsNotification(int id, EventMessages messages, int specificVersion);
+    protected abstract DeletingVersionsNotification<TContent> DeletingVersionsNotification(Guid key, EventMessages messages, int specificVersion);
 
-    protected abstract DeletedVersionsNotification<TContent> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion);
+    protected abstract DeletedVersionsNotification<TContent> DeletedVersionsNotification(Guid key, EventMessages messages, int specificVersion);
 
     /// <inheritdoc />
     public IReadOnlyCollection<ContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate) =>
@@ -259,8 +259,9 @@ internal abstract class ContentVersionServiceBase<TContent>
             foreach (ContentVersionMeta version in filteredContentVersions)
             {
                 EventMessages messages = _eventMessagesFactory.Get();
+                Guid key = _entityService.GetKey(version.ContentId, ItemObjectType).Result;
 
-                if (scope.Notifications.PublishCancelable(DeletingVersionsNotification(version.ContentId, messages, version.VersionId)))
+                if (scope.Notifications.PublishCancelable(DeletingVersionsNotification(key, messages, version.VersionId)))
                 {
                     if (_logger.IsEnabled(LogLevel.Debug))
                     {
@@ -302,8 +303,9 @@ internal abstract class ContentVersionServiceBase<TContent>
                 foreach (ContentVersionMeta version in groupEnumerated)
                 {
                     EventMessages messages = _eventMessagesFactory.Get();
+                    Guid key = _entityService.GetKey(version.ContentId, ItemObjectType).Result;
 
-                    scope.Notifications.Publish(DeletedVersionsNotification(version.ContentId, messages, version.VersionId));
+                    scope.Notifications.Publish(DeletedVersionsNotification(key, messages, version.VersionId));
                 }
 
                 scope.Complete();

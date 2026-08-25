@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -12,6 +13,8 @@ namespace Umbraco.Cms.Core.Webhooks.Events;
 [WebhookEvent("Content Versions Deleted", Constants.WebhookEvents.Types.Content)]
 public class LegacyContentDeletedVersionsWebhookEvent : WebhookEventBase<ContentDeletedVersionsNotification>
 {
+    private readonly IIdKeyMap _idKeyMap;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LegacyContentDeletedVersionsWebhookEvent"/> class.
     /// </summary>
@@ -19,17 +22,20 @@ public class LegacyContentDeletedVersionsWebhookEvent : WebhookEventBase<Content
     /// <param name="webhookService">The webhook service.</param>
     /// <param name="webhookSettings">The webhook settings.</param>
     /// <param name="serverRoleAccessor">The server role accessor.</param>
+    /// <param name="idKeyMap">The ID to key mapping service.</param>
     public LegacyContentDeletedVersionsWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IServerRoleAccessor serverRoleAccessor)
+        IServerRoleAccessor serverRoleAccessor,
+        IIdKeyMap idKeyMap)
         : base(
             webhookFiringService,
             webhookService,
             webhookSettings,
             serverRoleAccessor)
     {
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -38,9 +44,11 @@ public class LegacyContentDeletedVersionsWebhookEvent : WebhookEventBase<Content
     /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification)
     {
+        Attempt<int> attempt = _idKeyMap.GetIdForKeyAsync(notification.Key, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+
         return new
         {
-            notification.Id,
+            Id = attempt.Result,
             notification.DeletePriorVersions,
             notification.SpecificVersion,
             notification.DateToRetain

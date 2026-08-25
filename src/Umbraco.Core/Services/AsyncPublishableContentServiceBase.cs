@@ -1665,13 +1665,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="cancellationToken">The cancellation token.</param>
     public async Task DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = await _idKeyMap.GetIdForKeyAsync(key, ContentObjectType);
-        if (!idAttempt.Success)
-        {
-            return;
-        }
-
-        int id = idAttempt.Result;
         int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -1679,7 +1672,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         scope.WriteLock(WriteLockIds);
 
         var deletingVersionsNotification =
-            new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
+            new ContentDeletingVersionsNotification(key, evtMsgs, dateToRetain: versionDate);
         if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
         {
             scope.Complete();
@@ -1689,7 +1682,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         await _asyncContentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
 
         scope.Notifications.Publish(
-            new ContentDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(
+            new ContentDeletedVersionsNotification(key, evtMsgs, dateToRetain: versionDate).WithStateFrom(
                 deletingVersionsNotification));
         await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
 
@@ -1707,19 +1700,12 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     /// <param name="cancellationToken">The cancellation token.</param>
     public async Task DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken)
     {
-        Attempt<int> idAttempt = await _idKeyMap.GetIdForKeyAsync(key, ContentObjectType);
-        if (!idAttempt.Success)
-        {
-            return;
-        }
-
-        int id = idAttempt.Result;
         int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(WriteLockIds);
-        var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
+        var deletingVersionsNotification = new ContentDeletingVersionsNotification(key, evtMsgs, versionId);
         if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
         {
             scope.Complete();
@@ -1742,7 +1728,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         scope.Notifications.Publish(
-            new ContentDeletedVersionsNotification(id, evtMsgs, versionId).WithStateFrom(
+            new ContentDeletedVersionsNotification(key, evtMsgs, versionId).WithStateFrom(
                 deletingVersionsNotification));
         await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
 

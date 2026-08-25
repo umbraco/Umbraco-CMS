@@ -41,9 +41,9 @@ internal sealed class ElementVersionService : ContentVersionServiceBase<IElement
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Element;
 
-    protected override DeletingVersionsNotification<IElement> DeletingVersionsNotification(int id, EventMessages messages, int specificVersion)
-        => new ElementDeletingVersionsNotification(id, messages, specificVersion);
+    protected override DeletingVersionsNotification<IElement> DeletingVersionsNotification(Guid key, EventMessages messages, int specificVersion)
+        => new ElementDeletingVersionsNotification(key, messages, specificVersion);
 
-    protected override DeletedVersionsNotification<IElement> DeletedVersionsNotification(int id, EventMessages messages, int specificVersion)
-        => new ElementDeletedVersionsNotification(id, messages, specificVersion);
+    protected override DeletedVersionsNotification<IElement> DeletedVersionsNotification(Guid key, EventMessages messages, int specificVersion)
+        => new ElementDeletedVersionsNotification(key, messages, specificVersion);
 }

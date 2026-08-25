@@ -1856,6 +1856,13 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
     public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
     {
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
+        if (keyAttempt.Success is false)
+        {
+            return;
+        }
+
+        Guid key = keyAttempt.Result;
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -1863,7 +1870,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             scope.WriteLock(WriteLockIds);
 
             var deletingVersionsNotification =
-                new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
+                new ContentDeletingVersionsNotification(key, evtMsgs, dateToRetain: versionDate);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 scope.Complete();
@@ -1873,7 +1880,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             _contentRepository.DeleteVersions(id, versionDate);
 
             scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(
+                new ContentDeletedVersionsNotification(key, evtMsgs, dateToRetain: versionDate).WithStateFrom(
                     deletingVersionsNotification));
             Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
 
@@ -1891,12 +1898,19 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
     /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
     public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
     {
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, ContentObjectType).GetAwaiter().GetResult();
+        if (keyAttempt.Success is false)
+        {
+            return;
+        }
+
+        Guid key = keyAttempt.Result;
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(WriteLockIds);
-            var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
+            var deletingVersionsNotification = new ContentDeletingVersionsNotification(key, evtMsgs, versionId);
             if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
             {
                 scope.Complete();
@@ -1919,7 +1933,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
             }
 
             scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(id, evtMsgs, versionId).WithStateFrom(
+                new ContentDeletedVersionsNotification(key, evtMsgs, versionId).WithStateFrom(
                     deletingVersionsNotification));
             Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
 

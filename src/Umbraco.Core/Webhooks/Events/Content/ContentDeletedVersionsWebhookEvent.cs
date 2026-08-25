@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -13,8 +12,6 @@ namespace Umbraco.Cms.Core.Webhooks.Events;
 [WebhookEvent("Content Versions Deleted", Constants.WebhookEvents.Types.Content)]
 public class ContentDeletedVersionsWebhookEvent : WebhookEventBase<ContentDeletedVersionsNotification>
 {
-    private readonly IIdKeyMap _idKeyMap;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentDeletedVersionsWebhookEvent"/> class.
     /// </summary>
@@ -22,36 +19,29 @@ public class ContentDeletedVersionsWebhookEvent : WebhookEventBase<ContentDelete
     /// <param name="webhookService">The webhook service.</param>
     /// <param name="webhookSettings">The webhook settings.</param>
     /// <param name="serverRoleAccessor">The server role accessor.</param>
-    /// <param name="idKeyMap">The ID to key mapping service.</param>
     public ContentDeletedVersionsWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IServerRoleAccessor serverRoleAccessor,
-        IIdKeyMap idKeyMap)
+        IServerRoleAccessor serverRoleAccessor)
         : base(
             webhookFiringService,
             webhookService,
             webhookSettings,
             serverRoleAccessor)
     {
-        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
     public override string Alias => Constants.WebhookEvents.Aliases.ContentDeletedVersions;
 
     /// <inheritdoc />
-    public override object ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification)
-    {
-        Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(notification.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
-
-        return new
+    public override object ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification) =>
+        new
         {
-            Id = attempt.Result,
+            Id = notification.Key,
             notification.DeletePriorVersions,
             notification.SpecificVersion,
             notification.DateToRetain,
         };
-    }
 }
