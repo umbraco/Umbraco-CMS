@@ -250,18 +250,6 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc />
-    public ISet<Guid> GetKeysWithChildren(UmbracoObjectTypes objectType, IEnumerable<Guid> keys)
-    {
-        Type? entityType = objectType.GetClrType();
-        GetObjectType(entityType);
-
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _entityRepository.GetKeysWithChildren(objectType.GetGuid(), keys);
-        }
-    }
-
-    /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys)
     {
         Type? entityType = ObjectTypes.GetClrType(objectType);

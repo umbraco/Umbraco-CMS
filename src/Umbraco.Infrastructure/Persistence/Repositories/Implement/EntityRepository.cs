@@ -679,35 +679,6 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
-    /// <inheritdoc />
-    public ISet<Guid> GetKeysWithChildren(Guid objectType, IEnumerable<Guid> keys)
-    {
-        const string parentAlias = "parent";
-        const string childAlias = "child";
-
-        var keysWithChildren = new HashSet<Guid>();
-
-        // Two parameters of the budget are taken by the object type predicates.
-        foreach (IEnumerable<Guid> group in keys.Distinct().InGroupsOf(Constants.Sql.MaxParameterCount - 2))
-        {
-            Sql<ISqlContext> sql = Sql()
-                .SelectDistinct<NodeDto>(parentAlias, x => x.UniqueId)
-                .From<NodeDto>(parentAlias)
-                .InnerJoin<NodeDto>(childAlias)
-                .On<NodeDto, NodeDto>(
-                    (parent, child) => parent.NodeId == child.ParentId,
-                    aliasLeft: parentAlias,
-                    aliasRight: childAlias)
-                .WhereIn<NodeDto>(x => x.UniqueId, group, parentAlias)
-                .Where<NodeDto>(x => x.NodeObjectType == objectType, parentAlias)
-                .Where<NodeDto>(x => x.NodeObjectType == objectType, childAlias);
-
-            keysWithChildren.UnionWith(Database.Fetch<Guid>(sql));
-        }
-
-        return keysWithChildren;
-    }
-
     /// <summary>
     /// Determines whether an entity with the specified identifier and object type exists in the repository.
     /// </summary>

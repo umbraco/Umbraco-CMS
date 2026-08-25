@@ -3,13 +3,13 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
@@ -20,6 +20,7 @@ public class DocumentCollectionPresentationFactoryTests
     private Mock<IPublicAccessService> _publicAccessService = null!;
     private Mock<IEntityService> _entityService = null!;
     private Mock<IUserService> _userService = null!;
+    private Mock<IDocumentNavigationQueryService> _navigationQueryService = null!;
     private DocumentCollectionPresentationFactory _factory = null!;
 
     [SetUp]
@@ -29,21 +30,19 @@ public class DocumentCollectionPresentationFactoryTests
         _publicAccessService = new Mock<IPublicAccessService>();
         _entityService = new Mock<IEntityService>();
         _userService = new Mock<IUserService>();
+        _navigationQueryService = new Mock<IDocumentNavigationQueryService>();
 
         // Default: return empty user list for any batch call
         _userService.Setup(x => x.GetUsersById(It.IsAny<int[]>()))
             .Returns(Enumerable.Empty<IUser>());
-
-        // Default: no items have children
-        _entityService.Setup(x => x.GetKeysWithChildren(It.IsAny<UmbracoObjectTypes>(), It.IsAny<IEnumerable<Guid>>()))
-            .Returns(new HashSet<Guid>());
 
         _factory = new DocumentCollectionPresentationFactory(
             _mapper.Object,
             new FlagProviderCollection(() => Enumerable.Empty<IFlagProvider>()),
             _publicAccessService.Object,
             _entityService.Object,
-            _userService.Object);
+            _userService.Object,
+            _navigationQueryService.Object);
     }
 
     [Test]
@@ -327,7 +326,7 @@ public class DocumentCollectionPresentationFactoryTests
     }
 
     [Test]
-    public async Task Can_Flag_Collection_Items_That_Have_Children()
+    public async Task PopulateHasChildren_Flags_Items_That_Have_Children()
     {
         // Arrange - a mixed set, so that flagging all or none is visibly wrong.
         var contentKey1 = Guid.NewGuid();
@@ -336,8 +335,9 @@ public class DocumentCollectionPresentationFactoryTests
 
         ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey1, contentKey2, contentKey3);
 
-        _entityService.Setup(x => x.GetKeysWithChildren(It.IsAny<UmbracoObjectTypes>(), It.IsAny<IEnumerable<Guid>>()))
-            .Returns(new HashSet<Guid> { contentKey1, contentKey3 });
+        SetupHasChildren(contentKey1, true);
+        SetupHasChildren(contentKey2, false);
+        SetupHasChildren(contentKey3, true);
 
         // Act
         List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
@@ -349,39 +349,73 @@ public class DocumentCollectionPresentationFactoryTests
     }
 
     [Test]
-    public async Task Can_Resolve_Has_Children_In_A_Single_Batched_Call()
+    public async Task PopulateHasChildren_Flags_Trashed_Items_From_Recycle_Bin_Structure()
     {
-        var contentKey1 = Guid.NewGuid();
-        var contentKey2 = Guid.NewGuid();
-        var contentKey3 = Guid.NewGuid();
+        // Trashed items are removed from the main navigation structure, so the recycle bin structure
+        // has to be consulted for them.
+        var contentKey = Guid.NewGuid();
 
-        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey1, contentKey2, contentKey3);
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey);
 
-        await _factory.CreateCollectionModelAsync(contentCollection);
+        SetupHasChildren(contentKey, hasChildren: false, inStructure: false);
+        _navigationQueryService
+            .Setup(x => x.TryGetHasChildrenInBin(contentKey, out It.Ref<bool>.IsAny))
+            .Returns((Guid _, out bool hasChildren) =>
+            {
+                hasChildren = true;
+                return true;
+            });
 
-        // One call, carrying exactly the keys of the items being populated - no more, no less.
-        _entityService.Verify(
-            x => x.GetKeysWithChildren(
-                It.IsAny<UmbracoObjectTypes>(),
-                It.Is<IEnumerable<Guid>>(keys =>
-                    keys.Count() == 3
-                    && keys.Contains(contentKey1)
-                    && keys.Contains(contentKey2)
-                    && keys.Contains(contentKey3))),
-            Times.Once);
+        List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
+
+        Assert.IsTrue(result[0].HasChildren);
     }
 
     [Test]
-    public async Task Can_Query_Has_Children_With_The_Document_Object_Type()
+    public async Task PopulateHasChildren_Handles_Items_Missing_From_Both_Structures()
     {
-        ListViewPagedModel<IContent> contentCollection = SetupCollection(Guid.NewGuid());
+        var contentKey = Guid.NewGuid();
+
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey);
+
+        SetupHasChildren(contentKey, hasChildren: false, inStructure: false);
+        _navigationQueryService
+            .Setup(x => x.TryGetHasChildrenInBin(contentKey, out It.Ref<bool>.IsAny))
+            .Returns((Guid _, out bool hasChildren) =>
+            {
+                hasChildren = false;
+                return false;
+            });
+
+        List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
+
+        Assert.IsFalse(result[0].HasChildren);
+    }
+
+    [Test]
+    public async Task PopulateHasChildren_Skips_Recycle_Bin_For_Items_In_Main_Structure()
+    {
+        var contentKey = Guid.NewGuid();
+
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey);
+
+        SetupHasChildren(contentKey, hasChildren: false);
 
         await _factory.CreateCollectionModelAsync(contentCollection);
 
-        _entityService.Verify(
-            x => x.GetKeysWithChildren(UmbracoObjectTypes.Document, It.IsAny<IEnumerable<Guid>>()),
-            Times.Once);
+        _navigationQueryService.Verify(
+            x => x.TryGetHasChildrenInBin(It.IsAny<Guid>(), out It.Ref<bool>.IsAny),
+            Times.Never);
     }
+
+    private void SetupHasChildren(Guid key, bool hasChildren, bool inStructure = true)
+        => _navigationQueryService
+            .Setup(x => x.TryGetHasChildren(key, out It.Ref<bool>.IsAny))
+            .Returns((Guid _, out bool result) =>
+            {
+                result = hasChildren;
+                return inStructure;
+            });
 
     private ListViewPagedModel<IContent> SetupCollection(params Guid[] keys)
     {

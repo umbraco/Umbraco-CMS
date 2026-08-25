@@ -155,37 +155,6 @@ public interface IEntityService
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
 
     /// <summary>
-    ///     Gets the subset of the supplied entity keys that are of the given object type and have at least one
-    ///     child of that same object type.
-    /// </summary>
-    /// <param name="objectType">The object type, applied to both the supplied entities and their children.</param>
-    /// <param name="keys">The unique identifiers of the entities to test.</param>
-    /// <returns>
-    ///     The keys that have at least one child. Keys that do not exist, or that identify an entity of a different
-    ///     object type, are omitted.
-    /// </returns>
-    /// <remarks>
-    ///     Children are counted regardless of their published state and regardless of the requesting user's
-    ///     permissions, consistent with <see cref="IEntitySlim.HasChildren" />.
-    /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    ISet<Guid> GetKeysWithChildren(UmbracoObjectTypes objectType, IEnumerable<Guid> keys)
-    {
-        Guid[] distinctKeys = keys.Distinct().ToArray();
-
-        // GetAll treats an empty key array as "return everything", so the empty case cannot reach it.
-        if (distinctKeys.Length == 0)
-        {
-            return new HashSet<Guid>();
-        }
-
-        return GetAll(objectType, distinctKeys)
-            .Where(entity => entity.HasChildren)
-            .Select(entity => entity.Key)
-            .ToHashSet();
-    }
-
-    /// <summary>
     ///     Gets entities at root.
     /// </summary>
     /// <param name="objectType">The object type of the entities.</param>
