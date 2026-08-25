@@ -100,6 +100,21 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 	@state()
 	private _actionExtensions: Array<UmbMarkdownEditorAction> = [];
 
+	@state()
+	private _isSticky = false;
+
+	@query('#toolbar')
+	private _toolbarElement?: HTMLElement;
+
+	// Detects the toolbar sticking by watching it drop below full visibility,
+	// regardless of which ancestor is the one actually scrolling.
+	#scrollObserver = new IntersectionObserver(
+		([entry]) => {
+			this._isSticky = entry.intersectionRatio < 1;
+		},
+		{ threshold: 1 },
+	);
+
 	#mediaUrlRepository = new UmbMediaUrlRepository(this);
 
 	constructor() {
@@ -110,6 +125,25 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
 			() => !this.readonly && !!this.required && (this.value === undefined || this.value === null || this.value === ''),
 		);
+	}
+
+	protected override firstUpdated() {
+		if (this._toolbarElement) this.#scrollObserver.observe(this._toolbarElement);
+	}
+
+	protected override updated(changedProperties: Map<string, unknown>) {
+		super.updated(changedProperties);
+		if (changedProperties.has('readonly')) {
+			this.#scrollObserver.disconnect();
+			if (!this.readonly && this._toolbarElement) {
+				this.#scrollObserver.observe(this._toolbarElement);
+			}
+		}
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#scrollObserver.disconnect();
 	}
 
 	#onCodeEditorLoaded(event: UmbCodeEditorLoadedEvent) {
@@ -493,7 +527,7 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 	#renderToolbar() {
 		if (this.readonly) return nothing;
 		return html`
-			<div id="toolbar">
+			<div id="toolbar" ?data-sticky=${this._isSticky}>
 				<div id="buttons">
 					<uui-button-group>
 						<uui-button
@@ -634,12 +668,8 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 
 				border-radius: var(--uui-border-radius);
 				border: 1px solid var(--uui-color-border);
-				border-bottom: 0;
 				border-bottom-left-radius: 0;
 				border-bottom-right-radius: 0;
-				box-shadow:
-					0 2px 2px -2px rgba(34, 47, 62, 0.1),
-					0 8px 8px -4px rgba(34, 47, 62, 0.07);
 
 				background-color: var(--uui-color-surface);
 				color: var(--color-text);
@@ -654,6 +684,12 @@ export class UmbInputMarkdownElement extends UmbFormControlMixin<string, typeof 
 				uui-key {
 					text-transform: uppercase;
 				}
+			}
+
+			#toolbar[data-sticky] {
+				box-shadow:
+					0 2px 2px -2px rgba(34, 47, 62, 0.1),
+					0 8px 8px -4px rgba(34, 47, 62, 0.07);
 			}
 
 			#buttons {
