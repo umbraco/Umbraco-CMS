@@ -17,7 +17,6 @@ public sealed class SchemaLockdownRules : ISchemaLockdownRules
             x => HashCode.Combine(StringComparer.OrdinalIgnoreCase.GetHashCode(x.EntityType), x.Operation));
 
     private readonly Dictionary<(string EntityType, SchemaOperation Operation), bool> _cells = new(CellKeyComparer);
-    private readonly string[] _governedEntityTypes;
     private readonly bool _frozen;
 
     /// <summary>
@@ -32,15 +31,13 @@ public sealed class SchemaLockdownRules : ISchemaLockdownRules
         }
 
         _frozen = true;
-
-        _governedEntityTypes = _cells.Keys
-            .Select(cell => cell.EntityType)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
     }
 
     /// <inheritdoc />
-    public IReadOnlyCollection<string> GovernedEntityTypes => _governedEntityTypes;
+    public IReadOnlyCollection<string> GovernedEntityTypes => _cells.Keys
+        .Select(cell => cell.EntityType)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToArray();
 
     /// <inheritdoc />
     public void Allow(string entityType, SchemaOperation operation) => Set(entityType, operation, true);

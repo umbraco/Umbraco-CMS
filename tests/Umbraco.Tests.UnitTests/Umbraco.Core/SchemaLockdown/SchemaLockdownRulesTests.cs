@@ -163,6 +163,18 @@ public class SchemaLockdownRulesTests
     }
 
     [Test]
+    public void Governed_Entity_Types_Are_Visible_To_A_Configurator_Still_Running()
+    {
+        string[]? seen = null;
+
+        CreateRules(
+            x => x.BlockMutations(Constants.UdiEntityType.DocumentType),
+            x => seen = x.GovernedEntityTypes.ToArray());
+
+        Assert.That(seen, Is.EquivalentTo(new[] { Constants.UdiEntityType.DocumentType }));
+    }
+
+    [Test]
     public void Mutating_After_Construction_Throws()
     {
         SchemaLockdownRules rules = CreateRules(x => x.BlockMutations(Constants.UdiEntityType.DocumentType));
