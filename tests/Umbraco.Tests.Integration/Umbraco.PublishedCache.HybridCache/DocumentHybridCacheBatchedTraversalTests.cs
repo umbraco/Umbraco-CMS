@@ -244,8 +244,7 @@ internal sealed class DocumentHybridCacheBatchedTraversalTests : UmbracoIntegrat
         public void Rebuild(
             IReadOnlyCollection<int>? contentTypeIds,
             IReadOnlyCollection<int>? mediaTypeIds,
-            IReadOnlyCollection<int>? memberTypeIds,
             Action<Action>? executeStep)
-            => _inner.Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds, executeStep);
+            => _inner.Rebuild(contentTypeIds, mediaTypeIds, executeStep);
     }
 }
