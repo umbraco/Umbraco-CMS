@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentType)]
 [ApiExplorerSettings(GroupName = "Document Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
-[EntityType(Constants.UdiEntityType.DocumentType)]
+[SchemaEntityType(Constants.UdiEntityType.DocumentType)]
 public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)

@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MediaType}/folder")]
 [ApiExplorerSettings(GroupName = "Media Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
-[EntityType(Constants.UdiEntityType.MediaType)]
+[SchemaEntityType(Constants.UdiEntityType.MediaType)]
 public abstract class MediaTypeFolderControllerBase : FolderManagementControllerBase<IMediaType>
 {
     protected MediaTypeFolderControllerBase(

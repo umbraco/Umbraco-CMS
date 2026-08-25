@@ -14,13 +14,13 @@ namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 /// never by this attribute.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class, Inherited = true)]
-public sealed class EntityTypeAttribute : Attribute, IAuthorizationRequirementData, IAuthorizationRequirement
+public sealed class SchemaEntityTypeAttribute : Attribute, IAuthorizationRequirementData, IAuthorizationRequirement
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="EntityTypeAttribute"/> class.
+    /// Initializes a new instance of the <see cref="SchemaEntityTypeAttribute"/> class.
     /// </summary>
     /// <param name="entityType">The entity type the controller manages.</param>
-    public EntityTypeAttribute(string entityType)
+    public SchemaEntityTypeAttribute(string entityType)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(entityType);
         EntityType = entityType;

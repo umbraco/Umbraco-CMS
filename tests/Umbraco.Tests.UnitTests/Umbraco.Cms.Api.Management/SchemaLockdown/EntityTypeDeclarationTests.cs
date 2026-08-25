@@ -5,17 +5,17 @@ using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.SchemaLockdown;
 
-// [EntityType] carries a free-form string, so a value that names no governed entity type still compiles and simply
+// [SchemaEntityType] carries a free-form string, so a value that names no governed entity type still compiles and simply
 // never matches the decision table - the controller would look governed and be silently exempt. These tests are what
 // makes that mismatch fail, in both directions, and they read the Management API assembly rather than the current
-// AppDomain so no test fixture's own [EntityType] declaration can stand in for a real controller.
+// AppDomain so no test fixture's own [SchemaEntityType] declaration can stand in for a real controller.
 [TestFixture]
 public class EntityTypeDeclarationTests
 {
     private static readonly (Type Controller, string EntityType)[] Declarations =
-        typeof(EntityTypeAttribute).Assembly
+        typeof(SchemaEntityTypeAttribute).Assembly
             .GetTypes()
-            .Select(type => (Controller: type, Attribute: type.GetCustomAttribute<EntityTypeAttribute>(inherit: false)))
+            .Select(type => (Controller: type, Attribute: type.GetCustomAttribute<SchemaEntityTypeAttribute>(inherit: false)))
             .Where(declaration => declaration.Attribute is not null)
             .Select(declaration => (declaration.Controller, declaration.Attribute!.EntityType))
             .ToArray();

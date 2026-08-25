@@ -12,9 +12,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.SchemaLockdown;
 public class GovernedControllerAnonymousAccessTests
 {
     private static readonly Type[] GovernedControllers =
-        typeof(EntityTypeAttribute).Assembly
+        typeof(SchemaEntityTypeAttribute).Assembly
             .GetTypes()
-            .Where(type => type.GetCustomAttribute<EntityTypeAttribute>(inherit: true) is not null)
+            .Where(type => type.GetCustomAttribute<SchemaEntityTypeAttribute>(inherit: true) is not null)
             .ToArray();
 
     // The scan reads the Management API assembly, so these exercise the detector on both declaration sites without

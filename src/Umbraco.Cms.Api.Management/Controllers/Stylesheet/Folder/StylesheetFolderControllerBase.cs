@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Stylesheet}/folder")]
 [ApiExplorerSettings(GroupName = "Stylesheet")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]
-[EntityType(Constants.UdiEntityType.Stylesheet)]
+[SchemaEntityType(Constants.UdiEntityType.Stylesheet)]
 public class StylesheetFolderControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult OperationStatusResult(StylesheetFolderOperationStatus status) =>

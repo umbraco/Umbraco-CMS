@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberType}/folder")]
 [ApiExplorerSettings(GroupName = "Member Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
-[EntityType(Constants.UdiEntityType.MemberType)]
+[SchemaEntityType(Constants.UdiEntityType.MemberType)]
 public abstract class MemberTypeFolderControllerBase : FolderManagementControllerBase<IMemberType>
 {
     protected MemberTypeFolderControllerBase(

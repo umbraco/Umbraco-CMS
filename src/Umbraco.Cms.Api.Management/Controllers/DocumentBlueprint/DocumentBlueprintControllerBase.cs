@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 /// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentBlueprint)]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
-[EntityType(Constants.UdiEntityType.DocumentBlueprint)]
+[SchemaEntityType(Constants.UdiEntityType.DocumentBlueprint)]
 public abstract class DocumentBlueprintControllerBase : ContentControllerBase
 {
     protected IActionResult DocumentBlueprintNotFound()

@@ -7,9 +7,9 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.SchemaLockdown;
 
 [TestFixture]
-public class EntityTypeAttributeTests
+public class SchemaEntityTypeAttributeTests
 {
-    [EntityType(Constants.UdiEntityType.MediaType)]
+    [SchemaEntityType(Constants.UdiEntityType.MediaType)]
     private class ControllerBaseWithDeclaration
     {
     }
@@ -23,13 +23,13 @@ public class EntityTypeAttributeTests
     [Test]
     public void Declaration_On_A_Base_Controller_Is_Inherited()
         => Assert.That(
-            typeof(ControllerWithoutOwnDeclaration).GetCustomAttribute<EntityTypeAttribute>(inherit: true)?.EntityType,
+            typeof(ControllerWithoutOwnDeclaration).GetCustomAttribute<SchemaEntityTypeAttribute>(inherit: true)?.EntityType,
             Is.EqualTo(Constants.UdiEntityType.MediaType));
 
     [Test]
     public void Yields_Itself_As_The_Single_Requirement()
     {
-        var attribute = new EntityTypeAttribute(Constants.UdiEntityType.DocumentType);
+        var attribute = new SchemaEntityTypeAttribute(Constants.UdiEntityType.DocumentType);
 
         IAuthorizationRequirement[] requirements = attribute.GetRequirements().ToArray();
 
@@ -42,6 +42,6 @@ public class EntityTypeAttributeTests
     [Test]
     public void Is_Authorization_Requirement_Data()
         => Assert.That(
-            new EntityTypeAttribute(Constants.UdiEntityType.DocumentType),
+            new SchemaEntityTypeAttribute(Constants.UdiEntityType.DocumentType),
             Is.InstanceOf<IAuthorizationRequirementData>());
 }

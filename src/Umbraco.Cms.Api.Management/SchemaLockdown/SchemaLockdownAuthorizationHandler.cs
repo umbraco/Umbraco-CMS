@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 /// <summary>
 ///     Authorizes that the schema lockdown rules permit the requested change to schema.
 /// </summary>
-internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequirementAuthorizationHandler<EntityTypeAttribute>
+internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequirementAuthorizationHandler<SchemaEntityTypeAttribute>
 {
     private readonly IReadOnlySchemaLockdownRules _rules;
     private readonly IRuntimeState _runtimeState;
@@ -32,7 +32,7 @@ internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequiremen
     }
 
     /// <inheritdoc />
-    protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, EntityTypeAttribute requirement)
+    protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, SchemaEntityTypeAttribute requirement)
     {
         // Authorization runs ahead of every MVC filter, so a runtime that is not serving requests normally has to be
         // left to the parts of the pipeline that answer for it - denying here would mask their response.
