@@ -148,6 +148,9 @@ internal static class ContentTypeFactory
     /// <returns>An enumerable of <see cref="MemberPropertyTypeDto"/> for each property type on the member type, or an empty collection if none exist.</returns>
     public static IEnumerable<MemberPropertyTypeDto> BuildMemberPropertyTypeDtos(IMemberType entity)
     {
+        // MemberCanEditProperty/MemberCanViewProperty/IsSensitiveProperty are only exposed on the
+        // concrete MemberType class, not on IMemberType, so a non-MemberType implementation has no
+        // member-specific metadata to persist.
         if (entity is not MemberType memberType || memberType.PropertyTypes.Any() == false)
         {
             return Enumerable.Empty<MemberPropertyTypeDto>();

@@ -119,8 +119,6 @@ internal sealed class MemberTypeRepository : AsyncContentTypeRepositoryBase<IMem
         EnsureExplicitDataTypeForBuiltInProperties(entity);
         await PersistUpdatedBaseContentTypeAsync(entity);
 
-        // remove and re-insert - handle the cmsMemberType table
-        await ExecuteEfScopeAsync(db => db.MemberPropertyTypes.Where(x => x.NodeId == entity.Id).ExecuteDeleteAsync());
         await PersistMemberPropertyTypesAsync(entity);
 
         entity.ResetDirtyProperties();
@@ -133,6 +131,9 @@ internal sealed class MemberTypeRepository : AsyncContentTypeRepositoryBase<IMem
     private Task PersistMemberPropertyTypesAsync(IMemberType entity)
         => ExecuteEfScopeAsync(async db =>
         {
+            // remove and re-insert - ExecuteDeleteAsync is set-based and bypasses the change tracker.
+            await db.MemberPropertyTypes.Where(x => x.NodeId == entity.Id).ExecuteDeleteAsync();
+
             foreach (MemberPropertyTypeDto memberPropertyTypeDto in ContentTypeFactory.BuildMemberPropertyTypeDtos(entity))
             {
                 db.MemberPropertyTypes.Add(memberPropertyTypeDto);

@@ -278,6 +278,30 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Persist_Member_Type_Property_Metadata()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+
+            var memberType = (MemberType)MemberTypeBuilder.CreateSimpleMemberType();
+            memberType.SetMemberCanEditProperty("title", true);
+            memberType.SetMemberCanViewProperty("title", false);
+            memberType.SetIsSensitiveProperty("title", true);
+
+            repository.Save(memberType);
+            scope.Complete();
+
+            var sut = (MemberType)repository.Get(memberType.Id);
+
+            Assert.That(sut.MemberCanEditProperty("title"), Is.True);
+            Assert.That(sut.MemberCanViewProperty("title"), Is.False);
+            Assert.That(sut.IsSensitiveProperty("title"), Is.True);
+        }
+    }
+
+    [Test]
     public void Can_Delete_MemberType()
     {
         // Arrange
