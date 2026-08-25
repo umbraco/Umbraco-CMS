@@ -198,7 +198,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		}
 
 		if (_changedProperties.has('isDrillable')) {
-			this._api!.enableDrill?.(this.isDrillable ?? false);
+			this._api!.setDrillable?.(this.isDrillable ?? false);
 		}
 
 		if (_changedProperties.has('isMenu')) {

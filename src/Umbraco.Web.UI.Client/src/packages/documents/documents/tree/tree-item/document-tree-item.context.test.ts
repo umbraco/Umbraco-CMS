@@ -122,7 +122,7 @@ describe('UmbDocumentTreeItemContext', () => {
 		beforeEach(async () => {
 			// A picker is not a menu, but it does drill into opened items — which is what makes drilling into a collection
 			// possible at all.
-			treeContext.enableDrill(true);
+			treeContext.setDrillable(true);
 			context.setTreeItem(createTreeItem(true));
 			await aTimeout(0);
 		});
@@ -229,7 +229,7 @@ describe('UmbDocumentTreeItemContext', () => {
 
 		it('expands its children in a picker instead of emitting the open event', async () => {
 			// Declared browsable, so it is the no-access rule being tested and not the absence of a browsing host.
-			treeContext.enableDrill(true);
+			treeContext.setDrillable(true);
 			context.setTreeItem(createTreeItem(true, { noAccess: true }));
 			await aTimeout(0);
 

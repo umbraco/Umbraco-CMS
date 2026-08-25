@@ -74,7 +74,7 @@ export interface UmbTreeContext<
 	setIsMenu?(value: boolean): void;
 	getIsMenu?(): boolean;
 
-	enableDrill?(value: boolean): void;
+	setDrillable?(value: boolean): void;
 	getIsDrillable?(): boolean;
 
 	setStartNode(startNode: UmbTreeStartNode | undefined): void;

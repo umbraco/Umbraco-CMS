@@ -286,7 +286,7 @@ export class UmbDefaultTreeContext<
 	 * @param {boolean} value - True when the host acts on `UmbTreeItemOpenEvent`.
 	 * @memberof UmbDefaultTreeContext
 	 */
-	enableDrill(value: boolean) {
+	setDrillable(value: boolean) {
 		this.#isDrillable.setValue(value);
 	}
 
