@@ -314,6 +314,8 @@ export default {
 		isSensitiveValue:
 			'Dieser Wert ist verborgen.\n      Wenn Sie diesen Wert einsehen müssen, wenden Sie sich bitte an einen Administrator.\n    ',
 		isSensitiveValue_short: 'Dieser Wert ist verborgen.',
+		isSensitiveValueNotice:
+			'Wenn Sie die verborgenen Werte einsehen müssen, wenden Sie sich bitte an einen Administrator.',
 		languagesToPublish: 'Welche Sprache möchten Sie veröffentlichen?',
 		languagesToSendForApproval: 'Welche Sprachen möchten Sie zur Freigabe schicken?',
 		languagesToSchedule: 'Welche Sprachen möchten Sie zu einer bestimmten Zeit veröffentlichen?',
