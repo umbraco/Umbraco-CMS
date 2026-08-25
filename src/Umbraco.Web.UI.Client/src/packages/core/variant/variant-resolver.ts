@@ -134,7 +134,7 @@ export class UmbVariantResolver<VariantType extends UmbVariantLike = UmbVariantL
 		const displayCulture = this.#displayCulture.getValue();
 		const fallbackCulture = this.#fallbackCulture.getValue();
 
-		this.#variant.setValue(variants.find((variant) => variant.culture === displayCulture));
-		this.#fallbackVariant.setValue(variants.find((variant) => variant.culture === fallbackCulture));
+		this.#variant.setValue(variants.find((variant) => variant.culture === displayCulture && !variant.segment));
+		this.#fallbackVariant.setValue(variants.find((variant) => variant.culture === fallbackCulture && !variant.segment));
 	}
 }
