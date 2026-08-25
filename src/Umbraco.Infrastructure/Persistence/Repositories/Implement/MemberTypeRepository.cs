@@ -1,45 +1,36 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Factories.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
-using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IMemberType" />
 /// </summary>
-internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
+/// <remarks>
+///     The shared content-type-composition logic lives in <see cref="AsyncContentTypeRepositoryBase{TEntity}"/>;
+///     this class only supplies the member-type specifics: the node object type, the built-in standard properties,
+///     and the member-only property metadata (<see cref="MemberPropertyTypeDto"/>) persistence.
+/// </remarks>
+internal sealed class MemberTypeRepository : AsyncContentTypeRepositoryBase<IMemberType>, IMemberTypeRepository
 {
     private readonly IShortStringHelper _shortStringHelper;
-    private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
-    private readonly ICacheSyncService _cacheSyncService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MemberTypeRepository"/> class,
-    /// which is responsible for managing member type persistence in the Umbraco CMS.
+    /// Initializes a new instance of the <see cref="MemberTypeRepository"/> class.
     /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
-    /// <param name="cache">The application-level caches used for optimizing repository operations.</param>
-    /// <param name="logger">The logger used for logging repository activity and errors.</param>
-    /// <param name="commonRepository">A repository for common content type operations shared across repositories.</param>
-    /// <param name="languageRepository">Repository for accessing language information.</param>
-    /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
-    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
-    /// <param name="idKeyMap">Maps between integer IDs and GUID keys for entities.</param>
-    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public MemberTypeRepository(
-        IScopeAccessor scopeAccessor,
         AppCaches cache,
         ILogger<MemberTypeRepository> logger,
         IContentTypeCommonRepository commonRepository,
@@ -47,107 +38,29 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
         IShortStringHelper shortStringHelper,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         IIdKeyMap idKeyMap,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IEFCoreScopeAccessor<UmbracoDbContext> efCoreScopeAccessor)
         : base(
-            scopeAccessor,
             cache,
             logger,
             commonRepository,
             languageRepository,
-            shortStringHelper,
             repositoryCacheVersionService,
             idKeyMap,
-            cacheSyncService)
+            cacheSyncService,
+            efCoreScopeAccessor)
     {
         _shortStringHelper = shortStringHelper;
-        _repositoryCacheVersionService = repositoryCacheVersionService;
-        _cacheSyncService = cacheSyncService;
     }
 
-    protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;
-
+    /// <inheritdoc />
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberType;
 
-    protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IMemberType, int>(GlobalIsolatedCache, ScopeAccessor,  _repositoryCacheVersionService, _cacheSyncService, GetEntityId, /*expires:*/ true);
+    /// <inheritdoc />
+    protected override bool SupportsPublishing => MemberType.SupportsPublishingConst;
 
-    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
-    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
-    // internally and clones only the matched entity. This override exists only as a required
-    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
-    protected override IMemberType? PerformGet(int id)
-        => GetMany().FirstOrDefault(x => x.Id == id);
-
-    protected override IEnumerable<IMemberType>? GetAllWithFullCachePolicy() =>
-        CommonRepository.GetAllTypesAsync().GetAwaiter().GetResult()?.OfType<IMemberType>();
-
-    protected override IEnumerable<IMemberType> PerformGetByQuery(IQuery<IMemberType> query)
-    {
-        Sql<ISqlContext> subQuery = GetSubquery();
-        var translator = new SqlTranslator<IMemberType>(subQuery, query);
-        Sql<ISqlContext> subSql = translator.Translate();
-        Sql<ISqlContext> sql = GetBaseQuery(false)
-            .WhereIn<NodeDto>(x => x.NodeId, subSql)
-            .OrderBy<NodeDto>(x => x.SortOrder);
-        var ids = Database.Fetch<int>(sql).Distinct().ToArray();
-
-        return ids.Length > 0 ? GetMany(ids).OrderBy(x => x.Name) : Enumerable.Empty<IMemberType>();
-    }
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-    {
-        if (isCount)
-        {
-            return Sql()
-                .SelectCount()
-                .From<NodeDto>()
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-        }
-
-        Sql<ISqlContext> sql = Sql()
-            .Select<NodeDto>(x => x.NodeId)
-            .From<NodeDto>()
-            .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-            .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
-            .LeftJoin<MemberPropertyTypeDto>()
-            .On<MemberPropertyTypeDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-            .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.NodeId, right => right.DataTypeId)
-            .LeftJoin<PropertyTypeGroupDto>()
-            .On<PropertyTypeGroupDto, NodeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-
-        return sql;
-    }
-
-    private Sql<ISqlContext> GetSubquery()
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Select($"DISTINCT({QuoteTableName("umbracoNode")}.id)")
-            .From<NodeDto>()
-            .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-            .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, NodeDto>(left => left.ContentTypeId, right => right.NodeId)
-            .LeftJoin<MemberPropertyTypeDto>()
-            .On<MemberPropertyTypeDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-            .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.NodeId, right => right.DataTypeId)
-            .LeftJoin<PropertyTypeGroupDto>()
-            .On<PropertyTypeGroupDto, NodeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-        return sql;
-    }
-
-    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Node)}.id = @id";
-
-    protected override IEnumerable<string> GetDeleteClauses()
-    {
-        var l = (List<string>)base.GetDeleteClauses(); // we know it's a list
-        l.Add($"DELETE FROM {QuoteTableName(MemberPropertyTypeDto.TableName)} WHERE {QuoteColumnName(MemberPropertyTypeDto.NodeIdColumnName)} = @id");
-        l.Add($"DELETE FROM {QuoteTableName(ContentTypeDto.TableName)} WHERE {QuoteColumnName(ContentTypeDto.NodeIdColumnName)} = @id");
-        l.Add($"DELETE FROM {QuoteTableName(NodeDto.TableName)} WHERE id = @id");
-        return l;
-    }
-
-    protected override void PersistNewItem(IMemberType entity)
+    /// <inheritdoc />
+    protected override async Task PersistNewItemAsync(IMemberType entity)
     {
         ValidateAlias(entity);
 
@@ -171,77 +84,67 @@ internal sealed class MemberTypeRepository : ContentTypeRepositoryBase<IMemberTy
         }
 
         EnsureExplicitDataTypeForBuiltInProperties(entity);
-        PersistNewBaseContentType(entity);
+        await PersistNewBaseContentTypeAsync(entity);
 
-        // Handles the MemberTypeDto (cmsMemberType table)
-        IEnumerable<MemberPropertyTypeDto> memberTypeDtos = ContentTypeFactory.BuildMemberPropertyTypeDtos(entity);
-        foreach (MemberPropertyTypeDto memberTypeDto in memberTypeDtos)
-        {
-            Database.Insert(memberTypeDto);
-        }
+        await PersistMemberPropertyTypesAsync(entity);
 
         entity.ResetDirtyProperties();
     }
 
-    protected override void PersistUpdatedItem(IMemberType entity)
+    /// <inheritdoc />
+    protected override async Task PersistUpdatedItemAsync(IMemberType entity)
     {
         ValidateAlias(entity);
 
         // Updates Modified date
         entity.UpdatingEntity();
 
-        Sql<ISqlContext> sql;
         // Look up parent to get and set the correct Path if ParentId has changed
         if (entity.IsPropertyDirty("ParentId"))
         {
-            NodeDto? parent = Database.First<NodeDto>("WHERE id = @ParentId", new { entity.ParentId });
+            var parent = await ExecuteEfScopeAsync(db => db.Nodes
+                .Where(x => x.NodeId == entity.ParentId)
+                .Select(x => new { x.Path, x.Level })
+                .FirstAsync());
             entity.Path = string.Concat(parent.Path, ",", entity.Id);
             entity.Level = parent.Level + 1;
-            sql = Sql()
-                .SelectMax<NodeDto>(c => c.SortOrder, 0)
-                .From<NodeDto>()
-                .Where<NodeDto>(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId);
-            var maxSortOrder = Database.ExecuteScalar<int>(sql);
+
+            var maxSortOrder = await ExecuteEfScopeAsync(db => db.Nodes
+                .Where(x => x.ParentId == entity.ParentId && x.NodeObjectType == NodeObjectTypeId)
+                .Select(x => (int?)x.SortOrder)
+                .MaxAsync()) ?? 0;
             entity.SortOrder = maxSortOrder + 1;
         }
 
         EnsureExplicitDataTypeForBuiltInProperties(entity);
-        PersistUpdatedBaseContentType(entity);
+        await PersistUpdatedBaseContentTypeAsync(entity);
 
-        // remove and insert - handle cmsMemberType table
-        sql = Sql().Delete<MemberPropertyTypeDto>(c => c.NodeId == entity.Id);
-        _ = Database.Execute(sql);
-        IEnumerable<MemberPropertyTypeDto> memberTypeDtos = ContentTypeFactory.BuildMemberPropertyTypeDtos(entity);
-        foreach (MemberPropertyTypeDto memberTypeDto in memberTypeDtos)
-        {
-            Database.Insert(memberTypeDto);
-        }
+        // remove and re-insert - handle the cmsMemberType table
+        await ExecuteEfScopeAsync(db => db.MemberPropertyTypes.Where(x => x.NodeId == entity.Id).ExecuteDeleteAsync());
+        await PersistMemberPropertyTypesAsync(entity);
 
         entity.ResetDirtyProperties();
     }
 
-    /// <summary>
-    ///     Override so we can specify explicit db type's on any property types that are built-in.
-    /// </summary>
-    /// <param name="propertyEditorAlias"></param>
-    /// <param name="storageType"></param>
-    /// <param name="propertyTypeAlias"></param>
-    /// <returns></returns>
-    protected override PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType, string propertyTypeAlias)
-    {
-        // custom property type constructor logic to set explicit dbtype's for built in properties
-        Dictionary<string, PropertyType> builtinProperties =
-            ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
-        var readonlyStorageType = builtinProperties.TryGetValue(propertyTypeAlias, out PropertyType? propertyType);
-        storageType = readonlyStorageType ? propertyType!.ValueStorageType : storageType;
-        return new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, readonlyStorageType, propertyTypeAlias);
-    }
+    /// <inheritdoc />
+    protected override Task DeleteContentTypeSpecificDefinitionTablesAsync(UmbracoDbContext db, int id)
+        => db.MemberPropertyTypes.Where(x => x.NodeId == id).ExecuteDeleteAsync();
+
+    private Task PersistMemberPropertyTypesAsync(IMemberType entity)
+        => ExecuteEfScopeAsync(async db =>
+        {
+            foreach (MemberPropertyTypeDto memberPropertyTypeDto in ContentTypeFactory.BuildMemberPropertyTypeDtos(entity))
+            {
+                db.MemberPropertyTypes.Add(memberPropertyTypeDto);
+            }
+
+            await db.SaveChangesAsync();
+        });
 
     /// <summary>
     ///     Ensure that all the built-in membership provider properties have their correct data type
     ///     and property editors assigned. This occurs prior to saving so that the correct values are persisted.
     /// </summary>
-    /// <param name="memberType"></param>
     private void EnsureExplicitDataTypeForBuiltInProperties(IContentTypeBase memberType)
     {
         Dictionary<string, PropertyType> builtinProperties =

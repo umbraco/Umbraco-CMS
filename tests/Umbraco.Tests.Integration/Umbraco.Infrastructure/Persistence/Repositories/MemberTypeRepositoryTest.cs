@@ -11,6 +11,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -27,7 +29,8 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     {
         var commonRepository = GetRequiredService<IContentTypeCommonRepository>();
         var languageRepository = GetRequiredService<ILanguageRepository>();
-        return new MemberTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
+        var efCoreScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        return new MemberTypeRepository(AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>(), efCoreScopeAccessor);
     }
 
     [Test]
