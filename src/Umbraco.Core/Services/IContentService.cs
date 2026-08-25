@@ -365,19 +365,21 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Deletes versions of a document prior to a given date.
     /// </summary>
-    /// <param name="id">The document identifier.</param>
-    /// <param name="date">The date before which versions should be deleted.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    void DeleteVersions(int id, DateTime date, int userId = Constants.Security.SuperUserId);
+    /// <param name="key">The Guid key of the document.</param>
+    /// <param name="versionDate">The date before which versions should be deleted.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Deletes a version of a document.
     /// </summary>
-    /// <param name="id">The document identifier.</param>
+    /// <param name="key">The Guid key of the document.</param>
     /// <param name="versionId">The version identifier to delete.</param>
     /// <param name="deletePriorVersions">Whether to also delete versions prior to the specified version.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken);
 
     #endregion
 

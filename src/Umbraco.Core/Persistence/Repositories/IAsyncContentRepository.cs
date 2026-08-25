@@ -90,6 +90,17 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Task DeleteVersionAsync(Guid versionKey, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Deletes a specific version by its version id.
+    /// </summary>
+    /// <remarks>
+    ///     Int-keyed rather than Guid-keyed: mirrors <see cref="GetVersionAsync(int, CancellationToken)" />, since
+    ///     callers of this overload already hold the version's raw database id rather than a Guid key.
+    /// </remarks>
+    /// <param name="versionId">The id of the version to delete.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task DeleteVersionAsync(int versionId, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Deletes all versions of a content node that are older than the specified date.
     /// </summary>
     /// <param name="nodeKey">The Guid key of the content node.</param>

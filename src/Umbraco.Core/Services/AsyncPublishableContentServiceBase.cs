@@ -1659,80 +1659,94 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     ///     Permanently deletes versions from an <see cref="TContent" /> object prior to a specific date.
     ///     This method will never delete the latest version of a content item.
     /// </summary>
-    /// <param name="id">Id of the <see cref="TContent" /> object to delete versions from</param>
+    /// <param name="key">Guid key of the <see cref="TContent" /> object to delete versions from</param>
     /// <param name="versionDate">Latest version date</param>
-    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-    public void DeleteVersions(int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
+    /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public async Task DeleteVersionsAsync(Guid key, DateTime versionDate, Guid userKey, CancellationToken cancellationToken)
     {
+        Attempt<int> idAttempt = await _idKeyMap.GetIdForKeyAsync(key, ContentObjectType);
+        if (!idAttempt.Success)
+        {
+            return;
+        }
+
+        int id = idAttempt.Result;
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        var deletingVersionsNotification =
+            new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
+        if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
         {
-            scope.WriteLock(WriteLockIds);
-
-            var deletingVersionsNotification =
-                new ContentDeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
-            if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _contentRepository.DeleteVersions(id, versionDate);
-
-            scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(
-                    deletingVersionsNotification));
-            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
-
             scope.Complete();
+            return;
         }
+
+        await _asyncContentRepository.DeleteVersionsAsync(key, versionDate, cancellationToken);
+
+        scope.Notifications.Publish(
+            new ContentDeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(
+                deletingVersionsNotification));
+        await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version date)");
+
+        scope.Complete();
     }
 
     /// <summary>
     ///     Permanently deletes specific version(s) from an <see cref="TContent" /> object.
     ///     This method will never delete the latest version of a content item.
     /// </summary>
-    /// <param name="id">Id of the <see cref="TContent" /> object to delete a version from</param>
+    /// <param name="key">Guid key of the <see cref="TContent" /> object to delete a version from</param>
     /// <param name="versionId">Id of the version to delete</param>
     /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
-    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-    public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
+    /// <param name="userKey">Guid key of the User deleting versions of a Content object</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public async Task DeleteVersionAsync(Guid key, int versionId, bool deletePriorVersions, Guid userKey, CancellationToken cancellationToken)
     {
+        Attempt<int> idAttempt = await _idKeyMap.GetIdForKeyAsync(key, ContentObjectType);
+        if (!idAttempt.Success)
+        {
+            return;
+        }
+
+        int id = idAttempt.Result;
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+        var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
+        if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
         {
-            scope.WriteLock(WriteLockIds);
-            var deletingVersionsNotification = new ContentDeletingVersionsNotification(id, evtMsgs, versionId);
-            if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            if (deletePriorVersions)
-            {
-                TContent? content = GetVersionAsync(versionId, CancellationToken.None).GetAwaiter().GetResult();
-                DeleteVersions(id, content?.UpdateDate ?? DateTime.UtcNow, userId);
-            }
-
-            TContent? c = _contentRepository.Get(id);
-
-            // don't delete the current or published version
-            if (c?.VersionId != versionId &&
-                c?.PublishedVersionId != versionId)
-            {
-                _contentRepository.DeleteVersion(versionId);
-            }
-
-            scope.Notifications.Publish(
-                new ContentDeletedVersionsNotification(id, evtMsgs, versionId).WithStateFrom(
-                    deletingVersionsNotification));
-            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
-
             scope.Complete();
+            return;
         }
+
+        if (deletePriorVersions)
+        {
+            TContent? content = await GetVersionAsync(versionId, cancellationToken);
+            await DeleteVersionsAsync(key, content?.UpdateDate ?? DateTime.UtcNow, userKey, cancellationToken);
+        }
+
+        TContent? c = await _asyncContentRepository.GetAsync(key, cancellationToken);
+
+        // don't delete the current or published version
+        if (c?.VersionId != versionId &&
+            c?.PublishedVersionId != versionId)
+        {
+            await _asyncContentRepository.DeleteVersionAsync(versionId, cancellationToken);
+        }
+
+        scope.Notifications.Publish(
+            new ContentDeletedVersionsNotification(id, evtMsgs, versionId).WithStateFrom(
+                deletingVersionsNotification));
+        await AuditAsync(AuditType.Delete, userId, Constants.System.Root, "Delete (by version)");
+
+        scope.Complete();
     }
 
     #endregion

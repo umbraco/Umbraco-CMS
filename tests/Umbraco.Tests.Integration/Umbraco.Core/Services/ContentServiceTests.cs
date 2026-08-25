@@ -3686,7 +3686,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var version = content.VersionId;
 
         // Act
-        ContentService.DeleteVersion(Trashed.Id, version, true);
+        await ContentService.DeleteVersionAsync(Trashed.Key, version, true, Constants.Security.SuperUserKey, CancellationToken.None);
         var sut = await ContentService.GetByIdAsync(Trashed.Key, CancellationToken.None);
 
         // Assert
