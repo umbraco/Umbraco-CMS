@@ -129,10 +129,8 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
             // front-end was gated to the maintenance page to avoid serving — and caching — a negative result.
             _contentRoutingReadiness.MarkReady();
 
-            _hostApplicationLifetime.ApplicationStarted.Register(
-                () => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));
-            _hostApplicationLifetime.ApplicationStopped.Register(
-                () => _eventAggregator.Publish(new UmbracoApplicationStoppedNotification(false)));
+            _hostApplicationLifetime.ApplicationStarted.Register(PublishApplicationStarted);
+            _hostApplicationLifetime.ApplicationStopped.Register(PublishApplicationStopped);
 
             _logger.LogInformation("Unattended upgrade completed successfully.");
         }
@@ -196,6 +194,29 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
             case RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete:
             case RuntimeUnattendedUpgradeNotification.UpgradeResult.NotRequired:
                 break;
+        }
+    }
+
+    // The application has already started by the time an upgrade completes, so registering these callbacks
+    // invokes them inline on this thread. A handler exception must neither fail the upgrade nor bring down the
+    // host: on a normal startup the same exception is tolerated by the host's own lifetime handling, and the
+    // application keeps serving.
+    private void PublishApplicationStarted()
+        => Publish(new UmbracoApplicationStartedNotification(false));
+
+    private void PublishApplicationStopped()
+        => Publish(new UmbracoApplicationStoppedNotification(false));
+
+    private void Publish<TNotification>(TNotification notification)
+        where TNotification : INotification
+    {
+        try
+        {
+            _eventAggregator.Publish(notification);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred publishing {NotificationType}.", typeof(TNotification).Name);
         }
     }
 
