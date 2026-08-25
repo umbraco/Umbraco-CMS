@@ -125,4 +125,112 @@ internal sealed class MediaHybridCacheMockTests : UmbracoIntegrationTest
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Once);
         _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourceAsync(It.IsAny<Guid>()), Times.Never);
     }
+
+    [Test]
+    public async Task GetByKeysAsync_HonoursCachedNull_WithoutQueryingDatabase()
+    {
+        Guid missingKey = Guid.NewGuid();
+
+        // Arranged by hand: unlike documents, the media read-through never writes a null node, so this
+        // pins the probe's contract rather than a state media can reach today. The two probes are kept
+        // identical deliberately, and this is what stops the media one drifting out of step.
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.SetAsync<ContentCacheNode?>($"{missingKey}", null);
+
+        IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync([missingKey]);
+
+        Assert.IsEmpty(result);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_EmptyInput_ReturnsEmpty()
+    {
+        IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync(Array.Empty<Guid>());
+
+        Assert.IsEmpty(result);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()), Times.Never);
+        _mockDatabaseCacheRepository.Verify(x => x.GetMediaSourceAsync(It.IsAny<Guid>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_DuplicateKeys_ResolveToSameItemAtEveryOccurrence()
+    {
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{_mediaItem.Key}");
+
+        // A batched lookup preserves input multiplicity rather than collapsing duplicates, while only
+        // looking the key up once against the database.
+        var keys = new[] { _mediaItem.Key, _mediaItem.Key };
+
+        IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync(keys);
+
+        Assert.AreEqual(2, result.Count);
+        Assert.AreEqual(_mediaItem.Key, result[0].Key);
+        Assert.AreEqual(_mediaItem.Key, result[1].Key);
+
+        _mockDatabaseCacheRepository.Verify(
+            x => x.GetMediaSourcesAsync(It.Is<IEnumerable<Guid>>(k => k.Count() == 1 && k.Contains(_mediaItem.Key))),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task GetByKeysAsync_PreservesInputOrder_AcrossMixedCacheHits()
+    {
+        IMediaType mediaType = MediaTypeService.Get("image")!;
+        var mediaB = new MediaBuilder().WithName("Test Media Item B").WithMediaType(mediaType).Build();
+        MediaService.Save(mediaB);
+        var mediaC = new MediaBuilder().WithName("Test Media Item C").WithMediaType(mediaType).Build();
+        MediaService.Save(mediaC);
+
+        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
+        await hybridCache.RemoveAsync($"{_mediaItem.Key}");
+        await hybridCache.RemoveAsync($"{mediaB.Key}");
+        await hybridCache.RemoveAsync($"{mediaC.Key}");
+
+        var nodesByKey = new Dictionary<Guid, ContentCacheNode>
+        {
+            [_mediaItem.Key] = BuildMediaCacheNode(_mediaItem, mediaType.Id),
+            [mediaB.Key] = BuildMediaCacheNode(mediaB, mediaType.Id),
+            [mediaC.Key] = BuildMediaCacheNode(mediaC, mediaType.Id),
+        };
+
+        _mockDatabaseCacheRepository
+            .Setup(x => x.GetMediaSourceAsync(It.IsAny<Guid>()))
+            .ReturnsAsync((Guid key) => nodesByKey.GetValueOrDefault(key));
+        _mockDatabaseCacheRepository
+            .Setup(x => x.GetMediaSourcesAsync(It.IsAny<IEnumerable<Guid>>()))
+            .ReturnsAsync((IEnumerable<Guid> keys) => keys.Where(nodesByKey.ContainsKey).Select(k => nodesByKey[k]));
+
+        // Warm mediaB into L0 ahead of time; the others stay cold, so the batched call below resolves a
+        // mix of tiers in one go.
+        _ = await _mediaCacheService.GetByKeyAsync(mediaB.Key);
+
+        Guid[] requestOrder = [mediaC.Key, mediaB.Key, _mediaItem.Key];
+        IReadOnlyList<IPublishedContent> result = await _mediaCacheService.GetByKeysAsync(requestOrder);
+
+        CollectionAssert.AreEqual(requestOrder, result.Select(x => x.Key));
+    }
+
+    private static ContentCacheNode BuildMediaCacheNode(Media media, int mediaTypeId) =>
+        new()
+        {
+            ContentTypeId = mediaTypeId,
+            CreatorId = media.CreatorId,
+            CreateDate = media.CreateDate,
+            Id = media.Id,
+            Key = media.Key,
+            SortOrder = media.SortOrder,
+            Data = new ContentData(
+                media.Name,
+                null,
+                1,
+                media.UpdateDate,
+                media.CreatorId,
+                -1,
+                true,
+                new Dictionary<string, PropertyData[]>(),
+                null),
+            IsDraft = false,
+        };
 }

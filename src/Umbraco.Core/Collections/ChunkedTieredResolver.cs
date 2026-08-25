@@ -32,7 +32,7 @@ internal static class ChunkedTieredResolver
     /// <remarks>
     /// Chunk size starts at 1 and doubles up to <see cref="MaxChunkSize"/>. So a <c>FirstOrDefault()</c>
     /// materialises a single item, a full enumeration of N items uses O(log N + N / cap) chunks, and cold
-    /// over-fetch on a predicate short-circuit is bounded to roughly twice what the consumer draws. A
+    /// over-fetch when a consumer stops early is bounded to roughly twice what it draws. A
     /// chunk fully resolved by an earlier tier skips the later ones entirely — identical to the per-key
     /// warm path when everything is cached.
     /// </remarks>
@@ -101,7 +101,10 @@ internal static class ChunkedTieredResolver
         where TKey : notnull
     {
         var resolvedByKey = new Dictionary<TKey, TItem>(chunk.Count);
-        TKey[] pending = chunk.Distinct().ToArray();
+
+        // A single-key chunk has nothing to deduplicate, and it is the one every enumeration starts
+        // with and the only one a FirstOrDefault()/Take(1) consumer ever draws.
+        TKey[] pending = chunk.Count == 1 ? [chunk[0]] : [.. chunk.Distinct()];
 
         foreach (ResolveItemsDelegate<TKey, TItem> resolveTier in resolveItems)
         {
@@ -110,9 +113,17 @@ internal static class ChunkedTieredResolver
                 break;
             }
 
+            var resolvedBefore = resolvedByKey.Count;
             resolveTier(pending, resolvedByKey);
 
-            pending = pending.Where(key => !resolvedByKey.ContainsKey(key)).ToArray();
+            // A tier that resolved nothing leaves every key pending, so the current array still holds
+            // exactly what the next tier needs.
+            if (resolvedByKey.Count == resolvedBefore)
+            {
+                continue;
+            }
+
+            pending = [.. pending.Where(key => resolvedByKey.ContainsKey(key) is false)];
         }
 
         var resolved = new List<TItem>(chunk.Count);
