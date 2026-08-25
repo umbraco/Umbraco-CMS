@@ -22,6 +22,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: NESTED_INNER_BLOCK_LIST_DATA_TYPE_ID,
@@ -62,6 +63,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: NESTED_OUTER_BLOCK_LIST_DATA_TYPE_ID,
@@ -102,5 +104,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
+		noAccess: false,
 	},
 ];

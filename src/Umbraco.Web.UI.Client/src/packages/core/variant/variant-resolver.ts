@@ -124,9 +124,9 @@ export class UmbVariantResolver<VariantType extends UmbVariantLike = UmbVariantL
 			return;
 		}
 
-		// Invariant content has a single variant with a null culture; it is always the match.
+		// Invariant content has a non-segment variant with a null culture; it is always the match.
 		if (variants[0].culture === null) {
-			this.#variant.setValue(variants[0]);
+			this.#variant.setValue(variants.find((variant) => variant.culture === null && !variant.segment));
 			this.#fallbackVariant.setValue(undefined);
 			return;
 		}
@@ -134,7 +134,7 @@ export class UmbVariantResolver<VariantType extends UmbVariantLike = UmbVariantL
 		const displayCulture = this.#displayCulture.getValue();
 		const fallbackCulture = this.#fallbackCulture.getValue();
 
-		this.#variant.setValue(variants.find((variant) => variant.culture === displayCulture));
-		this.#fallbackVariant.setValue(variants.find((variant) => variant.culture === fallbackCulture));
+		this.#variant.setValue(variants.find((variant) => variant.culture === displayCulture && !variant.segment));
+		this.#fallbackVariant.setValue(variants.find((variant) => variant.culture === fallbackCulture && !variant.segment));
 	}
 }

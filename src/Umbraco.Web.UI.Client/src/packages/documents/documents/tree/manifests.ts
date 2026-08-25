@@ -38,14 +38,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		name: 'Document Tree Root',
 		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE],
 	},
-	{
-		type: 'treeItemCard',
-		kind: 'default',
-		alias: 'Umb.TreeItemCard.Document',
-		name: 'Document Tree Item Card',
-		element: () => import('./tree-item/document-tree-item-card.element.js'),
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-	},
 	...viewManifests,
 	...reloadTreeItemChildrenManifests,
 ];

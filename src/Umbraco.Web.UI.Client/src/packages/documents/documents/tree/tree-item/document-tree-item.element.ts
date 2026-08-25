@@ -66,18 +66,12 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 	};
 
-	#handleDblClick(event: MouseEvent) {
-		if (!this._item?.hasChildren) return;
-		event.stopPropagation();
-		this.api?.open();
-	}
-
 	override renderLabel() {
 		return html`<span
 			id="label"
 			slot="label"
 			class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}
-			@dblclick=${this.#handleDblClick}>
+			@dblclick=${this._handleDblClick}>
 			${this._name}
 		</span> `;
 	}
