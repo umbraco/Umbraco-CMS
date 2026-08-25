@@ -44,7 +44,7 @@ export class UmbSchemaLockdownContext extends UmbContextBase {
 		const schemaEntityType = toSchemaEntityType(entityType);
 		if (!schemaEntityType) return true;
 
-		const entry = this.#state.getValue().entityTypes.find((x) => x.entityType === schemaEntityType);
+		const entry = this.#state.getValue().entityTypes.find((x) => x.entityType.toLowerCase() === schemaEntityType);
 		if (!entry) return true;
 
 		return entry[operation];
