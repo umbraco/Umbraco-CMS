@@ -1157,6 +1157,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
       (inputs, groupName) => inputs.findIndex((input) => (input as HTMLInputElement).value === groupName),
       name,
     );
+    if (index === -1) {
+      throw new Error(`No block group named "${name}" was found.`);
+    }
     return this.blockGroups.nth(index);
   }
 

@@ -172,8 +172,9 @@ test('can use pagination', async ({umbracoUi}) => {
   await umbracoUi.logViewer.clickPageNumber(2);
 
   // Assert
-  const firstLogOnSecondPage = await umbracoUi.logViewer.getFirstLogMessage();
-  expect(firstLogOnSecondPage).not.toEqual(firstLogOnFirstPage);
+  // Poll rather than read once: the message element can re-render in place, so a plain visibility
+  // wait can be satisfied by the still-stale page-1 content before the page-2 fetch resolves.
+  await expect.poll(() => umbracoUi.logViewer.getFirstLogMessage()).not.toEqual(firstLogOnFirstPage);
   // TODO: Remove the comment below when the issue is resolved.
   // At the time this test was created, the UI only highlights page 1. Uncomment the line below when the issue is resolved.
   // await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
