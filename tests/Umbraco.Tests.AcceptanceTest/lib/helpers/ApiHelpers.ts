@@ -308,7 +308,12 @@ export class ApiHelpers {
 
   async getCurrentTimePlusMinute(minute: number = 1) {
     const now = new Date();
-    now.setMinutes(now.getMinutes() + minute); // Add one minute
+    // Round up so elapsed seconds in the current minute can't erode the promised margin.
+    if (now.getSeconds() > 0 || now.getMilliseconds() > 0) {
+      minute += 1;
+    }
+    now.setSeconds(0, 0);
+    now.setMinutes(now.getMinutes() + minute);
 
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');

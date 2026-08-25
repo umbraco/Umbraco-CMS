@@ -67,7 +67,7 @@ export class LogViewerUiHelper extends UiBaseLocators {
     // The force click is necessary.
     await this.click(this.saveSearchHeartIcon, {force: true});
     await this.enterText(this.searchNameTxt, searchName);
-    await this.click(this.saveSearchBtn);
+    await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.logViewerSavedSearch, this.click(this.saveSearchBtn), ConstantHelper.statusCodes.created, ConstantHelper.httpMethods.post);
   }
 
   checkSavedSearch(searchName: string) {
