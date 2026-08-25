@@ -266,6 +266,43 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task GetBlueprintByIdAsync_Returns_Blueprint_With_BlueprintFlagSet()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
+        ContentService.SaveBlueprint(blueprint, null);
+
+        var saved = ContentService.GetBlueprintsForContentTypes().Single();
+
+        var found = await ContentService.GetBlueprintByIdAsync(saved.Key, CancellationToken.None);
+
+        Assert.That(found, Is.Not.Null);
+        Assert.That(found.Key, Is.EqualTo(saved.Key));
+        Assert.That(found.Blueprint, Is.True);
+    }
+
+    [Test]
+    public async Task GetBlueprintByIdAsync_Returns_Null_For_Unknown_Key()
+    {
+        var found = await ContentService.GetBlueprintByIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.That(found, Is.Null);
+    }
+
+    [Test]
+    public async Task GetBlueprintByIdAsync_Returns_Null_For_Regular_Document_Key()
+    {
+        var found = await ContentService.GetBlueprintByIdAsync(Textpage.Key, CancellationToken.None);
+
+        Assert.That(found, Is.Null);
+    }
+
+    [Test]
     public async Task Create_Blueprint_From_Content()
     {
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))

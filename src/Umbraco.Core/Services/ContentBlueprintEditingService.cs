@@ -54,19 +54,16 @@ internal sealed class ContentBlueprintEditingService
         => _containerService = containerService;
 
     /// <inheritdoc />
-    public override Task<IContent?> GetAsync(Guid key)
-    {
-        IContent? blueprint = ContentService.GetBlueprintById(key);
-        return Task.FromResult(blueprint);
-    }
+    public override async Task<IContent?> GetAsync(Guid key) =>
+        await ContentService.GetBlueprintByIdAsync(key, CancellationToken.None);
 
     /// <inheritdoc />
-    public Task<IContent?> GetScaffoldedAsync(Guid key)
+    public async Task<IContent?> GetScaffoldedAsync(Guid key)
     {
-        IContent? blueprint = ContentService.GetBlueprintById(key);
+        IContent? blueprint = await ContentService.GetBlueprintByIdAsync(key, CancellationToken.None);
         if (blueprint is null)
         {
-            return Task.FromResult<IContent?>(null);
+            return null;
         }
 
         IContent scaffold = blueprint.DeepCloneWithResetIdentities();
@@ -75,7 +72,7 @@ internal sealed class ContentBlueprintEditingService
         scope.Notifications.Publish(new ContentScaffoldedNotification(blueprint, scaffold, Constants.System.Root, new EventMessages()));
         scope.Complete();
 
-        return Task.FromResult<IContent?>(scaffold);
+        return scaffold;
     }
 
     /// <inheritdoc />

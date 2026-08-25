@@ -21,16 +21,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Gets a blueprint.
     /// </summary>
-    /// <param name="id">The identifier of the blueprint.</param>
+    /// <param name="key">The Guid key of the blueprint.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The blueprint, or null if not found.</returns>
-    IContent? GetBlueprintById(int id);
-
-    /// <summary>
-    ///     Gets a blueprint.
-    /// </summary>
-    /// <param name="id">The unique identifier of the blueprint.</param>
-    /// <returns>The blueprint, or null if not found.</returns>
-    IContent? GetBlueprintById(Guid id);
+    Task<IContent?> GetBlueprintByIdAsync(Guid key, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets blueprints for a content type.

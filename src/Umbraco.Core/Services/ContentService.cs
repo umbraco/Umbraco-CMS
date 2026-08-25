@@ -27,6 +27,7 @@ namespace Umbraco.Cms.Core.Services;
 public class ContentService : AsyncPublishableContentServiceBase<IContent>, IContentService
 {
     private readonly IAsyncDocumentRepository _asyncDocumentRepository;
+    private readonly IAsyncDocumentBlueprintRepository _asyncDocumentBlueprintRepository;
     private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
     private readonly IDocumentRepository _documentRepository;
     private readonly IEntityRepository _entityRepository;
@@ -65,6 +66,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="asyncDocumentRepository">The async (EF Core) document repository.</param>
+    /// <param name="asyncDocumentBlueprintRepository">The async (EF Core) document blueprint repository.</param>
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -83,7 +85,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        IAsyncDocumentRepository asyncDocumentRepository)
+        IAsyncDocumentRepository asyncDocumentRepository,
+        IAsyncDocumentBlueprintRepository asyncDocumentBlueprintRepository)
         : base(
             provider,
             loggerFactory,
@@ -100,6 +103,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             idKeyMap)
     {
         _asyncDocumentRepository = asyncDocumentRepository;
+        _asyncDocumentBlueprintRepository = asyncDocumentBlueprintRepository;
         _documentRepository = documentRepository;
         _entityRepository = entityRepository;
         _documentBlueprintRepository = documentBlueprintRepository;
@@ -1901,44 +1905,19 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     #region Blueprints
 
-    /// <summary>
-    /// Gets a content blueprint by its integer ID.
-    /// </summary>
-    /// <param name="id">The ID of the blueprint to retrieve.</param>
-    /// <returns>The <see cref="IContent"/> blueprint, or <c>null</c> if not found.</returns>
-    public IContent? GetBlueprintById(int id)
+    /// <inheritdoc />
+    public async Task<IContent?> GetBlueprintByIdAsync(Guid key, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IContent? blueprint = await _asyncDocumentBlueprintRepository.GetAsync(key, cancellationToken);
+        if (blueprint is not null)
         {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IContent? blueprint = _documentBlueprintRepository.Get(id);
-            if (blueprint != null)
-            {
-                blueprint.Blueprint = true;
-            }
-
-            return blueprint;
+            blueprint.Blueprint = true;
         }
-    }
 
-    /// <summary>
-    /// Gets a content blueprint by its unique key.
-    /// </summary>
-    /// <param name="id">The unique key of the blueprint to retrieve.</param>
-    /// <returns>The <see cref="IContent"/> blueprint, or <c>null</c> if not found.</returns>
-    public IContent? GetBlueprintById(Guid id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IContent? blueprint = _documentBlueprintRepository.Get(id);
-            if (blueprint != null)
-            {
-                blueprint.Blueprint = true;
-            }
-
-            return blueprint;
-        }
+        scope.Complete();
+        return blueprint;
     }
 
     /// <summary>
