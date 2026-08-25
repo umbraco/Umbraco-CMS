@@ -144,4 +144,24 @@ public interface IPublishedElement
     ///     </para>
     /// </remarks>
     bool IsPublished(string? culture = null);
+
+    /// <summary>
+    ///     Gets the unique identifier of identity bearing root content item.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Published Elements used to model Block Editor content do not have an identity if they are
+    ///         locally sourced - that is, not sourced from reusable Elements.
+    ///     </para>
+    ///     <para>
+    ///         To contextualize the rendering context for such Published Elements, this property carries
+    ///         the identity of the "nearest" identity bearing content (e.g. the Document that holds the
+    ///         Block Editor property).
+    ///     </para>
+    ///     <para>
+    ///         The property value is always `null` for identity bearing content items (Document, Media and
+    ///         reusable Elements)
+    ///     </para>
+    /// </remarks>
+    int? IdentityRootId => null;
 }
