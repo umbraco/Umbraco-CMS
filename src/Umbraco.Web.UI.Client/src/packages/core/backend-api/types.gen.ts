@@ -2491,7 +2491,6 @@ export type ServerSchemaLockdownEntityTypeResponseModel = {
 };
 
 export type ServerSchemaLockdownResponseModel = {
-    enabled: boolean;
     entityTypes: Array<ServerSchemaLockdownEntityTypeResponseModel>;
 };
 

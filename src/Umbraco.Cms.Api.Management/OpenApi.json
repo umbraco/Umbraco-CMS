@@ -51036,14 +51036,10 @@
       },
       "ServerSchemaLockdownResponseModel": {
         "required": [
-          "enabled",
           "entityTypes"
         ],
         "type": "object",
         "properties": {
-          "enabled": {
-            "type": "boolean"
-          },
           "entityTypes": {
             "type": "array",
             "items": {
