@@ -152,7 +152,7 @@ export class UmbCascadingMenuPopoverElement extends UmbElementMixin(UUIPopoverCo
 				content: '';
 				position: absolute;
 				border-bottom: 1px solid var(--uui-color-border);
-				width: 100%;
+				width: calc(100% - var(--uui-size-space-1));
 			}
 
 			uui-scroll-container {
