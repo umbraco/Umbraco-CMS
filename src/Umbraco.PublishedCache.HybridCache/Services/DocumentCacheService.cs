@@ -487,7 +487,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
             contentTypeIds.ToList(),
             null,
             null,
-            null,
             action =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();

@@ -138,6 +138,62 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         Assert.AreEqual(primed.PropertyTypes.Count(), after.PropertyTypes.Count());
     }
 
+    [Test]
+    public async Task Published_Child_Type_Exposes_Property_From_Composition_On_Inherited_Parent()
+    {
+        // A composition that carries a "title" property.
+        var composition = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType("composition", "Composition"),
+            Constants.Security.SuperUserKey)).Result;
+
+        // A parent that already has the composition applied, and a child that inherits from it.
+        var parentModel = ContentTypeEditingBuilder.CreateBasicContentType("parent", "Parent");
+        parentModel.Compositions = [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }];
+        var parent = (await ContentTypeEditingService.CreateAsync(parentModel, Constants.Security.SuperUserKey)).Result!;
+
+        var childModel = ContentTypeEditingBuilder.CreateBasicContentType("child", "Child");
+        childModel.Compositions = [new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key }];
+        var child = (await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey)).Result!;
+
+        // The published child exposes the composition's "title" property, inherited through its parent.
+        var publishedChild = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
+        Assert.IsNotNull(publishedChild);
+        Assert.IsTrue(publishedChild.PropertyTypes.Any(p => p.Alias == "title"));
+    }
+
+    [Test]
+    public async Task Published_Child_Type_Reflects_Composition_Added_To_Inherited_Parent_After_Caching()
+    {
+        // A parent with no properties, inherited by a child.
+        var parent = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateBasicContentType("parent", "Parent"),
+            Constants.Security.SuperUserKey)).Result;
+
+        var childModel = ContentTypeEditingBuilder.CreateBasicContentType("child", "Child");
+        childModel.Compositions = [new Composition { CompositionType = CompositionType.Inheritance, Key = parent.Key }];
+        var child = (await ContentTypeEditingService.CreateAsync(childModel, Constants.Security.SuperUserKey)).Result;
+
+        // Prime the published content type cache for the child; it does not expose "title" yet.
+        var before = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
+        Assert.IsFalse(before.PropertyTypes.Any(p => p.Alias == "title"), "precondition: child should not yet expose 'title'");
+
+        // Add a composition carrying "title" to the (already inherited-from) parent.
+        var composition = (await ContentTypeEditingService.CreateAsync(
+            ContentTypeEditingBuilder.CreateSimpleContentType("composition", "Composition"),
+            Constants.Security.SuperUserKey)).Result;
+        var updateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(parent);
+        updateModel.Compositions = [new Composition { CompositionType = CompositionType.Composition, Key = composition.Key }];
+        var result = await ContentTypeEditingService.UpdateAsync(parent, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, result.Status.ToString());
+
+        // Adding the composition to the parent must invalidate the cached published content type of the
+        // inheriting child, so the child now exposes the property it inherits through the parent's composition.
+        var after = PublishedContentTypeCache.Get(PublishedItemType.Content, child.Key);
+        Assert.IsTrue(
+            after.PropertyTypes.Any(p => p.Alias == "title"),
+            "child published content type should pick up the property composed onto its inherited-from parent");
+    }
+
     private async Task<IContentType> CreateElementTypeAsync(string alias)
     {
         ContentTypeCreateModel createModel = ContentTypeEditingBuilder.CreateElementType(alias, alias);

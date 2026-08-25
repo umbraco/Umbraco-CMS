@@ -39,7 +39,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         IOptions<SecuritySettings> securitySettings,
         IRuntimeState runtimeState,
         ILogger<BackOfficeApplicationManager> logger)
-        : base(applicationManager)
+        : base(applicationManager, logger)
     {
         _webHostEnvironment = webHostEnvironment;
         _runtimeState = runtimeState;
@@ -84,10 +84,16 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         // Destination table: umbracoOpenIddictApplications
         // Destination Fields: RedirectUris and PostLogoutRedirectUris
         // Read saved settings from DB and add unique additional servers.
-        backOfficeHostsAsArray = await MergeWithExistingBackOfficeHostsAsync(backOfficeHostsAsArray, cancellationToken);
+        // The merge is redone per attempt, so a retry after a concurrency conflict picks up the hosts
+        // registered by the instance that won the race instead of overwriting them.
+        Uri[] requestedHosts = backOfficeHostsAsArray;
 
         await CreateOrUpdate(
-            BackofficeOpenIddictApplicationDescriptor(backOfficeHostsAsArray),
+            async token =>
+            {
+                backOfficeHostsAsArray = await MergeWithExistingBackOfficeHostsAsync(requestedHosts, token);
+                return BackofficeOpenIddictApplicationDescriptor(backOfficeHostsAsArray);
+            },
             cancellationToken);
 
         if (_webHostEnvironment.IsProduction())

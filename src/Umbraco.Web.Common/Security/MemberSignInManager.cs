@@ -234,6 +234,9 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         // If there are no autolink options then the attempt is failed (user does not exist)
         if (autoLinkOptions == null || !autoLinkOptions.AutoLinkExternalAccount)
         {
+            Logger.LogInformation(
+                "External login auto-link skipped for provider '{LoginProvider}': auto-linking is not enabled for this provider.",
+                loginInfo.LoginProvider);
             return SignInResult.Failed;
         }
 
@@ -242,6 +245,12 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         // we are allowing auto-linking/creating of local accounts
         if (email.IsNullOrWhiteSpace())
         {
+            // Only claim *types* are logged here, never claim values, to avoid leaking personal
+            // information such as email addresses or names into the logs.
+            Logger.LogWarning(
+                "External login auto-link failed for provider '{LoginProvider}': no claim resolving to ClaimTypes.Email was present. Available claim types: {ClaimTypes}",
+                loginInfo.LoginProvider,
+                string.Join(", ", loginInfo.Principal.Claims.Select(c => c.Type).Distinct()));
             return AutoLinkSignInResult.FailedNoEmail;
         }
 
@@ -274,7 +283,10 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         var name = loginInfo.Principal?.Identity?.Name;
         if (name.IsNullOrWhiteSpace())
         {
-            throw new InvalidOperationException("The Name value cannot be null");
+            Logger.LogWarning(
+                "External login auto-link failed for provider '{LoginProvider}': a Name value could not be resolved for the new user, and creating a user without a name is not supported.",
+                loginInfo.LoginProvider);
+            return AutoLinkSignInResult.FailedNoName;
         }
 
         autoLinkUser = MemberIdentityUser.CreateNew(email!, email!, autoLinkOptions.DefaultMemberTypeAlias, autoLinkOptions.DefaultIsApproved, name);
@@ -377,9 +389,10 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
 
     private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, MemberIdentityUser user) =>
         Logger.LogWarning(
-            "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'",
+            "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}', key: '{UserKey}'",
             loginInfo.LoginProvider,
-            user.Id);
+            user.Id,
+            user.Key);
 
     /// <inheritdoc />
     protected override async Task<SignInResult> HandleSignIn(MemberIdentityUser? user, string? username, SignInResult result)
@@ -462,6 +475,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         public static AutoLinkSignInResult FailedNotLinked { get; } = new() { Succeeded = false };
 
         public static AutoLinkSignInResult FailedNoEmail { get; } = new() { Succeeded = false };
+
+        public static AutoLinkSignInResult FailedNoName { get; } = new() { Succeeded = false };
 
         public IReadOnlyCollection<string> Errors { get; } = Array.Empty<string>();
 
