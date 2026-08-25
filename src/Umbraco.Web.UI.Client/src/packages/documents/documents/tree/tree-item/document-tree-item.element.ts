@@ -22,7 +22,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				this._forceShowExpand = has;
 				this.requestUpdate('_forceShowExpand', oldValue);
 			});
-			this.observe(this.#api.canEnterCollection, (enterable) => (this._canEnterCollection = enterable));
+			this.observe(this.#api.isDrillableCollection, (drillable) => (this._isDrillableCollection = drillable));
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
 			this.observe(this.#api.flags, (flags) => (this._flags = flags || []));
 		}
@@ -44,7 +44,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	protected _isDraft = false;
 
 	@state()
-	private _canEnterCollection = false;
+	private _isDrillableCollection = false;
 
 	#icon: string | null | undefined;
 
@@ -59,10 +59,10 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	override _renderExpandSymbol = () => {
-		// The list icon replaces the expand arrow only where activating it enters the Collection — see
-		// `canEnterCollection`. Where it would do nothing, the normal caret is rendered and the children expand, so a
+		// The list icon replaces the expand arrow only where activating it drills into the Collection — see
+		// `isDrillableCollection`. Where it would do nothing, the normal caret is rendered and the children expand, so a
 		// subtree is never made unreachable by an affordance that cannot act.
-		if (!this._canEnterCollection) return undefined;
+		if (!this._isDrillableCollection) return undefined;
 		return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 	};
 

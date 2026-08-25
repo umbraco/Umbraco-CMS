@@ -31,7 +31,7 @@ export interface UmbTreeContext<
 	readonly hideTreeItemActions?: Observable<boolean>;
 	readonly isMenu?: Observable<boolean | undefined>;
 	readonly selectOnly?: Observable<boolean | undefined>;
-	readonly canEnterItems?: Observable<boolean>;
+	readonly isDrillable?: Observable<boolean>;
 
 	selectableFilter?(item: TreeItemType): boolean;
 	filter?(item: TreeItemType): boolean;
@@ -74,8 +74,8 @@ export interface UmbTreeContext<
 	setIsMenu?(value: boolean): void;
 	getIsMenu?(): boolean;
 
-	setCanEnterItems?(value: boolean): void;
-	getCanEnterItems?(): boolean;
+	enableDrill?(value: boolean): void;
+	getIsDrillable?(): boolean;
 
 	setStartNode(startNode: UmbTreeStartNode | undefined): void;
 	getStartNode(): UmbTreeStartNode | undefined;
