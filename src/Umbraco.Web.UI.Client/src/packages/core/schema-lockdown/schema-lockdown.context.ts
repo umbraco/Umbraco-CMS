@@ -13,7 +13,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 // regardless - this layer only decides what the user is offered. Withholding permission instead would strip a
 // default site of every schema affordance the moment the request is slow or fails.
 const UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE: ServerSchemaLockdownResponseModel = Object.freeze({
-	enabled: false,
 	entityTypes: [],
 });
 

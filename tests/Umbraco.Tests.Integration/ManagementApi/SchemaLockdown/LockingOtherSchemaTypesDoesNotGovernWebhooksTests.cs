@@ -9,8 +9,8 @@ using Umbraco.Cms.Core.DependencyInjection;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// Locking every other governed entity type leaves webhooks creatable, so a broad lockdown cannot sweep up an
-/// entity type no configurator named.
+/// Locking a broad set of other entity types leaves webhooks creatable, so a lockdown cannot sweep up an entity
+/// type no configurator named.
 /// </summary>
 public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : ManagementApiTest<CreateWebhookController>
 {
@@ -18,7 +18,7 @@ public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : ManagementApiTe
         = x => x.Create(CancellationToken.None, null);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.SchemaLockdownConfigurators().Append<LockEverythingButWebhooksConfigurator>();
+        => builder.SchemaLockdownConfigurators().Append<LockOtherSchemaTypesConfigurator>();
 
     [SetUp]
     public override void Setup()

@@ -6,17 +6,11 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Server;
 public class ServerSchemaLockdownResponseModel
 {
     /// <summary>
-    /// Gets or sets a value indicating whether any operation on any entity type is blocked.
-    /// </summary>
-    /// <remarks>
-    /// Derived from <see cref="EntityTypes"/>, which is the only source there is. It is a summary for presentation
-    /// only - <see cref="EntityTypes"/> is what any allow/deny decision must be taken from.
-    /// </remarks>
-    public bool Enabled { get; set; }
-
-    /// <summary>
     /// Gets or sets the permitted operations per entity type.
     /// </summary>
+    /// <remarks>
+    /// Only entity types the rules speak to are listed. Anything absent is permitted every operation.
+    /// </remarks>
     public IEnumerable<ServerSchemaLockdownEntityTypeResponseModel> EntityTypes { get; set; } = [];
 }
 

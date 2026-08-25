@@ -9,24 +9,22 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// cell win, so registering last is how a rule is made authoritative.
 /// </remarks>
 /// <example>
-/// Locking every entity type schema lockdown can govern:
+/// Locking content type and data type schema:
 /// <code>
 /// <![CDATA[
-/// public class LockAllSchemaConfigurator : ISchemaLockdownConfigurator
+/// public class LockContentModellingConfigurator : ISchemaLockdownConfigurator
 /// {
 ///     public void Configure(ISchemaLockdownRules rules)
 ///     {
-///         foreach (string entityType in SchemaEntityTypes.All)
-///         {
-///             rules.BlockMutations(entityType);
-///         }
+///         rules.BlockMutations(Constants.UdiEntityType.DocumentType);
+///         rules.BlockMutations(Constants.UdiEntityType.DataType);
 ///     }
 /// }
 ///
-/// public class LockAllSchemaComposer : IComposer
+/// public class LockContentModellingComposer : IComposer
 /// {
 ///     public void Compose(IUmbracoBuilder builder)
-///         => builder.SchemaLockdownConfigurators().Append<LockAllSchemaConfigurator>();
+///         => builder.SchemaLockdownConfigurators().Append<LockContentModellingConfigurator>();
 /// }
 /// ]]>
 /// </code>

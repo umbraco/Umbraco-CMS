@@ -33,21 +33,17 @@ public class SchemaLockdownServerController : ServerControllerBase
     [EndpointDescription("Gets which schema operations are permitted for each entity type.")]
     public Task<IActionResult> SchemaLockdown(CancellationToken cancellationToken)
     {
-        ServerSchemaLockdownEntityTypeResponseModel[] entityTypes = SchemaEntityTypes.All
-            .Select(entityType => new ServerSchemaLockdownEntityTypeResponseModel
-            {
-                EntityType = entityType,
-                Create = _rules.IsAllowed(entityType, SchemaOperation.Create),
-                Update = _rules.IsAllowed(entityType, SchemaOperation.Update),
-                Delete = _rules.IsAllowed(entityType, SchemaOperation.Delete),
-            })
-            .ToArray();
-
         var model = new ServerSchemaLockdownResponseModel
         {
-            Enabled = entityTypes.Any(entityType =>
-                entityType.Create is false || entityType.Update is false || entityType.Delete is false),
-            EntityTypes = entityTypes,
+            EntityTypes = _rules.GovernedEntityTypes
+                .Select(entityType => new ServerSchemaLockdownEntityTypeResponseModel
+                {
+                    EntityType = entityType,
+                    Create = _rules.IsAllowed(entityType, SchemaOperation.Create),
+                    Update = _rules.IsAllowed(entityType, SchemaOperation.Update),
+                    Delete = _rules.IsAllowed(entityType, SchemaOperation.Delete),
+                })
+                .ToArray(),
         };
 
         return Task.FromResult<IActionResult>(Ok(model));

@@ -7,6 +7,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.SchemaLockdown;
 [TestFixture]
 public class SchemaLockdownRulesTests
 {
+    private static readonly string[] EntityTypes =
+    [
+        Constants.UdiEntityType.DocumentType,
+        Constants.UdiEntityType.DataType,
+        Constants.UdiEntityType.DictionaryItem,
+    ];
+
     private sealed class DelegateConfigurator : ISchemaLockdownConfigurator
     {
         private readonly Action<ISchemaLockdownRules> _configure;
@@ -27,7 +34,7 @@ public class SchemaLockdownRulesTests
 
         Assert.Multiple(() =>
         {
-            foreach (var entityType in SchemaEntityTypes.All)
+            foreach (var entityType in EntityTypes)
             {
                 Assert.That(rules.IsAllowed(entityType, SchemaOperation.Create), Is.True);
                 Assert.That(rules.IsAllowed(entityType, SchemaOperation.Update), Is.True);
@@ -131,11 +138,28 @@ public class SchemaLockdownRulesTests
 
         Assert.Multiple(() =>
         {
-            foreach (var entityType in SchemaEntityTypes.All)
+            foreach (var entityType in EntityTypes)
             {
                 Assert.That(rules.IsAllowed(entityType, SchemaOperation.Read), Is.True);
             }
         });
+    }
+
+    [Test]
+    public void Governed_Entity_Types_Are_Empty_When_No_Configurator_Is_Registered()
+        => Assert.That(CreateRules().GovernedEntityTypes, Is.Empty);
+
+    [Test]
+    public void Governed_Entity_Types_Are_Only_Those_A_Configurator_Wrote_A_Cell_For()
+    {
+        SchemaLockdownRules rules = CreateRules(
+            x => x.BlockMutations(Constants.UdiEntityType.DocumentType),
+            x => x.Allow(Constants.UdiEntityType.DataType, SchemaOperation.Delete),
+            x => x.Block(Constants.UdiEntityType.MediaType, SchemaOperation.Read));
+
+        Assert.That(
+            rules.GovernedEntityTypes,
+            Is.EquivalentTo(new[] { Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.DataType }));
     }
 
     [Test]
