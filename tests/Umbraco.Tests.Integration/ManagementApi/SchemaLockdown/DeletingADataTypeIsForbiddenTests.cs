@@ -2,7 +2,9 @@ using System.Linq.Expressions;
 using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
@@ -32,5 +34,15 @@ public class DeletingADataTypeIsForbiddenTests : ManagementApiTest<DeleteDataTyp
         var response = await Client.DeleteAsync(Url);
 
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    /// <summary>
+    /// Locks data types, and nothing else.
+    /// </summary>
+    private sealed class LockDataTypesConfigurator : ISchemaLockdownConfigurator
+    {
+        /// <inheritdoc />
+        public void Configure(ISchemaLockdownRules rules)
+            => rules.BlockMutations(Constants.UdiEntityType.DataType);
     }
 }

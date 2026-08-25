@@ -9,6 +9,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown.Configurators;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 

@@ -3,6 +3,7 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DocumentType;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown.Configurators;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 

@@ -4,7 +4,9 @@ using System.Net.Http.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Webhook;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
@@ -40,5 +42,30 @@ public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : ManagementApiTe
         var response = await Client.PostAsync(Url, JsonContent.Create(createModel));
 
         Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    /// <summary>
+    /// Locks a broad set of schema entity types, none of which are webhooks.
+    /// </summary>
+    private sealed class LockOtherSchemaTypesConfigurator : ISchemaLockdownConfigurator
+    {
+        private static readonly string[] EntityTypes =
+        [
+            Constants.UdiEntityType.DocumentType,
+            Constants.UdiEntityType.MediaType,
+            Constants.UdiEntityType.MemberType,
+            Constants.UdiEntityType.DataType,
+            Constants.UdiEntityType.DictionaryItem,
+            Constants.UdiEntityType.Language,
+        ];
+
+        /// <inheritdoc />
+        public void Configure(ISchemaLockdownRules rules)
+        {
+            foreach (var entityType in EntityTypes)
+            {
+                rules.BlockMutations(entityType);
+            }
+        }
     }
 }
