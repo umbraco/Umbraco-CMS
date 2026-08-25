@@ -464,10 +464,11 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Returns true if there is any content in the recycle bin.
+    ///     Gets a value indicating whether there is any content in the recycle bin.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns><c>true</c> if there is content in the recycle bin; otherwise, <c>false</c>.</returns>
-    bool RecycleBinSmells();
+    Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken);
 
     /// <summary>
     ///     Sorts documents.

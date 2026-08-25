@@ -519,6 +519,16 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     /// <inheritdoc />
+    public async Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        bool result = await _asyncDocumentRepository.RecycleBinSmellsAsync(cancellationToken);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> IsPathPublishableAsync(IContent content, CancellationToken cancellationToken)
     {
         // fast
@@ -1296,19 +1306,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
 
         return OperationResult.Succeed(eventMessages);
-    }
-
-    /// <summary>
-    /// Checks if there are any <see cref="IContent"/> items in the Recycle Bin.
-    /// </summary>
-    /// <returns><c>true</c> if there are items in the Recycle Bin; otherwise, <c>false</c>.</returns>
-    public bool RecycleBinSmells()
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.RecycleBinSmells();
-        }
     }
 
     #endregion

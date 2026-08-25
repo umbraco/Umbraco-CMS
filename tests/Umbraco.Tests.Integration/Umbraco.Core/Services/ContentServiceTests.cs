@@ -2609,6 +2609,18 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task RecycleBinSmellsAsync_ReflectsRecycleBinContents()
+    {
+        // Arrange - the Trashed fixture is already in the recycle bin.
+        // Act, Assert
+        Assert.That(await ContentService.RecycleBinSmellsAsync(CancellationToken.None), Is.True);
+
+        ContentService.EmptyRecycleBin();
+
+        Assert.That(await ContentService.RecycleBinSmellsAsync(CancellationToken.None), Is.False);
+    }
+
+    [Test]
     [LongRunning]
     public async Task Ensures_Permissions_Are_Retained_For_Copied_Descendants_With_Explicit_Permissions()
     {
