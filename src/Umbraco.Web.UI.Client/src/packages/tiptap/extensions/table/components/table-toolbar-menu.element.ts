@@ -11,12 +11,8 @@ export class UmbTiptapTableToolbarMenuElement extends UmbTiptapToolbarMenuElemen
 
 		if (changedProperties.has('isActive') && !this.isActive) {
 			const popover = this.shadowRoot?.getElementById('popover-menu');
-			try {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				popover?.hidePopover();
-			} catch {
-				// noop
+			if (popover?.matches(':popover-open')) {
+				popover.hidePopover();
 			}
 		}
 	}
