@@ -195,7 +195,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     public bool TryGetChildrenKeys(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_navigation.Structure, parentKey, out childrenKeys);
 
-    /// <inheritdoc />
+    /// <summary>
+    ///    Attempts to determine if a parent node has any children in the main navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node.</param>
+    /// <param name="hasChildren">
+    ///     When this method returns, contains a value indicating whether the parent node has any children.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the structure; otherwise, <c>false</c>.</returns>
     public bool TryGetHasChildren(Guid parentKey, out bool hasChildren)
         => TryGetHasChildrenFromStructure(_navigation.Structure, parentKey, out hasChildren);
 
@@ -365,7 +372,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     public bool TryGetChildrenKeysInBin(Guid parentKey, out IEnumerable<Guid> childrenKeys)
         => TryGetChildrenKeysFromStructure(_recycleBinNavigation.Structure, parentKey, out childrenKeys);
 
-    /// <inheritdoc />
+    /// <summary>
+    ///    Attempts to determine if a parent node has any children in the recycle bin navigation structure.
+    /// </summary>
+    /// <param name="parentKey">The unique identifier of the parent node in the recycle bin.</param>
+    /// <param name="hasChildren">
+    ///     When this method returns, contains a value indicating whether the parent node has any children.
+    /// </param>
+    /// <returns><c>true</c> if the parent node exists in the recycle bin; otherwise, <c>false</c>.</returns>
     public bool TryGetHasChildrenInBin(Guid parentKey, out bool hasChildren)
         => TryGetHasChildrenFromStructure(_recycleBinNavigation.Structure, parentKey, out hasChildren);
 
