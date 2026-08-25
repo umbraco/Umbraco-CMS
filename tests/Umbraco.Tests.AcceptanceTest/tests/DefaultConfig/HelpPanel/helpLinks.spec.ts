@@ -48,7 +48,9 @@ test("Check the youtube link works as expected", async ({ page, umbracoUi }) => 
     let ourUmbracoPopup = await ourUmbraco;
 
     //Assert
-    await expect(ourUmbracoPopup).toHaveURL(/.*our.umbraco.com/);
+    // our.umbraco.com has been retired and now issues a 301 to a page on community.umbraco.com,
+    // so assert on the host we actually land on rather than the one the link points at.
+    await expect(ourUmbracoPopup).toHaveURL(/.*community\.umbraco\.com\/.*/);
     await ourUmbracoPopup.close();
   });
 });
