@@ -320,6 +320,8 @@ export default {
 		createFromClipboard: 'Zalijepi iz međuspremnika',
 		nodeIsInTrash: 'Ova stavka je u košu za smeće',
 		saveModalTitle: 'Spremi',
+		saveAndPublishDescendantsModalTitle: 'Spremi i objavi sa potomcima',
+		saveAndScheduleModalTitle: 'Spremi i zakaži objavu',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Kreirajte novi predložak sadržaja iz <em>%0%</em>',
@@ -333,6 +335,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Kliknite za prijenos',
+		browseFilesAction: 'Pregledaj datoteke',
+		dropFilesOr: 'Povucite i ispustite medije ovdje<br />ili',
 		orClickHereToUpload: 'ili kliknite ovdje kako bi odaberali datoteke',
 		disallowedFileType: 'Nije moguće učitati ovu datoteku, jer nema odobrenu vrstu datoteke',
 		disallowedMediaType: "Nije moguće učitati ovu datoteku, format medija sa nastavkom '%0%' nije dozvoljen",
@@ -770,6 +774,8 @@ export default {
 		next: 'Sljedeći',
 		no: 'Ne',
 		nodeName: 'Ime čvora',
+		noResults: 'Nema rezultata',
+		noResultsFor: (query: string) => `Nema rezultata za "${query}".`,
 		of: 'od',
 		off: 'Isključeno',
 		ok: 'OK',
@@ -1576,8 +1582,10 @@ export default {
 		tabHasNoSortOrder: 'kartica nema redoslijed sortiranja',
 		compositionUsageHeading: 'Gdje se koristi ovaj sastav?',
 		compositionUsageSpecification: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta sadržaja:\n    ',
-		compositionUsageSpecificationMediaType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta medija:\n    ',
-		compositionUsageSpecificationMemberType: 'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta člana:\n    ',
+		compositionUsageSpecificationMediaType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta medija:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Ovaj sastav se trenutno koristi u sastavu sljedećih\n      vrsta člana:\n    ',
 		variantsHeading: 'Dozvoli varijacije',
 		cultureVariantHeading: 'Dozvolite varirati u zavisnosti od kulture',
 		segmentVariantHeading: 'Dozvoli segmentaciju',
@@ -1751,6 +1759,10 @@ export default {
 		templatingGroup: 'Predložak',
 		thirdPartyGroup: 'Treća strana',
 		webhooks: 'Webhooks',
+	},
+	picker: {
+		browseTab: 'Pregledaj',
+		searchTab: 'Pretraži',
 	},
 	update: {
 		updateAvailable: 'Postoji nova verzija',

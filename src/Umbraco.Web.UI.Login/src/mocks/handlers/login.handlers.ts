@@ -1,7 +1,6 @@
 import { umbLoginData } from '../data/login.data.js';
 import { delay, http, type HttpHandler, HttpResponse } from 'msw';
 import type { ManifestResponseModel, ResetPasswordRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { PostSecurityForgotPasswordData } from '../../api/types.gen.js';
 
 export const handlers: HttpHandler[] = [
 	http.get<any, Array<ManifestResponseModel>>('/umbraco/management/api/v1/manifest/manifest/public', async () => {
@@ -26,7 +25,7 @@ export const handlers: HttpHandler[] = [
 			const { status, data } = umbLoginData.login(username, password);
 
 			return HttpResponse.json(data, { status });
-		}
+		},
 	),
 
 	http.post('/umbraco/management/api/v1/security/forgot-password', async () => {
@@ -46,7 +45,7 @@ export const handlers: HttpHandler[] = [
 			await delay();
 
 			return HttpResponse.json(response.data, { status: response.status });
-		}
+		},
 	),
 
 	http.post<any, ResetPasswordRequestModel>('/umbraco/management/api/v1/security/forgot-password/reset', async () => {
@@ -64,6 +63,6 @@ export const handlers: HttpHandler[] = [
 			}
 			const user = umbLoginData.users[0];
 			return HttpResponse.json(user);
-		}
+		},
 	),
 ];

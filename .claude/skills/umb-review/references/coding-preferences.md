@@ -54,7 +54,7 @@ Large test classes are split into partial files by method: `ContentServiceTests.
 When making decisions, prioritize:
 
 - **Readability** over cleverness
-- **Flexibility** over rigidity
+- **Flexibility** over rigidity — see [General-Purpose by Default](../../../../CLAUDE.md#2-general-purpose-by-default) for what this means in shared/generic code
 - Explain trade-offs when deviating from these defaults
 
 ---
@@ -72,6 +72,7 @@ When making decisions, prioritize:
 - Keep documentation in sync with code changes
 - Add **JS Docs** on all public frontend APIs (classes, methods, properties)
 - Focus on "why" and usage, not restating the obvious
+- See the [Code Comment Policy](../../../../CLAUDE.md#9-code-comment-policy) for the full rules on comments
 
 ---
 

@@ -8647,6 +8647,10 @@ export type GetIndexerErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerResponses = {
@@ -8676,6 +8680,10 @@ export type GetIndexerByIndexNameErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetIndexerByIndexNameError = GetIndexerByIndexNameErrors[keyof GetIndexerByIndexNameErrors];
@@ -8707,6 +8715,10 @@ export type PostIndexerByIndexNameRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -14112,6 +14124,10 @@ export type PostPublishedCacheRebuildErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheRebuildResponses = {
@@ -14133,6 +14149,10 @@ export type GetPublishedCacheRebuildStatusErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetPublishedCacheRebuildStatusResponses = {
@@ -14156,6 +14176,10 @@ export type PostPublishedCacheReloadErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type PostPublishedCacheReloadResponses = {
@@ -14892,6 +14916,10 @@ export type GetSearcherErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
 };
 
 export type GetSearcherResponses = {
@@ -14921,6 +14949,10 @@ export type GetSearcherBySearcherNameQueryErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */

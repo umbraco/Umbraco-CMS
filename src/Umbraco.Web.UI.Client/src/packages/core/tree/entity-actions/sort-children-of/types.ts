@@ -9,8 +9,7 @@ export interface UmbSortChildrenOfArgs {
 	sorting: Array<{ unique: string; sortOrder: number }>;
 }
 
-export interface ManifestEntityActionSortChildrenOfKind
-	extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
+export interface ManifestEntityActionSortChildrenOfKind extends ManifestEntityAction<MetaEntityActionSortChildrenOfKind> {
 	type: 'entityAction';
 	kind: 'sortChildrenOf';
 }
