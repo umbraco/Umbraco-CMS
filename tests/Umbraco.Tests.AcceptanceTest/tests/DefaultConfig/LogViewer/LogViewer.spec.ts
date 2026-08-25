@@ -144,11 +144,7 @@ test('can sort logs by timestamp', async ({umbracoUi}) => {
   await umbracoUi.logViewer.clickSortLogByTimestampButton();
 
   // Assert
-  // Toggling sort re-queries the server from page 1, so ascending and descending pages can hold entirely
-  // different entries once there's more than a page of logs - comparing against an API snapshot (or the
-  // pre-sort page) made this flaky. Checking that the loaded page is itself in ascending order verifies
-  // the same behaviour without assuming what the other page's contents are. Polling also covers the small
-  // lag between the sort response arriving and the list re-rendering with it.
+  // Checks the loaded page is itself in ascending order, rather than against an external snapshot.
   await expect.poll(async () => {
     const timestamps = (await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime());
     return timestamps.every((timestamp, index) => index === 0 || timestamps[index - 1] <= timestamp);
