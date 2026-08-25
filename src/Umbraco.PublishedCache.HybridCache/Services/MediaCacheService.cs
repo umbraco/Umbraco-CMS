@@ -217,6 +217,7 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
     private async Task<List<Guid>> ProbeHybridCacheAsync(List<Guid> keys, long generation, Dictionary<Guid, IPublishedContent> resolved)
     {
         var pending = new List<Guid>(keys.Count);
+        var idKeyPairs = new List<(int Id, Guid Key)>();
 
         foreach (Guid key in keys)
         {
@@ -229,8 +230,16 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
 
             if (node is not null)
             {
+                idKeyPairs.Add((node.Id, node.Key));
                 ResolveNode(key, node, generation, resolved);
             }
+        }
+
+        // Mirrors GetNodeAsync, which warms the id/key map for every resolved node. Batched into one
+        // call since PopulateCache takes a write lock per call.
+        if (idKeyPairs.Count > 0)
+        {
+            _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Media);
         }
 
         return pending;
@@ -245,6 +254,12 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         {
             coldNodes = (await _databaseCacheRepository.GetMediaSourcesAsync(keys)).ToArray();
             scope.Complete();
+        }
+
+        // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns.
+        if (coldNodes.Count > 0)
+        {
+            _idKeyMap.PopulateCache(coldNodes.Select(node => (node.Id, node.Key)).ToArray(), UmbracoObjectTypes.Media);
         }
 
         foreach (ContentCacheNode node in coldNodes)

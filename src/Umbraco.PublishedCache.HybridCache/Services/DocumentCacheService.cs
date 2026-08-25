@@ -234,6 +234,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
     private async Task<List<Guid>> ProbeHybridCacheAsync(List<Guid> keys, bool preview, long generation, Dictionary<Guid, IPublishedContent> resolved)
     {
         var pending = new List<Guid>(keys.Count);
+        var idKeyPairs = new List<(int Id, Guid Key)>();
 
         foreach (Guid key in keys)
         {
@@ -247,8 +248,16 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
 
             if (node is not null)
             {
+                idKeyPairs.Add((node.Id, node.Key));
                 ResolveNode(key, node, preview, generation, resolved);
             }
+        }
+
+        // Mirrors GetNodeAsync, which warms the id/key map for every resolved node. Batched into one
+        // call since PopulateCache takes a write lock per call.
+        if (idKeyPairs.Count > 0)
+        {
+            _idKeyMap.PopulateCache(idKeyPairs, UmbracoObjectTypes.Document);
         }
 
         return pending;
@@ -263,6 +272,13 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
             coldNodes = (await _databaseCacheRepository.GetContentSourcesAsync(keys, preview)).ToArray();
+        }
+
+        // Mirrors GetNodeAsync, which warms the id/key map for every node the database returns,
+        // regardless of the ancestor guard below.
+        if (coldNodes.Count > 0)
+        {
+            _idKeyMap.PopulateCache(coldNodes.Select(node => (node.Id, node.Key)).ToArray(), UmbracoObjectTypes.Document);
         }
 
         foreach (ContentCacheNode node in coldNodes)
