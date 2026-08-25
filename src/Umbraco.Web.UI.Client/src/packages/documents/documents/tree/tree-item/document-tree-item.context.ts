@@ -51,9 +51,9 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	 * that drills into items takes the user into it. A tree with neither can do no more than expand, so it keeps the
 	 * expand caret and its children — the subtree would otherwise be unreachable.
 	 */
-	public readonly isDrillableCollection = mergeObservables(
-		[this.#collapsibleCollection, this.isMenu, this.isDrillable],
-		([collapsibleCollection, isMenu, isDrillable]) => collapsibleCollection && (isMenu || isDrillable),
+	public readonly drillableCollection = mergeObservables(
+		[this.#collapsibleCollection, this.isMenu, this.drillable],
+		([collapsibleCollection, isMenu, drillable]) => collapsibleCollection && (isMenu || drillable),
 	);
 
 	override setIsMenu(isMenu: boolean) {
@@ -118,7 +118,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override showChildren() {
-		if (this.#getIsDrillableCollection()) {
+		if (this.#getDrillableCollection()) {
 			this.#activateCollection();
 			return;
 		}
@@ -126,7 +126,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override hideChildren() {
-		if (this.#getIsDrillableCollection()) {
+		if (this.#getDrillableCollection()) {
 			this.#activateCollection();
 			return;
 		}
@@ -147,8 +147,8 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		return this.#item.getHasCollection() && this.getTreeItem()?.noAccess !== true;
 	}
 
-	#getIsDrillableCollection(): boolean {
-		return this.#getCollapsibleCollection() && (this.getIsMenu() || this.getIsDrillable());
+	#getDrillableCollection(): boolean {
+		return this.#getCollapsibleCollection() && (this.getIsMenu() || this.getDrillable());
 	}
 
 	#openCollection() {

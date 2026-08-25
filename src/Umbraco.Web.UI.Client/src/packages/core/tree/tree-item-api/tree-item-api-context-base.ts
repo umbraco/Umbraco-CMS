@@ -72,14 +72,14 @@ export abstract class UmbTreeItemApiContextBase<
 
 	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
 
-	protected readonly _isDrillable = new UmbBooleanState(false);
+	protected readonly _drillable = new UmbBooleanState(false);
 	/**
 	 * Whether opening this item takes the user into it, as answered by the tree — it is a property of the tree's host,
 	 * the same for every item in it.
 	 *
 	 * False until the tree says otherwise, so a host that cannot is never mistaken for one that can.
 	 */
-	readonly isDrillable = this._isDrillable.asObservable();
+	readonly drillable = this._drillable.asObservable();
 
 	/**
 	 * @returns {Observable<boolean>} True if any entity action is registered for this entity type
@@ -134,7 +134,7 @@ export abstract class UmbTreeItemApiContextBase<
 			this._observeIsSelectable();
 			this._observeIsSelected();
 			this._observeSelectOnly();
-			this._observeIsDrillable();
+			this._observeDrillable();
 			if (context) this._onTreeContextChanged(context);
 		});
 		this.#gotTreeContext = this._treeContextConsumer.asPromise();
@@ -150,8 +150,8 @@ export abstract class UmbTreeItemApiContextBase<
 	 * @returns {boolean} True when the tree's host enters opened items.
 	 * @memberof UmbTreeItemApiContextBase
 	 */
-	getIsDrillable(): boolean {
-		return this._isDrillable.getValue();
+	getDrillable(): boolean {
+		return this._drillable.getValue();
 	}
 
 	setTreeItem(item: TreeItemType | undefined): void {
@@ -226,10 +226,10 @@ export abstract class UmbTreeItemApiContextBase<
 		);
 	}
 
-	protected _observeIsDrillable() {
+	protected _observeDrillable() {
 		const ctx = this._treeContext;
 		if (!ctx) return;
-		this.observe(ctx.isDrillable, (value) => this._isDrillable.setValue(value ?? false), '_observeIsDrillable');
+		this.observe(ctx.drillable, (value) => this._drillable.setValue(value ?? false), '_observeDrillable');
 	}
 
 	protected _observeSelectOnly() {

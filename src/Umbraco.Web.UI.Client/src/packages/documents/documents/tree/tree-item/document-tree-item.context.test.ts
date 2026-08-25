@@ -162,8 +162,8 @@ describe('UmbDocumentTreeItemContext', () => {
 		});
 
 		it('does not offer to be drilled into', () => {
-			expect(context.getIsDrillable()).to.be.false;
-			expect(observeOnce(context.isDrillableCollection)).to.be.false;
+			expect(context.getDrillable()).to.be.false;
+			expect(observeOnce(context.drillableCollection)).to.be.false;
 		});
 
 		it('expands its children on showChildren', () => {
