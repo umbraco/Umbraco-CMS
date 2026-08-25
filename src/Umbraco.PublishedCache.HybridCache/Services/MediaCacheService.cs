@@ -381,7 +381,6 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
             null,
             contentTypeIds.ToList(),
             null,
-            null,
             action =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();
