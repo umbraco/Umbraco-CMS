@@ -306,6 +306,7 @@ export default {
 		isSensitiveValue:
 			"Mae'r gwerth yma'n gudd. Os ydych chi angen hawl i weld y gwerth yma, cysylltwch â gweinyddwr eich gwefan.",
 		isSensitiveValue_short: "Mae'r gwerth yma'n gudd.",
+		isSensitiveValueNotice: 'Os ydych chi angen hawl i weld y gwerthoedd cudd, cysylltwch â gweinyddwr eich gwefan.',
 		languagesToPublish: 'Pa ieithoedd yr hoffech chi eu cyhoeddi? ',
 		languagesToSendForApproval: 'Pa ieithoedd hoffech chi anfon am gymeradwyaeth?',
 		languagesToSchedule: 'Pa ieithoedd yr hoffech chi eu hamserlennu?',

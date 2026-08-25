@@ -300,6 +300,8 @@ export default {
 		isSensitiveValue:
 			'Ova vrijednost je skrivena. Ako vam je potreban pristup da vidite ovu vrijednost, obratite se\n       administratoru web stranice.\n    ',
 		isSensitiveValue_short: 'Ova vrijednost je skrivena.',
+		isSensitiveValueNotice:
+			'Ako vam je potreban pristup da vidite skrivene vrijednosti, obratite se administratoru web stranice.',
 		languagesToPublish: 'Koje jezike želite da objavite?',
 		languagesToSendForApproval: 'Koje jezike želite poslati na odobrenje?',
 		languagesToSchedule: 'Koje jezike želite da zakažete?',
