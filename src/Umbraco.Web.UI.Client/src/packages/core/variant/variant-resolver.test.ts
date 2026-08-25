@@ -71,6 +71,14 @@ describe('UmbVariantResolver', () => {
 		expect(controller.getFallbackVariant()).to.equal(undefined);
 	});
 
+	it('resolves the non-segment invariant variant even when a segment variant appears first', () => {
+		const segmentVariant: TestVariant = { culture: null, segment: 'segment-a', name: 'Segment A' };
+		const invariant: TestVariant = { culture: null, segment: null, name: 'Invariant' };
+		controller.setVariants([segmentVariant, invariant]);
+		expect(controller.getVariant()).to.equal(invariant);
+		expect(controller.getFallbackVariant()).to.equal(undefined);
+	});
+
 	it('resolves the fallback variant from the fallback culture', async () => {
 		await variantContext.setCulture('de-DE');
 		await observeValue(controller.displayCulture, (culture) => culture === 'de-DE');
