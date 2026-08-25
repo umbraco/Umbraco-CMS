@@ -971,7 +971,7 @@ export class DataTypeApiHelper {
   async doesBlockGridContainGroupWithName(blockGridName: string, groupName: string) {
     const blockEditor = await this.getByName(blockGridName);
     const blockGroupsValue = blockEditor.values.find(value => value.alias === 'blockGroups');
-    if (!blockGroupsValue || blockGroupsValue.value.length === 0) {
+    if (!blockGroupsValue?.value?.length) {
       return false;
     }
 
