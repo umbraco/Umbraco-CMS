@@ -1157,10 +1157,11 @@ export class DataTypeUiHelper extends UiBaseLocators {
       (inputs, groupName) => inputs.findIndex((input) => (input as HTMLInputElement).value === groupName),
       name,
     );
-    if (index === -1) {
-      throw new Error(`No block group named "${name}" was found.`);
-    }
-    return this.blockGroups.nth(index);
+    const group = this.blockGroups.nth(Math.max(index, 0));
+    // Locator.nth() treats a not-found (-1) index as the last group rather than failing, so verify the
+    // resolved group actually matches the requested name instead of trusting the index.
+    await expect(group.getByRole('textbox')).toHaveValue(name);
+    return group;
   }
 
   async clickDeleteGroupButtonWithName(name: string) {
