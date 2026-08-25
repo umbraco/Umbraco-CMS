@@ -550,7 +550,6 @@ internal sealed class MediaCacheService : IMediaCacheService, IMemoryCacheSizeRe
         => _databaseCacheRepository.Rebuild(
             null,
             contentTypeIds.ToList(),
-            null,
             action =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();

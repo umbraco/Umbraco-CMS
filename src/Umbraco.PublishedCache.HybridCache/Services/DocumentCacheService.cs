@@ -666,7 +666,6 @@ internal sealed class DocumentCacheService : IDocumentCacheService, IMemoryCache
         => _databaseCacheRepository.Rebuild(
             contentTypeIds.ToList(),
             null,
-            null,
             action =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();
