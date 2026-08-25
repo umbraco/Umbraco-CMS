@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -67,13 +68,13 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         // batch), while a cold set collapses its database access into batched reads. Returned lazily
         // so short-circuiting consumers still exit early; callers that enumerate more than once should
         // buffer the result themselves (.ToList() / .ToArray()).
-        return ChunkedPublishedContentEnumerator.Enumerate(
+        return ChunkedTieredResolver.Resolve<Guid, IPublishedContent>(
             keys,
-            (Guid key, out IPublishedContent? content) => _documentCacheService.TryGetCached(key, preview, out content),
-            misses => _documentCacheService.GetByKeysAsync(misses, preview).GetAwaiter().GetResult(),
-            content => culture == Constants.System.InvariantCulture
-                       || content.ContentType.VariesByCulture() is false
-                       || content.Cultures.ContainsKey(culture));
+            (batchKeys, results) => ResolveCachedItems(batchKeys, preview, results),
+            (missedKeys, results) => ResolvePersistedItems(missedKeys, preview, results))
+            .Where(content => culture == Constants.System.InvariantCulture
+                               || content.ContentType.VariesByCulture() is false
+                               || content.Cultures.ContainsKey(culture));
     }
 
     /// <inheritdoc />
@@ -81,5 +82,26 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     {
         var preview = _previewService.IsInPreview();
         return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull();
+    }
+
+    private void ResolveCachedItems(IReadOnlyCollection<Guid> batchKeys, bool preview, IDictionary<Guid, IPublishedContent> results)
+    {
+        foreach (Guid key in batchKeys)
+        {
+            if (_documentCacheService.TryGetCached(key, preview, out IPublishedContent? content) && content is not null)
+            {
+                results[key] = content;
+            }
+        }
+    }
+
+    // Sync-over-async is intentional: FilterAvailable backs the sync IPublishedContent.Children()/
+    // Descendants() surface, and GetByKeysAsync has no sync counterpart.
+    private void ResolvePersistedItems(IReadOnlyCollection<Guid> missedKeys, bool preview, IDictionary<Guid, IPublishedContent> results)
+    {
+        foreach (IPublishedContent content in _documentCacheService.GetByKeysAsync(missedKeys, preview).GetAwaiter().GetResult())
+        {
+            results[content.Key] = content;
+        }
     }
 }

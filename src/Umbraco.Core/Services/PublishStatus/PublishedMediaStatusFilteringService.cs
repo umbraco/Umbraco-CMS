@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -36,13 +37,33 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
     /// that need to enumerate the result more than once should buffer it themselves (.ToList() / .ToArray()).
     /// </remarks>
     public IEnumerable<IPublishedContent> FilterAvailable(IEnumerable<Guid> candidateKeys, string? culture)
-        => ChunkedPublishedContentEnumerator.Enumerate(
+        => ChunkedTieredResolver.Resolve<Guid, IPublishedContent>(
             candidateKeys,
-            _mediaCacheService.TryGetCached,
-            misses => _mediaCacheService.GetByKeysAsync(misses).GetAwaiter().GetResult(),
-            predicate: null);
+            ResolveCachedItems,
+            ResolvePersistedItems);
 
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
         => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull();
+
+    private void ResolveCachedItems(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
+    {
+        foreach (Guid key in batchKeys)
+        {
+            if (_mediaCacheService.TryGetCached(key, out IPublishedContent? content) && content is not null)
+            {
+                results[key] = content;
+            }
+        }
+    }
+
+    // Sync-over-async is intentional: FilterAvailable backs the sync IPublishedContent.Children()/
+    // Descendants() surface, and GetByKeysAsync has no sync counterpart.
+    private void ResolvePersistedItems(IReadOnlyCollection<Guid> missedKeys, IDictionary<Guid, IPublishedContent> results)
+    {
+        foreach (IPublishedContent content in _mediaCacheService.GetByKeysAsync(missedKeys).GetAwaiter().GetResult())
+        {
+            results[content.Key] = content;
+        }
+    }
 }
