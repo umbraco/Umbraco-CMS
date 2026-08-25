@@ -134,7 +134,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Could not register redirects because the old route couldn't be retrieved for content ID {ContentId} and culture '{Culture}'.", publishedContent.Id, culture);
+                    _logger.LogWarning(ex, "Could not register redirects because the old route couldn't be retrieved for content ID {ContentId} (key {ContentKey}) and culture '{Culture}'.", publishedContent.Id, publishedContent.Key, culture);
                 }
             }
         }
@@ -313,7 +313,7 @@ internal sealed class RedirectTracker : IRedirectTracker
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Could not track redirects because the new route couldn't be retrieved for content ID {ContentId} and culture '{Culture}'.", contentId, culture);
+                _logger.LogWarning(ex, "Could not track redirects because the new route couldn't be retrieved for content ID {ContentId} (key {ContentKey}) and culture '{Culture}'.", contentId, contentKey, culture);
             }
         }
     }

@@ -5,6 +5,7 @@ import { UmbTreeItemChildrenManager } from '../tree-item-children.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item-expansion.manager.js';
 import type { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
 import { UmbTreeItemApiContextBase } from '../../tree-item-api/tree-item-api-context-base.js';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -32,12 +33,14 @@ export abstract class UmbTreeItemContextBase<
 	});
 	isOpen = this.#treeItemExpansionManager.isExpanded;
 
-	#isMenu = false;
+	#isMenu = new UmbBooleanState(false);
+	/** Whether the tree is the section menu, which navigates by path rather than browsing in place. */
+	readonly isMenu = this.#isMenu.asObservable();
 	setIsMenu(isMenu: boolean) {
-		this.#isMenu = isMenu;
+		this.#isMenu.setValue(isMenu);
 	}
 	getIsMenu() {
-		return this.#isMenu;
+		return this.#isMenu.getValue();
 	}
 
 	constructor(host: UmbControllerHost) {
