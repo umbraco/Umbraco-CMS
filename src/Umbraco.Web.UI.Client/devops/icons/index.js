@@ -125,6 +125,9 @@ const collectDictionaryIcons = async () => {
 				if (!pattern.test(svg)) {
 					svg = svg.replace(/<path/g, '<path fill="currentColor"');
 				}
+                
+                // Replace <title> elements (see #23752)
+                svg = svg.replace(/<title\b[^>]*>[\s\S]*?<\/title>/gi, '');
 
 				const icon = {
 					name: iconDef.name,
