@@ -137,30 +137,22 @@ test('can expand a log entry', async ({umbracoUi}) => {
   await umbracoUi.logViewer.doesDetailedLogHaveText('The token');
 });
 
-test('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const locale = 'en-US';
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true,
-  };
-
+test('can sort logs by timestamp', async ({umbracoUi}) => {
   //Act
   await umbracoUi.logViewer.clickSearchButton();
   // Sorts logs by timestamp
   await umbracoUi.logViewer.clickSortLogByTimestampButton();
-  // The sort button orders ascending, so the first row is the oldest entry
-  const lastLog = await umbracoApi.logViewer.getLog(0, 1, 'Ascending');
-  const dateToFormat = new Date(lastLog.items[0].timestamp);
-  const lastLogTimestamp = new Intl.DateTimeFormat(locale, options).format(dateToFormat);
 
   // Assert
-  await umbracoUi.logViewer.doesFirstLogHaveTimestamp(lastLogTimestamp);
+  // Toggling sort re-queries the server from page 1, so ascending and descending pages can hold entirely
+  // different entries once there's more than a page of logs - comparing against an API snapshot (or the
+  // pre-sort page) made this flaky. Checking that the loaded page is itself in ascending order verifies
+  // the same behaviour without assuming what the other page's contents are. Polling also covers the small
+  // lag between the sort response arriving and the list re-rendering with it.
+  await expect.poll(async () => {
+    const timestamps = (await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime());
+    return timestamps.every((timestamp, index) => index === 0 || timestamps[index - 1] <= timestamp);
+  }).toBe(true);
 });
 
 test('can use pagination', async ({umbracoUi}) => {
