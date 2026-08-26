@@ -11,13 +11,13 @@ namespace Umbraco.Cms.Core.Templates;
 /// <remarks>
 /// Needs to support media and document links, order of attributes should not matter nor should other attributes mess with things:
 /// <![CDATA[
-/// <a type = "media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
+/// <a type="media" href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" title="media">media</a>
 /// <a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page">other page</a>
 /// ]]>
 /// </remarks>
 public sealed partial class HtmlLocalLinkParser
 {
-    [GeneratedRegex(@"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    [GeneratedRegex(@"<a\b[^>]*?href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-fA-F0-9-]+)(?:\}|\%7D))[^>]*?>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex GetLocalLinkTagPattern();
 
     [GeneratedRegex("""type=['"](?<type>(?:media|document))['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
@@ -38,8 +38,8 @@ public sealed partial class HtmlLocalLinkParser
     ///     &lt;a type="document" href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" title="other page"&gt;other page&lt;/a&gt;
     /// </remarks>
     internal static readonly Regex LocalLinkTagPattern = new(
-        @"<a.+?href=['""](?<locallink>\/?{localLink:(?<guid>[a-fA-F0-9-]+)})[^>]*?>",
-        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
+        @"<a\b[^>]*?href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-fA-F0-9-]+)(?:\}|\%7D))[^>]*?>",
+        RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
     /// <summary>
     ///     Regex pattern to match the type attribute (media or document) in local link tags.

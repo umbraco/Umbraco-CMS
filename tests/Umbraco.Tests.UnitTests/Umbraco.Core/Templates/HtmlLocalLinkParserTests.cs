@@ -140,10 +140,31 @@ public class HtmlLocalLinkParserTests
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}?v=1\" title=\"world\">world</a>",
         "<a href=\"/my-test-url?v=1\" title=\"world\">world</a>")]
 
+    // URL encoded braces, as accepted by the legacy pattern and preserved by the ConvertLocalLinks migration
+    [TestCase(
+        "<a type=\"document\" href=\"/%7BlocalLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E%7D\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"media\" href=\"/%7BlocalLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E%7D\" title=\"world\">world</a>",
+        "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/%7BlocalLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E%7D#anchor\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url#anchor\" title=\"world\">world</a>")]
+
     // custom type ignored
     [TestCase(
         "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
         "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
+    // the type attribute has to belong to the anchor holding the local link, not to a preceding tag
+    [TestCase(
+        "<a href=\"/other\" type=\"document\">other</a> <a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a href=\"/other\" type=\"document\">other</a> <a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
+    // only anchors hold local links, an element whose name merely starts with "a" does not
+    [TestCase(
+        "<abbr type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</abbr>",
+        "<abbr type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</abbr>")]
 
     // PascalCase type — historic mis-cased values written by the (now fixed) ConvertLocalLinks migration for Umbraco 15 (see #22597).
     [TestCase(
