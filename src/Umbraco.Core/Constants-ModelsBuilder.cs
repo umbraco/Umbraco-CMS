@@ -16,6 +16,16 @@ public static partial class Constants
         public const string DefaultModelsNamespace = "Umbraco.Cms.Web.Common.PublishedModels";
 
         /// <summary>
+        ///     Mode where models are generated and compiled at runtime.
+        /// </summary>
+        /// <remarks>
+        ///     Deliberately not part of <see cref="ModelsModes" />, which names only the modes that can be satisfied
+        ///     without an optional package. This mode requires a live model factory, so it is not a mode that can be
+        ///     offered unconditionally. It is named here so the string has a single canonical definition.
+        /// </remarks>
+        public const string InMemoryAutoModelsMode = "InMemoryAuto";
+
+        /// <summary>
         ///     Defines the available ModelsBuilder modes.
         /// </summary>
         public static class ModelsModes

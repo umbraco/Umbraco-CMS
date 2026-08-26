@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Runtime.RuntimeMode
 [TestFixture]
 public class RazorRuntimeCompilationValidatorTests
 {
-    private const string InMemoryAuto = "InMemoryAuto";
     private const string FutureVersionWarning = "Umbraco 19";
 
     private FakeLogger _logger = null!;
@@ -27,9 +26,9 @@ public class RazorRuntimeCompilationValidatorTests
     public void SetUp() => _logger = new FakeLogger();
 
     [Test]
-    public void Reports_An_Explicitly_Configured_Mode_That_No_Live_Factory_Can_Satisfy()
+    public void Handle_WhenExplicitlyConfiguredModeCannotBeSatisfied_LogsErrorWarningOfFutureVersion()
     {
-        CreateSut(InMemoryAuto, liveFactoryEnabled: false, modelsModeConfigured: true).Handle(Notification);
+        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured: true).Handle(Notification);
 
         Assert.That(_logger.LogEntries, Has.Exactly(1).Matches<FakeLogger.LogEntry>(
             e => e.Level == LogLevel.Error
@@ -38,9 +37,9 @@ public class RazorRuntimeCompilationValidatorTests
     }
 
     [Test]
-    public void Reports_A_Defaulted_Mode_That_No_Live_Factory_Can_Satisfy_Without_Warning_Of_A_Future_Version()
+    public void Handle_WhenDefaultedModeCannotBeSatisfied_LogsErrorWithoutWarningOfFutureVersion()
     {
-        CreateSut(InMemoryAuto, liveFactoryEnabled: false, modelsModeConfigured: false).Handle(Notification);
+        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured: false).Handle(Notification);
 
         Assert.That(_logger.LogEntries, Has.Exactly(1).Matches<FakeLogger.LogEntry>(
             e => e.Level == LogLevel.Error
@@ -50,9 +49,9 @@ public class RazorRuntimeCompilationValidatorTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public void Reports_Nothing_When_A_Live_Factory_Is_Available(bool modelsModeConfigured)
+    public void Handle_WhenLiveFactoryIsAvailable_LogsNothing(bool modelsModeConfigured)
     {
-        CreateSut(InMemoryAuto, liveFactoryEnabled: true, modelsModeConfigured).Handle(Notification);
+        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: true, modelsModeConfigured).Handle(Notification);
 
         Assert.That(_logger.LogEntries, Is.Empty);
     }
@@ -60,7 +59,7 @@ public class RazorRuntimeCompilationValidatorTests
     [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing)]
     [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)]
     [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual)]
-    public void Reports_Nothing_For_A_Mode_That_Does_Not_Require_A_Live_Factory(string modelsMode)
+    public void Handle_WhenModeDoesNotRequireLiveFactory_LogsNothing(string modelsMode)
     {
         CreateSut(modelsMode, liveFactoryEnabled: false, modelsModeConfigured: true).Handle(Notification);
 
@@ -68,15 +67,15 @@ public class RazorRuntimeCompilationValidatorTests
     }
 
     [Test]
-    public void Does_Not_Throw_When_The_Mode_Cannot_Be_Satisfied()
+    public void Handle_WhenModeCannotBeSatisfied_DoesNotThrow()
     {
-        RazorRuntimeCompilationValidator sut = CreateSut(InMemoryAuto, liveFactoryEnabled: false, modelsModeConfigured: true);
+        RazorRuntimeCompilationValidator sut = CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured: true);
 
         Assert.DoesNotThrow(() => sut.Handle(Notification));
     }
 
     [Test]
-    public void Can_Be_Resolved_From_A_Validating_Container()
+    public void Resolve_FromValidatingContainer_DoesNotThrow()
     {
         // The obsolete constructor kept for binary compatibility gives the type two public constructors, and
         // container activation with validation enabled is where an ambiguous choice between them would surface.

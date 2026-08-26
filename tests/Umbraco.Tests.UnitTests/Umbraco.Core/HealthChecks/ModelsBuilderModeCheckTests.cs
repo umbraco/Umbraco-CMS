@@ -18,12 +18,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.HealthChecks;
 [TestFixture]
 public class ModelsBuilderModeCheckTests
 {
-    private const string InMemoryAuto = "InMemoryAuto";
-
     [Test]
-    public async Task Reports_An_Error_When_An_Explicitly_Configured_Mode_Cannot_Be_Satisfied()
+    public async Task When_Explicitly_Configured_Mode_Cannot_Be_Satisfied_Returns_Error()
     {
-        HealthCheckStatus status = await GetStatus(InMemoryAuto, liveFactoryEnabled: false, modelsModeConfigured: true);
+        HealthCheckStatus status = await GetStatus(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured: true);
 
         Assert.Multiple(() =>
         {
@@ -33,9 +31,9 @@ public class ModelsBuilderModeCheckTests
     }
 
     [Test]
-    public async Task Reports_A_Warning_When_A_Defaulted_Mode_Cannot_Be_Satisfied()
+    public async Task When_Defaulted_Mode_Cannot_Be_Satisfied_Returns_Warning()
     {
-        HealthCheckStatus status = await GetStatus(InMemoryAuto, liveFactoryEnabled: false, modelsModeConfigured: false);
+        HealthCheckStatus status = await GetStatus(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured: false);
 
         Assert.Multiple(() =>
         {
@@ -45,9 +43,9 @@ public class ModelsBuilderModeCheckTests
     }
 
     [Test]
-    public async Task Reports_Success_When_A_Live_Factory_Is_Available()
+    public async Task When_Live_Factory_Is_Available_Returns_Success()
     {
-        HealthCheckStatus status = await GetStatus(InMemoryAuto, liveFactoryEnabled: true, modelsModeConfigured: true);
+        HealthCheckStatus status = await GetStatus(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: true, modelsModeConfigured: true);
 
         Assert.Multiple(() =>
         {
@@ -59,7 +57,7 @@ public class ModelsBuilderModeCheckTests
     [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing)]
     [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)]
     [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual)]
-    public async Task Reports_Success_For_A_Mode_That_Does_Not_Require_A_Live_Factory(string modelsMode)
+    public async Task When_Mode_Does_Not_Require_A_Live_Factory_Returns_Success(string modelsMode)
     {
         HealthCheckStatus status = await GetStatus(modelsMode, liveFactoryEnabled: false, modelsModeConfigured: true);
 

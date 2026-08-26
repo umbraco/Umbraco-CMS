@@ -502,7 +502,7 @@
     <key alias="notificationEmailsCheckErrorMessage">
       <![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
     <key alias="modelsBuilderModeCheckSuccessMessage">
-      <![CDATA[ModelsBuilder is using the <strong>%0%</strong> models mode, which the available model factory can satisfy.]]></key>
+      <![CDATA[ModelsBuilder is using the <strong>%0%</strong> models mode, which is correctly configured.]]></key>
     <key alias="modelsBuilderModeCheckConfiguredErrorMessage">
       <![CDATA[ModelsBuilder is configured to use the <strong>%0%</strong> models mode, but no live model factory is available, so no models will be generated. Install the <strong>Umbraco.Cms.DevelopmentMode.Backoffice</strong> package, set the runtime mode to <strong>BackofficeDevelopment</strong>, or configure a different ModelsBuilder mode.]]></key>
     <key alias="modelsBuilderModeCheckDefaultErrorMessage">

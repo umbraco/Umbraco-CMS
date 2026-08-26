@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -19,12 +20,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 // boot consistently on every startup path rather than only being reported.
 public class RazorRuntimeCompilationValidator : INotificationHandler<UmbracoApplicationStartedNotification>
 {
-    /// <remarks>
-    /// Not available on <see cref="Core.Constants.ModelsBuilder.ModelsModes"/>, which deliberately names only the
-    /// modes that can be satisfied without an optional package.
-    /// </remarks>
-    private const string InMemoryAutoModelsMode = "InMemoryAuto";
-
     private readonly IConfiguration _configuration;
     private readonly ILogger<RazorRuntimeCompilationValidator> _logger;
     private readonly IOptionsMonitor<ModelsBuilderSettings> _modelsBuilderSettings;
@@ -73,7 +68,7 @@ public class RazorRuntimeCompilationValidator : INotificationHandler<UmbracoAppl
     /// <param name="notification">The notification instance triggered when the Umbraco application has started.</param>
     public void Handle(UmbracoApplicationStartedNotification notification)
     {
-        if (_modelsBuilderSettings.CurrentValue.ModelsMode != InMemoryAutoModelsMode
+        if (_modelsBuilderSettings.CurrentValue.ModelsMode != Constants.ModelsBuilder.InMemoryAutoModelsMode
             || _publishedModelFactory.IsLiveFactoryEnabled())
         {
             return;
@@ -86,13 +81,13 @@ public class RazorRuntimeCompilationValidator : INotificationHandler<UmbracoAppl
         {
             _logger.LogError(
                 "ModelsBuilder is configured to use the {ModelsMode} models mode, but no live model factory is available, so no models will be generated. Install the Umbraco.Cms.DevelopmentMode.Backoffice package, set the runtime mode to BackofficeDevelopment, or configure a different ModelsBuilder mode. This configuration will prevent startup in Umbraco 19.",
-                InMemoryAutoModelsMode);
+                Constants.ModelsBuilder.InMemoryAutoModelsMode);
         }
         else
         {
             _logger.LogError(
                 "ModelsBuilder is using the default {ModelsMode} models mode, but no live model factory is available, so no models will be generated. Install the Umbraco.Cms.DevelopmentMode.Backoffice package, set the runtime mode to BackofficeDevelopment, or configure an explicit ModelsBuilder mode.",
-                InMemoryAutoModelsMode);
+                Constants.ModelsBuilder.InMemoryAutoModelsMode);
         }
     }
 }

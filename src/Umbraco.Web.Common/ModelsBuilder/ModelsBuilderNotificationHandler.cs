@@ -21,12 +21,6 @@ internal sealed class ModelsBuilderNotificationHandler :
     INotificationHandler<ServerVariablesParsingNotification>,
     INotificationHandler<TemplateSavingNotification>
 {
-    /// <remarks>
-    ///     Not available on <see cref="Core.Constants.ModelsBuilder.ModelsModes" />, which deliberately names only
-    ///     the modes that can be satisfied without an optional package.
-    /// </remarks>
-    private const string InMemoryAutoModelsMode = "InMemoryAuto";
-
     private readonly ModelsBuilderSettings _config;
     private readonly IDefaultViewContentProvider _defaultViewContentProvider;
     private readonly IModelsBuilderDashboardProvider _modelsBuilderDashboardProvider;
@@ -97,7 +91,7 @@ internal sealed class ModelsBuilderNotificationHandler :
         // A mode that generates models only at runtime relies on a factory that may not be present, in which
         // case no model type will ever exist for the template to inherit from. Leaving the template untyped
         // keeps it renderable; a typed template would fail to compile.
-        if (_config.ModelsMode == InMemoryAutoModelsMode && _publishedModelFactory.IsLiveFactoryEnabled() is false)
+        if (_config.ModelsMode == Core.Constants.ModelsBuilder.InMemoryAutoModelsMode && _publishedModelFactory.IsLiveFactoryEnabled() is false)
         {
             return;
         }

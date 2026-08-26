@@ -21,12 +21,6 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration;
     Group = "Configuration")]
 public class ModelsBuilderModeCheck : HealthCheck
 {
-    /// <remarks>
-    ///     Not available on <see cref="Constants.ModelsBuilder.ModelsModes" />, which deliberately names only the
-    ///     modes that can be satisfied without an optional package.
-    /// </remarks>
-    private const string InMemoryAutoModelsMode = "InMemoryAuto";
-
     private readonly IConfiguration _configuration;
     private readonly ILocalizedTextService _textService;
     private readonly IOptionsMonitor<ModelsBuilderSettings> _modelsBuilderSettings;
@@ -35,6 +29,10 @@ public class ModelsBuilderModeCheck : HealthCheck
     /// <summary>
     ///     Initializes a new instance of the <see cref="ModelsBuilderModeCheck" /> class.
     /// </summary>
+    /// <param name="textService">The localized text service, used to resolve the reported messages.</param>
+    /// <param name="modelsBuilderSettings">An <see cref="IOptionsMonitor{TOptions}" /> for <see cref="ModelsBuilderSettings" />, used to access the models mode in force.</param>
+    /// <param name="publishedModelFactory">The published model factory, used to establish what it is capable of generating.</param>
+    /// <param name="configuration">The configuration, used to establish whether a mode has been explicitly configured.</param>
     public ModelsBuilderModeCheck(
         ILocalizedTextService textService,
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
@@ -55,7 +53,7 @@ public class ModelsBuilderModeCheck : HealthCheck
     {
         var modelsMode = _modelsBuilderSettings.CurrentValue.ModelsMode;
 
-        if (modelsMode != InMemoryAutoModelsMode || _publishedModelFactory.IsLiveFactoryEnabled())
+        if (modelsMode != Constants.ModelsBuilder.InMemoryAutoModelsMode || _publishedModelFactory.IsLiveFactoryEnabled())
         {
             return new HealthCheckStatus(Localize("modelsBuilderModeCheckSuccessMessage", modelsMode))
             {

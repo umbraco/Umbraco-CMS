@@ -20,15 +20,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelsBuilder;
 [TestFixture]
 public class ModelsBuilderNotificationHandlerTests
 {
-    private const string InMemoryAuto = "InMemoryAuto";
     private const string TypedMarkup = "@inherits UmbracoViewPage<TModel>";
 
-    [TestCase(InMemoryAuto)]
+    [TestCase(Constants.ModelsBuilder.InMemoryAutoModelsMode)]
     [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)]
     [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual)]
     public void Can_Generate_Typed_Template_When_Models_Are_Available(string modelsMode)
     {
-        ITemplate template = CreateNewTemplate();
+        Template template = CreateNewTemplate();
 
         CreateSut(modelsMode, liveFactoryEnabled: true).Handle(CreateNotification(template));
 
@@ -39,7 +38,7 @@ public class ModelsBuilderNotificationHandlerTests
     [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual)]
     public void Can_Generate_Typed_Template_Without_A_Live_Factory_When_Models_Are_Generated_As_Source_Code(string modelsMode)
     {
-        ITemplate template = CreateNewTemplate();
+        Template template = CreateNewTemplate();
 
         CreateSut(modelsMode, liveFactoryEnabled: false).Handle(CreateNotification(template));
 
@@ -49,9 +48,9 @@ public class ModelsBuilderNotificationHandlerTests
     [Test]
     public void Cannot_Generate_Typed_Template_When_Models_Are_Only_Generated_At_Runtime_And_No_Live_Factory_Is_Available()
     {
-        ITemplate template = CreateNewTemplate();
+        Template template = CreateNewTemplate();
 
-        CreateSut(InMemoryAuto, liveFactoryEnabled: false).Handle(CreateNotification(template));
+        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false).Handle(CreateNotification(template));
 
         Assert.That(template.Content, Is.Null.Or.Empty);
     }
@@ -59,7 +58,7 @@ public class ModelsBuilderNotificationHandlerTests
     [Test]
     public void Cannot_Generate_Typed_Template_When_No_Models_Are_Generated()
     {
-        ITemplate template = CreateNewTemplate();
+        Template template = CreateNewTemplate();
 
         CreateSut(Constants.ModelsBuilder.ModelsModes.Nothing, liveFactoryEnabled: true).Handle(CreateNotification(template));
 
@@ -102,7 +101,7 @@ public class ModelsBuilderNotificationHandlerTests
     private static IShortStringHelper ShortStringHelper { get; } =
         new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-    private static ITemplate CreateNewTemplate() => new Template(ShortStringHelper, "TestType", "testType");
+    private static Template CreateNewTemplate() => new(ShortStringHelper, "TestType", "testType");
 
     private static TemplateSavingNotification CreateNotification(ITemplate template) => new(
         template,
