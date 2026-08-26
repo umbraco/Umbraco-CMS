@@ -180,8 +180,8 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
         Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
 
         // both of the block elements should have the content as their identity root
-        Assert.AreEqual(content.Id, block.Content.IdentityRootId);
-        Assert.AreEqual(content.Id, block.Settings.IdentityRootId);
+        Assert.AreEqual(content.Id, block.Content.OwningContentId);
+        Assert.AreEqual(content.Id, block.Settings.OwningContentId);
     }
 
     [Test]
@@ -292,8 +292,8 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
         Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
 
         // the elements of both the block and the nested block should have the content as their identity root
-        Assert.AreEqual(content.Id, block.Content.IdentityRootId);
-        Assert.AreEqual(content.Id, nestedBlock.Content.IdentityRootId);
+        Assert.AreEqual(content.Id, block.Content.OwningContentId);
+        Assert.AreEqual(content.Id, nestedBlock.Content.OwningContentId);
     }
 
     [Test]
@@ -383,8 +383,8 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
 
         // the content element (reusable element) should not track an identity root,
         // but the settings element (locally sourced) should still have the content as its identity root
-        Assert.IsNull(block.Content.IdentityRootId);
-        Assert.AreEqual(content.Id, block.Settings.IdentityRootId);
+        Assert.IsNull(block.Content.OwningContentId);
+        Assert.AreEqual(content.Id, block.Settings.OwningContentId);
     }
 
     [Test]
@@ -434,7 +434,7 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
 
         // the element (reusable element) should not track an identity root,
         // and the settings element should have the content as its identity root
-        Assert.IsNull(publishedElement.IdentityRootId);
+        Assert.IsNull(publishedElement.OwningContentId);
     }
 
     [Test]
@@ -523,8 +523,8 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
 
         // the block content element (locally sourced) should have the content as its identity root,
         // and the nested picked element (reusable) should not track any identity root
-        Assert.AreEqual(content.Id, block.Content.IdentityRootId);
-        Assert.IsNull(publishedElement.IdentityRootId);
+        Assert.AreEqual(content.Id, block.Content.OwningContentId);
+        Assert.IsNull(publishedElement.OwningContentId);
     }
 
     private async Task<(IContentType ContentType, IContentType ElementType)> SetupContentTypes()

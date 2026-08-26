@@ -129,7 +129,7 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
     public override PublishedItemType ItemType => ContentNode.ContentType.ItemType;
 
     /// <inheritdoc/>
-    public int? IdentityRootId => ContentNode.IdentityRootId;
+    public int? OwningContentId => ContentNode.IdentityRootId;
 
     public override IPublishedProperty? GetProperty(string alias)
     {

@@ -17,7 +17,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly IElementsCache _elementsCache;
     private readonly bool _isMember;
-    private readonly int? _identityRootId;
+    private readonly int? _owningContentId;
     private string? _valuesCacheKey;
 
     // the invariant-neutral source and inter values
@@ -77,7 +77,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         _isPreviewing = preview;
         _isMember = element.ContentType.ItemType == PublishedItemType.Member;
         _elementsCache = elementsElementsCache;
-        _identityRootId = element.IdentityRootId;
+        _owningContentId = element.OwningContentId;
 
         // this variable is used for contextualizing the variation level when calculating property values.
         // it must be set to the union of variance (the combination of content type and property type variance).
@@ -389,5 +389,5 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         }
     }
 
-    private int ContentIdForContextualization => _identityRootId ?? _element.Id;
+    private int ContentIdForContextualization => _owningContentId ?? _element.Id;
 }

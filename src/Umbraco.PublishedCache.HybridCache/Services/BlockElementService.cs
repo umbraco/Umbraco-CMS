@@ -127,7 +127,7 @@ internal class BlockElementService : IBlockElementService
             SortOrder = 0,
         };
 
-        var result = _publishedContentFactory.ToIPublishedElement(contentCacheNode, draft, identityRootId: owner.Id > 0 ? owner.Id : owner.IdentityRootId);
+        var result = _publishedContentFactory.ToIPublishedElement(contentCacheNode, draft, identityRootId: owner.Id > 0 ? owner.Id : owner.OwningContentId);
         return result.CreateModel(_publishedModelFactory);
     }
 }

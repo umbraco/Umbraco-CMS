@@ -135,7 +135,7 @@ public class ConvertersTests
         Assert.AreEqual("val1", ((PublishedSnapshotTestObjects.TestElementModel1)model1).Prop1);
 
         // the model forwards IdentityRootId to the wrapped element instead of falling back to the interface default
-        Assert.AreEqual(5678, ((PublishedSnapshotTestObjects.TestElementModel1)model1).IdentityRootId);
+        Assert.AreEqual(5678, ((PublishedSnapshotTestObjects.TestElementModel1)model1).OwningContentId);
 
         // can create a model for a published content
         var model2 = factory.CreateModel(element2);

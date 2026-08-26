@@ -163,5 +163,5 @@ public interface IPublishedElement
     ///         a Media item, or a reusable Element)
     ///     </para>
     /// </remarks>
-    int? IdentityRootId => null;
+    int? OwningContentId => null;
 }
