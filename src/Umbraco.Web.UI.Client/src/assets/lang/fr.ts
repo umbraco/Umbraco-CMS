@@ -286,6 +286,8 @@ export default {
 		isSensitiveValue:
 			"Cette valeur est masquée. Si vous avez besoin de pouvoir accéder à cette valeur, veuillez prendre contact avec l'administrateur du site web.",
 		isSensitiveValue_short: 'Cette valeur est masquée.',
+		isSensitiveValueNotice:
+			"Si vous avez besoin de pouvoir accéder aux valeurs masquées, veuillez prendre contact avec l'administrateur du site web.",
 		languagesToPublish: 'Quelles langues souhaitez-vous publier?',
 		languagesToSendForApproval: 'Quells langues souhaitez-vous envoyer pour approbation?',
 		languagesToSchedule: 'Quelles langues souhaitez-vous planifier?',
