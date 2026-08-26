@@ -20,7 +20,6 @@ export class UmbDocumentLinkPickerContext extends UmbPickerContext {
 	#variantContext = new UmbVariantContext(this).inherit();
 	public culture = this.#variantContext.culture;
 
-	#lastSearchCulture?: string | null;
 	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 
 	constructor(host: UmbControllerHost) {
@@ -44,11 +43,6 @@ export class UmbDocumentLinkPickerContext extends UmbPickerContext {
 	}
 
 	#updateSearchCulture(culture: string | null) {
-		// Losing/regaining the inherited context (e.g. while tearing down) can re-emit an unchanged
-		// effective culture - skip the no-op to avoid redundantly re-running an already active search.
-		if (culture === this.#lastSearchCulture) return;
-		this.#lastSearchCulture = culture;
-
 		this.search.updateConfig({ queryParams: { culture } });
 
 		// Re-run an already active search so visible results reflect the new culture scope right away.
