@@ -388,6 +388,87 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Track_Content_Id_For_Local_Block_In_Reusable_Element()
+    {
+        var innerContentElementKey = Guid.NewGuid();
+        var (contentType, elementType) = await SetupContentTypes();
+        var reusableElement = await CreateAndPublishReusableElement(elementType, innerContentElementKey);
+
+        var contentCreateResult = await ContentEditingService.CreateAndPublishAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                Properties = [
+                    new() { Alias = "documentTitle", Value = "Document Title" },
+                    new()
+                    {
+                        Alias = "blockList",
+                        Value = JsonSerializer.Serialize(
+                            new BlockListValue
+                            {
+                                Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+                                {
+                                    {
+                                        Constants.PropertyEditors.Aliases.BlockList,
+                                        [
+                                            new BlockListLayoutItem
+                                            {
+                                                ContentKey = reusableElement.Key,
+                                                IsExternalContent = true,
+                                            },
+                                        ]
+                                    },
+                                },
+                                ContentData = [],
+                                SettingsData = [],
+                                Expose = [new BlockItemVariation(reusableElement.Key, null, null)],
+                            }),
+                    }
+                ],
+                Variants = [new() { Name = "Page" }],
+            },
+            [],
+            Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(contentCreateResult.Success);
+
+        var content = await DocumentCacheService.GetByKeyAsync(contentCreateResult.Result.Content!.Key);
+        Assert.IsNotNull(content);
+
+        // the assertions below distinguish the reusable element from the document, so the two must differ
+        Assert.AreNotEqual(content.Id, reusableElement.Id);
+
+        var blockListValue = content.Value<BlockListModel>("blockList");
+        Assert.IsNotNull(blockListValue);
+        Assert.AreEqual(1, blockListValue.Count);
+
+        var block = blockListValue.First();
+
+        // the reusable element bears its own identity, so it has no owning content
+        Assert.IsNull(block.Content.OwningContentId);
+
+        var innerBlockListValue = block.Content.Value<BlockListModel>("elementBlockList");
+        Assert.IsNotNull(innerBlockListValue);
+        Assert.AreEqual(1, innerBlockListValue.Count);
+
+        var innerBlock = innerBlockListValue.First();
+
+        // read a document level property first, so the tracking assertion below cannot pass on a value
+        // left over from reading the reusable element
+        content.Value<string>("documentTitle");
+        Assert.AreEqual(content.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+
+        var innerTitleValue = innerBlock.Content.Value<string>("elementTitle");
+        Assert.AreEqual("Local Element Content Title In Reusable Element", innerTitleValue);
+
+        // the locally sourced block inside the reusable element is owned by the reusable element,
+        // not by the document that renders it
+        Assert.AreEqual(reusableElement.Id, _contextTrackingVariationContextAccessor.LastTrackedContentId);
+        Assert.AreEqual(reusableElement.Id, innerBlock.Content.OwningContentId);
+        Assert.AreNotEqual(content.Id, innerBlock.Content.OwningContentId);
+    }
+
+    [Test]
     public async Task Can_Track_Content_Id_For_Picked_Reusable_Element()
     {
         var (contentType, elementType) = await SetupContentTypes();
@@ -626,14 +707,56 @@ public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
         return (contentType, elementType);
     }
 
-    private async Task<IElement> CreateAndPublishReusableElement(IContentType elementType)
+    private async Task<IElement> CreateAndPublishReusableElement(IContentType elementType, Guid? innerBlockKey = null)
     {
+        var properties = new List<PropertyValueModel>
+        {
+            new() { Alias = "elementTitle", Value = "Reusable Element Title" },
+        };
+
+        if (innerBlockKey.HasValue)
+        {
+            properties.Add(new PropertyValueModel
+            {
+                Alias = "elementBlockList",
+                Value = JsonSerializer.Serialize(
+                    new BlockListValue
+                    {
+                        Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+                        {
+                            {
+                                Constants.PropertyEditors.Aliases.BlockList,
+                                [new BlockListLayoutItem { ContentKey = innerBlockKey.Value }]
+                            },
+                        },
+                        ContentData = [
+                            new BlockItemData
+                            {
+                                Key = innerBlockKey.Value,
+                                ContentTypeAlias = elementType.Alias,
+                                ContentTypeKey = elementType.Key,
+                                Values =
+                                [
+                                    new BlockPropertyValue
+                                    {
+                                        Alias = "elementTitle",
+                                        Value = "Local Element Content Title In Reusable Element",
+                                    }
+                                ],
+                            },
+                        ],
+                        SettingsData = [],
+                        Expose = [new BlockItemVariation(innerBlockKey.Value, null, null)],
+                    }),
+            });
+        }
+
         var elementCreateResult = await ElementEditingService.CreateAsync(
             new ElementCreateModel
             {
                 ContentTypeKey = elementType.Key,
                 ParentKey = null,
-                Properties = [new PropertyValueModel { Alias = "elementTitle", Value = "Reusable Element Title" }],
+                Properties = properties,
                 Variants = [new VariantModel { Name = "Reusable element" }],
             },
             Constants.Security.SuperUserKey);
