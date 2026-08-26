@@ -45,9 +45,10 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         return publishedContent;
     }
 
-    public IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview, int? identityRootId = null)
+    /// <inheritdoc/>
+    public IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview, int? owningContentId = null)
     {
-        ContentNode contentNode = CreateContentNode(contentCacheNode, preview, identityRootId);
+        ContentNode contentNode = CreateContentNode(contentCacheNode, preview, owningContentId);
 
         IPublishedElement? publishedElement = GetPublishedElement(contentNode, preview);
 
@@ -108,7 +109,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor, _propertyRenderingContextAccessor);
     }
 
-    private ContentNode CreateContentNode(ContentCacheNode contentCacheNode, bool preview, int? identityRootId = null)
+    private ContentNode CreateContentNode(ContentCacheNode contentCacheNode, bool preview, int? owningContentId = null)
     {
         IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
         return new ContentNode(
@@ -120,7 +121,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             contentType,
             preview ? contentCacheNode.Data : null,
             preview ? null : contentCacheNode.Data,
-            identityRootId);
+            owningContentId);
     }
 
     private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)

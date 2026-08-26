@@ -26,5 +26,5 @@ internal interface IPublishedContentFactory
     /// <summary>
     /// Converts a <see cref="ContentCacheNode"/> to an <see cref="IPublishedElement"/>.
     /// </summary>
-    IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview, int? identityRootId = null);
+    IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview, int? owningContentId = null);
 }
