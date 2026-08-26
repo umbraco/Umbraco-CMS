@@ -238,15 +238,13 @@ public class DeleteCulturesTests : TestBase
         root.SetValue("title", "Japanese Title", "ja-JP");
 
         var indexAlias = GetIndexAlias(publish);
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             if (publish)
             {
                 ContentService.Publish(root, ["*"]);
             }
-
-            return Task.CompletedTask;
         });
     }
 
@@ -293,15 +291,13 @@ public class DeleteCulturesTests : TestBase
         root.SetValue("title", "French Title", "fr-FR");
 
         var indexAlias = GetIndexAlias(publish);
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             if (publish)
             {
                 ContentService.Publish(root, ["*"]);
             }
-
-            return Task.CompletedTask;
         });
     }
 
@@ -352,15 +348,13 @@ public class DeleteCulturesTests : TestBase
         variantRoot.SetValue("title", "English Title", "en-US");
         variantRoot.SetValue("title", "Danish Title", "da-DK");
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            ContentService.Save(variantRoot);
+            await ContentService.SaveAsync(variantRoot, null, null, CancellationToken.None);
             if (publish)
             {
                 ContentService.Publish(variantRoot, ["*"]);
             }
-
-            return Task.CompletedTask;
         });
 
         // Create invariant content
@@ -372,15 +366,13 @@ public class DeleteCulturesTests : TestBase
         invariantRoot.Name = "Invariant Content";
         invariantRoot.SetValue("title", "Invariant Title");
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            ContentService.Save(invariantRoot);
+            await ContentService.SaveAsync(invariantRoot, null, null, CancellationToken.None);
             if (publish)
             {
                 ContentService.Publish(invariantRoot, ["*"]);
             }
-
-            return Task.CompletedTask;
         });
     }
 

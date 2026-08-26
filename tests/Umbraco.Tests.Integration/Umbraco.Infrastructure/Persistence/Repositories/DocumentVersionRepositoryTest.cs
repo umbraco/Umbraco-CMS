@@ -33,7 +33,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         ContentService.Publish(content, []);
         // At this point content has 2 versions, a draft version and a published version.
@@ -65,7 +65,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         ContentService.Publish(content, []);
         // At this point content has 2 versions, a draft version and a published version.
@@ -110,7 +110,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
         // Create 4 versions in total: 2 historic (1, 2), 1 current draft (3), 1 current published (4).
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, []);
         ContentService.Publish(content, []);
         ContentService.Publish(content, []);
@@ -150,7 +150,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
 
         // Create 5 versions in total: 3 historic (1, 2, 3), 1 current draft (4), 1 current published (5).
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, []);
         ContentService.Publish(content, []);
         ContentService.Publish(content, []);
@@ -193,7 +193,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         ContentService.Publish(content, []);
         ContentService.Publish(content, []);
@@ -230,7 +230,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         ContentService.Publish(content, []);
         ContentService.Publish(content, []);
@@ -286,7 +286,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         ContentService.Publish(content, []); // Draft + Published
         ContentService.Publish(content, []); // New Draft
@@ -327,7 +327,7 @@ internal sealed class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(contentType, "foo", culture: "en-US");
         content.SetCultureName("foo", "en-US");
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["en-US"]); // Draft + Published
         ContentService.Publish(content, ["en-US"]); // New Draft
 

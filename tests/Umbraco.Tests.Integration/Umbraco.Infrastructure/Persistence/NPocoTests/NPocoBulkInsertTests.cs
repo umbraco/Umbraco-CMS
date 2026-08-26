@@ -229,7 +229,7 @@ internal sealed class NPocoBulkInsertTests : UmbracoIntegrationTest
         await contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
-        contentService.Save(content);
+        await contentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Replicate what ContentRepositoryBase.ReplacePropertyValues does:
         // delete existing property data for the version, then re-insert via InsertBulk.

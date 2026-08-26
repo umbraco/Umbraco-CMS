@@ -193,7 +193,7 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
         {
             var contentBuilder = new ContentBuilder().WithContentType(contentType);
             var content = contentBuilder.Build();
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         }
 
         // Act
@@ -285,7 +285,7 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
         for (int i = 0; i < amountOfElementsCreated; i++)
         {
             var element = new Element($"Element {i}", contentType);
-            ElementService.Save(element);
+            await ElementService.SaveAsync(element, null, null, CancellationToken.None);
         }
 
         // Act

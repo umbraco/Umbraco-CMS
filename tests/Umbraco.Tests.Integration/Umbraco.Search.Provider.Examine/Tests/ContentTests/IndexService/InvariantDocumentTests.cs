@@ -226,11 +226,10 @@ public class InvariantDocumentTests : IndexTestBase
                 })
             .Build();
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             ContentService.Publish(root, ["*"]);
-            return Task.CompletedTask;
         });
 
         IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
@@ -242,15 +241,13 @@ public class InvariantDocumentTests : IndexTestBase
         IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
         content.SetValue(propertyName, value);
 
-        await WaitForIndexing(GetIndexAlias(publish), () =>
+        await WaitForIndexing(GetIndexAlias(publish), async () =>
         {
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             if (publish)
             {
                 ContentService.Publish(content, ["*"]);
             }
-
-            return Task.CompletedTask;
         });
     }
 }

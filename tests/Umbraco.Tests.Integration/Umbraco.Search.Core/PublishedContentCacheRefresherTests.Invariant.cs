@@ -18,12 +18,12 @@ public partial class PublishedContentCacheRefresherTests
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
         if (publishDescendants)
         {
-            ContentService.Save(Get(RootKey));
+            await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
             ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
         else
         {
-            ContentService.Save(Get(RootKey));
+            await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
             ContentService.Publish(Get(RootKey), ["*"]);
         }
 
@@ -43,7 +43,7 @@ public partial class PublishedContentCacheRefresherTests
     public async Task Invariant_RepublishChild(bool publishDescendants)
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
-        ContentService.Save(Get(RootKey));
+        await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
@@ -52,14 +52,14 @@ public partial class PublishedContentCacheRefresherTests
             // we need to change something, otherwise the branch publish will detect "no changes" and no notifications will be invoked
             IContent content = Get(ChildKey);
             content.Name = "Updated";
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
-            ContentService.Save(Get(ChildKey));
+            await ContentService.SaveAsync(Get(ChildKey), null, null, CancellationToken.None);
             ContentService.PublishBranch(Get(ChildKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
         else
         {
-            ContentService.Save(Get(ChildKey));
+            await ContentService.SaveAsync(Get(ChildKey), null, null, CancellationToken.None);
             ContentService.Publish(Get(ChildKey), ["*"]);
         }
 
@@ -79,7 +79,7 @@ public partial class PublishedContentCacheRefresherTests
     public async Task Invariant_UnpublishRoot(bool publishDescendants)
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
-        ContentService.Save(Get(RootKey));
+        await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
@@ -100,7 +100,7 @@ public partial class PublishedContentCacheRefresherTests
     public async Task Invariant_UnpublishChild()
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
-        ContentService.Save(Get(RootKey));
+        await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
@@ -121,7 +121,7 @@ public partial class PublishedContentCacheRefresherTests
     public async Task Invariant_MoveRootToRecycleBin()
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
-        ContentService.Save(Get(RootKey));
+        await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
@@ -141,7 +141,7 @@ public partial class PublishedContentCacheRefresherTests
     public async Task Invariant_MoveChildToRecycleBin()
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
-        ContentService.Save(Get(RootKey));
+        await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
@@ -161,7 +161,7 @@ public partial class PublishedContentCacheRefresherTests
     public async Task Invariant_DeletePublishedRoot()
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
-        ContentService.Save(Get(RootKey));
+        await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
@@ -181,7 +181,7 @@ public partial class PublishedContentCacheRefresherTests
     public async Task Invariant_DeletePublishedChild()
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
-        ContentService.Save(Get(RootKey));
+        await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
@@ -201,7 +201,7 @@ public partial class PublishedContentCacheRefresherTests
     public async Task Invariant_DeleteRootFromRecycleBin()
     {
         (Guid RootKey, Guid ChildKey, Guid GrandchildKey) = await SetupInvariantContentTest();
-        ContentService.Save(Get(RootKey));
+        await ContentService.SaveAsync(Get(RootKey), null, null, CancellationToken.None);
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ContentService.MoveToRecycleBin(Get(RootKey));
         ResetNotificationPayloads();
@@ -227,21 +227,21 @@ public partial class PublishedContentCacheRefresherTests
             .WithContentType(contentType)
             .WithName("Root")
             .Build();
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         Content child = new ContentBuilder()
             .WithContentType(contentType)
             .WithName("Child")
             .WithParent(root)
             .Build();
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         Content grandchild = new ContentBuilder()
             .WithContentType(contentType)
             .WithName("Grandchild")
             .WithParent(child)
             .Build();
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
 
         ResetNotificationPayloads();
 

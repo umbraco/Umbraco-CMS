@@ -56,9 +56,9 @@ public abstract class TestBase : UmbracoIntegrationTest
     protected IRuntimeState RuntimeState => GetRequiredService<IRuntimeState>();
 
 
-    protected void SaveAndPublish(IContent content)
+    protected async Task SaveAndPublishAsync(IContent content)
     {
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
     }
 

@@ -76,7 +76,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         var c1 = ContentBuilder.CreateTextpageContent(ct, "my content 1", -1);
-        ContentService.Save(c1);
+        await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
 
         var c2 = ContentBuilder.CreateTextpageContent(ct, "my content 2", -1);
 
@@ -93,7 +93,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
     <div data-udi='umb://member/" + member.Key.ToString("N") + @"'></div>
 </p>");
 
-        ContentService.Save(c2);
+        await ContentService.SaveAsync(c2, null, null, CancellationToken.None);
 
         var relations = (await RelationService.GetByParentIdAsync(c2.Id)).ToList();
         Assert.AreEqual(4, relations.Count);
@@ -130,7 +130,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
             "<p><img src='/media/2.jpg' data-udi='umb://media/" + m2.Key.ToString("N") + "' /></p>");
 
         RelationSavedTracker.Reset();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Verify the saved notification was published with the correct relations.
         Assert.AreEqual(2, RelationSavedTracker.SavedRelations.Count);
@@ -162,13 +162,13 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         content.Properties["bodyText"]!.SetValue(
             "<p><img src='/media/1.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + "' /></p>" +
             "<p><img src='/media/2.jpg' data-udi='umb://media/" + m2.Key.ToString("N") + "' /></p>");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Remove one media reference, keeping only m1.
         RelationDeletedTracker.Reset();
         content.Properties["bodyText"]!.SetValue(
             "<p><img src='/media/1.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + "' /></p>");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Verify the deleted notification was published for the removed relation.
         Assert.AreEqual(1, RelationDeletedTracker.DeletedRelations.Count);
@@ -196,12 +196,12 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         var content = ContentBuilder.CreateTextpageContent(ct, "my content", -1);
         content.Properties["bodyText"]!.SetValue(
             "<p><img src='/media/1.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + "' /></p>");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Remove all references (hits the early-exit path in ContentRelationsUpdate).
         RelationDeletedTracker.Reset();
         content.Properties["bodyText"]!.SetValue("<p>no references</p>");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Verify the deleted notification was published for the removed relation.
         Assert.AreEqual(1, RelationDeletedTracker.DeletedRelations.Count);
@@ -229,12 +229,12 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         var content = ContentBuilder.CreateTextpageContent(ct, "my content", -1);
         content.Properties["bodyText"]!.SetValue(
             "<p><img src='/media/1.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + "' /></p>");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Save again with the same references - no notifications should fire.
         RelationSavedTracker.Reset();
         RelationDeletedTracker.Reset();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         Assert.AreEqual(0, RelationSavedTracker.SavedRelations.Count);
         Assert.AreEqual(0, RelationDeletedTracker.DeletedRelations.Count);
@@ -257,7 +257,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         // Save a draft that re-points the picker to target B.
         IContent draft = (await ContentService.GetByIdAsync(source.Key, CancellationToken.None))!;
         draft.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetB.Key).ToString());
-        ContentService.Save(draft);
+        await ContentService.SaveAsync(draft, null, null, CancellationToken.None);
 
         // The stale relation to target A (from the previously-published snapshot) must be gone; only the draft reference to B remains.
         Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetB.Id }));
@@ -273,7 +273,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         // live (published A) and draft (edited B) references are legitimately tracked.
         IContent draft = (await ContentService.GetByIdAsync(source.Key, CancellationToken.None))!;
         draft.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetB.Key).ToString());
-        ContentService.Save(draft);
+        await ContentService.SaveAsync(draft, null, null, CancellationToken.None);
         Assert.That((await RelationService.GetByParentIdAsync(source.Id)).Select(x => x.ChildId), Is.EquivalentTo(new[] { targetA.Id, targetB.Id }));
 
         // Unpublish. There is no longer a live published version, so the stale published reference to A must be removed,
@@ -306,11 +306,11 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         await ContentTypeService.CreateAsync(sourceType, Constants.Security.SuperUserKey);
 
         var target = new ContentBuilder().WithContentType(targetType).WithName("Target").Build();
-        ContentService.Save(target);
+        await ContentService.SaveAsync(target, null, null, CancellationToken.None);
 
         var source = new ContentBuilder().WithContentType(sourceType).WithName("Source").Build();
         source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, target.Key).ToString());
-        ContentService.Save(source);
+        await ContentService.SaveAsync(source, null, null, CancellationToken.None);
         PublishResult publishResult = ContentService.Publish(source, ["*"]);
         Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
 
@@ -344,15 +344,15 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var targetA = new ContentBuilder().WithContentType(contentType).WithName("Target A").Build();
-        ContentService.Save(targetA);
+        await ContentService.SaveAsync(targetA, null, null, CancellationToken.None);
         var targetB = new ContentBuilder().WithContentType(contentType).WithName("Target B").Build();
-        ContentService.Save(targetB);
+        await ContentService.SaveAsync(targetB, null, null, CancellationToken.None);
 
         // Publish the source document with the picker pointing at target A. Both the edited and published property
         // snapshots now reference target A.
         var source = new ContentBuilder().WithContentType(contentType).WithName("Source").Build();
         source.Properties["contentPicker"]!.SetValue(Udi.Create(Constants.UdiEntityType.Document, targetA.Key).ToString());
-        ContentService.Save(source);
+        await ContentService.SaveAsync(source, null, null, CancellationToken.None);
         PublishResult publishResult = ContentService.Publish(source, ["*"]);
         Assert.IsTrue(publishResult.Success, publishResult.Result.ToString());
 

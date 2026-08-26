@@ -29,7 +29,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
     }
 
     [Test]
-    public void NewDateTimeEditors_CanBeIndexed()
+    public async Task NewDateTimeEditors_CanBeIndexed()
     {
         Content content = new ContentBuilder()
             .WithContentType(GetContentType())
@@ -57,7 +57,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
@@ -85,14 +85,14 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
     }
 
     [Test]
-    public void UnsetValue_IsNotIndexed()
+    public async Task UnsetValue_IsNotIndexed()
     {
         Content content = new ContentBuilder()
             .WithContentType(GetContentType())
             .WithName("Date Time Editors")
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
@@ -100,7 +100,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
     }
 
     [Test]
-    public void MalformedValue_IsNotIndexed()
+    public async Task MalformedValue_IsNotIndexed()
     {
         Content content = new ContentBuilder()
             .WithContentType(GetContentType())
@@ -111,7 +111,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
@@ -119,7 +119,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
     }
 
     [Test]
-    public void WrongShapeJsonValue_IsNotIndexed_AndDoesNotPreventDocumentIndexing()
+    public async Task WrongShapeJsonValue_IsNotIndexed_AndDoesNotPreventDocumentIndexing()
     {
         // NOTE: only saved (draft index), not published - publishing a wrong-shape stored value fails
         //       property validation with an unrelated, pre-existing exception in TypedJsonValidatorRunner.
@@ -136,7 +136,7 @@ public class DateTimeEditorsPropertyValueHandlerTests : PropertyValueHandlerTest
             })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         TestIndexDocument document = IndexerAndSearcher.Dump(IndexAliases.DraftContent).Single();
         Assert.Multiple(() =>

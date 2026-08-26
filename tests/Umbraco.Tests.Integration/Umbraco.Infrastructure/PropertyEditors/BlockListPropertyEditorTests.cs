@@ -38,7 +38,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(textPageContentType, Constants.Security.SuperUserKey);
 
         var textPage = ContentBuilder.CreateTextpageContent(textPageContentType, "My Picked Content", -1);
-        ContentService.Save(textPage);
+        await ContentService.SaveAsync(textPage, null, null, CancellationToken.None);
 
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
@@ -84,7 +84,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var valueEditor = await GetValueEditor(blockListContentType);
 
@@ -143,7 +143,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var valueEditor = await GetValueEditor(blockListContentType);
 
@@ -220,7 +220,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             .WithCultureName("da-DK", "My Blocks DA")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var valueEditor = await GetValueEditor(blockListContentType);
 
@@ -285,7 +285,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Culture;
@@ -369,7 +369,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Nothing;
         elementType.Variations = ContentVariation.Nothing;
@@ -441,7 +441,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var valueEditor = await GetValueEditor(blockListContentType);
         var toEditorValue = valueEditor.ToEditor(content.Properties["blocks"]!) as BlockListValue;

@@ -25,7 +25,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         var rteDataType = await CreateRichTextDataType(elementType);
         var contentType = await CreateContentType(rteDataType);
         var richTextValue = CreateRichTextValue(elementType);
-        var content = CreateContent(contentType, richTextValue);
+        var content = await CreateContent(contentType, richTextValue);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -83,7 +83,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         }
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, ["en-US"]);
 
         AssertPropertyValues(
@@ -183,7 +183,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         var rteDataType = await CreateRichTextDataType(elementType);
         var contentType = await CreateContentType(rteDataType);
         var richTextValue = CreateRichTextValue(elementType);
-        var content = CreateContent(contentType, richTextValue);
+        var content = await CreateContent(contentType, richTextValue);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -219,7 +219,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         richTextValue.Blocks.SettingsData[1].Values[2].Value = "#3: The second settings value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, ["en-US"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -288,7 +288,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         var rteDataType = await CreateRichTextDataType(elementType);
         var contentType = await CreateContentType(rteDataType);
         var richTextValue = CreateRichTextValue(elementType);
-        var content = CreateContent(contentType, richTextValue);
+        var content = await CreateContent(contentType, richTextValue);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -311,7 +311,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             .Replace("The end", "The end updated");
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, ["en-US"]);
 
         AssertPropertyValuesForAllCultures(markup =>
@@ -372,7 +372,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         var rteDataType = await CreateRichTextDataType(elementType);
         var contentType = await CreateContentType(rteDataType);
         var richTextValue = new RichTextEditorValue { Markup = "<p>Markup here</p>", Blocks = null };
-        var content = CreateContent(contentType, richTextValue);
+        var content = await CreateContent(contentType, richTextValue);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -401,7 +401,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         var rteDataType = await CreateRichTextDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Nothing, rteDataType);
         var richTextValue = new RichTextEditorValue { Markup = "<p>Markup here</p>", Blocks = null };
-        var content = CreateContent(contentType, richTextValue);
+        var content = await CreateContent(contentType, richTextValue);
 
         PublishContent(content, ["*"]);
 
@@ -536,7 +536,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         };
     }
 
-    private IContent CreateContent(IContentType contentType, RichTextEditorValue? richTextValue = null)
+    private async Task<IContent> CreateContent(IContentType contentType, RichTextEditorValue? richTextValue = null)
     {
         var contentBuilder = new ContentBuilder()
             .WithContentType(contentType);
@@ -560,7 +560,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             content.Properties["blocks"]!.SetValue(propertyValue);
         }
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         return content;
     }
 
@@ -620,7 +620,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             }
         };
 
-        var content = CreateContent(contentType, richTextValue);
+        var content = await CreateContent(contentType, richTextValue);
         PublishContent(content, ["en-US", "da-DK"]);
 
         // 3. Change element property type to invariant (remove culture variation)
@@ -656,7 +656,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             .ToList();
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // 5. Publish selected cultures
         string[] culturesToPublish = republishEnglish && republishDanish
@@ -758,7 +758,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
             }
         };
 
-        var content = CreateContent(contentType, richTextValue);
+        var content = await CreateContent(contentType, richTextValue);
         PublishContent(content, ["en-US", "da-DK"]);
 
         // Verify initial state - both cultures should see the same invariant value
@@ -822,7 +822,7 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(richTextValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // 5. Publish selected cultures
         string[] culturesToPublish = republishEnglish && republishDanish

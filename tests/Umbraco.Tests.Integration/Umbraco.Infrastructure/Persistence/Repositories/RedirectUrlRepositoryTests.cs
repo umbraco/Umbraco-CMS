@@ -378,22 +378,22 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
         // Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
         _textpage = ContentBuilder.CreateSimpleContent(contentType);
         _textpage.Key = Guid.NewGuid();
-        contentService.Save(_textpage);
+        await contentService.SaveAsync(_textpage, null, null, CancellationToken.None);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
         _subpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 1", _textpage.Id);
         _subpage.Key = Guid.NewGuid();
-        contentService.Save(_subpage);
+        await contentService.SaveAsync(_subpage, null, null, CancellationToken.None);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
         _otherpage = ContentBuilder.CreateSimpleContent(contentType, "Text Page 2", _textpage.Id);
         _otherpage.Key = Guid.NewGuid();
-        contentService.Save(_otherpage);
+        await contentService.SaveAsync(_otherpage, null, null, CancellationToken.None);
 
         // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 4)
         _trashed = ContentBuilder.CreateSimpleContent(contentType, "Text Page Deleted", -20);
         _trashed.Key = Guid.NewGuid();
         ((Content)_trashed).Trashed = true;
-        contentService.Save(_trashed);
+        await contentService.SaveAsync(_trashed, null, null, CancellationToken.None);
     }
 }

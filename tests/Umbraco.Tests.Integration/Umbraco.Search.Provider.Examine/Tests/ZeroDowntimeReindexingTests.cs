@@ -85,17 +85,15 @@ public class ZeroDowntimeReindexingTests : TestBase
         await Indexer.ResetAsync(indexAlias);
 
         // During rebuild, a content change should write to shadow
-        await WaitForShadowIndexing(indexAlias, () =>
+        await WaitForShadowIndexing(indexAlias, async () =>
         {
             IContent content = ContentService.GetByIdAsync(_createdContentKey, CancellationToken.None).GetAwaiter().GetResult()!;
             content.Name = "Updated During Rebuild";
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             if (publish)
             {
                 ContentService.Publish(content, ["*"]);
             }
-
-            return Task.CompletedTask;
         });
 
         // Verify shadow index has data
@@ -143,17 +141,15 @@ public class ZeroDowntimeReindexingTests : TestBase
         // Start rebuild and write data to shadow
         ActiveIndexManager.StartRebuilding(indexAlias);
 
-        await WaitForShadowIndexing(indexAlias, () =>
+        await WaitForShadowIndexing(indexAlias, async () =>
         {
             IContent content = ContentService.GetByIdAsync(_createdContentKey, CancellationToken.None).GetAwaiter().GetResult()!;
             content.Name = "Rebuilt Content";
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             if (publish)
             {
                 ContentService.Publish(content, ["*"]);
             }
-
-            return Task.CompletedTask;
         });
 
         // Complete the rebuild (swap)

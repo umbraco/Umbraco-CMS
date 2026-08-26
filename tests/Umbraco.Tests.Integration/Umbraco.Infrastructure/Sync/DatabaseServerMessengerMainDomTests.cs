@@ -51,7 +51,7 @@ internal sealed class DatabaseServerMessengerMainDomTests : UmbracoIntegrationTe
         var contentType = ContentTypeBuilder.CreateSimpleContentType("testPage", "Test Page", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Cms.Core.Constants.Security.SuperUserKey);
         var content = ContentBuilder.CreateSimpleContent(contentType, "Test Content");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, Array.Empty<string>());
         Assert.That(publishResult.Success, Is.True);

@@ -51,7 +51,7 @@ public class DistributedContentIndexRebuilderTests : TestBase
                 .WithContentType(contentType)
                 .WithName($"Content {i}")
                 .Build();
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             ContentService.Publish(content, ["*"]);
         }
 

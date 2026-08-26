@@ -48,7 +48,7 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
                 .WithContentType(contentType)
                 .WithName($"Root {rootNumber}")
                 .Build();
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             ContentService.Publish(root, ["*"]);
             _contentByName[root.Name!] = root;
 
@@ -59,7 +59,7 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
                     .WithParent(root)
                     .WithName($"Child {childNumber}")
                     .Build();
-                ContentService.Save(child);
+                await ContentService.SaveAsync(child, null, null, CancellationToken.None);
                 ContentService.Publish(child, ["*"]);
                 _contentByName[$"{root.Name!}/{child.Name!}"] = child;
 
@@ -70,7 +70,7 @@ public class ApiContentPathResolverInvariantTests : ApiContentPathResolverTestBa
                         .WithParent(child)
                         .WithName($"Grandchild {grandchildNumber}")
                         .Build();
-                    ContentService.Save(grandchild);
+                    await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
                     ContentService.Publish(grandchild, ["*"]);
                     _contentByName[$"{root.Name!}/{child.Name!}/{grandchild.Name!}"] = grandchild;
                 }

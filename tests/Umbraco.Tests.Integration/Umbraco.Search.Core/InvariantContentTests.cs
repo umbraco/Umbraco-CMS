@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
 public partial class InvariantContentTests : InvariantContentTestBase
 {
-    private void SetupDraftContent()
+    private async Task SetupDraftContent()
     {
         foreach (Guid key in new[] { RootKey, ChildKey, GrandchildKey, GreatGrandchildKey })
         {
@@ -16,7 +16,7 @@ public partial class InvariantContentTests : InvariantContentTestBase
             content.SetValue("title", content.GetValue<string>("title") + " (draft)");
             content.SetValue("count", content.GetValue<int>("count") + 1);
             content.SetValue("tags", content.GetValue<string>("tags")!.TrimEnd("]") + ",\"draft\"]");
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         }
 
         IndexerAndSearcher.Reset();

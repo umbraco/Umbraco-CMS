@@ -16,7 +16,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
     private IContentType _contentType;
 
     [Test]
-    public void ExplicitDocumentPicker_CanBeIndexed()
+    public async Task ExplicitDocumentPicker_CanBeIndexed()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -28,7 +28,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -40,7 +40,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
     }
 
     [Test]
-    public void ImplicitDocumentPicker_CanBeIndexed()
+    public async Task ImplicitDocumentPicker_CanBeIndexed()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -52,7 +52,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -64,7 +64,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
     }
 
     [Test]
-    public void NonDocumentPicker_IsIgnored()
+    public async Task NonDocumentPicker_IsIgnored()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -77,7 +77,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -91,7 +91,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
     }
 
     [Test]
-    public void ExplicitDocumentPicker_DisregardsInvalidValues()
+    public async Task ExplicitDocumentPicker_DisregardsInvalidValues()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -103,7 +103,7 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);

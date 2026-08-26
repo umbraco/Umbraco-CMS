@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -30,11 +31,11 @@ public partial class ElementServiceTests : UmbracoIntegrationTest
         element.SetValue("title", "The Element Title");
 
         // Act
-        var result = ElementService.Save(element);
+        var result = await ElementService.SaveAsync(element, null, null, CancellationToken.None);
 
         // Assert
         Assert.That(result.Success, Is.True);
-        Assert.That(result.Result, Is.EqualTo(OperationResultType.Success));
+        Assert.That(result.Result, Is.EqualTo(ContentSaveOperationStatus.Success));
 
         element = await ElementService.GetByIdAsync(element.Key, CancellationToken.None);
         Assert.That(element, Is.Not.Null);

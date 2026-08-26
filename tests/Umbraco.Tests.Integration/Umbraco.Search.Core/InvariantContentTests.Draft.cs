@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 public partial class InvariantContentTests
 {
     [Test]
-    public void DraftStructure_YieldsAllDocuments()
+    public async Task DraftStructure_YieldsAllDocuments()
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
@@ -37,9 +37,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void DraftStructure_YieldsStructuralFields()
+    public async Task DraftStructure_YieldsStructuralFields()
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
@@ -63,9 +63,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void DraftStructure_YieldsSystemFields()
+    public async Task DraftStructure_YieldsSystemFields()
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
@@ -90,12 +90,12 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedDraftStructure_YieldsSystemFieldsWithTags()
+    public async Task PublishedDraftStructure_YieldsSystemFieldsWithTags()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
@@ -121,9 +121,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void DraftStructure_UpdatesSystemFieldsWhenRootIsTrashed()
+    public async Task DraftStructure_UpdatesSystemFieldsWhenRootIsTrashed()
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
         ContentService.MoveToRecycleBin(Root());
 
@@ -149,9 +149,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void DraftStructure_UpdatesStructuralFieldsWhenRootIsTrashed()
+    public async Task DraftStructure_UpdatesStructuralFieldsWhenRootIsTrashed()
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
         ContentService.MoveToRecycleBin(Root());
 
@@ -177,9 +177,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void DraftStructure_UpdatesStructuralFieldsWhenChildIsTrashed()
+    public async Task DraftStructure_UpdatesStructuralFieldsWhenChildIsTrashed()
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
         ContentService.MoveToRecycleBin(Child());
 
@@ -207,9 +207,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void DraftStructure_UpdatesStructuralFieldsWhenRootIsMoved()
+    public async Task DraftStructure_UpdatesStructuralFieldsWhenRootIsMoved()
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
         var secondRootKey = Guid.NewGuid();
@@ -218,7 +218,7 @@ public partial class InvariantContentTests
             .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
-        ContentService.Save(secondRoot);
+        await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
 
         OperationResult moveResult = ContentService.Move(Root(), secondRoot.Id);
         Assert.That(moveResult.Result, Is.EqualTo(OperationResultType.Success));
@@ -248,9 +248,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void DraftStructure_UpdatesStructuralFieldsWhenChildIsMoved()
+    public async Task DraftStructure_UpdatesStructuralFieldsWhenChildIsMoved()
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
         var secondRootKey = Guid.NewGuid();
@@ -259,7 +259,7 @@ public partial class InvariantContentTests
             .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
-        ContentService.Save(secondRoot);
+        await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
 
         OperationResult moveResult = ContentService.Move(Child(), secondRoot.Id);
         Assert.That(moveResult.Result, Is.EqualTo(OperationResultType.Success));
@@ -291,9 +291,9 @@ public partial class InvariantContentTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public void DraftStructure_RemovesAllDocumentsWhenRootIsDeleted(bool moveToRecycleBinBeforeDeleting)
+    public async Task DraftStructure_RemovesAllDocumentsWhenRootIsDeleted(bool moveToRecycleBinBeforeDeleting)
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
         if (moveToRecycleBinBeforeDeleting)
@@ -309,9 +309,9 @@ public partial class InvariantContentTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public void DraftStructure_RemovesAllDescendantDocumentsWhenChildIsDeleted(bool moveToRecycleBinBeforeDeleting)
+    public async Task DraftStructure_RemovesAllDescendantDocumentsWhenChildIsDeleted(bool moveToRecycleBinBeforeDeleting)
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
         if (moveToRecycleBinBeforeDeleting)
@@ -329,9 +329,9 @@ public partial class InvariantContentTests
 
     [TestCase(true)]
     [TestCase(false)]
-    public void DraftStructure_RebuildIndexYieldsAllDocuments(bool populateIndexBeforeRebuild)
+    public async Task DraftStructure_RebuildIndexYieldsAllDocuments(bool populateIndexBeforeRebuild)
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         if (populateIndexBeforeRebuild)
         {
             ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
@@ -360,9 +360,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void DraftStructure_RebuildIncludesTrashedContent()
+    public async Task DraftStructure_RebuildIncludesTrashedContent()
     {
-        SetupDraftContent();
+        await SetupDraftContent();
         ContentService.MoveToRecycleBin(Grandchild());
         ContentService.MoveToRecycleBin(Child());
 

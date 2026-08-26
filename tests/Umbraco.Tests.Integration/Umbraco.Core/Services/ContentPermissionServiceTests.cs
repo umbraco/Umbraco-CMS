@@ -44,9 +44,9 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
         await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
@@ -78,11 +78,11 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         var grandchild = ContentBuilder.CreateSimpleContent(contentType, "grandchild", child.Id);
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
 
         await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
         await ContentService.SetPermissionAsync(parent, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
@@ -111,9 +111,9 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         // Different permissions on parent and child
         await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
@@ -146,11 +146,11 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         var grandchild = ContentBuilder.CreateSimpleContent(contentType, "grandchild", child.Id);
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
 
         await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
         await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
@@ -188,9 +188,9 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(parent);
+        await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         // No explicit permissions set on any node.
 

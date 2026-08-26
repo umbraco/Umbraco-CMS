@@ -14,7 +14,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
     private IContentType _contentType;
 
     [Test]
-    public void RichTextEditor_CanIndexAllTextRelevanceLevels()
+    public async Task RichTextEditor_CanIndexAllTextRelevanceLevels()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -38,7 +38,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -58,7 +58,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
     }
 
     [Test]
-    public void RichTextEditor_IncludesTextFromNestedTags()
+    public async Task RichTextEditor_IncludesTextFromNestedTags()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -73,7 +73,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -86,7 +86,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
 
     [TestCase(null)]
     [TestCase("")]
-    public void RichTextEditor_IgnoresEmptyAndInvalidValues(object? value)
+    public async Task RichTextEditor_IgnoresEmptyAndInvalidValues(object? value)
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -98,7 +98,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -110,7 +110,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
     [TestCase(true)]
     [TestCase(123)]
     [TestCase("This is not valid HTML")]
-    public void RichTextEditor_IncludesSimpleValues(object value)
+    public async Task RichTextEditor_IncludesSimpleValues(object value)
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -122,7 +122,7 @@ public class RichTextPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));

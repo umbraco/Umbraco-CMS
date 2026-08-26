@@ -36,9 +36,9 @@ public partial class InvariantContentStructureTests
     }
 
     [Test]
-    public void DraftRoot_YieldsOnlyDraftRoot()
+    public async Task DraftRoot_YieldsOnlyDraftRoot()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));

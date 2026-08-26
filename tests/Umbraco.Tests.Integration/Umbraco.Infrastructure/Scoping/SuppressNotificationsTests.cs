@@ -40,7 +40,7 @@ internal sealed class SuppressNotificationsTests : UmbracoIntegrationTest
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var content = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
     }
 
     [Test]
@@ -55,7 +55,7 @@ internal sealed class SuppressNotificationsTests : UmbracoIntegrationTest
                 var contentType = ContentTypeBuilder.CreateBasicContentType();
                 await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
                 var content = ContentBuilder.CreateBasicContent(contentType);
-                ContentService.Save(content);
+                await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             }
         }
     }

@@ -147,7 +147,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -179,7 +179,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -210,7 +210,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -248,7 +248,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         content.SetValue("title", "SE title", culture: langSe.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -282,7 +282,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -317,7 +317,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -365,7 +365,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [
@@ -397,7 +397,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         await ContentPublishingService.PublishAsync(
             content.Key,
             [

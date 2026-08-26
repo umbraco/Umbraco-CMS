@@ -34,7 +34,7 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithCultureName("en-US", "Root en-US")
             .WithCultureName("da-DK", "Root da-DK")
             .Build();
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
         ContentService.Publish(root, ["*"]);
 
         var child = new ContentBuilder()
@@ -43,7 +43,7 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithCultureName("en-US", "Child en-US")
             .WithCultureName("da-DK", "Child da-DK")
             .Build();
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         ContentService.Publish(child, ["*"]);
 
         var grandchild = new ContentBuilder()
@@ -52,7 +52,7 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithCultureName("en-US", "Grandchild en-US")
             .WithCultureName("da-DK", "Grandchild da-DK")
             .Build();
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
         ContentService.Publish(grandchild, ["*"]);
 
         if (breakPublishedPath)
@@ -102,7 +102,7 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithContentType(contentType)
             .WithName("Root")
             .Build();
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
         ContentService.Publish(root, ["*"]);
 
         var child = new ContentBuilder()
@@ -110,7 +110,7 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithParent(root)
             .WithName("Child")
             .Build();
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         ContentService.Publish(child, ["*"]);
 
         var grandchild = new ContentBuilder()
@@ -118,7 +118,7 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
             .WithParent(child)
             .WithName("Grandchild")
             .Build();
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
         ContentService.Publish(grandchild, ["*"]);
 
         if (breakPublishedPath)

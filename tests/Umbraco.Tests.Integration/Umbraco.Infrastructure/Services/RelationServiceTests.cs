@@ -48,7 +48,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
-            ContentService.Save(c1);
+            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
             createdContent.Add(c1);
         }
 
@@ -103,7 +103,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
         await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
-        void CreateContentWithMediaRefs()
+        async Task CreateContentWithMediaRefs()
         {
             var content = ContentBuilder.CreateTextpageContent(ct, "my content 2", -1);
 
@@ -111,12 +111,12 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
             content.Properties["bodyText"].SetValue(@"<p>
         <img src='/media/12312.jpg' data-udi='umb://media/" + m1.Key.ToString("N") + @"' />
 </p>");
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         }
 
         for (var i = 0; i < 6; i++)
         {
-            CreateContentWithMediaRefs(); // create 6 content items referencing the same media
+            await CreateContentWithMediaRefs(); // create 6 content items referencing the same media
         }
 
         var relations = (await RelationService.GetByChildIdAsync(m1.Id, Constants.Conventions.RelationTypes.RelatedMediaAlias))
@@ -139,18 +139,18 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
         await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
-        void CreateContentWithMemberRefs()
+        async Task CreateContentWithMemberRefs()
         {
             var content = ContentBuilder.CreateTextpageContent(ct, "my content 2", -1);
 
             // 'bodyText' is a property with a RTE property editor which we knows automatically tracks relations
             content.Properties["bodyText"].SetValue(@"<div data-udi='umb://member/" + member.Key.ToString("N") + @"'></div>");
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         }
 
         for (var i = 0; i < 6; i++)
         {
-            CreateContentWithMemberRefs(); // create 6 content items referencing the same member
+            await CreateContentWithMemberRefs(); // create 6 content items referencing the same member
         }
 
         var relations = (await RelationService.GetByChildIdAsync(member.Id, Constants.Conventions.RelationTypes.RelatedMemberAlias)).ToList();
@@ -168,13 +168,13 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parentA = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(parentA);
+        await ContentService.SaveAsync(parentA, null, null, CancellationToken.None);
         var childA = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(childA);
+        await ContentService.SaveAsync(childA, null, null, CancellationToken.None);
         var parentB = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(parentB);
+        await ContentService.SaveAsync(parentB, null, null, CancellationToken.None);
         var childB = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(childB);
+        await ContentService.SaveAsync(childB, null, null, CancellationToken.None);
 
         await RelationService.RelateAsync(parentA.Id, childA.Id, Constants.Conventions.RelationTypes.RelatedElementAlias);
         await RelationService.RelateAsync(parentB.Id, childB.Id, Constants.Conventions.RelationTypes.RelatedElementAlias);
@@ -310,7 +310,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
 
         var c1 = ContentBuilder.CreateBasicContent(ct);
         var c2 = MediaBuilder.CreateMediaImage(mt, -1);
-        ContentService.Save(c1);
+        await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
         MediaService.Save(c2);
 
         var r = new Relation(c1.Id, c2.Id, rt);
@@ -337,15 +337,18 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         var mt = MediaTypeBuilder.CreateImageMediaType("img");
         await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
 
-        return Enumerable.Range(1, count).Select(index =>
+        var relations = new List<IRelation>();
+        foreach (var index in Enumerable.Range(1, count))
         {
             var c1 = ContentBuilder.CreateBasicContent(ct);
             var c2 = MediaBuilder.CreateMediaImage(mt, -1);
-            ContentService.Save(c1);
+            await ContentService.SaveAsync(c1, null, null, CancellationToken.None);
             MediaService.Save(c2);
 
-            return new Relation(c1.Id, c2.Id, rt);
-        }).ToList();
+            relations.Add(new Relation(c1.Id, c2.Id, rt));
+        }
+
+        return relations;
     }
 
     // TODO: Create a relation for entities of the wrong Entity Type (GUID) based on the Relation Type's defined parent/child object types

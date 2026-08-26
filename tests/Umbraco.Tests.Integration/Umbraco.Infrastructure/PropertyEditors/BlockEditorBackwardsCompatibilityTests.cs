@@ -64,7 +64,7 @@ internal sealed class BlockEditorBackwardsCompatibilityTests : UmbracoIntegratio
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(json);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var toEditor = richTextDataType.Editor!.GetValueEditor().ToEditor(content.Properties["blocks"]!) as RichTextEditorValue;
         Assert.IsNotNull(toEditor);

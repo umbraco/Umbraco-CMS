@@ -349,9 +349,9 @@ public class InvariantFilterTests : SearcherTestBase
                 })
             .Build();
 
-        await WaitForIndexing(GetIndexAlias(false), () =>
+        await WaitForIndexing(GetIndexAlias(false), async () =>
         {
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
 
             Content child = new ContentBuilder()
@@ -369,7 +369,7 @@ public class InvariantFilterTests : SearcherTestBase
                     })
                 .Build();
 
-            ContentService.Save(child);
+            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
             Content grandchild = new ContentBuilder()
                 .WithKey(GrandchildKey)
@@ -386,8 +386,7 @@ public class InvariantFilterTests : SearcherTestBase
                     })
                 .Build();
 
-            ContentService.Save(grandchild);
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
         });
 
 

@@ -34,7 +34,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new List<BlockPropertyValue>
@@ -74,7 +74,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.SettingsData[0].Values[2].Value = "The second settings value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -138,7 +138,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new []
@@ -200,7 +200,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.SettingsData[0].Values[1].Value = "Danish variantText settings value (updated)";
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue), "da-DK");
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -299,7 +299,7 @@ internal partial class BlockListElementLevelVariationTests
 
         var nestedElementContentKey = Guid.NewGuid();
         var nestedElementSettingsKey = Guid.NewGuid();
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             rootElementType,
             new List<BlockPropertyValue>
@@ -387,7 +387,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.ContentData[0].Values[3].Value = "The second root content value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -502,7 +502,7 @@ internal partial class BlockListElementLevelVariationTests
         var nestedElementSettingsKeyEnUs = Guid.NewGuid();
         var nestedElementContentKeyDaDk = Guid.NewGuid();
         var nestedElementSettingsKeyDaDk = Guid.NewGuid();
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             rootElementType,
             new List<BlockPropertyValue>
@@ -626,7 +626,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.ContentData[0].Values[4].Value = "The second root content value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -704,7 +704,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new List<BlockPropertyValue>
@@ -766,7 +766,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.ContentData[0].Values[6].Value = "The second content value in Danish (Segment 2)";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues(
@@ -855,7 +855,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Segment, blockListDataType);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new List<BlockPropertyValue>
@@ -881,7 +881,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.ContentData[0].Values[3].Value = "The second content value (Segment 2)";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType);
 
         AssertPropertyValues(null, "The second invariant content value", "The second content value");
@@ -916,7 +916,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -965,7 +965,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         AssertPropertyValues("en-US", 3, blocks =>
@@ -1010,7 +1010,7 @@ internal partial class BlockListElementLevelVariationTests
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -1062,7 +1062,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var firstBlockContentElementKey = Guid.NewGuid();
         var firstBlockSettingsElementKey = Guid.NewGuid();
         var blockListValue = BlockListPropertyValue(
@@ -1085,7 +1085,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         AssertPropertyValues("en-US", 1, blocks =>
@@ -1135,7 +1135,7 @@ internal partial class BlockListElementLevelVariationTests
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -1181,7 +1181,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1223,7 +1223,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -1250,7 +1250,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["da-DK"]);
 
         AssertPropertyValues("da-DK", 2, blocks =>
@@ -1282,7 +1282,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1321,7 +1321,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         foreach (var culture in new[] { "en-US", "da-DK" })
@@ -1342,7 +1342,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // note how publishing in one language affects both due to the invariance of the block element type
         PublishContent(content, contentType, ["en-US"]);
@@ -1383,7 +1383,7 @@ internal partial class BlockListElementLevelVariationTests
             });
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, invariantElementType, [], false);
+        var content = await CreateContent(contentType, invariantElementType, [], false);
         var blockListValue = BlockListPropertyValue(
             invariantElementType,
             [
@@ -1423,7 +1423,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -1449,7 +1449,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, contentType, ["da-DK"]);
 
@@ -1483,7 +1483,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1514,7 +1514,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, contentType, ["da-DK"]);
 
@@ -1537,7 +1537,7 @@ internal partial class BlockListElementLevelVariationTests
         blockListValue.SettingsData[0].Values[2].Value = "The second settings value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["da-DK"]);
 
         AssertPropertyValues("en-US", 0);
@@ -1571,7 +1571,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1602,7 +1602,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, contentType, ["da-DK"]);
 
@@ -1637,7 +1637,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1662,7 +1662,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
         Assert.IsTrue(publishResult.Success);
@@ -1677,7 +1677,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1702,7 +1702,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, ["en-US"]);
         Assert.IsTrue(publishResult.Success);
@@ -1717,7 +1717,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1742,7 +1742,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, ["*"]);
         Assert.IsTrue(publishResult.Success);
@@ -1758,7 +1758,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1783,7 +1783,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
         Assert.Multiple(() =>
@@ -1802,7 +1802,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1825,7 +1825,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, ["en-US", "da-DK"]);
         Assert.Multiple(() =>
@@ -1845,7 +1845,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1870,7 +1870,7 @@ internal partial class BlockListElementLevelVariationTests
             ]);
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, ["en-US"]);
         Assert.IsTrue(publishResult.Success);
@@ -1892,7 +1892,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -1922,7 +1922,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, ["en-US"]);
         Assert.IsTrue(publishResult.Success);
@@ -1958,10 +1958,10 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var pickedContent1 = CreateContent(contentType, elementType, [], true);
-        var pickedContent2 = CreateContent(contentType, elementType, [], true);
+        var pickedContent1 = await CreateContent(contentType, elementType, [], true);
+        var pickedContent2 = await CreateContent(contentType, elementType, [], true);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             [
@@ -2019,7 +2019,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new []
@@ -2111,7 +2111,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         // 2. Create content with variant values and publish all cultures
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new List<BlockPropertyValue>
@@ -2189,7 +2189,7 @@ internal partial class BlockListElementLevelVariationTests
             .ToList();
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // 5. Publish selected cultures
         string[] culturesToPublish = republishEnglish && republishDanish
@@ -2280,7 +2280,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         // 2. Create content with invariant values and publish
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             Guid.NewGuid(),
@@ -2306,7 +2306,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, ["en-US", "da-DK"]);
 
         // Verify initial state - both cultures should see the same invariant value
@@ -2384,7 +2384,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // 5. Publish selected cultures
         string[] culturesToPublish = republishEnglish && republishDanish
@@ -2469,7 +2469,7 @@ internal partial class BlockListElementLevelVariationTests
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         // Create content without publishing first.
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             [
@@ -2535,7 +2535,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, [], false);
+        var content = await CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
             elementType,
             [
@@ -2576,7 +2576,7 @@ internal partial class BlockListElementLevelVariationTests
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, contentType, ["en-US", "da-DK"]);
 
         SetVariationContext("en-US", null);

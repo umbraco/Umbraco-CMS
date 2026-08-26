@@ -72,12 +72,12 @@ public class ApiContentResponseBuilderTests : UmbracoIntegrationTest
             .WithCultureName("en-US", "Content EN")
             .WithCultureName("da-DK", "Content DA")
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         Thread.Sleep(200);
         content.SetCultureName("Content DA updated", "da-DK");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["da-DK"]);
 
         RefreshContentCache();

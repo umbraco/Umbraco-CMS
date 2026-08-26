@@ -53,7 +53,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         Element element = new Element("My Element", elementType);
         element.SetValue("title", "The Element Title");
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
 
         var xml = Serializer.Serialize(element);
 
@@ -78,7 +78,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         Element element = new Element("My Element", elementType);
         element.SetValue("title", "The Element Title");
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
 
         var elementKey = element.Key;
 
@@ -137,7 +137,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         IElement element = new Element("My Element", containerB.Id, elementType);
         element.SetValue("title", "Nested Title");
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
         var elementKey = element.Key;
 
         // Reload so Level/Path (used to resolve the ancestor folders) are populated.
@@ -205,7 +205,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
 
         IElement element = new Element("My Element", container.Id, elementType);
         element.SetValue("title", "Renamed Folder Title");
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
         var elementKey = element.Key;
 
         // Reload so Level/Path are populated, then serialize.

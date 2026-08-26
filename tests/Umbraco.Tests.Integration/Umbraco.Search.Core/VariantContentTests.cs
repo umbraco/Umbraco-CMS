@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 public class VariantContentTests : VariantContentTestBase
 {
     [Test]
-    public void PublishedStructure_YieldsAllPublishedDocuments()
+    public async Task PublishedStructure_YieldsAllPublishedDocuments()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -37,9 +37,9 @@ public class VariantContentTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructure_CanRefreshChild_InSingleCulture()
+    public async Task PublishedStructure_CanRefreshChild_InSingleCulture()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IContent child = Child();
@@ -47,7 +47,7 @@ public class VariantContentTests : VariantContentTestBase
         child.SetValue("message", "The updated child message in English (default)", "en-US");
         child.SetValue("message", "The updated child message in English (segment-1)", "en-US", "segment-1");
         child.SetValue("message", "The updated child message in English (segment-2)", "en-US", "segment-2");
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         ContentService.Publish(Child(), ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -63,15 +63,15 @@ public class VariantContentTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructure_CanRefreshChild_InMultipleCultures()
+    public async Task PublishedStructure_CanRefreshChild_InMultipleCultures()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IContent child = Child();
         child.SetValue("title", "The updated child title in English", "en-US");
         child.SetValue("title", "The updated child title in Danish", "da-DK");
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         ContentService.Publish(Child(), ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -81,14 +81,14 @@ public class VariantContentTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructure_CanRefreshChild_InvariantCulture()
+    public async Task PublishedStructure_CanRefreshChild_InvariantCulture()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IContent child = Child();
         child.SetValue("count", 123456);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         ContentService.Publish(Child(), ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -98,9 +98,9 @@ public class VariantContentTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructure_YieldsSystemFields()
+    public async Task PublishedStructure_YieldsSystemFields()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);

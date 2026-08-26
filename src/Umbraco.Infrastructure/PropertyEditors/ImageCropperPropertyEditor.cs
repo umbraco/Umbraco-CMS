@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class ImageCropperPropertyEditor : DataEditor,
     IMediaUrlGenerator,
     IValueSchemaProvider,
-    INotificationHandler<ContentCopiedNotification>,
+    INotificationAsyncHandler<ContentCopiedNotification>,
     INotificationHandler<ContentDeletedNotification>,
     INotificationHandler<MediaDeletedNotification>,
     INotificationHandler<MediaSavingNotification>,
@@ -167,7 +167,8 @@ public class ImageCropperPropertyEditor : DataEditor,
     ///     Handles the copying of uploaded image files for image cropper properties after content has been copied.
     /// </summary>
     /// <param name="notification">The notification containing the original content and its copy.</param>
-    public void Handle(ContentCopiedNotification notification)
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public async Task HandleAsync(ContentCopiedNotification notification, CancellationToken cancellationToken)
     {
         // get the image cropper field properties
         IEnumerable<IProperty> properties = notification.Original.Properties.Where(IsCropperField);
@@ -203,7 +204,7 @@ public class ImageCropperPropertyEditor : DataEditor,
         // if updated, re-save the copy with the updated value
         if (isUpdated)
         {
-            _contentService.Save(notification.Copy);
+            await _contentService.SaveAsync(notification.Copy, null, null, cancellationToken);
         }
     }
 

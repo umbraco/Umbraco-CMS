@@ -83,21 +83,21 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         // Create and Save Content "Homepage" based on "umbTextpage" -> (_textpage.Id)
         _textpage = ContentBuilder.CreateSimpleContent(_contentType);
         _textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-        ContentService.Save(_textpage, -1);
+        await ContentService.SaveAsync(_textpage, -1, null, CancellationToken.None);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> (_subpage.Id)
         _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
         _subpage.Key = new Guid("FF11402B-7E53-4654-81A7-462AC2108059");
-        ContentService.Save(_subpage, -1);
+        await ContentService.SaveAsync(_subpage, -1, null, CancellationToken.None);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> (_subpage2.Id)
         _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);
-        ContentService.Save(_subpage2, -1);
+        await ContentService.SaveAsync(_subpage2, -1, null, CancellationToken.None);
 
         // Create and Save Content "Text Page Deleted" based on "umbTextpage" -> (_trashed.Id)
         _trashed = ContentBuilder.CreateSimpleContent(_contentType, "Text Page Deleted", -20);
         _trashed.Trashed = true;
-        ContentService.Save(_trashed, -1);
+        await ContentService.SaveAsync(_trashed, -1, null, CancellationToken.None);
     }
 
     private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out DataTypeRepository dtdRepository, AppCaches appCaches = null)
@@ -993,7 +993,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         // Create content
         var root = ContentBuilder.CreateSimpleContent(invariantCt);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         var children = new List<IContent>();
 
@@ -1018,7 +1018,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
                 child.SetValue("author", "John Doe", culture);
             }
 
-            ContentService.Save(child);
+            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
             children.Add(child);
         }
 

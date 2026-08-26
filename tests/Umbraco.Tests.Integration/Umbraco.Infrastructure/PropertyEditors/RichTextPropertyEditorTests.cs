@@ -55,7 +55,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         content.Properties["bodyText"]!.SetValue(markup);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var toEditor = valueEditor.ToEditor(content.Properties["bodyText"]);
         var richTextEditorValue = toEditor as RichTextEditorValue;
@@ -83,7 +83,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         content.Properties["bodyText"]!.SetValue(propertyValue);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var toEditor = valueEditor.ToEditor(content.Properties["bodyText"]);
         var richTextEditorValue = toEditor as RichTextEditorValue;
@@ -104,7 +104,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var pickedContent = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
-        ContentService.Save(pickedContent);
+        await ContentService.SaveAsync(pickedContent, null, null, CancellationToken.None);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = await IdKeyMap.GetKeyForIdAsync(dataTypeId, UmbracoObjectTypes.DataType);
@@ -142,7 +142,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         content.Properties["bodyText"]!.SetValue(propertyValue);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var references = valueEditor.GetReferences(content.GetValue("bodyText")).ToArray();
         Assert.AreEqual(1, references.Length);
@@ -198,7 +198,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         content.Properties["bodyText"]!.SetValue(propertyValue);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var tags = valueEditor.GetTags(content.GetValue("bodyText"), null, null).ToArray();
         Assert.AreEqual(3, tags.Length);
@@ -227,7 +227,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
                 })
             .Build();
 
-        var contentResult = ContentService.Save(content);
+        var contentResult = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         Assert.IsTrue(contentResult.Success);
 
         var publishResult = ContentService.Publish(content, []);
@@ -264,7 +264,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
                 "en-US")
             .Build();
 
-        var contentResult = ContentService.Save(content);
+        var contentResult = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         Assert.IsTrue(contentResult.Success);
 
         var publishResult = ContentService.Publish(content, ["en-US"]);

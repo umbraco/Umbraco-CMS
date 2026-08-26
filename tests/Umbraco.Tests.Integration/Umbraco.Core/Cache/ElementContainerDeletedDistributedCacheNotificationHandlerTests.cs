@@ -68,7 +68,7 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
         EntityContainer secondContainer = await CreateContainerAsync(containerKey, "Container v2");
         Assert.AreNotEqual(firstContainer.Id, secondContainer.Id, "Recreated container should have a new id.");
 
-        IElement element = CreateElementUnder(secondContainer.Id, elementType);
+        IElement element = await CreateElementUnder(secondContainer.Id, elementType);
 
         // Without the fix, the stale containerKey->firstContainer.Id mapping survives and the children query
         // resolves to the old (now non-existent) parent id, returning nothing.
@@ -104,10 +104,10 @@ internal sealed class ElementContainerDeletedDistributedCacheNotificationHandler
         return result.Result!;
     }
 
-    private IElement CreateElementUnder(int parentId, IContentType elementType)
+    private async Task<IElement> CreateElementUnder(int parentId, IContentType elementType)
     {
         var element = new Element($"Element {Guid.NewGuid():N}", parentId, elementType);
-        OperationResult saveResult = ElementService.Save(element);
+        Attempt<ContentSaveOperationStatus> saveResult = await ElementService.SaveAsync(element, null, null, CancellationToken.None);
         Assert.IsTrue(saveResult.Success, "Failed to save element.");
         return element;
     }

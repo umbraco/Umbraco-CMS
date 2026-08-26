@@ -53,7 +53,7 @@ public class ProtectedContentTests : InvariantContentTestBase
             ]));
         Assert.That(entryResult.Success, Is.True);
 
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -71,7 +71,7 @@ public class ProtectedContentTests : InvariantContentTestBase
     [Test]
     public async Task PublishedStructure_CanAddContentProtectionWithoutRepublishing()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IContent root = Root();
@@ -121,7 +121,7 @@ public class ProtectedContentTests : InvariantContentTestBase
             ]));
         Assert.That(entryResult.Success, Is.True);
 
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         PublicAccessEntry? entry = await PublicAccessService.GetEntryForContentAsync(root);

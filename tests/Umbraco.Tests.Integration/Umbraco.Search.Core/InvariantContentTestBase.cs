@@ -45,7 +45,7 @@ public abstract class InvariantContentTestBase : ContentTestBase
                     tags = "[\"tag1\",\"tag2\"]"
                 })
             .Build();
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         Content child = new ContentBuilder()
             .WithKey(ChildKey)
@@ -60,7 +60,7 @@ public abstract class InvariantContentTestBase : ContentTestBase
                     tags = "[\"tag3\",\"tag4\"]"
                 })
             .Build();
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         Content grandchild = new ContentBuilder()
             .WithKey(GrandchildKey)
@@ -75,7 +75,7 @@ public abstract class InvariantContentTestBase : ContentTestBase
                     tags = "[\"tag5\",\"tag6\"]"
                 })
             .Build();
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
 
         Content greatGrandchild = new ContentBuilder()
             .WithKey(GreatGrandchildKey)
@@ -90,7 +90,7 @@ public abstract class InvariantContentTestBase : ContentTestBase
                     tags = "[\"tag7\",\"tag8\"]"
                 })
             .Build();
-        ContentService.Save(greatGrandchild);
+        await ContentService.SaveAsync(greatGrandchild, null, null, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
     }

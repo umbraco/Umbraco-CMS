@@ -26,7 +26,7 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         _content = ContentBuilder.CreateSimpleContent(ct, "Test");
-        ContentService.Save(_content);
+        await ContentService.SaveAsync(_content, null, null, CancellationToken.None);
     }
 
     private IContentService ContentService => GetRequiredService<IContentService>();

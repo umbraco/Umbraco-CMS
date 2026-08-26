@@ -243,7 +243,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new List<BlockPropertyValue>
@@ -329,7 +329,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new List<BlockPropertyValue>
@@ -410,7 +410,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new []
@@ -498,7 +498,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new []
@@ -598,7 +598,7 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Culture);
 
-        var content = CreateContent(
+        var content = await CreateContent(
             contentType,
             elementType,
             new []

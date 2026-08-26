@@ -8,9 +8,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 public partial class InvariantContentStructureTests
 {
     [Test]
-    public void PublishedStructure_YieldsAllPublishedDocuments()
+    public async Task PublishedStructure_YieldsAllPublishedDocuments()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -28,9 +28,9 @@ public partial class InvariantContentStructureTests
     }
 
     [Test]
-    public void PublishedRoot_YieldsOnlyRootDocument()
+    public async Task PublishedRoot_YieldsOnlyRootDocument()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.Publish(Root(), ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -39,9 +39,9 @@ public partial class InvariantContentStructureTests
     }
 
     [Test]
-    public void PublishedStructure_WithUnpublishedRoot_YieldsNoDocuments()
+    public async Task PublishedStructure_WithUnpublishedRoot_YieldsNoDocuments()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         PublishResult result = ContentService.Unpublish(Root());
@@ -53,9 +53,9 @@ public partial class InvariantContentStructureTests
     }
 
     [Test]
-    public void PublishedStructure_WithUnpublishedGrandchild_YieldsNothingBelowChild()
+    public async Task PublishedStructure_WithUnpublishedGrandchild_YieldsNothingBelowChild()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         PublishResult result = ContentService.Unpublish(Grandchild());
@@ -73,9 +73,9 @@ public partial class InvariantContentStructureTests
     }
 
     [Test]
-    public void PublishedStructure_WithGrandchildInRecycleBin_YieldsNothingBelowChild()
+    public async Task PublishedStructure_WithGrandchildInRecycleBin_YieldsNothingBelowChild()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         OperationResult result = ContentService.MoveToRecycleBin(Grandchild());
@@ -93,9 +93,9 @@ public partial class InvariantContentStructureTests
     }
 
     [Test]
-    public void PublishedStructure_WithGrandchildDeleted_YieldsNothingBelowChild()
+    public async Task PublishedStructure_WithGrandchildDeleted_YieldsNothingBelowChild()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         OperationResult result = ContentService.Delete(Grandchild());

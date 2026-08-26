@@ -309,14 +309,14 @@ internal sealed partial class ContentTypeEditingServiceTests
             ElementService.Publish((IElement)instance, ["*"]);
             var elementToEdit = await ElementService.GetByIdAsync(instance.Key, CancellationToken.None);
             elementToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
-            ElementService.Save(elementToEdit);
+            await ElementService.SaveAsync(elementToEdit, null, null, CancellationToken.None);
         }
         else
         {
             ContentService.Publish((IContent)instance, ["*"]);
             var contentToEdit = await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
             contentToEdit!.SetValue(VarianceTestPropertyAlias, "draft edited value", null);
-            ContentService.Save(contentToEdit);
+            await ContentService.SaveAsync(contentToEdit, null, null, CancellationToken.None);
         }
 
         var propertyType = contentType.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
@@ -363,14 +363,14 @@ internal sealed partial class ContentTypeEditingServiceTests
             ElementService.Publish((IElement)instance, ["*"]);
             var elementToEdit = await ElementService.GetByIdAsync(instance.Key, CancellationToken.None);
             elementToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
-            ElementService.Save(elementToEdit);
+            await ElementService.SaveAsync(elementToEdit, null, null, CancellationToken.None);
         }
         else
         {
             ContentService.Publish((IContent)instance, ["*"]);
             var contentToEdit = await ContentService.GetByIdAsync(instance.Key, CancellationToken.None);
             contentToEdit!.SetValue(VarianceTestPropertyAlias, "unpublished danish edit", "da-DK");
-            ContentService.Save(contentToEdit);
+            await ContentService.SaveAsync(contentToEdit, null, null, CancellationToken.None);
         }
 
         var propertyType = contentType.PropertyTypes.Single(p => p.Alias == VarianceTestPropertyAlias);
@@ -427,7 +427,7 @@ internal sealed partial class ContentTypeEditingServiceTests
             element.SetValue(VarianceTestPropertyAlias, value, culture);
         }
 
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
         return element;
     }
 
@@ -452,7 +452,7 @@ internal sealed partial class ContentTypeEditingServiceTests
             content.SetValue(VarianceTestPropertyAlias, value, culture);
         }
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         return content;
     }
 }

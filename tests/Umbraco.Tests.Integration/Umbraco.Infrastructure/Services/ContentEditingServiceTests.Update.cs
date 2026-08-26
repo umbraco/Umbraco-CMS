@@ -482,7 +482,7 @@ public partial class ContentEditingServiceTests
     {
         var content = await CreateInvariantContent();
         content.SetValue("label", "The initial label value");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var updateModel = new ContentUpdateModel
         {
@@ -521,7 +521,7 @@ public partial class ContentEditingServiceTests
         var content = await CreateCultureVariantContent();
         content.SetValue("variantLabel", "The initial English label value", "en-US");
         content.SetValue("variantLabel", "The initial Danish label value", "da-DK");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var updateModel = new ContentUpdateModel
         {

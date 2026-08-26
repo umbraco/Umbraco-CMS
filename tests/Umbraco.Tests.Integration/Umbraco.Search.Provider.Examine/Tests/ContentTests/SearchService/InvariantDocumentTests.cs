@@ -164,11 +164,10 @@ public class InvariantDocumentTests : SearcherTestBase
                 })
             .Build();
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             ContentService.Publish(root, new[] { "*" });
-            return Task.CompletedTask;
         });
 
         IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
@@ -180,18 +179,17 @@ public class InvariantDocumentTests : SearcherTestBase
         IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
         content.SetValue(propertyName, value);
 
-        await WaitForIndexing(GetIndexAlias(publish), () =>
+        await WaitForIndexing(GetIndexAlias(publish), async () =>
         {
             if (publish)
             {
-                ContentService.Save(content);
+                await ContentService.SaveAsync(content, null, null, CancellationToken.None);
                 ContentService.Publish(content, ["*"]);
             }
             else
             {
-                ContentService.Save(content);
+                await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             }
-            return Task.CompletedTask;
         });
     }
 }

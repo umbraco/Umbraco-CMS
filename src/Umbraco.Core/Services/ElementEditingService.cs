@@ -530,7 +530,7 @@ internal sealed class ElementEditingService
         copy.CreatorId = userId;
         copy.WriterId = userId;
 
-        OperationResult saveResult = ContentService.Save(copy, userId);
+        Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(copy, userId, null, CancellationToken.None);
         if (saveResult.Success is false)
         {
             return null;
@@ -562,12 +562,12 @@ internal sealed class ElementEditingService
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            OperationResult saveResult = ContentService.Save(content, currentUserId);
+            Attempt<ContentSaveOperationStatus> saveResult = await ContentService.SaveAsync(content, currentUserId, null, CancellationToken.None);
             return saveResult.Result switch
             {
-                // these are the only result states currently expected from Save
-                OperationResultType.Success => ContentEditingOperationStatus.Success,
-                OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+                // these are the only result states currently expected from SaveAsync
+                ContentSaveOperationStatus.Success => ContentEditingOperationStatus.Success,
+                ContentSaveOperationStatus.CancelledByNotification => ContentEditingOperationStatus.CancelledByNotification,
 
                 // for any other state we'll return "unknown" so we know that we need to amend this
                 _ => ContentEditingOperationStatus.Unknown

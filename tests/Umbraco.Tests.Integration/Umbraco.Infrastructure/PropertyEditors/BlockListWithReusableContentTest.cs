@@ -59,7 +59,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, ["*"]);
 
@@ -113,7 +113,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, ["*"]);
 
@@ -180,7 +180,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, ["*"]);
 
@@ -260,7 +260,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, ["*"]);
 
@@ -362,7 +362,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, ["*"]);
 
@@ -490,7 +490,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(englishBlockListValue), culture: "en-US");
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(danishBlockListValue), culture: "da-DK");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -579,7 +579,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -666,7 +666,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, ["*"]);
 
@@ -758,7 +758,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var content = contentBuilder.Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -821,7 +821,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var content = new ContentBuilder().WithContentType(contentType).WithName("Page").Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, ["*"]);
 
         var relationService = GetRequiredService<IRelationService>();

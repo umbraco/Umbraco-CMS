@@ -9,9 +9,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 public class VariantContentStructureTests : VariantContentTestBase
 {
     [Test]
-    public void PublishedStructureInAllCultures_YieldsAllPublishedDocumentsInAllCultures()
+    public async Task PublishedStructureInAllCultures_YieldsAllPublishedDocumentsInAllCultures()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -38,9 +38,9 @@ public class VariantContentStructureTests : VariantContentTestBase
 
     [TestCase("en-US")]
     [TestCase("da-DK")]
-    public void PublishedStructureSingleCulture_YieldsAllPublishedDocumentsInOneCultures(string culture)
+    public async Task PublishedStructureSingleCulture_YieldsAllPublishedDocumentsInOneCultures(string culture)
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, [culture]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -64,9 +64,9 @@ public class VariantContentStructureTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedRootInAllCultures_YieldsOnlyRootDocumentInAllCultures()
+    public async Task PublishedRootInAllCultures_YieldsOnlyRootDocumentInAllCultures()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.Default, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -76,9 +76,9 @@ public class VariantContentStructureTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructureInAllCultures_WithUnpublishedRoot_YieldsNoDocuments()
+    public async Task PublishedStructureInAllCultures_WithUnpublishedRoot_YieldsNoDocuments()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         PublishResult result = ContentService.Unpublish(Root());
@@ -91,9 +91,9 @@ public class VariantContentStructureTests : VariantContentTestBase
 
     [TestCase("en-US", "da-DK")]
     [TestCase("da-DK", "en-US")]
-    public void PublishedStructureInAllCultures_WithUnpublishedRootInSingleCulture_YieldsAllDocumentInPublishedRootCulture(string cultureToUnpublish, string expectedCulture)
+    public async Task PublishedStructureInAllCultures_WithUnpublishedRootInSingleCulture_YieldsAllDocumentInPublishedRootCulture(string cultureToUnpublish, string expectedCulture)
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         PublishResult result = ContentService.Unpublish(Root(), cultureToUnpublish);
@@ -129,9 +129,9 @@ public class VariantContentStructureTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructureInAllCultures_WithUnpublishedGrandchildInAllCultures_YieldsNothingBelowChild()
+    public async Task PublishedStructureInAllCultures_WithUnpublishedGrandchildInAllCultures_YieldsNothingBelowChild()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         PublishResult result = ContentService.Unpublish(Grandchild());
@@ -155,9 +155,9 @@ public class VariantContentStructureTests : VariantContentTestBase
     }
 
     [Test]
-    public void PublishedStructureInAllCultures_UnpublishAllCulturesForGrandchildOneAtATime_YieldsNothingBelowChild()
+    public async Task PublishedStructureInAllCultures_UnpublishAllCulturesForGrandchildOneAtATime_YieldsNothingBelowChild()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         PublishResult result = ContentService.Unpublish(Grandchild(), "en-US");
@@ -186,9 +186,9 @@ public class VariantContentStructureTests : VariantContentTestBase
 
     [TestCase("en-US", "da-DK")]
     [TestCase("da-DK", "en-US")]
-    public void PublishedStructureInAllCultures_WithUnpublishedGrandchildInSingleCulture_YieldsSingleCultureBelowChild(string cultureToUnpublish, string expectedCulture)
+    public async Task PublishedStructureInAllCultures_WithUnpublishedGrandchildInSingleCulture_YieldsSingleCultureBelowChild(string cultureToUnpublish, string expectedCulture)
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         PublishResult result = ContentService.Unpublish(Grandchild(), cultureToUnpublish);

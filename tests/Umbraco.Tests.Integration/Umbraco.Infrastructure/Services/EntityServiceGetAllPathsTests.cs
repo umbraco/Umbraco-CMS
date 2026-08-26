@@ -45,13 +45,13 @@ internal sealed class EntityServiceGetAllPathsTests : UmbracoIntegrationTest
         var contentType = await CreateContentType();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         var ids = new List<int>();
         for (var i = 0; i < itemCount; i++)
         {
             var child = ContentBuilder.CreateSimpleContent(contentType, $"Item {i}", root);
-            ContentService.Save(child);
+            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
             ids.Add(child.Id);
         }
 
@@ -87,13 +87,13 @@ internal sealed class EntityServiceGetAllPathsTests : UmbracoIntegrationTest
         var contentType = await CreateContentType();
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         var keys = new List<Guid>();
         for (var i = 0; i < itemCount; i++)
         {
             var child = ContentBuilder.CreateSimpleContent(contentType, $"Item {i}", root);
-            ContentService.Save(child);
+            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
             keys.Add(child.Key);
         }
 

@@ -373,7 +373,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
 
         // Set property value directly
         content.SetValue("title", "Original Title", culture: "en-US");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var documentKey = content.Key;
 
@@ -451,7 +451,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         // Set property values directly
         content.SetValue("title", "Original Title", culture: "en-US");
         content.SetValue("description", "Original Description", culture: "en-US");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var documentKey = content.Key;
 
@@ -527,7 +527,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
 
         // Set property value directly
         content.SetValue("title", "Original Title", culture: "en-US");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var documentKey = content.Key;
 
@@ -665,7 +665,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         content.SetValue("price", "75", culture: "en-US", segment: null); // Default segment
         content.SetValue("price", "100", culture: "en-US", segment: "standard");
         content.SetValue("price", "150", culture: "en-US", segment: "premium");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var documentKey = content.Key;
 
@@ -722,7 +722,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
         var content = new ContentBuilder()
             .WithContentType(contentType)
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.MoveToRecycleBin(content);
 
         var documentKey = content.Key;
@@ -916,7 +916,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             .Build();
 
         content.SetValue("contentBlocks", blockListJson);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         var documentKey = content.Key;
 
         // Act - Patch only the headline of block 2 using nested path
@@ -1112,7 +1112,7 @@ public class PatchDocumentControllerTests : ManagementApiUserGroupTestBase<Patch
             .Build();
 
         content.SetValue("contentBlocks", blockListJson);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         var documentKey = content.Key;
 
         // Act - Add a new block to the block list using two add operations:

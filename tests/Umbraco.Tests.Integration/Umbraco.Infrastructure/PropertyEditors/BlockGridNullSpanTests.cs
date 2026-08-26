@@ -70,7 +70,7 @@ internal sealed class BlockGridNullSpanTests : BlockEditorElementVariationTestBa
 
         var content = new ContentBuilder().WithContentType(contentType).WithName("Home").Build();
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, ["*"]);
 
         SetVariationContext(null, null);

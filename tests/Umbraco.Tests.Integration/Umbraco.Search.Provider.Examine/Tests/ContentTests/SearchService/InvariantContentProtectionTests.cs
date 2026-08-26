@@ -213,11 +213,10 @@ public class InvariantContentProtectionTests : SearcherTestBase
                 new { title = "root title", })
             .Build();
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.PublishedContent, async () =>
         {
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             ContentService.Publish(root, ["*"]);
-            return Task.CompletedTask;
         });
 
         IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();

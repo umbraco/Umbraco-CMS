@@ -50,7 +50,7 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
                 .WithCultureName("en-US", $"Root {rootNumber} en-US")
                 .WithCultureName("da-DK", $"Root {rootNumber} da-DK")
                 .Build();
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             ContentService.Publish(root, ["*"]);
             _contentByName[$"Root {rootNumber}"] = root;
 
@@ -62,7 +62,7 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
                     .WithCultureName("en-US", $"Child {childNumber} en-US")
                     .WithCultureName("da-DK", $"Child {childNumber} da-DK")
                     .Build();
-                ContentService.Save(child);
+                await ContentService.SaveAsync(child, null, null, CancellationToken.None);
                 ContentService.Publish(child, ["*"]);
                 _contentByName[$"Root {rootNumber}/Child {childNumber}"] = child;
 
@@ -74,7 +74,7 @@ public class ApiContentRouteBuilderVariantTests : ApiContentRouteBuilderTestBase
                         .WithCultureName("en-US", $"Grandchild {grandchildNumber} en-US")
                         .WithCultureName("da-DK", $"Grandchild {grandchildNumber} da-DK")
                         .Build();
-                    ContentService.Save(grandchild);
+                    await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
                     ContentService.Publish(grandchild, ["*"]);
                     _contentByName[$"Root {rootNumber}/Child {childNumber}/Grandchild {grandchildNumber}"] = grandchild;
                 }

@@ -52,7 +52,7 @@ public class DistributedContentIndexRefresherContentTests : TestBase
             .WithCultureName("en-US", "Variant EN")
             .WithCultureName("da-DK", "Variant DA")
             .Build();
-        ContentService.Save(variantContent);
+        await ContentService.SaveAsync(variantContent, null, null, CancellationToken.None);
         ContentService.Publish(variantContent, ["en-US", "da-DK"]);
 
         _invariantContentKey = Guid.NewGuid();
@@ -61,7 +61,7 @@ public class DistributedContentIndexRefresherContentTests : TestBase
             .WithContentType(invariantContentType)
             .WithName("Invariant")
             .Build();
-        ContentService.Save(invariantContent);
+        await ContentService.SaveAsync(invariantContent, null, null, CancellationToken.None);
         ContentService.Publish(invariantContent, ["*"]);
 
         IndexerAndSearcher.Reset();

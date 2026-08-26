@@ -35,7 +35,7 @@ internal sealed class EntityRepositoryTest : UmbracoIntegrationTest
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
-            contentService.Save(c1);
+            await contentService.SaveAsync(c1, null, null, CancellationToken.None);
             createdContent.Add(c1);
         }
 

@@ -30,14 +30,14 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
                 new() { ContentElementTypeKey = elementType.Key, SettingsElementTypeKey = elementType.Key }
             });
 
-    private IContent CreateContent(IContentType contentType, IContentType elementType, IList<BlockPropertyValue> blockContentValues, IList<BlockPropertyValue> blockSettingsValues, bool publishContent)
-        => CreateContent(
+    private async Task<IContent> CreateContent(IContentType contentType, IContentType elementType, IList<BlockPropertyValue> blockContentValues, IList<BlockPropertyValue> blockSettingsValues, bool publishContent)
+        => await CreateContent(
             contentType,
             elementType,
             new[] { new BlockProperty(blockContentValues, blockSettingsValues, null, null) },
             publishContent);
 
-    private IContent CreateContent(IContentType contentType, IContentType elementType, IEnumerable<BlockProperty> blocksProperties, bool publishContent)
+    private async Task<IContent> CreateContent(IContentType contentType, IContentType elementType, IEnumerable<BlockProperty> blocksProperties, bool publishContent)
     {
         var contentBuilder = new ContentBuilder()
             .WithContentType(contentType);
@@ -58,7 +58,7 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
             content.Properties["blocks"]!.SetValue(propertyValue, blocksProperty.Culture, blocksProperty.Segment);
         }
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         if (publishContent)
         {
@@ -144,7 +144,7 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = await CreateContentType(variation, blockListDataType);
 
-        var content = CreateContent(contentType, elementType, blockContentValues, blockSettingsValues, true);
+        var content = await CreateContent(contentType, elementType, blockContentValues, blockSettingsValues, true);
         return GetPublishedContent(content.Key);
     }
 

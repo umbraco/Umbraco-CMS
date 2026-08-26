@@ -460,21 +460,19 @@ public class ExplicitSegmentIndexTests : IndexTestBase
             docWithSpecialCharacterSegments.SetValue("segmentedProperty", $"ValueFor_{sanitizedSegment}", "da-DK", segment);
         }
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            ContentService.Save(docWithAllSegments);
+            await ContentService.SaveAsync(docWithAllSegments, null, null, CancellationToken.None);
             ContentService.Publish(docWithAllSegments, ["*"]);
 
-            ContentService.Save(docWithOnlyNullSegment);
+            await ContentService.SaveAsync(docWithOnlyNullSegment, null, null, CancellationToken.None);
             ContentService.Publish(docWithOnlyNullSegment, ["*"]);
 
-            ContentService.Save(docWithOnlySegment1);
+            await ContentService.SaveAsync(docWithOnlySegment1, null, null, CancellationToken.None);
             ContentService.Publish(docWithOnlySegment1, ["*"]);
 
-            ContentService.Save(docWithSpecialCharacterSegments);
+            await ContentService.SaveAsync(docWithSpecialCharacterSegments, null, null, CancellationToken.None);
             ContentService.Publish(docWithSpecialCharacterSegments, ["*"]);
-
-            return Task.CompletedTask;
         });
     }
 }

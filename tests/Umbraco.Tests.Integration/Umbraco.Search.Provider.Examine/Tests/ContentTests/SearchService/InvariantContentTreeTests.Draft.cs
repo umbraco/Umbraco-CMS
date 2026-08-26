@@ -152,11 +152,11 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         if (publish)
         {
-            SaveAndPublish(root);
+            await SaveAndPublishAsync(root);
         }
         else
         {
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
         }
 
 
@@ -177,11 +177,11 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         if (publish)
         {
-            SaveAndPublish(child);
+            await SaveAndPublishAsync(child);
         }
         else
         {
-            ContentService.Save(child);
+            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         }
 
         Content grandchild = new ContentBuilder()
@@ -201,11 +201,11 @@ public partial class InvariantContentTreeTests : SearcherTestBase
 
         if (publish)
         {
-            SaveAndPublish(grandchild);
+            await SaveAndPublishAsync(grandchild);
         }
         else
         {
-            ContentService.Save(grandchild);
+            await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
         }
     }
 }

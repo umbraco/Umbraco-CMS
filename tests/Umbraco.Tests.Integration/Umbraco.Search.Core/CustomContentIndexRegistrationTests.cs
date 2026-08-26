@@ -49,7 +49,7 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
             .Build();
         await GetRequiredService<IContentTypeService>().CreateAsync(contentType, CoreConstants.Security.SuperUserKey);
 
-        ContentService.Save(
+        await ContentService.SaveAsync(
             new ContentBuilder()
                 .WithKey(ContentKey)
                 .WithContentType(contentType)
@@ -59,7 +59,10 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
                     {
                         title = "The content title"
                     })
-                .Build());
+                .Build(),
+            null,
+            null,
+            CancellationToken.None);
 
         IMediaType mediaType = new MediaTypeBuilder()
             .WithAlias("theMediaType")
@@ -113,9 +116,9 @@ public class CustomContentIndexRegistrationTests : ContentBaseTestBase
     }
 
     [Test]
-    public void CustomIndexRegistration_CanContainAllTypesOfContent()
+    public async Task CustomIndexRegistration_CanContainAllTypesOfContent()
     {
-        ContentService.Save(Content());
+        await ContentService.SaveAsync(Content(), null, null, CancellationToken.None);
         MediaService.Save(Media());
         MemberService.Save(Member());
 

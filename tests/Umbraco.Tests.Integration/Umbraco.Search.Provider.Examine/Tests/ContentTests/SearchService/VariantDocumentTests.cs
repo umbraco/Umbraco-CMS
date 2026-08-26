@@ -153,11 +153,10 @@ public class VariantDocumentTests : SearcherTestBase
         root.SetValue("body", "ボディSegment1", "ja-JP", "segment-1");
         root.SetValue("body", "ボディSegment2", "ja-JP", "segment-2");
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
             ContentService.Publish(root, ["*"]);
-            return Task.CompletedTask;
         });
 
         IContent? content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult();
@@ -170,11 +169,10 @@ public class VariantDocumentTests : SearcherTestBase
         IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
         content.SetValue(propertyName, value, culture);
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
             ContentService.Publish(content, ["*"]);
-            return Task.CompletedTask;
         });
     }
 }

@@ -41,9 +41,9 @@ public class ContentTypeTests : ContentBaseTestBase
         _contentType2 = await CreateContentType();
         _contentType3 = await CreateContentType();
 
-        CreateContentStructure(_contentType1, _contentType1RootContentKey, _contentType1ChildContentKey);
-        CreateContentStructure(_contentType2, _contentType2RootContentKey, _contentType2ChildContentKey);
-        CreateContentStructure(_contentType3, _contentType3RootContentKey, _contentType3ChildContentKey);
+        await CreateContentStructure(_contentType1, _contentType1RootContentKey, _contentType1ChildContentKey);
+        await CreateContentStructure(_contentType2, _contentType2RootContentKey, _contentType2ChildContentKey);
+        await CreateContentStructure(_contentType3, _contentType3RootContentKey, _contentType3ChildContentKey);
 
         return;
 
@@ -58,20 +58,20 @@ public class ContentTypeTests : ContentBaseTestBase
             return contentType;
         }
 
-        void CreateContentStructure(IContentType contentType, Guid rootContentKey, Guid childContentKey)
+        async Task CreateContentStructure(IContentType contentType, Guid rootContentKey, Guid childContentKey)
         {
             Content root = new ContentBuilder()
                 .WithKey(rootContentKey)
                 .WithContentType(contentType)
                 .Build();
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
             Content child = new ContentBuilder()
                 .WithKey(childContentKey)
                 .WithContentType(contentType)
                 .WithParent(root)
                 .Build();
-            ContentService.Save(child);
+            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
             ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
@@ -167,7 +167,7 @@ public class ContentTypeTests : ContentBaseTestBase
             .WithKey(compositionContentKey)
             .WithContentType(compositionType)
             .Build();
-        ContentService.Save(compositionContent);
+        await ContentService.SaveAsync(compositionContent, null, null, CancellationToken.None);
 
         // Create content of the composing type
         var composingContentKey = Guid.NewGuid();
@@ -175,7 +175,7 @@ public class ContentTypeTests : ContentBaseTestBase
             .WithKey(composingContentKey)
             .WithContentType(composingType)
             .Build();
-        ContentService.Save(composingContent);
+        await ContentService.SaveAsync(composingContent, null, null, CancellationToken.None);
 
         // Verify initial state: both new content items indexed in draft
         // (plus 6 from the base SetUp = 8 total)
@@ -241,21 +241,21 @@ public class ContentTypeTests : ContentBaseTestBase
             .WithKey(rootContentKey)
             .WithContentType(rootType)
             .Build();
-        ContentService.Save(rootContent);
+        await ContentService.SaveAsync(rootContent, null, null, CancellationToken.None);
 
         var childContentKey = Guid.NewGuid();
         Content childContent = new ContentBuilder()
             .WithKey(childContentKey)
             .WithContentType(childType)
             .Build();
-        ContentService.Save(childContent);
+        await ContentService.SaveAsync(childContent, null, null, CancellationToken.None);
 
         var grandchildContentKey = Guid.NewGuid();
         Content grandchildContent = new ContentBuilder()
             .WithKey(grandchildContentKey)
             .WithContentType(grandchildType)
             .Build();
-        ContentService.Save(grandchildContent);
+        await ContentService.SaveAsync(grandchildContent, null, null, CancellationToken.None);
 
         // Verify initial state (6 from SetUp + 3 new = 9)
         IReadOnlyList<TestIndexDocument> draftDocuments = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
@@ -311,7 +311,7 @@ public class ContentTypeTests : ContentBaseTestBase
             .WithKey(compositionContentKey)
             .WithContentType(compositionType)
             .Build();
-        ContentService.Save(compositionContent);
+        await ContentService.SaveAsync(compositionContent, null, null, CancellationToken.None);
         ContentService.PublishBranch(compositionContent, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         // Create content of the composing type
@@ -320,7 +320,7 @@ public class ContentTypeTests : ContentBaseTestBase
             .WithKey(composingContentKey)
             .WithContentType(composingType)
             .Build();
-        ContentService.Save(composingContent);
+        await ContentService.SaveAsync(composingContent, null, null, CancellationToken.None);
         ContentService.PublishBranch(composingContent, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         // Verify initial state (6 from SetUp + 2 new = 8)

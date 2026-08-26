@@ -28,7 +28,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(elementTypeResult.Success, "Failed to create element content type");
 
         var element = ElementBuilder.CreateBasicElement(elementType);
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
 
         var elementScheduleAttempt = await ElementPublishingService.PublishAsync(
             element.Key,
@@ -49,7 +49,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(docTypeResult.Success, "Failed to create document content type");
 
         var document = ContentBuilder.CreateBasicContent(docType);
-        ContentServiceForScheduling.Save(document);
+        await ContentServiceForScheduling.SaveAsync(document, null, null, CancellationToken.None);
 
         var docScheduleAttempt = await ContentPublishingService.PublishAsync(
             document.Key,
@@ -87,7 +87,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(elementTypeResult.Success, "Failed to create element content type");
 
         var element = ElementBuilder.CreateBasicElement(elementType);
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
 
         var publishAttempt = await ElementPublishingService.PublishAsync(
             element.Key,
@@ -114,7 +114,7 @@ public partial class ElementServiceTests
         Assert.IsTrue(docTypeResult.Success, "Failed to create document content type");
 
         var document = ContentBuilder.CreateBasicContent(docType);
-        ContentServiceForScheduling.Save(document);
+        await ContentServiceForScheduling.SaveAsync(document, null, null, CancellationToken.None);
 
         var docPublishAttempt = await ContentPublishingService.PublishAsync(
             document.Key,

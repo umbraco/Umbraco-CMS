@@ -118,15 +118,13 @@ public class ContentServiceTests : UmbracoIntegrationTest
         // Update the content name
         _rootDocument.Name = "Updated Root Document";
 
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            ContentService.Save(_rootDocument);
+            await ContentService.SaveAsync(_rootDocument, null, null, CancellationToken.None);
             if (publish)
             {
                 ContentService.Publish(_rootDocument, ["*"]);
             }
-
-            return Task.CompletedTask;
         });
 
         using (ScopeProvider.CreateScope(autoComplete: true))

@@ -1087,21 +1087,19 @@ public class ExplicitSegmentSearchTests : SearcherTestBase
         docWithOverlappingValues.SetValue("datetime", new DateTime(2025, 8, 1), "en-US");
         docWithOverlappingValues.SetValue("datetime", new DateTime(2025, 8, 1), "en-US", "segment-1");
 
-        await WaitForIndexing(GetIndexAlias(true), () =>
+        await WaitForIndexing(GetIndexAlias(true), async () =>
         {
-            ContentService.Save(docWithAllSegments);
+            await ContentService.SaveAsync(docWithAllSegments, null, null, CancellationToken.None);
             ContentService.Publish(docWithAllSegments, ["*"]);
 
-            ContentService.Save(docWithOnlyNullSegment);
+            await ContentService.SaveAsync(docWithOnlyNullSegment, null, null, CancellationToken.None);
             ContentService.Publish(docWithOnlyNullSegment, ["*"]);
 
-            ContentService.Save(docWithOnlySegment1);
+            await ContentService.SaveAsync(docWithOnlySegment1, null, null, CancellationToken.None);
             ContentService.Publish(docWithOnlySegment1, ["*"]);
 
-            ContentService.Save(docWithOverlappingValues);
+            await ContentService.SaveAsync(docWithOverlappingValues, null, null, CancellationToken.None);
             ContentService.Publish(docWithOverlappingValues, ["*"]);
-
-            return Task.CompletedTask;
         });
     }
 }

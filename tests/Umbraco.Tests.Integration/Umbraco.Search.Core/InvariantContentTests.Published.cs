@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 public partial class InvariantContentTests
 {
     [Test]
-    public void PublishedStructure_YieldsAllPublishedDocuments()
+    public async Task PublishedStructure_YieldsAllPublishedDocuments()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -36,15 +36,15 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_CanRefreshChild()
+    public async Task PublishedStructure_CanRefreshChild()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IContent child = Child();
         child.SetValue("title", "The updated child title");
         child.SetValue("count", 123456);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         ContentService.Publish(child, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -62,9 +62,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_YieldsStructuralFields()
+    public async Task PublishedStructure_YieldsStructuralFields()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -88,9 +88,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_YieldsSystemFields()
+    public async Task PublishedStructure_YieldsSystemFields()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -114,15 +114,15 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_CanUpdateEditableSystemFields()
+    public async Task PublishedStructure_CanUpdateEditableSystemFields()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         IContent child = Child();
         child.Name = "The updated child name";
         child.SetValue("tags", "[\"updated-tag1\",\"updated-tag2\",\"updated-tag3\"]");
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         ContentService.Publish(child, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -133,9 +133,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_RemovesAllPublishedDocumentsWhenRootIsTrashed()
+    public async Task PublishedStructure_RemovesAllPublishedDocumentsWhenRootIsTrashed()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ContentService.MoveToRecycleBin(Root());
 
@@ -144,9 +144,9 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_RemovesAllPublishedDescendantDocumentsWhenChildIsTrashed()
+    public async Task PublishedStructure_RemovesAllPublishedDescendantDocumentsWhenChildIsTrashed()
     {
-        ContentService.Save(Root());
+        await ContentService.SaveAsync(Root(), null, null, CancellationToken.None);
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ContentService.MoveToRecycleBin(Child());
 
@@ -156,7 +156,7 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_UpdatesStructuralFieldsWhenRootIsMoved()
+    public async Task PublishedStructure_UpdatesStructuralFieldsWhenRootIsMoved()
     {
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
@@ -166,7 +166,7 @@ public partial class InvariantContentTests
             .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
-        ContentService.Save(secondRoot);
+        await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
         ContentService.Publish(secondRoot, ["*"]);
 
         OperationResult moveResult = ContentService.Move(Root(), secondRoot.Id);
@@ -197,7 +197,7 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_UpdatesStructuralFieldsWhenChildIsMoved()
+    public async Task PublishedStructure_UpdatesStructuralFieldsWhenChildIsMoved()
     {
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
@@ -207,7 +207,7 @@ public partial class InvariantContentTests
             .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
-        ContentService.Save(secondRoot);
+        await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
         ContentService.Publish(secondRoot, ["*"]);
 
         OperationResult moveResult = ContentService.Move(Child(), secondRoot.Id);
@@ -239,7 +239,7 @@ public partial class InvariantContentTests
     }
 
     [Test]
-    public void PublishedStructure_RemovesChildAndDescendantsWhenMovedToAnUnpublishedParent()
+    public async Task PublishedStructure_RemovesChildAndDescendantsWhenMovedToAnUnpublishedParent()
     {
         ContentService.PublishBranch(Root(), PublishBranchFilter.IncludeUnpublished, ["*"]);
 
@@ -249,7 +249,7 @@ public partial class InvariantContentTests
             .WithContentType(ContentTypeService.GetAsync(Root().ContentType.Key).GetAwaiter().GetResult()!)
             .WithName("Second Root")
             .Build();
-        ContentService.Save(secondRoot);
+        await ContentService.SaveAsync(secondRoot, null, null, CancellationToken.None);
 
         OperationResult moveResult = ContentService.Move(Child(), secondRoot.Id);
         Assert.That(moveResult.Result, Is.EqualTo(OperationResultType.Success));

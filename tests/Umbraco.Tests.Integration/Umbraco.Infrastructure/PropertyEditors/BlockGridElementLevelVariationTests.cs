@@ -25,7 +25,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
         var contentType = await CreateContentType(blockGridDataType);
         var blockGridValue = CreateBlockGridValue(elementType, areaKey);
-        var content = CreateContent(contentType, blockGridValue);
+        var content = await CreateContent(contentType, blockGridValue);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -83,7 +83,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         }
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, ["en-US"]);
 
         AssertPropertyValues(
@@ -182,7 +182,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
         var contentType = await CreateContentType(blockGridDataType);
         var blockGridValue = CreateBlockGridValue(elementType, areaKey);
-        var content = CreateContent(contentType, blockGridValue);
+        var content = await CreateContent(contentType, blockGridValue);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -213,7 +213,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         }
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, ["en-US"]);
 
         AssertPropertyValues("en-US", 1, blocks =>
@@ -288,7 +288,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         var blockGridDataType = await CreateBlockGridDataType(elementType, areaKey);
         var contentType = await CreateContentType(blockGridDataType);
         var blockGridValue = CreateBlockGridValue(elementType, areaKey);
-        var content = CreateContent(contentType, blockGridValue);
+        var content = await CreateContent(contentType, blockGridValue);
 
         PublishContent(content, ["en-US", "da-DK"]);
 
@@ -330,7 +330,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         blockGridValue.SettingsData[1].Values[2].Value = "#3: The second settings value in Danish";
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         PublishContent(content, ["en-US"]);
 
         AssertPropertyValues("en-US", 2, blocks =>
@@ -515,7 +515,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         };
     }
 
-    private IContent CreateContent(IContentType contentType, BlockGridValue blockGridValue)
+    private async Task<IContent> CreateContent(IContentType contentType, BlockGridValue blockGridValue)
     {
         var contentBuilder = new ContentBuilder()
             .WithContentType(contentType)
@@ -527,7 +527,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         var propertyValue = JsonSerializer.Serialize(blockGridValue);
         content.Properties["blocks"]!.SetValue(propertyValue);
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         return content;
     }
 
@@ -578,7 +578,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             ]
         };
 
-        var content = CreateContent(contentType, blockGridValue);
+        var content = await CreateContent(contentType, blockGridValue);
         PublishContent(content, ["en-US", "da-DK"]);
 
         // 3. Change element property type to invariant (remove culture variation)
@@ -607,7 +607,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             .ToList();
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // 5. Publish
         PublishContent(content, ["en-US", "da-DK"]);
@@ -691,7 +691,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
             ]
         };
 
-        var content = CreateContent(contentType, blockGridValue);
+        var content = await CreateContent(contentType, blockGridValue);
         PublishContent(content, ["en-US", "da-DK"]);
 
         // 3. Change element type to variant (add culture variation)
@@ -739,7 +739,7 @@ internal sealed class BlockGridElementLevelVariationTests : BlockEditorElementVa
         ];
 
         content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockGridValue));
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // 5. Publish selected cultures
         string[] culturesToPublish = republishEnglish && republishDanish

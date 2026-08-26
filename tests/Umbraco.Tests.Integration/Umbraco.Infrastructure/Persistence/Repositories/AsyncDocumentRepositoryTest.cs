@@ -70,21 +70,21 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         _textpage = ContentBuilder.CreateSimpleContent(_contentType);
         _textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-        ContentService.Save(_textpage, -1);
+        await ContentService.SaveAsync(_textpage, -1, null, CancellationToken.None);
 
         _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
         _subpage.Key = new Guid("FF11402B-7E53-4654-81A7-462AC2108059");
-        ContentService.Save(_subpage, -1);
+        await ContentService.SaveAsync(_subpage, -1, null, CancellationToken.None);
 
         _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);
-        ContentService.Save(_subpage2, -1);
+        await ContentService.SaveAsync(_subpage2, -1, null, CancellationToken.None);
 
         _trashed = ContentBuilder.CreateSimpleContent(_contentType, "Text Page Deleted", -20);
         _trashed.Trashed = true;
-        ContentService.Save(_trashed, -1);
+        await ContentService.SaveAsync(_trashed, -1, null, CancellationToken.None);
 
         _publishedPage = ContentBuilder.CreateSimpleContent(_contentType, "Published Page");
-        ContentService.Save(_publishedPage, -1);
+        await ContentService.SaveAsync(_publishedPage, -1, null, CancellationToken.None);
         ContentService.Publish(_publishedPage, ["*"]);
     }
 
@@ -409,7 +409,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // _publishedPage was saved with title="Welcome to our Home page" and then published in SetUp.
         // Edit the title in the draft without re-publishing so the two versions diverge.
         _publishedPage.SetValue("title", "draft edit");
-        ContentService.Save(_publishedPage, -1);
+        await ContentService.SaveAsync(_publishedPage, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -456,7 +456,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
         doc.SetCultureName("English Name", "en-US");
         doc.SetCultureName("Nom Français", "fr");
-        ContentService.Save(doc);
+        await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -476,7 +476,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
         doc.SetCultureName("English Name", "en-US");
         doc.SetCultureName("Nom Français", "fr");
-        ContentService.Save(doc);
+        await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
         ContentService.Publish(doc, doc.AvailableCultures.ToArray());
 
         using var scope = NewScopeProvider.CreateScope();
@@ -497,13 +497,13 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
         doc.SetCultureName("English Name", "en-US");
         doc.SetCultureName("Nom Français", "fr");
-        ContentService.Save(doc);
+        await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
         ContentService.Publish(doc, doc.AvailableCultures.ToArray());
 
         // Re-fetch so the entity has the published state, then edit fr only.
         doc = (await ContentService.GetByIdAsync(doc.Key, CancellationToken.None))!;
         doc.SetCultureName("Nom Modifié", "fr");
-        ContentService.Save(doc);
+        await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -527,7 +527,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         doc.SetCultureName("Nom Français", "fr");
         doc.SetValue("variantTitle", "English Title", "en-US");
         doc.SetValue("variantTitle", "Titre Français", "fr");
-        ContentService.Save(doc);
+        await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -544,7 +544,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Page");
         content.TemplateId = _template.Id;
-        ContentService.Save(content, -1);
+        await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         using var scope = NewScopeProvider.CreateScope();
@@ -570,7 +570,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
         doc.SetCultureName("English Name", "en-US");
         doc.SetCultureName("Nom Français", "fr");
-        ContentService.Save(doc);
+        await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
         ContentService.Publish(doc, ["en-US"]); // publish only en-US, leave fr as draft
 
         using var scope = NewScopeProvider.CreateScope();
@@ -755,9 +755,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             .WithName("Doc With Second Type")
             .WithParentId(_textpage.Id)
             .Build();
-        ContentService.Save(docWithSecondType, -1);
+        await ContentService.SaveAsync(docWithSecondType, -1, null, CancellationToken.None);
         IContent docWithFirstType = ContentBuilder.CreateSimpleContent(_contentType, "Doc With First Type", _textpage.Id);
-        ContentService.Save(docWithFirstType, -1);
+        await ContentService.SaveAsync(docWithFirstType, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -873,7 +873,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Child", _textpage.Id);
         content.TemplateId = _template.Id;
-        ContentService.Save(content, -1);
+        await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         using var scope = NewScopeProvider.CreateScope();
@@ -895,7 +895,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Child For Verify", _textpage.Id);
         content.TemplateId = _template.Id;
-        ContentService.Save(content, -1);
+        await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         using var scope = NewScopeProvider.CreateScope();
@@ -978,7 +978,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     public async Task GetDescendantsAsync_OrderedByPath_ReturnsAncestorsBeforeDescendants()
     {
         var grandchild = ContentBuilder.CreateSimpleContent(_contentType, "Grandchild", _subpage.Id);
-        ContentService.Save(grandchild, -1);
+        await ContentService.SaveAsync(grandchild, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1048,7 +1048,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Descendant", _textpage.Id);
         content.TemplateId = _template.Id;
-        ContentService.Save(content, -1);
+        await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         using var scope = NewScopeProvider.CreateScope();
@@ -1070,7 +1070,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Descendant For Verify", _textpage.Id);
         content.TemplateId = _template.Id;
-        ContentService.Save(content, -1);
+        await ContentService.SaveAsync(content, -1, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         using var scope = NewScopeProvider.CreateScope();
@@ -1096,13 +1096,13 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         doc.SetCultureName("English Name", "en-US");
         doc.SetCultureName("Nom Français", "fr");
         doc.SetValue("variantTitle", "published value", "en-US");
-        ContentService.Save(doc);
+        await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
         ContentService.Publish(doc, ["en-US", "fr"]);
 
         // Edit the draft value without re-publishing.
         doc = (await ContentService.GetByIdAsync(doc.Key, CancellationToken.None))!;
         doc.SetValue("variantTitle", "draft value", "en-US");
-        ContentService.Save(doc);
+        await ContentService.SaveAsync(doc, null, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1130,7 +1130,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             .WithParentId(_textpage.Id)
             .Build();
         docA.SetCultureName("Alpha", "en-US");
-        ContentService.Save(docA, -1);
+        await ContentService.SaveAsync(docA, -1, null, CancellationToken.None);
 
         var docB = new ContentBuilder()
             .WithContentType(contentType)
@@ -1138,7 +1138,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             .WithParentId(_textpage.Id)
             .Build();
         docB.SetCultureName("Zeta", "en-US");
-        ContentService.Save(docB, -1);
+        await ContentService.SaveAsync(docB, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1166,7 +1166,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             .WithParentId(_textpage.Id)
             .Build();
         docA.SetCultureName("Alpha", "en-US");
-        ContentService.Save(docA, -1);
+        await ContentService.SaveAsync(docA, -1, null, CancellationToken.None);
 
         var docB = new ContentBuilder()
             .WithContentType(contentType)
@@ -1174,7 +1174,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
             .WithParentId(_textpage.Id)
             .Build();
         docB.SetCultureName("Zeta", "en-US");
-        ContentService.Save(docB, -1);
+        await ContentService.SaveAsync(docB, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1214,15 +1214,15 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_textpage.Id).Build();
         docHigh.SetValue("priority", 30);
-        ContentService.Save(docHigh, -1);
+        await ContentService.SaveAsync(docHigh, -1, null, CancellationToken.None);
 
         var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
         docLow.SetValue("priority", 5);
-        ContentService.Save(docLow, -1);
+        await ContentService.SaveAsync(docLow, -1, null, CancellationToken.None);
 
         var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").WithParentId(_textpage.Id).Build();
         docMid.SetValue("priority", 15);
-        ContentService.Save(docMid, -1);
+        await ContentService.SaveAsync(docMid, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1245,11 +1245,11 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_textpage.Id).Build();
         docHigh.SetValue("priority", 30);
-        ContentService.Save(docHigh, -1);
+        await ContentService.SaveAsync(docHigh, -1, null, CancellationToken.None);
 
         var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
         docLow.SetValue("priority", 5);
-        ContentService.Save(docLow, -1);
+        await ContentService.SaveAsync(docLow, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1272,12 +1272,12 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         var docWithValue = new ContentBuilder().WithContentType(contentType).WithName("HasValue").WithParentId(_textpage.Id).Build();
         docWithValue.SetValue("priority", 10);
-        ContentService.Save(docWithValue, -1);
+        await ContentService.SaveAsync(docWithValue, -1, null, CancellationToken.None);
 
         // Force this node's SortOrder ahead of its siblings, so a fallback-to-SortOrder implementation
         // would (wrongly) place it first — only real custom-field ordering puts it last.
         docWithValue.SortOrder = -100;
-        ContentService.Save(docWithValue, -1);
+        await ContentService.SaveAsync(docWithValue, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1301,11 +1301,11 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_subpage.Id).Build();
         docHigh.SetValue("priority", 30);
-        ContentService.Save(docHigh, -1);
+        await ContentService.SaveAsync(docHigh, -1, null, CancellationToken.None);
 
         var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
         docLow.SetValue("priority", 5);
-        ContentService.Save(docLow, -1);
+        await ContentService.SaveAsync(docLow, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1327,22 +1327,22 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         IContentType contentType = await CreateIntPropertyContentTypeAsync();
 
         var root = ContentBuilder.CreateSimpleContent(_contentType, "Priority Root", _textpage.Id);
-        ContentService.Save(root, -1);
+        await ContentService.SaveAsync(root, -1, null, CancellationToken.None);
 
         var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(root.Id).Build();
         docLow.SetValue("priority", 10);
-        ContentService.Save(docLow, -1);
+        await ContentService.SaveAsync(docLow, -1, null, CancellationToken.None);
 
         // Trashed directly (rather than via MoveToRecycleBin) so it stays nested under root, sitting
         // inside the page window between docLow and docHigh in priority order.
         var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").WithParentId(root.Id).Build();
         docMid.SetValue("priority", 20);
         docMid.Trashed = true;
-        ContentService.Save(docMid, -1);
+        await ContentService.SaveAsync(docMid, -1, null, CancellationToken.None);
 
         var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(root.Id).Build();
         docHigh.SetValue("priority", 30);
-        ContentService.Save(docHigh, -1);
+        await ContentService.SaveAsync(docHigh, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -1367,15 +1367,15 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // expected value order — a fallback-to-SortOrder implementation would land on the wrong node.
         var doc3 = new ContentBuilder().WithContentType(contentType).WithName("Three").WithParentId(_textpage.Id).Build();
         doc3.SetValue("priority", 30);
-        ContentService.Save(doc3, -1);
+        await ContentService.SaveAsync(doc3, -1, null, CancellationToken.None);
 
         var doc1 = new ContentBuilder().WithContentType(contentType).WithName("One").WithParentId(_textpage.Id).Build();
         doc1.SetValue("priority", 10);
-        ContentService.Save(doc1, -1);
+        await ContentService.SaveAsync(doc1, -1, null, CancellationToken.None);
 
         var doc2 = new ContentBuilder().WithContentType(contentType).WithName("Two").WithParentId(_textpage.Id).Build();
         doc2.SetValue("priority", 20);
-        ContentService.Save(doc2, -1);
+        await ContentService.SaveAsync(doc2, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -2541,7 +2541,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // Trashed-only filter), so it must include both, not just direct children of the bin.
         var deepDescendant = ContentBuilder.CreateSimpleContent(_contentType, "Deep Trashed Descendant", _trashed.Id);
         deepDescendant.Trashed = true;
-        ContentService.Save(deepDescendant, -1);
+        await ContentService.SaveAsync(deepDescendant, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -2579,9 +2579,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         // Trash two more items (in addition to the existing _trashed) so paging has something to page over.
         _subpage.Trashed = true;
-        ContentService.Save(_subpage, -1);
+        await ContentService.SaveAsync(_subpage, -1, null, CancellationToken.None);
         _subpage2.Trashed = true;
-        ContentService.Save(_subpage2, -1);
+        await ContentService.SaveAsync(_subpage2, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -2611,12 +2611,12 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         _subpage.Trashed = true;
         _subpage.Name = "Zzz Last";
-        ContentService.Save(_subpage, -1);
+        await ContentService.SaveAsync(_subpage, -1, null, CancellationToken.None);
         _subpage2.Trashed = true;
         _subpage2.Name = "Aaa First";
-        ContentService.Save(_subpage2, -1);
+        await ContentService.SaveAsync(_subpage2, -1, null, CancellationToken.None);
         _trashed.Name = "Mmm Middle";
-        ContentService.Save(_trashed, -1);
+        await ContentService.SaveAsync(_trashed, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -2642,12 +2642,12 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var docA = new ContentBuilder().WithContentType(contentType).WithName("Z-First").WithParentId(_textpage.Id).Build();
         docA.SetCultureName("Alpha", "en-US");
         docA.Trashed = true;
-        ContentService.Save(docA, -1);
+        await ContentService.SaveAsync(docA, -1, null, CancellationToken.None);
 
         var docB = new ContentBuilder().WithContentType(contentType).WithName("A-Second").WithParentId(_textpage.Id).Build();
         docB.SetCultureName("Zeta", "en-US");
         docB.Trashed = true;
-        ContentService.Save(docB, -1);
+        await ContentService.SaveAsync(docB, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -2669,17 +2669,17 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_textpage.Id).Build();
         docHigh.SetValue("priority", 30);
         docHigh.Trashed = true;
-        ContentService.Save(docHigh, -1);
+        await ContentService.SaveAsync(docHigh, -1, null, CancellationToken.None);
 
         var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
         docLow.SetValue("priority", 5);
         docLow.Trashed = true;
-        ContentService.Save(docLow, -1);
+        await ContentService.SaveAsync(docLow, -1, null, CancellationToken.None);
 
         var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").WithParentId(_textpage.Id).Build();
         docMid.SetValue("priority", 15);
         docMid.Trashed = true;
-        ContentService.Save(docMid, -1);
+        await ContentService.SaveAsync(docMid, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3201,7 +3201,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         IContentType secondContentType = await CreateIntPropertyContentTypeAsync();
         var secondTypeDoc = new ContentBuilder().WithContentType(secondContentType).WithName("Second Type Doc").Build();
-        ContentService.Save(secondTypeDoc, -1);
+        await ContentService.SaveAsync(secondTypeDoc, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3226,7 +3226,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         IContentType secondContentType = await CreateIntPropertyContentTypeAsync();
         var secondTypeDoc = new ContentBuilder().WithContentType(secondContentType).WithName("Second Type Doc").Build();
-        ContentService.Save(secondTypeDoc, -1);
+        await ContentService.SaveAsync(secondTypeDoc, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3280,9 +3280,9 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // Baseline fixture already has 5 items of _contentType. Add 2 items of a second, different type.
         IContentType secondContentType = await CreateIntPropertyContentTypeAsync();
         var doc1 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 1").Build();
-        ContentService.Save(doc1, -1);
+        await ContentService.SaveAsync(doc1, -1, null, CancellationToken.None);
         var doc2 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 2").Build();
-        ContentService.Save(doc2, -1);
+        await ContentService.SaveAsync(doc2, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3304,11 +3304,11 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         IContentType secondContentType = await CreateIntPropertyContentTypeAsync();
         var doc1 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 1").Build();
-        ContentService.Save(doc1, -1);
+        await ContentService.SaveAsync(doc1, -1, null, CancellationToken.None);
         var doc2 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 2").Build();
-        ContentService.Save(doc2, -1);
+        await ContentService.SaveAsync(doc2, -1, null, CancellationToken.None);
         var doc3 = new ContentBuilder().WithContentType(secondContentType).WithName("Second 3").Build();
-        ContentService.Save(doc3, -1);
+        await ContentService.SaveAsync(doc3, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3336,15 +3336,15 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").Build();
         docHigh.SetValue("priority", 30);
-        ContentService.Save(docHigh, -1);
+        await ContentService.SaveAsync(docHigh, -1, null, CancellationToken.None);
 
         var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").Build();
         docLow.SetValue("priority", 5);
-        ContentService.Save(docLow, -1);
+        await ContentService.SaveAsync(docLow, -1, null, CancellationToken.None);
 
         var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").Build();
         docMid.SetValue("priority", 15);
-        ContentService.Save(docMid, -1);
+        await ContentService.SaveAsync(docMid, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3375,11 +3375,11 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // mirroring GetPagedRecycleBinAsync_OrderedByName_WithCulture_UsesCultureVariantName.
         var docA = new ContentBuilder().WithContentType(contentType).WithName("Z-First").Build();
         docA.SetCultureName("Alpha", "en-US");
-        ContentService.Save(docA, -1);
+        await ContentService.SaveAsync(docA, -1, null, CancellationToken.None);
 
         var docB = new ContentBuilder().WithContentType(contentType).WithName("A-Second").Build();
         docB.SetCultureName("Zeta", "en-US");
-        ContentService.Save(docB, -1);
+        await ContentService.SaveAsync(docB, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3400,13 +3400,13 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         IContentType contentType = await CreateIntPropertyContentTypeAsync();
 
         var root1 = new ContentBuilder().WithContentType(contentType).WithName("Root 1").Build();
-        ContentService.Save(root1, -1);
+        await ContentService.SaveAsync(root1, -1, null, CancellationToken.None);
 
         var childOfTextpage = new ContentBuilder().WithContentType(contentType).WithName("Child").WithParentId(_textpage.Id).Build();
-        ContentService.Save(childOfTextpage, -1);
+        await ContentService.SaveAsync(childOfTextpage, -1, null, CancellationToken.None);
 
         var root2 = new ContentBuilder().WithContentType(contentType).WithName("Root 2").Build();
-        ContentService.Save(root2, -1);
+        await ContentService.SaveAsync(root2, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3431,7 +3431,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // _subpage and _subpage2 are both direct children of _textpage, i.e. the same tree level.
         // Trashing one of them must not affect the other's presence in the result.
         _subpage2.Trashed = true;
-        ContentService.Save(_subpage2, -1);
+        await ContentService.SaveAsync(_subpage2, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3452,10 +3452,10 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     public async Task GetByLevelAsync_Paging_ReturnsCorrectPagesAndTotal()
     {
         var extraSibling1 = new ContentBuilder().WithContentType(_contentType).WithName("Extra Sibling 1").WithParentId(_textpage.Id).Build();
-        ContentService.Save(extraSibling1, -1);
+        await ContentService.SaveAsync(extraSibling1, -1, null, CancellationToken.None);
 
         var extraSibling2 = new ContentBuilder().WithContentType(_contentType).WithName("Extra Sibling 2").WithParentId(_textpage.Id).Build();
-        ContentService.Save(extraSibling2, -1);
+        await ContentService.SaveAsync(extraSibling2, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3483,15 +3483,15 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 
         var docHigh = new ContentBuilder().WithContentType(contentType).WithName("High").WithParentId(_textpage.Id).Build();
         docHigh.SetValue("priority", 30);
-        ContentService.Save(docHigh, -1);
+        await ContentService.SaveAsync(docHigh, -1, null, CancellationToken.None);
 
         var docLow = new ContentBuilder().WithContentType(contentType).WithName("Low").WithParentId(_textpage.Id).Build();
         docLow.SetValue("priority", 5);
-        ContentService.Save(docLow, -1);
+        await ContentService.SaveAsync(docLow, -1, null, CancellationToken.None);
 
         var docMid = new ContentBuilder().WithContentType(contentType).WithName("Mid").WithParentId(_textpage.Id).Build();
         docMid.SetValue("priority", 15);
-        ContentService.Save(docMid, -1);
+        await ContentService.SaveAsync(docMid, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3509,7 +3509,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     public async Task GetAncestorsAsync_ReturnsAncestorsInRootFirstOrder_ExcludingSelf()
     {
         var grandchild = new ContentBuilder().WithContentType(_contentType).WithName("Grandchild").WithParentId(_subpage.Id).Build();
-        ContentService.Save(grandchild, -1);
+        await ContentService.SaveAsync(grandchild, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();
@@ -3533,10 +3533,10 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     public async Task GetAncestorsAsync_Paging_ReturnsCorrectPagesAndTotal()
     {
         var level3 = new ContentBuilder().WithContentType(_contentType).WithName("Level 3").WithParentId(_subpage.Id).Build();
-        ContentService.Save(level3, -1);
+        await ContentService.SaveAsync(level3, -1, null, CancellationToken.None);
 
         var level4 = new ContentBuilder().WithContentType(_contentType).WithName("Level 4").WithParentId(level3.Id).Build();
-        ContentService.Save(level4, -1);
+        await ContentService.SaveAsync(level4, -1, null, CancellationToken.None);
 
         // Ancestors of level4, root-first: _textpage, _subpage, level3.
         using var scope = NewScopeProvider.CreateScope();
@@ -3587,10 +3587,10 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         // Unlike GetByLevelAsync, an ancestor chain must not silently drop trashed ancestors — a
         // document's own breadcrumb still needs to reflect its real parentage even if a parent was trashed.
         _subpage.Trashed = true;
-        ContentService.Save(_subpage, -1);
+        await ContentService.SaveAsync(_subpage, -1, null, CancellationToken.None);
 
         var child = new ContentBuilder().WithContentType(_contentType).WithName("Child Of Trashed Parent").WithParentId(_subpage.Id).Build();
-        ContentService.Save(child, -1);
+        await ContentService.SaveAsync(child, -1, null, CancellationToken.None);
 
         using var scope = NewScopeProvider.CreateScope();
         var repository = CreateRepository();

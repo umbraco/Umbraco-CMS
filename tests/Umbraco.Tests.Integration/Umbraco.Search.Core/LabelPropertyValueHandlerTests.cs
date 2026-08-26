@@ -12,7 +12,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
     private IContentType _contentType;
 
     [Test]
-    public void AllLabelEditors_CanBeIndexed()
+    public async Task AllLabelEditors_CanBeIndexed()
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -29,7 +29,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -60,7 +60,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
 
     [TestCase(long.MaxValue)]
     [TestCase(long.MinValue)]
-    public void LongValueWithOverflowAsInteger_IsNotIndexed(long value)
+    public async Task LongValueWithOverflowAsInteger_IsNotIndexed(long value)
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -72,7 +72,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -84,7 +84,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
 
     [TestCase(null)]
     [TestCase("")]
-    public void EmptyValues_AreNotIndexed(string? value)
+    public async Task EmptyValues_AreNotIndexed(string? value)
     {
         Content content = new ContentBuilder()
             .WithContentType(_contentType)
@@ -101,7 +101,7 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);

@@ -273,7 +273,7 @@ public class VariantContentTreeTests : IndexTestBase
         root.SetValue("body", "ル-ト-ボディ-segment-1", "ja-JP", "segment-1");
         root.SetValue("body", "ル-ト-ボディ-segment-2", "ja-JP", "segment-2");
 
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         Content child = new ContentBuilder()
             .WithKey(ChildKey)
@@ -295,7 +295,7 @@ public class VariantContentTreeTests : IndexTestBase
         child.SetValue("body", "子供-ボディ-segment-1", "ja-JP", "segment-1");
         child.SetValue("body", "子供-ボディ-segment-2", "ja-JP", "segment-2");
 
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         Content grandchild = new ContentBuilder()
             .WithKey(GrandchildKey)
@@ -317,10 +317,9 @@ public class VariantContentTreeTests : IndexTestBase
         grandchild.SetValue("body", "孫-ボディ-segment-1", "ja-JP", "segment-1");
         grandchild.SetValue("body", "孫-ボディ-segment-2", "ja-JP", "segment-2");
 
-        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, () =>
+        await WaitForIndexing(Cms.Core.Constants.IndexAliases.DraftContent, async () =>
         {
-            ContentService.Save(grandchild);
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
         });
     }
 

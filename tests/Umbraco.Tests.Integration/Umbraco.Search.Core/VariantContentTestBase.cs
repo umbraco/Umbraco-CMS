@@ -51,7 +51,7 @@ public abstract class VariantContentTestBase : ContentTestBase
         SetTitle(root, "The root title");
         SetMessage(root, "The root message");
         root.SetValue("count", 12);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         Content child = new ContentBuilder()
             .WithKey(ChildKey)
@@ -63,7 +63,7 @@ public abstract class VariantContentTestBase : ContentTestBase
         SetTitle(child, "The child title");
         SetMessage(child, "The child message");
         child.SetValue("count", 34);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         Content grandchild = new ContentBuilder()
             .WithKey(GrandchildKey)
@@ -75,7 +75,7 @@ public abstract class VariantContentTestBase : ContentTestBase
         SetTitle(grandchild, "The grandchild title");
         SetMessage(grandchild, "The grandchild message");
         grandchild.SetValue("count", 56);
-        ContentService.Save(grandchild);
+        await ContentService.SaveAsync(grandchild, null, null, CancellationToken.None);
 
         Content greatGrandchild = new ContentBuilder()
             .WithKey(GreatGrandchildKey)
@@ -87,7 +87,7 @@ public abstract class VariantContentTestBase : ContentTestBase
         SetTitle(greatGrandchild, "The great grandchild title");
         SetMessage(greatGrandchild, "The great grandchild message");
         greatGrandchild.SetValue("count", 78);
-        ContentService.Save(greatGrandchild);
+        await ContentService.SaveAsync(greatGrandchild, null, null, CancellationToken.None);
 
         IndexerAndSearcher.Reset();
     }

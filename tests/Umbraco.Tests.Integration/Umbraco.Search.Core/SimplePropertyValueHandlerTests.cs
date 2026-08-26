@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
 {
     [Test]
-    public void AllSupportedEditors_CanBeIndexed()
+    public async Task AllSupportedEditors_CanBeIndexed()
     {
         IJsonSerializer jsonSerializer = GetRequiredService<IJsonSerializer>();
 
@@ -79,7 +79,7 @@ public class SimplePropertyValueHandlerTests : PropertyValueHandlerTestsBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);

@@ -161,15 +161,13 @@ public class RebuildTests : UmbracoIntegrationTest
 
         // Update the content name directly (simulating a change)
         _rootDocument.Name = "Updated Document Name";
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            ContentService.Save(_rootDocument);
+            await ContentService.SaveAsync(_rootDocument, null, null, CancellationToken.None);
             if (publish)
             {
                 ContentService.Publish(_rootDocument, ["*"]);
             }
-
-            return Task.CompletedTask;
         });
 
         using (ScopeProvider.CreateScope(autoComplete: true))

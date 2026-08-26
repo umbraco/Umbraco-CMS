@@ -106,12 +106,12 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        ContentService.Save(secondRoot, -1, contentSchedule);
+        await ContentService.SaveAsync(secondRoot, -1, contentSchedule, CancellationToken.None);
 
         // Create a child of second root
         var childOfSecondRoot = ContentBuilder.CreateSimpleContent(ContentType, Subpage.Name, secondRoot);
         childOfSecondRoot.Key = new Guid("FF6654FB-BC68-4A65-8C6C-135567F50BD6");
-        ContentService.Save(childOfSecondRoot, -1, contentSchedule);
+        await ContentService.SaveAsync(childOfSecondRoot, -1, contentSchedule, CancellationToken.None);
 
         // Publish both the main root and the second root with descendants
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
@@ -137,12 +137,12 @@ internal sealed class PublishedUrlInfoProviderTests : PublishedUrlInfoProviderTe
         // Create a second root
         var secondRoot = ContentBuilder.CreateSimpleContent(ContentType, "Second Root", null);
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.UtcNow.AddMinutes(-5), null);
-        ContentService.Save(secondRoot, -1, contentSchedule);
+        await ContentService.SaveAsync(secondRoot, -1, contentSchedule, CancellationToken.None);
 
         // Create a child of second root
         var childOfSecondRoot = ContentBuilder.CreateSimpleContent(ContentType, Subpage.Name, secondRoot);
         childOfSecondRoot.Key = new Guid("FF6654FB-BC68-4A65-8C6C-135567F50BD6");
-        ContentService.Save(childOfSecondRoot, -1, contentSchedule);
+        await ContentService.SaveAsync(childOfSecondRoot, -1, contentSchedule, CancellationToken.None);
 
         // Publish both the main root and the second root with descendants
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);

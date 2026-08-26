@@ -387,7 +387,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<MemberDeletedNotification, FileUploadContentDeletedNotificationHandler>()
             .AddNotificationHandler<MediaSavingNotification, FileUploadMediaSavingNotificationHandler>()
             .AddNotificationHandler<MediaSavingNotification, SvgFileUploadMediaSavingNotificationHandler>()
-            .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
+            .AddNotificationAsyncHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()

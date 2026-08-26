@@ -35,11 +35,11 @@ internal sealed class EntityServiceTestsIsolated : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
         for (var i = 0; i < 10; i++)
         {
             var content = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
             if (i % 2 == 0)
             {

@@ -159,7 +159,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         AssertDocumentFields(IndexAliases.DraftContent);
@@ -319,7 +319,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithName("My Blocks")
             .WithPropertyValues(new { rootBlocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
@@ -504,7 +504,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithCultureName("da-DK", "My Blocks DA")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         AssertDocumentFields(
@@ -599,7 +599,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithName("My Blocks")
             .WithPropertyValues(new { blocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));
@@ -957,7 +957,7 @@ public class BlockListPropertyValueHandlerTests : PropertyValueHandlerTestsBase
             .WithCultureName("de-DE", "My Blocks DE")
             .WithPropertyValues(new { rootBlocks = blocksPropertyValue })
             .Build();
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         if (publishAllCultures)
         {
             ContentService.Publish(content, ["en-US", "da-DK", "de-DE"]);

@@ -30,7 +30,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
         ElementService.Publish(element, Array.Empty<string>());
 
         for (var i = 0; i < 10; i++)
@@ -70,7 +70,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
         ElementService.Publish(element, Array.Empty<string>());
 
         for (var i = 0; i < 10; i++)
@@ -113,7 +113,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
-        ElementService.Save(element);
+        await ElementService.SaveAsync(element, null, null, CancellationToken.None);
         ElementService.Publish(element, Array.Empty<string>());
 
         var retainedVersionIds = new List<int>();

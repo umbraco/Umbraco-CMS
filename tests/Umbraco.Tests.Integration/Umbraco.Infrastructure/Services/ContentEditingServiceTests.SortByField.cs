@@ -250,7 +250,7 @@ public partial class ContentEditingServiceTests
             // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
             child.CreateDate = baseDate.AddDays(createOffset);
             child.UpdateDate = baseDate.AddDays(100 + updateOffset);
-            ContentService.Save(child);
+            await ContentService.SaveAsync(child, null, null, CancellationToken.None);
         }
 
         return (root, childKeys);
@@ -284,7 +284,7 @@ public partial class ContentEditingServiceTests
             // Setting the dates marks them dirty, so they are persisted as-is rather than being stamped with "now".
             root.CreateDate = baseDate.AddDays(createOffset);
             root.UpdateDate = baseDate.AddDays(100 + updateOffset);
-            ContentService.Save(root);
+            await ContentService.SaveAsync(root, null, null, CancellationToken.None);
         }
 
         return rootKeys;

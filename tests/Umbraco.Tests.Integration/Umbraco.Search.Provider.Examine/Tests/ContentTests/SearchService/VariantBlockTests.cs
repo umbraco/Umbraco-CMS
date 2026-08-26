@@ -134,10 +134,9 @@ public class VariantBlockTests : SearcherTestBase
             .Build();
 
         var indexAlias = GetIndexAlias(false);
-        await WaitForIndexing(indexAlias, () =>
+        await WaitForIndexing(indexAlias, async () =>
         {
-            ContentService.Save(content);
-            return Task.CompletedTask;
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         });
     }
 

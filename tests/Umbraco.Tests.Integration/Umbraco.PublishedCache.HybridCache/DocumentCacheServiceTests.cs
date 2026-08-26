@@ -188,7 +188,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
             .Build();
         variantContent.SetValue("pageTitle", "English Title", culture: langEn.IsoCode);
         variantContent.SetValue("pageTitle", "Danish Title", culture: langDa.IsoCode);
-        ContentService.Save(variantContent);
+        await ContentService.SaveAsync(variantContent, null, null, CancellationToken.None);
 
         // Act - Rebuild the cache for the variant document type
         DocumentCacheService.Rebuild([variantContentType.Id]);
@@ -230,7 +230,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
         => RemoveDatesFromJsonSerialization().Replace(input, @"""dt"":""""");
 
     [Test]
-    public void Rebuild_Replaces_Existing_Document_Database_Cache_Records()
+    public async Task Rebuild_Replaces_Existing_Document_Database_Cache_Records()
     {
         // Arrange - First rebuild to create initial records
         DocumentCacheService.Rebuild([ContentType.Id]);
@@ -250,7 +250,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
 
         // Modify content
         Textpage.SetValue("title", "Modified Title For Rebuild Test");
-        ContentService.Save(Textpage);
+        await ContentService.SaveAsync(Textpage, null, null, CancellationToken.None);
 
         // Act - Rebuild again
         DocumentCacheService.Rebuild([ContentType.Id]);
@@ -327,7 +327,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
                 metaDescription = "This is a meta description from the composition.",
             })
             .Build();
-        ContentService.Save(composedContent);
+        await ContentService.SaveAsync(composedContent, null, null, CancellationToken.None);
 
         // Act - Rebuild the cache for the composed content type
         DocumentCacheService.Rebuild([composedContentType.Id]);
@@ -453,7 +453,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
             .Build();
         variantContent.SetValue("pageTitle", "English Title", culture: langEn.IsoCode);
         variantContent.SetValue("pageTitle", "Danish Title", culture: langDa.IsoCode);
-        ContentService.Save(variantContent);
+        await ContentService.SaveAsync(variantContent, null, null, CancellationToken.None);
 
         // Act - Full rebuild (the "Rebuild Database Cache" dashboard button path)
         await DatabaseCacheRebuilder.RebuildAsync(false);
@@ -544,7 +544,7 @@ internal sealed partial class DocumentCacheServiceTests : UmbracoIntegrationTest
                 metaDescription = "This is a meta description from the composition.",
             })
             .Build();
-        ContentService.Save(composedContent);
+        await ContentService.SaveAsync(composedContent, null, null, CancellationToken.None);
 
         // Act - Full rebuild (the "Rebuild Database Cache" dashboard button path)
         await DatabaseCacheRebuilder.RebuildAsync(false);

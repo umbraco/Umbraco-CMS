@@ -78,7 +78,7 @@ public partial class ContentPublishingServiceTests
     {
         await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         var subpage2Subpage = ContentBuilder.CreateSimpleContent(ContentType, "Text Page 2-2", Subpage2.Id);
-        ContentService.Save(subpage2Subpage, -1);
+        await ContentService.SaveAsync(subpage2Subpage, -1, null, CancellationToken.None);
 
         VerifyIsNotPublished(Subpage2.Key);
         var result = await ContentPublishingService.PublishBranchAsync(Subpage2.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
@@ -113,7 +113,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishAsync(
             content.Key,
@@ -144,7 +144,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = await ContentPublishingService.PublishAsync(
             content.Key,
@@ -194,7 +194,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         root.SetValue("title", "EN root title", culture: langEn.IsoCode);
         root.SetValue("title", "DA root title", culture: langDa.IsoCode);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         IContent child = new ContentBuilder()
             .WithContentType(contentType)
@@ -204,7 +204,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         child.SetValue("title", "EN child title", culture: langEn.IsoCode);
         child.SetValue("title", "DA child title", culture: langDa.IsoCode);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode, langDa.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
         Assert.IsTrue(result.Success);
@@ -233,7 +233,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", null, culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishAsync(content.Key, [new CulturePublishScheduleModel { Culture = langEn.IsoCode }], Constants.Security.SuperUserKey);
 
@@ -257,7 +257,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         root.SetValue("title", "EN title", culture: langEn.IsoCode);
         root.SetValue("title", null, culture: langDa.IsoCode);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         IContent child = new ContentBuilder()
             .WithContentType(contentType)
@@ -267,7 +267,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         child.SetValue("title", "EN child title", culture: langEn.IsoCode);
         child.SetValue("title", "DA child title", culture: langDa.IsoCode);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
         Assert.IsTrue(result.Success);
@@ -294,7 +294,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         root.SetValue("title", "EN title", culture: langEn.IsoCode);
         root.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         root = (await ContentService.GetByIdAsync(root.Key, CancellationToken.None))!;
 
@@ -306,7 +306,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         child.SetValue("title", "EN child title", culture: langEn.IsoCode);
         child.SetValue("title", "DA child title", culture: langDa.IsoCode);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
         Assert.IsTrue(result.Success);
@@ -333,7 +333,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishAsync(
             content.Key,
@@ -374,7 +374,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("variantValue", "EN value", culture: "en-US");
         content.SetValue("variantValue", "DA value", culture: "da-DK");
         content.SetValue("invariantValue", "Invariant value");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishAsync(
             content.Key,
@@ -390,7 +390,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("variantValue", "EN value updated", culture: "en-US");
         content.SetValue("variantValue", "DA value updated", culture: "da-DK");
         content.SetValue("invariantValue", null);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         result = await ContentPublishingService.PublishAsync(
             content.Key,
@@ -476,7 +476,7 @@ public partial class ContentPublishingServiceTests
     {
         var content = await CreateInvalidContent(Textpage);
         var child = ContentBuilder.CreateSimpleContent(ContentType, "Child page", content.Id);
-        ContentService.Save(child, -1);
+        await ContentService.SaveAsync(child, -1, null, CancellationToken.None);
         Assert.AreEqual(content.Id, (await ContentService.GetByIdAsync(child.Key, CancellationToken.None))!.ParentId);
 
         var result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
@@ -504,7 +504,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", null, culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishAsync(
             content.Key,
@@ -532,7 +532,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishAsync(
             content.Key,
@@ -558,7 +558,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         root.SetValue("title", "EN title", culture: langEn.IsoCode);
         root.SetValue("title", null, culture: langDa.IsoCode);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         IContent child = new ContentBuilder()
             .WithContentType(contentType)
@@ -568,7 +568,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         child.SetValue("title", "EN child title", culture: langEn.IsoCode);
         child.SetValue("title", "DA child title", culture: langDa.IsoCode);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode, langDa.IsoCode }, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
         Assert.IsFalse(result.Success);
@@ -611,7 +611,7 @@ public partial class ContentPublishingServiceTests
     {
         Textpage.SetValue("title", string.Empty);
         Textpage.SetValue("author", "This is not a number");
-        ContentService.Save(Textpage);
+        await ContentService.SaveAsync(Textpage, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishAsync(Textpage.Key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
@@ -675,7 +675,7 @@ public partial class ContentPublishingServiceTests
         {
             var content = (await ContentService.GetByIdAsync(key, CancellationToken.None))!;
             content.SetValue("title", "Updated");
-            ContentService.Save(content);
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         }
 
         ContentType.AddPropertyType(
@@ -691,7 +691,7 @@ public partial class ContentPublishingServiceTests
         // as an added bonus, this lets us test a partially successful branch publish :)
         var textPage = (await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None))!;
         textPage.SetValue("mandatoryProperty", "This is a valid value");
-        ContentService.Save(textPage);
+        await ContentService.SaveAsync(textPage, null, null, CancellationToken.None);
 
         result = await ContentPublishingService.PublishBranchAsync(Textpage.Key, _allCultures, PublishBranchFilter.IncludeUnpublished, Constants.Security.SuperUserKey, false);
         Assert.IsFalse(result.Success);
@@ -723,7 +723,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishAsync(
             content.Key,
@@ -747,7 +747,7 @@ public partial class ContentPublishingServiceTests
             .Build();
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var result = await ContentPublishingService.PublishAsync(
             content.Key,

@@ -262,12 +262,12 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
 
         // Create Element1 (will be referenced by Element3)
         Element1 = new Element("Element 1", ElementType);
-        ElementService.Save(Element1);
+        await ElementService.SaveAsync(Element1, null, null, CancellationToken.None);
         ElementService.Publish(Element1, ["*"]);
 
         // Create Element2 (will be referenced by Element3)
         Element2 = new Element("Element 2", ElementType);
-        ElementService.Save(Element2);
+        await ElementService.SaveAsync(Element2, null, null, CancellationToken.None);
         ElementService.Publish(Element2, ["*"]);
 
         // Create a folder with an element inside it
@@ -294,7 +294,7 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
         Element3 = new Element("Element 3", ElementType);
         Element3.SetValue("elementPicker", $"[\"{Element1.Key}\", \"{ElementInFolder.Key}\"]");
         Element3.SetValue("elementPicker2", $"[\"{Element2.Key}\"]");
-        ElementService.Save(Element3);
+        await ElementService.SaveAsync(Element3, null, null, CancellationToken.None);
         ElementService.Publish(Element3, ["*"]);
     }
 }

@@ -40,7 +40,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
         content.SetCultureName("Test item", cultureNameCultureCode);
         content.SetValue("title", "Title", valueCultureCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, [publishCultureCode]);
         Assert.IsTrue(publishResult.Success);
@@ -66,7 +66,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
         content.SetCultureName("Test item", cultureNameCultureCode);
         content.SetValue("title", "Title", valueCultureCode);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         // use correctly cased culture code to publish
         ContentService.Publish(content, ["en-US"]);
 
@@ -93,12 +93,12 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         IContent root = ContentService.Create("Root", Constants.System.Root, contentType);
         root.SetCultureName("Root", cultureNameCultureCode);
         root.SetValue("title", "Root Title", valueCultureCode);
-        ContentService.Save(root);
+        await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
         var child = ContentService.Create("Child", root.Id, contentType);
         child.SetCultureName("Child", cultureNameCultureCode);
         child.SetValue("title", "Child Title", valueCultureCode);
-        ContentService.Save(child);
+        await ContentService.SaveAsync(child, null, null, CancellationToken.None);
 
         var publishResult = ContentService.PublishBranch(root, PublishBranchFilter.All, [publishCultureCode]);
         Assert.AreEqual(2, publishResult.Count());
@@ -138,7 +138,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
         content.SetCultureInfo("en-gb", "Test item", DateTime.UtcNow);
         content.SetValue("title", "Title", "en-gb");
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         var publishResult = ContentService.Publish(content, ["en-gb"]);
         Assert.IsTrue(publishResult.Success);

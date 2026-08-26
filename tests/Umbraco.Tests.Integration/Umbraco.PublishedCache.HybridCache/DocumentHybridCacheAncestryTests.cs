@@ -38,7 +38,7 @@ internal sealed class DocumentHybridCacheAncestryTests : UmbracoIntegrationTestW
         // Publish documents
         _subSubPage = ContentBuilder.CreateSimpleContent(ContentType, "_subSubPage", Subpage.Id);
         _subSubPage.Key = Guid.Parse("E4C369B5-CCCA-4981-ADAC-389824CF6B0B");
-        ContentService.Save(_subSubPage, -1);
+        await ContentService.SaveAsync(_subSubPage, -1, null, CancellationToken.None);
     }
 
     [Test]

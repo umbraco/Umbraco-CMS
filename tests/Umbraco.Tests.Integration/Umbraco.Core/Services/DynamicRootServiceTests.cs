@@ -138,43 +138,43 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
         ContentYears = ContentBuilder.CreateSimpleContent(ContentTypeYears, "Years");
         ContentYears.Key = new Guid("CD3BBE28-D03F-422B-9DC6-A0E591543A8E");
-        ContentService.Save(ContentYears, -1);
+        await ContentService.SaveAsync(ContentYears, -1, null, CancellationToken.None);
 
         ContentYear2022 = ContentBuilder.CreateSimpleContent(ContentTypeYear, "2022", ContentYears.Id);
         ContentYear2022.Key = new Guid("9B3066E3-3CE9-4DF6-82C7-444236FF4DAC");
-        ContentService.Save(ContentYear2022, -1);
+        await ContentService.SaveAsync(ContentYear2022, -1, null, CancellationToken.None);
 
         ContentActs2022 = ContentBuilder.CreateSimpleContent(ContentTypeActs, "Acts", ContentYear2022.Id);
         ContentActs2022.Key = new Guid("6FD7F030-269D-45BE-BEB4-030FF8764B6D");
-        ContentService.Save(ContentActs2022, -1);
+        await ContentService.SaveAsync(ContentActs2022, -1, null, CancellationToken.None);
 
         ContentAct2022RanD = ContentBuilder.CreateSimpleContent(ContentTypeAct, "Ran-D", ContentActs2022.Id);
         ContentAct2022RanD.Key = new Guid("9BE4C615-240E-4616-BB65-C1F2DE9C3873");
-        ContentService.Save(ContentAct2022RanD, -1);
+        await ContentService.SaveAsync(ContentAct2022RanD, -1, null, CancellationToken.None);
 
         ContentStages2022 = ContentBuilder.CreateSimpleContent(ContentTypeStages, "Stages", ContentYear2022.Id);
         ContentStages2022.Key = new Guid("1FF59D2F-FCE8-455B-98A6-7686BF41FD33");
-        ContentService.Save(ContentStages2022, -1);
+        await ContentService.SaveAsync(ContentStages2022, -1, null, CancellationToken.None);
 
         ContentStage2022Red = ContentBuilder.CreateSimpleContent(ContentTypeStage, "Red", ContentStages2022.Id);
         ContentStage2022Red.Key = new Guid("F1C4E4D6-FFDE-4053-9240-EC594CE2A073");
-        ContentService.Save(ContentStage2022Red, -1);
+        await ContentService.SaveAsync(ContentStage2022Red, -1, null, CancellationToken.None);
 
         ContentStage2022Blue = ContentBuilder.CreateSimpleContent(ContentTypeStage, "Blue", ContentStages2022.Id);
         ContentStage2022Blue.Key = new Guid("085311BB-2E75-4FB3-AC30-05F8CF2D3CB5");
-        ContentService.Save(ContentStage2022Blue, -1);
+        await ContentService.SaveAsync(ContentStage2022Blue, -1, null, CancellationToken.None);
 
         ContentYear2023 = ContentBuilder.CreateSimpleContent(ContentTypeYear, "2023", ContentYears.Id);
         ContentYear2023.Key = new Guid("2A863C61-8422-4863-8818-795711FFF0FC");
-        ContentService.Save(ContentYear2023, -1);
+        await ContentService.SaveAsync(ContentYear2023, -1, null, CancellationToken.None);
 
         ContentYear2024 = ContentBuilder.CreateSimpleContent(ContentTypeYear, "2024", ContentYears.Id);
         ContentYear2024.Key = new Guid("E547A970-3923-4EF0-9EDA-10CB83FF038F");
-        ContentService.Save(ContentYear2024, -1);
+        await ContentService.SaveAsync(ContentYear2024, -1, null, CancellationToken.None);
 
         Trashed = ContentBuilder.CreateSimpleContent(ContentTypeYears, "Text Page Deleted", -20);
         Trashed.Trashed = true;
-        ContentService.Save(Trashed, -1);
+        await ContentService.SaveAsync(Trashed, -1, null, CancellationToken.None);
     }
 
     /// <summary>
@@ -299,12 +299,12 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
         var contentNewActs = ContentBuilder.CreateSimpleContent(ContentTypeActs, "new Acts", ContentAct2022RanD.Id);
         contentNewActs.Key = new Guid("EA309F8C-8F1A-4C19-9613-2F950CDDCB8D");
-        ContentService.Save(contentNewActs, -1);
+        await ContentService.SaveAsync(contentNewActs, -1, null, CancellationToken.None);
 
         var contentNewAct =
             ContentBuilder.CreateSimpleContent(ContentTypeAct, "new act under new acts", contentNewActs.Id);
         contentNewAct.Key = new Guid("7E14BA13-C998-46DE-92AE-8E1C18CCEE02");
-        ContentService.Save(contentNewAct, -1);
+        await ContentService.SaveAsync(contentNewAct, -1, null, CancellationToken.None);
 
         var startNodeSelector = new DynamicRootNodeQuery()
         {
@@ -347,12 +347,12 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
 
         var contentNewActs = ContentBuilder.CreateSimpleContent(ContentTypeActs, "new Acts", ContentAct2022RanD.Id);
         contentNewActs.Key = new Guid("EA309F8C-8F1A-4C19-9613-2F950CDDCB8D");
-        ContentService.Save(contentNewActs, -1);
+        await ContentService.SaveAsync(contentNewActs, -1, null, CancellationToken.None);
 
         var contentNewAct =
             ContentBuilder.CreateSimpleContent(ContentTypeAct, "new act under new acts", contentNewActs.Id);
         contentNewAct.Key = new Guid("7E14BA13-C998-46DE-92AE-8E1C18CCEE02");
-        ContentService.Save(contentNewAct, -1);
+        await ContentService.SaveAsync(contentNewAct, -1, null, CancellationToken.None);
 
 
         var startNodeSelector = new DynamicRootNodeQuery()

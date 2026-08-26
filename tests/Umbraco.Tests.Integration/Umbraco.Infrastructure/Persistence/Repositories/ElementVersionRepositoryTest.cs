@@ -27,7 +27,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
-        ElementService.Save(content);
+        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
 
         ElementService.Publish(content, Array.Empty<string>());
         // At this point content has 2 versions, a draft version and a published version.
@@ -55,7 +55,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
-        ElementService.Save(content);
+        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
 
         ElementService.Publish(content, Array.Empty<string>());
         // At this point content has 2 versions, a draft version and a published version.
@@ -94,7 +94,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
-        ElementService.Save(content);
+        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
 
         ElementService.Publish(content, Array.Empty<string>());
         ElementService.Publish(content, Array.Empty<string>());
@@ -128,7 +128,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
-        ElementService.Save(content);
+        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
 
         ElementService.Publish(content, Array.Empty<string>()); // Draft + Published
         ElementService.Publish(content, Array.Empty<string>()); // New Draft
@@ -164,7 +164,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         var content = ElementBuilder.CreateSimpleElement(contentType, "foo", culture: "en-US");
         content.SetCultureName("foo", "en-US");
 
-        ElementService.Save(content);
+        await ElementService.SaveAsync(content, null, null, CancellationToken.None);
         ElementService.Publish(content, new[] { "en-US" }); // Draft + Published
         ElementService.Publish(content, new[] { "en-US" }); // New Draft
 

@@ -62,7 +62,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         content.SetValue("title", string.Empty);
         content.SetValue("bodyText", string.Empty);
         content.SetValue("author", string.Empty);
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         return content;
     }

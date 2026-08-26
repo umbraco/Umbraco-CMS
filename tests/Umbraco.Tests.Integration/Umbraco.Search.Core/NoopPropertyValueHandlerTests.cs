@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 public class NoopPropertyValueHandlerTests : ContentTestBase
 {
     [Test]
-    public void AllNoopEditors_YieldNoValues()
+    public async Task AllNoopEditors_YieldNoValues()
     {
         IJsonSerializer jsonSerializer = GetRequiredService<IJsonSerializer>();
 
@@ -43,7 +43,7 @@ public class NoopPropertyValueHandlerTests : ContentTestBase
                 })
             .Build();
 
-        ContentService.Save(content);
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         ContentService.Publish(content, ["*"]);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.PublishedContent);
