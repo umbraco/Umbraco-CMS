@@ -542,7 +542,9 @@ declare global {
 		content_resetFocalPoint: string;
 		content_routeError: string;
 		content_routeErrorCannotRoute: string;
+		content_saveAndPublishDescendantsModalTitle: string;
 		content_saveAndPublishModalTitle: string;
+		content_saveAndScheduleModalTitle: string;
 		content_saveModalTitle: string;
 		content_scheduledPendingChanges: string;
 		content_scheduledPublishDocumentation: string;
@@ -1145,6 +1147,8 @@ declare global {
 		general_nodeName: string;
 		general_noItemsInList: string;
 		general_none: string;
+		general_noResults: string;
+		general_noResultsFor: (query: string) => string;
 		general_notFound: string;
 		general_of: string;
 		general_off: string;
@@ -1540,6 +1544,7 @@ declare global {
 		main_dashboard: string;
 		main_sections: string;
 		main_tree: string;
+		media_browseFilesAction: string;
 		media_clickToUpload: string;
 		media_createFolderFailed: string;
 		media_disallowedFileExtension: (extension: string) => string;
@@ -1548,6 +1553,7 @@ declare global {
 		media_disallowedMediaTypeNotAllowedHere: (extension: string, mediaTypeName: string) => string;
 		media_disallowedMediaTypesNotAllowedHere: (extension: string, mediaTypeNames: string) => string;
 		media_dragAndDropYourFilesIntoTheArea: string;
+		media_dropFilesOr: string;
 		media_fileSecurityValidationFailure: string;
 		media_invalidFileName: string;
 		media_invalidFileSize: string;
@@ -1712,6 +1718,9 @@ declare global {
 		permissions_FileWritingForPackages: string;
 		permissions_FolderCreation: string;
 		permissions_MediaFolderCreation: string;
+		picker_browseTab: string;
+		picker_searchTab: string;
+		picker_selectedCount: (count: number) => string;
 		placeholders_a11yCreateItem: string;
 		placeholders_a11yEdit: string;
 		placeholders_a11yName: string;
@@ -1826,6 +1835,9 @@ declare global {
 		recycleBin_itemCannotBeRestored: string;
 		recycleBin_itemCannotBeRestoredHelpText: string;
 		recycleBin_mediaTrashed: string;
+		recycleBin_restoreItemTo: (from: string, to: string) => string;
+		recycleBin_restoreToTitle: string;
+		recycleBin_selectRestoreLocation: string;
 		recycleBin_wasRestored: string;
 		redirectUrls_confirmDisable: string;
 		redirectUrls_culture: string;

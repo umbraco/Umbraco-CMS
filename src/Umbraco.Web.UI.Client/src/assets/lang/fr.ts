@@ -286,6 +286,8 @@ export default {
 		isSensitiveValue:
 			"Cette valeur est masquée. Si vous avez besoin de pouvoir accéder à cette valeur, veuillez prendre contact avec l'administrateur du site web.",
 		isSensitiveValue_short: 'Cette valeur est masquée.',
+		isSensitiveValueNotice:
+			"Si vous avez besoin de pouvoir accéder aux valeurs masquées, veuillez prendre contact avec l'administrateur du site web.",
 		languagesToPublish: 'Quelles langues souhaitez-vous publier?',
 		languagesToSendForApproval: 'Quells langues souhaitez-vous envoyer pour approbation?',
 		languagesToSchedule: 'Quelles langues souhaitez-vous planifier?',
@@ -313,6 +315,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Cliquez pour télécharger',
+		browseFilesAction: 'Parcourir les fichiers',
+		dropFilesOr: 'Glissez-déposez des médias ici<br />ou',
 		orClickHereToUpload: 'ou cliquez ici pour choisir un fichier',
 		disallowedFileType: "Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé",
 		invalidFileName: "Ce fichier ne peut pas être chargé, le nom du fichier n'est pas valide",
@@ -722,6 +726,8 @@ export default {
 		new: 'Nouveau',
 		next: 'Suivant',
 		no: 'Non',
+		noResults: 'Aucun résultat',
+		noResultsFor: (query: string) => `Aucun résultat pour "${query}".`,
 		of: 'de',
 		off: 'Inactif',
 		ok: 'OK',
@@ -1958,5 +1964,10 @@ export default {
 	treeSearch: {
 		searchResult: 'élément retrouvé',
 		searchResults: 'éléments retrouvés',
+	},
+	picker: {
+		browseTab: 'Parcourir',
+		searchTab: 'Rechercher',
+		selectedCount: (count: number) => `${count} ${count > 1 ? 'éléments sélectionnés' : 'élément sélectionné'}`,
 	},
 } as UmbLocalizationDictionary;

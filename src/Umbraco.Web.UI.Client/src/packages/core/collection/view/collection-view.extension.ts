@@ -1,8 +1,7 @@
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestCollectionView
-	extends ManifestElement,
-		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
+	extends ManifestElement, ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'collectionView';
 	meta: MetaCollectionView;
 }
@@ -15,10 +14,7 @@ export interface MetaCollectionView {
 
 	/**
 	 * An icon to represent the collection view
-	 * @examples [
-	 *   "icon-box",
-	 *   "icon-grid"
-	 * ]
+	 * @examples ["icon-box", "icon-grid"]
 	 */
 	icon: string;
 

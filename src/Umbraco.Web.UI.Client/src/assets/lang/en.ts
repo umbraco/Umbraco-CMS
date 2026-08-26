@@ -226,8 +226,8 @@ export default {
 		sendtopublishvariant: 'Content sent for publishing for languages: %0%',
 		sort: 'Sort child items performed by user',
 		custom: '%0%',
-		contentversionpreventcleanup: 'Clean up disabled for version: %0%',
-		contentversionenablecleanup: 'Clean up enabled for version: %0%',
+		contentversionpreventcleanup: 'Cleanup disabled for version: %0%',
+		contentversionenablecleanup: 'Cleanup enabled for version: %0%',
 		smallAssignDomain: 'Assign Hostname',
 		smallCopy: 'Copy',
 		smallPublish: 'Publish',
@@ -357,6 +357,7 @@ export default {
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
+		isSensitiveValueNotice: 'If you need access to view the hidden values, contact your website administrator.',
 		languagesToPublish: 'What languages would you like to publish?',
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
@@ -423,6 +424,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Click to upload',
+		browseFilesAction: 'Browse files',
+		dropFilesOr: 'Drag and drop media here<br />or',
 		orClickHereToUpload: 'or click here to choose files',
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
 		disallowedFileExtension: (extension: string) =>
@@ -965,6 +968,8 @@ export default {
 		nodeName: 'Node Name',
 		none: 'None',
 		notFound: 'Not found',
+		noResults: 'No results',
+		noResultsFor: (query: string) => `No result for "${query}".`,
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
@@ -1992,14 +1997,14 @@ export default {
 		removeChildNodeWarning:
 			'Removing a child node will limit the editors options to create different content types beneath a node.',
 		usingEditor: 'using this editor will get updated with the new settings.',
-		historyCleanupHeading: 'History clean up',
-		historyCleanupDescription: 'Allow overriding the global history clean up settings.',
+		historyCleanupHeading: 'History cleanup',
+		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
-		historyCleanupPreventCleanup: 'Prevent clean up',
-		historyCleanupEnableCleanup: 'Enable clean up',
+		historyCleanupPreventCleanup: 'Prevent cleanup',
+		historyCleanupEnableCleanup: 'Enable cleanup',
 		historyCleanupGloballyDisabled:
-			'<strong>NOTE!</strong> The clean up of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
+			'<strong>NOTE!</strong> The clean up of historical content versions is disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Collection',
@@ -2177,6 +2182,11 @@ export default {
 		tableViewLabel: 'Table',
 		children: 'Children',
 		noItems: 'No items',
+	},
+	picker: {
+		browseTab: 'Browse',
+		searchTab: 'Search',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} selected`,
 	},
 	update: {
 		updateAvailable: 'New update ready',
@@ -2566,11 +2576,14 @@ export default {
 		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
+		restoreItemTo: (from: string, to: string) => `Restore <strong>${from}</strong> to <strong>${to}</strong>`,
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
 		mediaTrashed: 'Trashed media with Id: {0} related to original parent media item with Id: {1}',
 		itemCannotBeRestored: 'Cannot automatically restore this item',
 		itemCannotBeRestoredHelpText:
-			'There is no location where this item can be automatically restored. You can move the item manually using the tree below.',
+			'There is no location where this item can be automatically restored. You can select a new location below.',
+		restoreToTitle: 'Restore to',
+		selectRestoreLocation: 'Select location',
 		wasRestored: 'was restored under',
 	},
 	relationType: {

@@ -3,7 +3,7 @@ import type {
 	UmbContentTypeStructureDataSource,
 	UmbContentTypeStructureDataSourceConstructor,
 } from './content-type-structure-data-source.interface.js';
-import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase, type UmbDataSourceResponse, type UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
@@ -19,12 +19,15 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 
 	/**
 	 * Returns a promise with the allowed children of a content type
-	 * @param {string} unique
-	 * @param parentContentUnique
-	 * @returns {*}
+	 * @param {string} unique The unique identifier of the content type.
+	 * @param {string | null} parentContentUnique The unique identifier of the parent content.
+	 * @returns {Promise<UmbDataSourceResponse<UmbPagedModel<ItemType>>>} The allowed children of the content type.
 	 * @memberof UmbContentTypeStructureRepositoryBase
 	 */
-	requestAllowedChildrenOf(unique: string | null, parentContentUnique: string | null) {
+	requestAllowedChildrenOf(
+		unique: string | null,
+		parentContentUnique: string | null,
+	): Promise<UmbDataSourceResponse<UmbPagedModel<ItemType>>> {
 		return this._dataSource.getAllowedChildrenOf(unique, parentContentUnique);
 	}
 }

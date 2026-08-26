@@ -9,8 +9,8 @@ import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffi
 
 /**
  *
- * @param manifest
- * @returns
+ * @param {ManifestPropertyAction} manifest - The property action manifest
+ * @returns {[UmbPropertyActionArgs<MetaPropertyAction>]} The API arguments built from the manifest
  */
 function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyActionArgs<MetaPropertyAction>] {
 	return [{ meta: manifest.meta }];
