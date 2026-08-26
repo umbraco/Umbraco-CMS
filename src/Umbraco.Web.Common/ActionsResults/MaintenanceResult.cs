@@ -8,8 +8,6 @@ namespace Umbraco.Cms.Web.Common.ActionsResults;
 /// </summary>
 public class MaintenanceResult : IActionResult
 {
-    private readonly string _viewName;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="MaintenanceResult"/> class using the default maintenance view.
     /// </summary>
@@ -23,7 +21,12 @@ public class MaintenanceResult : IActionResult
     /// </summary>
     /// <param name="viewName">The view path to render, e.g. <c>~/umbraco/UmbracoWebsite/Maintenance.cshtml</c>.</param>
     public MaintenanceResult(string viewName)
-        => _viewName = viewName;
+        => ViewName = viewName;
+
+    /// <summary>
+    /// Gets the path of the view that will be rendered.
+    /// </summary>
+    public string ViewName { get; }
 
     /// <inheritdoc />
     public async Task ExecuteResultAsync(ActionContext context)
@@ -34,7 +37,7 @@ public class MaintenanceResult : IActionResult
 
         response.StatusCode = StatusCodes.Status503ServiceUnavailable;
 
-        var viewResult = new ViewResult { ViewName = _viewName };
+        var viewResult = new ViewResult { ViewName = ViewName };
 
         await viewResult.ExecuteResultAsync(context);
     }
