@@ -41,10 +41,10 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	hideSingleGroup = false;
 
 	@state()
-	private _groups: Array<UmbPropertyTypeContainerMergedModel> = [];
+	private _groups?: Array<UmbPropertyTypeContainerMergedModel>;
 
 	@state()
-	private _hasProperties = false;
+	private _hasProperties?: boolean;
 
 	constructor() {
 		super();
@@ -80,7 +80,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 
 	#renderRootProperties() {
 		if (!this._hasProperties) return;
-		if (this.hideSingleGroup && this._groups.length === 0) {
+		if (this.hideSingleGroup && (!this._groups || this._groups.length === 0)) {
 			return html`<umb-block-workspace-view-edit-properties
 				.managerName=${this.#managerName}
 				data-mark="property-group:root"
@@ -95,8 +95,8 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	#renderGroups() {
-		if (this._groups.length === 0) return;
-		if (this.hideSingleGroup && this._hasProperties === false && this._groups.length === 1) {
+		if (!this._groups || this._groups.length === 0) return;
+		if (this.hideSingleGroup && this._hasProperties === false && this._groups?.length === 1) {
 			return this.renderGroup(this._groups[0]);
 		}
 		return repeat(
