@@ -75,6 +75,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	override render() {
+		if (this._containerId === undefined) return;
 		return html`${this.#renderRootProperties()}${this.#renderGroups()}`;
 	}
 
