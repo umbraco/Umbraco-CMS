@@ -32,10 +32,12 @@ import {
   DateTimeWithTimeZonePickerDataTypeBuilder,
   DateOnlyPickerDataTypeBuilder,
   TimeOnlyPickerDataTypeBuilder,
+  DateTimePickerDataTypeBuilder,
   EntityDataPickerDataTypeBuilder,
   ElementPickerDataTypeBuilder,
   UserPickerDataTypeBuilder,
-  MemberGroupPickerDataTypeBuilder
+  MemberGroupPickerDataTypeBuilder,
+  SingleBlockDataTypeBuilder
 } from "../builders";
 
 export class DataTypeApiHelper {
@@ -351,6 +353,19 @@ export class DataTypeApiHelper {
       .build();
 
     return await this.save(blockList);
+  }
+
+  async createSingleBlockDataTypeWithABlock(name: string, contentElementTypeId: string) {
+    await this.ensureNameNotExists(name);
+
+    const singleBlock = new SingleBlockDataTypeBuilder()
+      .withName(name)
+      .addBlock()
+        .withContentElementTypeKey(contentElementTypeId)
+        .done()
+      .build();
+
+    return await this.save(singleBlock);
   }
 
   async createBlockListDataTypeWithContentAndSettingsElementType(name: string, contentElementTypeId: string, settingsElementTypeId: string) {
@@ -2131,6 +2146,16 @@ export class DataTypeApiHelper {
     await this.ensureNameNotExists(name);
 
     const dataType = new TimeOnlyPickerDataTypeBuilder()
+      .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultDateTimePickerDataType(name: string) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new DateTimePickerDataTypeBuilder()
       .withName(name)
       .build();
 
