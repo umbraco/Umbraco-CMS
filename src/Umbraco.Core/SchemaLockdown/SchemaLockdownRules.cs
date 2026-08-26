@@ -11,14 +11,7 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// </remarks>
 public sealed class SchemaLockdownRules : ISchemaLockdownRules
 {
-    private static readonly DelegateEqualityComparer<(string EntityType, SchemaOperation Operation)> BlockedKeyComparer =
-        new(
-            (x, y) => x.Operation == y.Operation
-                && string.Equals(x.EntityType, y.EntityType, StringComparison.OrdinalIgnoreCase),
-            x => HashCode.Combine(StringComparer.OrdinalIgnoreCase.GetHashCode(x.EntityType), x.Operation));
-
-    private readonly HashSet<(string EntityType, SchemaOperation Operation)> _blocked = new(BlockedKeyComparer);
-    private readonly HashSet<string> _governed = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, HashSet<SchemaOperation>> _blocked = new(StringComparer.OrdinalIgnoreCase);
     private readonly bool _frozen;
 
     /// <summary>
@@ -36,7 +29,7 @@ public sealed class SchemaLockdownRules : ISchemaLockdownRules
     }
 
     /// <inheritdoc />
-    public IReadOnlyCollection<string> GovernedEntityTypes => _governed.ToArray();
+    public IReadOnlyCollection<string> RestrictedEntityTypes => _blocked.Keys.ToArray();
 
     /// <inheritdoc />
     public void Block(string entityType, SchemaOperation operation)
@@ -55,8 +48,12 @@ public sealed class SchemaLockdownRules : ISchemaLockdownRules
             throw new InvalidOperationException("The schema lockdown rules cannot be modified after they have been built.");
         }
 
-        _blocked.Add((entityType, operation));
-        _governed.Add(entityType);
+        if (_blocked.TryGetValue(entityType, out HashSet<SchemaOperation>? operations) is false)
+        {
+            _blocked[entityType] = operations = [];
+        }
+
+        operations.Add(operation);
     }
 
     /// <inheritdoc />
@@ -70,17 +67,17 @@ public sealed class SchemaLockdownRules : ISchemaLockdownRules
     /// <inheritdoc />
     public bool IsAllowed(string entityType, SchemaOperation operation)
     {
-        // An operation that could not be classified is denied wherever anything is denied: it may well be one of
-        // those, and there is no way to tell which.
-        if (operation == SchemaOperation.Unknown)
+        if (_blocked.TryGetValue(entityType, out HashSet<SchemaOperation>? operations) is false)
         {
-            return _governed.Contains(entityType) is false;
+            return true;
         }
 
-        return _blocked.Contains((entityType, operation)) is false;
+        // An operation that could not be classified is denied wherever anything is denied: it may well be one of
+        // those, and there is no way to tell which.
+        return operation != SchemaOperation.Unknown && operations.Contains(operation) is false;
     }
 
-    // Reads are never governed, and an unclassified operation is answered by whether the entity type is blocked at
+    // Reads are never denied, and an unclassified operation is answered by whether the entity type is restricted at
     // all. Both are decided by rule, so neither can be recorded as a decision of its own.
     private static bool IsBlockable(SchemaOperation operation)
         => operation is SchemaOperation.Create or SchemaOperation.Update or SchemaOperation.Delete;

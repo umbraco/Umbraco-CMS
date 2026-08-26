@@ -122,7 +122,7 @@ public class SchemaLockdownRulesTests
             Assert.That(rules.IsAllowed("dictionary-item", SchemaOperation.Update), Is.False);
             Assert.That(rules.IsAllowed("Dictionary-Item", SchemaOperation.Update), Is.False);
             Assert.That(rules.IsAllowed("DICTIONARY-ITEM", SchemaOperation.Unknown), Is.False);
-            Assert.That(rules.GovernedEntityTypes, Is.EquivalentTo(new[] { "Dictionary-Item" }));
+            Assert.That(rules.RestrictedEntityTypes, Is.EquivalentTo(new[] { "Dictionary-Item" }));
         });
     }
 
@@ -172,11 +172,11 @@ public class SchemaLockdownRulesTests
     }
 
     [Test]
-    public void Governed_Entity_Types_Are_Empty_When_No_Configurator_Is_Registered()
-        => Assert.That(CreateRules().GovernedEntityTypes, Is.Empty);
+    public void Restricted_Entity_Types_Are_Empty_When_No_Configurator_Is_Registered()
+        => Assert.That(CreateRules().RestrictedEntityTypes, Is.Empty);
 
     [Test]
-    public void Governed_Entity_Types_Are_Only_Those_A_Configurator_Blocked_Something_On()
+    public void Restricted_Entity_Types_Are_Only_Those_A_Configurator_Blocked_Something_On()
     {
         SchemaLockdownRules rules = CreateRules(
             x => x.BlockMutations(Constants.UdiEntityType.DocumentType),
@@ -184,18 +184,18 @@ public class SchemaLockdownRulesTests
             x => x.Block(Constants.UdiEntityType.MediaType, SchemaOperation.Read));
 
         Assert.That(
-            rules.GovernedEntityTypes,
+            rules.RestrictedEntityTypes,
             Is.EquivalentTo(new[] { Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.DataType }));
     }
 
     [Test]
-    public void Governed_Entity_Types_Are_Visible_To_A_Configurator_Still_Running()
+    public void Restricted_Entity_Types_Are_Visible_To_A_Configurator_Still_Running()
     {
         string[]? seen = null;
 
         CreateRules(
             x => x.BlockMutations(Constants.UdiEntityType.DocumentType),
-            x => seen = x.GovernedEntityTypes.ToArray());
+            x => seen = x.RestrictedEntityTypes.ToArray());
 
         Assert.That(seen, Is.EquivalentTo(new[] { Constants.UdiEntityType.DocumentType }));
     }

@@ -35,7 +35,7 @@ public class SchemaLockdownServerController : ServerControllerBase
     {
         var model = new ServerSchemaLockdownResponseModel
         {
-            EntityTypes = _rules.GovernedEntityTypes
+            EntityTypes = _rules.RestrictedEntityTypes
                 .Select(entityType => new ServerSchemaLockdownEntityTypeResponseModel
                 {
                     EntityType = entityType,
