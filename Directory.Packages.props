@@ -50,8 +50,8 @@
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.2.1" />
     <PackageVersion Include="BitFaster.Caching" Version="2.6.0" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
-    <PackageVersion Include="Examine" Version="4.0.0-beta.9" />
-    <PackageVersion Include="Examine.Core" Version="4.0.0-beta.9" />
+    <PackageVersion Include="Examine" Version="4.0.0" />
+    <PackageVersion Include="Examine.Core" Version="4.0.0" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="JsonPatch.Net" Version="3.3.0" />
     <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.8" />
@@ -97,7 +97,7 @@
       resolve System.Security.Cryptography.Xml down to a vulnerable 8.0.0 (GHSA-37gx-xxp4-5rgx, GHSA-w3x6-4m5h-cxqf).
       Pin it forward until both of those dependencies reference a fixed version.
     -->
-    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.10" />
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.11" />
     <!--
       Microsoft.AspNetCore.OpenApi and Swashbuckle only require Microsoft.OpenApi >= 2.0.0, which otherwise
       resolves to a vulnerable 2.0.0 (CVE-2026-49451, GHSA-v5pm-xwqc-g5wc). Pin forward to a patched 2.x
