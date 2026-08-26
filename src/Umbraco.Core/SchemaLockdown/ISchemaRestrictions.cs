@@ -1,16 +1,16 @@
 namespace Umbraco.Cms.Core.SchemaLockdown;
 
 /// <summary>
-/// The writable view of the schema lockdown rules, handed to each <see cref="ISchemaLockdownConfigurator"/> while
-/// the rules are being built.
+/// The writable view of the schema lockdown restrictions, handed to each <see cref="ISchemaLockdownConfigurator"/>
+/// while they are being built.
 /// </summary>
 /// <remarks>
-/// It extends <see cref="IReadOnlySchemaLockdownRules"/> because a configurator may consult the decisions already made by
+/// It extends <see cref="IReadOnlySchemaRestrictions"/> because a configurator may consult the decisions already made by
 /// the configurators that ran before it, and only then decide what to write. There is deliberately no way to permit
 /// something: everything is permitted until a configurator denies it, and a denial cannot then be lifted. A site that
 /// disagrees with a package's configurator removes it from the collection rather than amending what it decided.
 /// </remarks>
-public interface ISchemaLockdownRules : IReadOnlySchemaLockdownRules
+public interface ISchemaRestrictions : IReadOnlySchemaRestrictions
 {
     /// <summary>
     /// Denies the supplied operation on the supplied entity type.
@@ -18,7 +18,7 @@ public interface ISchemaLockdownRules : IReadOnlySchemaLockdownRules
     /// <remarks>
     /// Only <see cref="SchemaOperation.Create"/>, <see cref="SchemaOperation.Update"/> and
     /// <see cref="SchemaOperation.Delete"/> can be denied; the others are answered by rule and denying one does
-    /// nothing. See <see cref="IReadOnlySchemaLockdownRules.IsAllowed"/>.
+    /// nothing. See <see cref="IReadOnlySchemaRestrictions.IsAllowed"/>.
     /// </remarks>
     void Block(string entityType, SchemaOperation operation);
 

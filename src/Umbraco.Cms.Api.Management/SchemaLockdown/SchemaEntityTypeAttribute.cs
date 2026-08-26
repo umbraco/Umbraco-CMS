@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 
 /// <summary>
 /// Declares which schema entity type a controller manages, and thereby authorizes every action on that controller
-/// against the schema lockdown rules.
+/// against the schema lockdown restrictions.
 /// </summary>
 /// <remarks>
 /// Declaring the entity type is all a controller has to do: because the requirement is carried as authorization

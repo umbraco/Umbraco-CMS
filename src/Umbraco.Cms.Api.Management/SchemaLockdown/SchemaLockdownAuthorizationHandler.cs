@@ -11,23 +11,23 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 
 /// <summary>
-///     Authorizes that the schema lockdown rules permit the requested change to schema.
+///     Authorizes that the schema lockdown restrictions permit the requested change to schema.
 /// </summary>
 internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequirementAuthorizationHandler<SchemaEntityTypeAttribute>
 {
-    private readonly IReadOnlySchemaLockdownRules _rules;
+    private readonly IReadOnlySchemaRestrictions _restrictions;
     private readonly IRuntimeState _runtimeState;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SchemaLockdownAuthorizationHandler"/> class.
     /// </summary>
-    /// <param name="rules">The frozen decision table.</param>
+    /// <param name="restrictions">The frozen decision table.</param>
     /// <param name="runtimeState">The runtime state.</param>
     public SchemaLockdownAuthorizationHandler(
-        IReadOnlySchemaLockdownRules rules,
+        IReadOnlySchemaRestrictions restrictions,
         IRuntimeState runtimeState)
     {
-        _rules = rules;
+        _restrictions = restrictions;
         _runtimeState = runtimeState;
     }
 
@@ -43,7 +43,7 @@ internal sealed class SchemaLockdownAuthorizationHandler : MustSatisfyRequiremen
 
         SchemaOperation operation = ResolveOperation(context.Resource);
 
-        return Task.FromResult(_rules.IsAllowed(requirement.EntityType, operation));
+        return Task.FromResult(_restrictions.IsAllowed(requirement.EntityType, operation));
     }
 
     private static SchemaOperation ResolveOperation(object? resource)

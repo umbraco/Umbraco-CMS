@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.SchemaLockdown;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
-/// The rules match entity types case-insensitively and report back whatever casing a configurator wrote, so the
+/// The restrictions match entity types case-insensitively and report back whatever casing a configurator wrote, so the
 /// endpoint settles the casing rather than leaving the backoffice to guess at it.
 /// </summary>
 public class ReportedEntityTypesAreLowerCasedTests : ManagementApiTest<SchemaLockdownServerController>
@@ -46,12 +46,12 @@ public class ReportedEntityTypesAreLowerCasedTests : ManagementApiTest<SchemaLoc
     }
 
     /// <summary>
-    /// Denies an operation naming the entity type in a casing the rules accept but the backoffice never uses.
+    /// Denies an operation naming the entity type in a casing the restrictions accept but the backoffice never uses.
     /// </summary>
     private sealed class LockAMixedCaseEntityTypeConfigurator : ISchemaLockdownConfigurator
     {
         /// <inheritdoc />
-        public void Configure(ISchemaLockdownRules rules)
-            => rules.BlockMutations("Dictionary-Item");
+        public void Configure(ISchemaRestrictions restrictions)
+            => restrictions.BlockMutations("Dictionary-Item");
     }
 }

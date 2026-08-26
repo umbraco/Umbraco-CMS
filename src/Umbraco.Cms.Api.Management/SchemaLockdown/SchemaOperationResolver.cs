@@ -16,7 +16,7 @@ internal static class SchemaOperationResolver
     /// <remarks>
     /// <see cref="SchemaOperation.Read"/> is only ever produced by an explicit allowlist of safe verbs. Anything
     /// unrecognised, or absent, resolves to <see cref="SchemaOperation.Unknown"/>, which is denied on every entity
-    /// type the rules speak to, so a new or custom verb cannot bypass lockdown.
+    /// type the restrictions speak to, so a new or custom verb cannot bypass lockdown.
     /// </remarks>
     public static SchemaOperation Resolve(string? httpMethod)
         => httpMethod is null ? SchemaOperation.Unknown : FromVerb(httpMethod);

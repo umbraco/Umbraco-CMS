@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
 /// <summary>
 /// A configurator that blocks only some operations on an entity type leaves the untouched operations governed by
-/// the real request pipeline, not just by the rules in isolation.
+/// the real request pipeline, not just by the restrictions in isolation.
 /// </summary>
 public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTests : ManagementApiTest<DeleteDataTypeController>
 {
@@ -69,10 +69,10 @@ public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTe
     private sealed class LockDataTypeCreateAndUpdateConfigurator : ISchemaLockdownConfigurator
     {
         /// <inheritdoc />
-        public void Configure(ISchemaLockdownRules rules)
+        public void Configure(ISchemaRestrictions restrictions)
         {
-            rules.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create);
-            rules.Block(Constants.UdiEntityType.DataType, SchemaOperation.Update);
+            restrictions.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create);
+            restrictions.Block(Constants.UdiEntityType.DataType, SchemaOperation.Update);
         }
     }
 }

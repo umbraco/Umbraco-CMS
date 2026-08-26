@@ -9,16 +9,16 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// served to the backoffice without the two being able to disagree. Denials only ever accumulate, so the order the
 /// configurators run in does not affect the result.
 /// </remarks>
-public sealed class SchemaLockdownRules : ISchemaLockdownRules
+internal sealed class SchemaRestrictions : ISchemaRestrictions
 {
     private readonly Dictionary<string, HashSet<SchemaOperation>> _blocked = new(StringComparer.OrdinalIgnoreCase);
     private readonly bool _frozen;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SchemaLockdownRules"/> class.
+    /// Initializes a new instance of the <see cref="SchemaRestrictions"/> class.
     /// </summary>
     /// <param name="configurators">The registered configurators.</param>
-    public SchemaLockdownRules(SchemaLockdownConfiguratorCollection configurators)
+    public SchemaRestrictions(SchemaLockdownConfiguratorCollection configurators)
     {
         foreach (ISchemaLockdownConfigurator configurator in configurators)
         {
@@ -45,7 +45,7 @@ public sealed class SchemaLockdownRules : ISchemaLockdownRules
 
         if (_frozen)
         {
-            throw new InvalidOperationException("The schema lockdown rules cannot be modified after they have been built.");
+            throw new InvalidOperationException("The schema lockdown restrictions cannot be modified after they have been built.");
         }
 
         if (_blocked.TryGetValue(entityType, out HashSet<SchemaOperation>? operations) is false)

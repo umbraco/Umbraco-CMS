@@ -4,16 +4,16 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// Answers whether schema lockdown permits a given operation on a given entity type.
 /// </summary>
 /// <remarks>
-/// This is the read-only view of the decision table, which is what anything consulting the rules needs. The rules
+/// This is the read-only view of the decision table, which is what anything consulting the restrictions needs. They
 /// are built once at start-up and frozen, so every consumer is answered from the same decisions.
 /// </remarks>
-public interface IReadOnlySchemaLockdownRules
+public interface IReadOnlySchemaRestrictions
 {
     /// <summary>
     /// Gets the entity types at least one operation is denied on.
     /// </summary>
     /// <remarks>
-    /// Anything absent from this is permitted every operation, so this is the whole of what the rules have to say.
+    /// Anything absent from this is permitted every operation, so this is the whole of what the restrictions have to say.
     /// It is empty until a configurator denies something, and is not the set of entity types lockdown is capable of
     /// enforcing on - that is decided by which controllers declare one.
     /// </remarks>

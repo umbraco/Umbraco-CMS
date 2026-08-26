@@ -33,19 +33,19 @@ public class SchemaLockdownAuthorizationHandlerTests
 
     private sealed class LockDocumentTypes : ISchemaLockdownConfigurator
     {
-        public void Configure(ISchemaLockdownRules rules)
-            => rules.BlockMutations(Constants.UdiEntityType.DocumentType);
+        public void Configure(ISchemaRestrictions restrictions)
+            => restrictions.BlockMutations(Constants.UdiEntityType.DocumentType);
     }
 
     private static SchemaLockdownAuthorizationHandler CreateHandler(bool lockDocumentTypes, RuntimeLevel runtimeLevel)
     {
         ISchemaLockdownConfigurator[] configurators = lockDocumentTypes ? [new LockDocumentTypes()] : [];
-        var rules = new SchemaLockdownRules(new SchemaLockdownConfiguratorCollection(() => configurators));
+        var restrictions = new SchemaRestrictions(new SchemaLockdownConfiguratorCollection(() => configurators));
 
         var runtimeState = new Mock<IRuntimeState>();
         runtimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
 
-        return new SchemaLockdownAuthorizationHandler(rules, runtimeState.Object);
+        return new SchemaLockdownAuthorizationHandler(restrictions, runtimeState.Object);
     }
 
     private static SchemaEntityTypeAttribute CreateRequirement(
