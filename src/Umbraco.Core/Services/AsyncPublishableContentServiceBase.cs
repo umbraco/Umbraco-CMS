@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -240,7 +241,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         // Store the result of doing the save of content for the rollback
-        OperationResult rollbackSaveResult;
+        Attempt<ContentSaveOperationStatus> rollbackSaveResult;
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -255,7 +256,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             content.CopyFrom(version, culture);
 
             // Save the content for the rollback
-            rollbackSaveResult = Save(content, userId);
+            rollbackSaveResult = SaveAsync(content, userId, null, CancellationToken.None).GetAwaiter().GetResult();
 
             // Depending on the save result - is what we log & audit along with what we return
             if (rollbackSaveResult.Success == false)
@@ -276,7 +277,13 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             scope.Complete();
         }
 
-        return rollbackSaveResult;
+        OperationResultType rollbackResultType = rollbackSaveResult.Result switch
+        {
+            ContentSaveOperationStatus.Success => OperationResultType.Success,
+            ContentSaveOperationStatus.CancelledByNotification => OperationResultType.FailedCancelledByEvent,
+            _ => OperationResultType.FailedCannot,
+        };
+        return new OperationResult(rollbackResultType, evtMsgs);
     }
 
     #endregion
@@ -653,6 +660,77 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         }
 
         return OperationResult.Succeed(eventMessages);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, int? userId, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
+    {
+        PublishedState publishedState = content.PublishedState;
+        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
+        {
+            return Attempt.Fail(ContentSaveOperationStatus.InvalidPublishedState);
+        }
+
+        if (content.Name != null && content.Name.Length > 255)
+        {
+            return Attempt.Fail(ContentSaveOperationStatus.InvalidName);
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        SavingNotification<TContent> savingNotification = SavingNotification(content, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification);
+        }
+
+        userId ??= Constants.Security.SuperUserId;
+
+        if (content.HasIdentity == false)
+        {
+            content.CreatorId = userId.Value;
+        }
+
+        content.WriterId = userId.Value;
+
+        List<string>? culturesChanging = content.ContentType.VariesByCulture()
+            ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+            : null;
+
+        IReadOnlyCollection<string>? savedCultures = content.ContentType.VariesByCulture()
+            ? culturesChanging
+            : content.IsDirty() ? ["*"] : [];
+
+        await _asyncContentRepository.SaveAsync(content, cancellationToken);
+
+        if (contentSchedule != null)
+        {
+            await _asyncContentRepository.PersistContentScheduleAsync(content, contentSchedule, cancellationToken);
+        }
+
+        scope.Notifications.Publish(
+            SavedNotification(content, eventMessages, BuildCultureMap(content, savedCultures)).WithStateFrom(savingNotification));
+
+        scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.RefreshNode, eventMessages));
+
+        if (culturesChanging != null)
+        {
+            IEnumerable<ILanguage> allLangs = await _languageRepository.GetAllAsync(cancellationToken);
+            var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesChanging);
+            await AuditAsync(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
+        }
+        else
+        {
+            await AuditAsync(AuditType.Save, userId.Value, content.Id);
+        }
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentSaveOperationStatus.Success);
     }
 
     /// <inheritdoc />

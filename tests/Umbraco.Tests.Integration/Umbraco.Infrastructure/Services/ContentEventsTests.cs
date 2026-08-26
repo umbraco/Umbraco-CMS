@@ -408,6 +408,29 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         [Test]
         [LongRunning]
+        public async Task SaveAsync_UnpublishedContent_FiresSameNotificationSequence()
+        {
+            // rule: when a content is saved,
+            // - repository : refresh u=u
+            // - content cache : refresh newest
+            IContent content = ContentService.GetRootContentAsync(CancellationToken.None).GetAwaiter().GetResult().FirstOrDefault();
+            Assert.IsNotNull(content);
+
+            ResetEvents();
+            content.Name = "changed";
+            await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+
+            Assert.AreEqual(2, _msgCount);
+            Assert.AreEqual(2, _events.Count);
+            int i = 0;
+            int m = 0;
+            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.u=u", _events[i++].ToString());
+            m++;
+            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
+        }
+
+        [Test]
+        [LongRunning]
         public void SavePublishedContent_ContentProperty1()
         {
             // rule: when a content is saved,

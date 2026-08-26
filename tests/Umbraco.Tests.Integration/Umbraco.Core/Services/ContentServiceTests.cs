@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -514,6 +515,31 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task SaveAsync_WithContentSchedule_PersistsThenRemovesSchedule()
+    {
+        // Arrange
+        var content = ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage");
+
+        // Act
+        var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddHours(2));
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserId, contentSchedule, CancellationToken.None);
+        Assert.AreEqual(1, contentSchedule.FullSchedule.Count);
+
+        contentSchedule = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
+        var sched = contentSchedule.FullSchedule;
+        Assert.AreEqual(1, sched.Count);
+        Assert.AreEqual(1, sched.Count(x => x.Culture == Constants.System.InvariantCulture));
+        contentSchedule.Clear(ContentScheduleAction.Expire);
+        await ContentService.SaveAsync(content, Constants.Security.SuperUserId, contentSchedule, CancellationToken.None);
+
+        // Assert
+        contentSchedule = await ContentService.GetContentScheduleByContentIdAsync(content.Key, CancellationToken.None);
+        sched = contentSchedule.FullSchedule;
+        Assert.AreEqual(0, sched.Count);
+        Assert.IsTrue(ContentService.Publish(content, content.AvailableCultures.ToArray()).Success);
+    }
+
+    [Test]
     [LongRunning]
     public async Task Get_Top_Version_Ids()
     {
@@ -835,6 +861,40 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task SaveAsync_NewContentWithExplicitUser_SetsCreatorAndWriter()
+    {
+        var user = new UserBuilder().Build();
+        UserService.Save(user);
+        var content = new Content("Test", Constants.System.Root, await ContentTypeService.GetAsync("umbTextpage"));
+
+        // Act
+        await ContentService.SaveAsync(content, user.Id, null, CancellationToken.None);
+
+        // Assert
+        Assert.That(content.CreatorId, Is.EqualTo(user.Id));
+        Assert.That(content.WriterId, Is.EqualTo(user.Id));
+    }
+
+    [Test]
+    public async Task SaveAsync_SecondSaveByDifferentUser_PreservesCreatorUpdatesWriter()
+    {
+        var creator = new UserBuilder().Build();
+        UserService.Save(creator);
+        var writer = new UserBuilder().Build();
+        UserService.Save(writer);
+        var content = new Content("Test", Constants.System.Root, await ContentTypeService.GetAsync("umbTextpage"));
+
+        // Act
+        await ContentService.SaveAsync(content, creator.Id, null, CancellationToken.None);
+        content.Name = "Test Updated";
+        await ContentService.SaveAsync(content, writer.Id, null, CancellationToken.None);
+
+        // Assert
+        Assert.That(content.CreatorId, Is.EqualTo(creator.Id));
+        Assert.That(content.WriterId, Is.EqualTo(writer.Id));
+    }
+
+    [Test]
     public void Cannot_Create_Content_With_Non_Existing_ContentType_Alias() =>
         Assert.Throws<Exception>(() => ContentService.Create("Test", Constants.System.Root, "umbAliasDoesntExist"));
 
@@ -846,6 +906,16 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => ContentService.Save(content));
+    }
+
+    [Test]
+    public async Task SaveAsync_EmptyInvariantName_Throws()
+    {
+        // Arrange
+        var content = new Content(string.Empty, Constants.System.Root, await ContentTypeService.GetAsync("umbTextpage"));
+
+        // Act & Assert
+        Assert.ThrowsAsync<InvalidOperationException>(() => ContentService.SaveAsync(content, null, null, CancellationToken.None));
     }
 
     [Test]
@@ -2454,6 +2524,69 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Assert
         Assert.That(content.HasIdentity, Is.True);
+    }
+
+    [Test]
+    public async Task SaveAsync_BasicContent_AssignsIdentity()
+    {
+        // Arrange
+        var content = ContentService.Create("Home US", -1, "umbTextpage");
+        content.SetValue("author", "Barack Obama");
+
+        // Act
+        await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+
+        // Assert
+        Assert.That(content.HasIdentity, Is.True);
+    }
+
+    [Test]
+    public async Task SaveAsync_SavingNotificationCancelled_ReturnsCancelAndDoesNotPersist()
+    {
+        ContentNotificationHandler.SavingContent = notification =>
+        {
+            notification.Cancel = true;
+        };
+
+        try
+        {
+            var content = ContentService.Create("Cancel Me", -1, "umbTextpage");
+
+            Attempt<ContentSaveOperationStatus> result = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(ContentSaveOperationStatus.CancelledByNotification, result.Result);
+            Assert.IsFalse(content.HasIdentity);
+        }
+        finally
+        {
+            ContentNotificationHandler.SavingContent = null;
+        }
+    }
+
+    [Test]
+    public async Task SaveAsync_NameTooLong_ReturnsInvalidNameStatus()
+    {
+        var content = ContentService.Create(new string('a', 256), -1, "umbTextpage");
+
+        Attempt<ContentSaveOperationStatus> result = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentSaveOperationStatus.InvalidName, result.Result);
+        Assert.IsFalse(content.HasIdentity);
+    }
+
+    [Test]
+    public async Task SaveAsync_PublishedStateNotAllowed_ReturnsInvalidPublishedStateStatus()
+    {
+        var content = ContentService.Create("Test", -1, "umbTextpage");
+        content.PublishedState = PublishedState.Publishing;
+
+        Attempt<ContentSaveOperationStatus> result = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentSaveOperationStatus.InvalidPublishedState, result.Result);
+        Assert.IsFalse(content.HasIdentity);
     }
 
     [Test]

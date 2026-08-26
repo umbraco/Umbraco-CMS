@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -75,6 +76,18 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     // See GetByIdAsync above - same bridge, same reason.
     public Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken) =>
         Task.FromResult(GetContentScheduleByContentId(contentId));
+
+    /// <inheritdoc />
+    // See GetByIdAsync above - same bridge, same reason. Element's sync Save only fails via notification
+    // cancellation (its two validation checks still throw, unconverted), so any non-success result maps to
+    // CancelledByNotification.
+    public Task<Attempt<ContentSaveOperationStatus>> SaveAsync(IElement content, int? userId, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
+    {
+        OperationResult result = Save(content, userId, contentSchedule);
+        return Task.FromResult(result.Success
+            ? Attempt.Succeed(ContentSaveOperationStatus.Success)
+            : Attempt.Fail(ContentSaveOperationStatus.CancelledByNotification));
+    }
 
     /// <inheritdoc />
     Attempt<OperationResult?> IAsyncContentServiceBase<IElement>.Save(IEnumerable<IElement> contents, int userId) =>

@@ -130,6 +130,70 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task SaveAsync_Culture()
+    {
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
+
+        _contentType.Variations = ContentVariation.Culture;
+        foreach (var propertyType in _contentType.PropertyTypes)
+        {
+            propertyType.Variations = ContentVariation.Culture;
+        }
+
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
+
+        IContent document = new Content("content", -1, _contentType);
+        document.SetCultureName("hello", "en-US");
+        document.SetCultureName("bonjour", "fr-FR");
+        ContentService.Save(document);
+
+        // re-get - dirty properties need resetting
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
+
+        // properties: title, bodyText, keywords, description
+        document.SetValue("title", "title-en", "en-US");
+
+        var savingWasCalled = false;
+        var savedWasCalled = false;
+
+        ContentNotificationHandler.SavingContent = notification =>
+        {
+            var saved = notification.SavedEntities.First();
+
+            Assert.AreSame(document, saved);
+
+            Assert.IsTrue(notification.IsSavingCulture(saved, "en-US"));
+            Assert.IsFalse(notification.IsSavingCulture(saved, "fr-FR"));
+
+            savingWasCalled = true;
+        };
+
+        ContentNotificationHandler.SavedContent = notification =>
+        {
+            var saved = notification.SavedEntities.First();
+
+            Assert.AreSame(document, saved);
+
+            Assert.IsTrue(notification.HasSavedCulture(saved, "en-US"));
+            Assert.IsFalse(notification.HasSavedCulture(saved, "fr-FR"));
+
+            savedWasCalled = true;
+        };
+
+        try
+        {
+            await ContentService.SaveAsync(document, null, null, CancellationToken.None);
+            Assert.IsTrue(savingWasCalled);
+            Assert.IsTrue(savedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.SavingContent = null;
+            ContentNotificationHandler.SavedContent = null;
+        }
+    }
+
+    [Test]
     public void Can_Set_Value_When_Saving()
     {
         IContent document = new Content("content", -1, _contentType);
@@ -723,6 +787,35 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task SaveAsync_ReadsSavedCulturesForInvariant()
+    {
+        IContent document = new Content("content", -1, _contentType);
+
+        var savedWasCalled = false;
+
+        ContentNotificationHandler.SavedContent = notification =>
+        {
+            IContent saved = notification.SavedEntities.First();
+
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[saved.Key]);
+
+            savedWasCalled = true;
+        };
+
+        try
+        {
+            await ContentService.SaveAsync(document, null, null, CancellationToken.None);
+            Assert.IsTrue(savedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.SavedContent = null;
+        }
+    }
+
+    [Test]
     public async Task Can_Read_Only_Changed_Saved_Cultures()
     {
         await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
@@ -764,6 +857,56 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ContentService.Save(document);
+            Assert.IsTrue(savedWasCalled);
+        }
+        finally
+        {
+            ContentNotificationHandler.SavedContent = null;
+        }
+    }
+
+    [Test]
+    public async Task SaveAsync_ReadsOnlyChangedSavedCultures()
+    {
+        await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
+
+        _contentType.Variations = ContentVariation.Culture;
+        foreach (IPropertyType propertyType in _contentType.PropertyTypes)
+        {
+            propertyType.Variations = ContentVariation.Culture;
+        }
+
+        await ContentTypeService.UpdateAsync(_contentType, Constants.Security.SuperUserKey);
+
+        IContent document = new Content("content", -1, _contentType);
+        document.SetCultureName("hello", "en-US");
+        document.SetCultureName("bonjour", "fr-FR");
+        ContentService.Save(document);
+
+        // re-get - dirty properties need resetting
+        document = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
+
+        // only change the en-US culture
+        document.SetValue("title", "title-en", "en-US");
+
+        var savedWasCalled = false;
+
+        ContentNotificationHandler.SavedContent = notification =>
+        {
+            IContent saved = notification.SavedEntities.First();
+
+            Assert.IsNotNull(notification.SavedCultures);
+            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+
+            // captured at raise-time even though the entity's change tracking has been reset by persistence
+            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.SavedCultures[saved.Key]);
+
+            savedWasCalled = true;
+        };
+
+        try
+        {
+            await ContentService.SaveAsync(document, null, null, CancellationToken.None);
             Assert.IsTrue(savedWasCalled);
         }
         finally

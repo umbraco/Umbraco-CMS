@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -50,6 +51,16 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
     Task<ContentScheduleCollection> GetContentScheduleByContentIdAsync(Guid contentId, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Saves a content item.
+    /// </summary>
+    /// <param name="content">The content item to save.</param>
+    /// <param name="userId">The identifier of the user performing the action, or <c>null</c> to use the super user.</param>
+    /// <param name="contentSchedule">The content schedule to persist alongside the save, or <c>null</c> to leave the schedule unchanged.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, int? userId, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Gets a version of content.

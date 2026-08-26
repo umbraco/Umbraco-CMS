@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -312,7 +313,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                 ? new Content(name, parent!, contentType, userId)
                 : new Content(name, parentId, contentType, userId);
 
-            Save(content, userId);
+            SaveAsync(content, userId, null, CancellationToken.None).GetAwaiter().GetResult();
 
             scope.Complete();
 
@@ -350,7 +351,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
             var content = new Content(name, parent, contentType, userId);
 
-            Save(content, userId);
+            SaveAsync(content, userId, null, CancellationToken.None).GetAwaiter().GetResult();
 
             scope.Complete();
             return content;
@@ -1541,7 +1542,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             // have always changed if it's been saved in the back office but that's not really fail safe.
 
             // Save before raising event
-            OperationResult saveResult = Save(content, userId);
+            Attempt<ContentSaveOperationStatus> saveResult = SaveAsync(content, userId, null, CancellationToken.None).GetAwaiter().GetResult();
 
             // always complete (but maybe return a failed status)
             scope.Complete();
