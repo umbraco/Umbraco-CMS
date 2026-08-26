@@ -21,7 +21,8 @@ internal static class HybridCacheExtensions
     /// <returns>True if the item exists already. False if it doesn't.</returns>
     /// <remarks>
     /// Hat-tip: https://github.com/dotnet/aspnetcore/discussions/57191
-    /// Will never add or alter the state of any items in the cache.
+    /// Leaves the cache as it found it, but is not a read-only operation: on a miss it creates an entry
+    /// and then removes it again, so a probe against a distributed L2 costs a write and a delete.
     /// </remarks>
     public static async Task<bool> ExistsAsync<T>(this Microsoft.Extensions.Caching.Hybrid.HybridCache cache, string key, CancellationToken token)
     {
@@ -39,7 +40,8 @@ internal static class HybridCacheExtensions
     /// <returns>A tuple of <see cref="bool"/> and the object (if found) retrieved from the cache.</returns>
     /// <remarks>
     /// Hat-tip: https://github.com/dotnet/aspnetcore/discussions/57191
-    /// Will never add or alter the state of any items in the cache.
+    /// Leaves the cache as it found it, but is not a read-only operation: on a miss it creates an entry
+    /// and then removes it again, so a probe against a distributed L2 costs a write and a delete.
     /// </remarks>
     public static async Task<(bool Exists, T? Value)> TryGetValueAsync<T>(this Microsoft.Extensions.Caching.Hybrid.HybridCache cache, string key, CancellationToken token)
     {
