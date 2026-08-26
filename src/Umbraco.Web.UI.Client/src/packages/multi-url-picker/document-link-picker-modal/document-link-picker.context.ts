@@ -1,7 +1,7 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS } from '@umbraco-cms/backoffice/document';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import { UmbTreeItemPickerExpansionManager } from '@umbraco-cms/backoffice/tree';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
@@ -14,10 +14,13 @@ export class UmbDocumentLinkPickerContext extends UmbPickerContext {
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public languages = this.#languages.asObservable();
 
-	#culture = new UmbStringState<string | null>(null);
-	public culture = this.#culture.asObservable();
+	// Provided downward (so the tree renders document names in the picked culture) and read from directly
+	// here to scope search - both need the same "explicit pick, else inherited" culture, so one context
+	// computes it once rather than each maintaining its own copy.
+	#variantContext = new UmbVariantContext(this).inherit();
+	public culture = this.#variantContext.culture;
 
-	#variantContext?: UmbVariantContext;
+	#lastSearchCulture?: string | null;
 	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 
 	constructor(host: UmbControllerHost) {
@@ -27,32 +30,40 @@ export class UmbDocumentLinkPickerContext extends UmbPickerContext {
 			providerAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
 		});
 
+		this.observe(
+			this.#variantContext.displayCulture,
+			(culture) => this.#updateSearchCulture(culture ?? null),
+			'umbDocumentLinkPickerSearchCultureObserver',
+		);
+
 		this.#loadLanguages();
 	}
 
 	async setCulture(culture: string | null) {
-		this.#culture.setValue(culture);
-		await this.#variantContext?.setCulture(culture);
+		await this.#variantContext.setCulture(culture);
 	}
 
 	async getCulture(): Promise<string | null> {
-		return this.#culture.getValue();
+		return (await this.#variantContext.getCulture()) ?? null;
+	}
+
+	#updateSearchCulture(culture: string | null) {
+		// Losing/regaining the inherited context (e.g. while tearing down) can re-emit an unchanged
+		// effective culture - skip the no-op to avoid redundantly re-running an already active search.
+		if (culture === this.#lastSearchCulture) return;
+		this.#lastSearchCulture = culture;
+
+		this.search.updateConfig({ queryParams: { culture } });
+
+		// Re-run an already active search so visible results reflect the new culture scope right away.
+		if (this.search.getSearchable() && this.search.getQuery()?.query) {
+			this.search.search();
+		}
 	}
 
 	async #loadLanguages() {
 		const { data } = await this.#languageCollectionRepository.requestAllItems();
-		const languages = data?.items || [];
-
-		this.#languages.setValue(languages);
-
-		if (languages.length > 0) {
-			// Create variant context only when we have languages available
-			this.#variantContext = new UmbVariantContext(this).inherit();
-		} else {
-			// No languages available - ensure variant context is not set
-			this.#variantContext?.destroy();
-			this.#variantContext = undefined;
-		}
+		this.#languages.setValue(data?.items || []);
 	}
 }
 
