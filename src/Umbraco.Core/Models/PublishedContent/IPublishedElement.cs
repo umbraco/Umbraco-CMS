@@ -146,21 +146,26 @@ public interface IPublishedElement
     bool IsPublished(string? culture = null);
 
     /// <summary>
-    ///     Gets the unique identifier of the nearest identity bearing root content item.
+    ///     Gets the unique identifier of the content item that owns this element, or <c>null</c> when the
+    ///     element bears its own identity.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Published Elements used to model Block Editor content do not have an identity if they are
-    ///         locally sourced - that is, not sourced from reusable Elements.
+    ///         Some Published Elements carry no identity of their own - they exist only within the content
+    ///         item that defines them, and their <see cref="Id" /> is <c>0</c>. For example, an element
+    ///         modelling a locally sourced block in a Block Editor exists only in the context of the content
+    ///         item holding that property. This property gives such an element the identifier of the nearest
+    ///         enclosing content item that does bear an identity, so that its property values can still be
+    ///         attributed to a content item while rendering.
     ///     </para>
     ///     <para>
-    ///         To contextualize the rendering context for such Published Elements, this property carries
-    ///         the identity of the "nearest" identity bearing content (e.g. the Document that holds the
-    ///         Block Editor property).
+    ///         Nearest, not outermost - where identity bearing content is itself nested, the closest
+    ///         enclosing owner wins.
     ///     </para>
     ///     <para>
-    ///         The property value is always `null` for identity bearing content items (for example,, a Document,
-    ///         a Media item, or a reusable Element)
+    ///         The value is <c>null</c> for anything that bears its own identity, such as a Document, a Media
+    ///         item, or a reusable Element, so <c>OwningContentId ?? Id</c> yields the owning identifier for
+    ///         any element.
     ///     </para>
     /// </remarks>
     int? OwningContentId => null;
