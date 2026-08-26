@@ -15,7 +15,6 @@ export class UmbContextBoundary {
 	 * Creates an instance of UmbContextBoundary.
 	 * @param {EventTarget} eventTarget - the host element for this context provider
 	 * @param {string | UmbContextToken} contextIdentifier - a string or token to identify the context
-	 * @param {*} instance - the instance to provide
 	 * @memberof UmbContextBoundary
 	 */
 	constructor(eventTarget: EventTarget, contextIdentifier: string | UmbContextToken<any>) {

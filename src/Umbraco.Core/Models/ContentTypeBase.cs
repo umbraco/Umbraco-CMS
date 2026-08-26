@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Models;
 public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
 {
     // Custom comparer for enumerable
-    private static readonly DelegateEqualityComparer<IEnumerable<ContentTypeSort>> ContentTypeSortComparer =
+    private static readonly DelegateEqualityComparer<IEnumerable<ContentTypeSort>> _contentTypeSortComparer =
         new(
             (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
             sorts => sorts.GetHashCode());
@@ -237,7 +237,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     public IEnumerable<ContentTypeSort>? AllowedContentTypes
     {
         get => _allowedContentTypes;
-        set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, nameof(AllowedContentTypes), ContentTypeSortComparer);
+        set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, nameof(AllowedContentTypes), _contentTypeSortComparer);
     }
 
     /// <summary>
@@ -298,10 +298,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         get => PropertyTypeCollection;
         set
         {
-            if (PropertyTypeCollection != null)
-            {
-                PropertyTypeCollection.ClearCollectionChangedEvents();
-            }
+            PropertyTypeCollection?.ClearCollectionChangedEvents();
 
             PropertyTypeCollection = new PropertyTypeCollection(SupportsPublishing, value);
             PropertyTypeCollection.CollectionChanged += PropertyTypesChanged;
@@ -345,12 +342,14 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     /// </summary>
     /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
     /// <param name="propertyGroupAlias">Alias of the PropertyGroup to move the PropertyType to</param>
-    /// <returns></returns>
+    /// <returns>
+    ///     Returns <c>True</c> if the PropertyType was moved, otherwise <c>False</c>.
+    /// </returns>
     /// <remarks>
     ///     If <paramref name="propertyGroupAlias" /> is null then the property is moved back to
     ///     "generic properties" ie does not have a tab anymore.
     /// </remarks>
-    public bool MovePropertyType(string propertyTypeAlias, string propertyGroupAlias)
+    public bool MovePropertyType(string propertyTypeAlias, string? propertyGroupAlias)
     {
         // get property, ensure it exists
         IPropertyType? propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
@@ -361,7 +360,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
 
         // get new group, if required, and ensure it exists
         PropertyGroup? newPropertyGroup = null;
-        if (propertyGroupAlias != null)
+        if (propertyGroupAlias is not null)
         {
             var index = PropertyGroups.IndexOfKey(propertyGroupAlias);
             if (index == -1)
@@ -379,9 +378,23 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         propertyType.PropertyGroupId =
             newPropertyGroup == null ? null : new Lazy<int>(() => newPropertyGroup.Id, false);
 
-        // remove from old group, if any - add to new group, if any
+        // remove from the old group, if any, and add to the new group - or, when there's no new
+        // group, to the collection of properties that do not belong to a group
         oldPropertyGroup?.PropertyTypes?.RemoveItem(propertyTypeAlias);
-        newPropertyGroup?.PropertyTypes?.Add(propertyType);
+
+        if (newPropertyGroup is not null)
+        {
+            PropertyTypeCollection.RemoveItem(propertyTypeAlias);
+
+            // the group's collection is nullable, and a null-conditional add would silently drop
+            // the property instead of moving it, so ensure the collection exists first
+            newPropertyGroup.PropertyTypes ??= new PropertyTypeCollection(SupportsPublishing);
+            newPropertyGroup.PropertyTypes.Add(propertyType);
+        }
+        else if (PropertyTypeCollection.Contains(propertyTypeAlias) is false)
+        {
+            PropertyTypeCollection.Add(propertyType);
+        }
 
         return true;
     }

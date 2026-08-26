@@ -157,6 +157,8 @@ export default {
 	},
 	media: {
 		clickToUpload: '點選以便上傳',
+		browseFilesAction: '瀏覽檔案',
+		dropFilesOr: '將媒體拖放至此處<br />或',
 		orClickHereToUpload: '或按這裡選擇檔案',
 		maxFileSize: '檔案大小上限為',
 	},
@@ -403,6 +405,8 @@ export default {
 		new: '新的',
 		next: '下一步',
 		no: '否',
+		noResults: '沒有結果',
+		noResultsFor: (query: string) => `找不到 "${query}" 的結果。`,
 		of: '屬於',
 		ok: '確定',
 		open: '打開',
@@ -1056,5 +1060,10 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: '全選',
 		deselectAllLogLevelFilters: '取消全選',
+	},
+	picker: {
+		browseTab: '瀏覽',
+		searchTab: '搜尋',
+		selectedCount: (count: number) => `已選取 ${count} 個項目`,
 	},
 } as UmbLocalizationDictionary;
