@@ -220,8 +220,9 @@ public sealed class UserNotificationsHandler :
                 if (user == null)
                 {
                     _logger.LogWarning(
-                        "Notifications can not be sent, no admin user with id {SuperUserId} could be resolved",
-                        Constants.Security.SuperUserId);
+                        "Notifications can not be sent, no admin user with id {SuperUserId} (key {SuperUserKey}) could be resolved",
+                        Constants.Security.SuperUserId,
+                        Constants.Security.SuperUserKey);
                     return;
                 }
             }
