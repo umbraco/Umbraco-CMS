@@ -13,7 +13,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 // regardless - this layer only decides what the user is offered. Withholding permission instead would strip a
 // default site of every schema affordance the moment the request is slow or fails.
 const UMB_SCHEMA_LOCKDOWN_UNKNOWN_STATE: ServerSchemaLockdownResponseModel = Object.freeze({
-	entityTypes: [],
+	restrictedEntityTypes: [],
 });
 
 export class UmbSchemaLockdownContext extends UmbContextBase {
@@ -44,7 +44,7 @@ export class UmbSchemaLockdownContext extends UmbContextBase {
 		const schemaEntityType = toSchemaEntityType(entityType);
 		if (!schemaEntityType) return true;
 
-		const entry = this.#state.getValue().entityTypes.find((x) => x.entityType.toLowerCase() === schemaEntityType);
+		const entry = this.#state.getValue().restrictedEntityTypes.find((x) => x.entityType === schemaEntityType);
 		if (!entry) return true;
 
 		return entry[operation];

@@ -9,9 +9,10 @@ public class ServerSchemaLockdownResponseModel
     /// Gets or sets the permitted operations per entity type.
     /// </summary>
     /// <remarks>
-    /// Only entity types the rules speak to are listed. Anything absent is permitted every operation.
+    /// Only entity types at least one operation is denied on are listed, and their entity types are lower case.
+    /// Anything absent is permitted every operation.
     /// </remarks>
-    public IEnumerable<ServerSchemaLockdownEntityTypeResponseModel> EntityTypes { get; set; } = [];
+    public IEnumerable<ServerSchemaLockdownEntityTypeResponseModel> RestrictedEntityTypes { get; set; } = [];
 }
 
 /// <summary>

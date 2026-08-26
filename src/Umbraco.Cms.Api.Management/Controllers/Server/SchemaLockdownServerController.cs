@@ -35,10 +35,12 @@ public class SchemaLockdownServerController : ServerControllerBase
     {
         var model = new ServerSchemaLockdownResponseModel
         {
-            EntityTypes = _rules.RestrictedEntityTypes
+            // The rules match entity types case-insensitively and report back whatever casing a configurator wrote.
+            // The backoffice looks its own entity types up against this, so the casing is settled here instead.
+            RestrictedEntityTypes = _rules.RestrictedEntityTypes
                 .Select(entityType => new ServerSchemaLockdownEntityTypeResponseModel
                 {
-                    EntityType = entityType,
+                    EntityType = entityType.ToLowerInvariant(),
                     Create = _rules.IsAllowed(entityType, SchemaOperation.Create),
                     Update = _rules.IsAllowed(entityType, SchemaOperation.Update),
                     Delete = _rules.IsAllowed(entityType, SchemaOperation.Delete),
