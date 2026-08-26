@@ -30,11 +30,7 @@ export class UmbDocumentLinkPickerContext extends UmbPickerContext {
 			providerAlias: UMB_DOCUMENT_SEARCH_PROVIDER_ALIAS,
 		});
 
-		this.observe(
-			this.#variantContext.displayCulture,
-			(culture) => this.#updateSearchCulture(culture ?? null),
-			'umbDocumentLinkPickerSearchCultureObserver',
-		);
+		this.observe(this.#variantContext.displayCulture, (culture) => this.#updateSearchCulture(culture ?? null), null);
 
 		this.#loadLanguages();
 	}
