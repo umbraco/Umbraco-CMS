@@ -554,23 +554,15 @@ Labels are only added, never removed. Claude applies only labels it is confident
 
 ## 9. Code Comment Policy
 
-**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Well-named identifiers and small functions carry the meaning; a comment is a fallback for what the code genuinely cannot say — a non-obvious *why*, a subtle invariant the types don't enforce, or a surprising edge case the code handles deliberately. Add XML doc / JSDoc on public members, but keep it concise.
+**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Identifiers, small functions, and recognized idioms (a guard clause, a null check, an early return) carry their own meaning, even when some other layer has a reason to trigger them redundantly — that reason belongs to that layer, not to a comment here. Write one only for what *this* code genuinely can't say on its own: a non-obvious *why*, an invariant the types don't enforce, or an edge case it deliberately handles. Public members get XML doc / JSDoc, kept concise.
 
-**Write the rule, at the altitude of the code it sits in.** A comment states what must hold going forward, in the vocabulary of the layer it lives in — see §2. Where a comment exists because something once went wrong, the rule is what survives; the incident and the reported scenario belong in the commit message and PR body:
+**When a comment is justified, pitch it at the altitude of the code it sits in** — the vocabulary of the layer it lives in, not the incident that prompted it. §2 shows what that looks like in practice.
 
-```typescript
-// A resolver may emit several groups of inner values.
-// Pair each draft group with its persisted group by the
-// identifier the resolver supplies, not by call order.
-```
-
-**Keep issue references where they stay actionable.** A tracked issue link (`(#21996)`, `https://...`) is welcome wherever it explains a non-obvious *why* — a guard whose reason isn't clear from the code, a workaround for a defect this code cannot fix (so it can be deleted when the fix lands), or a regression test recording why it exists. Elsewhere the comment stands on its own in general terms.
-
-**Let commit messages and PR descriptions carry provenance.** Which task, PR, or issue produced a change (`Fix for X`, `Used by Y`, `Added for the Z flow`, `See PR #1234`) is recorded in git history, where it stays accurate. Source describes the code as it is now.
+**Comments aren't a changelog.** An issue link (`#21996`) earns its place inline only while it's explaining a live *why* — a guard, a workaround, a regression test. It does not belong there as provenance (`// Fix for X`, `// Used by Y`, `// See PR #1234`); which task or PR produced a change lives in the commit message and PR description, where it stays accurate.
 
 ### TODOs
 
-Allowed, and can name the specific issue, implementation, or use case it concerns — the one exception to §2, since the comment is deleted once the TODO is done. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
+The one exception to "default to no comment" — deleted once the TODO is done, so it can't rot. Keep them short and trackable, anchored to an author or a version trigger: `// TODO (V19): remove once obsolete overload is gone`, `// TODO: pagination [NL]`.
 
 ---
 

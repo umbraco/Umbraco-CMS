@@ -167,6 +167,7 @@ export default {
 		isPublished: 'Er publisert',
 		isSensitiveValue: 'Denne verdien er skjult. Kontakt administrator for tilgang.',
 		isSensitiveValue_short: 'Denne verdien er skjult.',
+		isSensitiveValueNotice: 'Kontakt administrator for tilgang til de skjulte verdiene.',
 		itemChanged: 'Denne noden er endret siden siste publisering',
 		itemNotPublished: 'Denne noden er enda ikke publisert',
 		languagesToPublish: 'Hvilke språk vil du publisere?',

@@ -149,7 +149,7 @@ internal abstract class ContentSearchServiceBase<TContent> : IndexedSearchServic
             Attempt<int> keyToId = _idKeyMap.GetIdForKey(parentId.Value, ObjectType);
             if (keyToId.Success is false)
             {
-                _logger.LogWarning("Could not obtain an ID for parent key: {parentId} (object type: {contentType}", parentId, typeof(TContent).FullName);
+                _logger.LogWarning("Could not obtain an ID for parent key: {parentKey} (object type: {contentType})", parentId, typeof(TContent).FullName);
                 return new PagedModel<TContent>(0, []);
             }
 
