@@ -18,7 +18,7 @@ public class DeletingADataTypeIsForbiddenTests : ManagementApiTest<DeleteDataTyp
         = x => x.Delete(CancellationToken.None, Guid.Empty);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.SchemaLockdownConfigurators().Append<LockDataTypesConfigurator>();
+        => builder.SchemaLockdownConfigurators().Add<LockDataTypesConfigurator>();
 
     [SetUp]
     public override void Setup()

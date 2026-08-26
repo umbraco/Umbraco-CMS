@@ -20,7 +20,7 @@ public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : ManagementApiTe
         = x => x.Create(CancellationToken.None, null);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.SchemaLockdownConfigurators().Append<LockOtherSchemaTypesConfigurator>();
+        => builder.SchemaLockdownConfigurators().Add<LockOtherSchemaTypesConfigurator>();
 
     [SetUp]
     public override void Setup()

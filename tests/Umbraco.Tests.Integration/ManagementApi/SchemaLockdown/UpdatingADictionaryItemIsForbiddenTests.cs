@@ -25,7 +25,7 @@ public class UpdatingADictionaryItemIsForbiddenTests : ManagementApiTest<UpdateD
     protected override Expression<Func<UpdateDictionaryController, object>> MethodSelector { get; set; }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.SchemaLockdownConfigurators().Append<LockDictionaryItemsConfigurator>();
+        => builder.SchemaLockdownConfigurators().Add<LockDictionaryItemsConfigurator>();
 
     [SetUp]
     public override void Setup()

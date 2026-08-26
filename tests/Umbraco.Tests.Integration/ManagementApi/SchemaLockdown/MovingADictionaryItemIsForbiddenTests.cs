@@ -26,7 +26,7 @@ public class MovingADictionaryItemIsForbiddenTests : ManagementApiTest<MoveDicti
     protected override Expression<Func<MoveDictionaryController, object>> MethodSelector { get; set; }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.SchemaLockdownConfigurators().Append<LockDictionaryItemsConfigurator>();
+        => builder.SchemaLockdownConfigurators().Add<LockDictionaryItemsConfigurator>();
 
     [SetUp]
     public override void Setup()

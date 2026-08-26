@@ -15,7 +15,7 @@ public class CreatingADocumentTypeIsForbiddenTests : ManagementApiTest<CreateDoc
         = x => x.Create(CancellationToken.None, null);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.SchemaLockdownConfigurators().Append<LockDocumentTypesConfigurator>();
+        => builder.SchemaLockdownConfigurators().Add<LockDocumentTypesConfigurator>();
 
     [SetUp]
     public override void Setup()

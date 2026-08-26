@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// public class LockContentModellingComposer : IComposer
 /// {
 ///     public void Compose(IUmbracoBuilder builder)
-///         => builder.SchemaLockdownConfigurators().Append<LockContentModellingConfigurator>();
+///         => builder.SchemaLockdownConfigurators().Add<LockContentModellingConfigurator>();
 /// }
 /// ]]>
 /// </code>

@@ -25,7 +25,7 @@ public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTe
     protected override Expression<Func<DeleteDataTypeController, object>> MethodSelector { get; set; }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
-        => builder.SchemaLockdownConfigurators().Append<LockDataTypeCreateAndUpdateConfigurator>();
+        => builder.SchemaLockdownConfigurators().Add<LockDataTypeCreateAndUpdateConfigurator>();
 
     [SetUp]
     public override void Setup()
