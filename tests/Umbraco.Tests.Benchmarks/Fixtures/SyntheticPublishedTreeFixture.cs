@@ -104,6 +104,10 @@ internal sealed class SyntheticPublishedTreeFixture
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
+        publishStatusMock
+            .Setup(x => x.WhereAncestorPathPublished(It.IsAny<IEnumerable<Guid>>(), It.IsAny<string?>()))
+            .Returns((IEnumerable<Guid> keys, string? _) => keys);
+
         // Repository: never called because we pre-seed the cache, but provide a safe stub.
         var repoMock = new Mock<IDatabaseCacheRepository>();
         repoMock.Setup(r => r.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
