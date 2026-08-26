@@ -10,16 +10,21 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 public interface IReadOnlySchemaLockdownRules
 {
     /// <summary>
-    /// Gets the entity types the rules hold a decision for.
+    /// Gets the entity types at least one operation is denied on.
     /// </summary>
     /// <remarks>
     /// Anything absent from this is permitted every operation, so this is the whole of what the rules have to say.
-    /// It is empty until a configurator writes something.
+    /// It is empty until a configurator denies something.
     /// </remarks>
     IReadOnlyCollection<string> GovernedEntityTypes { get; }
 
     /// <summary>
     /// Gets a value indicating whether the supplied operation is permitted on the supplied entity type.
     /// </summary>
+    /// <remarks>
+    /// <see cref="SchemaOperation.Read"/> is always permitted. <see cref="SchemaOperation.Unknown"/> is permitted
+    /// only on an entity type absent from <see cref="GovernedEntityTypes"/>: it may well be one of the operations
+    /// denied there, and there is no way to tell which.
+    /// </remarks>
     bool IsAllowed(string entityType, SchemaOperation operation);
 }

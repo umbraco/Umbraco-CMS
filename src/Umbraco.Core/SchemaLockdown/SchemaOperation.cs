@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 public enum SchemaOperation
 {
     /// <summary>
-    /// The endpoint could not be classified. Treated as a mutation so that it fails closed.
+    /// The endpoint could not be classified. Denied on every entity type the rules speak to, so it fails closed.
     /// </summary>
     Unknown = 0,
 

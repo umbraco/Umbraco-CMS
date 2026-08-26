@@ -1,22 +1,24 @@
 namespace Umbraco.Cms.Core.SchemaLockdown;
 
 /// <summary>
-/// The decision table for schema lockdown, mapping each entity type and operation to whether it is permitted.
+/// The decision table for schema lockdown, holding which operations are denied on which entity types.
 /// </summary>
 /// <remarks>
 /// Every registered <see cref="ISchemaLockdownConfigurator"/> writes to it while it is being constructed, after which
 /// it is frozen. Freezing is what allows the same instance to be both consulted by the authorization handler and
-/// served to the backoffice without the two being able to disagree.
+/// served to the backoffice without the two being able to disagree. Denials only ever accumulate, so the order the
+/// configurators run in does not affect the result.
 /// </remarks>
 public sealed class SchemaLockdownRules : ISchemaLockdownRules
 {
-    private static readonly DelegateEqualityComparer<(string EntityType, SchemaOperation Operation)> CellKeyComparer =
+    private static readonly DelegateEqualityComparer<(string EntityType, SchemaOperation Operation)> BlockedKeyComparer =
         new(
             (x, y) => x.Operation == y.Operation
                 && string.Equals(x.EntityType, y.EntityType, StringComparison.OrdinalIgnoreCase),
             x => HashCode.Combine(StringComparer.OrdinalIgnoreCase.GetHashCode(x.EntityType), x.Operation));
 
-    private readonly Dictionary<(string EntityType, SchemaOperation Operation), bool> _cells = new(CellKeyComparer);
+    private readonly HashSet<(string EntityType, SchemaOperation Operation)> _blocked = new(BlockedKeyComparer);
+    private readonly HashSet<string> _governed = new(StringComparer.OrdinalIgnoreCase);
     private readonly bool _frozen;
 
     /// <summary>
@@ -34,41 +36,16 @@ public sealed class SchemaLockdownRules : ISchemaLockdownRules
     }
 
     /// <inheritdoc />
-    public IReadOnlyCollection<string> GovernedEntityTypes => _cells.Keys
-        .Select(cell => cell.EntityType)
-        .Distinct(StringComparer.OrdinalIgnoreCase)
-        .ToArray();
+    public IReadOnlyCollection<string> GovernedEntityTypes => _governed.ToArray();
 
     /// <inheritdoc />
-    public void Allow(string entityType, SchemaOperation operation) => Set(entityType, operation, true);
-
-    /// <inheritdoc />
-    public void Block(string entityType, SchemaOperation operation) => Set(entityType, operation, false);
-
-    /// <inheritdoc />
-    public void BlockMutations(string entityType)
-    {
-        foreach (SchemaOperation operation in Enum.GetValues<SchemaOperation>())
-        {
-            if (operation != SchemaOperation.Read)
-            {
-                Block(entityType, operation);
-            }
-        }
-    }
-
-    /// <inheritdoc />
-    public bool IsAllowed(string entityType, SchemaOperation operation)
-        => _cells.TryGetValue((entityType, operation), out var allowed) is false || allowed;
-
-    // Reads are never governed, so a read cell would never be consulted. Refusing to record one - ahead of the frozen
-    // check, so that it holds whenever the write is attempted - keeps that a structural guarantee rather than leaving
-    // behind a cell that looks meaningful and is not.
-    private void Set(string entityType, SchemaOperation operation, bool allowed)
+    public void Block(string entityType, SchemaOperation operation)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(entityType);
 
-        if (operation == SchemaOperation.Read)
+        // Refusing the write ahead of the frozen check keeps the rule holding whenever the write is attempted,
+        // rather than leaving behind a decision that looks meaningful and is not.
+        if (IsBlockable(operation) is false)
         {
             return;
         }
@@ -78,6 +55,33 @@ public sealed class SchemaLockdownRules : ISchemaLockdownRules
             throw new InvalidOperationException("The schema lockdown rules cannot be modified after they have been built.");
         }
 
-        _cells[(entityType, operation)] = allowed;
+        _blocked.Add((entityType, operation));
+        _governed.Add(entityType);
     }
+
+    /// <inheritdoc />
+    public void BlockMutations(string entityType)
+    {
+        Block(entityType, SchemaOperation.Create);
+        Block(entityType, SchemaOperation.Update);
+        Block(entityType, SchemaOperation.Delete);
+    }
+
+    /// <inheritdoc />
+    public bool IsAllowed(string entityType, SchemaOperation operation)
+    {
+        // An operation that could not be classified is denied wherever anything is denied: it may well be one of
+        // those, and there is no way to tell which.
+        if (operation == SchemaOperation.Unknown)
+        {
+            return _governed.Contains(entityType) is false;
+        }
+
+        return _blocked.Contains((entityType, operation)) is false;
+    }
+
+    // Reads are never governed, and an unclassified operation is answered by whether the entity type is blocked at
+    // all. Both are decided by rule, so neither can be recorded as a decision of its own.
+    private static bool IsBlockable(SchemaOperation operation)
+        => operation is SchemaOperation.Create or SchemaOperation.Update or SchemaOperation.Delete;
 }

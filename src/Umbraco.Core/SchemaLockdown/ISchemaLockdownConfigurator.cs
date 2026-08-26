@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// </summary>
 /// <remarks>
 /// Registering a configurator is the only way an entity type comes under lockdown: nothing is locked until one
-/// says so. Every registered configurator runs, in collection order, against the same rules. Later writes to a
-/// cell win, so registering last is how a rule is made authoritative.
+/// says so. Every registered configurator runs against the same rules, and because a denial cannot be lifted once
+/// made, the order they run in does not affect the result.
 /// </remarks>
 /// <example>
 /// Locking content type and data type schema:

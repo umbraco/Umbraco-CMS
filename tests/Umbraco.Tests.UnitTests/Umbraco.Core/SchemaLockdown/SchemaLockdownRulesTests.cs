@@ -56,26 +56,32 @@ public class SchemaLockdownRulesTests
         });
     }
 
+    // Denials only accumulate, so every configurator's decisions survive whichever order they run in.
     [Test]
-    public void Configurators_Run_In_Order_And_Later_Writes_Win()
+    public void Every_Configurators_Denials_Are_Kept_Whatever_The_Order()
     {
         SchemaLockdownRules rules = CreateRules(
-            x => x.Allow(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete),
-            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete));
+            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete),
+            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Create),
+            x => x.Block(Constants.UdiEntityType.DataType, SchemaOperation.Update));
 
-        Assert.That(rules.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(rules.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.False);
+            Assert.That(rules.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.False);
+            Assert.That(rules.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Update), Is.True);
+            Assert.That(rules.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Update), Is.False);
+        });
     }
 
     [Test]
-    public void Block_Then_Allow_Leaves_Cell_Allowed()
+    public void Blocking_The_Same_Operation_Twice_Is_Harmless()
     {
-        SchemaLockdownRules rules = CreateRules(x =>
-        {
-            x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete);
-            x.Allow(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete);
-        });
+        SchemaLockdownRules rules = CreateRules(
+            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete),
+            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete));
 
-        Assert.That(rules.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.True);
+        Assert.That(rules.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.False);
     }
 
     [Test]
@@ -109,21 +115,41 @@ public class SchemaLockdownRulesTests
     [Test]
     public void Cell_Lookup_Is_Case_Insensitive_On_Entity_Type()
     {
-        SchemaLockdownRules blocked = CreateRules(x => x.Block("Dictionary-Item", SchemaOperation.Update));
+        SchemaLockdownRules rules = CreateRules(x => x.Block("Dictionary-Item", SchemaOperation.Update));
 
         Assert.Multiple(() =>
         {
-            Assert.That(blocked.IsAllowed("dictionary-item", SchemaOperation.Update), Is.False);
-            Assert.That(blocked.IsAllowed("Dictionary-Item", SchemaOperation.Update), Is.False);
+            Assert.That(rules.IsAllowed("dictionary-item", SchemaOperation.Update), Is.False);
+            Assert.That(rules.IsAllowed("Dictionary-Item", SchemaOperation.Update), Is.False);
+            Assert.That(rules.IsAllowed("DICTIONARY-ITEM", SchemaOperation.Unknown), Is.False);
+            Assert.That(rules.GovernedEntityTypes, Is.EquivalentTo(new[] { "Dictionary-Item" }));
         });
+    }
 
-        SchemaLockdownRules allowed = CreateRules(x =>
+    // A single denial is enough: the unclassified operation could be the one that was denied.
+    [Test]
+    public void Unknown_Is_Blocked_Wherever_Any_Operation_Is_Blocked()
+    {
+        SchemaLockdownRules single = CreateRules(x => x.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create));
+        SchemaLockdownRules all = CreateRules(x => x.BlockMutations(Constants.UdiEntityType.DataType));
+
+        Assert.Multiple(() =>
         {
-            x.Block("Dictionary-Item", SchemaOperation.Update);
-            x.Allow("dictionary-item", SchemaOperation.Update);
+            Assert.That(single.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Unknown), Is.False);
+            Assert.That(all.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Unknown), Is.False);
         });
+    }
 
-        Assert.That(allowed.IsAllowed("DICTIONARY-ITEM", SchemaOperation.Update), Is.True);
+    [Test]
+    public void Unknown_Stays_Permitted_On_An_Entity_Type_Nothing_Is_Blocked_On()
+    {
+        SchemaLockdownRules rules = CreateRules(x => x.BlockMutations(Constants.UdiEntityType.DocumentType));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(rules.IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Unknown), Is.True);
+            Assert.That(CreateRules().IsAllowed(Constants.UdiEntityType.DataType, SchemaOperation.Unknown), Is.True);
+        });
     }
 
     // Nothing consults a read cell, so a configurator writing one would be writing something that cannot take effect.
@@ -150,11 +176,11 @@ public class SchemaLockdownRulesTests
         => Assert.That(CreateRules().GovernedEntityTypes, Is.Empty);
 
     [Test]
-    public void Governed_Entity_Types_Are_Only_Those_A_Configurator_Wrote_A_Cell_For()
+    public void Governed_Entity_Types_Are_Only_Those_A_Configurator_Blocked_Something_On()
     {
         SchemaLockdownRules rules = CreateRules(
             x => x.BlockMutations(Constants.UdiEntityType.DocumentType),
-            x => x.Allow(Constants.UdiEntityType.DataType, SchemaOperation.Delete),
+            x => x.Block(Constants.UdiEntityType.DataType, SchemaOperation.Delete),
             x => x.Block(Constants.UdiEntityType.MediaType, SchemaOperation.Read));
 
         Assert.That(
@@ -180,6 +206,6 @@ public class SchemaLockdownRulesTests
         SchemaLockdownRules rules = CreateRules(x => x.BlockMutations(Constants.UdiEntityType.DocumentType));
 
         Assert.Throws<InvalidOperationException>(
-            () => rules.Allow(Constants.UdiEntityType.DataType, SchemaOperation.Create));
+            () => rules.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create));
     }
 }
