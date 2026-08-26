@@ -101,7 +101,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(propertyType.Variations, content.OwningContentId ?? content.Id, alias, ref culture, ref segment);
 
         if (TryGetValueForDefaultSegment(content, alias, culture, segment, out value))
         {
