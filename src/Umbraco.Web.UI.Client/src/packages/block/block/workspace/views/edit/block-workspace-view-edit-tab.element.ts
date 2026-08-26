@@ -79,7 +79,8 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	#renderRootProperties() {
-		if (!this._hasProperties) return;
+		// Only render the root properties if we have loaded both root properties and groups.
+		if (!this._hasProperties || this._groups === undefined) return;
 		if (this.hideSingleGroup && (!this._groups || this._groups.length === 0)) {
 			return html`<umb-block-workspace-view-edit-properties
 				.managerName=${this.#managerName}
