@@ -1,10 +1,22 @@
 import { UmbTiptapToolbarMenuElement } from '../../../components/toolbar/tiptap-toolbar-menu.element.js';
 import { customElement, html, ifDefined, when } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 
 import './table-insert.element.js';
 
 @customElement('umb-tiptap-table-toolbar-menu')
 export class UmbTiptapTableToolbarMenuElement extends UmbTiptapToolbarMenuElement {
+	protected override updated(changedProperties: PropertyValues) {
+		super.updated(changedProperties);
+
+		if (changedProperties.has('isActive') && !this.isActive) {
+			const popover = this.shadowRoot?.getElementById('popover-menu');
+			if (popover?.matches(':popover-open')) {
+				popover.hidePopover();
+			}
+		}
+	}
+
 	override render() {
 		const label = this.localize.string(this.manifest?.meta.label);
 		return html`
