@@ -54,6 +54,7 @@ tools/docfx/
 # Local config
 .claude/*
 !.claude/skills/
+!.claude/plans/
 !.claude/settings.json
 .env.local
 
