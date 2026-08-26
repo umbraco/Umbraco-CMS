@@ -21,7 +21,7 @@ export class UmbEnableUserServerDataSource implements UmbEnableUserDataSource {
 
 	/**
 	 * Enables the specified user ids
-	 * @param {string[]} userIds
+	 * @param {string[]} userIds - The ids of the users to enable
 	 * @returns {Promise<void>}
 	 * @memberof UmbEnableUserServerDataSource
 	 */

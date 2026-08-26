@@ -302,6 +302,8 @@ export default {
 		isSensitiveValue:
 			'Deze waarde is verborgen. Indien u toegang nodig heeft om deze waarde te bekijken,\n      neem dan contact op met uw websitebeheerder.\n    ',
 		isSensitiveValue_short: 'Deze waarde is verborgen',
+		isSensitiveValueNotice:
+			'Indien u toegang nodig heeft om de verborgen waarden te bekijken, neem dan contact op met uw websitebeheerder.',
 		languagesToPublish: 'Welke talen wil je publiceren?',
 		languagesToSendForApproval: 'Welke talen wil je ter goedkeuring verzenden?',
 		languagesToSchedule: 'Welke talen wil je plannen?',
@@ -335,6 +337,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klik om te uploaden',
+		browseFilesAction: 'Blader door bestanden',
+		dropFilesOr: 'Sleep media hierheen<br />of',
 		orClickHereToUpload: 'Of klik hier om bestanden te kiezen',
 		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype',
 		maxFileSize: 'Maximale bestandsgrootte is',
@@ -743,6 +747,8 @@ export default {
 		new: 'Nieuw',
 		next: 'Volgende',
 		no: 'Nee',
+		noResults: 'Geen resultaten',
+		noResultsFor: (query: string) => `Geen resultaat voor "${query}".`,
 		of: 'of',
 		off: 'Uit',
 		ok: 'OK',
@@ -2208,6 +2214,8 @@ export default {
 			'U kunt Inhoudssjablonen bewerken en verwijderen vanuit de boomstructuur\n      "inhoudssjablonen" in de sectie Instellingen. Vouw het documenttype uit waarop de Inhoudssjabloon is gebaseerd en\n      klik erop om het te bewerken of te verwijderen.\n    ',
 	},
 	picker: {
+		browseTab: 'Bladeren',
+		searchTab: 'Zoeken',
 		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
 	},
 } as UmbLocalizationDictionary;

@@ -1,13 +1,12 @@
 import type { UmbWebhookDetailModel } from '../../../types.js';
+import { UMB_EDIT_WEBHOOK_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
+import './column-layouts/name/webhook-table-name-column-layout.element.js';
+import './column-layouts/content-type/webhook-table-name-column-layout.element.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
-
-import './column-layouts/name/webhook-table-name-column-layout.element.js';
-import './column-layouts/content-type/webhook-table-name-column-layout.element.js';
-import { UMB_EDIT_WEBHOOK_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 
 @customElement('umb-webhook-table-collection-view')
 export class UmbWebhookTableCollectionViewElement extends UmbLitElement {
