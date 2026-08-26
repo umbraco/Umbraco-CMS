@@ -35,8 +35,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	private _containerId?: string | null;
 
 	/**
-	 * If true, the group box will be hidden, if we are to only represents one group.
-	 * This is used by Inline Editing Mode of Block List Editor.
+	 * This is used by Inline Editing Mode of Block Editors, to simplify the visuals when possible.
 	 */
 	@property({ type: Boolean, reflect: false })
 	hideSingleGroup = false;
