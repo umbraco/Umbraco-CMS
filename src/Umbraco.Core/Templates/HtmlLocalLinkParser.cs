@@ -20,7 +20,7 @@ public sealed partial class HtmlLocalLinkParser
     [GeneratedRegex(@"<a\b[^>]*?href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-fA-F0-9-]+)(?:\}|\%7D))[^>]*?>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex GetLocalLinkTagPattern();
 
-    [GeneratedRegex("""type=['"](?<type>(?:media|document))['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
+    [GeneratedRegex("""(?<![\w-])type=['"](?<type>(?:media|document))['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex GetTypePattern();
 
     [GeneratedRegex("""data-culture=['"](?<culture>[a-zA-Z0-9-_]+)['"]""", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-GB")]
@@ -45,7 +45,7 @@ public sealed partial class HtmlLocalLinkParser
     ///     Regex pattern to match the type attribute (media or document) in local link tags.
     /// </summary>
     internal static readonly Regex TypePattern = new(
-        """type=['"](?<type>(?:media|document))['"]""",
+        """(?<![\w-])type=['"](?<type>(?:media|document))['"]""",
         RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
     /// <summary>

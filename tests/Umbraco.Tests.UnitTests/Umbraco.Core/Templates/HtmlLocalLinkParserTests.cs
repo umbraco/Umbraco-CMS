@@ -156,6 +156,14 @@ public class HtmlLocalLinkParserTests
         "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
         "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
 
+    // an attribute whose name merely ends with "type" is not the type attribute
+    [TestCase(
+        "<a data-type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a data-type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a itemtype=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a itemtype=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
     // the type attribute has to belong to the anchor holding the local link, not to a preceding tag
     [TestCase(
         "<a href=\"/other\" type=\"document\">other</a> <a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
