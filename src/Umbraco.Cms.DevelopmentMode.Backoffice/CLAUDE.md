@@ -42,7 +42,6 @@ Umbraco.Cms.DevelopmentMode.Backoffice/
     ├── UmbracoCompilationException.cs     # Custom exception with CompilationFailures
     ├── ModelsBuilderAssemblyAttribute.cs  # Marks InMemory assemblies
     ├── ModelsBuilderBindingErrorHandler.cs # Handles model binding version mismatches
-    ├── InMemoryModelsBuilderModeValidator.cs # Validates runtime mode configuration
     └── ModelsModeConstants.cs             # "InMemoryAuto" constant
 ```
 
@@ -138,7 +137,7 @@ Reports detailed error messages including assembly versions.
 
 ## 4. Security
 
-**Runtime Mode Validation**: `InMemoryModelsBuilderModeValidator.cs` prevents `InMemoryAuto` mode outside `BackofficeDevelopment` runtime mode.
+**Runtime Mode Validation**: lives in `Umbraco.Infrastructure` (`Runtime/RuntimeModeValidators/InMemoryModelsBuilderModeValidator.cs`), which fails the boot when `InMemoryAuto` is in force with no factory able to generate models at runtime. This package removes that validator when it registers such a factory — which it only does in `BackofficeDevelopment` runtime mode — so the component that can satisfy the mode is the one that withdraws the objection.
 
 **Temp File Location**: Models compiled to `~/umbraco/Data/TEMP/InMemoryAuto/` - ensure this directory isn't web-accessible.
 

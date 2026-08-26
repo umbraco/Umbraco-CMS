@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -112,8 +113,15 @@ public static class UmbracoBuilderExtensions
                 // Generating models at runtime is only possible because this package supplies the factory for it,
                 // so this package owns the mode when the site has expressed no preference. Core cannot default to
                 // a mode it has no way to satisfy on its own.
-                builder.Services.PostConfigure<ModelsBuilderSettings>(
-                    settings => settings.ModelsMode = ModelsModeConstants.InMemoryAuto);
+                builder.Services.PostConfigure<ModelsBuilderSettings>(settings =>
+                {
+                    // A mode set in code is not visible in configuration, but has been applied by the time this
+                    // runs, so raise only a mode still left at its default rather than overriding that choice.
+                    if (settings.ModelsMode == Constants.ModelsBuilder.ModelsModes.Nothing)
+                    {
+                        settings.ModelsMode = ModelsModeConstants.InMemoryAuto;
+                    }
+                });
             }
 
             // Nothing else needs to object to the mode now that it can be satisfied.

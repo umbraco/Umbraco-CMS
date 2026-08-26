@@ -1,7 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -17,7 +18,7 @@ public class InMemoryModelsBuilderModeValidatorTests
     [TestCase(RuntimeMode.BackofficeDevelopment)]
     [TestCase(RuntimeMode.Development)]
     [TestCase(RuntimeMode.Production)]
-    public void Cannot_Validate_An_Explicitly_Configured_Runtime_Generated_Mode(RuntimeMode runtimeMode)
+    public void Validate_WhenRuntimeGeneratedModeIsInForce_Fails(RuntimeMode runtimeMode)
     {
         var sut = CreateSut(InMemoryAuto);
 
@@ -31,11 +32,11 @@ public class InMemoryModelsBuilderModeValidatorTests
     }
 
     [Test]
-    public void Can_Validate_When_No_Mode_Has_Been_Configured()
+    public void Validate_WhenModeIsLeftAtItsDefault_Succeeds()
     {
         // The default is a mode that needs no runtime generation, and the package that can generate at runtime
-        // removes this validator, so an unconfigured site must never fail here.
-        var sut = CreateSut(configuredModelsMode: null);
+        // removes this validator, so a site that configured nothing must never fail here.
+        var sut = CreateSut(new ModelsBuilderSettings().ModelsMode);
 
         var result = sut.Validate(RuntimeMode.BackofficeDevelopment, out var validationErrorMessage);
 
@@ -49,9 +50,9 @@ public class InMemoryModelsBuilderModeValidatorTests
     [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing)]
     [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)]
     [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual)]
-    public void Can_Validate_A_Mode_That_Does_Not_Generate_At_Runtime(string configuredModelsMode)
+    public void Validate_WhenModeDoesNotGenerateAtRuntime_Succeeds(string modelsMode)
     {
-        var sut = CreateSut(configuredModelsMode);
+        var sut = CreateSut(modelsMode);
 
         var result = sut.Validate(RuntimeMode.BackofficeDevelopment, out var validationErrorMessage);
 
@@ -62,18 +63,13 @@ public class InMemoryModelsBuilderModeValidatorTests
         });
     }
 
-    private static InMemoryModelsBuilderModeValidator CreateSut(string? configuredModelsMode)
+    private static InMemoryModelsBuilderModeValidator CreateSut(string modelsMode)
     {
-        var configurationValues = new Dictionary<string, string?>();
-        if (configuredModelsMode is not null)
-        {
-            configurationValues[Constants.Configuration.ConfigModelsMode] = configuredModelsMode;
-        }
+        // Reading the mode in force, rather than the configured one, is what lets a mode set in code be
+        // validated the same as one set in configuration.
+        var settings = new ModelsBuilderSettings { ModelsMode = modelsMode };
 
-        IConfiguration configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(configurationValues)
-            .Build();
-
-        return new InMemoryModelsBuilderModeValidator(configuration);
+        return new InMemoryModelsBuilderModeValidator(
+            Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(m => m.CurrentValue == settings));
     }
 }
