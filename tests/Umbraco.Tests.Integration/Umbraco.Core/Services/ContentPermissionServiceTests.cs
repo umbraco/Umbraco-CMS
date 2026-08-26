@@ -47,8 +47,8 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         var child = ContentBuilder.CreateSimpleContent(contentType, "child", parent.Id);
         ContentService.Save(child);
 
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act - call both services
         NodePermissions[] viaPermissionService = (await ContentPermissionService.GetPermissionsAsync(user, [child.Key])).ToArray();
@@ -83,8 +83,8 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         var grandchild = ContentBuilder.CreateSimpleContent(contentType, "grandchild", child.Id);
         ContentService.Save(grandchild);
 
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         NodePermissions[] viaPermissionService = (await ContentPermissionService.GetPermissionsAsync(user, [grandchild.Key])).ToArray();
@@ -115,10 +115,10 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         ContentService.Save(child);
 
         // Different permissions on parent and child
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         NodePermissions[] viaPermissionService = (await ContentPermissionService.GetPermissionsAsync(user, [child.Key])).ToArray();
@@ -151,10 +151,10 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         var grandchild = ContentBuilder.CreateSimpleContent(contentType, "grandchild", child.Id);
         ContentService.Save(grandchild);
 
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         NodePermissions[] viaPermissionService = (await ContentPermissionService.GetPermissionsAsync(user, [grandchild.Key])).ToArray();

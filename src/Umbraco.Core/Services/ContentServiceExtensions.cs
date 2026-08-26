@@ -69,8 +69,9 @@ public static class ContentServiceExtensions
     /// </summary>
     /// <param name="contentService"></param>
     /// <param name="contentId"></param>
-    public static void RemoveContentPermissions(this IContentService contentService, int contentId) =>
-        contentService.SetPermissions(new EntityPermissionSet(contentId, new EntityPermissionCollection()));
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public static Task RemoveContentPermissionsAsync(this IContentService contentService, int contentId, CancellationToken cancellationToken) =>
+        contentService.SetPermissionsAsync(new EntityPermissionSet(contentId, new EntityPermissionCollection()), cancellationToken);
 
     /// <summary>
     /// Gets all anchor values from Rich Text Editor properties of a content item.

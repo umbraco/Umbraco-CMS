@@ -30,8 +30,8 @@ internal sealed partial class UserServiceTests
         ContentService.Save(child);
 
         // Set explicit permissions on the parent only
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -69,8 +69,8 @@ internal sealed partial class UserServiceTests
         ContentService.Save(grandchild);
 
         // Set explicit permissions on the parent only
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -106,10 +106,10 @@ internal sealed partial class UserServiceTests
         ContentService.Save(child);
 
         // Set different explicit permissions on parent and child
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -147,10 +147,10 @@ internal sealed partial class UserServiceTests
         ContentService.Save(grandchild);
 
         // Set different explicit permissions on parent and child
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionBrowse.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionBrowse.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act
         var result = await UserService
@@ -226,8 +226,8 @@ internal sealed partial class UserServiceTests
         ContentService.Save(child);
 
         // Set explicit permissions on the child only
-        ContentService.SetPermission(child, ActionDelete.ActionLetter, [userGroup.Id]);
-        ContentService.SetPermission(child, ActionMove.ActionLetter, [userGroup.Id]);
+        await ContentService.SetPermissionAsync(child, ActionDelete.ActionLetter, [userGroup.Key], CancellationToken.None);
+        await ContentService.SetPermissionAsync(child, ActionMove.ActionLetter, [userGroup.Key], CancellationToken.None);
 
         // Act - query permissions for both parent and child
         var result = await UserService

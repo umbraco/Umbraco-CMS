@@ -2683,7 +2683,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.Save(childPage);
 
         // assign explicit permissions to the child
-        ContentService.SetPermission(childPage, "A", new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(childPage, "A", new[] { userGroup.Key }, CancellationToken.None);
 
         // Ok, now copy, what should happen is the childPage will retain it's own permissions
         var parentPage2 = ContentBuilder.CreateSimpleContent(contentType);
@@ -2719,7 +2719,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var parentPage = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage);
-        ContentService.SetPermission(parentPage, "A", new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(parentPage, "A", new[] { userGroup.Key }, CancellationToken.None);
 
         var childPage1 = ContentBuilder.CreateSimpleContent(contentType, "child1", parentPage);
         ContentService.Save(childPage1);
@@ -2753,7 +2753,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // create a new parent with a new permission structure
         var parentPage2 = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage2);
-        ContentService.SetPermission(parentPage2, "B", new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(parentPage2, "B", new[] { userGroup.Key }, CancellationToken.None);
 
         // Now copy, what should happen is the child pages will now have permissions inherited from the new parent
         var copy = ContentService.Copy(childPage1, parentPage2.Id, false, true);
@@ -2843,7 +2843,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         NotificationService.TryCreateNotification(user, content1, "X", out Notification? notification);
         Assert.IsNotNull(notification);
 
-        ContentService.SetPermission(content1, "A", new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(content1, "A", new[] { userGroup.Key }, CancellationToken.None);
         var updateDomainResult = await DomainService.UpdateDomainsAsync(
             content1.Key,
             new DomainsUpdateModel

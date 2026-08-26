@@ -559,25 +559,28 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Gets permissions assigned to a document.
     /// </summary>
-    /// <param name="content">The document.</param>
+    /// <param name="contentKey">The Guid key of the document.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The permissions assigned to the document.</returns>
-    EntityPermissionCollection GetPermissions(IContent content);
+    Task<EntityPermissionCollection> GetPermissionsAsync(Guid contentKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Sets the permission of a document.
     /// </summary>
     /// <param name="permissionSet">The permission set to apply.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <remarks>Replaces all permissions with the new set of permissions.</remarks>
-    void SetPermissions(EntityPermissionSet permissionSet);
+    Task SetPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Assigns a permission to a document.
     /// </summary>
     /// <param name="entity">The document entity.</param>
     /// <param name="permission">The permission to assign.</param>
-    /// <param name="groupIds">The group identifiers to assign the permission to.</param>
+    /// <param name="groupKeys">The Guid keys of the groups to assign the permission to.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <remarks>Adds the permission to existing permissions.</remarks>
-    void SetPermission(IContent entity, string permission, IEnumerable<int> groupIds);
+    Task SetPermissionAsync(IContent entity, string permission, IEnumerable<Guid> groupKeys, CancellationToken cancellationToken);
 
     #endregion
 

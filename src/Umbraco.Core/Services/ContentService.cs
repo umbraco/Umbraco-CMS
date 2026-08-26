@@ -127,49 +127,32 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     #region Permissions
 
-    /// <summary>
-    ///     Used to bulk update the permissions set for a content item. This will replace all permissions
-    ///     assigned to an entity with a list of user id &amp; permission pairs.
-    /// </summary>
-    /// <param name="permissionSet"></param>
-    public void SetPermissions(EntityPermissionSet permissionSet)
+    /// <inheritdoc />
+    public async Task SetPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentRepository.ReplaceContentPermissions(permissionSet);
-            scope.Complete();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+        await _asyncDocumentRepository.ReplaceContentPermissionsAsync(permissionSet, cancellationToken);
+        scope.Complete();
     }
 
-    /// <summary>
-    ///     Assigns a single permission to the current content item for the specified group ids
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="permission"></param>
-    /// <param name="groupIds"></param>
-    public void SetPermission(IContent entity, string permission, IEnumerable<int> groupIds)
+    /// <inheritdoc />
+    public async Task SetPermissionAsync(IContent entity, string permission, IEnumerable<Guid> groupKeys, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentRepository.AssignEntityPermission(entity, permission, groupIds);
-            scope.Complete();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+        await _asyncDocumentRepository.AssignEntityPermissionAsync(entity, permission, groupKeys, cancellationToken);
+        scope.Complete();
     }
 
-    /// <summary>
-    ///     Returns implicit/inherited permissions assigned to the content item for all user groups
-    /// </summary>
-    /// <param name="content"></param>
-    /// <returns></returns>
-    public EntityPermissionCollection GetPermissions(IContent content)
+    /// <inheritdoc />
+    public async Task<EntityPermissionCollection> GetPermissionsAsync(Guid contentKey, CancellationToken cancellationToken)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetPermissionsForEntity(content.Id);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        EntityPermissionCollection result = await _asyncDocumentRepository.GetPermissionsForEntityAsync(contentKey, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     #endregion
@@ -1393,7 +1376,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             copy.WriterId = userId;
 
             // get the current permissions, if there are any explicit ones they need to be copied
-            EntityPermissionCollection currentPermissions = GetPermissions(content);
+            EntityPermissionCollection currentPermissions = GetPermissionsAsync(content.Key, CancellationToken.None).GetAwaiter().GetResult();
             currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
 
             // save and flush because we need the ID for the recursive Copying events

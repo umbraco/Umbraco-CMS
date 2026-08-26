@@ -80,12 +80,12 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType)
         };
         ContentService.Save(content);
-        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[2], ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[0], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[0], ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[1], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[1], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[2], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
 
         // Act
         var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).OrderBy(x=>x.EntityId).ToArray();
@@ -114,12 +114,12 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType)
         };
         ContentService.Save(content);
-        ContentService.SetPermission(content.ElementAt(0), ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content.ElementAt(0), ActionDelete.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content.ElementAt(0), ActionMove.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content.ElementAt(1), ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content.ElementAt(1), ActionDelete.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content.ElementAt(2), ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(content.ElementAt(0), ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content.ElementAt(0), ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content.ElementAt(0), ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content.ElementAt(1), ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content.ElementAt(1), ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content.ElementAt(2), ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
 
         // Act
         var permissions = UserService.GetPermissions(userGroup, false, content[0].Id, content[1].Id, content[2].Id)
@@ -149,11 +149,11 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType)
         };
         ContentService.Save(content);
-        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[0], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[0], ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[1], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[1], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
 
         // Act
         var permissions = UserService.GetPermissions(userGroup, true, content[0].Id, content[1].Id, content[2].Id)
@@ -195,12 +195,12 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         ContentService.Save(content);
 
         // assign permissions - we aren't assigning anything explicit for group3 and nothing explicit for content[2] /w group2
-        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] { userGroup1.Id });
-        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] { userGroup1.Id });
-        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] { userGroup2.Id });
-        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] { userGroup1.Id });
-        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] { userGroup2.Id });
-        ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new[] { userGroup1.Id });
+        await ContentService.SetPermissionAsync(content[0], ActionBrowse.ActionLetter, new[] { userGroup1.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[0], ActionDelete.ActionLetter, new[] { userGroup1.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[0], ActionMove.ActionLetter, new[] { userGroup2.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[1], ActionBrowse.ActionLetter, new[] { userGroup1.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[1], ActionDelete.ActionLetter, new[] { userGroup2.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[2], ActionDelete.ActionLetter, new[] { userGroup1.Key }, CancellationToken.None);
 
         // Act
         // we don't pass in any nodes so it will return all of them
@@ -279,12 +279,12 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType)
         };
         ContentService.Save(content);
-        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[0], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[0], ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[1], ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[1], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(content[2], ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
 
         // Act
         // we don't pass in any nodes so it will return all of them
@@ -478,11 +478,11 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var child2 = ContentBuilder.CreateSimpleContent(contentType, "child2", child1.Id);
         ContentService.Save(child2);
 
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(parent, ActionMove.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new[] { userGroup.Id });
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, new[] { userGroup.Id });
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionMove.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionBrowse.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(parent, ActionDelete.ActionLetter, new[] { userGroup.Key }, CancellationToken.None);
 
         // Act
         var permissions = UserService.GetPermissionsForPath(userGroup, child2.Path);

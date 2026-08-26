@@ -975,8 +975,8 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         // Set explicit permissions on 2 children that do NOT include Browse.
         // When explicit permissions exist for a group+node, they replace the group's defaults,
         // so these children will only have Delete permission (no Browse).
-        ContentService.SetPermission(children[3], ActionDelete.ActionLetter, new[] { userGroupCreateResult.Result.Id });
-        ContentService.SetPermission(children[4], ActionDelete.ActionLetter, new[] { userGroupCreateResult.Result.Id });
+        await ContentService.SetPermissionAsync(children[3], ActionDelete.ActionLetter, new[] { userGroupCreateResult.Result.Key }, CancellationToken.None);
+        await ContentService.SetPermissionAsync(children[4], ActionDelete.ActionLetter, new[] { userGroupCreateResult.Result.Key }, CancellationToken.None);
 
         // Act
         var result = await ContentListViewService.GetListViewItemsByKeyAsync(
