@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-public class ContextTrackingVariationContextAccessorTests : UmbracoIntegrationTest
+public class VariationContextSegmentAccessorTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
