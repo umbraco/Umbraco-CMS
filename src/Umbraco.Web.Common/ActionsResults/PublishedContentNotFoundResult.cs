@@ -1,6 +1,9 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 
@@ -43,7 +46,10 @@ public class PublishedContentNotFoundResult : IActionResult
             reason = "No template exists to render the document at URL '{0}'.";
         }
 
-        var viewResult = new ViewResult { ViewName = "~/umbraco/UmbracoWebsite/NotFound.cshtml" };
+        GlobalSettings globalSettings = context.HttpContext.RequestServices
+            .GetRequiredService<IOptions<GlobalSettings>>().Value;
+
+        var viewResult = new ViewResult { ViewName = globalSettings.NotFoundViewPath };
         context.HttpContext.Items.Add(
             "reason",
             string.Format(reason, WebUtility.HtmlEncode(_umbracoContext.OriginalRequestUrl.PathAndQuery)));

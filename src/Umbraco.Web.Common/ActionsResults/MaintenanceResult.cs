@@ -21,7 +21,7 @@ public class MaintenanceResult : IActionResult
     /// <summary>
     /// Initializes a new instance of the <see cref="MaintenanceResult"/> class using a custom view path.
     /// </summary>
-    /// <param name="viewName">The view path to render, e.g. <c>~/umbraco/UmbracoWebsite/Upgrading.cshtml</c>.</param>
+    /// <param name="viewName">The view path to render, e.g. <c>~/umbraco/UmbracoWebsite/Maintenance.cshtml</c>.</param>
     public MaintenanceResult(string viewName)
         => _viewName = viewName;
 
