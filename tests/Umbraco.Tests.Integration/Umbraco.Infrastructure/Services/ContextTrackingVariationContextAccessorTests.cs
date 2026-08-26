@@ -45,7 +45,7 @@ public class ContextTrackingVariationContextAccessorTests : UmbracoIntegrationTe
 
     private IElementPublishingService ElementPublishingService => GetRequiredService<IElementPublishingService>();
 
-    private ContextTrackingVariationContextAccessor _contextTrackingVariationContextAccessor = new();
+    private readonly ContextTrackingVariationContextAccessor _contextTrackingVariationContextAccessor = new();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {

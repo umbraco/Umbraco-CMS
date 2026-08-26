@@ -45,8 +45,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         bool preview,
         PropertyData[]? sourceValues,
         IElementsCache elementsElementsCache,
-        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element,
-        int? identityRootId = null)
+        PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
         : base(propertyType, referenceCacheLevel)
     {
         if (sourceValues != null)
@@ -78,7 +77,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         _isPreviewing = preview;
         _isMember = element.ContentType.ItemType == PublishedItemType.Member;
         _elementsCache = elementsElementsCache;
-        _identityRootId = identityRootId;
+        _identityRootId = element.IdentityRootId;
 
         // this variable is used for contextualizing the variation level when calculating property values.
         // it must be set to the union of variance (the combination of content type and property type variance).

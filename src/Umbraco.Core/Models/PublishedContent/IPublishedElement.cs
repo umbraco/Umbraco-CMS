@@ -146,7 +146,7 @@ public interface IPublishedElement
     bool IsPublished(string? culture = null);
 
     /// <summary>
-    ///     Gets the unique identifier of identity bearing root content item.
+    ///     Gets the unique identifier of the nearest identity bearing root content item.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -159,8 +159,8 @@ public interface IPublishedElement
     ///         Block Editor property).
     ///     </para>
     ///     <para>
-    ///         The property value is always `null` for identity bearing content items (Document, Media and
-    ///         reusable Elements)
+    ///         The property value is always `null` for identity bearing content items (for example,, a Document,
+    ///         a Media item, or a reusable Element)
     ///     </para>
     /// </remarks>
     int? IdentityRootId => null;

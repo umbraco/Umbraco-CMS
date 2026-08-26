@@ -128,6 +128,9 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
     /// <inheritdoc/>
     public override PublishedItemType ItemType => ContentNode.ContentType.ItemType;
 
+    /// <inheritdoc/>
+    public int? IdentityRootId => ContentNode.IdentityRootId;
+
     public override IPublishedProperty? GetProperty(string alias)
     {
         var index = ContentNode.ContentType.GetPropertyIndex(alias);
@@ -169,7 +172,7 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
             // add one property per property type - this is required for the indexing to work
             // if ContentData supplies pdatas, use them, else use null
             ContentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? propertyDatas);
-            newProperties[i++] = new PublishedProperty(propertyType, this, VariationContextAccessor, PropertyRenderingContextAccessor, _isPreviewing, propertyDatas, _elementsCache, propertyType.CacheLevel, IdentityRootId);
+            newProperties[i++] = new PublishedProperty(propertyType, this, VariationContextAccessor, PropertyRenderingContextAccessor, _isPreviewing, propertyDatas, _elementsCache, propertyType.CacheLevel);
         }
 
         // Use CompareExchange so concurrent first-access threads agree on a single canonical
@@ -235,7 +238,4 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         // = depends on the culture
         return ContentNode.HasPublishedCulture(culture);
     }
-
-    /// <inheritdoc/>
-    public int? IdentityRootId => ContentNode.IdentityRootId;
 }
