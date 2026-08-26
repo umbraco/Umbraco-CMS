@@ -32,7 +32,9 @@ let indexAlias = '';
 
 test.beforeEach(async ({umbracoApi}) => {
   const indexes = await umbracoApi.searchManagement.getAllIndexes();
-  indexAlias = indexes.items.find((index) => index.indexAlias === 'Umb_Content').indexAlias;
+  const contentIndex = indexes.items.find((index) => index.indexAlias === 'Umb_Content');
+  expect(contentIndex, 'the Umb_Content index must exist').toBeTruthy();
+  indexAlias = contentIndex!.indexAlias;
 });
 
 test.describe('SingleBlock property indexing', () => {
@@ -59,17 +61,25 @@ test.describe('SingleBlock property indexing', () => {
       singleBlockGroupName,
     );
     await umbracoApi.document.publish(documentId);
-    await umbracoApi.page.waitForTimeout(ConstantHelper.wait.medium); // Wait is needed to ensure content is indexed
 
     // Act
     // SingleBlockPropertyValueHandler recursively indexes the block's inner content under the outer block
     // property's own field name (not the inner "textstring" property alias) - a free-text search for the
     // inner value must still find the document via the ad-hoc search box's query endpoint.
-    const searchResult = await umbracoApi.searchManagement.search(indexAlias, singleBlockSearchableValue);
+    // Indexing is asynchronous, so poll the search until the document appears rather than waiting a fixed time.
+    let searchResult;
+    await expect
+      .poll(
+        async () => {
+          searchResult = await umbracoApi.searchManagement.search(indexAlias, singleBlockSearchableValue);
+          return searchResult.documents.some((document: {id: string}) => document.id === documentId);
+        },
+        {timeout: ConstantHelper.timeout.pageLoad},
+      )
+      .toBeTruthy();
 
     // Assert
     expect(searchResult.total).toBeGreaterThan(0);
-    expect(searchResult.documents.some((document: {id: string}) => document.id === documentId)).toBeTruthy();
   });
 });
 
