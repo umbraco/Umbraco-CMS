@@ -540,20 +540,25 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	}
 
 	#renderBody() {
-		return html`${this.#renderToolbar()}
+		return html` ${this.#renderToolbar()}
+			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()}
+
 			<umb-dropzone-media
 				id="dropzone"
 				multiple
 				@change=${this.#onDropzoneChange}
 				.parentUnique=${this._currentMediaEntity.unique}
-				.noAccess=${this._noAccess}></umb-dropzone-media>
-			${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()} `;
+				.noAccess=${this._noAccess}></umb-dropzone-media>`;
+	}
+
+	#renderEmptyState() {
+		return html` <umb-empty-media-state @browse=${() => this._dropzone.browse()}> </umb-empty-media-state> `;
 	}
 
 	#renderSearchResult() {
 		return html`
 			${!this._searchResult.length && !this._searching
-				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
+				? this.#renderEmptyState()
 				: this._currentView === 'table'
 					? this.#renderTable(this._searchResult)
 					: html`<div id="media-grid">
@@ -569,7 +574,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 	#renderCurrentChildren() {
 		return html`
 			${!this._currentChildren.length
-				? html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`
+				? this.#renderEmptyState()
 				: html`${this._currentView === 'table'
 						? this.#renderTable(this._currentChildren)
 						: html`<div id="media-grid">
@@ -622,7 +627,7 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					look="outline"
 					color="default"
 					.disabled=${this._noAccess}></uui-button>
-				<uui-button compact popovertarget="media-picker-view-popover" label="View">
+				<uui-button compact popovertarget="media-picker-view-popover" label=${this.localize.term('general_view')}>
 					<umb-icon name=${this._currentView === 'cards' ? 'icon-grid' : 'icon-table'}></umb-icon>
 				</uui-button>
 				<uui-popover-container id="media-picker-view-popover" placement="bottom-end">
@@ -805,13 +810,16 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				max-width: 100%;
 			}
 
+			umb-empty-media-state {
+				padding: var(--uui-size-layout-1);
+			}
+
 			.not-allowed {
 				cursor: not-allowed;
 				opacity: 0.5;
 			}
 
 			uui-pagination {
-				display: block;
 				margin-top: var(--uui-size-layout-1);
 			}
 

@@ -405,9 +405,10 @@ WHERE nodeId IN (@0)";
         }
 
         _logger.LogDebug(
-            "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
+            "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
             propertyType.Name,
             propertyType.Id,
+            propertyType.Key,
             propertyType.Alias,
             propertyType.PropertyEditorAlias,
             result);
@@ -466,6 +467,7 @@ WHERE nodeId IN (@0)";
                 cultureResult.OrphanedLanguageId,
                 propertyType.Name,
                 propertyType.Id,
+                propertyType.Key,
                 propertyType.Alias);
             updateItem = null;
             return false;
@@ -481,10 +483,11 @@ WHERE nodeId IN (@0)";
         if (TryTransformValue(toEditorValue, property, out var updatedValue) is false)
         {
             _logger.LogDebug(
-                "    - skipping as no processor modified the data for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                "    - skipping as no processor modified the data for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})",
                 propertyDataDto.Id,
                 propertyType.Name,
                 propertyType.Id,
+                propertyType.Key,
                 propertyType.Alias);
             updateItem = null;
             return false;
@@ -545,7 +548,7 @@ WHERE nodeId IN (@0)";
     private void LogFailedConversion(UpdateItem updateItem, string reason)
     {
         const string MessageTemplate =
-            "    - refused to update property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias}) as {reason}. The stored value is left as it was.";
+            "    - refused to update property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias}) as {reason}. The stored value is left as it was.";
 
         if (updateItem.PropertyDataDto.TextValue.IsNullOrWhiteSpace())
         {
@@ -554,6 +557,7 @@ WHERE nodeId IN (@0)";
                 updateItem.PropertyDataDto.Id,
                 updateItem.PropertyType.Name,
                 updateItem.PropertyType.Id,
+                updateItem.PropertyType.Key,
                 updateItem.PropertyType.Alias,
                 reason);
             return;
@@ -564,6 +568,7 @@ WHERE nodeId IN (@0)";
             updateItem.PropertyDataDto.Id,
             updateItem.PropertyType.Name,
             updateItem.PropertyType.Id,
+            updateItem.PropertyType.Key,
             updateItem.PropertyType.Alias,
             reason);
     }

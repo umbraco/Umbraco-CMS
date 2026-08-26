@@ -107,7 +107,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 * Gets the unique identifier of the content type.
 	 * @deprecated Use `getContentTypeUnique` instead.
 	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentWorkspaceContext
+	 * @memberof UmbDocumentBlueprintWorkspaceContext
 	 */
 	getContentTypeId(): string | undefined {
 		return this.getContentTypeUnique();
@@ -116,7 +116,7 @@ export class UmbDocumentBlueprintWorkspaceContext
 	/**
 	 * Gets the unique identifier of the content type.
 	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentWorkspaceContext
+	 * @memberof UmbDocumentBlueprintWorkspaceContext
 	 */
 	getContentTypeUnique(): string | undefined {
 		return this.getData()?.documentType.unique;
@@ -125,6 +125,9 @@ export class UmbDocumentBlueprintWorkspaceContext
 	/**
 	 * Override mandatory validation to filter out variants without a name before validating.
 	 * Blueprints allow partial variant data and users may only provide a name for some cultures.
+	 * @param {ContentModel} saveData - The data to validate.
+	 * @param {Array<UmbVariantId>} variantIds - The variant ids to validate.
+	 * @returns {Promise<void>}
 	 */
 	public override async runMandatoryValidationForSaveData(
 		saveData: ContentModel,
