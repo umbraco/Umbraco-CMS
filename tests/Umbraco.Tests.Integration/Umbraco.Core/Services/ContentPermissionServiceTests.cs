@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+#pragma warning disable CS0618 // Type or member is obsolete
 internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
 {
     private IContentPermissionService ContentPermissionService => GetRequiredService<IContentPermissionService>();
@@ -219,3 +220,4 @@ internal sealed class ContentPermissionServiceTests : UmbracoIntegrationTest
         return (user, userGroup);
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

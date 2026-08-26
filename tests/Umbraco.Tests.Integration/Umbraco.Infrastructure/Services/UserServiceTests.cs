@@ -23,6 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+#pragma warning disable CS0618 // Type or member is obsolete
 internal sealed partial class UserServiceTests : UmbracoIntegrationTest
 {
     private UserService UserService => (UserService)GetRequiredService<IUserService>();
@@ -1214,3 +1215,4 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         return userGroup;
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

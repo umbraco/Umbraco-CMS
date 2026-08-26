@@ -128,7 +128,9 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     #region Permissions
 
     /// <inheritdoc />
+#pragma warning disable CS0618 // Type or member is obsolete
     public async Task SetPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
@@ -137,7 +139,9 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     /// <inheritdoc />
+#pragma warning disable CS0618 // Type or member is obsolete
     public async Task SetPermissionAsync(IContent entity, string permission, IEnumerable<Guid> groupKeys, CancellationToken cancellationToken)
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);

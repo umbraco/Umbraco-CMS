@@ -9,6 +9,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 internal sealed partial class UserServiceTests
 {
     [Test]
@@ -445,3 +446,4 @@ internal sealed partial class UserServiceTests
         Assert.IsTrue(nodePermissions[0].Permissions.Contains(ActionDelete.ActionLetter));
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

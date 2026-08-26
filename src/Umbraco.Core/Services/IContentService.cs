@@ -570,6 +570,7 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="permissionSet">The permission set to apply.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <remarks>Replaces all permissions with the new set of permissions.</remarks>
+    [Obsolete("Use IUserGroup.GranularPermissions (persisted via IUserGroupService) to manage document permissions instead. Scheduled for removal in Umbraco 21.")]
     Task SetPermissionsAsync(EntityPermissionSet permissionSet, CancellationToken cancellationToken);
 
     /// <summary>
@@ -580,6 +581,7 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="groupKeys">The Guid keys of the groups to assign the permission to.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <remarks>Adds the permission to existing permissions.</remarks>
+    [Obsolete("Use IUserGroup.GranularPermissions (persisted via IUserGroupService) to manage document permissions instead. Scheduled for removal in Umbraco 21.")]
     Task SetPermissionAsync(IContent entity, string permission, IEnumerable<Guid> groupKeys, CancellationToken cancellationToken);
 
     #endregion
