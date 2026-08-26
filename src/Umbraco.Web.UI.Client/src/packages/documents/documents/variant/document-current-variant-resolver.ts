@@ -115,8 +115,8 @@ export class UmbDocumentCurrentVariantResolver<
 	}
 
 	#resolve() {
-		if (!this.#variantResolver.getDisplayCulture()) return;
-		if (!this.#variantResolver.getFallbackCulture()) return;
+		if (this.#variantResolver.getDisplayCulture() === undefined) return;
+		if (this.#variantResolver.getFallbackCulture() === undefined) return;
 		if (!this.#hasVariants) return;
 		this.#setName();
 		this.#setFlags();

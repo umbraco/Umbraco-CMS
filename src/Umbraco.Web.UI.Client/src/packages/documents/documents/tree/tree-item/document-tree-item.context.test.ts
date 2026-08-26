@@ -122,9 +122,9 @@ describe('UmbDocumentTreeItemContext', () => {
 
 	describe('collection item in a picker', () => {
 		beforeEach(async () => {
-			// A picker is not a menu, but it does enter opened items — which is what makes entering a collection possible
-			// at all.
-			treeContext.setCanEnterItems(true);
+			// A picker is not a menu, but it does drill into opened items — which is what makes drilling into a collection
+			// possible at all.
+			treeContext.setDrillable(true);
 			context.setTreeItem(createTreeItem(true));
 			await aTimeout(0);
 		});
@@ -154,17 +154,18 @@ describe('UmbDocumentTreeItemContext', () => {
 		});
 	});
 
-	// Opening asks the host to enter the item, so where the host does not, it does nothing. Entering a collection there
-	// would replace the expand caret with an affordance that cannot act, leaving the whole subtree unreachable.
-	describe('collection item in a tree that cannot enter items', () => {
+	// Opening asks the host to drill into the item, so where the host does not, it does nothing. Drilling into a
+	// collection there would replace the expand caret with an affordance that cannot act, leaving the whole subtree
+	// unreachable.
+	describe('collection item in a tree that cannot drill', () => {
 		beforeEach(async () => {
 			context.setTreeItem(createTreeItem(true));
 			await aTimeout(0);
 		});
 
-		it('does not offer to be entered', () => {
-			expect(context.getCanEnterItems()).to.be.false;
-			expect(observeOnce(context.canEnterCollection)).to.be.false;
+		it('does not offer to be drilled into', () => {
+			expect(context.getDrillable()).to.be.false;
+			expect(observeOnce(context.drillableCollection)).to.be.false;
 		});
 
 		it('expands its children on showChildren', () => {
@@ -230,7 +231,7 @@ describe('UmbDocumentTreeItemContext', () => {
 
 		it('expands its children in a picker instead of emitting the open event', async () => {
 			// Declared browsable, so it is the no-access rule being tested and not the absence of a browsing host.
-			treeContext.setCanEnterItems(true);
+			treeContext.setDrillable(true);
 			context.setTreeItem(createTreeItem(true, { noAccess: true }));
 			await aTimeout(0);
 

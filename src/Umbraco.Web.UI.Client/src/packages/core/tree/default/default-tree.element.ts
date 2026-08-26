@@ -121,7 +121,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	 * replaces the affordance that expands with one that cannot act.
 	 */
 	@property({ type: Boolean, attribute: false })
-	canEnterItems?: boolean = false;
+	drillable?: boolean = false;
 
 	@property({ attribute: false })
 	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
@@ -207,8 +207,8 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this._api!.setHideTreeItemActions?.(this.hideTreeItemActions);
 		}
 
-		if (_changedProperties.has('canEnterItems')) {
-			this._api!.setCanEnterItems?.(this.canEnterItems ?? false);
+		if (_changedProperties.has('drillable')) {
+			this._api!.setDrillable?.(this.drillable ?? false);
 		}
 
 		if (_changedProperties.has('isMenu')) {

@@ -55,15 +55,15 @@ export class UmbDefaultTreeContext<
 	#isMenu = new UmbBooleanState(undefined);
 	public readonly isMenu = this.#isMenu.asObservable();
 
-	#canEnterItems = new UmbBooleanState(false);
+	#drillable = new UmbBooleanState(false);
 	/**
 	 * Whether opening an item takes the user into it. A property of the host, so it is the same for every item in the
 	 * tree.
 	 *
 	 * Off unless the host declares otherwise: a tree that can do no more than expand and collapse is the common case,
-	 * and the one where offering to enter an item would strand everything below it.
+	 * and the one where offering to drill into an item would strand everything below it.
 	 */
-	public readonly canEnterItems = this.#canEnterItems.asObservable();
+	public readonly drillable = this.#drillable.asObservable();
 
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
@@ -286,8 +286,8 @@ export class UmbDefaultTreeContext<
 	 * @param {boolean} value - True when the host acts on `UmbTreeItemOpenEvent`.
 	 * @memberof UmbDefaultTreeContext
 	 */
-	setCanEnterItems(value: boolean) {
-		this.#canEnterItems.setValue(value);
+	setDrillable(value: boolean) {
+		this.#drillable.setValue(value);
 	}
 
 	/**
@@ -295,8 +295,8 @@ export class UmbDefaultTreeContext<
 	 * @returns {boolean} True when the host acts on `UmbTreeItemOpenEvent`.
 	 * @memberof UmbDefaultTreeContext
 	 */
-	getCanEnterItems(): boolean {
-		return this.#canEnterItems.getValue();
+	getDrillable(): boolean {
+		return this.#drillable.getValue();
 	}
 
 	/**

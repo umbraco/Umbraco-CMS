@@ -47,13 +47,13 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	/**
 	 * Whether the collection replaces expansion for this item.
 	 *
-	 * Entering a collection needs somewhere to enter it: the menu navigates to the Collection view by path, and a host
-	 * that enters items takes the user into it. A tree with neither can do no more than expand, so it keeps the expand
-	 * caret and its children — the subtree would otherwise be unreachable.
+	 * Drilling into a collection needs somewhere to drill: the menu navigates to the Collection view by path, and a host
+	 * that drills into items takes the user into it. A tree with neither can do no more than expand, so it keeps the
+	 * expand caret and its children — the subtree would otherwise be unreachable.
 	 */
-	public readonly canEnterCollection = mergeObservables(
-		[this.#collapsibleCollection, this.isMenu, this.canEnterItems],
-		([collapsibleCollection, isMenu, canEnterItems]) => collapsibleCollection && (isMenu || canEnterItems),
+	public readonly drillableCollection = mergeObservables(
+		[this.#collapsibleCollection, this.isMenu, this.drillable],
+		([collapsibleCollection, isMenu, drillable]) => collapsibleCollection && (isMenu || drillable),
 	);
 
 	override setIsMenu(isMenu: boolean) {
@@ -120,7 +120,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override showChildren() {
-		if (this.#getCanEnterCollection()) {
+		if (this.#getDrillableCollection()) {
 			this.#activateCollection();
 			return;
 		}
@@ -128,7 +128,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override hideChildren() {
-		if (this.#getCanEnterCollection()) {
+		if (this.#getDrillableCollection()) {
 			this.#activateCollection();
 			return;
 		}
@@ -136,7 +136,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	// Collections cannot be expanded/collapsed. In a menu we navigate to the Collection view via the path;
-	// elsewhere we ask the host to enter the item, which only happens where the host declared that it does.
+	// elsewhere we ask the host to drill into the item, which only happens where the host declared that it does.
 	#activateCollection() {
 		if (this.getIsMenu()) {
 			this.#openCollection();
@@ -149,8 +149,8 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		return this.#item.getHasCollection() && this.getTreeItem()?.noAccess !== true;
 	}
 
-	#getCanEnterCollection(): boolean {
-		return this.#getCollapsibleCollection() && (this.getIsMenu() || this.getCanEnterItems());
+	#getDrillableCollection(): boolean {
+		return this.#getCollapsibleCollection() && (this.getIsMenu() || this.getDrillable());
 	}
 
 	#openCollection() {

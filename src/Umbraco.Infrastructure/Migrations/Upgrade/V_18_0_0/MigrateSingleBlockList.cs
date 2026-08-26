@@ -340,9 +340,10 @@ WHERE nodeId IN (@0)";
             }
 
             _logger.LogDebug(
-                "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
+                "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
                 propertyType.Name,
                 propertyType.Id,
+                propertyType.Key,
                 propertyType.Alias,
                 propertyType.PropertyEditorAlias,
                 result);
@@ -367,6 +368,7 @@ WHERE nodeId IN (@0)";
                 cultureResult.OrphanedLanguageId,
                 propertyType.Name,
                 propertyType.Id,
+                propertyType.Key,
                 propertyType.Alias);
             updateItem = null;
             return false;
@@ -382,10 +384,11 @@ WHERE nodeId IN (@0)";
         if (TryTransformValue(toEditorValue, property, out var updatedValue) is false)
         {
             _logger.LogDebug(
-                "    - skipping as no processor modified the data for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                "    - skipping as no processor modified the data for property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})",
                 propertyDataDto.Id,
                 propertyType.Name,
                 propertyType.Id,
+                propertyType.Key,
                 propertyType.Alias);
             updateItem = null;
             return false;
@@ -419,10 +422,11 @@ WHERE nodeId IN (@0)";
         if (dbValue is not string stringValue || stringValue.DetectIsJson() is false)
         {
             _logger.LogWarning(
-                "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                "    - value editor did not yield a valid JSON string as FromEditor value property data with id: {propertyDataId} (property type: {propertyTypeName}, id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias})",
                 updateItem.PropertyDataDto.Id,
                 updateItem.PropertyType.Name,
                 updateItem.PropertyType.Id,
+                updateItem.PropertyType.Key,
                 updateItem.PropertyType.Alias);
             return false;
         }
