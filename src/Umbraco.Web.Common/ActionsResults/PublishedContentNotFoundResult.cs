@@ -47,7 +47,7 @@ public class PublishedContentNotFoundResult : IActionResult
         }
 
         GlobalSettings globalSettings = context.HttpContext.RequestServices
-            .GetRequiredService<IOptions<GlobalSettings>>().Value;
+            .GetRequiredService<IOptionsMonitor<GlobalSettings>>().CurrentValue;
 
         var viewResult = new ViewResult { ViewName = globalSettings.NotFoundViewPath };
         context.HttpContext.Items.Add(

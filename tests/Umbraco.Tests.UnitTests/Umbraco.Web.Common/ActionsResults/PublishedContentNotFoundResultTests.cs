@@ -39,6 +39,9 @@ public class PublishedContentNotFoundResultTests
 
         await ExecuteAsync(new GlobalSettings(), executor);
 
+        // Spelled out rather than read from GlobalSettings.StaticNotFoundViewPath: this pins the default to the
+        // view that actually ships in Umbraco.Cms.StaticAssets. Asserting against the constant would make the
+        // test follow a change to it, and a default pointing at a non-existent view would still pass.
         Assert.That(executor.CapturedViewName, Is.EqualTo("~/umbraco/UmbracoWebsite/NotFound.cshtml"));
     }
 
@@ -55,7 +58,7 @@ public class PublishedContentNotFoundResultTests
     private static async Task<ActionContext> ExecuteAsync(GlobalSettings settings, IActionResultExecutor<ViewResult> executor)
     {
         IServiceProvider services = new ServiceCollection()
-            .AddSingleton<IOptions<GlobalSettings>>(Options.Create(settings))
+            .AddSingleton<IOptionsMonitor<GlobalSettings>>(Mock.Of<IOptionsMonitor<GlobalSettings>>(m => m.CurrentValue == settings))
             .AddSingleton(executor)
             .BuildServiceProvider();
 

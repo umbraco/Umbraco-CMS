@@ -11,6 +11,10 @@ public class MaintenanceResult : IActionResult
     /// <summary>
     /// Initializes a new instance of the <see cref="MaintenanceResult"/> class using the default maintenance view.
     /// </summary>
+    /// <remarks>
+    /// This is the built-in view, not the one configured for the site. To honour the site's configuration, pass
+    /// <c>GlobalSettings.MaintenanceViewPath</c> to the overload taking a view path.
+    /// </remarks>
     public MaintenanceResult()
         : this("~/umbraco/UmbracoWebsite/Maintenance.cshtml")
     {
