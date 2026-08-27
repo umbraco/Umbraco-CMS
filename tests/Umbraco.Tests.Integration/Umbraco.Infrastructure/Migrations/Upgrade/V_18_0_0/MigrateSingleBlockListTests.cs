@@ -295,6 +295,97 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Migrate_Rows_After_A_Whole_Page_In_Which_Nothing_Converted()
+    {
+        _migrationLogger.Clear();
+
+        TestSchema schema = await CreateSchemaAsync();
+
+        // One property data row per content item, so the page boundaries follow creation order.
+        IContentType pageContentType = await CreateContentTypeAsync(
+            "topLevelPage",
+            OuterPropertyAlias,
+            schema.NestedDataType.Id,
+            Constants.PropertyEditors.Aliases.BlockList);
+
+        // Six rows at two per page, with the middle page holding nothing to convert: that page issues no update at
+        // all, so the rows after it are only reached if the paging cursor advances past a page it did not write.
+        var convertibleInnerBlockKeys = new List<Guid>();
+        var pages = new[] { true, true, false, false, true, true };
+        var unconvertibleContent = new List<Content>();
+
+        foreach ((bool convertible, int index) in pages.Select((convertible, index) => (convertible, index)))
+        {
+            if (convertible)
+            {
+                var innerBlockKey = Guid.NewGuid();
+                convertibleInnerBlockKeys.Add(innerBlockKey);
+                SaveContent(pageContentType, $"Top level page {index}", BuildNestedSingleBlockListJson(schema, innerBlockKey));
+                continue;
+            }
+
+            // A single block mode Block List holding no block: fetched, but there is nothing to convert.
+            unconvertibleContent.Add(SaveContent(
+                pageContentType,
+                $"Top level page {index} with nothing to convert",
+                JsonSerializer.Serialize(new BlockListValue())));
+        }
+
+        var storedValuesBeforeMigration = new List<string?>();
+        foreach (Content content in unconvertibleContent)
+        {
+            storedValuesBeforeMigration.Add(await GetStoredValueAsync(content.Id, OuterPropertyAlias));
+        }
+
+        await ExecuteMigrationAsync<PageSizeOfTwoMigrateSingleBlockList>();
+
+        // Every convertible row converted, including the two that sit after the page that converted nothing.
+        var storedValues = new List<string?>();
+        foreach (Content content in ContentService.GetRootContent().Where(x => x.ContentTypeId == pageContentType.Id))
+        {
+            storedValues.Add(await GetStoredValueAsync(content.Id, OuterPropertyAlias));
+        }
+
+        foreach (Guid innerBlockKey in convertibleInnerBlockKeys)
+        {
+            var converted = storedValues
+                .WhereNotNull()
+                .Select(JsonSerializer.Deserialize<SingleBlockValue>)
+                .WhereNotNull()
+                .SingleOrDefault(x => x.GetLayouts()?.Any(layout => layout.ContentKey == innerBlockKey) ?? false);
+
+            Assert.That(
+                converted,
+                Is.Not.Null,
+                $"The block {innerBlockKey} was not converted - a row was skipped along with the page that converted nothing.");
+            AssertIsInnerSingleBlock(schema, converted, innerBlockKey);
+        }
+
+        // The rows with nothing to convert were left exactly as they were.
+        for (var i = 0; i < unconvertibleContent.Count; i++)
+        {
+            Assert.That(
+                await GetStoredValueAsync(unconvertibleContent[i].Id, OuterPropertyAlias),
+                Is.EqualTo(storedValuesBeforeMigration[i]));
+        }
+
+        Assert.Multiple(() =>
+        {
+            // Two pages saved two rows each, and the middle page saved nothing rather than being skipped over.
+            Assert.That(
+                _migrationLogger.MessagesMatching("properties converted, saving"),
+                Is.EqualTo(new[]
+                {
+                    "  - 2 properties converted, saving...",
+                    "  - 2 properties converted, saving...",
+                }));
+
+            // Having nothing to convert is a normal outcome, not a failed conversion.
+            Assert.That(_migrationLogger.MessagesAtLevel(LogLevel.Error), Is.Empty);
+        });
+    }
+
+    [Test]
     public async Task Can_Migrate_Property_Data_Of_Multiple_Property_Types_Whose_Rows_Interleave()
     {
         TestSchema schema = await CreateSchemaAsync();
