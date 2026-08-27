@@ -6,8 +6,9 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     where TContent : class, IPublishableContentBase
 {
     // Deliberately not IContentServiceBase<TContent> - that would bring back GetById(Guid), which has been
-    // retired from the Document surface in favour of the async GetByIdAsync. Save is redeclared directly here
-    // since it's still needed by every implementer (Document, Element).
+    // retired from the Document surface in favour of the async GetByIdAsync. The plural Save is redeclared
+    // directly here since it's still needed by every implementer (Document, Element) and has no async
+    // equivalent yet.
     /// <summary>
     ///     Saves content.
     /// </summary>
@@ -19,14 +20,8 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     // GetByIds(IEnumerable<Guid>) has been retired from this interface in favour of the async
     // GetByIdsAsync (declared on IAsyncPublishableContentService<TContent>).
 
-    /// <summary>
-    ///     Saves content.
-    /// </summary>
-    /// <param name="content">The content to save.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <param name="contentSchedule">The content schedule collection.</param>
-    /// <returns>The operation result.</returns>
-    OperationResult Save(TContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
+    // Save(TContent, ...) has been retired from this interface in favour of the async
+    // SaveAsync (declared on IAsyncPublishableContentService<TContent>).
 
     /// <summary>
     ///     Deletes content.
@@ -95,20 +90,7 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     /// <param name="culturesToPublish">The cultures to publish, or an empty array for invariant content.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns>The result of the publish operation, or a failure result if saving failed.</returns>
-    // TODO (V19): Remove the default implementation when the method is no longer new.
-    PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
-    {
-        OperationResult saveResult = Save(content, userId);
-        if (saveResult.Success)
-        {
-            return Publish(content, culturesToPublish, userId);
-        }
-
-        PublishResultType resultType = saveResult.Result == OperationResultType.FailedCancelledByEvent
-            ? PublishResultType.FailedPublishCancelledByEvent
-            : PublishResultType.FailedPublish;
-        return new PublishResult(resultType, saveResult.EventMessages, content);
-    }
+    PublishResult SaveAndPublish(TContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Unpublishes content.

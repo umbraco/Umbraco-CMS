@@ -257,7 +257,7 @@ public class UmbracoTestDataController : SurfaceController
         parent.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));
         parent.SetValue("desc", company);
         parent.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
-        Services.ContentService.Save(parent);
+        await Services.ContentService.SaveAsync(parent, null, null, CancellationToken.None);
 
         var udis = CreateHierarchy(parent, count, depth, currParent =>
         {
@@ -268,7 +268,9 @@ public class UmbracoTestDataController : SurfaceController
             content.SetValue("desc", string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective())));
             content.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
 
-            Services.ContentService.Save(content);
+            // CreateHierarchy's delegate is sync (it's a yield-return iterator) - bridging here rather
+            // than restructuring it to accept an async delegate for one sample-data call site.
+            Services.ContentService.SaveAsync(content, null, null, CancellationToken.None).GetAwaiter().GetResult();
             return (content, () => content);
         });
 

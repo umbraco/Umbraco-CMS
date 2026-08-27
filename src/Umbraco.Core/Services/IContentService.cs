@@ -315,14 +315,8 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
 
     #region Save, Delete Document
 
-    /// <summary>
-    ///     Saves a document.
-    /// </summary>
-    /// <param name="content">The document to save.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <param name="contentSchedule">The content schedule collection.</param>
-    /// <returns>The operation result.</returns>
-    OperationResult Save(IContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
+    // Save(IContent, ...) has been retired from this interface in favour of the async SaveAsync
+    // (declared on IAsyncPublishableContentService<IContent>).
 
     /// <summary>
     ///     Saves documents.

@@ -245,7 +245,7 @@ public class LoadTestController : Controller
         await _contentTypeService.CreateAsync(containerType, Constants.Security.SuperUserKey);
 
         var content = _contentService.Create("LoadTestContainer", -1, ContainerAlias);
-        _contentService.Save(content);
+        await _contentService.SaveAsync(content, null, null, CancellationToken.None);
         _contentService.Publish(content, content.AvailableCultures.ToArray());
 
         return ContentHtml("Installed.");
@@ -310,7 +310,7 @@ public class LoadTestController : Controller
             var name = Guid.NewGuid().ToString("N").ToUpper() + "-" + (restart ? "R" : "X") + "-" + o;
             var content = _contentService.Create(name, _containerId, ContentAlias);
             content.SetValue("origin", o);
-            _contentService.Save(content);
+            await _contentService.SaveAsync(content, null, null, CancellationToken.None);
             _contentService.Publish(content, content.AvailableCultures.ToArray());
         }
 

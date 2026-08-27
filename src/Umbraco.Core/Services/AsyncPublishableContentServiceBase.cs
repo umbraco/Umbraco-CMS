@@ -578,91 +578,6 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     #region Save, Publish, Unpublish
 
     /// <inheritdoc />
-    public OperationResult Save(TContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null)
-    {
-        PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-        {
-            throw new InvalidOperationException(
-                $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}, use the dedicated SavePublished method.");
-        }
-
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException(
-                $"Content with the name {content.Name} cannot be more than 255 characters in length.");
-        }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(WriteLockIds);
-
-            SavingNotification<TContent> savingNotification = SavingNotification(content, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            userId ??= Constants.Security.SuperUserId;
-
-            if (content.HasIdentity == false)
-            {
-                content.CreatorId = userId.Value;
-            }
-
-            content.WriterId = userId.Value;
-
-            // track the cultures that have changed
-            List<string>? culturesChanging = content.ContentType.VariesByCulture()
-                ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                : null;
-
-            // the saved notification reports the changed cultures for variant content, or the "*" marker for invariant
-            // content - but only when something actually changed. Captured here before saving resets change tracking.
-            IReadOnlyCollection<string>? savedCultures = content.ContentType.VariesByCulture()
-                ? culturesChanging
-                : content.IsDirty() ? ["*"] : [];
-
-            // TODO: Currently there's no way to change track which variant properties have changed, we only have change
-            // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
-            // in this particular case, determining which cultures have changed works with the above with names since it will
-            // have always changed if it's been saved in the back office but that's not really fail safe.
-            _contentRepository.Save(content);
-
-            if (contentSchedule != null)
-            {
-                _contentRepository.PersistContentSchedule(content, contentSchedule);
-            }
-
-            scope.Notifications.Publish(
-                SavedNotification(content, eventMessages, BuildCultureMap(content, savedCultures)).WithStateFrom(savingNotification));
-
-            // TODO: we had code here to FORCE that this event can never be suppressed. But that just doesn't make a ton of sense?!
-            // I understand that if its suppressed that the caches aren't updated, but that would be expected. If someone
-            // is supressing events then I think it's expected that nothing will happen. They are probably doing it for perf
-            // reasons like bulk import and in those cases we don't want this occuring.
-            scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.RefreshNode, eventMessages));
-
-            if (culturesChanging != null)
-            {
-                var langs = GetLanguageDetailsForAuditEntry(culturesChanging);
-                Audit(AuditType.SaveVariant, userId.Value, content.Id, $"Saved languages: {langs}", langs);
-            }
-            else
-            {
-                Audit(AuditType.Save, userId.Value, content.Id);
-            }
-
-            scope.Complete();
-        }
-
-        return OperationResult.Succeed(eventMessages);
-    }
-
-    /// <inheritdoc />
     public async Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, int? userId, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken)
     {
         PublishedState publishedState = content.PublishedState;
@@ -940,7 +855,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
             content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
         }
 
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -991,7 +906,7 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
         content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
 
-        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseSavedNotification: true);
         scope.Complete();
         return result;
     }
@@ -1348,7 +1263,8 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         IDictionary<string, object?>? notificationState,
         int userId,
         bool branchOne = false,
-        bool branchRoot = false)
+        bool branchRoot = false,
+        bool raiseSavedNotification = false)
     {
         if (scope == null)
         {
@@ -1388,6 +1304,17 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         IReadOnlyList<string>? culturesChanging = variesByCulture
             ? content.CultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
             : null;
+
+        // For a save-and-publish, capture the saved cultures the same way (and at the same point) as the standalone
+        // SaveAsync path - before persistence resets change tracking - so the "saved" notification honours the same
+        // SavedCultures contract: the changed cultures for variant content, or the "*" marker for changed invariant content.
+        IReadOnlyCollection<string>? savedCultures = null;
+        if (raiseSavedNotification)
+        {
+            savedCultures = variesByCulture
+                ? culturesChanging
+                : content.IsDirty() ? ["*"] : [];
+        }
 
         var isNew = !content.HasIdentity;
         TreeChangeTypes changeType = isNew || SupportsBranchPublishing is false ? TreeChangeTypes.RefreshNode : TreeChangeTypes.RefreshBranch;
@@ -1528,6 +1455,19 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
 
         // Persist the content
         SaveContent(content);
+
+        // A save-and-publish is also a save, so raise the paired "saved" notification (https://github.com/umbraco/Umbraco-CMS/issues/23523).
+        // Positioned here, after the content is actually persisted, so it does not fire on the cancelled-publishing or
+        // concurrency-violation paths above, which return before reaching this point.
+        if (raiseSavedNotification)
+        {
+            scope.Notifications.Publish(
+                SavedNotification(
+                    content,
+                    eventMessages,
+                    BuildCultureMap(content, savedCultures))
+                .WithState(notificationState));
+        }
 
         // we have tried to unpublish - won't happen in a branch
         if (unpublishing)

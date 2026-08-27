@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     ScopeAccessor.AmbientScope.Database.Execute("SET LOCK_TIMEOUT 60000");
                 }
 
-                service.Save(content);
+                service.SaveAsync(content, null, null, CancellationToken.None).GetAwaiter().GetResult();
                 scope.Complete();
             }
         }
