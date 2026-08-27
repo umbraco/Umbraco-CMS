@@ -335,6 +335,64 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
+        public void WriteLock_With_Timeout_Acquires_A_Write_Lock()
+        {
+            var scopeProvider = GetScopeProvider(out var lockingMechanismMock);
+            var timeout = TimeSpan.FromMilliseconds(10000);
+
+            using (var scope = (Scope)scopeProvider.CreateScope())
+            {
+                scope.WriteLock(timeout, Constants.Locks.Domains);
+
+                // The lock is lazy, so it only reaches the locking mechanism once the locks are ensured.
+                scope.GetWriteLocks();
+
+                scope.Complete();
+            }
+
+            lockingMechanismMock.Verify(x => x.WriteLock(Constants.Locks.Domains, timeout), Times.Once);
+            lockingMechanismMock.Verify(x => x.ReadLock(Constants.Locks.Domains, It.IsAny<TimeSpan?>()), Times.Never);
+        }
+
+        [Test]
+        public void ReadLock_With_Timeout_Acquires_A_Read_Lock()
+        {
+            var scopeProvider = GetScopeProvider(out var lockingMechanismMock);
+            var timeout = TimeSpan.FromMilliseconds(10000);
+
+            using (var scope = (Scope)scopeProvider.CreateScope())
+            {
+                scope.ReadLock(timeout, Constants.Locks.Domains);
+
+                // The lock is lazy, so it only reaches the locking mechanism once the locks are ensured.
+                scope.GetReadLocks();
+
+                scope.Complete();
+            }
+
+            lockingMechanismMock.Verify(x => x.ReadLock(Constants.Locks.Domains, timeout), Times.Once);
+            lockingMechanismMock.Verify(x => x.WriteLock(Constants.Locks.Domains, It.IsAny<TimeSpan?>()), Times.Never);
+        }
+
+        [Test]
+        public void EagerLock_Without_Timeout_Leaves_Timeout_Unspecified()
+        {
+            var scopeProvider = GetScopeProvider(out var lockingMechanismMock);
+
+            using (var scope = (Scope)scopeProvider.CreateScope())
+            {
+                scope.EagerReadLock(Constants.Locks.Domains);
+                scope.EagerWriteLock(Constants.Locks.Languages);
+                scope.Complete();
+            }
+
+            // A null timeout lets the distributed locking mechanism apply its configured default;
+            // passing TimeSpan.Zero instead would mean no wait at all.
+            lockingMechanismMock.Verify(x => x.ReadLock(Constants.Locks.Domains, null), Times.Once);
+            lockingMechanismMock.Verify(x => x.WriteLock(Constants.Locks.Languages, null), Times.Once);
+        }
+
+        [Test]
         public void ReadLock_Acquired_Only_Once_When_InnerScope_Disposed()
         {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);

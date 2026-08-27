@@ -265,7 +265,7 @@ public class CoreScope : ICoreScope
     public void EagerReadLock(TimeSpan timeout, int lockId) => Locks.EagerReadLock(InstanceId, timeout, lockId);
 
     /// <inheritdoc />
-    public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, TimeSpan.Zero, lockIds);
+    public void EagerReadLock(params int[] lockIds) => Locks.EagerReadLock(InstanceId, null, lockIds);
 
     /// <summary>
     ///     Disposes the scope, handling file systems, notifications, and parent scope completion.
