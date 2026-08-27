@@ -64,7 +64,13 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<UserDto> Users { get; set; }
 
+    public required DbSet<UserGroupDto> UserGroups { get; set; }
+
     public required DbSet<UserGroup2GranularPermissionDto> UserGroup2GranularPermissions { get; set; }
+
+    public required DbSet<UserStartNodeDto> UserStartNodes { get; set; }
+
+    public required DbSet<User2NodeNotifyDto> User2NodeNotifies { get; set; }
 
     public required DbSet<AuditEntryDto> AuditEntries { get; set; }
 

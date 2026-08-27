@@ -429,13 +429,6 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     OperationResult MoveToRecycleBin(IContent content, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Empties the Recycle Bin by deleting all <see cref="IContent" /> that resides in the bin.
-    /// </summary>
-    /// <param name="userId">Optional identifier of the user emptying the Recycle Bin.</param>
-    /// <returns>The operation result.</returns>
-    OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Gets a value indicating whether there is any content in the recycle bin.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>

@@ -427,6 +427,42 @@ internal class AsyncDocumentRepository
         });
 
     /// <inheritdoc />
+    protected override Task PersistEntitySpecificDeleteClausesAsync(UmbracoDbContext db, int nodeId)
+    {
+        IQueryable<Guid> uniqueIdQuery = db.Nodes.Where(n => n.NodeId == nodeId).Select(n => n.UniqueId);
+
+        return PersistEntitySpecificDeleteClausesCoreAsync(db, nodeId, uniqueIdQuery);
+    }
+
+    private static async Task PersistEntitySpecificDeleteClausesCoreAsync(UmbracoDbContext db, int nodeId, IQueryable<Guid> uniqueIdQuery)
+    {
+        await db.RedirectUrls.Where(x => uniqueIdQuery.Contains(x.ContentKey)).ExecuteDeleteAsync();
+
+        await db.UserGroups
+            .Where(x => x.StartContentId == nodeId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.StartContentId, (int?)null));
+
+        await db.Domains.Where(x => x.RootStructureId == nodeId).ExecuteDeleteAsync();
+        await db.Documents.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+        await db.DocumentCultureVariations.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+
+        IQueryable<int> versionIdQuery = db.ContentVersions.Where(x => x.NodeId == nodeId).Select(x => x.Id);
+        await db.DocumentVersions.Where(x => versionIdQuery.Contains(x.Id)).ExecuteDeleteAsync();
+
+        IQueryable<Guid> accessIdQuery = db.Access
+            .Where(x => x.NodeId == nodeId || x.LoginNodeId == nodeId || x.NoAccessNodeId == nodeId)
+            .Select(x => x.Id);
+        await db.AccessRules.Where(x => accessIdQuery.Contains(x.AccessId)).ExecuteDeleteAsync();
+
+        await db.Access.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+        await db.Access.Where(x => x.LoginNodeId == nodeId).ExecuteDeleteAsync();
+        await db.Access.Where(x => x.NoAccessNodeId == nodeId).ExecuteDeleteAsync();
+
+        await db.DocumentUrls.Where(x => uniqueIdQuery.Contains(x.UniqueId)).ExecuteDeleteAsync();
+        await db.DocumentUrlAliases.Where(x => uniqueIdQuery.Contains(x.UniqueId)).ExecuteDeleteAsync();
+    }
+
+    /// <inheritdoc />
     protected override string RecycleBinCacheKey => CacheKeys.ContentRecycleBinCacheKey;
 
     /// <inheritdoc />

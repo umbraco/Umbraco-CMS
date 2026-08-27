@@ -2761,7 +2761,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         Assert.IsTrue(descendants.All(x => x.Path.StartsWith("-1,-20,")));
         Assert.True(descendants.All(x => x.Trashed));
 
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
         var trashed = (await ContentService.GetPagedContentInRecycleBinAsync(0, int.MaxValue, ordering: null, CancellationToken.None)).Items.ToList();
         Assert.IsEmpty(trashed);
     }
@@ -2771,7 +2771,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         // Act
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
         var contents = (await ContentService.GetPagedContentInRecycleBinAsync(0, int.MaxValue, ordering: null, CancellationToken.None)).Items.ToList();
 
         // Assert
@@ -2785,7 +2785,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Act, Assert
         Assert.That(await ContentService.RecycleBinSmellsAsync(CancellationToken.None), Is.True);
 
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
         Assert.That(await ContentService.RecycleBinSmellsAsync(CancellationToken.None), Is.False);
     }
@@ -2987,7 +2987,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         // Act
         ContentService.MoveToRecycleBin(content1);
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
         var contents = (await ContentService.GetPagedContentInRecycleBinAsync(0, int.MaxValue, ordering: null, CancellationToken.None)).Items.ToList();
 
         // Assert

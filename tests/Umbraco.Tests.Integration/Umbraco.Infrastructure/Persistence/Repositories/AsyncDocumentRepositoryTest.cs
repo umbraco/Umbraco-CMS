@@ -3601,4 +3601,62 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
         Assert.That(result.Items.Select(c => c.Key), Does.Contain(_subpage.Key),
             "GetAncestorsAsync must include trashed ancestors, unlike GetByLevelAsync's trashed exclusion");
     }
+
+    [Test]
+    public async Task DeleteAsync_ClearsUserGroupStartContentReference_And_RemovesUserStartNodeAndUser2NodeNotifyRows()
+    {
+        var scopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        IUser admin = (await GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey))!;
+
+        using var setupScope = NewScopeProvider.CreateScope();
+        await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(async db =>
+        {
+            db.UserGroups.Add(new UserGroupDto
+            {
+                Key = Guid.NewGuid(),
+                Alias = "testGroupStartContentReference",
+                Name = "Test Group Start Content Reference",
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
+                HasAccessToAllLanguages = true,
+                StartContentId = _subpage.Id,
+            });
+
+            db.UserStartNodes.Add(new UserStartNodeDto
+            {
+                UserId = admin.Id,
+                StartNode = _subpage.Id,
+                StartNodeType = 1, // Content — see NPoco UserStartNodeDto.StartNodeTypeValue
+            });
+
+            db.User2NodeNotifies.Add(new User2NodeNotifyDto
+            {
+                UserId = admin.Id,
+                NodeId = _subpage.Id,
+                Action = "X",
+            });
+
+            return await db.SaveChangesAsync();
+        });
+        setupScope.Complete();
+
+        using var deleteScope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        await repository.DeleteAsync(_subpage, CancellationToken.None);
+        deleteScope.Complete();
+
+        using var verifyScope = NewScopeProvider.CreateScope();
+        (int? startContentId, bool startNodeExists, bool notifyExists) = await scopeAccessor.AmbientScope!.ExecuteWithContextAsync(async db =>
+        {
+            int? sc = await db.UserGroups.Where(x => x.Alias == "testGroupStartContentReference").Select(x => x.StartContentId).SingleAsync();
+            bool hasStartNode = await db.UserStartNodes.AnyAsync(x => x.StartNode == _subpage.Id);
+            bool hasNotify = await db.User2NodeNotifies.AnyAsync(x => x.NodeId == _subpage.Id);
+            return (sc, hasStartNode, hasNotify);
+        });
+        verifyScope.Complete();
+
+        Assert.That(startContentId, Is.Null, "UserGroup.StartContentId should be nulled when the referenced content is deleted.");
+        Assert.That(startNodeExists, Is.False, "UserStartNode rows referencing the deleted content should be removed.");
+        Assert.That(notifyExists, Is.False, "User2NodeNotify rows referencing the deleted content should be removed.");
+    }
 }

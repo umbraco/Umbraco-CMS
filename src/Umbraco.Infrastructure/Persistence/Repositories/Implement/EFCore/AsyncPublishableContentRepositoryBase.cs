@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -5,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -131,6 +133,59 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
 
             return true;
         });
+
+    /// <summary>
+    ///     Deletes every row across every table that references a publishable content node, in FK-safe
+    ///     (child-to-parent) order, before deleting the <c>umbracoNode</c> row itself. Entity-specific tables
+    ///     (e.g. Document's redirect URLs, domains) are deleted first via
+    ///     <see cref="PersistEntitySpecificDeleteClausesAsync" />, then the tables shared across all publishable
+    ///     content kinds.
+    /// </summary>
+    protected override async Task PersistDeletedItemAsync(TEntity entity)
+    {
+        // Raise event first else potential FK issues — mirrors PublishableContentRepositoryBase.PersistDeletedItem.
+        EventAggregator.Publish(new ScopedEntityRemoveNotification(entity, new EventMessages()));
+
+        var nodeId = entity.Id;
+
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            await PersistEntitySpecificDeleteClausesAsync(db, nodeId);
+
+            await db.ContentSchedules.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.User2NodeNotifies.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+
+            IQueryable<Guid> uniqueIdQuery = db.Nodes.Where(n => n.NodeId == nodeId).Select(n => n.UniqueId);
+            await db.UserGroup2GranularPermissions
+                .Where(x => x.UniqueId.HasValue && uniqueIdQuery.Contains(x.UniqueId.Value))
+                .ExecuteDeleteAsync();
+
+            await db.UserStartNodes.Where(x => x.StartNode == nodeId).ExecuteDeleteAsync();
+            await db.Relations.Where(x => x.ParentId == nodeId).ExecuteDeleteAsync();
+            await db.Relations.Where(x => x.ChildId == nodeId).ExecuteDeleteAsync();
+            await db.TagRelationships.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+
+            IQueryable<int> versionIdQuery = db.ContentVersions.Where(x => x.NodeId == nodeId).Select(x => x.Id);
+            await db.PropertyData.Where(x => versionIdQuery.Contains(x.VersionId)).ExecuteDeleteAsync();
+            await db.ContentVersionCultureVariations.Where(x => versionIdQuery.Contains(x.VersionId)).ExecuteDeleteAsync();
+            await db.ContentVersions.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.Content.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+            await db.Nodes.Where(x => x.NodeId == nodeId).ExecuteDeleteAsync();
+
+            return true;
+        });
+
+        entity.DeleteDate = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    ///     Deletes the rows in tables specific to this publishable content kind (e.g. Document's redirect URLs,
+    ///     domains, access rules) that reference the node being deleted. Called by
+    ///     <see cref="PersistDeletedItemAsync" /> before the tables shared across all publishable content kinds.
+    /// </summary>
+    /// <param name="db">The EF Core context for the ambient scope.</param>
+    /// <param name="nodeId">The node identifier of the content being deleted.</param>
+    protected abstract Task PersistEntitySpecificDeleteClausesAsync(UmbracoDbContext db, int nodeId);
 
     /// <inheritdoc />
     public virtual Task<ContentScheduleCollection> GetContentScheduleAsync(Guid contentKey, CancellationToken cancellationToken) =>

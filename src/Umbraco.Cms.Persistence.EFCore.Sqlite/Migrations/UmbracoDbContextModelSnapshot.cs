@@ -1885,6 +1885,30 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.ToTable("cmsTagRelationship", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.User2NodeNotifyDto", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("userId");
+
+                    b.Property<int>("NodeId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("nodeId");
+
+                    b.Property<string>("Action")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("action")
+                        .UseCollation("NOCASE");
+
+                    b.HasKey("UserId", "NodeId", "Action")
+                        .HasName("PK_umbracoUser2NodeNotify");
+
+                    b.HasIndex("NodeId");
+
+                    b.ToTable("umbracoUser2NodeNotify", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserDto", b =>
                 {
                     b.Property<int>("Id")
@@ -2043,6 +2067,126 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasDatabaseName("IX_umbracoUserGroup2GranularPermission_UserGroupKey_UniqueId");
 
                     b.ToTable("umbracoUserGroup2GranularPermission", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserGroupDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Alias")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("userGroupAlias")
+                        .UseCollation("NOCASE");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("createDate");
+
+                    b.Property<string>("DefaultPermissions")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("userGroupDefaultPermissions")
+                        .UseCollation("NOCASE");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("description")
+                        .UseCollation("NOCASE");
+
+                    b.Property<bool>("HasAccessToAllLanguages")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("hasAccessToAllLanguages");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("icon")
+                        .UseCollation("NOCASE");
+
+                    b.Property<Guid>("Key")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("key");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("userGroupName")
+                        .UseCollation("NOCASE");
+
+                    b.Property<int?>("StartContentId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("startContentId");
+
+                    b.Property<int?>("StartElementId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("startElementId");
+
+                    b.Property<int?>("StartMediaId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("startMediaId");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("updateDate");
+
+                    b.HasKey("Id")
+                        .HasName("PK_umbracoUserGroup");
+
+                    b.HasIndex("Alias")
+                        .IsUnique()
+                        .HasDatabaseName("IX_umbracoUserGroup_userGroupAlias");
+
+                    b.HasIndex("Key")
+                        .IsUnique()
+                        .HasDatabaseName("IX_umbracoUserGroup_userGroupKey");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_umbracoUserGroup_userGroupName");
+
+                    b.HasIndex("StartContentId");
+
+                    b.HasIndex("StartElementId");
+
+                    b.HasIndex("StartMediaId");
+
+                    b.ToTable("umbracoUserGroup", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserStartNodeDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<int>("StartNode")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("startNode");
+
+                    b.Property<int>("StartNodeType")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("startNodeType");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("userId");
+
+                    b.HasKey("Id")
+                        .HasName("PK_userStartNode");
+
+                    b.HasIndex("StartNode");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("StartNodeType", "StartNode", "UserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_umbracoUserStartNode_startNodeType");
+
+                    b.ToTable("umbracoUserStartNode", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>
@@ -2520,6 +2664,23 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.User2NodeNotifyDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
+                        .WithMany()
+                        .HasForeignKey("NodeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_umbracoUser2NodeNotify_umbracoNode_id");
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserDto", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_umbracoUser2NodeNotify_umbracoUser_id");
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserGroup2GranularPermissionDto", b =>
                 {
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
@@ -2527,6 +2688,44 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasForeignKey("UniqueId")
                         .HasPrincipalKey("UniqueId")
                         .OnDelete(DeleteBehavior.NoAction);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserGroupDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
+                        .WithMany()
+                        .HasForeignKey("StartContentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("FK_startContentId_umbracoNode_id");
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
+                        .WithMany()
+                        .HasForeignKey("StartElementId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("FK_startElementId_umbracoNode_id");
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
+                        .WithMany()
+                        .HasForeignKey("StartMediaId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("FK_startMediaId_umbracoNode_id");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserStartNodeDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
+                        .WithMany()
+                        .HasForeignKey("StartNode")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_umbracoUserStartNode_umbracoNode_id");
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserDto", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_umbracoUserStartNode_umbracoUser_id");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>

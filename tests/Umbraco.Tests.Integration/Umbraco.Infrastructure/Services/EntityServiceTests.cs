@@ -989,7 +989,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task EntityService_Siblings_Returns_Trashed_Siblings()
     {
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
         var children = await CreateDocumentSiblingsTestData();
 
         for (int i = 0; i <= 3; i++)

@@ -1052,7 +1052,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [LongRunning]
         public async Task EmptyRecycleBinContent()
         {
-            ContentService.EmptyRecycleBin();
+            await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
             IContent content = await CreateContent();
             Assert.IsNotNull(content);
@@ -1060,7 +1060,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.MoveToRecycleBin(content);
 
             ResetEvents();
-            ContentService.EmptyRecycleBin();
+            await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1075,7 +1075,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [LongRunning]
         public async Task EmptyRecycleBinContents()
         {
-            ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
             IContent content1 = await CreateContent();
             Assert.IsNotNull(content1);
@@ -1086,7 +1086,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.MoveToRecycleBin(content2);
 
             ResetEvents();
-            ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
             Assert.AreEqual(3, _msgCount);
             Assert.AreEqual(4, _events.Count);
@@ -1103,7 +1103,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [LongRunning]
         public async Task EmptyRecycleBinBranch()
         {
-            ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
             IContent content1 = await CreateBranch();
             Assert.IsNotNull(content1);
@@ -1118,7 +1118,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
 
-            ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);

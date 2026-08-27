@@ -31,4 +31,5 @@ public enum EFCoreMigration
     AddContentTypeDtosBasic = 23,
     ReconcileEfCoreRepositoriesMerge = 24,
     AddUserGroup2GranularPermissionDto = 25,
+    AddUserGroupUserStartNodeUser2NodeNotifyDtos = 26,
 }

@@ -79,7 +79,7 @@ public partial class ContentEditingServiceTests
         // Setup a relation where the trashed page is related to another page as a child (e.g. the other page has a picker and has selected this page).
         await RelateAsync(Subpage2, Subpage);
 
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
         // re-get and verify not deleted (the relation prevents deletion)
         var subpage = await ContentEditingService.GetAsync(Subpage.Key);
@@ -96,7 +96,7 @@ public partial class ContentEditingServiceTests
         // This relation should be excluded from the "disable delete when referenced" check.
         await RelateAsync(Subpage2, Subpage, Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
 
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
         // re-get and verify is deleted (the restore relation should not prevent deletion)
         var subpage = await ContentEditingService.GetAsync(Subpage.Key);
@@ -113,7 +113,7 @@ public partial class ContentEditingServiceTests
         // Only child relations should prevent deletion.
         await RelateAsync(Subpage, Subpage2);
 
-        ContentService.EmptyRecycleBin();
+        await ContentService.EmptyRecycleBinAsync(Constants.Security.SuperUserKey);
 
         // re-get and verify deleted (parent relations should not prevent deletion)
         var subpage = await ContentEditingService.GetAsync(Subpage.Key);

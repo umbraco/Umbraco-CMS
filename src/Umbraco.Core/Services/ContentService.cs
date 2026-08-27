@@ -1194,72 +1194,61 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <param name="userId">The unique key of the user performing the operation.</param>
     /// <returns>An <see cref="OperationResult"/> indicating the result of the operation.</returns>
     public async Task<OperationResult> EmptyRecycleBinAsync(Guid userId)
-        => EmptyRecycleBin(await _userIdKeyResolver.GetAsync(userId));
-
-    /// <summary>
-    ///     Empties the Recycle Bin by deleting all <see cref="IContent" /> that resides in the bin
-    /// </summary>
-    public OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId)
     {
         var deleted = new List<IContent>();
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        int intUserId = await _userIdKeyResolver.GetAsync(userId);
+
+        // emptying the recycle bin means deleting whatever is in there - do it properly!
+        PagedModel<IContent> contentsPage = await GetChildrenAsync(Constants.System.RecycleBinContentKey, 0, int.MaxValue, propertyAliases: null, ordering: null, CancellationToken.None);
+        IContent[] contents = contentsPage.Items.ToArray();
+
+        var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
+        var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(emptyingRecycleBinNotification)
+            || await scope.Notifications.PublishCancelableAsync(deletingContentNotification))
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            // emptying the recycle bin means deleting whatever is in there - do it properly!
-            IQuery<IContent>? query = Query<IContent>().Where(x => x.ParentId == Constants.System.RecycleBinContent);
-            IContent[] contents = _documentRepository.Get(query).ToArray();
-
-            var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, eventMessages);
-            var deletingContentNotification = new ContentDeletingNotification(contents, eventMessages);
-            if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification) || scope.Notifications.PublishCancelable(deletingContentNotification))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            if (contents is not null)
-            {
-                // When checking if an item is related, we need to exclude the "relate parent on delete" relation type,
-                // as this is automatically created when items are trashed and would prevent emptying the recycle bin.
-                int[]? relateParentOnDeleteRelationTypeIds = null;
-                if (_contentSettings.DisableDeleteWhenReferenced)
-                {
-                    IRelationType? relateParentOnDeleteRelationType = _relationService
-                        .GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias)
-                        .GetAwaiter().GetResult();
-                    if (relateParentOnDeleteRelationType is not null)
-                    {
-                        relateParentOnDeleteRelationTypeIds = [relateParentOnDeleteRelationType.Id];
-                    }
-                }
-
-                foreach (IContent content in contents)
-                {
-                    if (_contentSettings.DisableDeleteWhenReferenced
-                        && _relationService
-                            .IsRelatedAsync(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds)
-                            .GetAwaiter().GetResult())
-                    {
-                        continue;
-                    }
-
-                    DeleteLocked(scope, content, eventMessages);
-                    deleted.Add(content);
-                }
-            }
-
-            scope.Notifications.Publish(
-                new ContentEmptiedRecycleBinNotification(deleted, eventMessages).WithStateFrom(
-                    emptyingRecycleBinNotification));
-            scope.Notifications.Publish(
-                new ContentTreeChangeNotification(deleted, TreeChangeTypes.Remove, eventMessages));
-            Audit(AuditType.Delete, userId, Constants.System.RecycleBinContent, "Recycle bin emptied");
-
             scope.Complete();
+            return OperationResult.Cancel(eventMessages);
         }
+
+        // When checking if an item is related, we need to exclude the "relate parent on delete" relation type,
+        // as this is automatically created when items are trashed and would prevent emptying the recycle bin.
+        int[]? relateParentOnDeleteRelationTypeIds = null;
+        if (_contentSettings.DisableDeleteWhenReferenced)
+        {
+            IRelationType? relateParentOnDeleteRelationType = await _relationService
+                .GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
+            if (relateParentOnDeleteRelationType is not null)
+            {
+                relateParentOnDeleteRelationTypeIds = [relateParentOnDeleteRelationType.Id];
+            }
+        }
+
+        foreach (IContent content in contents)
+        {
+            if (_contentSettings.DisableDeleteWhenReferenced
+                && await _relationService.IsRelatedAsync(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds))
+            {
+                continue;
+            }
+
+            await DeleteLockedAsync(scope, content, eventMessages, CancellationToken.None);
+            deleted.Add(content);
+        }
+
+        scope.Notifications.Publish(
+            new ContentEmptiedRecycleBinNotification(deleted, eventMessages).WithStateFrom(
+                emptyingRecycleBinNotification));
+        scope.Notifications.Publish(
+            new ContentTreeChangeNotification(deleted, TreeChangeTypes.Remove, eventMessages));
+        await AuditAsync(AuditType.Delete, intUserId, Constants.System.RecycleBinContent, "Recycle bin emptied");
+
+        scope.Complete();
 
         return OperationResult.Succeed(eventMessages);
     }
@@ -2127,6 +2116,33 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         }
 
         DoDelete(content);
+    }
+
+    /// <inheritdoc cref="AsyncPublishableContentServiceBase{TContent}.DeleteLockedAsync" />
+    protected override async Task DeleteLockedAsync(ICoreScope scope, IContent content, EventMessages evtMsgs, CancellationToken cancellationToken)
+    {
+        async Task DoDeleteAsync(IContent c)
+        {
+            await _asyncDocumentRepository.DeleteAsync(c, cancellationToken);
+            scope.Notifications.Publish(new ContentDeletedNotification(c, evtMsgs));
+
+            // media files deleted by QueuingEventDispatcher
+        }
+
+        const int pageSize = 500;
+        var total = long.MaxValue;
+        while (total > 0)
+        {
+            // get descendants - ordered from deepest to shallowest
+            PagedModel<IContent> descendantsPage = await GetDescendantsAsync(content.Key, 0, pageSize, Ordering.By("Path", Direction.Descending), cancellationToken);
+            total = descendantsPage.Total;
+            foreach (IContent c in descendantsPage.Items)
+            {
+                await DoDeleteAsync(c);
+            }
+        }
+
+        await DoDeleteAsync(content);
     }
 
     protected override SavingNotification<IContent> SavingNotification(IContent content, EventMessages eventMessages)
