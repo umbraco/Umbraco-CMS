@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.SchemaLockdown;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.SchemaLockdown;
 
@@ -49,15 +48,6 @@ public sealed class SchemaEntityTypeAttribute : Attribute, IAsyncAuthorizationFi
     public Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         HttpContext httpContext = context.HttpContext;
-
-        // A runtime that is not serving requests normally has to be left to the parts of the pipeline that answer
-        // for it - denying here would mask their response.
-        IRuntimeState runtimeState = httpContext.RequestServices.GetRequiredService<IRuntimeState>();
-        if (runtimeState.Level != RuntimeLevel.Run && runtimeState.Level != RuntimeLevel.Upgrade)
-        {
-            return Task.CompletedTask;
-        }
-
         SchemaOperation operation = ResolveOperation(httpContext, context.ActionDescriptor);
 
         ISchemaRestrictions restrictions =
@@ -70,6 +60,10 @@ public sealed class SchemaEntityTypeAttribute : Attribute, IAsyncAuthorizationFi
         // The denial is an ordinary bodyless 403, as every other one in this API is: a 403 on these endpoints can
         // equally come from the permissions the request has already passed, and one status code cannot describe two
         // bodies. The header names what was denied for whoever is reading the network tab.
+        //
+        // This holds at every runtime level. An entity type a configurator restricted is restricted during an
+        // unattended upgrade as much as after one, so the 503 MaintenanceModeActionFilter would otherwise write -
+        // meaning "try again later" - would be untrue. Anything not restricted still falls through to it.
         httpContext.Response.Headers[Constants.Headers.SchemaLockdown] =
             $"{EntityType.ToLowerInvariant()}:{operation.ToString().ToLowerInvariant()}";
 
