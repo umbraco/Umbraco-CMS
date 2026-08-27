@@ -352,24 +352,6 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return await _asyncDocumentRepository.GetByLevelAsync(level, skip, take, ordering, cancellationToken);
     }
 
-    /// <summary>
-    ///     Gets a collection of <see cref="IContent" /> objects, which are ancestors of the current content.
-    /// </summary>
-    /// <param name="key">Guid key of the <see cref="IContent" /> to retrieve ancestors for</param>
-    /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    [Obsolete("Use GetAncestorsAsync(Guid, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
-    public IEnumerable<IContent> GetAncestors(Guid key) =>
-        GetAncestorsAsync(key, 0, int.MaxValue, CancellationToken.None).GetAwaiter().GetResult().Items;
-
-    /// <summary>
-    ///     Gets a collection of <see cref="IContent" /> objects, which are ancestors of the current content.
-    /// </summary>
-    /// <param name="content"><see cref="IContent" /> to retrieve ancestors for</param>
-    /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    [Obsolete("Use GetAncestorsAsync(IContent, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
-    public IEnumerable<IContent> GetAncestors(IContent content) =>
-        GetAncestorsAsync(content, 0, int.MaxValue, CancellationToken.None).GetAwaiter().GetResult().Items;
-
     /// <inheritdoc />
     public async Task<PagedModel<IContent>> GetAncestorsAsync(Guid key, int skip, int take, CancellationToken cancellationToken)
     {

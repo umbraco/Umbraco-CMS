@@ -117,22 +117,6 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     Task<IContent?> GetParentAsync(IContent? content, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets ancestor documents of a document.
-    /// </summary>
-    /// <param name="key">The Guid key of the document.</param>
-    /// <returns>The ancestor documents.</returns>
-    [Obsolete("Use GetAncestorsAsync(Guid, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
-    IEnumerable<IContent> GetAncestors(Guid key);
-
-    /// <summary>
-    ///     Gets ancestor documents of a document.
-    /// </summary>
-    /// <param name="content">The document.</param>
-    /// <returns>The ancestor documents.</returns>
-    [Obsolete("Use GetAncestorsAsync(IContent, int, int, CancellationToken) instead. Scheduled for removal in Umbraco 21.")]
-    IEnumerable<IContent> GetAncestors(IContent content);
-
-    /// <summary>
     ///     Gets a paged list of ancestor documents of a document, ordered root-first.
     /// </summary>
     /// <param name="key">The Guid key of the document to retrieve ancestors for.</param>

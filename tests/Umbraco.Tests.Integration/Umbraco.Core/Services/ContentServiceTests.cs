@@ -679,24 +679,24 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void GetAncestors_Returns_Empty_List_When_Path_Is_Null()
+    public async Task GetAncestorsAsync_Returns_Empty_List_When_Path_Is_Null()
     {
         // Arrange
         // Act
         var current = new Mock<IContent>();
-        var res = ContentService.GetAncestors(current.Object);
+        PagedModel<IContent> res = await ContentService.GetAncestorsAsync(current.Object, 0, int.MaxValue, CancellationToken.None);
 
         // Assert
-        Assert.IsEmpty(res);
+        Assert.IsEmpty(res.Items);
     }
 
     [Test]
-    public void GetAncestors_Guid_Returns_Ancestors_Of_Content()
+    public async Task GetAncestorsAsync_Guid_Returns_Ancestors_Of_Content()
     {
-        var res = ContentService.GetAncestors(Subpage.Key).ToList();
+        PagedModel<IContent> res = await ContentService.GetAncestorsAsync(Subpage.Key, 0, int.MaxValue, CancellationToken.None);
 
-        Assert.That(res, Has.Count.EqualTo(1));
-        Assert.That(res[0].Key, Is.EqualTo(Textpage.Key));
+        Assert.That(res.Items.ToList(), Has.Count.EqualTo(1));
+        Assert.That(res.Items.ToList()[0].Key, Is.EqualTo(Textpage.Key));
     }
 
     [Test]
