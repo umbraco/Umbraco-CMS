@@ -1,5 +1,5 @@
 using System.Reflection;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Filters;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
@@ -26,22 +26,11 @@ public class SchemaEntityTypeAttributeTests
             typeof(ControllerWithoutOwnDeclaration).GetCustomAttribute<SchemaEntityTypeAttribute>(inherit: true)?.EntityType,
             Is.EqualTo(Constants.UdiEntityType.MediaType));
 
+    // MVC only collects the attribute as a filter through this interface, so losing the implementation would
+    // silently leave every governed controller ungoverned.
     [Test]
-    public void Yields_Itself_As_The_Single_Requirement()
-    {
-        var attribute = new SchemaEntityTypeAttribute(Constants.UdiEntityType.DocumentType);
-
-        IAuthorizationRequirement[] requirements = attribute.GetRequirements().ToArray();
-
-        Assert.That(requirements, Has.Length.EqualTo(1));
-        Assert.That(requirements[0], Is.SameAs(attribute));
-    }
-
-    // The framework only reaches GetRequirements through this interface, so losing the implementation would silently
-    // leave every governed controller ungoverned.
-    [Test]
-    public void Is_Authorization_Requirement_Data()
+    public void Is_An_Authorization_Filter()
         => Assert.That(
             new SchemaEntityTypeAttribute(Constants.UdiEntityType.DocumentType),
-            Is.InstanceOf<IAuthorizationRequirementData>());
+            Is.InstanceOf<IAsyncAuthorizationFilter>());
 }

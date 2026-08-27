@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
-using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 using Umbraco.Cms.Api.Management.Security.Authorization.Dictionary;
@@ -31,7 +30,6 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, AllowedApplicationHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, BackOfficeHandler>();
-        builder.Services.AddSingleton<IAuthorizationHandler, SchemaLockdownAuthorizationHandler>();
 
         builder.Services.AddAuthorization(CreatePolicies);
         return builder;
