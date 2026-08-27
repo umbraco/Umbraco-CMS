@@ -111,6 +111,13 @@ public class HtmlLocalLinkParserTests
     [TestCase(
         "<a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
         "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+
+    // a single quoted type attribute is honoured when reading the entity type, so it has to be
+    // removed from the rendered output too.
+    [TestCase(
+        "<a type='document' href='/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}'>world</a>",
+        "<a href='/my-test-url'>world</a>")]
+
     [TestCase(
         "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"type=\"document\" title=\"world\">world</a>",
         "<a href=\"/my-test-url\" title=\"world\">world</a>")]
@@ -140,6 +147,14 @@ public class HtmlLocalLinkParserTests
         "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}?v=1\" title=\"world\">world</a>",
         "<a href=\"/my-test-url?v=1\" title=\"world\">world</a>")]
 
+    // the attributes of a single tag may be spread over several lines
+    [TestCase(
+        "<a\n  type=\"document\"\n  href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"\n  title=\"world\">world</a>",
+        "<a\n  href=\"/my-test-url\"\n  title=\"world\">world</a>")]
+    [TestCase(
+        "<a\n  href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"\n  type=\"media\">world</a>",
+        "<a\n  href=\"/media/1001/my-image.jpg\">world</a>")]
+
     // URL encoded braces, as accepted by the legacy pattern and preserved by the ConvertLocalLinks migration
     [TestCase(
         "<a type=\"document\" href=\"/%7BlocalLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E%7D\" title=\"world\">world</a>",
@@ -164,10 +179,21 @@ public class HtmlLocalLinkParserTests
         "<a itemtype=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
         "<a itemtype=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
 
+    // such an attribute also survives untouched when an unrelated local link elsewhere in the value resolves.
+    [TestCase(
+        "<a data-type=\"document\" href=\"/other\">other</a><a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">world</a>",
+        "<a data-type=\"document\" href=\"/other\">other</a><a href=\"/my-test-url\">world</a>")]
+
     // the type attribute has to belong to the anchor holding the local link, not to a preceding tag
     [TestCase(
         "<a href=\"/other\" type=\"document\">other</a> <a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
         "<a href=\"/other\" type=\"document\">other</a> <a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
+
+    // a local link with no type of its own stays unresolved even when another anchor in the same value
+    // points at the same entity.
+    [TestCase(
+        "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">no type</a> <a type=\"media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\">no type</a> <a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
 
     // only anchors hold local links, an element whose name merely starts with "a" does not
     [TestCase(
@@ -506,6 +532,14 @@ public class HtmlLocalLinkParserTests
     [TestCase(
         "<a href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" type=\"media\" data-culture=\"no-NO\" title=\"world\">world</a>",
         "<a href=\"/media/1001/my-image.jpg\" data-culture=\"no-NO\" title=\"world\">world</a>")]
+
+    // trailing content in the href is preserved for a cultured link, just as it is without a culture
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}#anchor\" data-culture=\"en-US\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url#anchor\" data-culture=\"en-US\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}?v=1\" data-culture=\"en-US\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url?v=1\" data-culture=\"en-US\" title=\"world\">world</a>")]
     public void EnsureInternalLinks_WithCultureAttribute_ReplacesLinkPreservingCulture(string input, string expected)
     {
         // Arrange
