@@ -1882,6 +1882,29 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
         return contentType;
     }
 
+    protected async Task<IContentType> GetContentTypeAsync(ICoreScope scope, string contentTypeAlias, CancellationToken cancellationToken)
+    {
+        if (contentTypeAlias == null)
+        {
+            throw new ArgumentNullException(nameof(contentTypeAlias));
+        }
+
+        if (string.IsNullOrWhiteSpace(contentTypeAlias))
+        {
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
+        }
+
+        scope.ReadLock(ReadLockIds);
+
+        IContentType? contentType = await _contentTypeRepository.GetAsync(contentTypeAlias, cancellationToken)
+                                    ??
+                                    // causes rollback
+                                    throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}'" +
+                                                        $" was found");
+
+        return contentType;
+    }
+
     protected IContentType GetContentType(string contentTypeAlias)
     {
         if (contentTypeAlias == null)

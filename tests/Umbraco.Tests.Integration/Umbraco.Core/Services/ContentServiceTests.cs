@@ -344,7 +344,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             originalPage.SetValue("description", "blueprint 4");
             await ContentService.SaveAsync(originalPage, null, null, CancellationToken.None);
 
-            var fromContent = ContentService.CreateBlueprintFromContent(originalPage, "hello world");
+            var fromContent = await ContentService.CreateBlueprintFromContentAsync(originalPage, "hello world", Constants.Security.SuperUserKey, CancellationToken.None);
             ContentService.SaveBlueprint(fromContent, originalPage);
 
             Assert.IsTrue(fromContent.HasIdentity);

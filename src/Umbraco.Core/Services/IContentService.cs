@@ -62,11 +62,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// </summary>
     /// <param name="blueprint">The content item to create a blueprint from.</param>
     /// <param name="name">The name for the new blueprint.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The created blueprint.</returns>
-    // TODO: Remove the default implementation when CreateContentFromBlueprint is removed.
-    IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
-        => throw new NotImplementedException();
+    Task<IContent> CreateBlueprintFromContentAsync(IContent blueprint, string name, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Deletes blueprints for a content type.

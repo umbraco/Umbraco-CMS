@@ -1953,14 +1953,19 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <param name="name">The name for the new content.</param>
     /// <param name="userId">The optional ID of the user creating the content.</param>
     /// <returns>The newly created <see cref="IContent"/> based on the blueprint.</returns>
-    public IContent CreateBlueprintFromContent(
+    public async Task<IContent> CreateBlueprintFromContentAsync(
         IContent blueprint,
         string name,
-        int userId = Constants.Security.SuperUserId)
+        Guid userKey,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(blueprint);
 
-        IContentType contentType = GetContentType(blueprint.ContentType.Alias);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        IContentType contentType = await GetContentTypeAsync(scope, blueprint.ContentType.Alias, cancellationToken);
         var content = new Content(name, -1, contentType);
         content.Path = string.Concat(content.ParentId.ToString(), ",", content.Id);
 
@@ -1971,15 +1976,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         if (blueprint.CultureInfos?.Count > 0)
         {
             cultures = blueprint.CultureInfos.Values.Select(x => x.Culture);
-            using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-            // TODO: Await this properly when adjusting this service to our new EF Core approach.
-            if (blueprint.CultureInfos.TryGetValue(_languageRepository.GetDefaultIsoCodeAsync().GetAwaiter().GetResult(), out ContentCultureInfos defaultCulture))
+            if (blueprint.CultureInfos.TryGetValue(await _languageRepository.GetDefaultIsoCodeAsync(), out ContentCultureInfos defaultCulture))
             {
                 defaultCulture.Name = name;
             }
-
-            scope.Complete();
         }
 
         DateTime now = DateTime.UtcNow;
@@ -1996,6 +1997,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
                 content.SetCultureInfo(culture, blueprint.GetCultureName(culture), now);
             }
         }
+
+        scope.Complete();
 
         return content;
     }

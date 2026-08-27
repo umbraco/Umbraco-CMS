@@ -137,8 +137,7 @@ internal sealed class ContentBlueprintEditingService
         }
 
         // Create Blueprint
-        var currentUserId = await GetUserIdAsync(userKey);
-        IContent blueprint = ContentService.CreateBlueprintFromContent(content, name, currentUserId);
+        IContent blueprint = await ContentService.CreateBlueprintFromContentAsync(content, name, userKey, CancellationToken.None);
 
         if (key.HasValue)
         {
