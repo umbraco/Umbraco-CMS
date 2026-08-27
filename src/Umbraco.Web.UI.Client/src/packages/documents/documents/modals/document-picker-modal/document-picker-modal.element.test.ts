@@ -5,11 +5,15 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { ignoreResizeObserverLoopErrors } from '@umbraco-cms/internal/test-utils';
 import { umbMockManager, useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UmbEntityContext, UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTreeItemOpenEvent } from '@umbraco-cms/backoffice/tree';
 import type { UmbInteractionMemoryManager } from '@umbraco-cms/backoffice/interaction-memory';
+import { UMB_CONTENT_SECTION_ALIAS } from '@umbraco-cms/backoffice/content';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 const TREE_ALIAS = 'Umb.Test.DocumentPicker.Tree';
 const TREE_REPOSITORY_ALIAS = 'Umb.Test.DocumentPicker.TreeRepository';
@@ -53,15 +57,40 @@ class UmbTestTreeRepository {
 	destroy() {}
 }
 
+/**
+ * Stands in for `UMB_CURRENT_USER_CONTEXT`, exposing only the `allowedSections` part the modal reads. Defaults to
+ * Content-section access so tests unrelated to the permission guard see the same collection/tree behaviour as before
+ * it existed.
+ */
+class UmbTestCurrentUserContext {
+	#host: UmbElement;
+	#allowedSections = new UmbArrayState<string>([UMB_CONTENT_SECTION_ALIAS], (alias) => alias);
+	readonly allowedSections = this.#allowedSections.asObservable();
+
+	constructor(host: UmbElement) {
+		this.#host = host;
+	}
+
+	getHostElement() {
+		return this.#host;
+	}
+
+	setAllowedSections(sections: Array<string>) {
+		this.#allowedSections.setValue(sections);
+	}
+}
+
 /** Stands in for the element that opened the modal, so the modal's own entity context has something to shadow. */
 @customElement('test-document-picker-opener')
 class UmbTestOpenerElement extends UmbElementMixin(HTMLElement) {
 	entityContext = new UmbEntityContext(this);
+	currentUserContext = new UmbTestCurrentUserContext(this);
 
 	constructor() {
 		super();
 		this.entityContext.setEntityType('test-item');
 		this.entityContext.setUnique(OPENER_UNIQUE);
+		this.provideContext(UMB_CURRENT_USER_CONTEXT, this.currentUserContext as never);
 	}
 }
 
@@ -150,6 +179,10 @@ describe('UmbDocumentPickerModalElement', () => {
 		return (element as unknown as { _hasCollection: boolean })._hasCollection;
 	}
 
+	function hasContentSectionAccess() {
+		return (element as unknown as { _hasContentSectionAccess: boolean })._hasContentSectionAccess;
+	}
+
 	/**
 	 * The modal's `value` is written through the modal context, which a standalone element has none of, so the
 	 * selection is read from the picker context the modal owns.
@@ -183,6 +216,42 @@ describe('UmbDocumentPickerModalElement', () => {
 
 			expect(hasCollection()).to.be.true;
 			// The tree must not be shown in the collection's place, not even while the data type is still loading.
+			expect(getTree()).to.not.exist;
+		});
+	});
+
+	// The Collection endpoint authorizes against the Content section alone, while the Tree endpoint accepts any
+	// backoffice section, so a user without Content-section access must be routed to the tree even for a
+	// collection-configured node, rather than hitting a bare 403 from the collection.
+	describe('guarding the collection by Content-section access', () => {
+		it('falls back to the tree for a collection-configured node when the user lacks Content-section access', async () => {
+			opener.currentUserContext.setAllowedSections(['Umb.Section.Media']);
+			await browseTo('with-collection');
+
+			expect(hasCollection()).to.be.true;
+			expect(getTree()).to.exist;
+			expect(getCollection()).to.not.exist;
+		});
+
+		it('still renders the collection for a collection-configured node when the user has Content-section access', async () => {
+			await browseTo('with-collection');
+
+			expect(hasCollection()).to.be.true;
+			expect(getTree()).to.not.exist;
+		});
+
+		it('reacts to the current user context changing allowed sections', async () => {
+			await browseTo('with-collection');
+			expect(hasContentSectionAccess()).to.be.true;
+			expect(getTree()).to.not.exist;
+
+			opener.currentUserContext.setAllowedSections(['Umb.Section.Media']);
+			await waitUntil(() => !!getTree(), 'never fell back to the tree once access was lost');
+			expect(hasContentSectionAccess()).to.be.false;
+
+			opener.currentUserContext.setAllowedSections([UMB_CONTENT_SECTION_ALIAS]);
+			await waitUntil(() => hasContentSectionAccess(), 'never regained Content-section access');
+			await element.updateComplete;
 			expect(getTree()).to.not.exist;
 		});
 	});

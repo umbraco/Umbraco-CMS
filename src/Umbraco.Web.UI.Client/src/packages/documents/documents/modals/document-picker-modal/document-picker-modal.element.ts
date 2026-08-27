@@ -1,7 +1,8 @@
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../../collection/constants.js';
 import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import type { UmbDocumentPickerModalData, UmbDocumentPickerModalValue } from './types.js';
-import { UmbContentCollectionConfigurationContext } from '@umbraco-cms/backoffice/content';
+import { UMB_CONTENT_SECTION_ALIAS, UmbContentCollectionConfigurationContext } from '@umbraco-cms/backoffice/content';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import {
 	css,
 	customElement,
@@ -47,9 +48,8 @@ type UmbContentTreeItemLike = {
 };
 
 /**
- * A picker that browses documents, rendering the document collection at any level whose node has one configured and the
- * tree everywhere else. The node being browsed decides how its children render, so collection and tree levels
- * interleave.
+ * A picker that browses documents, rendering the document collection at any level whose node has one configured
+ * (and the user has Content-section access) and the tree everywhere else.
  * @element umb-document-picker-modal
  */
 @customElement('umb-document-picker-modal')
@@ -107,6 +107,9 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 	@state()
 	private _collectionConfig?: UmbCollectionConfiguration;
 
+	@state()
+	private _hasContentSectionAccess = false;
+
 	@query('umb-picker-search-field')
 	private _searchField?: UmbPickerSearchFieldElement;
 
@@ -143,6 +146,7 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		this.#observeTreeInteractionMemories();
 		this.#observeCollectionInteractionMemories();
 		this.#observeCollectionConfiguration();
+		this.#observeContentSectionAccess();
 		this.#observeLocation();
 	}
 
@@ -329,6 +333,19 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		);
 	}
 
+	/** The Collection endpoint requires Content-section access; the Tree endpoint accepts any section. */
+	#observeContentSectionAccess() {
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(
+				context?.allowedSections,
+				(allowedSections) => {
+					this._hasContentSectionAccess = allowedSections?.includes(UMB_CONTENT_SECTION_ALIAS) ?? false;
+				},
+				'umbDocumentPickerContentSectionAccessObserver',
+			);
+		});
+	}
+
 	/**
 	 * Collection memories are nested per browsed node, so returning to a node restores the view, filter, ordering and
 	 * page it was left in while a sibling starts clean. An ordering column configured on one content type need not
@@ -401,11 +418,16 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		}
 	}
 
+	/** Whether the collection is actually being rendered for the browsed node, rather than merely configured for it. */
+	#willRenderCollection(): boolean {
+		return this._hasCollection && this._hasContentSectionAccess;
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout
 				headline=${this.localize.string(this.data?.headline ?? '#general_choose')}
-				?main-no-padding=${this._hasCollection}>
+				?main-no-padding=${this.#willRenderCollection()}>
 				${this.#renderTabs()}
 				<div id="browse" ?hidden=${this._activeTab !== 'browse'}>${this.#renderBrowse()}</div>
 				<div id="search" ?hidden=${this._activeTab !== 'search'}>${this.#renderSearch()}</div>
@@ -462,7 +484,7 @@ export class UmbDocumentPickerModalElement extends UmbPickerModalBaseElement<
 		if (this._currentLocation === undefined) return html`<umb-view-loader></umb-view-loader>`;
 		// A level the tree cannot describe has no renderer, so neither the tree nor the collection stands in for it.
 		if (this._currentLocation === null) return this.#renderNotFound();
-		if (!this._hasCollection) return this.#renderTree();
+		if (!this.#willRenderCollection()) return this.#renderTree();
 		// The configuration is resolved from a data type, so the collection is held back rather than briefly showing
 		// the tree in its place.
 		return this._collectionConfig ? this.#renderCollection() : html`<umb-view-loader></umb-view-loader>`;
