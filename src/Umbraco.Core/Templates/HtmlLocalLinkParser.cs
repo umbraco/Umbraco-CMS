@@ -17,6 +17,14 @@ namespace Umbraco.Cms.Core.Templates;
 /// </remarks>
 public sealed partial class HtmlLocalLinkParser
 {
+    /// <summary>
+    ///     The name of the capture group holding the local link.
+    /// </summary>
+    /// <remarks>
+    ///     Must match the group name used by every local link pattern below.
+    /// </remarks>
+    private const string LocalLinkGroupName = "locallink";
+
     [GeneratedRegex(@"<a\b[^>]*?href=['""](?<locallink>\/?(?:\{|\%7B)localLink:(?<guid>[a-fA-F0-9-]+)(?:\}|\%7D))[^>]*?>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace, "en-GB")]
     private static partial Regex GetLocalLinkTagPattern();
 
@@ -132,7 +140,7 @@ public sealed partial class HtmlLocalLinkParser
             _ => string.Empty,
         };
 
-        Group localLink = tagMatch.Groups["locallink"];
+        Group localLink = tagMatch.Groups[LocalLinkGroupName];
         var localLinkIndex = localLink.Index - tagMatch.Index;
         Match typeMatch = tagData.TypeMatch;
 
@@ -216,7 +224,7 @@ public sealed partial class HtmlLocalLinkParser
             yield return new LocalLinkTag(
                 null,
                 new GuidUdi(tagData.EntityType, tagData.Key),
-                linkTag.Groups["locallink"].Value,
+                linkTag.Groups[LocalLinkGroupName].Value,
                 tagData.Culture);
         }
 
@@ -253,13 +261,13 @@ public sealed partial class HtmlLocalLinkParser
             {
                 if (udi is GuidUdi guidUdi)
                 {
-                    yield return new LocalLinkTag(null, guidUdi, tag.Groups["locallink"].Value);
+                    yield return new LocalLinkTag(null, guidUdi, tag.Groups[LocalLinkGroupName].Value);
                 }
             }
 
             if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
             {
-                yield return new LocalLinkTag (intId, null, tag.Groups["locallink"].Value);
+                yield return new LocalLinkTag (intId, null, tag.Groups[LocalLinkGroupName].Value);
             }
         }
     }
