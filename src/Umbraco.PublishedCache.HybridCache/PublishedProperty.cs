@@ -17,6 +17,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly IElementsCache _elementsCache;
     private readonly bool _isMember;
+    private readonly int? _owningContentId;
     private string? _valuesCacheKey;
 
     // the invariant-neutral source and inter values
@@ -76,6 +77,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         _isPreviewing = preview;
         _isMember = element.ContentType.ItemType == PublishedItemType.Member;
         _elementsCache = elementsElementsCache;
+        _owningContentId = element.OwningContentId;
 
         // this variable is used for contextualizing the variation level when calculating property values.
         // it must be set to the union of variance (the combination of content type and property type variance).
@@ -101,7 +103,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
 
         var value = GetSourceValue(culture, segment);
         var isValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -125,7 +127,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_sourceVariations, _element.Id, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_sourceVariations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
 
         // source values are tightly bound to the property/schema culture and segment configurations, so we need to
         // sanitize the contextualized culture/segment states before using them to access the source values.
@@ -168,7 +170,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
 
         // Include the fallback policy in the cache key so that different fallback strategies
         // produce separate cached values (e.g., block editors filter differently with Fallback.ToLanguage).
@@ -233,7 +235,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, ContentIdForContextualization, PropertyType.Alias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
@@ -386,4 +388,6 @@ internal sealed class PublishedProperty : PublishedPropertyBase
             _sourceValues ??= InitializeConcurrentDictionary<CompositeStringStringKey, SourceInterValue>();
         }
     }
+
+    private int ContentIdForContextualization => _owningContentId ?? _element.Id;
 }
