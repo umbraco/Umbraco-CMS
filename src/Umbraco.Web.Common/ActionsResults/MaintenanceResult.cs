@@ -30,6 +30,10 @@ public class MaintenanceResult : IActionResult
     /// <summary>
     /// Gets the path of the view that will be rendered.
     /// </summary>
+    /// <remarks>
+    /// Exposed so the chosen view can be inspected without executing the result. Tests rely on this to assert
+    /// which view the maintenance mode filter selects for a given runtime level.
+    /// </remarks>
     public string ViewName { get; }
 
     /// <inheritdoc />

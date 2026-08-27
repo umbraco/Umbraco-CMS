@@ -17,6 +17,9 @@ public class PublishedContentNotFoundResult : IActionResult
     private readonly string? _message;
     private readonly IUmbracoContext _umbracoContext;
 
+    // TODO (V19): Take the view path as a constructor parameter, as MaintenanceResult does, and drop the
+    // service location in ExecuteResultAsync.
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedContentNotFoundResult" /> class.
     /// </summary>
@@ -46,6 +49,9 @@ public class PublishedContentNotFoundResult : IActionResult
             reason = "No template exists to render the document at URL '{0}'.";
         }
 
+        // Resolved from the request rather than injected: this type is public and constructed with `new` by
+        // callers outside this assembly, so taking the settings as a constructor parameter would be a binary
+        // breaking change.
         GlobalSettings globalSettings = context.HttpContext.RequestServices
             .GetRequiredService<IOptionsMonitor<GlobalSettings>>().CurrentValue;
 
