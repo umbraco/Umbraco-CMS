@@ -626,11 +626,12 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Creates and saves a document.
     /// </summary>
     /// <param name="name">The name of the document.</param>
-    /// <param name="parentId">The identifier of the parent.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the content tree.</param>
     /// <param name="contentTypeAlias">The content type alias.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The created and saved document.</returns>
-    IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
+    Task<IContent> CreateAndSaveAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Creates and saves a document.
@@ -638,9 +639,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="name">The name of the document.</param>
     /// <param name="parent">The parent document.</param>
     /// <param name="contentTypeAlias">The content type alias.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The created and saved document.</returns>
-    IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
+    Task<IContent> CreateAndSaveAsync(string name, IContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken);
 
     #endregion
 

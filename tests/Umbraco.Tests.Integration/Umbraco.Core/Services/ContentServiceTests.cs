@@ -494,7 +494,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Arrange
 
         // Act
-        var content = ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAndSaveAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddHours(2));
         await ContentService.SaveAsync(content, Constants.Security.SuperUserId, contentSchedule, CancellationToken.None);
@@ -518,7 +518,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task SaveAsync_WithContentSchedule_PersistsThenRemovesSchedule()
     {
         // Arrange
-        var content = ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAndSaveAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.UtcNow.AddHours(2));
@@ -545,7 +545,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Arrange
         // Act
-        var content = ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAndSaveAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         for (var i = 0; i < 20; i++)
         {
             content.SetValue("bodyText", "hello world " + Guid.NewGuid());
@@ -570,7 +570,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var results = new List<IContent>();
         for (var i = 0; i < 20; i++)
         {
-            results.Add(ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage", -1));
+            results.Add(await ContentService.CreateAndSaveAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None));
         }
 
         var sortedGet = (await ContentService.GetByIdsAsync(new[] { results[10].Key, results[5].Key, results[12].Key }, CancellationToken.None))
@@ -589,7 +589,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Act
         for (var i = 0; i < 20; i++)
         {
-            ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage");
+            await ContentService.CreateAndSaveAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // Assert
@@ -610,7 +610,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Act
         for (var i = 0; i < 20; i++)
         {
-            ContentService.CreateAndSave("Test", Constants.System.Root, "umbBlah");
+            await ContentService.CreateAndSaveAsync("Test", (Guid?)null, "umbBlah", Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // Assert
@@ -627,12 +627,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbBlah", "test Doc Type", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        var parent = ContentService.CreateAndSave("Test", Constants.System.Root, "umbBlah");
+        var parent = await ContentService.CreateAndSaveAsync("Test", (Guid?)null, "umbBlah", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         for (var i = 0; i < 20; i++)
         {
-            ContentService.CreateAndSave("Test", parent, "umbBlah");
+            await ContentService.CreateAndSaveAsync("Test", parent, "umbBlah", Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // Assert
@@ -649,13 +649,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbBlah", "test Doc Type", defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-        var parent = ContentService.CreateAndSave("Test", Constants.System.Root, "umbBlah");
+        var parent = await ContentService.CreateAndSaveAsync("Test", (Guid?)null, "umbBlah", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Act
         var current = parent;
         for (var i = 0; i < 20; i++)
         {
-            current = ContentService.CreateAndSave("Test", current, "umbBlah");
+            current = await ContentService.CreateAndSaveAsync("Test", current, "umbBlah", Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         // Assert

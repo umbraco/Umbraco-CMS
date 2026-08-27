@@ -275,87 +275,69 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return content;
     }
 
-    /// <summary>
-    ///     Creates an <see cref="IContent" /> object of a specified content type.
-    /// </summary>
-    /// <remarks>This method returns a new, persisted, IContent with an identity.</remarks>
-    /// <param name="name">The name of the content object.</param>
-    /// <param name="parentId">The identifier of the parent, or -1.</param>
-    /// <param name="contentTypeAlias">The alias of the content type.</param>
-    /// <param name="userId">The optional id of the user creating the content.</param>
-    /// <returns>The content object.</returns>
-    public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<IContent> CreateAndSaveAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
     {
         // TODO: what about culture?
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        // locking the content tree secures content types too
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        IContentType contentType = GetContentType(contentTypeAlias)
+            // + locks
+            ??
+            // causes rollback
+            throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+
+        IContent? parent = null;
+        if (parentKey.HasValue)
         {
-            // locking the content tree secures content types too
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            IContentType contentType = GetContentType(contentTypeAlias)
-                // + locks
-                ??
-                // causes rollback
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
-
-            IContent? parent = null;
-            if (parentId > 0 && TryGetParentKey(parentId, out Guid? parentKey))
+            parent = await GetByIdAsync(parentKey.Value, cancellationToken); // + locks
+            if (parent is null)
             {
-                parent = GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult(); // + locks
+                throw new ArgumentException("No content with that key.", nameof(parentKey)); // causes rollback
             }
-
-            if (parentId > 0 && parent == null)
-            {
-                throw new ArgumentException("No content with that id.", nameof(parentId)); // causes rollback
-            }
-
-            Content content = parentId > 0
-                ? new Content(name, parent!, contentType, userId)
-                : new Content(name, parentId, contentType, userId);
-
-            SaveAsync(content, userId, null, CancellationToken.None).GetAwaiter().GetResult();
-
-            scope.Complete();
-
-            return content;
         }
+
+        Content content = parent is not null
+            ? new Content(name, parent, contentType, userId)
+            : new Content(name, Constants.System.Root, contentType, userId);
+
+        await SaveAsync(content, userId, null, cancellationToken);
+
+        scope.Complete();
+
+        return content;
     }
 
-    /// <summary>
-    ///     Creates an <see cref="IContent" /> object of a specified content type, under a parent.
-    /// </summary>
-    /// <remarks>This method returns a new, persisted, IContent with an identity.</remarks>
-    /// <param name="name">The name of the content object.</param>
-    /// <param name="parent">The parent content object.</param>
-    /// <param name="contentTypeAlias">The alias of the content type.</param>
-    /// <param name="userId">The optional id of the user creating the content.</param>
-    /// <returns>The content object.</returns>
-    public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<IContent> CreateAndSaveAsync(string name, IContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
     {
         // TODO: what about culture?
-        if (parent == null)
-        {
-            throw new ArgumentNullException(nameof(parent));
-        }
+        ArgumentNullException.ThrowIfNull(parent);
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            // locking the content tree secures content types too
-            scope.WriteLock(Constants.Locks.ContentTree);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-            IContentType contentType = GetContentType(contentTypeAlias)
-            // + locks
-                ??
-                // causes rollback
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+        // locking the content tree secures content types too
+        scope.WriteLock(Constants.Locks.ContentTree);
 
-            var content = new Content(name, parent, contentType, userId);
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
 
-            SaveAsync(content, userId, null, CancellationToken.None).GetAwaiter().GetResult();
+        IContentType contentType = GetContentType(contentTypeAlias)
+        // + locks
+            ??
+            // causes rollback
+            throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
-            scope.Complete();
-            return content;
-        }
+        var content = new Content(name, parent, contentType, userId);
+
+        await SaveAsync(content, userId, null, cancellationToken);
+
+        scope.Complete();
+        return content;
     }
 
     #endregion
