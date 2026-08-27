@@ -456,7 +456,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IElementSwitchValidator, ElementSwitchValidator>();
 
             // Schema lockdown
-            Services.AddUnique<IReadOnlySchemaRestrictions, SchemaRestrictions>();
+            Services.AddUnique<ISchemaRestrictions, SchemaRestrictions>();
 
             // Routing
             Services.AddUnique<DocumentUrlService, DocumentUrlService>();

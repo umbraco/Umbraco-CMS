@@ -1,29 +1,32 @@
 namespace Umbraco.Cms.Core.SchemaLockdown;
 
 /// <summary>
-/// The writable view of the schema lockdown restrictions, handed to each <see cref="ISchemaLockdownConfigurator"/>
-/// while they are being built.
+/// Answers whether schema lockdown permits a given operation on a given entity type.
 /// </summary>
 /// <remarks>
-/// It extends <see cref="IReadOnlySchemaRestrictions"/> because a configurator may consult the decisions already made by
-/// the configurators that ran before it, and only then decide what to write. There is deliberately no way to permit
-/// something: everything is permitted until a configurator denies it, and a denial cannot then be lifted. A site that
-/// disagrees with a package's configurator removes it from the collection rather than amending what it decided.
+/// This is what anything consulting the restrictions needs, and the only view resolvable from the container. They
+/// are built once at start-up, through <see cref="ISchemaRestrictionsBuilder"/>, and frozen thereafter, so every
+/// consumer is answered from the same decisions.
 /// </remarks>
-public interface ISchemaRestrictions : IReadOnlySchemaRestrictions
+public interface ISchemaRestrictions
 {
     /// <summary>
-    /// Denies the supplied operation on the supplied entity type.
+    /// Gets the entity types at least one operation is denied on.
     /// </summary>
     /// <remarks>
-    /// Only <see cref="SchemaOperation.Create"/>, <see cref="SchemaOperation.Update"/> and
-    /// <see cref="SchemaOperation.Delete"/> can be denied; the others are answered by rule and denying one does
-    /// nothing. See <see cref="IReadOnlySchemaRestrictions.IsAllowed"/>.
+    /// Anything absent from this is permitted every operation, so this is the whole of what the restrictions have to say.
+    /// It is empty until a configurator denies something, and is not the set of entity types lockdown is capable of
+    /// enforcing on - that is decided by which controllers declare one.
     /// </remarks>
-    void Block(string entityType, SchemaOperation operation);
+    IReadOnlyCollection<string> RestrictedEntityTypes { get; }
 
     /// <summary>
-    /// Denies every operation on the supplied entity type that is not a read.
+    /// Gets a value indicating whether the supplied operation is permitted on the supplied entity type.
     /// </summary>
-    void BlockMutations(string entityType);
+    /// <remarks>
+    /// <see cref="SchemaOperation.Read"/> is always permitted. <see cref="SchemaOperation.Unknown"/> is permitted
+    /// only on an entity type absent from <see cref="RestrictedEntityTypes"/>: it may well be one of the operations
+    /// denied there, and there is no way to tell which.
+    /// </remarks>
+    bool IsAllowed(string entityType, SchemaOperation operation);
 }

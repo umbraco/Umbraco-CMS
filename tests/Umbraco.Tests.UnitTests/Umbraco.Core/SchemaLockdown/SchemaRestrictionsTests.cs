@@ -16,14 +16,14 @@ public class SchemaRestrictionsTests
 
     private sealed class DelegateConfigurator : ISchemaLockdownConfigurator
     {
-        private readonly Action<ISchemaRestrictions> _configure;
+        private readonly Action<ISchemaRestrictionsBuilder> _configure;
 
-        public DelegateConfigurator(Action<ISchemaRestrictions> configure) => _configure = configure;
+        public DelegateConfigurator(Action<ISchemaRestrictionsBuilder> configure) => _configure = configure;
 
-        public void Configure(ISchemaRestrictions restrictions) => _configure(restrictions);
+        public void Configure(ISchemaRestrictionsBuilder builder) => _configure(builder);
     }
 
-    private static SchemaRestrictions CreateRestrictions(params Action<ISchemaRestrictions>[] configure)
+    private static SchemaRestrictions CreateRestrictions(params Action<ISchemaRestrictionsBuilder>[] configure)
         => new(new SchemaLockdownConfiguratorCollection(
             () => configure.Select(ISchemaLockdownConfigurator (x) => new DelegateConfigurator(x))));
 

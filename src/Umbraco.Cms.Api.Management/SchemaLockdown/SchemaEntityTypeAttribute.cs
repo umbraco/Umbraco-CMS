@@ -60,8 +60,8 @@ public sealed class SchemaEntityTypeAttribute : Attribute, IAsyncAuthorizationFi
 
         SchemaOperation operation = ResolveOperation(httpContext, context.ActionDescriptor);
 
-        IReadOnlySchemaRestrictions restrictions =
-            httpContext.RequestServices.GetRequiredService<IReadOnlySchemaRestrictions>();
+        ISchemaRestrictions restrictions =
+            httpContext.RequestServices.GetRequiredService<ISchemaRestrictions>();
         if (restrictions.IsAllowed(EntityType, operation))
         {
             return Task.CompletedTask;

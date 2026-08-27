@@ -60,11 +60,11 @@ public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : ManagementApiTe
         ];
 
         /// <inheritdoc />
-        public void Configure(ISchemaRestrictions restrictions)
+        public void Configure(ISchemaRestrictionsBuilder builder)
         {
             foreach (var entityType in EntityTypes)
             {
-                restrictions.BlockMutations(entityType);
+                builder.BlockMutations(entityType);
             }
         }
     }

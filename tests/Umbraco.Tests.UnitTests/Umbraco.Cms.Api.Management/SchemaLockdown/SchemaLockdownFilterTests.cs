@@ -31,8 +31,8 @@ public class SchemaLockdownFilterTests
 
     private sealed class LockDocumentTypes : ISchemaLockdownConfigurator
     {
-        public void Configure(ISchemaRestrictions restrictions)
-            => restrictions.BlockMutations(Constants.UdiEntityType.DocumentType);
+        public void Configure(ISchemaRestrictionsBuilder builder)
+            => builder.BlockMutations(Constants.UdiEntityType.DocumentType);
     }
 
     [Test]
@@ -184,7 +184,7 @@ public class SchemaLockdownFilterTests
         runtimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
 
         var services = new ServiceCollection();
-        services.AddSingleton<IReadOnlySchemaRestrictions>(restrictions);
+        services.AddSingleton<ISchemaRestrictions>(restrictions);
         services.AddSingleton(runtimeState.Object);
 
         return services.BuildServiceProvider();

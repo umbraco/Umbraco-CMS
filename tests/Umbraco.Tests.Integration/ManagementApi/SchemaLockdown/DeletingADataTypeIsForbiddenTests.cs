@@ -42,7 +42,7 @@ public class DeletingADataTypeIsForbiddenTests : ManagementApiTest<DeleteDataTyp
     private sealed class LockDataTypesConfigurator : ISchemaLockdownConfigurator
     {
         /// <inheritdoc />
-        public void Configure(ISchemaRestrictions restrictions)
-            => restrictions.BlockMutations(Constants.UdiEntityType.DataType);
+        public void Configure(ISchemaRestrictionsBuilder builder)
+            => builder.BlockMutations(Constants.UdiEntityType.DataType);
     }
 }

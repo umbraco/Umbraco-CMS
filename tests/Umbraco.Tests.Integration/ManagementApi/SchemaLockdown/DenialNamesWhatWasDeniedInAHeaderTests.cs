@@ -45,7 +45,7 @@ public class DenialNamesWhatWasDeniedInAHeaderTests : ManagementApiTest<DeleteDa
     private sealed class LockDataTypeDeletionConfigurator : ISchemaLockdownConfigurator
     {
         /// <inheritdoc />
-        public void Configure(ISchemaRestrictions restrictions)
-            => restrictions.Block(Constants.UdiEntityType.DataType, SchemaOperation.Delete);
+        public void Configure(ISchemaRestrictionsBuilder builder)
+            => builder.Block(Constants.UdiEntityType.DataType, SchemaOperation.Delete);
     }
 }

@@ -14,10 +14,10 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// <![CDATA[
 /// public class LockContentModellingConfigurator : ISchemaLockdownConfigurator
 /// {
-///     public void Configure(ISchemaRestrictions restrictions)
+///     public void Configure(ISchemaRestrictionsBuilder builder)
 ///     {
-///         restrictions.BlockMutations(Constants.UdiEntityType.DocumentType);
-///         restrictions.BlockMutations(Constants.UdiEntityType.DataType);
+///         builder.BlockMutations(Constants.UdiEntityType.DocumentType);
+///         builder.BlockMutations(Constants.UdiEntityType.DataType);
 ///     }
 /// }
 ///
@@ -34,6 +34,6 @@ public interface ISchemaLockdownConfigurator
     /// <summary>
     /// Adjusts the supplied restrictions.
     /// </summary>
-    /// <param name="restrictions">The restrictions being built.</param>
-    void Configure(ISchemaRestrictions restrictions);
+    /// <param name="builder">The restrictions being built.</param>
+    void Configure(ISchemaRestrictionsBuilder builder);
 }

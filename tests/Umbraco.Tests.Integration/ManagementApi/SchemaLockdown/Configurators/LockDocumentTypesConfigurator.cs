@@ -9,6 +9,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown.Configurato
 public class LockDocumentTypesConfigurator : ISchemaLockdownConfigurator
 {
     /// <inheritdoc />
-    public void Configure(ISchemaRestrictions restrictions)
-        => restrictions.BlockMutations(Constants.UdiEntityType.DocumentType);
+    public void Configure(ISchemaRestrictionsBuilder builder)
+        => builder.BlockMutations(Constants.UdiEntityType.DocumentType);
 }

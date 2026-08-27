@@ -51,7 +51,7 @@ public class ReportedEntityTypesAreLowerCasedTests : ManagementApiTest<SchemaLoc
     private sealed class LockAMixedCaseEntityTypeConfigurator : ISchemaLockdownConfigurator
     {
         /// <inheritdoc />
-        public void Configure(ISchemaRestrictions restrictions)
-            => restrictions.BlockMutations("Dictionary-Item");
+        public void Configure(ISchemaRestrictionsBuilder builder)
+            => builder.BlockMutations("Dictionary-Item");
     }
 }

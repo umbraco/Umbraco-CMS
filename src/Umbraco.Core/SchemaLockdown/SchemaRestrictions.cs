@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 /// served to the backoffice without the two being able to disagree. Denials only ever accumulate, so the order the
 /// configurators run in does not affect the result.
 /// </remarks>
-internal sealed class SchemaRestrictions : ISchemaRestrictions
+internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
 {
     private readonly Dictionary<string, HashSet<SchemaOperation>> _blocked = new(StringComparer.OrdinalIgnoreCase);
     private readonly bool _frozen;

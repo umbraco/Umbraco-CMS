@@ -69,10 +69,10 @@ public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTe
     private sealed class LockDataTypeCreateAndUpdateConfigurator : ISchemaLockdownConfigurator
     {
         /// <inheritdoc />
-        public void Configure(ISchemaRestrictions restrictions)
+        public void Configure(ISchemaRestrictionsBuilder builder)
         {
-            restrictions.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create);
-            restrictions.Block(Constants.UdiEntityType.DataType, SchemaOperation.Update);
+            builder.Block(Constants.UdiEntityType.DataType, SchemaOperation.Create);
+            builder.Block(Constants.UdiEntityType.DataType, SchemaOperation.Update);
         }
     }
 }
