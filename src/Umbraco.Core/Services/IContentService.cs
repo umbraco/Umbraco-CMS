@@ -542,9 +542,10 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Saves a document and raises the "sent to publication" events.
     /// </summary>
     /// <param name="content">The document to send to publication.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns><c>true</c> if the document was sent to publication; otherwise, <c>false</c>.</returns>
-    bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId);
+    Task<bool> SendToPublicationAsync(IContent? content, Guid userKey, CancellationToken cancellationToken);
 
     #endregion
 

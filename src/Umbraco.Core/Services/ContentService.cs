@@ -1488,14 +1488,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             .Select(attempt => attempt.Result)
             .ToArray();
 
-    /// <summary>
-    ///     Sends an <see cref="IContent" /> to Publication, which executes handlers and events for the 'Send to Publication'
-    ///     action.
-    /// </summary>
-    /// <param name="content">The <see cref="IContent" /> to send to publication</param>
-    /// <param name="userId">Optional Id of the User issuing the send to publication</param>
-    /// <returns>True if sending publication was successful otherwise false</returns>
-    public bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<bool> SendToPublicationAsync(IContent? content, Guid userKey, CancellationToken cancellationToken)
     {
         if (content is null)
         {
@@ -1504,50 +1498,51 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        var sendingToPublishNotification = new ContentSendingToPublishNotification(content, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(sendingToPublishNotification))
         {
-            var sendingToPublishNotification = new ContentSendingToPublishNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(sendingToPublishNotification))
-            {
-                scope.Complete();
-                return false;
-            }
-
-            // track the cultures changing for auditing
-            var culturesChanging = content.ContentType.VariesByCulture()
-                ? string.Join(",", content.CultureInfos!.Values.Where(x => x.IsDirty()).Select(x => x.Culture))
-                : null;
-
-            // TODO: Currently there's no way to change track which variant properties have changed, we only have change
-            // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
-            // in this particular case, determining which cultures have changed works with the above with names since it will
-            // have always changed if it's been saved in the back office but that's not really fail safe.
-
-            // Save before raising event
-            Attempt<ContentSaveOperationStatus> saveResult = SaveAsync(content, userId, null, CancellationToken.None).GetAwaiter().GetResult();
-
-            // always complete (but maybe return a failed status)
             scope.Complete();
+            return false;
+        }
 
-            if (!saveResult.Success)
-            {
-                return saveResult.Success;
-            }
+        // track the cultures changing for auditing
+        var culturesChanging = content.ContentType.VariesByCulture()
+            ? string.Join(",", content.CultureInfos!.Values.Where(x => x.IsDirty()).Select(x => x.Culture))
+            : null;
 
-            scope.Notifications.Publish(
-                new ContentSentToPublishNotification(content, evtMsgs).WithStateFrom(sendingToPublishNotification));
+        // TODO: Currently there's no way to change track which variant properties have changed, we only have change
+        // tracking enabled on all values on the Property which doesn't allow us to know which variants have changed.
+        // in this particular case, determining which cultures have changed works with the above with names since it will
+        // have always changed if it's been saved in the back office but that's not really fail safe.
 
-            if (culturesChanging != null)
-            {
-                Audit(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
-            }
-            else
-            {
-                Audit(AuditType.SendToPublish, userId, content.Id);
-            }
+        // Save before raising event
+        Attempt<ContentSaveOperationStatus> saveResult = await SaveAsync(content, userId, null, cancellationToken);
 
+        // always complete (but maybe return a failed status)
+        scope.Complete();
+
+        if (!saveResult.Success)
+        {
             return saveResult.Success;
         }
+
+        scope.Notifications.Publish(
+            new ContentSentToPublishNotification(content, evtMsgs).WithStateFrom(sendingToPublishNotification));
+
+        if (culturesChanging != null)
+        {
+            await AuditAsync(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
+        }
+        else
+        {
+            await AuditAsync(AuditType.SendToPublish, userId, content.Id);
+        }
+
+        return saveResult.Success;
     }
 
     /// <summary>

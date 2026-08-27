@@ -54,7 +54,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         .AddNotificationHandler<ContentPublishedNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentUnpublishingNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentUnpublishedNotification, ContentNotificationHandler>()
-        .AddNotificationHandler<ContentTreeChangeNotification, ContentNotificationHandler>();
+        .AddNotificationHandler<ContentTreeChangeNotification, ContentNotificationHandler>()
+        .AddNotificationHandler<ContentSendingToPublishNotification, ContentNotificationHandler>()
+        .AddNotificationHandler<ContentSentToPublishNotification, ContentNotificationHandler>();
 
     private async Task CreateTestData()
     {
@@ -1531,6 +1533,44 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public async Task SendToPublicationAsync_Saves_Content_And_Fires_Notifications()
+    {
+        Content document = new Content("content", -1, _contentType);
+
+        var sendingWasCalled = false;
+        var sentWasCalled = false;
+
+        ContentNotificationHandler.SendingToPublishContent = _ => sendingWasCalled = true;
+        ContentNotificationHandler.SentToPublishContent = _ => sentWasCalled = true;
+
+        try
+        {
+            var result = await ContentService.SendToPublicationAsync(document, Constants.Security.SuperUserKey, CancellationToken.None);
+
+            Assert.IsTrue(result);
+            Assert.IsTrue(sendingWasCalled);
+            Assert.IsTrue(sentWasCalled);
+            Assert.IsTrue(document.HasIdentity);
+
+            IContent? saved = await ContentService.GetByIdAsync(document.Key, CancellationToken.None);
+            Assert.IsNotNull(saved);
+        }
+        finally
+        {
+            ContentNotificationHandler.SendingToPublishContent = null;
+            ContentNotificationHandler.SentToPublishContent = null;
+        }
+    }
+
+    [Test]
+    public async Task SendToPublicationAsync_Returns_False_For_Null_Content()
+    {
+        var result = await ContentService.SendToPublicationAsync(null, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        Assert.IsFalse(result);
+    }
+
     internal sealed class ContentNotificationHandler :
         INotificationHandler<ContentSavingNotification>,
         INotificationHandler<ContentSavedNotification>,
@@ -1538,7 +1578,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         INotificationHandler<ContentPublishedNotification>,
         INotificationHandler<ContentUnpublishingNotification>,
         INotificationHandler<ContentUnpublishedNotification>,
-        INotificationHandler<ContentTreeChangeNotification>
+        INotificationHandler<ContentTreeChangeNotification>,
+        INotificationHandler<ContentSendingToPublishNotification>,
+        INotificationHandler<ContentSentToPublishNotification>
     {
         public static Action<ContentSavingNotification> SavingContent { get; set; }
 
@@ -1554,6 +1596,10 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         public static Action<ContentTreeChangeNotification> TreeChange { get; set; }
 
+        public static Action<ContentSendingToPublishNotification> SendingToPublishContent { get; set; }
+
+        public static Action<ContentSentToPublishNotification> SentToPublishContent { get; set; }
+
         public void Handle(ContentPublishedNotification notification) => PublishedContent?.Invoke(notification);
 
         public void Handle(ContentPublishingNotification notification) => PublishingContent?.Invoke(notification);
@@ -1566,5 +1612,9 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         public void Handle(ContentUnpublishingNotification notification) => UnpublishingContent?.Invoke(notification);
 
         public void Handle(ContentTreeChangeNotification notification) => TreeChange?.Invoke(notification);
+
+        public void Handle(ContentSendingToPublishNotification notification) => SendingToPublishContent?.Invoke(notification);
+
+        public void Handle(ContentSentToPublishNotification notification) => SentToPublishContent?.Invoke(notification);
     }
 }
