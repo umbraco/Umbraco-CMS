@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
@@ -15,24 +16,54 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStatusFilteringService
 {
     private readonly IPublishedMediaCache _publishedMediaCache;
+    private readonly IMediaCacheService _mediaCacheService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishedMediaStatusFilteringService"/> class.
     /// </summary>
     /// <param name="publishedMediaCache">The published media cache for retrieving media items.</param>
-    public PublishedMediaStatusFilteringService(IPublishedMediaCache publishedMediaCache)
-        => _publishedMediaCache = publishedMediaCache;
+    /// <param name="mediaCacheService">The media cache service used to materialise candidate keys in batches.</param>
+    public PublishedMediaStatusFilteringService(IPublishedMediaCache publishedMediaCache, IMediaCacheService mediaCacheService)
+    {
+        _publishedMediaCache = publishedMediaCache;
+        _mediaCacheService = mediaCacheService;
+    }
 
     /// <inheritdoc />
     /// <remarks>
-    /// Returned lazily so consumers like .FirstOrDefault() / .Take(n) can short-circuit without
-    /// materialising the full result. Callers that need to enumerate the result more than once
-    /// should buffer it themselves (.ToList() / .ToArray()).
+    /// Materialised in growing chunks: an all-L0-hit chunk stays fully synchronous, while a cold set
+    /// collapses its database access into batched reads. Returned lazily so consumers like
+    /// .FirstOrDefault() / .Take(n) can short-circuit without materialising the full result. Callers
+    /// that need to enumerate the result more than once should buffer it themselves (.ToList() / .ToArray()).
     /// </remarks>
     public IEnumerable<IPublishedContent> FilterAvailable(IEnumerable<Guid> candidateKeys, string? culture)
-        => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull();
+        => ChunkedTieredResolver.Resolve<Guid, IPublishedContent>(
+            candidateKeys,
+            ResolveCachedItems,
+            ResolvePersistedItems);
 
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
         => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull();
+
+    private void ResolveCachedItems(IReadOnlyCollection<Guid> batchKeys, IDictionary<Guid, IPublishedContent> results)
+    {
+        foreach (Guid key in batchKeys)
+        {
+            if (_mediaCacheService.TryGetCached(key, out IPublishedContent? content) && content is not null)
+            {
+                results[key] = content;
+            }
+        }
+    }
+
+    // Sync-over-async is intentional: FilterAvailable backs the sync IPublishedContent.Children()/
+    // Descendants() surface, and GetByKeysAsync has no sync counterpart.
+    private void ResolvePersistedItems(IReadOnlyCollection<Guid> missedKeys, IDictionary<Guid, IPublishedContent> results)
+    {
+        foreach (IPublishedContent content in _mediaCacheService.GetByKeysAsync(missedKeys).GetAwaiter().GetResult())
+        {
+            results[content.Key] = content;
+        }
+    }
 }
