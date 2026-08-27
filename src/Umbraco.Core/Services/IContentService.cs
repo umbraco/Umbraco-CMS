@@ -45,9 +45,9 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Moves a blueprint.
     /// </summary>
     /// <param name="content">The blueprint to move.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    // TODO (V19): Remove the default implementation from this
-    void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task MoveBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Deletes a blueprint.

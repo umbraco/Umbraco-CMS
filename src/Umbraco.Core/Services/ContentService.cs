@@ -1904,26 +1904,25 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// </summary>
     /// <param name="content">The blueprint content to move.</param>
     /// <param name="userId">The optional ID of the user moving the blueprint.</param>
-    public void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+    public async Task MoveBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         content.Blueprint = true;
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
 
-            content.WriterId = userId;
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        content.WriterId = userId;
 
-            _documentBlueprintRepository.Save(content);
+        await _asyncDocumentBlueprintRepository.SaveAsync(content, cancellationToken);
 
-            Audit(AuditType.Move, userId, content.Id);
+        await AuditAsync(AuditType.Move, userId, content.Id);
 
-            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
+        scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
-            scope.Complete();
-        }
+        scope.Complete();
     }
 
     /// <summary>

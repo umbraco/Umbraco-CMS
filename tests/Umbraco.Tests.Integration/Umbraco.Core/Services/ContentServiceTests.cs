@@ -267,6 +267,29 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
+    public async Task Move_Blueprint()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var container = ContentBuilder.CreateTextpageContent(contentType, "container", Constants.System.Root);
+        await ContentService.SaveAsync(container, null, null, CancellationToken.None);
+
+        var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
+        ContentService.SaveBlueprint(blueprint, null);
+
+        blueprint.ParentId = container.Id;
+        await ContentService.MoveBlueprintAsync(blueprint, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        IContent? moved = await ContentService.GetBlueprintByIdAsync(blueprint.Key, CancellationToken.None);
+        Assert.IsNotNull(moved);
+        Assert.AreEqual(container.Id, moved!.ParentId);
+    }
+
+    [Test]
     public async Task GetBlueprintByIdAsync_Returns_Blueprint_With_BlueprintFlagSet()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
