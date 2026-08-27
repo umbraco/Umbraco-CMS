@@ -1,8 +1,10 @@
 ﻿using Examine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Search.Core.Models.Configuration;
 using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Search.Provider.Examine.Services;
@@ -20,6 +22,7 @@ public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicatio
     private readonly IContentIndexingService _contentIndexingService;
     private readonly ILogger<RebuildNotificationHandler> _logger;
     private readonly IOriginProvider _originProvider;
+    private readonly IRuntimeState _runtimeState;
     private readonly IndexOptions _options;
 
     /// <summary>
@@ -31,25 +34,38 @@ public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicatio
     /// <param name="options">The options listing the registered content indexes to check on startup.</param>
     /// <param name="logger">The logger used to record which indexes are being rebuilt.</param>
     /// <param name="originProvider">The provider used to obtain the current server origin for the rebuild.</param>
+    /// <param name="runtimeState">The runtime state used to only rebuild once Umbraco has finished booting and any pending upgrade migrations have run.</param>
     public RebuildNotificationHandler(
         IExamineManager examineManager,
         IActiveIndexManager activeIndexManager,
         IContentIndexingService contentIndexingService,
         IOptions<IndexOptions> options,
         ILogger<RebuildNotificationHandler> logger,
-        IOriginProvider originProvider)
+        IOriginProvider originProvider,
+        IRuntimeState runtimeState)
     {
         _examineManager = examineManager;
         _activeIndexManager = activeIndexManager;
         _contentIndexingService = contentIndexingService;
         _logger = logger;
         _originProvider = originProvider;
+        _runtimeState = runtimeState;
         _options = options.Value;
     }
 
     /// <inheritdoc />
     public void Handle(UmbracoApplicationStartedNotification notification)
     {
+        // Wait for runtime mode, as there might be incoming schema changes etc.
+        if (_runtimeState.Level != RuntimeLevel.Run)
+        {
+            _logger.LogDebug(
+                "Skipping startup index rebuild check because the runtime level is {RuntimeLevel}, not {RunLevel}.",
+                _runtimeState.Level,
+                RuntimeLevel.Run);
+            return;
+        }
+
         _logger.LogInformation("Boot detected, determining indexes to rebuild");
         foreach (ContentIndexRegistration indexRegistration in _options.GetContentIndexRegistrations())
         {
