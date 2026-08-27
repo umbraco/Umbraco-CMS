@@ -952,7 +952,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             }
         }
 
-        public IReadOnlyList<string> MessagesMatching(string fragment)
+        public string[] MessagesMatching(string fragment)
         {
             lock (_entries)
             {
@@ -960,7 +960,7 @@ internal sealed class MigrateSingleBlockListTests : UmbracoIntegrationTest
             }
         }
 
-        public IReadOnlyList<string> MessagesAtLevel(LogLevel level)
+        public string[] MessagesAtLevel(LogLevel level)
         {
             lock (_entries)
             {
