@@ -13,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
-const DATA_TYPE_OBSERVER_ALIAS = 'umbContentCollectionConfigurationDataTypeObserver';
+const DATA_TYPE_OBSERVER_ALIAS = Symbol();
 
 /**
  * Resolves the configuration of a content collection, for any host that can say which collection it renders, which
