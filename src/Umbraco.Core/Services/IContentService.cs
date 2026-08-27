@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -47,7 +48,8 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="content">The blueprint to move.</param>
     /// <param name="userKey">The Guid key of the user performing the action.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    Task MoveBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken);
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentBlueprintOperationStatus>> MoveBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Deletes a blueprint.
@@ -55,7 +57,8 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="content">The blueprint to delete.</param>
     /// <param name="userKey">The Guid key of the user performing the action.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    Task DeleteBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken);
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentBlueprintOperationStatus>> DeleteBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Creates a blueprint from a content item.
@@ -447,12 +450,12 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="orderedChildKeys">The Guid keys of the children, in the desired order.</param>
     /// <param name="userKey">The Guid key of the user performing the action.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The operation result.</returns>
+    /// <returns>An attempt carrying the operation status.</returns>
     /// <remarks>
     ///     Unlike <see cref="Sort(IEnumerable{int}?, int)" />, this does not load the children or fire per-item
     ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
     /// </remarks>
-    Task<OperationResult> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken);
+    Task<Attempt<ContentSortChildrenOperationStatus>> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken);
 
     #endregion
 
@@ -509,8 +512,8 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <param name="content">The document to send to publication.</param>
     /// <param name="userKey">The Guid key of the user performing the action.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns><c>true</c> if the document was sent to publication; otherwise, <c>false</c>.</returns>
-    Task<bool> SendToPublicationAsync(IContent? content, Guid userKey, CancellationToken cancellationToken);
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentSendToPublicationOperationStatus>> SendToPublicationAsync(IContent? content, Guid userKey, CancellationToken cancellationToken);
 
     #endregion
 
@@ -616,6 +619,6 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Empties the Recycle Bin asynchronously by deleting all <see cref="IContent" /> that resides in the bin.
     /// </summary>
     /// <param name="userId">The unique identifier of the user emptying the Recycle Bin.</param>
-    /// <returns>A task representing the asynchronous operation with the operation result.</returns>
-    Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userId);
 }

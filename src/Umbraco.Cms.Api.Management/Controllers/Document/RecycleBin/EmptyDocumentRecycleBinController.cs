@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
@@ -68,9 +70,18 @@ public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBas
             return Forbidden();
         }
 
-        OperationResult result = await _contentService.EmptyRecycleBinAsync(CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<ContentEmptyRecycleBinOperationStatus> result = await _contentService.EmptyRecycleBinAsync(CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
-            : OperationStatusResult(result);
+            : OperationStatusResult(result.Result, problemDetailsBuilder => result.Result switch
+            {
+                ContentEmptyRecycleBinOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
+                    .WithTitle("Cancelled by notification")
+                    .WithDetail("A notification handler prevented the operation.")
+                    .Build()),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                    .WithTitle("Unknown operation status.")
+                    .Build()),
+            });
     }
 }

@@ -314,8 +314,14 @@ internal sealed class ContentEditingService
     /// <inheritdoc />
     protected override async Task<ContentEditingOperationStatus> SortChildrenInBulkAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey)
     {
-        OperationResult result = await ContentService.SortChildrenAsync(parentKey, orderedChildKeys, userKey, CancellationToken.None);
-        return OperationResultToOperationStatus(result);
+        Attempt<ContentSortChildrenOperationStatus> result = await ContentService.SortChildrenAsync(parentKey, orderedChildKeys, userKey, CancellationToken.None);
+        OperationResult operationResult = result.Result switch
+        {
+            ContentSortChildrenOperationStatus.Success => OperationResult.Succeed(new EventMessages()),
+            ContentSortChildrenOperationStatus.NoOperation => new OperationResult(OperationResultType.NoOperation, new EventMessages()),
+            _ => OperationResult.Cancel(new EventMessages()),
+        };
+        return OperationResultToOperationStatus(operationResult);
     }
 
     private async Task<ContentEditingOperationStatus> Save(IContent content, Guid userKey)

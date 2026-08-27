@@ -1192,8 +1192,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// Empties the Recycle Bin by deleting all <see cref="IContent"/> items that reside in the bin asynchronously.
     /// </summary>
     /// <param name="userId">The unique key of the user performing the operation.</param>
-    /// <returns>An <see cref="OperationResult"/> indicating the result of the operation.</returns>
-    public async Task<OperationResult> EmptyRecycleBinAsync(Guid userId)
+    /// <returns>An attempt carrying the operation status.</returns>
+    public async Task<Attempt<ContentEmptyRecycleBinOperationStatus>> EmptyRecycleBinAsync(Guid userId)
     {
         var deleted = new List<IContent>();
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -1213,7 +1213,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             || await scope.Notifications.PublishCancelableAsync(deletingContentNotification))
         {
             scope.Complete();
-            return OperationResult.Cancel(eventMessages);
+            return Attempt.Fail(ContentEmptyRecycleBinOperationStatus.CancelledByNotification);
         }
 
         // When checking if an item is related, we need to exclude the "relate parent on delete" relation type,
@@ -1250,7 +1250,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         scope.Complete();
 
-        return OperationResult.Succeed(eventMessages);
+        return Attempt.Succeed(ContentEmptyRecycleBinOperationStatus.Success);
     }
 
     #endregion
@@ -1460,11 +1460,11 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             .ToArray();
 
     /// <inheritdoc />
-    public async Task<bool> SendToPublicationAsync(IContent? content, Guid userKey, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentSendToPublicationOperationStatus>> SendToPublicationAsync(IContent? content, Guid userKey, CancellationToken cancellationToken)
     {
         if (content is null)
         {
-            return false;
+            return Attempt.Fail(ContentSendToPublicationOperationStatus.NotFound);
         }
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -1477,7 +1477,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         if (await scope.Notifications.PublishCancelableAsync(sendingToPublishNotification))
         {
             scope.Complete();
-            return false;
+            return Attempt.Fail(ContentSendToPublicationOperationStatus.CancelledByNotification);
         }
 
         // track the cultures changing for auditing
@@ -1498,7 +1498,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
         if (!saveResult.Success)
         {
-            return saveResult.Success;
+            return Attempt.Fail(ContentSendToPublicationOperationStatus.SaveFailed);
         }
 
         scope.Notifications.Publish(
@@ -1513,7 +1513,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             await AuditAsync(AuditType.SendToPublish, userId, content.Id);
         }
 
-        return saveResult.Success;
+        return Attempt.Succeed(ContentSendToPublicationOperationStatus.Success);
     }
 
     /// <summary>
@@ -1586,12 +1586,12 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     }
 
     /// <inheritdoc />
-    public async Task<OperationResult> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentSortChildrenOperationStatus>> SortChildrenAsync(Guid? parentKey, IReadOnlyList<Guid> orderedChildKeys, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
         if (orderedChildKeys.Count == 0)
         {
-            return new OperationResult(OperationResultType.NoOperation, evtMsgs);
+            return Attempt.Fail(ContentSortChildrenOperationStatus.NoOperation);
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1623,7 +1623,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         await AuditAsync(AuditType.Sort, userId, parentId);
 
         scope.Complete();
-        return OperationResult.Succeed(evtMsgs);
+        return Attempt.Succeed(ContentSortChildrenOperationStatus.Success);
     }
 
     private OperationResult Sort(ICoreScope scope, IContent[] itemsA, int userId, EventMessages eventMessages)
@@ -1904,7 +1904,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// </summary>
     /// <param name="content">The blueprint content to move.</param>
     /// <param name="userId">The optional ID of the user moving the blueprint.</param>
-    public async Task MoveBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentBlueprintOperationStatus>> MoveBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -1923,6 +1923,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
         scope.Complete();
+
+        return Attempt.Succeed(ContentBlueprintOperationStatus.Success);
     }
 
     /// <summary>
@@ -1930,7 +1932,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// </summary>
     /// <param name="content">The blueprint content to delete.</param>
     /// <param name="userId">The optional ID of the user deleting the blueprint.</param>
-    public async Task DeleteBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
+    public async Task<Attempt<ContentBlueprintOperationStatus>> DeleteBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -1942,6 +1944,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         scope.Notifications.Publish(new ContentDeletedBlueprintNotification(content, evtMsgs));
         scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
         scope.Complete();
+
+        return Attempt.Succeed(ContentBlueprintOperationStatus.Success);
     }
 
     private static readonly string?[] ArrayOfOneNullString = { null };
