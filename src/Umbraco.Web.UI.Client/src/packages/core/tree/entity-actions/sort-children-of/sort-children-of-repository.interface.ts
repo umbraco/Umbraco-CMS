@@ -19,9 +19,9 @@ export interface UmbSortChildrenOfRepository extends UmbApi {
 	sortChildrenOfByField?(args: UmbSortChildrenOfByFieldArgs): Promise<UmbRepositoryErrorResponse>;
 
 	/**
-	 * Gets the fields the children of an entity can be sorted by on the server.
+	 * Requests the fields the children of an entity can be sorted by on the server.
 	 * Optional: only implemented by repositories whose entity supports server-side field sorting.
-	 * @returns {Array<UmbSortChildrenByFieldOption>} the available fields
+	 * @returns {Promise<Array<UmbSortChildrenByFieldOption>>} the available fields
 	 */
-	getSortByFieldOptions?(): Array<UmbSortChildrenByFieldOption>;
+	requestSortByFieldOptions?(): Promise<Array<UmbSortChildrenByFieldOption>>;
 }

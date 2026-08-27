@@ -21,8 +21,8 @@ describe('UmbSortChildrenOfDocumentRepository', () => {
 		document.body.innerHTML = '';
 	});
 
-	it('offers only the culture-dependent fields as varying by culture', () => {
-		const options = repository.getSortByFieldOptions();
+	it('offers only the culture-dependent fields as varying by culture', async () => {
+		const options = await repository.requestSortByFieldOptions();
 
 		expect(options.find((option) => option.value === ContentSortFieldModel.NAME)?.variesByCulture).to.be.true;
 		expect(options.find((option) => option.value === ContentSortFieldModel.CREATE_DATE)?.variesByCulture).to.be

@@ -135,9 +135,9 @@ export class UmbSortChildrenOfModalElement<
 		try {
 			const repository = await this.#getSortChildrenOfRepository();
 
-			if (!repository.sortChildrenOfByField || !repository.getSortByFieldOptions) return;
+			if (!repository.sortChildrenOfByField || !repository.requestSortByFieldOptions) return;
 
-			this._sortByFieldOptions = repository.getSortByFieldOptions();
+			this._sortByFieldOptions = await repository.requestSortByFieldOptions();
 			this._selectedField = this._sortByFieldOptions[0]?.value;
 			this._supportsSortByField = this._sortByFieldOptions.length > 0;
 		} catch {

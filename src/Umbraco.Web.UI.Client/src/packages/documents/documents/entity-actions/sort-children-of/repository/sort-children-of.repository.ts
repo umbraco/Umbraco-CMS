@@ -20,7 +20,7 @@ export class UmbSortChildrenOfDocumentRepository extends UmbControllerBase imple
 		return this.#dataSource.sortChildrenOfByField(args);
 	}
 
-	getSortByFieldOptions(): Array<UmbSortChildrenOfDocumentByFieldOption> {
+	async requestSortByFieldOptions(): Promise<Array<UmbSortChildrenOfDocumentByFieldOption>> {
 		return [
 			{ value: ContentSortFieldModel.NAME, label: '#sort_sortByFieldNameOption', variesByCulture: true },
 			{ value: ContentSortFieldModel.CREATE_DATE, label: '#sort_sortByFieldCreateDateOption' },

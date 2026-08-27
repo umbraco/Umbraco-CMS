@@ -24,7 +24,7 @@ export class UmbSortChildrenOfMediaRepository extends UmbControllerBase implemen
 		return this.#dataSource.sortChildrenOfByField(args);
 	}
 
-	getSortByFieldOptions(): Array<UmbSortChildrenByFieldOption> {
+	async requestSortByFieldOptions(): Promise<Array<UmbSortChildrenByFieldOption>> {
 		return [
 			{ value: ContentSortFieldModel.NAME, label: '#sort_sortByFieldNameOption' },
 			{ value: ContentSortFieldModel.CREATE_DATE, label: '#sort_sortByFieldCreateDateOption' },
