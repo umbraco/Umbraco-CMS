@@ -28,6 +28,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 /// </summary>
 public class MigrateSingleBlockList : AsyncMigrationBase
 {
+    private const int DefaultPageSize = 1000;
+
     private readonly IUmbracoContextFactory _umbracoContextFactory;
     private readonly ILanguageService _languageService;
     private readonly IContentTypeService _contentTypeService;
@@ -41,8 +43,6 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     private readonly IBlockEditorElementTypeCache _elementTypeCache;
     private readonly AppCaches _appCaches;
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
-    private const int DefaultPageSize = 1000;
-
     private readonly ILogger<MigrateSingleBlockList> _logger;
     private readonly IDataValueEditor _dummySingleBlockValueEditor;
 
@@ -177,6 +177,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     /// </remarks>
     internal virtual int PageSize => DefaultPageSize;
 
+    /// <inheritdoc/>
     protected override async Task MigrateAsync()
     {
         // Give scope for the migration to complete within the command timeout, which may be necessary on large datasets.
@@ -227,17 +228,16 @@ public class MigrateSingleBlockList : AsyncMigrationBase
 
         // Save the converted property values first, and only switch the data types over below.
         //
-        // This ordering is load-bearing, not cosmetic. The value editors that re-serialize a converted value resolve
-        // the value editor of each nested block property from its data type's property editor alias, and they do so on
-        // their own scopes - and therefore their own connections - which cannot observe anything this migration has
-        // written but not committed. Converting first means those lookups only ever read committed, pre-migration
+        // This ordering is important. The value editors that re-serialize a converted value resolve the value editor
+        // of each nested block property from its data type's property editor alias, and they do so on their own scopes
+        // - and therefore their own connections - which cannot observe anything this migration has written but not
+        // committed. Converting first means those lookups only ever read committed, pre-migration
         // state, and SingleBlockMigrationEditorAliasOverride is what routes the converted values to the single block
         // value editor regardless (https://github.com/umbraco/Umbraco-CMS/issues/23596).
         //
         // Each page of property data is converted and saved before the next one is fetched, so that neither the
         // fetched rows nor the values they deserialize to accumulate across the whole site
-        // (https://github.com/umbraco/Umbraco-CMS/issues/23766). That does not weaken the ordering above, which
-        // constrains when umbracoDataType is written, not umbracoPropertyData.
+        // (https://github.com/umbraco/Umbraco-CMS/issues/23766).
         foreach (var propertyEditorAlias in propertyEditorAliases)
         {
             if (relevantPropertyEditors.TryGetValue(propertyEditorAlias, out IPropertyType[]? propertyTypes) is false)
