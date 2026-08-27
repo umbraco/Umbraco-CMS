@@ -90,6 +90,15 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     }
 
     /// <inheritdoc />
+    public Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(IElement content, int? userId, CancellationToken cancellationToken)
+    {
+        OperationResult result = Delete(content, userId ?? Constants.Security.SuperUserId);
+        return Task.FromResult(result.Success
+            ? Attempt.Succeed(ContentDeleteOperationStatus.Success)
+            : Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification));
+    }
+
+    /// <inheritdoc />
     Attempt<OperationResult?> IAsyncContentServiceBase<IElement>.Save(IEnumerable<IElement> contents, int userId) =>
         Attempt.Succeed(Save(contents, userId));
 

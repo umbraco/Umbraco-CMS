@@ -58,7 +58,7 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Delete the content (simulating what happens before server restart)
-        ContentService.Delete(content);
+        await ContentService.DeleteAsync(content, null, CancellationToken.None);
 
         return content;
     }

@@ -1154,7 +1154,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsNotNull(content);
 
             ResetEvents();
-            ContentService.Delete(content);
+            await ContentService.DeleteAsync(content, null, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1174,7 +1174,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
-            ContentService.Delete(content);
+            await ContentService.DeleteAsync(content, null, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1196,7 +1196,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
             ResetEvents();
-            ContentService.Delete(content);
+            await ContentService.DeleteAsync(content, null, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1220,7 +1220,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Unpublish(content1);
 
             ResetEvents();
-            ContentService.Delete(content2);
+            await ContentService.DeleteAsync(content2, null, CancellationToken.None);
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
@@ -1246,7 +1246,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content5C = Children(content1C[3]).ToArray();
 
             ResetEvents();
-            ContentService.Delete(content1);
+            await ContentService.DeleteAsync(content1, null, CancellationToken.None);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);

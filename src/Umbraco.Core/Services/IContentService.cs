@@ -312,18 +312,6 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     new OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
-    ///     Deletes a document.
-    /// </summary>
-    /// <param name="content">The document to delete.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The operation result.</returns>
-    /// <remarks>
-    ///     <para>This method will also delete associated media files, child content and possibly associated domains.</para>
-    ///     <para>This method entirely clears the content from the database.</para>
-    /// </remarks>
-    OperationResult Delete(IContent content, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Deletes all documents of a given document type.
     /// </summary>
     /// <param name="documentTypeId">The document type identifier.</param>

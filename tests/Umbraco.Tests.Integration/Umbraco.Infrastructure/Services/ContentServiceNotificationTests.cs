@@ -1431,7 +1431,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Delete(document);
+            await ContentService.DeleteAsync(document, null, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally
@@ -1480,7 +1480,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            ContentService.Delete(document);
+            await ContentService.DeleteAsync(document, null, CancellationToken.None);
             Assert.IsTrue(unpublishedWasCalled);
         }
         finally

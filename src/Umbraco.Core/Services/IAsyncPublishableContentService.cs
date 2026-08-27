@@ -63,6 +63,19 @@ public interface IAsyncPublishableContentService<TContent> : IAsyncContentServic
     Task<Attempt<ContentSaveOperationStatus>> SaveAsync(TContent content, int? userId, ContentScheduleCollection? contentSchedule, CancellationToken cancellationToken);
 
     /// <summary>
+    ///     Deletes a content item.
+    /// </summary>
+    /// <param name="content">The content item to delete.</param>
+    /// <param name="userId">The identifier of the user performing the action, or <c>null</c> to use the super user.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    /// <remarks>
+    ///     <para>This method will also delete associated media files, child content and possibly associated domains.</para>
+    ///     <para>This method entirely clears the content from the database.</para>
+    /// </remarks>
+    Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, int? userId, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Gets a version of content.
     /// </summary>
     /// <remarks>

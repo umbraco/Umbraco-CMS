@@ -95,7 +95,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
                         Serializer.Serialize(element)))));
 
         // Remove the originals so the install genuinely re-creates them (import skips items whose key already exists).
-        ElementService.Delete(element);
+        await ElementService.DeleteAsync(element, null, CancellationToken.None);
         await ContentTypeService.DeleteAsync(elementType, Constants.Security.SuperUserKey);
 
         Assert.That(await ElementService.GetByIdAsync(elementKey, CancellationToken.None), Is.Null);
@@ -163,7 +163,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
                         serialized))));
 
         // Remove the originals (leaf-first) so the install genuinely re-creates them.
-        ElementService.Delete(element);
+        await ElementService.DeleteAsync(element, null, CancellationToken.None);
         await ElementContainerService.DeleteAsync(containerB.Key, Constants.Security.SuperUserKey);
         await ElementContainerService.DeleteAsync(containerA.Key, Constants.Security.SuperUserKey);
         await ContentTypeService.DeleteAsync(elementType, Constants.Security.SuperUserKey);
@@ -228,7 +228,7 @@ internal sealed class ElementPackagingTests : UmbracoIntegrationTest
                         serialized))));
 
         // Remove the element so the install genuinely re-creates it, but keep the (renamed) container.
-        ElementService.Delete(element);
+        await ElementService.DeleteAsync(element, null, CancellationToken.None);
         Assert.That(await ElementService.GetByIdAsync(elementKey, CancellationToken.None), Is.Null);
 
         // Act

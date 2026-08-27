@@ -1642,40 +1642,39 @@ public abstract class AsyncPublishableContentServiceBase<TContent> : RepositoryS
     #region Delete
 
     /// <inheritdoc />
-    public OperationResult Delete(TContent content, int userId = Constants.Security.SuperUserId)
+    public async Task<Attempt<ContentDeleteOperationStatus>> DeleteAsync(TContent content, int? userId, CancellationToken cancellationToken)
     {
+        userId ??= Constants.Security.SuperUserId;
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(WriteLockIds);
+
+        if (await scope.Notifications.PublishCancelableAsync(DeletingNotification(content, eventMessages)))
         {
-            scope.WriteLock(WriteLockIds);
-
-            if (scope.Notifications.PublishCancelable(DeletingNotification(content, eventMessages)))
-            {
-                scope.Complete();
-                return OperationResult.Cancel(eventMessages);
-            }
-
-            // if it's not trashed yet, and published, we should unpublish
-            // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
-            // just raise the event
-            if (content.Trashed == false && content.Published)
-            {
-                scope.Notifications.Publish(UnpublishedNotification(
-                    content,
-                    eventMessages,
-                    BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
-            }
-
-            DeleteLocked(scope, content, eventMessages);
-
-            scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
-            Audit(AuditType.Delete, userId, content.Id);
-
             scope.Complete();
+            return Attempt.Fail(ContentDeleteOperationStatus.CancelledByNotification);
         }
 
-        return OperationResult.Succeed(eventMessages);
+        // if it's not trashed yet, and published, we should unpublish
+        // but... Unpublishing event makes no sense (not going to cancel?) and no need to save
+        // just raise the event
+        if (content.Trashed == false && content.Published)
+        {
+            scope.Notifications.Publish(UnpublishedNotification(
+                content,
+                eventMessages,
+                BuildCultureMap(content, content.ContentType.VariesByCulture() ? content.PublishedCultures : ["*"])));
+        }
+
+        await DeleteLockedAsync(scope, content, eventMessages, cancellationToken);
+
+        scope.Notifications.Publish(TreeChangeNotification(content, TreeChangeTypes.Remove, eventMessages));
+        await AuditAsync(AuditType.Delete, userId.Value, content.Id);
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentDeleteOperationStatus.Success);
     }
 
     // TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way

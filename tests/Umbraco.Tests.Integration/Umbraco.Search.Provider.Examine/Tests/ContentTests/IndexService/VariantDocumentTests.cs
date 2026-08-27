@@ -33,7 +33,7 @@ public class VariantDocumentTests : IndexTestBase
         await WaitForIndexing(indexAlias, () =>
         {
             IContent content = ContentService.GetByIdAsync(RootKey, CancellationToken.None).GetAwaiter().GetResult()!;
-            ContentService.Delete(content);
+            ContentService.DeleteAsync(content, null, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 

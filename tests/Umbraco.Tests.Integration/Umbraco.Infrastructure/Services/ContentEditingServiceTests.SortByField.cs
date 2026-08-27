@@ -260,7 +260,7 @@ public partial class ContentEditingServiceTests
     {
         foreach (var existingRoot in await ContentService.GetRootContentAsync(CancellationToken.None))
         {
-            ContentService.Delete(existingRoot);
+            await ContentService.DeleteAsync(existingRoot, null, CancellationToken.None);
         }
 
         var rootContentType = ContentTypeBuilder.CreateBasicContentType(alias: "rootPage", name: "Root Page");

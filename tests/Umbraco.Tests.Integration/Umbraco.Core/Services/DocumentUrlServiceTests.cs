@@ -226,7 +226,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        ContentService.Delete(Textpage);
+        await ContentService.DeleteAsync(Textpage, null, CancellationToken.None);
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
@@ -240,7 +240,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
-        ContentService.Delete(Subpage2);
+        await ContentService.DeleteAsync(Subpage2, null, CancellationToken.None);
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 

@@ -24,18 +24,6 @@ public interface IPublishableContentService<TContent> : IContentServiceBase
     // SaveAsync (declared on IAsyncPublishableContentService<TContent>).
 
     /// <summary>
-    ///     Deletes content.
-    /// </summary>
-    /// <param name="content">The content to delete.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The operation result.</returns>
-    /// <remarks>
-    ///     <para>This method will also delete associated media files, child content and possibly associated domains.</para>
-    ///     <para>This method entirely clears the content from the database.</para>
-    /// </remarks>
-    OperationResult Delete(TContent content, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Deletes all content of given types.
     /// </summary>
     /// <param name="contentTypeIds">The content type identifiers.</param>

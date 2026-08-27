@@ -154,7 +154,7 @@ public class ContentServiceTests : UmbracoIntegrationTest
         // Delete the content
         await WaitForIndexing(indexAlias, () =>
         {
-            ContentService.Delete(_rootDocument);
+            ContentService.DeleteAsync(_rootDocument, null, CancellationToken.None).GetAwaiter().GetResult();
             return Task.CompletedTask;
         });
 

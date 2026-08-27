@@ -165,7 +165,7 @@ public partial class PublishedContentCacheRefresherTests
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
-        ContentService.Delete(Get(RootKey));
+        await ContentService.DeleteAsync(Get(RootKey), null, CancellationToken.None);
 
         List<PublishedContentCacheRefresher.JsonPayload> payloads = GetNotificationPayloads();
         Assert.That(payloads, Has.Count.EqualTo(1));
@@ -185,7 +185,7 @@ public partial class PublishedContentCacheRefresherTests
         ContentService.PublishBranch(Get(RootKey), PublishBranchFilter.IncludeUnpublished, ["*"]);
         ResetNotificationPayloads();
 
-        ContentService.Delete(Get(ChildKey));
+        await ContentService.DeleteAsync(Get(ChildKey), null, CancellationToken.None);
 
         List<PublishedContentCacheRefresher.JsonPayload> payloads = GetNotificationPayloads();
         Assert.That(payloads, Has.Count.EqualTo(1));
@@ -206,7 +206,7 @@ public partial class PublishedContentCacheRefresherTests
         ContentService.MoveToRecycleBin(Get(RootKey));
         ResetNotificationPayloads();
 
-        ContentService.Delete(Get(RootKey));
+        await ContentService.DeleteAsync(Get(RootKey), null, CancellationToken.None);
 
         // no payload expected; it should've already been handled when moving the content to the recycle bin
         List<PublishedContentCacheRefresher.JsonPayload> payloads = GetNotificationPayloads();

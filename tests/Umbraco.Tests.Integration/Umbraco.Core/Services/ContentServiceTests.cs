@@ -2696,7 +2696,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var content = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Act
-        ContentService.Delete(content);
+        await ContentService.DeleteAsync(content, null, CancellationToken.None);
         var deleted = await ContentService.GetByIdAsync(Textpage.Key, CancellationToken.None);
 
         // Assert
@@ -3881,7 +3881,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Start by cleaning the "db"
         var umbTextPage = await ContentService.GetByIdAsync(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"), CancellationToken.None);
-        ContentService.Delete(umbTextPage);
+        await ContentService.DeleteAsync(umbTextPage, null, CancellationToken.None);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -3910,7 +3910,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     {
         // Start by cleaning the "db"
         var umbTextPage = await ContentService.GetByIdAsync(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"), CancellationToken.None);
-        ContentService.Delete(umbTextPage);
+        await ContentService.DeleteAsync(umbTextPage, null, CancellationToken.None);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);

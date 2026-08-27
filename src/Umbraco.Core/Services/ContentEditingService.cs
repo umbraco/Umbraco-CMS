@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -289,10 +290,15 @@ internal sealed class ContentEditingService
     }
 
     /// <inheritdoc />
-    protected override OperationResult? MoveToRecycleBin(IContent content, int userId) => ContentService.MoveToRecycleBin(content, userId);
+    protected override Task<OperationResult?> MoveToRecycleBinAsync(IContent content, int userId)
+        => Task.FromResult<OperationResult?>(ContentService.MoveToRecycleBin(content, userId));
 
     /// <inheritdoc />
-    protected override OperationResult? Delete(IContent content, int userId) => ContentService.Delete(content, userId);
+    protected override async Task<OperationResult?> DeleteAsync(IContent content, int userId)
+    {
+        Attempt<ContentDeleteOperationStatus> result = await ContentService.DeleteAsync(content, userId, CancellationToken.None);
+        return result.Success ? OperationResult.Succeed(new EventMessages()) : OperationResult.Cancel(new EventMessages());
+    }
 
     /// <inheritdoc />
     protected override Task<PagedModel<IContent>> GetPagedChildrenAsync(Guid? parentKey, int pageIndex, int pageSize, Ordering? ordering)

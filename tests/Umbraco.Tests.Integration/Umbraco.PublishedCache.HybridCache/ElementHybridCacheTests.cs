@@ -141,7 +141,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         var elementService = GetRequiredService<IElementService>();
         var element = await elementService.GetByIdAsync(elementKey, CancellationToken.None);
         Assert.That(element, Is.Not.Null);
-        elementService.Delete(element!);
+        await elementService.DeleteAsync(element!, null, CancellationToken.None);
 
         // Assert
         IPublishedElement? result = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);

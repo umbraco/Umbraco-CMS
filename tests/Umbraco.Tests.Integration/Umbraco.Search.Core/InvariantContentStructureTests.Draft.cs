@@ -1,6 +1,8 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
@@ -75,7 +77,7 @@ public partial class InvariantContentStructureTests
     {
         ContentService.Save([Root(), Child(), Grandchild(), GreatGrandchild()]);
 
-        OperationResult result = ContentService.Delete(Grandchild());
+        Attempt<ContentDeleteOperationStatus> result = ContentService.DeleteAsync(Grandchild(), null, CancellationToken.None).GetAwaiter().GetResult();
         Assert.Multiple(() =>
         {
             Assert.That(result.Success, Is.True);

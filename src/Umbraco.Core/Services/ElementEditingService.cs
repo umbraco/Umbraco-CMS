@@ -548,11 +548,14 @@ internal sealed class ElementEditingService
         return copy;
     }
 
-    protected override OperationResult? MoveToRecycleBin(IElement element, int userId)
+    protected override Task<OperationResult?> MoveToRecycleBinAsync(IElement element, int userId)
         => throw new NotImplementedException("Explicitly implemented elsewhere by this service");
 
-    protected override OperationResult? Delete(IElement element, int userId)
-        => ContentService.Delete(element, userId);
+    protected override async Task<OperationResult?> DeleteAsync(IElement element, int userId)
+    {
+        Attempt<ContentDeleteOperationStatus> result = await ContentService.DeleteAsync(element, userId, CancellationToken.None);
+        return result.Success ? OperationResult.Succeed(new EventMessages()) : OperationResult.Cancel(new EventMessages());
+    }
 
     // NOTE: We have a custom implementation for Move because ContentEditingServiceBase has no concept of Containers.
     protected override OperationResult? Move(IElement element, int newParentId, bool includeDescendants, int userId) => throw new NotImplementedException();

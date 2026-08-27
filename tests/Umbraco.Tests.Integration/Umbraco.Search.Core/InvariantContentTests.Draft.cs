@@ -301,7 +301,7 @@ public partial class InvariantContentTests
             ContentService.MoveToRecycleBin(Root());
         }
 
-        ContentService.Delete(Root());
+        await ContentService.DeleteAsync(Root(), null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(0));
@@ -319,7 +319,7 @@ public partial class InvariantContentTests
             ContentService.MoveToRecycleBin(Child());
         }
 
-        ContentService.Delete(Child());
+        await ContentService.DeleteAsync(Child(), null, CancellationToken.None);
 
         IReadOnlyList<TestIndexDocument> documents = IndexerAndSearcher.Dump(IndexAliases.DraftContent);
         Assert.That(documents, Has.Count.EqualTo(1));

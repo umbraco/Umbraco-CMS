@@ -120,7 +120,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// <param name="content">The content to move to recycle bin.</param>
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
+    protected abstract Task<OperationResult?> MoveToRecycleBinAsync(TContent content, int userId);
 
     /// <summary>
     /// Deletes content.
@@ -128,7 +128,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
     /// <param name="content">The content to delete.</param>
     /// <param name="userId">The user performing the operation.</param>
     /// <returns>The operation result.</returns>
-    protected abstract OperationResult? Delete(TContent content, int userId);
+    protected abstract Task<OperationResult?> DeleteAsync(TContent content, int userId);
 
     /// <summary>
     /// Gets the current content settings.
@@ -311,7 +311,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
                 key,
                 userKey,
                 ContentTrashStatusRequirement.MustNotBeTrashed,
-                MoveToRecycleBin,
+                MoveToRecycleBinAsync,
                 ContentSettings.DisableDeleteWhenReferenced,
                 ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
@@ -329,20 +329,20 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
                 mustBeTrashed
                     ? ContentTrashStatusRequirement.MustBeTrashed
                     : ContentTrashStatusRequirement.Irrelevant,
-                Delete,
+                DeleteAsync,
                 ContentSettings.DisableDeleteWhenReferenced,
                 ContentEditingOperationStatus.CannotDeleteWhenReferenced);
 
     // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
     // IContentEditingService methods hitting this (ContentTrashStatusRequirement, calledFunction):
-    // DeleteAsync (irrelevant, Delete)
-    // MoveToRecycleBinAsync (MustNotBeTrashed, MoveToRecycleBin)
-    // DeleteFromRecycleBinAsync (MustBeTrashed, Delete)
+    // DeleteAsync (irrelevant, DeleteAsync)
+    // MoveToRecycleBinAsync (MustNotBeTrashed, MoveToRecycleBinAsync)
+    // DeleteFromRecycleBinAsync (MustBeTrashed, DeleteAsync)
     private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(
         Guid key,
         Guid userKey,
         ContentTrashStatusRequirement trashStatusRequirement,
-        Func<TContent, int, OperationResult?> performDelete,
+        Func<TContent, int, Task<OperationResult?>> performDelete,
         bool disabledWhenReferenced,
         ContentEditingOperationStatus referenceFailStatus)
     {
@@ -387,7 +387,7 @@ internal abstract class AsyncContentEditingServiceBase<TContent, TContentType, T
         }
 
         var userId = await GetUserIdAsync(userKey);
-        OperationResult? deleteResult = performDelete(content, userId);
+        OperationResult? deleteResult = await performDelete(content, userId);
 
         scope.Complete();
 
