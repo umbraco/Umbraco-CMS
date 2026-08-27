@@ -1931,18 +1931,18 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// </summary>
     /// <param name="content">The blueprint content to delete.</param>
     /// <param name="userId">The optional ID of the user deleting the blueprint.</param>
-    public void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+    public async Task DeleteBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentBlueprintRepository.Delete(content);
-            scope.Notifications.Publish(new ContentDeletedBlueprintNotification(content, evtMsgs));
-            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
-            scope.Complete();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        await _asyncDocumentBlueprintRepository.DeleteAsync(content, cancellationToken);
+
+        scope.Notifications.Publish(new ContentDeletedBlueprintNotification(content, evtMsgs));
+        scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
+        scope.Complete();
     }
 
     private static readonly string?[] ArrayOfOneNullString = { null };

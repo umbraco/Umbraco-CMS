@@ -260,7 +260,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         ContentService.SaveBlueprint(blueprint, null);
 
-        ContentService.DeleteBlueprint(blueprint);
+        await ContentService.DeleteBlueprintAsync(blueprint, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
         Assert.AreEqual(0, found.Length);

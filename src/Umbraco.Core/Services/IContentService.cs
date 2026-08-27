@@ -53,8 +53,9 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Deletes a blueprint.
     /// </summary>
     /// <param name="content">The blueprint to delete.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    void DeleteBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task DeleteBlueprintAsync(IContent content, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Creates a blueprint from a content item.

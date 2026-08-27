@@ -193,8 +193,7 @@ internal sealed class ContentBlueprintEditingService
         }
 
         // Delete blueprint
-        var performingUserId = await GetUserIdAsync(userKey);
-        ContentService.DeleteBlueprint(blueprint, performingUserId);
+        await ContentService.DeleteBlueprintAsync(blueprint, userKey, CancellationToken.None);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, blueprint);
