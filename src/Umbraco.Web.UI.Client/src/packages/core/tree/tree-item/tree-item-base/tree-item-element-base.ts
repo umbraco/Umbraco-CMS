@@ -312,15 +312,14 @@ export abstract class UmbTreeItemElementBase<
 
 	#renderChildItems() {
 		if (!this._childItems) return nothing;
-		return repeat(
-			this._childItems,
-			(item) => `${item.entityType}:${item.unique}`,
-			(item) => html`
-				<umb-tree-item
-					.entityType=${item.entityType}
-					.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>
-			`,
-		);
+		return repeat(this._childItems, (item) => `${item.entityType}:${item.unique}`, this.#renderChildItem);
+	}
+
+	#renderChildItem = this._renderChildItem.bind(this);
+	protected _renderChildItem(item: TreeItemModelType) {
+		return html`<umb-tree-item
+			.entityType=${item.entityType}
+			.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>`;
 	}
 
 	protected _renderLoadPrevButton() {

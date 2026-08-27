@@ -61,8 +61,15 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		return this.#icon;
 	}
 
-	override render() {
-		return html`${this._collapsibleCollection ? html`<div id="peek-child"></div>` : nothing}${super.render()}`;
+	protected override _renderChildItem(item: UmbDocumentTreeItemModel) {
+		if (this._collapsibleCollection) {
+			return html`<div class="child">
+				<div class="peek-child"></div>
+				${super._renderChildItem(item)}
+			</div>`;
+		} else {
+			return super._renderChildItem(item);
+		}
 	}
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -96,9 +103,17 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	static override styles = [
 		...UmbTreeItemElementBase.styles,
 		css`
+			:host {
+				--umb-tree-item-indent: calc(var(--uui-menu-item-indent, 0) + 1);
+			}
+
 			/* A collapsible collection is peeked, not drilled into — its children stay at its own indent rather than one level deeper. */
+			:host([collection]) uui-menu-item::slotted(*:not([name])) {
+				--uui-menu-item-indent: var(--umb-tree-item-indent, 0);
+				--uui-menu-item-flat-structure: 1;
+			}
 			:host([collection]) uui-menu-item {
-				--uui-menu-item-child-indent: var(--uui-menu-item-indent, 0);
+				--uui-menu-item-child-indent: 0;
 			}
 
 			:host([draft]) #label {
@@ -108,21 +123,33 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				opacity: 0.6;
 			}
 
-			#peek-child {
+			.child {
+				display: flex;
+				flex-direction: row;
+				align-items: flex-start;
+			}
+			umb-tree-item {
+				flex-grow: 1;
+				flex-shrink: 1;
+			}
+			.peek-child {
 				position: relative;
 				display: block;
-				width: calc(var(--uui-menu-item-indent, 0) * var(--uui-size-4));
+				flex-grow: 0;
+				flex-shrink: 0;
+				width: calc((1 + var(--umb-tree-item-indent, 0)) * var(--uui-size-4));
 			}
-			#peek-child::after {
+			.peek-child::after {
 				content: '';
 				position: absolute;
-				top: 0;
-				right: 0;
-				border-left: 1px solid var(--uui-color-border);
-				border-bottom: 1px solid var(--uui-color-border);
+				z-index: 1;
+				top: 9px;
+				right: -7px;
+				border-left: 1px solid var(--uui-color-interactive);
+				border-bottom: 1px solid var(--uui-color-interactive);
 				border-bottom-left-radius: var(--uui-border-radius);
-				width: 8px;
-				height: 8px;
+				width: 9px;
+				height: 9px;
 			}
 		`,
 	];
