@@ -46,7 +46,7 @@ internal sealed class MemberPresentationService : IMemberPresentationService
         ExternalMemberIdentity? externalMember = await _memberEditingService.GetExternalMemberAsync(id);
         if (externalMember is not null)
         {
-            return await _memberPresentationFactory.CreateExternalMemberResponseModelAsync(externalMember);
+            return await _memberPresentationFactory.CreateExternalMemberResponseModelAsync(externalMember, currentUser);
         }
 
         return null;

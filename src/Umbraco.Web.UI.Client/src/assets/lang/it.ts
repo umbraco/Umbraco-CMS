@@ -302,6 +302,8 @@ export default {
 		isSensitiveValue:
 			"Questo valore è nascosto. Se hai bisogno dell'accesso per visualizzare questo valore contatta l'amministratore del sito.",
 		isSensitiveValue_short: 'Questo valore è nascosto.',
+		isSensitiveValueNotice:
+			"Se hai bisogno dell'accesso per visualizzare i valori nascosti contatta l'amministratore del sito.",
 		languagesToPublishForFirstTime:
 			'Quali lingue vorresti pubblicare? Tutte le lingue con contenuto vengono\n      salvate!\n    ',
 		languagesToPublish: 'Quali lingue vorresti pubblicare?',
