@@ -84,12 +84,12 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value), '_observeTotalPages');
 			this.observe(
 				this.#api.isLoadingPrevChildren,
-				(value) => (this._isLoadingPrevChildren = value ?? false),
+				(value) => (this._isLoadingPrevChildren = value),
 				'_observeIsLoadingPrevChildren',
 			);
 			this.observe(
 				this.#api.isLoadingNextChildren,
-				(value) => (this._isLoadingNextChildren = value ?? false),
+				(value) => (this._isLoadingNextChildren = value),
 				'_observeIsLoadingNextChildren',
 			);
 
@@ -240,10 +240,10 @@ export abstract class UmbTreeItemElementBase<
 				label=${ifDefined(this._label)}
 				href=${ifDefined(this._isSelectableContext || this._noAccess ? undefined : this._href)}
 				.renderExpandSymbol=${this._renderExpandSymbol}>
-				${this.#renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
+				${this._renderLoadPrevButton()} ${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()}
 				${this.#renderChildItems()}
 				<slot></slot>
-				${this.#renderLoadNextButton()}
+				${this._renderLoadNextButton()}
 			</uui-menu-item>
 		`;
 	}
@@ -311,29 +311,26 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	#renderChildItems() {
-		return html`
-			${this._childItems
-				? repeat(
-						this._childItems,
-						(item) => `${item.entityType}:${item.unique}`,
-						(item) => html`
-							<umb-tree-item
-								.entityType=${item.entityType}
-								.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>
-						`,
-					)
-				: ''}
-		`;
+		if (!this._childItems) return nothing;
+		return repeat(
+			this._childItems,
+			(item) => `${item.entityType}:${item.unique}`,
+			(item) => html`
+				<umb-tree-item
+					.entityType=${item.entityType}
+					.props=${{ hideActions: this.hideActions, item, isMenu: this.isMenu }}></umb-tree-item>
+			`,
+		);
 	}
 
-	#renderLoadPrevButton() {
+	protected _renderLoadPrevButton() {
 		if (!this._hasPreviousItems) return nothing;
 		return html` <umb-tree-load-prev-button
 			@click=${this.#onLoadPrev}
 			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
 	}
 
-	#renderLoadNextButton() {
+	protected _renderLoadNextButton() {
 		if (!this._hasNextItems) return nothing;
 		return html`
 			<umb-tree-load-more-button
