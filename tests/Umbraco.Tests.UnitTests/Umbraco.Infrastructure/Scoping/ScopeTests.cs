@@ -263,8 +263,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 outerScope.Complete();
             }
 
-            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.Domains, It.IsAny<TimeSpan?>()), Times.Once);
-            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.Languages, It.IsAny<TimeSpan?>()), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.Domains, timeout), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(Constants.Locks.Languages, timeout), Times.Once);
         }
 
         [Test]
@@ -330,8 +330,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
                 outerScope.Complete();
             }
 
-            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.Domains, It.IsAny<TimeSpan?>()), Times.Once);
-            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.Languages, It.IsAny<TimeSpan?>()), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.Domains, timeOut), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(Constants.Locks.Languages, timeOut), Times.Once);
         }
 
         [Test]
