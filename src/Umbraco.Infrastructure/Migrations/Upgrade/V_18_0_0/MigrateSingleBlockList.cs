@@ -324,8 +324,7 @@ WHERE nodeId IN (@0)";
                                        ?? throw new InvalidOperationException(
                                            "The data type value editor could not be obtained.");
 
-        var total = await Database.ExecuteScalarAsync<long>(
-            BuildPropertyDataSql(propertyType, lastId: 0, isCount: true));
+        var total = await Database.ExecuteScalarAsync<long>(BuildPropertyDataCountSql(propertyType));
         if (total == 0)
         {
             return (false, true);
@@ -351,9 +350,8 @@ WHERE nodeId IN (@0)";
 
         while (true)
         {
-            // SelectTop has to be applied last: SQL Server inserts "TOP n" after SELECT, SQLite appends "LIMIT n".
             List<PropertyDataDto> page = await Database.FetchAsync<PropertyDataDto>(
-                BuildPropertyDataSql(propertyType, lastId).SelectTop(pageSize));
+                BuildPropertyDataPageSql(propertyType, lastId, pageSize));
 
             if (page.Count == 0)
             {
@@ -389,10 +387,26 @@ WHERE nodeId IN (@0)";
         return (true, success);
     }
 
-    private Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, int lastId, bool isCount = false)
-    {
-        Sql<ISqlContext> sql = (isCount ? Sql().SelectCount() : Sql().Select<PropertyDataDto>())
-            .From<PropertyDataDto>()
+    /// <summary>
+    /// Counts the property data of a property type that is a candidate for conversion, for progress reporting. No
+    /// ordering, as an ordered count would only add an avoidable sort.
+    /// </summary>
+    private Sql<ISqlContext> BuildPropertyDataCountSql(IPropertyType propertyType)
+        => AddPropertyDataFilter(Sql().SelectCount(), propertyType);
+
+    /// <summary>
+    /// Selects the next page of a property type's candidate property data, by keyset rather than by offset.
+    /// </summary>
+    private Sql<ISqlContext> BuildPropertyDataPageSql(IPropertyType propertyType, int lastId, int pageSize)
+        => AddPropertyDataFilter(Sql().Select<PropertyDataDto>(), propertyType)
+            .Where<PropertyDataDto>(propertyData => propertyData.Id > lastId)
+            .OrderBy<PropertyDataDto>(propertyData => propertyData.Id)
+
+            // Applied last: SQL Server inserts "TOP n" after SELECT, but SQLite appends "LIMIT n" to the statement.
+            .SelectTop(pageSize);
+
+    private static Sql<ISqlContext> AddPropertyDataFilter(Sql<ISqlContext> sql, IPropertyType propertyType)
+        => sql.From<PropertyDataDto>()
             .InnerJoin<ContentVersionDto>()
             .On<PropertyDataDto, ContentVersionDto>((propertyData, contentVersion) =>
                 propertyData.VersionId == contentVersion.Id)
@@ -402,16 +416,10 @@ WHERE nodeId IN (@0)";
             .Where<PropertyDataDto, ContentVersionDto, DocumentVersionDto>((propertyData, contentVersion, documentVersion) =>
                 (contentVersion.Current == true || documentVersion.Published == true)
                 && propertyData.PropertyTypeId == propertyType.Id
-                && propertyData.Id > lastId
 
                 // Block and rich text values are held as text, but PropertyDataDto.Value falls back to the varchar
                 // column before the text one, so a row only has nothing to convert when both are empty.
                 && (propertyData.TextValue != null || propertyData.VarcharValue != null));
-
-        return isCount
-            ? sql
-            : sql.OrderBy<PropertyDataDto>(propertyData => propertyData.Id);
-    }
 
     /// <summary>
     /// Converts a page of property data and persists whatever converted, leaving the rest of the rows untouched.
@@ -439,7 +447,7 @@ WHERE nodeId IN (@0)";
         {
             using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
-            var completed = Interlocked.Increment(ref progress.Processed);
+            var completed = progress.Increment();
             if (completed % 100 == 0)
             {
                 _logger.LogInformation("  - finished {Progress} of {Total} properties", completed, progress.Total);
@@ -690,15 +698,17 @@ WHERE nodeId IN (@0)";
     /// </summary>
     private sealed class MigrationProgress
     {
+        private long _processed;
+
         public MigrationProgress(long total) => Total = total;
 
         public long Total { get; }
 
         /// <summary>
-        /// The number of property data values processed so far. A field rather than a property as it is
-        /// incremented with <see cref="Interlocked" />.
+        /// Counts one more processed property data value and returns the running total. Safe to call from the
+        /// parallelized conversion workers.
         /// </summary>
-        public int Processed;
+        public long Increment() => Interlocked.Increment(ref _processed);
     }
 
     private class UpdateItem
