@@ -1,5 +1,3 @@
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import type { MetaEntityActionSortChildrenOfContentKind } from '@umbraco-cms/backoffice/content';
 import type { UmbSortChildrenByFieldOption, UmbSortChildrenOfByFieldArgs } from '@umbraco-cms/backoffice/tree';
 
 /**
@@ -20,15 +18,4 @@ export interface UmbSortChildrenOfDocumentByFieldOption extends UmbSortChildrenB
 	 * Whether the sort order this field produces depends on the culture sorted by.
 	 */
 	variesByCulture?: boolean;
-}
-
-export interface ManifestEntityActionSortChildrenOfDocumentKind extends ManifestEntityAction<MetaEntityActionSortChildrenOfContentKind> {
-	type: 'entityAction';
-	kind: 'sortChildrenOfDocument';
-}
-
-declare global {
-	interface UmbExtensionManifestMap {
-		umbManifestEntityActionSortChildrenOfDocumentKind: ManifestEntityActionSortChildrenOfDocumentKind;
-	}
 }

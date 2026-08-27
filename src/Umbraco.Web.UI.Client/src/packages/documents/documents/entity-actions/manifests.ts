@@ -11,7 +11,6 @@ import { manifests as moveManifests } from './move-to/manifests.js';
 import { manifests as sortChildrenOfManifests } from './sort-children-of/manifests.js';
 import { manifests as notificationManifests } from './notifications/manifests.js';
 import { UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<UmbExtensionManifest> = [
 	{
@@ -38,7 +37,7 @@ const entityActions: Array<UmbExtensionManifest> = [
 	},
 ];
 
-export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+export const manifests: Array<UmbExtensionManifest> = [
 	...createBlueprintManifests,
 	...createManifests,
 	...cultureAndHostnamesManifests,
