@@ -87,7 +87,7 @@ internal sealed class ContentIndexingService : IContentIndexingService
     }
 
     /// <inheritdoc />
-    public void Rebuild(string indexAlias, string origin)
+    public void Rebuild(string indexAlias, string origin, TimeSpan? delay = null)
     {
         ContentIndexRegistration? indexRegistration = _indexOptions.GetContentIndexRegistration(indexAlias);
         if (indexRegistration is null)
@@ -101,11 +101,16 @@ internal sealed class ContentIndexingService : IContentIndexingService
             return;
         }
 
-        _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken => await RebuildAsync(indexRegistration, cancellationToken));
+        _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken => await RebuildAsync(indexRegistration, delay ?? TimeSpan.Zero, cancellationToken));
     }
 
-    private async Task RebuildAsync(ContentIndexRegistration indexRegistration, CancellationToken cancellationToken)
+    private async Task RebuildAsync(ContentIndexRegistration indexRegistration, TimeSpan delay, CancellationToken cancellationToken)
     {
+        if (delay > TimeSpan.Zero)
+        {
+            await Task.Delay(delay, cancellationToken);
+        }
+
         if (TryGetContentChangeStrategy(indexRegistration.ContentChangeStrategy, out IContentChangeStrategy? contentChangeStrategy) is false
             || TryGetIndexer(indexRegistration.Indexer, out IIndexer? indexer) is false)
         {

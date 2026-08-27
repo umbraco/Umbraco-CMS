@@ -20,5 +20,6 @@ public interface IContentIndexingService
     /// </summary>
     /// <param name="indexAlias">The alias of the index to rebuild.</param>
     /// <param name="origin">An identifier for the server/request that requested the rebuild, used for same-origin filtering.</param>
-    void Rebuild(string indexAlias, string origin);
+    /// <param name="delay">An optional delay to wait before the queued rebuild actually starts work.</param>
+    void Rebuild(string indexAlias, string origin, TimeSpan? delay = null);
 }

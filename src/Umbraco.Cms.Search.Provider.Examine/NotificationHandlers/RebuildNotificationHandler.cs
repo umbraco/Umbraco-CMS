@@ -17,6 +17,9 @@ namespace Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 /// </summary>
 public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicationStartedNotification>
 {
+    // Gives the server a chance to finish starting up before potentially resource-intensive index rebuilds begin.
+    private static readonly TimeSpan RebuildDelay = TimeSpan.FromMinutes(2);
+
     private readonly IExamineManager _examineManager;
     private readonly IActiveIndexManager _activeIndexManager;
     private readonly IContentIndexingService _contentIndexingService;
@@ -86,7 +89,7 @@ public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicatio
             }
 
             _logger.LogInformation("Rebuilding index {IndexRegistrationIndexAlias}", indexRegistration.IndexAlias);
-            _contentIndexingService.Rebuild(indexRegistration.IndexAlias, _originProvider.GetCurrent());
+            _contentIndexingService.Rebuild(indexRegistration.IndexAlias, _originProvider.GetCurrent(), RebuildDelay);
         }
     }
 }
