@@ -41,6 +41,8 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     private readonly IBlockEditorElementTypeCache _elementTypeCache;
     private readonly AppCaches _appCaches;
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
+    private const int DefaultPageSize = 1000;
+
     private readonly ILogger<MigrateSingleBlockList> _logger;
     private readonly IDataValueEditor _dummySingleBlockValueEditor;
 
@@ -165,8 +167,21 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         _dummySingleBlockValueEditor = new SingleBlockPropertyEditor(dataValueEditorFactory, jsonSerializer, ioHelper, blockValuePropertyIndexValueFactory).GetValueEditor();
     }
 
+    /// <summary>
+    /// Gets the number of property data rows fetched, converted and saved at a time.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately lower than the page size other property data migrations use: this migration deserializes a
+    /// whole block object graph per row, which is several times the size of the stored JSON it came from.
+    /// Overridable so tests can exercise the paging loop without creating thousands of rows.
+    /// </remarks>
+    internal virtual int PageSize => DefaultPageSize;
+
     protected override async Task MigrateAsync()
     {
+        // Give scope for the migration to complete within the command timeout, which may be necessary on large datasets.
+        EnsureLongCommandTimeout(Database);
+
         // gets filled by all registered ITypedSingleBlockListProcessor
         IEnumerable<string> propertyEditorAliases = _singleBlockListProcessor.GetSupportedPropertyEditorAliases();
 
@@ -207,33 +222,6 @@ public class MigrateSingleBlockList : AsyncMigrationBase
             "Found {blockListsConfiguredAsSingleCount} number of blockListConfigurations with UseSingleBlockMode set to true",
             blockListsConfiguredAsSingleCount);
 
-        // we want to batch actual update calls to the database, so we are grouping them by propertyEditorAlias
-        // and again by propertyType(dataType).
-        var updateItemsByPropertyEditorAlias = new Dictionary<string, Dictionary<IPropertyType, List<UpdateItem>>>();
-
-        // For each propertyEditor, collect and process all propertyTypes and their propertyData
-        foreach (var propertyEditorAlias in propertyEditorAliases)
-        {
-            if (relevantPropertyEditors.TryGetValue(propertyEditorAlias, out IPropertyType[]? propertyTypes) is false)
-            {
-                continue;
-            }
-
-            _logger.LogInformation(
-                "Migration starting for all properties of type: {propertyEditorAlias}",
-                propertyEditorAlias);
-            Dictionary<IPropertyType, List<UpdateItem>> updateItemsByPropertyType = await ProcessPropertyTypesAsync(propertyTypes, languagesById);
-            if (updateItemsByPropertyType.Count < 1)
-            {
-                _logger.LogInformation(
-                    "No properties have been found to migrate for {propertyEditorAlias}",
-                    propertyEditorAlias);
-                continue;
-            }
-
-            updateItemsByPropertyEditorAlias[propertyEditorAlias] = updateItemsByPropertyType;
-        }
-
         IDataType[] singleBlockListDataTypes = _blockListConfigurationCache.CachedDataTypes.ToArray();
         var singleBlockListDataTypeKeys = singleBlockListDataTypes.Select(dataType => dataType.Key).ToHashSet();
 
@@ -245,9 +233,45 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         // written but not committed. Converting first means those lookups only ever read committed, pre-migration
         // state, and SingleBlockMigrationEditorAliasOverride is what routes the converted values to the single block
         // value editor regardless (https://github.com/umbraco/Umbraco-CMS/issues/23596).
-        foreach (string propertyEditorAlias in updateItemsByPropertyEditorAlias.Keys)
+        //
+        // Each page of property data is converted and saved before the next one is fetched, so that neither the
+        // fetched rows nor the values they deserialize to accumulate across the whole site
+        // (https://github.com/umbraco/Umbraco-CMS/issues/23766). That does not weaken the ordering above, which
+        // constrains when umbracoDataType is written, not umbracoPropertyData.
+        foreach (var propertyEditorAlias in propertyEditorAliases)
         {
-            if (await SavePropertyTypes(updateItemsByPropertyEditorAlias[propertyEditorAlias], singleBlockListDataTypeKeys))
+            if (relevantPropertyEditors.TryGetValue(propertyEditorAlias, out IPropertyType[]? propertyTypes) is false)
+            {
+                continue;
+            }
+
+            _logger.LogInformation(
+                "Migration starting for all properties of type: {propertyEditorAlias}",
+                propertyEditorAlias);
+
+            var success = true;
+            var foundPropertyData = false;
+
+            foreach (IPropertyType propertyType in propertyTypes)
+            {
+                (bool hadPropertyData, bool propertyTypeSucceeded) =
+                    await MigratePropertyTypeAsync(propertyType, languagesById, singleBlockListDataTypeKeys);
+
+                foundPropertyData |= hadPropertyData;
+                success &= propertyTypeSucceeded;
+            }
+
+            // Reported when no property type of this editor alias had any candidate property data at all - not
+            // when none of it needed converting, which is a normal outcome.
+            if (foundPropertyData is false)
+            {
+                _logger.LogInformation(
+                    "No properties have been found to migrate for {propertyEditorAlias}",
+                    propertyEditorAlias);
+                continue;
+            }
+
+            if (success)
             {
                 _logger.LogInformation(
                     "Migration succeeded for all properties of type: {propertyEditorAlias}",
@@ -281,130 +305,168 @@ WHERE nodeId IN (@0)";
         RebuildCache = true;
     }
 
-    private async Task<Dictionary<IPropertyType, List<UpdateItem>>> ProcessPropertyTypesAsync(IPropertyType[] propertyTypes, IDictionary<int, ILanguage> languagesById)
-    {
-        var updateItemsByPropertyType = new Dictionary<IPropertyType, List<UpdateItem>>();
-        foreach (IPropertyType propertyType in propertyTypes)
-        {
-            // make sure the passed in data is valid and can be processed
-            IDataType dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey)
-                                 ?? throw new InvalidOperationException("The data type could not be fetched.");
-            IDataValueEditor valueEditor = dataType.Editor?.GetValueEditor()
-                                           ?? throw new InvalidOperationException(
-                                               "The data type value editor could not be obtained.");
-
-            // fetch all the propertyData for the current propertyType
-            Sql<ISqlContext> sql = Sql()
-                .Select<PropertyDataDto>()
-                .From<PropertyDataDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<PropertyDataDto, ContentVersionDto>((propertyData, contentVersion) =>
-                    propertyData.VersionId == contentVersion.Id)
-                .LeftJoin<DocumentVersionDto>()
-                .On<ContentVersionDto, DocumentVersionDto>((contentVersion, documentVersion) =>
-                    contentVersion.Id == documentVersion.Id)
-                .Where<PropertyDataDto, ContentVersionDto, DocumentVersionDto>((propertyData, contentVersion, documentVersion) =>
-                    (contentVersion.Current == true || documentVersion.Published == true)
-                    && propertyData.PropertyTypeId == propertyType.Id);
-
-            List<PropertyDataDto> propertyDataDtos = await Database.FetchAsync<PropertyDataDto>(sql);
-            if (propertyDataDtos.Count < 1)
-            {
-                continue;
-            }
-
-            var updateItems = new List<UpdateItem>();
-
-            // process all the propertyData
-            // if none of the processors modify the value, the propertyData is skipped from being saved.
-            foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
-            {
-                if (ProcessPropertyDataDto(propertyDataDto, propertyType, languagesById, valueEditor, out UpdateItem? updateItem) is false)
-                {
-                    continue;
-                }
-
-                updateItems.Add(updateItem!);
-            }
-
-            updateItemsByPropertyType[propertyType] = updateItems;
-        }
-
-        return updateItemsByPropertyType;
-    }
-
-    private async Task<bool> SavePropertyTypes(
-        IDictionary<IPropertyType, List<UpdateItem>> propertyTypes,
-        IReadOnlySet<Guid> singleBlockListDataTypeKeys)
-    {
-        var success = true;
-
-        foreach (IPropertyType propertyType in propertyTypes.Keys)
-        {
-            success &= await SavePropertyType(propertyType, propertyTypes[propertyType], singleBlockListDataTypeKeys);
-        }
-
-        return success;
-    }
-
-    private async Task<bool> SavePropertyType(
+    /// <summary>
+    /// Converts and saves the property data of a single property type, a page at a time.
+    /// </summary>
+    /// <returns>
+    /// Whether the property type had any candidate property data at all, and whether every value that needed
+    /// converting could be converted.
+    /// </returns>
+    private async Task<(bool HadPropertyData, bool Success)> MigratePropertyTypeAsync(
         IPropertyType propertyType,
-        List<UpdateItem> updateItems,
+        IDictionary<int, ILanguage> languagesById,
         IReadOnlySet<Guid> singleBlockListDataTypeKeys)
     {
-        // Both lookups already succeeded for this property type in ProcessPropertyTypesAsync, so neither can
-        // realistically fail here - the throws are only because the APIs are nullable.
+        // make sure the passed in data is valid and can be processed
         IDataType dataType = await _dataTypeService.GetAsync(propertyType.DataTypeKey)
                              ?? throw new InvalidOperationException("The data type could not be fetched.");
         IDataValueEditor valueEditor = dataType.Editor?.GetValueEditor()
                                        ?? throw new InvalidOperationException(
                                            "The data type value editor could not be obtained.");
 
-        // batch by datatype
-        var propertyDataDtos = updateItems.Select(item => item.PropertyDataDto).ToList();
+        var total = await Database.ExecuteScalarAsync<long>(
+            BuildPropertyDataSql(propertyType, lastId: 0, isCount: true));
+        if (total == 0)
+        {
+            return (false, true);
+        }
 
-        var updateBatch = propertyDataDtos.Select(propertyDataDto =>
-            UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto))).ToList();
+        _logger.LogInformation(
+            "Migrating {PropertyDataCount} property data values for property {PropertyTypeAlias} ({PropertyTypeKey}) with property editor alias {PropertyEditorAlias}",
+            total,
+            propertyType.Alias,
+            propertyType.Key,
+            propertyType.PropertyEditorAlias);
 
-        var updatesToSkip = new ConcurrentBag<UpdateBatch<PropertyDataDto>>();
+        var pageSize = PageSize;
+        var progress = new MigrationProgress(total);
+        var success = true;
+        var converted = 0;
 
-        var total = updateBatch.Count;
-        var progress = 0;
+        // Keyset paging, restarting from zero for each property type: the page is the next rows by id rather than
+        // an offset into the result set, so every page costs the same and no row can be visited twice or skipped.
+        // That holds because nothing this migration writes touches a column the query filters or orders on - the
+        // batched update below only ever writes a non-empty textValue.
+        var lastId = 0;
+
+        while (true)
+        {
+            // SelectTop has to be applied last: SQL Server inserts "TOP n" after SELECT, SQLite appends "LIMIT n".
+            List<PropertyDataDto> page = await Database.FetchAsync<PropertyDataDto>(
+                BuildPropertyDataSql(propertyType, lastId).SelectTop(pageSize));
+
+            if (page.Count == 0)
+            {
+                break;
+            }
+
+            lastId = page[^1].Id;
+
+            (bool pageSucceeded, int pageConverted) = ConvertAndSavePage(
+                page, propertyType, languagesById, valueEditor, singleBlockListDataTypeKeys, progress);
+
+            success &= pageSucceeded;
+            converted += pageConverted;
+
+            if (page.Count < pageSize)
+            {
+                break;
+            }
+        }
+
+        if (converted > 0)
+        {
+            _logger.LogDebug(
+                "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
+                propertyType.Name,
+                propertyType.Id,
+                propertyType.Key,
+                propertyType.Alias,
+                propertyType.PropertyEditorAlias,
+                converted);
+        }
+
+        return (true, success);
+    }
+
+    private Sql<ISqlContext> BuildPropertyDataSql(IPropertyType propertyType, int lastId, bool isCount = false)
+    {
+        Sql<ISqlContext> sql = (isCount ? Sql().SelectCount() : Sql().Select<PropertyDataDto>())
+            .From<PropertyDataDto>()
+            .InnerJoin<ContentVersionDto>()
+            .On<PropertyDataDto, ContentVersionDto>((propertyData, contentVersion) =>
+                propertyData.VersionId == contentVersion.Id)
+            .LeftJoin<DocumentVersionDto>()
+            .On<ContentVersionDto, DocumentVersionDto>((contentVersion, documentVersion) =>
+                contentVersion.Id == documentVersion.Id)
+            .Where<PropertyDataDto, ContentVersionDto, DocumentVersionDto>((propertyData, contentVersion, documentVersion) =>
+                (contentVersion.Current == true || documentVersion.Published == true)
+                && propertyData.PropertyTypeId == propertyType.Id
+                && propertyData.Id > lastId
+
+                // Block and rich text values are held as text, but PropertyDataDto.Value falls back to the varchar
+                // column before the text one, so a row only has nothing to convert when both are empty.
+                && (propertyData.TextValue != null || propertyData.VarcharValue != null));
+
+        return isCount
+            ? sql
+            : sql.OrderBy<PropertyDataDto>(propertyData => propertyData.Id);
+    }
+
+    /// <summary>
+    /// Converts a page of property data and persists whatever converted, leaving the rest of the rows untouched.
+    /// </summary>
+    private (bool Success, int Converted) ConvertAndSavePage(
+        List<PropertyDataDto> page,
+        IPropertyType propertyType,
+        IDictionary<int, ILanguage> languagesById,
+        IDataValueEditor valueEditor,
+        IReadOnlySet<Guid> singleBlockListDataTypeKeys,
+        MigrationProgress progress)
+    {
+        // The snapshot is taken before the value is converted, so the batched update only writes the columns that
+        // actually changed. Database belongs to the ambient scope and is not thread safe, so it is only touched
+        // here, never from the workers below.
+        var updateBatch = page
+            .Select(propertyDataDto => UpdateBatch.For(propertyDataDto, Database.StartSnapshot(propertyDataDto)))
+            .ToList();
+
+        // Keyed by property data id, which is unique within a page, so a worker's outcome can be looked up
+        // directly rather than by scanning the batch.
+        var results = new ConcurrentDictionary<int, ConversionResult>();
 
         void HandleUpdateBatch(UpdateBatch<PropertyDataDto> update)
         {
             using UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
-            // The override has to be applied here rather than around the whole loop: the parallelized path below
-            // deliberately does not flow the execution context, which is what an ambient AsyncLocal rides on.
-            using (SingleBlockMigrationEditorAliasOverride.For(singleBlockListDataTypeKeys))
+            var completed = Interlocked.Increment(ref progress.Processed);
+            if (completed % 100 == 0)
             {
-                var completed = Interlocked.Increment(ref progress);
-                if (completed % 100 == 0)
-                {
-                    _logger.LogInformation("  - finished {Progress} of {Total} properties", completed, total);
-                }
-
-                if (FinalizeUpdateItem(updateItems.First(item => Equals(item.PropertyDataDto, update.Poco)), valueEditor) is false)
-                {
-                    updatesToSkip.Add(update);
-                }
+                _logger.LogInformation("  - finished {Progress} of {Total} properties", completed, progress.Total);
             }
+
+            results[update.Poco.Id] = ConvertPropertyDataDto(
+                update.Poco, propertyType, languagesById, valueEditor, singleBlockListDataTypeKeys);
         }
 
         RunUpdateBatch(updateBatch, HandleUpdateBatch);
 
-        var success = true;
-        if (updatesToSkip.IsEmpty is false)
+        var refused = 0;
+        updateBatch.RemoveAll(update =>
         {
-            success = false;
-            updateBatch.RemoveAll(updatesToSkip.Contains);
-        }
+            ConversionResult result = results[update.Poco.Id];
+            if (result is ConversionResult.Refused)
+            {
+                refused++;
+            }
 
-        if (updateBatch.Any() is false)
+            return result is not ConversionResult.Converted;
+        });
+
+        if (updateBatch.Count == 0)
         {
             _logger.LogDebug("  - no properties to convert, continuing");
-            return success;
+            return (refused == 0, 0);
         }
 
         _logger.LogInformation("  - {totalConverted} properties converted, saving...", updateBatch.Count);
@@ -415,16 +477,7 @@ WHERE nodeId IN (@0)";
                 $"The database batch update was supposed to update {updateBatch.Count} property DTO entries, but it updated {result} entries.");
         }
 
-        _logger.LogDebug(
-            "Migration completed for property type: {propertyTypeName} (id: {propertyTypeId}, key: {propertyTypeKey}, alias: {propertyTypeAlias}, editor alias: {propertyTypeEditorAlias}) - {updateCount} property DTO entries updated.",
-            propertyType.Name,
-            propertyType.Id,
-            propertyType.Key,
-            propertyType.Alias,
-            propertyType.PropertyEditorAlias,
-            result);
-
-        return success;
+        return (refused == 0, updateBatch.Count);
     }
 
     private void RunUpdateBatch(
@@ -462,12 +515,15 @@ WHERE nodeId IN (@0)";
         }).GetAwaiter().GetResult();
     }
 
-    private bool ProcessPropertyDataDto(
+    /// <summary>
+    /// Converts a single property data value, setting the converted value on the DTO ready to be persisted.
+    /// </summary>
+    private ConversionResult ConvertPropertyDataDto(
         PropertyDataDto propertyDataDto,
         IPropertyType propertyType,
         IDictionary<int, ILanguage> languagesById,
         IDataValueEditor valueEditor,
-        out UpdateItem? updateItem)
+        IReadOnlySet<Guid> singleBlockListDataTypeKeys)
     {
         var cultureResult = PropertyDataCultureResolver.ResolveCulture(propertyType, propertyDataDto.LanguageId, languagesById);
         if (cultureResult.ShouldSkip)
@@ -480,8 +536,7 @@ WHERE nodeId IN (@0)";
                 propertyType.Id,
                 propertyType.Key,
                 propertyType.Alias);
-            updateItem = null;
-            return false;
+            return ConversionResult.Skipped;
         }
 
         var culture = cultureResult.Culture;
@@ -489,6 +544,9 @@ WHERE nodeId IN (@0)";
         // create a fake property to be able to get a typed value and run it through the processors.
         var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
         var property = PropertyDataCultureResolver.CreateMigrationProperty(propertyType, propertyDataDto.Value, culture, segment);
+
+        // No editor alias override around this: the value is read as it is still stored, which is exactly what the
+        // property type's own value editor is for.
         var toEditorValue = valueEditor.ToEditor(property, culture, segment);
 
         if (TryTransformValue(toEditorValue, property, out var updatedValue) is false)
@@ -500,12 +558,18 @@ WHERE nodeId IN (@0)";
                 propertyType.Id,
                 propertyType.Key,
                 propertyType.Alias);
-            updateItem = null;
-            return false;
+            return ConversionResult.Skipped;
         }
 
-        updateItem = new UpdateItem(propertyDataDto, propertyType, updatedValue);
-        return true;
+        // The override only affects re-serialization, and it has to be applied per value rather than around the
+        // loop: the parallelized path deliberately does not flow the execution context, which is what an ambient
+        // AsyncLocal rides on.
+        using (SingleBlockMigrationEditorAliasOverride.For(singleBlockListDataTypeKeys))
+        {
+            return FinalizeUpdateItem(new UpdateItem(propertyDataDto, propertyType, updatedValue), valueEditor)
+                ? ConversionResult.Converted
+                : ConversionResult.Refused;
+        }
     }
 
     /// <summary>
@@ -604,6 +668,37 @@ WHERE nodeId IN (@0)";
 
         value = toEditorValue;
         return hasChanged;
+    }
+
+    private enum ConversionResult
+    {
+        /// <summary>There was nothing to convert. The row is left untouched and the migration still succeeds.</summary>
+        Skipped,
+
+        /// <summary>The converted value has been set on the DTO and is ready to be persisted.</summary>
+        Converted,
+
+        /// <summary>
+        /// The value could not be converted safely. The row is left untouched and the migration of its property
+        /// editor alias is reported as failed.
+        /// </summary>
+        Refused,
+    }
+
+    /// <summary>
+    /// Tracks how far through a property type's property data the migration has got, across all of its pages.
+    /// </summary>
+    private sealed class MigrationProgress
+    {
+        public MigrationProgress(long total) => Total = total;
+
+        public long Total { get; }
+
+        /// <summary>
+        /// The number of property data values processed so far. A field rather than a property as it is
+        /// incremented with <see cref="Interlocked" />.
+        /// </summary>
+        public int Processed;
     }
 
     private class UpdateItem
