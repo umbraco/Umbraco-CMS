@@ -60,7 +60,10 @@ internal sealed class FileUploadContentCopiedOrScaffoldedNotificationHandler : F
             return;
         }
 
-        Handle(notification.CreatedFromContent, notification.SavedBlueprint, (IContent c) => _contentService.SaveBlueprint(c, null));
+        Handle(
+            notification.CreatedFromContent,
+            notification.SavedBlueprint,
+            (IContent c) => _contentService.SaveBlueprintAsync(c, null, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult());
     }
 
     private void Handle(IContent source, IContent destination, Action<IContent>? postUpdateAction = null)

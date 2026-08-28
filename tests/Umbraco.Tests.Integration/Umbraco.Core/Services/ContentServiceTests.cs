@@ -233,7 +233,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint, null);
+        await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
         Assert.AreEqual(1, found.Length);
@@ -258,7 +258,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint, null);
+        await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
 
         await ContentService.DeleteBlueprintAsync(blueprint, Constants.Security.SuperUserKey, CancellationToken.None);
 
@@ -279,7 +279,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await ContentService.SaveAsync(container, null, null, CancellationToken.None);
 
         var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
-        ContentService.SaveBlueprint(blueprint, null);
+        await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
 
         blueprint.ParentId = container.Id;
         await ContentService.MoveBlueprintAsync(blueprint, Constants.Security.SuperUserKey, CancellationToken.None);
@@ -299,7 +299,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
-        ContentService.SaveBlueprint(blueprint, null);
+        await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var saved = ContentService.GetBlueprintsForContentTypes().Single();
 
@@ -345,7 +345,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             await ContentService.SaveAsync(originalPage, null, null, CancellationToken.None);
 
             var fromContent = await ContentService.CreateBlueprintFromContentAsync(originalPage, "hello world", Constants.Security.SuperUserKey, CancellationToken.None);
-            ContentService.SaveBlueprint(fromContent, originalPage);
+            await ContentService.SaveBlueprintAsync(fromContent, originalPage, Constants.Security.SuperUserKey, CancellationToken.None);
 
             Assert.IsTrue(fromContent.HasIdentity);
             Assert.AreEqual("blueprint 1", fromContent.Properties["title"]?.GetValue());
@@ -373,7 +373,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         {
             var blueprint =
                 ContentBuilder.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, Constants.System.Root);
-            ContentService.SaveBlueprint(blueprint, null);
+            await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();

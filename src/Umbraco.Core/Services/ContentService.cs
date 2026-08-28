@@ -1856,47 +1856,35 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return blueprint;
     }
 
-    /// <summary>
-    /// Saves a content blueprint.
-    /// </summary>
-    /// <param name="content">The blueprint content to save.</param>
-    /// <param name="userId">The optional ID of the user saving the blueprint.</param>
-    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 20.")]
-    public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
-        => SaveBlueprint(content, null, userId);
-
-    /// <summary>
-    /// Saves a content blueprint with reference to the source content it was created from.
-    /// </summary>
-    /// <param name="content">The blueprint content to save.</param>
-    /// <param name="createdFromContent">The original content the blueprint was created from, or <c>null</c>.</param>
-    /// <param name="userId">The optional ID of the user saving the blueprint.</param>
-    public void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<Attempt<ContentBlueprintOperationStatus>> SaveBlueprintAsync(IContent content, IContent? createdFromContent, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         content.Blueprint = true;
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        if (content.HasIdentity == false)
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            if (content.HasIdentity == false)
-            {
-                content.CreatorId = userId;
-            }
-
-            content.WriterId = userId;
-
-            _documentBlueprintRepository.Save(content);
-
-            Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
-
-            scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
-            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
-
-            scope.Complete();
+            content.CreatorId = userId;
         }
+
+        content.WriterId = userId;
+
+        await _asyncDocumentBlueprintRepository.SaveAsync(content, cancellationToken);
+
+        await AuditAsync(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
+
+        scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
+        scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
+
+        scope.Complete();
+
+        return Attempt.Succeed(ContentBlueprintOperationStatus.Success);
     }
 
     /// <summary>

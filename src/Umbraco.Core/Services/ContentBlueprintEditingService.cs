@@ -310,11 +310,8 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="blueprint">The blueprint to save.</param>
     /// <param name="userKey">The unique identifier of the user performing the save.</param>
     /// <param name="createdFromContent">The optional content item the blueprint was created from.</param>
-    private async Task SaveAsync(IContent blueprint, Guid userKey, IContent? createdFromContent = null)
-    {
-        var currentUserId = await GetUserIdAsync(userKey);
-        ContentService.SaveBlueprint(blueprint, createdFromContent, currentUserId);
-    }
+    private async Task SaveAsync(IContent blueprint, Guid userKey, IContent? createdFromContent = null) =>
+        await ContentService.SaveBlueprintAsync(blueprint, createdFromContent, userKey, CancellationToken.None);
 
     /// <summary>
     /// Validates that the specified name is unique among blueprints of the same content type.

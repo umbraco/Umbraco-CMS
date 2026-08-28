@@ -35,12 +35,14 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeId);
 
     /// <summary>
-    ///     Saves a blueprint.
+    ///     Saves a content blueprint, with an optional reference to the source content it was created from.
     /// </summary>
-    /// <param name="content">The blueprint to save.</param>
-    /// <param name="createdFromContent">The content from which the blueprint was created.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId);
+    /// <param name="content">The blueprint content to save.</param>
+    /// <param name="createdFromContent">The original content the blueprint was created from, or <c>null</c>.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentBlueprintOperationStatus>> SaveBlueprintAsync(IContent content, IContent? createdFromContent, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Moves a blueprint.

@@ -116,7 +116,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         blueprint.SetValue("keywords", "blueprint 3");
         blueprint.SetValue("description", "blueprint 4");
 
-        ContentService.SaveBlueprint(blueprint, null);
+        await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
 
         var fromBlueprint = await ContentBlueprintEditingService.GetScaffoldedAsync(blueprint.Key);
         Assert.IsNotNull(fromBlueprint);
