@@ -1998,7 +1998,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     /// <inheritdoc />
     public async Task<IEnumerable<IContent>> GetBlueprintsForContentTypesAsync(CancellationToken cancellationToken, params Guid[] contentTypeKeys)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
         IEnumerable<IContent> blueprints;
@@ -2018,6 +2018,7 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
             blueprint.Blueprint = true;
         }
 
+        scope.Complete();
         return blueprints;
     }
 
