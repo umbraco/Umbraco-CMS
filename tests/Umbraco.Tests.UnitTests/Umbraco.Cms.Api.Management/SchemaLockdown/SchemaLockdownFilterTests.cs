@@ -27,8 +27,8 @@ public class SchemaLockdownFilterTests
         }
     }
 
-    // Mirrors CreateDocumentTypeTemplateController: a POST that creates a template and updates the document type
-    // it belongs to, so the two entity types resolve to different operations.
+    // A POST that updates one of its entity types, leaving the other to be resolved from the verb, so the two
+    // resolve to different operations.
     private class TemplateForDocumentTypeController
     {
         [SchemaOperation(Constants.UdiEntityType.DocumentType, SchemaOperation.Update)]
