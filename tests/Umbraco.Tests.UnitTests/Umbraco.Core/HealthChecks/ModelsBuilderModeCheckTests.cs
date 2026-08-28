@@ -26,7 +26,7 @@ public class ModelsBuilderModeCheckTests
         Assert.Multiple(() =>
         {
             Assert.That(status.ResultType, Is.EqualTo(StatusResultType.Error));
-            Assert.That(status.Message, Is.EqualTo("modelsBuilderModeCheckConfiguredErrorMessage"));
+            Assert.That(status.Message, Is.EqualTo("modelsBuilderModeCheckPackageMissingConfiguredErrorMessage"));
         });
     }
 
@@ -38,7 +38,39 @@ public class ModelsBuilderModeCheckTests
         Assert.Multiple(() =>
         {
             Assert.That(status.ResultType, Is.EqualTo(StatusResultType.Warning));
-            Assert.That(status.Message, Is.EqualTo("modelsBuilderModeCheckDefaultErrorMessage"));
+            Assert.That(status.Message, Is.EqualTo("modelsBuilderModeCheckPackageMissingDefaultErrorMessage"));
+        });
+    }
+
+    [Test]
+    public async Task When_Runtime_Mode_Blocks_The_Factory_And_Mode_Is_Configured_Returns_Error()
+    {
+        HealthCheckStatus status = await GetStatus(
+            Constants.ModelsBuilder.InMemoryAutoModelsMode,
+            liveFactoryEnabled: false,
+            modelsModeConfigured: true,
+            RuntimeMode.Development);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(status.ResultType, Is.EqualTo(StatusResultType.Error));
+            Assert.That(status.Message, Is.EqualTo("modelsBuilderModeCheckRuntimeModeConfiguredErrorMessage"));
+        });
+    }
+
+    [Test]
+    public async Task When_Runtime_Mode_Blocks_The_Factory_And_Mode_Is_Defaulted_Returns_Warning()
+    {
+        HealthCheckStatus status = await GetStatus(
+            Constants.ModelsBuilder.InMemoryAutoModelsMode,
+            liveFactoryEnabled: false,
+            modelsModeConfigured: false,
+            RuntimeMode.Development);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(status.ResultType, Is.EqualTo(StatusResultType.Warning));
+            Assert.That(status.Message, Is.EqualTo("modelsBuilderModeCheckRuntimeModeDefaultErrorMessage"));
         });
     }
 
@@ -64,7 +96,11 @@ public class ModelsBuilderModeCheckTests
         Assert.That(status.ResultType, Is.EqualTo(StatusResultType.Success));
     }
 
-    private static async Task<HealthCheckStatus> GetStatus(string modelsMode, bool liveFactoryEnabled, bool modelsModeConfigured)
+    private static async Task<HealthCheckStatus> GetStatus(
+        string modelsMode,
+        bool liveFactoryEnabled,
+        bool modelsModeConfigured,
+        RuntimeMode? runtimeMode = null)
     {
         var settings = new ModelsBuilderSettings { ModelsMode = modelsMode };
 
@@ -72,6 +108,11 @@ public class ModelsBuilderModeCheckTests
         if (modelsModeConfigured)
         {
             configurationValues[Constants.Configuration.ConfigModelsMode] = modelsMode;
+        }
+
+        if (runtimeMode is not null)
+        {
+            configurationValues[Constants.Configuration.ConfigRuntimeMode] = runtimeMode.ToString();
         }
 
         IConfiguration configuration = new ConfigurationBuilder()

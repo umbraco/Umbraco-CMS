@@ -25,45 +25,54 @@ public class RazorRuntimeCompilationValidatorTests
     [SetUp]
     public void SetUp() => _logger = new FakeLogger();
 
-    [Test]
-    public void Handle_WhenExplicitlyConfiguredModeCannotBeSatisfied_LogsErrorWarningOfFutureVersion()
+    [TestCase(true, "Install the package")]
+    [TestCase(false, "Install the package")]
+    public void Handle_WhenRuntimeModeAllowsTheFactoryButThereIsNone_ReportsTheMissingPackage(bool modelsModeConfigured, string expectedRemedy)
     {
-        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured: true).Handle(Notification);
+        // The runtime mode this models mode requires is also the default, so once it is in force the package
+        // providing the factory is the only thing that can still be missing.
+        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured).Handle(Notification);
 
         Assert.That(_logger.LogEntries, Has.Exactly(1).Matches<FakeLogger.LogEntry>(
             e => e.Level == LogLevel.Error
-                 && e.Message.Contains("configured to use")
-                 && e.Message.Contains(FutureVersionWarning)));
-    }
-
-    [Test]
-    public void Handle_WhenDefaultedModeCannotBeSatisfied_LogsErrorWithoutWarningOfFutureVersion()
-    {
-        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured: false).Handle(Notification);
-
-        Assert.That(_logger.LogEntries, Has.Exactly(1).Matches<FakeLogger.LogEntry>(
-            e => e.Level == LogLevel.Error
-                 && e.Message.Contains("using the default")
-                 && !e.Message.Contains(FutureVersionWarning)));
+                 && e.Message.Contains(expectedRemedy)
+                 && !e.Message.Contains("Change the runtime mode")));
     }
 
     [TestCase(true)]
     [TestCase(false)]
-    public void Handle_WhenLiveFactoryIsAvailable_LogsNothing(bool modelsModeConfigured)
+    public void Handle_WhenRuntimeModeBlocksTheFactory_ReportsTheRuntimeModeInForce(bool modelsModeConfigured)
     {
-        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: true, modelsModeConfigured).Handle(Notification);
+        // The runtime mode blocks the factory before any package can supply it, so reporting a missing package
+        // here would send the reader after the wrong thing.
+        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured, RuntimeMode.Development)
+            .Handle(Notification);
 
-        Assert.That(_logger.LogEntries, Is.Empty);
+        Assert.That(_logger.LogEntries, Has.Exactly(1).Matches<FakeLogger.LogEntry>(
+            e => e.Level == LogLevel.Error
+                 && e.Message.Contains($"currently {RuntimeMode.Development}")
+                 && e.Message.Contains("Change the runtime mode")
+                 && !e.Message.Contains("Install the package")));
     }
 
-    [TestCase(Constants.ModelsBuilder.ModelsModes.Nothing)]
-    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeAuto)]
-    [TestCase(Constants.ModelsBuilder.ModelsModes.SourceCodeManual)]
-    public void Handle_WhenModeDoesNotRequireLiveFactory_LogsNothing(string modelsMode)
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+    [TestCase(RuntimeMode.Development)]
+    public void Handle_WhenModeIsExplicitlyConfigured_WarnsOfTheFutureVersion(RuntimeMode runtimeMode)
     {
-        CreateSut(modelsMode, liveFactoryEnabled: false, modelsModeConfigured: true).Handle(Notification);
+        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured: true, runtimeMode).Handle(Notification);
 
-        Assert.That(_logger.LogEntries, Is.Empty);
+        Assert.That(_logger.LogEntries, Has.Exactly(1).Matches<FakeLogger.LogEntry>(
+            e => e.Message.Contains("configured to use") && e.Message.Contains(FutureVersionWarning)));
+    }
+
+    [TestCase(RuntimeMode.BackofficeDevelopment)]
+    [TestCase(RuntimeMode.Development)]
+    public void Handle_WhenModeIsDefaulted_DoesNotWarnOfTheFutureVersion(RuntimeMode runtimeMode)
+    {
+        CreateSut(Constants.ModelsBuilder.InMemoryAutoModelsMode, liveFactoryEnabled: false, modelsModeConfigured: false, runtimeMode).Handle(Notification);
+
+        Assert.That(_logger.LogEntries, Has.Exactly(1).Matches<FakeLogger.LogEntry>(
+            e => e.Message.Contains("using the default") && !e.Message.Contains(FutureVersionWarning)));
     }
 
     [Test]
@@ -98,7 +107,11 @@ public class RazorRuntimeCompilationValidatorTests
 
     private static UmbracoApplicationStartedNotification Notification => new(false);
 
-    private RazorRuntimeCompilationValidator CreateSut(string modelsMode, bool liveFactoryEnabled, bool modelsModeConfigured)
+    private RazorRuntimeCompilationValidator CreateSut(
+        string modelsMode,
+        bool liveFactoryEnabled,
+        bool modelsModeConfigured,
+        RuntimeMode? runtimeMode = null)
     {
         var settings = new ModelsBuilderSettings { ModelsMode = modelsMode };
 
@@ -106,6 +119,11 @@ public class RazorRuntimeCompilationValidatorTests
         if (modelsModeConfigured)
         {
             configurationValues[Constants.Configuration.ConfigModelsMode] = modelsMode;
+        }
+
+        if (runtimeMode is not null)
+        {
+            configurationValues[Constants.Configuration.ConfigRuntimeMode] = runtimeMode.ToString();
         }
 
         IConfiguration configuration = new ConfigurationBuilder()

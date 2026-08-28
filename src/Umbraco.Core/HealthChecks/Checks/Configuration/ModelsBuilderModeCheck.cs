@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -61,20 +62,41 @@ public class ModelsBuilderModeCheck : HealthCheck
             };
         }
 
+        // The runtime mode blocks the factory before any package can supply it, so it is the first thing to
+        // report. Once it allows the factory and there still is not one, the package providing it is what is
+        // missing — reporting both remedies at once would tell most sites to set a runtime mode they already
+        // have, since the one this mode requires is also the default.
+        RuntimeMode runtimeMode = _configuration.GetRuntimeMode();
+
         // A mode that was explicitly asked for and cannot be met is a misconfiguration to act on. The default
         // predates the model factory moving into an optional package, so a site that never chose this mode is
         // told that models are unavailable without being told it configured something wrong.
-        return _configuration.IsModelsModeConfigured()
-            ? new HealthCheckStatus(Localize("modelsBuilderModeCheckConfiguredErrorMessage", modelsMode))
+        var modelsModeConfigured = _configuration.IsModelsModeConfigured();
+
+        if (runtimeMode != RuntimeMode.BackofficeDevelopment)
+        {
+            return modelsModeConfigured
+                ? new HealthCheckStatus(Localize("modelsBuilderModeCheckRuntimeModeConfiguredErrorMessage", modelsMode, runtimeMode.ToString()))
+                {
+                    ResultType = StatusResultType.Error,
+                }
+                : new HealthCheckStatus(Localize("modelsBuilderModeCheckRuntimeModeDefaultErrorMessage", modelsMode, runtimeMode.ToString()))
+                {
+                    ResultType = StatusResultType.Warning,
+                };
+        }
+
+        return modelsModeConfigured
+            ? new HealthCheckStatus(Localize("modelsBuilderModeCheckPackageMissingConfiguredErrorMessage", modelsMode))
             {
                 ResultType = StatusResultType.Error,
             }
-            : new HealthCheckStatus(Localize("modelsBuilderModeCheckDefaultErrorMessage", modelsMode))
+            : new HealthCheckStatus(Localize("modelsBuilderModeCheckPackageMissingDefaultErrorMessage", modelsMode))
             {
                 ResultType = StatusResultType.Warning,
             };
     }
 
-    private string Localize(string alias, string modelsMode)
-        => _textService.Localize("healthcheck", alias, [modelsMode]);
+    private string Localize(string alias, params string[] tokens)
+        => _textService.Localize("healthcheck", alias, tokens);
 }

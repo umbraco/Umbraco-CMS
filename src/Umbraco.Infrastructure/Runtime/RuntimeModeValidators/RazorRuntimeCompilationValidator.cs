@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -74,19 +75,49 @@ public class RazorRuntimeCompilationValidator : INotificationHandler<UmbracoAppl
             return;
         }
 
+        // The runtime mode blocks the factory before any package can supply it, so it is the first thing to
+        // report. Once it allows the factory and there still is not one, the package providing it is what is
+        // missing — reporting both remedies at once would tell most sites to set a runtime mode they already
+        // have, since the one this mode requires is also the default.
+        RuntimeMode runtimeMode = _configuration.GetRuntimeMode();
+
         // Only a mode that was asked for is a misconfiguration to be acted on. The default predates the model
         // factory moving into an optional package, so a site that never chose this mode is reported without
         // being warned about a future version it will not be affected by.
-        if (_configuration.IsModelsModeConfigured())
+        var modelsModeConfigured = _configuration.IsModelsModeConfigured();
+
+        if (runtimeMode != RuntimeMode.BackofficeDevelopment)
+        {
+            if (modelsModeConfigured)
+            {
+                _logger.LogError(
+                    "ModelsBuilder is configured to use the {ModelsMode} models mode, but that mode is only available in the {RequiredRuntimeMode} runtime mode and the runtime mode is currently {RuntimeMode}, so no models will be generated. Change the runtime mode, or configure a different ModelsBuilder mode. This configuration will prevent startup in Umbraco 19.",
+                    Constants.ModelsBuilder.InMemoryAutoModelsMode,
+                    RuntimeMode.BackofficeDevelopment,
+                    runtimeMode);
+            }
+            else
+            {
+                _logger.LogError(
+                    "ModelsBuilder is using the default {ModelsMode} models mode, but that mode is only available in the {RequiredRuntimeMode} runtime mode and the runtime mode is currently {RuntimeMode}, so no models will be generated. Change the runtime mode, or configure an explicit ModelsBuilder mode.",
+                    Constants.ModelsBuilder.InMemoryAutoModelsMode,
+                    RuntimeMode.BackofficeDevelopment,
+                    runtimeMode);
+            }
+
+            return;
+        }
+
+        if (modelsModeConfigured)
         {
             _logger.LogError(
-                "ModelsBuilder is configured to use the {ModelsMode} models mode, but no live model factory is available, so no models will be generated. Install the Umbraco.Cms.DevelopmentMode.Backoffice package, set the runtime mode to BackofficeDevelopment, or configure a different ModelsBuilder mode. This configuration will prevent startup in Umbraco 19.",
+                "ModelsBuilder is configured to use the {ModelsMode} models mode, but no model factory able to generate models at runtime is available, so no models will be generated. That factory is provided by the Umbraco.Cms.DevelopmentMode.Backoffice package. Install the package, or configure a different ModelsBuilder mode. This configuration will prevent startup in Umbraco 19.",
                 Constants.ModelsBuilder.InMemoryAutoModelsMode);
         }
         else
         {
             _logger.LogError(
-                "ModelsBuilder is using the default {ModelsMode} models mode, but no live model factory is available, so no models will be generated. Install the Umbraco.Cms.DevelopmentMode.Backoffice package, set the runtime mode to BackofficeDevelopment, or configure an explicit ModelsBuilder mode.",
+                "ModelsBuilder is using the default {ModelsMode} models mode, but no model factory able to generate models at runtime is available, so no models will be generated. That factory is provided by the Umbraco.Cms.DevelopmentMode.Backoffice package. Install the package, or configure an explicit ModelsBuilder mode.",
                 Constants.ModelsBuilder.InMemoryAutoModelsMode);
         }
     }
