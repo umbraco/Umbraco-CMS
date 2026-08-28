@@ -169,22 +169,8 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        int userId = await _userIdKeyResolver.GetAsync(userKey);
         IContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
-
-        IContent? parent = null;
-        if (parentKey.HasValue)
-        {
-            parent = await GetByIdAsync(parentKey.Value, cancellationToken);
-            if (parent is null)
-            {
-                throw new ArgumentException("No content with that key.", nameof(parentKey));
-            }
-        }
-
-        Content content = parent is not null
-            ? new Content(name, parent, contentType, userId)
-            : new Content(name, Constants.System.Root, contentType, userId);
+        IContent content = await CreateAsync(name, parentKey, contentType, userKey, cancellationToken);
 
         scope.Complete();
         return content;
