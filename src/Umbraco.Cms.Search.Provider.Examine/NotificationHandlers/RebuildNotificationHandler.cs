@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Search.Provider.Examine.NotificationHandlers;
 /// <summary>
 /// On application startup, rebuilds any registered index whose active physical Lucene index does not yet exist.
 /// </summary>
-public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicationStartedNotification>
+internal sealed class RebuildNotificationHandler : INotificationHandler<UmbracoApplicationStartedNotification>
 {
     // Gives the server a chance to finish starting up before potentially resource-intensive index rebuilds begin.
     private static readonly TimeSpan RebuildDelay = TimeSpan.FromMinutes(2);
@@ -59,17 +59,24 @@ public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicatio
     /// <inheritdoc />
     public void Handle(UmbracoApplicationStartedNotification notification)
     {
-        // Wait for runtime mode, as there might be incoming schema changes etc.
+        // Wait for runtime level of "Run", as there might be incoming schema changes etc.
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
-            _logger.LogDebug(
-                "Skipping startup index rebuild check because the runtime level is {RuntimeLevel}, not {RunLevel}.",
-                _runtimeState.Level,
-                RuntimeLevel.Run);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug(
+                    "Skipping startup index rebuild check because the runtime level is {RuntimeLevel}, not {RunLevel}.",
+                    _runtimeState.Level,
+                    RuntimeLevel.Run);
+            }
+
             return;
         }
 
         _logger.LogInformation("Boot detected, determining indexes to rebuild");
+
+        var origin = _originProvider.GetCurrent();
+        bool isFirstRebuild = true;
         foreach (ContentIndexRegistration indexRegistration in _options.GetContentIndexRegistrations())
         {
             var activePhysicalName = _activeIndexManager.ResolveActiveIndexName(indexRegistration.IndexAlias);
@@ -89,7 +96,8 @@ public class RebuildNotificationHandler : INotificationHandler<UmbracoApplicatio
             }
 
             _logger.LogInformation("Rebuilding index {IndexRegistrationIndexAlias}", indexRegistration.IndexAlias);
-            _contentIndexingService.Rebuild(indexRegistration.IndexAlias, _originProvider.GetCurrent(), RebuildDelay);
+            _contentIndexingService.Rebuild(indexRegistration.IndexAlias, origin, isFirstRebuild ? RebuildDelay : null);
+            isFirstRebuild = false;
         }
     }
 }
