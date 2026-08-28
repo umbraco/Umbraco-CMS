@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -77,8 +76,7 @@ public class RazorRuntimeCompilationValidator : INotificationHandler<UmbracoAppl
 
         // The runtime mode blocks the factory before any package can supply it, so it is the first thing to
         // report. Once it allows the factory and there still is not one, the package providing it is what is
-        // missing — reporting both remedies at once would tell most sites to set a runtime mode they already
-        // have, since the one this mode requires is also the default.
+        // missing.
         RuntimeMode runtimeMode = _configuration.GetRuntimeMode();
 
         // Only a mode that was asked for is a misconfiguration to be acted on. The default predates the model

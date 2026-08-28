@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -64,8 +63,7 @@ public class ModelsBuilderModeCheck : HealthCheck
 
         // The runtime mode blocks the factory before any package can supply it, so it is the first thing to
         // report. Once it allows the factory and there still is not one, the package providing it is what is
-        // missing — reporting both remedies at once would tell most sites to set a runtime mode they already
-        // have, since the one this mode requires is also the default.
+        // missing.
         RuntimeMode runtimeMode = _configuration.GetRuntimeMode();
 
         // A mode that was explicitly asked for and cannot be met is a misconfiguration to act on. The default
