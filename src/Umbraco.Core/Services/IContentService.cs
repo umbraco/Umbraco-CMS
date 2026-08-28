@@ -76,16 +76,20 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     /// <summary>
     ///     Deletes blueprints for a content type.
     /// </summary>
-    /// <param name="contentTypeId">The content type identifier.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId);
+    /// <param name="contentTypeKey">The Guid key of the content type to delete blueprints for.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentBlueprintOperationStatus>> DeleteBlueprintsOfTypeAsync(Guid contentTypeKey, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Deletes blueprints for content types.
+    ///     Deletes blueprints for the specified content types, or all blueprints if no content type keys are given.
     /// </summary>
-    /// <param name="contentTypeIds">The content type identifiers.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
+    /// <param name="contentTypeKeys">The Guid keys of the content types to delete blueprints for, or none for all blueprints.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An attempt carrying the operation status.</returns>
+    Task<Attempt<ContentBlueprintOperationStatus>> DeleteBlueprintsOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken);
 
     #endregion
 

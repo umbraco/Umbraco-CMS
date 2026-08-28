@@ -2022,56 +2022,49 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return blueprints;
     }
 
-    /// <summary>
-    /// Deletes all content blueprints of the specified content type IDs.
-    /// </summary>
-    /// <param name="contentTypeIds">The content type IDs whose blueprints should be deleted.</param>
-    /// <param name="userId">The optional ID of the user deleting the blueprints.</param>
-    public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public Task<Attempt<ContentBlueprintOperationStatus>> DeleteBlueprintsOfTypeAsync(Guid contentTypeKey, Guid userKey, CancellationToken cancellationToken) =>
+        DeleteBlueprintsOfTypesAsync(new[] { contentTypeKey }, userKey, cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<Attempt<ContentBlueprintOperationStatus>> DeleteBlueprintsOfTypesAsync(IEnumerable<Guid> contentTypeKeys, Guid userKey, CancellationToken cancellationToken)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        Guid[] contentTypeKeysArray = contentTypeKeys.ToArray();
+
+        IEnumerable<IContent> blueprints;
+        if (contentTypeKeysArray.Length == 0)
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            // Need to use a List here because the expression tree cannot convert an array when used in Contains.
-            // See ExpressionTests.Sql_In().
-            var contentTypeIdsAsList = contentTypeIds.ToList();
-
-            IQuery<IContent> query = Query<IContent>();
-            if (contentTypeIdsAsList.Count > 0)
-            {
-                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
-            }
-
-            IContent[]? blueprints = _documentBlueprintRepository.Get(query)?.Select(x =>
-            {
-                x.Blueprint = true;
-                return x;
-            }).ToArray();
-
-            if (blueprints is not null)
-            {
-                foreach (IContent blueprint in blueprints)
-                {
-                    _documentBlueprintRepository.Delete(blueprint);
-                }
-
-                scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprints, evtMsgs));
-                scope.Notifications.Publish(new ContentTreeChangeNotification(blueprints, TreeChangeTypes.Remove, evtMsgs));
-                scope.Complete();
-            }
+            blueprints = await _asyncDocumentBlueprintRepository.GetAllAsync(cancellationToken);
         }
-    }
+        else
+        {
+            PagedModel<IContent> paged = await _asyncDocumentBlueprintRepository.GetPagedOfContentTypesAsync(
+                contentTypeKeysArray, 0, int.MaxValue, Ordering.By("sortOrder"), cancellationToken);
+            blueprints = paged.Items;
+        }
 
-    /// <summary>
-    /// Deletes all content blueprints of the specified content type ID.
-    /// </summary>
-    /// <param name="contentTypeId">The content type ID whose blueprints should be deleted.</param>
-    /// <param name="userId">The optional ID of the user deleting the blueprints.</param>
-    public void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId) =>
-        DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
+        IContent[] blueprintsArray = blueprints.ToArray();
+
+        if (blueprintsArray.Length > 0)
+        {
+            foreach (IContent blueprint in blueprintsArray)
+            {
+                blueprint.Blueprint = true;
+                await _asyncDocumentBlueprintRepository.DeleteAsync(blueprint, cancellationToken);
+            }
+
+            scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprintsArray, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(blueprintsArray, TreeChangeTypes.Remove, evtMsgs));
+        }
+
+        scope.Complete();
+        return Attempt.Succeed(ContentBlueprintOperationStatus.Success);
+    }
 
     #endregion
 

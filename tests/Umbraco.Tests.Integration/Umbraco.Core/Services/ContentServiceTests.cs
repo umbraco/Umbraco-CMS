@@ -388,6 +388,39 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
+    public async Task Delete_Blueprints_Of_Types()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var ct1 = ContentTypeBuilder.CreateTextPageContentType("ct1", defaultTemplateId: template.Id);
+        await TemplateService.CreateAsync(ct1.DefaultTemplate, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ct1, Constants.Security.SuperUserKey);
+        var ct2 = ContentTypeBuilder.CreateTextPageContentType("ct2", defaultTemplateId: template.Id);
+        await TemplateService.CreateAsync(ct2.DefaultTemplate, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(ct2, Constants.Security.SuperUserKey);
+
+        for (var i = 0; i < 10; i++)
+        {
+            var blueprint =
+                ContentBuilder.CreateTextpageContent(i % 2 == 0 ? ct1 : ct2, "hello" + i, Constants.System.Root);
+            await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
+        }
+
+        await ContentService.DeleteBlueprintsOfTypeAsync(ct1.Key, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        var found = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None)).ToArray();
+        Assert.AreEqual(5, found.Length);
+        Assert.IsTrue(found.All(x => x.ContentTypeId == ct2.Id));
+
+        await ContentService.DeleteBlueprintsOfTypesAsync(Array.Empty<Guid>(), Constants.Security.SuperUserKey, CancellationToken.None);
+
+        found = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None)).ToArray();
+        Assert.AreEqual(0, found.Length);
+    }
+
+    [Test]
+    [LongRunning]
     public async Task Perform_Scheduled_Publishing()
     {
         var langUk = new LanguageBuilder()

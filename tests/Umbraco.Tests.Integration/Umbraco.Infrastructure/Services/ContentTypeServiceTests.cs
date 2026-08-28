@@ -511,6 +511,27 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Delete_ContentType_Deletes_Its_Blueprints()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
+        await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
+
+        var foundBeforeDelete = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, contentType.Key)).ToArray();
+        Assert.AreEqual(1, foundBeforeDelete.Length);
+
+        await ContentTypeService.DeleteAsync(contentType, Constants.Security.SuperUserKey);
+
+        var foundAfterDelete = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, contentType.Key)).ToArray();
+        Assert.AreEqual(0, foundAfterDelete.Length);
+    }
+
+    [Test]
     public async Task Can_Create_Container()
     {
         // Act

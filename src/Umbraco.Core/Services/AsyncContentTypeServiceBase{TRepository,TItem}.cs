@@ -918,6 +918,7 @@ public abstract class AsyncContentTypeServiceBase<TRepository, TItem> : ContentT
     /// Deletes content items of the specified types.
     /// </summary>
     /// <param name="typeIds">The type IDs whose content should be deleted.</param>
+    // TODO (V19): Change to take Guid keys instead of int IDs, once IIdKeyMap resolution can be removed from callers.
     protected abstract Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds);
 
     /// <summary>

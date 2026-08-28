@@ -19,6 +19,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
     private readonly ITemplateService _templateService;
     private readonly IContentService _contentService;
     private readonly IElementService _elementService;
+    private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
@@ -35,6 +36,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
     /// <param name="contentTypeFilters">The content type filter collection.</param>
     /// <param name="templateService">The template service.</param>
+    /// <param name="idKeyMap">The ID/key map.</param>
     public ContentTypeService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -48,7 +50,8 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
         IEventAggregator eventAggregator,
         IUserIdKeyResolver userIdKeyResolver,
         ContentTypeFilterCollection contentTypeFilters,
-        ITemplateService templateService)
+        ITemplateService templateService,
+        IIdKeyMap idKeyMap)
         : base(
             provider,
             loggerFactory,
@@ -64,6 +67,7 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
         _templateService = templateService;
         _contentService = contentService;
         _elementService = elementService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -168,18 +172,31 @@ public class ContentTypeService : AsyncContentTypeServiceBase<IContentTypeReposi
     }
 
     /// <inheritdoc />
-    protected override Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
+    protected override async Task DeleteItemsOfTypesAsync(IEnumerable<int> typeIds)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var typeIdsA = typeIds.ToArray();
             _contentService.DeleteOfTypes(typeIdsA);
-            _contentService.DeleteBlueprintsOfTypes(typeIdsA);
+
+            var typeKeys = new List<Guid>();
+            foreach (int typeId in typeIdsA)
+            {
+                Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(typeId, UmbracoObjectTypes.DocumentType);
+                if (keyAttempt.Success)
+                {
+                    typeKeys.Add(keyAttempt.Result);
+                }
+            }
+
+            if (typeKeys.Count > 0)
+            {
+                await _contentService.DeleteBlueprintsOfTypesAsync(typeKeys, Constants.Security.SuperUserKey, CancellationToken.None);
+            }
+
             _elementService.DeleteOfTypes(typeIdsA);
             scope.Complete();
         }
-
-        return Task.CompletedTask;
     }
 
     #region Notifications
