@@ -96,8 +96,18 @@ internal sealed class ContentIndexingService : IContentIndexingService
             return;
         }
 
-        if (indexRegistration.SameOriginOnly && origin != _originProvider.GetCurrent())
+        var currentOrigin = _originProvider.GetCurrent();
+        if (indexRegistration.SameOriginOnly && origin != currentOrigin)
         {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug(
+                    "Skipping rebuild of index {IndexAlias} - it only accepts same-origin rebuilds, and the request originated from {RequestOrigin} rather than {CurrentOrigin}.",
+                    indexRegistration.IndexAlias,
+                    origin,
+                    currentOrigin);
+            }
+
             return;
         }
 
