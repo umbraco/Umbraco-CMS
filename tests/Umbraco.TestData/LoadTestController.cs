@@ -34,6 +34,7 @@ public class LoadTestController : Controller
     private static readonly Lock _locko = new();
 
     private static volatile int _containerId = -1;
+    private static Guid _containerKey = Guid.Empty;
 
     private static readonly string _headHtml = @"<html>
 <head>
@@ -194,6 +195,7 @@ public class LoadTestController : Controller
             }
 
             _containerId = container.Id;
+            _containerKey = container.Key;
             return null;
         }
     }
@@ -244,7 +246,7 @@ public class LoadTestController : Controller
         containerType.SetDefaultTemplate(containerTemplate);
         await _contentTypeService.CreateAsync(containerType, Constants.Security.SuperUserKey);
 
-        var content = _contentService.Create("LoadTestContainer", -1, ContainerAlias);
+        var content = await _contentService.CreateAsync("LoadTestContainer", (Guid?)null, ContainerAlias, Constants.Security.SuperUserKey, CancellationToken.None);
         await _contentService.SaveAsync(content, null, null, CancellationToken.None);
         _contentService.Publish(content, content.AvailableCultures.ToArray());
 
@@ -308,7 +310,7 @@ public class LoadTestController : Controller
         for (var i = 0; i < n; i++)
         {
             var name = Guid.NewGuid().ToString("N").ToUpper() + "-" + (restart ? "R" : "X") + "-" + o;
-            var content = _contentService.Create(name, _containerId, ContentAlias);
+            var content = await _contentService.CreateAsync(name, _containerKey, ContentAlias, Constants.Security.SuperUserKey, CancellationToken.None);
             content.SetValue("origin", o);
             await _contentService.SaveAsync(content, null, null, CancellationToken.None);
             _contentService.Publish(content, content.AvailableCultures.ToArray());

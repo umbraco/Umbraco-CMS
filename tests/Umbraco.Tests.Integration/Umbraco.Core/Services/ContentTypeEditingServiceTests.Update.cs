@@ -1571,7 +1571,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         createModel.AllowedAsRoot = true;
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
-        var content = ContentService.Create("Test Content", Constants.System.Root, contentType.Alias);
+        var content = await ContentService.CreateAsync("Test Content", (Guid?)null, contentType.Alias, Constants.Security.SuperUserKey, CancellationToken.None);
         var saveResult = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         Assert.IsTrue(saveResult.Success);
 

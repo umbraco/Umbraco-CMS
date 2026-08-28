@@ -251,7 +251,7 @@ public class UmbracoTestDataController : SurfaceController
 
         var docType = await GetOrCreateContentTypeAsync();
 
-        var parent = Services.ContentService.Create(company, -1, docType.Alias);
+        var parent = await Services.ContentService.CreateAsync(company, (Guid?)null, docType.Alias, Constants.Security.SuperUserKey, CancellationToken.None);
 
         // give it some reasonable data (100 reviews)
         parent.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));
@@ -261,7 +261,7 @@ public class UmbracoTestDataController : SurfaceController
 
         var udis = CreateHierarchy(parent, count, depth, currParent =>
         {
-            var content = Services.ContentService.Create(faker.Commerce.ProductName(), currParent, docType.Alias);
+            var content = Services.ContentService.CreateAsync(faker.Commerce.ProductName(), currParent, docType.Alias, Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
             // give it some reasonable data (100 reviews)
             content.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));

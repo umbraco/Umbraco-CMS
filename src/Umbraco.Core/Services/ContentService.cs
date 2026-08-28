@@ -164,114 +164,72 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
 
     #region Create
 
-    /// <summary>
-    ///     Creates an <see cref="IContent" /> object using the alias of the <see cref="IContentType" />
-    ///     that this Content should based on.
-    /// </summary>
-    /// <remarks>
-    ///     Note that using this method will simply return a new IContent without any identity
-    ///     as it has not yet been persisted. It is intended as a shortcut to creating new content objects
-    ///     that does not invoke a save operation against the database.
-    /// </remarks>
-    /// <param name="name">Name of the Content object</param>
-    /// <param name="parentId">Id of Parent for the new Content</param>
-    /// <param name="contentTypeAlias">Alias of the <see cref="IContentType" /></param>
-    /// <param name="userId">Optional id of the user creating the content</param>
-    /// <returns>
-    ///     <see cref="IContent" />
-    /// </returns>
-    public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<IContent> CreateAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
     {
-        // TODO: what about culture?
-        IContent? parent = GetByIdAsync(parentId, CancellationToken.None).GetAwaiter().GetResult();
-        return Create(name, parent, contentTypeAlias, userId);
-    }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-    /// <summary>
-    ///     Creates an <see cref="IContent" /> object of a specified content type.
-    /// </summary>
-    /// <remarks>
-    ///     This method simply returns a new, non-persisted, IContent without any identity. It
-    ///     is intended as a shortcut to creating new content objects that does not invoke a save
-    ///     operation against the database.
-    /// </remarks>
-    /// <param name="name">The name of the content object.</param>
-    /// <param name="parentId">The identifier of the parent, or -1.</param>
-    /// <param name="contentTypeAlias">The alias of the content type.</param>
-    /// <param name="userId">The optional id of the user creating the content.</param>
-    /// <returns>The content object.</returns>
-    public IContent Create(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
-    {
-        // TODO: what about culture?
-        IContentType contentType = GetContentType(contentTypeAlias);
-        return Create(name, parentId, contentType, userId);
-    }
-
-    /// <summary>
-    ///     Creates an <see cref="IContent" /> object of a specified content type.
-    /// </summary>
-    /// <remarks>
-    ///     This method simply returns a new, non-persisted, IContent without any identity. It
-    ///     is intended as a shortcut to creating new content objects that does not invoke a save
-    ///     operation against the database.
-    /// </remarks>
-    /// <param name="name">The name of the content object.</param>
-    /// <param name="parentId">The identifier of the parent, or -1.</param>
-    /// <param name="contentType">The content type of the content</param>
-    /// <param name="userId">The optional id of the user creating the content.</param>
-    /// <returns>The content object.</returns>
-    public IContent Create(string name, int parentId, IContentType contentType, int userId = Constants.Security.SuperUserId)
-    {
-        if (contentType is null)
-        {
-            throw new ArgumentException("Content type must be specified", nameof(contentType));
-        }
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        IContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
 
         IContent? parent = null;
-        if (parentId > 0 && TryGetParentKey(parentId, out Guid? parentKey))
+        if (parentKey.HasValue)
         {
-            parent = GetByIdAsync(parentKey.Value, CancellationToken.None).GetAwaiter().GetResult();
+            parent = await GetByIdAsync(parentKey.Value, cancellationToken);
+            if (parent is null)
+            {
+                throw new ArgumentException("No content with that key.", nameof(parentKey));
+            }
         }
 
-        if (parentId > 0 && parent is null)
-        {
-            throw new ArgumentException("No content with that id.", nameof(parentId));
-        }
+        Content content = parent is not null
+            ? new Content(name, parent, contentType, userId)
+            : new Content(name, Constants.System.Root, contentType, userId);
 
-        Content content = parentId > 0
-            ? new Content(name, parent!, contentType, userId)
-            : new Content(name, parentId, contentType, userId);
-
+        scope.Complete();
         return content;
     }
 
-    /// <summary>
-    ///     Creates an <see cref="IContent" /> object of a specified content type, under a parent.
-    /// </summary>
-    /// <remarks>
-    ///     This method simply returns a new, non-persisted, IContent without any identity. It
-    ///     is intended as a shortcut to creating new content objects that does not invoke a save
-    ///     operation against the database.
-    /// </remarks>
-    /// <param name="name">The name of the content object.</param>
-    /// <param name="parent">The parent content object.</param>
-    /// <param name="contentTypeAlias">The alias of the content type.</param>
-    /// <param name="userId">The optional id of the user creating the content.</param>
-    /// <returns>The content object.</returns>
-    public IContent Create(string name, IContent? parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
+    /// <inheritdoc />
+    public async Task<IContent> CreateAsync(string name, Guid? parentKey, IContentType contentType, Guid userKey, CancellationToken cancellationToken)
     {
-        // TODO: what about culture?
-        if (parent == null)
+        ArgumentNullException.ThrowIfNull(contentType);
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+
+        IContent? parent = null;
+        if (parentKey.HasValue)
         {
-            throw new ArgumentNullException(nameof(parent));
+            parent = await GetByIdAsync(parentKey.Value, cancellationToken);
+            if (parent is null)
+            {
+                throw new ArgumentException("No content with that key.", nameof(parentKey));
+            }
         }
 
-        IContentType contentType = GetContentType(contentTypeAlias)
-            // causes rollback
-            ?? throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+        Content content = parent is not null
+            ? new Content(name, parent, contentType, userId)
+            : new Content(name, Constants.System.Root, contentType, userId);
+
+        scope.Complete();
+        return content;
+    }
+
+    /// <inheritdoc />
+    public async Task<IContent> CreateAsync(string name, IContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(parent);
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
+        IContentType contentType = await GetContentTypeAsync(scope, contentTypeAlias, cancellationToken);
 
         var content = new Content(name, parent, contentType, userId);
 
+        scope.Complete();
         return content;
     }
 

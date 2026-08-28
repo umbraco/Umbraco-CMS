@@ -368,7 +368,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
         await cts.CreateAsync(ctHomePage, Constants.Security.SuperUserKey);
 
         // Act
-        var homeDoc = cs.Create("Home Page", -1, contentTypeAlias);
+        var homeDoc = await cs.CreateAsync("Home Page", (Guid?)null, contentTypeAlias, Constants.Security.SuperUserKey, CancellationToken.None);
         await cs.SaveAsync(homeDoc, null, null, CancellationToken.None);
         cs.Publish(homeDoc, new[] { "*" });
 
@@ -490,7 +490,7 @@ internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
             propertyGroupName: "Child Content",
             defaultTemplateId: template.Id);
         await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
-        var content = ContentService.Create("Page 1", -1, childContentType.Alias);
+        var content = await ContentService.CreateAsync("Page 1", (Guid?)null, childContentType.Alias, Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         await ContentTypeService.DeleteAsync(contentType, Constants.Security.SuperUserKey);

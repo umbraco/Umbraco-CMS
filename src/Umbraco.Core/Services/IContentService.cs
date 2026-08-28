@@ -562,41 +562,34 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     ///     Creates a document.
     /// </summary>
     /// <param name="name">The name of the document.</param>
-    /// <param name="parentId">The unique identifier of the parent.</param>
-    /// <param name="documentTypeAlias">The document type alias.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the content tree.</param>
+    /// <param name="contentTypeAlias">The content type alias.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The created document.</returns>
-    IContent Create(string name, Guid parentId, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
+    Task<IContent> CreateAsync(string name, Guid? parentKey, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Creates a document.
     /// </summary>
     /// <param name="name">The name of the document.</param>
-    /// <param name="parentId">The identifier of the parent.</param>
-    /// <param name="documentTypeAlias">The document type alias.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The created document.</returns>
-    IContent Create(string name, int parentId, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Creates a document.
-    /// </summary>
-    /// <param name="name">The name of the document.</param>
-    /// <param name="parentId">The identifier of the parent.</param>
+    /// <param name="parentKey">The Guid key of the parent, or <c>null</c> for the root of the content tree.</param>
     /// <param name="contentType">The content type.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The created document.</returns>
-    IContent Create(string name, int parentId, IContentType contentType, int userId = Constants.Security.SuperUserId);
+    Task<IContent> CreateAsync(string name, Guid? parentKey, IContentType contentType, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Creates a document.
     /// </summary>
     /// <param name="name">The name of the document.</param>
     /// <param name="parent">The parent document.</param>
-    /// <param name="documentTypeAlias">The document type alias.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <param name="contentTypeAlias">The content type alias.</param>
+    /// <param name="userKey">The Guid key of the user performing the action.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The created document.</returns>
-    IContent Create(string name, IContent? parent, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
+    Task<IContent> CreateAsync(string name, IContent parent, string contentTypeAlias, Guid userKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Creates and saves a document.

@@ -61,7 +61,15 @@ public static class ContentServiceExtensions
         }
 
         IContent? parent = contentService.GetByIdAsync(guidUdi.Guid, CancellationToken.None).GetAwaiter().GetResult();
-        return contentService.Create(name, parent, contentTypeAlias, userId);
+        if (parent is null)
+        {
+            throw new ArgumentNullException(nameof(parentId), "No content found for the specified parent UDI.");
+        }
+
+        IUserIdKeyResolver userIdKeyResolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
+        Guid userKey = userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+
+        return contentService.CreateAsync(name, parent, contentTypeAlias, userKey, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>

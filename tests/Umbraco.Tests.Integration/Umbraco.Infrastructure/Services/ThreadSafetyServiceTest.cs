@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         Assert.IsNull(currentScope);
 
                         string name1 = "test-" + Guid.NewGuid();
-                        IContent content1 = contentService.Create(name1, -1, "umbTextpage");
+                        IContent content1 = contentService.CreateAsync(name1, (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
                         log.LogInformation("[{ThreadId}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content1);
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         Thread.Sleep(100); // quick pause for maximum overlap!
 
                         string name2 = "test-" + Guid.NewGuid();
-                        IContent content2 = contentService.Create(name2, -1, "umbTextpage");
+                        IContent content2 = contentService.CreateAsync(name2, (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None).GetAwaiter().GetResult();
 
                         log.LogInformation("[{ThreadId}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content2);

@@ -37,7 +37,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
     {
         var contentType = await SetupVariantTest();
 
-        IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
+        IContent content = await ContentService.CreateAsync("Test Item", null, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetCultureName("Test item", cultureNameCultureCode);
         content.SetValue("title", "Title", valueCultureCode);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
@@ -63,7 +63,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
     {
         var contentType = await SetupVariantTest();
 
-        IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
+        IContent content = await ContentService.CreateAsync("Test Item", null, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetCultureName("Test item", cultureNameCultureCode);
         content.SetValue("title", "Title", valueCultureCode);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
@@ -90,12 +90,12 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
     {
         var contentType = await SetupVariantTest();
 
-        IContent root = ContentService.Create("Root", Constants.System.Root, contentType);
+        IContent root = await ContentService.CreateAsync("Root", null, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         root.SetCultureName("Root", cultureNameCultureCode);
         root.SetValue("title", "Root Title", valueCultureCode);
         await ContentService.SaveAsync(root, null, null, CancellationToken.None);
 
-        var child = ContentService.Create("Child", root.Id, contentType);
+        var child = await ContentService.CreateAsync("Child", root.Key, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         child.SetCultureName("Child", cultureNameCultureCode);
         child.SetValue("title", "Child Title", valueCultureCode);
         await ContentService.SaveAsync(child, null, null, CancellationToken.None);
@@ -135,7 +135,7 @@ internal sealed class ContentServiceVariantTests : UmbracoIntegrationTest
         // en-GB is not installed by default; add it so the non-canonical "en-gb" can be published.
         await LanguageService.CreateAsync(new Language("en-GB", "English (UK)"), Constants.Security.SuperUserKey);
 
-        IContent content = ContentService.Create("Test Item", Constants.System.Root, contentType);
+        IContent content = await ContentService.CreateAsync("Test Item", null, contentType, Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetCultureInfo("en-gb", "Test item", DateTime.UtcNow);
         content.SetValue("title", "Title", "en-gb");
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);

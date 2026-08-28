@@ -864,11 +864,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Remove_Property_Type()
+    public async Task Can_Remove_Property_Type()
     {
         // Arrange
         // Act
-        var content = ContentService.Create("Test", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(content, Is.Not.Null);
@@ -876,22 +876,22 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Create_Content()
+    public async Task Can_Create_Content()
     {
         // Arrange
         // Act
-        var content = ContentService.Create("Test", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(content, Is.Not.Null);
         Assert.That(content.HasIdentity, Is.False);
     }
 
-    public void Can_Create_Content_Without_Explicitly_Set_User()
+    public async Task Can_Create_Content_Without_Explicitly_Set_User()
     {
         // Arrange
         // Act
-        var content = ContentService.Create("Test", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Assert
         Assert.That(content, Is.Not.Null);
@@ -952,7 +952,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     public void Cannot_Create_Content_With_Non_Existing_ContentType_Alias() =>
-        Assert.Throws<Exception>(() => ContentService.Create("Test", Constants.System.Root, "umbAliasDoesntExist"));
+        Assert.ThrowsAsync<Exception>(() => ContentService.CreateAsync("Test", (Guid?)null, "umbAliasDoesntExist", Constants.Security.SuperUserKey, CancellationToken.None));
 
     [Test]
     public async Task Cannot_Save_Content_With_Empty_Name()
@@ -1575,11 +1575,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task IsPublishable()
     {
         // Arrange
-        var parent = ContentService.Create("parent", Constants.System.Root, "umbTextpage");
+        var parent = await ContentService.CreateAsync("parent", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         await ContentService.SaveAsync(parent, null, null, CancellationToken.None);
         ContentService.Publish(parent, parent.AvailableCultures.ToArray());
-        var content = ContentService.Create("child", parent, "umbTextpage");
+        var content = await ContentService.CreateAsync("child", parent, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         Assert.IsTrue(await ContentService.IsPathPublishableAsync(content, CancellationToken.None));
@@ -2037,7 +2037,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task Cannot_Publish_Content_Where_Parent_Is_Unpublished()
     {
         // Arrange
-        var content = ContentService.Create("Subpage with Unpublished Parent", Textpage.Id, "umbTextpage");
+        var content = await ContentService.CreateAsync("Subpage with Unpublished Parent", Textpage.Key, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         // Act
@@ -2068,7 +2068,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task Can_Save_And_Publish_Content()
     {
         // Arrange
-        var content = ContentService.Create("Home US", -1, "umbTextpage");
+        var content = await ContentService.CreateAsync("Home US", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetValue("author", "Barack Obama");
 
         // Act
@@ -2093,13 +2093,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task Can_Save_And_Publish_Content_And_Child_Without_Identity()
     {
         // Arrange
-        var content = ContentService.Create("Home US", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAsync("Home US", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetValue("author", "Barack Obama");
 
         // Act
         var saved = await ContentService.SaveAsync(content, Constants.Security.SuperUserId, null, CancellationToken.None);
         var published = ContentService.Publish(content, content.AvailableCultures.ToArray(), userId: Constants.Security.SuperUserId);
-        var childContent = ContentService.Create("Child", content.Id, "umbTextpage");
+        var childContent = await ContentService.CreateAsync("Child", content.Key, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Reset all identity properties
         childContent.Id = 0;
@@ -2121,9 +2121,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_SaveAndPublish_Invariant_Content()
+    public async Task Can_SaveAndPublish_Invariant_Content()
     {
-        var content = ContentService.Create("Home US", -1, "umbTextpage");
+        var content = await ContentService.CreateAsync("Home US", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetValue("author", "Barack Obama");
 
         var result = ContentService.SaveAndPublish(content, Array.Empty<string>());
@@ -2136,7 +2136,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     [Test]
     public async Task Can_SaveAndPublish_Invariant_Content_Without_Prior_Save()
     {
-        var content = ContentService.Create("Unsaved Content", -1, "umbTextpage");
+        var content = await ContentService.CreateAsync("Unsaved Content", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetValue("author", "Test Author");
         Assert.IsFalse(content.HasIdentity);
 
@@ -2201,13 +2201,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_SaveAndPublish_And_Child_Without_Identity()
+    public async Task Can_SaveAndPublish_And_Child_Without_Identity()
     {
-        var content = ContentService.Create("Home US", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAsync("Home US", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetValue("author", "John Doe");
 
         var published = ContentService.SaveAndPublish(content, []);
-        var childContent = ContentService.Create("Child", content.Id, "umbTextpage");
+        var childContent = await ContentService.CreateAsync("Child", content.Key, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // Reset all identity properties
         childContent.Id = 0;
@@ -2267,7 +2267,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void SaveAndPublish_Can_Be_Cancelled_By_Saving_Notification()
+    public async Task SaveAndPublish_Can_Be_Cancelled_By_Saving_Notification()
     {
         ContentNotificationHandler.SavingContent = notification =>
         {
@@ -2276,7 +2276,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         try
         {
-            var content = ContentService.Create("Cancel Me", -1, "umbTextpage");
+            var content = await ContentService.CreateAsync("Cancel Me", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
             var result = ContentService.SaveAndPublish(content, Array.Empty<string>());
 
@@ -2320,9 +2320,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void SaveAndPublish_Rejects_Cultures_On_Invariant_Content()
+    public async Task SaveAndPublish_Rejects_Cultures_On_Invariant_Content()
     {
-        var content = ContentService.Create("Invariant", -1, "umbTextpage");
+        var content = await ContentService.CreateAsync("Invariant", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         Assert.Throws<ArgumentException>(() => ContentService.SaveAndPublish(content, ["en-US"]));
     }
@@ -2572,7 +2572,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task Can_Save_Content()
     {
         // Arrange
-        var content = ContentService.Create("Home US", -1, "umbTextpage");
+        var content = await ContentService.CreateAsync("Home US", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetValue("author", "Barack Obama");
 
         // Act
@@ -2586,7 +2586,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     public async Task SaveAsync_BasicContent_AssignsIdentity()
     {
         // Arrange
-        var content = ContentService.Create("Home US", -1, "umbTextpage");
+        var content = await ContentService.CreateAsync("Home US", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         content.SetValue("author", "Barack Obama");
 
         // Act
@@ -2606,7 +2606,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         try
         {
-            var content = ContentService.Create("Cancel Me", -1, "umbTextpage");
+            var content = await ContentService.CreateAsync("Cancel Me", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
             Attempt<ContentSaveOperationStatus> result = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
@@ -2623,7 +2623,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     [Test]
     public async Task SaveAsync_NameTooLong_ReturnsInvalidNameStatus()
     {
-        var content = ContentService.Create(new string('a', 256), -1, "umbTextpage");
+        var content = await ContentService.CreateAsync(new string('a', 256), (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         Attempt<ContentSaveOperationStatus> result = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
@@ -2635,7 +2635,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     [Test]
     public async Task SaveAsync_PublishedStateNotAllowed_ReturnsInvalidPublishedStateStatus()
     {
-        var content = ContentService.Create("Test", -1, "umbTextpage");
+        var content = await ContentService.CreateAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         content.PublishedState = PublishedState.Publishing;
 
         Attempt<ContentSaveOperationStatus> result = await ContentService.SaveAsync(content, null, null, CancellationToken.None);
@@ -4199,7 +4199,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await TemplateService.CreateAsync(contentType.DefaultTemplate, Constants.Security.SuperUserKey); // else, FK violation on contentType!
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var content = ContentService.Create("foo", Constants.System.Root, "foo");
+        var content = await ContentService.CreateAsync("foo", (Guid?)null, "foo", Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
 
         Assert.IsFalse(content.Published);
@@ -4496,7 +4496,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // TODO: add test w/ an invariant prop
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var content = ContentService.Create("Home US", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAsync("Home US", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
 
         // creating content with a name but no culture - will set the invariant name
         // but, because that content is variant, as soon as we save, we'll need to
@@ -4914,9 +4914,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Cannot_Publish_Newly_Created_Unsaved_Content()
+    public async Task Cannot_Publish_Newly_Created_Unsaved_Content()
     {
-        var content = ContentService.Create("Test", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         var publishResult = ContentService.Publish(content, new[] { "*" });
         Assert.AreEqual(PublishResultType.FailedPublishUnsavedChanges, publishResult.Result);
     }
@@ -4924,7 +4924,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     [Test]
     public async Task Cannot_Publish_Unsaved_Content()
     {
-        var content = ContentService.Create("Test", Constants.System.Root, "umbTextpage");
+        var content = await ContentService.CreateAsync("Test", (Guid?)null, "umbTextpage", Constants.Security.SuperUserKey, CancellationToken.None);
         await ContentService.SaveAsync(content, null, null, CancellationToken.None);
         content.Name = "Test2";
 
