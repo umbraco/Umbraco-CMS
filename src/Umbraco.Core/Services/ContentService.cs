@@ -1995,30 +1995,30 @@ public class ContentService : AsyncPublishableContentServiceBase<IContent>, ICon
         return content;
     }
 
-    /// <summary>
-    /// Gets all content blueprints for the specified content type IDs.
-    /// </summary>
-    /// <param name="contentTypeId">The content type IDs to get blueprints for, or empty to get all blueprints.</param>
-    /// <returns>A collection of <see cref="IContent"/> blueprints.</returns>
-    public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
+    /// <inheritdoc />
+    public async Task<IEnumerable<IContent>> GetBlueprintsForContentTypesAsync(CancellationToken cancellationToken, params Guid[] contentTypeKeys)
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            IQuery<IContent> query = Query<IContent>();
-            if (contentTypeId.Length > 0)
-            {
-                // Need to use a List here because the expression tree cannot convert the array when used in Contains.
-                // See ExpressionTests.Sql_In().
-                List<int> contentTypeIdsAsList = [.. contentTypeId];
-                query.Where(x => contentTypeIdsAsList.Contains(x.ContentTypeId));
-            }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(Constants.Locks.ContentTree);
 
-            return _documentBlueprintRepository.Get(query).Select(x =>
-            {
-                x.Blueprint = true;
-                return x;
-            });
+        IEnumerable<IContent> blueprints;
+        if (contentTypeKeys.Length == 0)
+        {
+            blueprints = await _asyncDocumentBlueprintRepository.GetAllAsync(cancellationToken);
         }
+        else
+        {
+            PagedModel<IContent> paged = await _asyncDocumentBlueprintRepository.GetPagedOfContentTypesAsync(
+                contentTypeKeys, 0, int.MaxValue, Ordering.By("sortOrder"), cancellationToken);
+            blueprints = paged.Items;
+        }
+
+        foreach (IContent blueprint in blueprints)
+        {
+            blueprint.Blueprint = true;
+        }
+
+        return blueprints;
     }
 
     /// <summary>

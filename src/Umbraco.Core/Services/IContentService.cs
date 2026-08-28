@@ -28,11 +28,12 @@ public interface IContentService : IPublishableContentService<IContent>, IAsyncP
     Task<IContent?> GetBlueprintByIdAsync(Guid key, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets blueprints for a content type.
+    ///     Gets blueprints for the specified content types, or all blueprints if no content type keys are given.
     /// </summary>
-    /// <param name="documentTypeId">The document type identifiers.</param>
-    /// <returns>The blueprints.</returns>
-    IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeId);
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="contentTypeKeys">The Guid keys of the content types to filter by, or none for all blueprints.</param>
+    /// <returns>The matching blueprints.</returns>
+    Task<IEnumerable<IContent>> GetBlueprintsForContentTypesAsync(CancellationToken cancellationToken, params Guid[] contentTypeKeys);
 
     /// <summary>
     ///     Saves a content blueprint, with an optional reference to the source content it was created from.

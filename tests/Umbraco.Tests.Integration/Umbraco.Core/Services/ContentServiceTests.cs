@@ -235,7 +235,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        var found = ContentService.GetBlueprintsForContentTypes().ToArray();
+        var found = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None)).ToArray();
         Assert.AreEqual(1, found.Length);
 
         // ensures it's not found by normal content
@@ -262,7 +262,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         await ContentService.DeleteBlueprintAsync(blueprint, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        var found = ContentService.GetBlueprintsForContentTypes().ToArray();
+        var found = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None)).ToArray();
         Assert.AreEqual(0, found.Length);
     }
 
@@ -301,7 +301,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
         await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
 
-        var saved = ContentService.GetBlueprintsForContentTypes().Single();
+        var saved = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None)).Single();
 
         var found = await ContentService.GetBlueprintByIdAsync(saved.Key, CancellationToken.None);
 
@@ -376,13 +376,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             await ContentService.SaveBlueprintAsync(blueprint, null, Constants.Security.SuperUserKey, CancellationToken.None);
         }
 
-        var found = ContentService.GetBlueprintsForContentTypes().ToArray();
+        var found = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None)).ToArray();
         Assert.AreEqual(10, found.Length);
 
-        found = ContentService.GetBlueprintsForContentTypes(ct1.Id).ToArray();
+        found = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, ct1.Key)).ToArray();
         Assert.AreEqual(5, found.Length);
 
-        found = ContentService.GetBlueprintsForContentTypes(ct2.Id).ToArray();
+        found = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, ct2.Key)).ToArray();
         Assert.AreEqual(5, found.Length);
     }
 

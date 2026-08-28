@@ -84,7 +84,7 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.FailWithStatus<PagedModel<IContent>?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ContentTypeNotFound, null);
         }
 
-        IContent[] blueprints = ContentService.GetBlueprintsForContentTypes([contentType.Id]).ToArray();
+        IContent[] blueprints = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, contentType.Key)).ToArray();
 
         var result = new PagedModel<IContent>
         {
@@ -111,7 +111,7 @@ internal sealed class ContentBlueprintEditingService
 
         IContent blueprint = result.Result.Content!;
 
-        if (ValidateUniqueNames(createModel.Variants, blueprint) is false)
+        if (await ValidateUniqueNamesAsync(createModel.Variants, blueprint) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentCreateResult());
         }
@@ -131,7 +131,7 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentCreateResult());
         }
 
-        if (ValidateUniqueName(name, content) is false)
+        if (await ValidateUniqueNameAsync(name, content) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentCreateResult());
         }
@@ -159,7 +159,7 @@ internal sealed class ContentBlueprintEditingService
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
         }
 
-        if (ValidateUniqueNames(updateModel.Variants, blueprint) is false)
+        if (await ValidateUniqueNamesAsync(updateModel.Variants, blueprint) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.DuplicateName, new ContentUpdateResult());
         }
@@ -319,9 +319,9 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="name">The name to validate.</param>
     /// <param name="content">The content item to check against.</param>
     /// <returns><c>true</c> if the name is unique; otherwise, <c>false</c>.</returns>
-    private bool ValidateUniqueName(string name, IContent content)
+    private async Task<bool> ValidateUniqueNameAsync(string name, IContent content)
     {
-        IEnumerable<IContent> existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId);
+        IEnumerable<IContent> existing = await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, content.ContentType.Key);
         return existing.Any(c => c.Name == name && c.Id != content.Id) is false;
     }
 
@@ -331,9 +331,9 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="variants">The variants containing names to validate.</param>
     /// <param name="content">The content item to check against.</param>
     /// <returns><c>true</c> if all names are unique; otherwise, <c>false</c>.</returns>
-    private bool ValidateUniqueNames(IEnumerable<VariantModel> variants, IContent content)
+    private async Task<bool> ValidateUniqueNamesAsync(IEnumerable<VariantModel> variants, IContent content)
     {
-        IContent[] existing = ContentService.GetBlueprintsForContentTypes(content.ContentTypeId).ToArray();
+        IContent[] existing = (await ContentService.GetBlueprintsForContentTypesAsync(CancellationToken.None, content.ContentType.Key)).ToArray();
         foreach (VariantModel variant in variants)
         {
             if (existing.Any(c => c.GetCultureName(variant.Culture) == variant.Name && c.Id != content.Id))
