@@ -125,4 +125,54 @@ public enum ContentEditingOperationStatus
     ///     One or more property values have a segment variance that does not match the property type's segment variance.
     /// </summary>
     PropertyTypeSegmentVarianceMismatch,
+
+    /// <summary>
+    ///     The content item is awaiting release and cannot be published immediately.
+    /// </summary>
+    AwaitingRelease,
+
+    /// <summary>
+    ///     The specified culture is awaiting release and cannot be published immediately.
+    /// </summary>
+    CultureAwaitingRelease,
+
+    /// <summary>
+    ///     The content item has expired and cannot be published.
+    /// </summary>
+    HasExpired,
+
+    /// <summary>
+    ///     The specified culture has expired and cannot be published.
+    /// </summary>
+    CultureHasExpired,
+
+    /// <summary>
+    ///     The content path is not published; parent content must be published first.
+    /// </summary>
+    PathNotPublished,
+
+    /// <summary>
+    ///     The content item is invalid and cannot be published.
+    /// </summary>
+    ContentInvalid,
+
+    /// <summary>
+    ///     There is nothing to publish for the content item.
+    /// </summary>
+    NothingToPublish,
+
+    /// <summary>
+    ///     A mandatory culture is missing from the content item.
+    /// </summary>
+    MandatoryCultureMissing,
+
+    /// <summary>
+    ///     A concurrency violation occurred; the content was modified by another operation.
+    /// </summary>
+    ConcurrencyViolation,
+
+    /// <summary>
+    ///     The content item has unsaved changes that must be saved before publishing.
+    /// </summary>
+    UnsavedChanges,
 }
