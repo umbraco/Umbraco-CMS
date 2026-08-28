@@ -23,8 +23,8 @@ public class SchemaEntityTypeAttributeTests
     [Test]
     public void Declaration_On_A_Base_Controller_Is_Inherited()
         => Assert.That(
-            typeof(ControllerWithoutOwnDeclaration).GetCustomAttribute<SchemaEntityTypeAttribute>(inherit: true)?.EntityType,
-            Is.EqualTo(Constants.UdiEntityType.MediaType));
+            typeof(ControllerWithoutOwnDeclaration).GetCustomAttribute<SchemaEntityTypeAttribute>(inherit: true)?.EntityTypes,
+            Is.EqualTo(new[] { Constants.UdiEntityType.MediaType }));
 
     // MVC only collects the attribute as a filter through this interface, so losing the implementation would
     // silently leave every governed controller ungoverned.

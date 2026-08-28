@@ -27,10 +27,26 @@ public class SchemaLockdownFilterTests
         }
     }
 
+    // Mirrors CreateDocumentTypeTemplateController: a POST that creates a template and updates the document type
+    // it belongs to, so the two entity types resolve to different operations.
+    private class TemplateForDocumentTypeController
+    {
+        [SchemaOperation(Constants.UdiEntityType.DocumentType, SchemaOperation.Update)]
+        public void Post()
+        {
+        }
+    }
+
     private sealed class LockDocumentTypes : ISchemaLockdownConfigurator
     {
         public void Configure(ISchemaRestrictionsBuilder builder)
             => builder.BlockMutations(Constants.UdiEntityType.DocumentType);
+    }
+
+    private sealed class LockDocumentTypeCreationOnly : ISchemaLockdownConfigurator
+    {
+        public void Configure(ISchemaRestrictionsBuilder builder)
+            => builder.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Create);
     }
 
     [Test]
@@ -123,32 +139,124 @@ public class SchemaLockdownFilterTests
             Is.EqualTo("document-type:create"));
     }
 
+    // An endpoint touching more than one entity type is denied if any of them denies the operation, so the most
+    // restrictive answer wins. Creating a template for a document type is the case in the codebase.
+    [Test]
+    public async Task Every_Declared_Entity_Type_Has_To_Permit_The_Operation()
+    {
+        AuthorizationFilterContext context = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
+
+        await CreateFilter(Constants.UdiEntityType.Webhook, Constants.UdiEntityType.DocumentType)
+            .OnAuthorizationAsync(context);
+
+        AssertForbidden(context);
+    }
+
+    [Test]
+    public async Task Denial_Names_The_Entity_Type_That_Denied_It()
+    {
+        AuthorizationFilterContext context = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
+
+        await CreateFilter(Constants.UdiEntityType.Webhook, Constants.UdiEntityType.DocumentType)
+            .OnAuthorizationAsync(context);
+
+        Assert.That(
+            context.HttpContext.Response.Headers[Constants.Headers.SchemaLockdown].ToString(),
+            Is.EqualTo($"{Constants.UdiEntityType.DocumentType}:create"));
+    }
+
+    [Test]
+    public async Task Several_Declared_Entity_Types_Are_Permitted_When_None_Denies()
+    {
+        AuthorizationFilterContext context = CreateContext(HttpMethods.Post, lockDocumentTypes: true);
+
+        await CreateFilter(Constants.UdiEntityType.Webhook, Constants.UdiEntityType.Language)
+            .OnAuthorizationAsync(context);
+
+        AssertPermitted(context);
+    }
+
+    // A declaration naming an entity type decides that one's operation, so an endpoint doing different things to
+    // each of its types is judged on what it actually does to each.
+    [Test]
+    public async Task An_Entity_Type_Named_By_A_Declaration_Uses_That_Operation()
+    {
+        AuthorizationFilterContext context = CreateContext(
+            HttpMethods.Post,
+            new LockDocumentTypeCreationOnly(),
+            typeof(TemplateForDocumentTypeController));
+
+        await CreateFilter(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)
+            .OnAuthorizationAsync(context);
+
+        // The verb says create and document type creation is denied, but the declaration says this updates the
+        // document type, and updating it is not.
+        AssertPermitted(context);
+    }
+
+    [Test]
+    public async Task An_Entity_Type_Without_A_Declaration_Falls_Back_To_The_Verb()
+    {
+        AuthorizationFilterContext context = CreateContext(
+            HttpMethods.Post,
+            new LockTemplateCreation(),
+            typeof(TemplateForDocumentTypeController));
+
+        await CreateFilter(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)
+            .OnAuthorizationAsync(context);
+
+        Assert.Multiple(() =>
+        {
+            AssertForbidden(context);
+            Assert.That(
+                context.HttpContext.Response.Headers[Constants.Headers.SchemaLockdown].ToString(),
+                Is.EqualTo($"{Constants.UdiEntityType.Template}:create"));
+        });
+    }
+
+    private sealed class LockTemplateCreation : ISchemaLockdownConfigurator
+    {
+        public void Configure(ISchemaRestrictionsBuilder builder)
+            => builder.Block(Constants.UdiEntityType.Template, SchemaOperation.Create);
+    }
+
     // Mirrors what MVC hands an authorization filter: the routed action descriptor, and an HttpContext whose
     // RequestServices is where the filter reaches its dependencies.
     private static AuthorizationFilterContext CreateContext(
         string httpMethod,
         bool lockDocumentTypes,
         string actionName = nameof(DocumentTypeController.Post))
+        => CreateContext(
+            httpMethod,
+            lockDocumentTypes ? new LockDocumentTypes() : null,
+            typeof(DocumentTypeController),
+            actionName);
+
+    private static AuthorizationFilterContext CreateContext(
+        string httpMethod,
+        ISchemaLockdownConfigurator? configurator,
+        Type controller,
+        string actionName = "Post")
     {
         var httpContext = new DefaultHttpContext
         {
-            RequestServices = CreateServices(lockDocumentTypes),
+            RequestServices = CreateServices(configurator),
         };
         httpContext.Request.Method = httpMethod;
 
         var descriptor = new ControllerActionDescriptor
         {
-            ControllerTypeInfo = typeof(DocumentTypeController).GetTypeInfo(),
-            MethodInfo = typeof(DocumentTypeController).GetMethod(actionName)!,
+            ControllerTypeInfo = controller.GetTypeInfo(),
+            MethodInfo = controller.GetMethod(actionName)!,
             ActionName = actionName,
         };
 
         return new AuthorizationFilterContext(new ActionContext(httpContext, new RouteData(), descriptor), []);
     }
 
-    private static IServiceProvider CreateServices(bool lockDocumentTypes)
+    private static IServiceProvider CreateServices(ISchemaLockdownConfigurator? configurator)
     {
-        ISchemaLockdownConfigurator[] configurators = lockDocumentTypes ? [new LockDocumentTypes()] : [];
+        ISchemaLockdownConfigurator[] configurators = configurator is null ? [] : [configurator];
         var restrictions = new SchemaRestrictions(new SchemaLockdownConfiguratorCollection(() => configurators));
 
         var services = new ServiceCollection();
@@ -157,9 +265,8 @@ public class SchemaLockdownFilterTests
         return services.BuildServiceProvider();
     }
 
-    private static SchemaEntityTypeAttribute CreateFilter(
-        string entityType = Constants.UdiEntityType.DocumentType)
-        => new(entityType);
+    private static SchemaEntityTypeAttribute CreateFilter(params string[] entityTypes)
+        => new(entityTypes.Length > 0 ? entityTypes : [Constants.UdiEntityType.DocumentType]);
 
     private static void AssertPermitted(AuthorizationFilterContext context)
         => Assert.Multiple(() =>

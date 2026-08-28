@@ -32,10 +32,18 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
     public IReadOnlyCollection<string> RestrictedEntityTypes => _blocked.Keys.ToArray();
 
     /// <inheritdoc />
-    public void Block(string entityType, SchemaOperation operation)
+    public void Block(string entityType, params SchemaOperation[] operations)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(entityType);
 
+        foreach (SchemaOperation operation in operations)
+        {
+            Block(entityType, operation);
+        }
+    }
+
+    private void Block(string entityType, SchemaOperation operation)
+    {
         // Refusing the write ahead of the frozen check keeps the rule holding whenever the write is attempted,
         // rather than leaving behind a decision that looks meaningful and is not.
         if (IsBlockable(operation) is false)
@@ -48,21 +56,17 @@ internal sealed class SchemaRestrictions : ISchemaRestrictionsBuilder
             throw new InvalidOperationException("The schema lockdown restrictions cannot be modified after they have been built.");
         }
 
-        if (_blocked.TryGetValue(entityType, out HashSet<SchemaOperation>? operations) is false)
+        if (_blocked.TryGetValue(entityType, out HashSet<SchemaOperation>? blocked) is false)
         {
-            _blocked[entityType] = operations = [];
+            _blocked[entityType] = blocked = [];
         }
 
-        operations.Add(operation);
+        blocked.Add(operation);
     }
 
     /// <inheritdoc />
     public void BlockMutations(string entityType)
-    {
-        Block(entityType, SchemaOperation.Create);
-        Block(entityType, SchemaOperation.Update);
-        Block(entityType, SchemaOperation.Delete);
-    }
+        => Block(entityType, SchemaOperation.Create, SchemaOperation.Update, SchemaOperation.Delete);
 
     /// <inheritdoc />
     public bool IsAllowed(string entityType, SchemaOperation operation)

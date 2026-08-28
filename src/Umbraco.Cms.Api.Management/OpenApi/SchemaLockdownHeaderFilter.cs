@@ -28,13 +28,12 @@ internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
             return;
         }
 
-        if (GovernedEntityType(context) is not string entityType)
-        {
-            return;
-        }
-
-        // A read is never denied, so the header could not appear on one however locked down the entity type is.
-        if (ResolveOperation(context) == SchemaOperation.Read)
+        // A read is never denied, so an operation that only reads could not carry the header however locked down
+        // its entity types are.
+        (string EntityType, SchemaOperation Operation)[] deniable = Array.FindAll(
+            GovernedOperations(context),
+            x => x.Operation != SchemaOperation.Read);
+        if (deniable.Length == 0)
         {
             return;
         }
@@ -52,24 +51,40 @@ internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
             new OpenApiHeader
             {
                 Description =
-                    $"Present when schema lockdown denied the request, naming the entity type and the operation it "
-                    + $"was denied for, for example \"{entityType}:update\". Absent when the response has another cause.",
+                    "Present when schema lockdown denied the request, naming the entity type and the operation it "
+                    + $"was denied for, for example \"{deniable[0].EntityType}:"
+                    + $"{deniable[0].Operation.ToString().ToLowerInvariant()}\". Absent when the response has "
+                    + "another cause.",
                 Schema = new OpenApiSchema { Type = JsonSchemaType.String },
             });
     }
 
-    private static SchemaOperation ResolveOperation(OperationFilterContext context)
+    // Mirrors what the filter resolves per request: an entity type named outright wins, then a declaration naming
+    // none, then the verb.
+    private static (string EntityType, SchemaOperation Operation)[] GovernedOperations(OperationFilterContext context)
     {
-        SchemaOperation? declared = context.MethodInfo?
-            .GetCustomAttribute<SchemaOperationAttribute>()?.Operation;
+        if ((context.ApiDescription.ActionDescriptor as ControllerActionDescriptor)?
+                .ControllerTypeInfo
+                .GetCustomAttribute<SchemaEntityTypeAttribute>(inherit: true) is not SchemaEntityTypeAttribute governed)
+        {
+            return [];
+        }
 
-        return declared ?? SchemaOperationResolver.Resolve(context.ApiDescription.HttpMethod);
+        SchemaOperationAttribute[] declared = context.MethodInfo?
+            .GetCustomAttributes<SchemaOperationAttribute>()
+            .ToArray() ?? [];
+
+        return governed.EntityTypes
+            .Select(entityType =>
+            {
+                SchemaOperationAttribute? match =
+                    Array.Find(declared, x => string.Equals(x.EntityType, entityType, StringComparison.OrdinalIgnoreCase))
+                    ?? Array.Find(declared, x => x.EntityType is null);
+
+                return (
+                    EntityType: entityType.ToLowerInvariant(),
+                    Operation: match?.Operation ?? SchemaOperationResolver.Resolve(context.ApiDescription.HttpMethod));
+            })
+            .ToArray();
     }
-
-    private static string? GovernedEntityType(OperationFilterContext context)
-        => (context.ApiDescription.ActionDescriptor as ControllerActionDescriptor)?
-            .ControllerTypeInfo
-            .GetCustomAttribute<SchemaEntityTypeAttribute>(inherit: true)?
-            .EntityType
-            .ToLowerInvariant();
 }

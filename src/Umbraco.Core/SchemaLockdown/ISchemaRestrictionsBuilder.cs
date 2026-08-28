@@ -13,14 +13,14 @@ namespace Umbraco.Cms.Core.SchemaLockdown;
 public interface ISchemaRestrictionsBuilder : ISchemaRestrictions
 {
     /// <summary>
-    /// Denies the supplied operation on the supplied entity type.
+    /// Denies the supplied operations on the supplied entity type.
     /// </summary>
     /// <remarks>
     /// Only <see cref="SchemaOperation.Create"/>, <see cref="SchemaOperation.Update"/> and
     /// <see cref="SchemaOperation.Delete"/> can be denied; the others are answered by rule and denying one does
     /// nothing. See <see cref="ISchemaRestrictions.IsAllowed"/>.
     /// </remarks>
-    void Block(string entityType, SchemaOperation operation);
+    void Block(string entityType, params SchemaOperation[] operations);
 
     /// <summary>
     /// Denies every operation on the supplied entity type that is not a read.

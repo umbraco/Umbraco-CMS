@@ -75,6 +75,20 @@ public class SchemaRestrictionsTests
     }
 
     [Test]
+    public void Several_Operations_Can_Be_Denied_In_One_Call()
+    {
+        SchemaRestrictions restrictions = CreateRestrictions(
+            x => x.Block(Constants.UdiEntityType.DocumentType, SchemaOperation.Create, SchemaOperation.Delete));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Create), Is.False);
+            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Delete), Is.False);
+            Assert.That(restrictions.IsAllowed(Constants.UdiEntityType.DocumentType, SchemaOperation.Update), Is.True);
+        });
+    }
+
+    [Test]
     public void Blocking_The_Same_Operation_Twice_Is_Harmless()
     {
         SchemaRestrictions restrictions = CreateRestrictions(

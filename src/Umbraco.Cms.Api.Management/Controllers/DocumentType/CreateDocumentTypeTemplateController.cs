@@ -2,8 +2,10 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Template;
+using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -14,6 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 /// Controller responsible for handling requests to create templates for document types in the Umbraco CMS.
 /// </summary>
 [ApiVersion("1.0")]
+[SchemaEntityType(Constants.UdiEntityType.DocumentType, Constants.UdiEntityType.Template)]
 public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
@@ -41,6 +44,8 @@ public class CreateDocumentTypeTemplateController : DocumentTypeControllerBase
     /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [HttpPost("{id:guid}/template")]
     [MapToApiVersion("1.0")]
+    [SchemaOperation(Constants.UdiEntityType.Template, SchemaOperation.Create)]
+    [SchemaOperation(Constants.UdiEntityType.DocumentType, SchemaOperation.Update)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [EndpointSummary("Creates a template for a document type.")]

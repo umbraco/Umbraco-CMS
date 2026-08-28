@@ -17,7 +17,8 @@ public class EntityTypeDeclarationTests
             .GetTypes()
             .Select(type => (Controller: type, Attribute: type.GetCustomAttribute<SchemaEntityTypeAttribute>(inherit: false)))
             .Where(declaration => declaration.Attribute is not null)
-            .Select(declaration => (declaration.Controller, declaration.Attribute!.EntityType))
+            .SelectMany(declaration => declaration.Attribute!.EntityTypes
+                .Select(entityType => (declaration.Controller, EntityType: entityType)))
             .ToArray();
 
     private static readonly string[] UdiEntityTypes =
