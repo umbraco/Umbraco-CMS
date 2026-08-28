@@ -67,19 +67,16 @@ public sealed class SchemaEntityTypeAttribute : Attribute, IAsyncAuthorizationFi
         ISchemaRestrictions restrictions =
             httpContext.RequestServices.GetRequiredService<ISchemaRestrictions>();
 
-        (string EntityType, SchemaOperation Operation)? refusal = EntityTypes
-            .Select(entityType => (
-                EntityType: entityType,
-                Operation: ResolveOperation(httpContext, declared, entityType)))
-            .Cast<(string EntityType, SchemaOperation Operation)?>()
-            .FirstOrDefault(x => restrictions.IsAllowed(x!.Value.EntityType, x.Value.Operation) is false);
+        (string EntityType, SchemaOperation Operation)[] governed =
+            SchemaOperationResolver.Resolve(EntityTypes, declared, httpContext.Request.Method);
 
-        if (refusal is null)
+        var refusal = Array.FindIndex(governed, x => restrictions.IsAllowed(x.EntityType, x.Operation) is false);
+        if (refusal < 0)
         {
             return Task.CompletedTask;
         }
 
-        (var denied, SchemaOperation operation) = refusal.Value;
+        (var denied, SchemaOperation operation) = governed[refusal];
 
         // The denial is an ordinary bodyless 403, as every other one in this API is: a 403 on these endpoints can
         // equally come from the permissions the request has already passed, and one status code cannot describe two
@@ -100,17 +97,4 @@ public sealed class SchemaEntityTypeAttribute : Attribute, IAsyncAuthorizationFi
         => (actionDescriptor as ControllerActionDescriptor)?.MethodInfo
             .GetCustomAttributes<SchemaOperationAttribute>()
             .ToArray() ?? [];
-
-    // An entity type named outright wins, then a declaration naming none, then the verb.
-    private static SchemaOperation ResolveOperation(
-        HttpContext httpContext,
-        SchemaOperationAttribute[] declared,
-        string entityType)
-    {
-        SchemaOperationAttribute? match =
-            Array.Find(declared, x => string.Equals(x.EntityType, entityType, StringComparison.OrdinalIgnoreCase))
-            ?? Array.Find(declared, x => x.EntityType is null);
-
-        return match?.Operation ?? SchemaOperationResolver.Resolve(httpContext.Request.Method);
-    }
 }

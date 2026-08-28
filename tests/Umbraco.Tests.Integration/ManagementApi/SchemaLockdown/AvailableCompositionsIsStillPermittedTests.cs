@@ -4,26 +4,19 @@ using System.Net.Http.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown.Configurators;
+using Umbraco.Cms.Core.SchemaLockdown;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
-public class AvailableCompositionsIsStillPermittedTests : ManagementApiTest<AvailableCompositionDocumentTypeController>
+public class AvailableCompositionsIsStillPermittedTests : SchemaLockdownApiTest<AvailableCompositionDocumentTypeController>
 {
     protected override Expression<Func<AvailableCompositionDocumentTypeController, object>> MethodSelector { get; set; }
         = x => x.AvailableCompositions(CancellationToken.None, null);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder.SchemaLockdownConfigurators().Add<LockDocumentTypesConfigurator>();
-
-    [SetUp]
-    public override void Setup()
-    {
-        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
-        base.Setup();
-        AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true).GetAwaiter().GetResult();
-    }
 
     [Test]
     public async Task AvailableCompositions_Returns_Ok()
@@ -33,5 +26,15 @@ public class AvailableCompositionsIsStillPermittedTests : ManagementApiTest<Avai
         var response = await Client.PostAsync(Url, JsonContent.Create(requestModel));
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    /// <summary>
+    /// Locks document types, and nothing else.
+    /// </summary>
+    private sealed class LockDocumentTypesConfigurator : ISchemaLockdownConfigurator
+    {
+        /// <inheritdoc />
+        public void Configure(ISchemaRestrictionsBuilder builder)
+            => builder.BlockMutations(Constants.UdiEntityType.DocumentType);
     }
 }

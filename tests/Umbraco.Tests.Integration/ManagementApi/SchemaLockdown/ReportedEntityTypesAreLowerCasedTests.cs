@@ -14,21 +14,13 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 /// The restrictions match entity types case-insensitively and report back whatever casing a configurator wrote, so the
 /// endpoint settles the casing rather than leaving the backoffice to guess at it.
 /// </summary>
-public class ReportedEntityTypesAreLowerCasedTests : ManagementApiTest<SchemaLockdownServerController>
+public class ReportedEntityTypesAreLowerCasedTests : SchemaLockdownApiTest<SchemaLockdownServerController>
 {
     protected override Expression<Func<SchemaLockdownServerController, object>> MethodSelector { get; set; }
         = x => x.SchemaLockdown(CancellationToken.None);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder.SchemaLockdownConfigurators().Add<LockAMixedCaseEntityTypeConfigurator>();
-
-    [SetUp]
-    public override void Setup()
-    {
-        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
-        base.Setup();
-        AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true).GetAwaiter().GetResult();
-    }
 
     [Test]
     public async Task Reported_Entity_Type_Is_Lower_Cased()

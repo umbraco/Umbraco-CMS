@@ -14,21 +14,13 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 /// Locking a broad set of other entity types leaves webhooks creatable, so a lockdown cannot sweep up an entity
 /// type no configurator named.
 /// </summary>
-public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : ManagementApiTest<CreateWebhookController>
+public class LockingOtherSchemaTypesDoesNotGovernWebhooksTests : SchemaLockdownApiTest<CreateWebhookController>
 {
     protected override Expression<Func<CreateWebhookController, object>> MethodSelector { get; set; }
         = x => x.Create(CancellationToken.None, null);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder.SchemaLockdownConfigurators().Add<LockOtherSchemaTypesConfigurator>();
-
-    [SetUp]
-    public override void Setup()
-    {
-        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
-        base.Setup();
-        AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true).GetAwaiter().GetResult();
-    }
 
     [Test]
     public async Task Create_Returns_Created()

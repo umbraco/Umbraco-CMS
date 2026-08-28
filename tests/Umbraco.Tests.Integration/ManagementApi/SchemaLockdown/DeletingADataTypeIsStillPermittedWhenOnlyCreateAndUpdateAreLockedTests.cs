@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 /// A configurator that blocks only some operations on an entity type leaves the untouched operations governed by
 /// the real request pipeline, not just by the restrictions in isolation.
 /// </summary>
-public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTests : ManagementApiTest<DeleteDataTypeController>
+public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTests : SchemaLockdownApiTest<DeleteDataTypeController>
 {
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
@@ -30,7 +30,6 @@ public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTe
     [SetUp]
     public override void Setup()
     {
-        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
         base.Setup();
         CreateDataType().GetAwaiter().GetResult();
     }
@@ -50,8 +49,6 @@ public class DeletingADataTypeIsStillPermittedWhenOnlyCreateAndUpdateAreLockedTe
         _dataTypeKey = result.Result.Key;
 
         MethodSelector = x => x.Delete(CancellationToken.None, _dataTypeKey);
-
-        await AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true);
     }
 
     [Test]

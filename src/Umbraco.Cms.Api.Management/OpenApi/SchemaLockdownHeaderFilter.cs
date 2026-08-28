@@ -52,15 +52,13 @@ internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
             {
                 Description =
                     "Present when schema lockdown denied the request, naming the entity type and the operation it "
-                    + $"was denied for, for example \"{deniable[0].EntityType}:"
+                    + $"was denied for, for example \"{deniable[0].EntityType.ToLowerInvariant()}:"
                     + $"{deniable[0].Operation.ToString().ToLowerInvariant()}\". Absent when the response has "
                     + "another cause.",
                 Schema = new OpenApiSchema { Type = JsonSchemaType.String },
             });
     }
 
-    // Mirrors what the filter resolves per request: an entity type named outright wins, then a declaration naming
-    // none, then the verb.
     private static (string EntityType, SchemaOperation Operation)[] GovernedOperations(OperationFilterContext context)
     {
         if ((context.ApiDescription.ActionDescriptor as ControllerActionDescriptor)?
@@ -74,17 +72,8 @@ internal sealed class SchemaLockdownHeaderFilter : IOperationFilter
             .GetCustomAttributes<SchemaOperationAttribute>()
             .ToArray() ?? [];
 
-        return governed.EntityTypes
-            .Select(entityType =>
-            {
-                SchemaOperationAttribute? match =
-                    Array.Find(declared, x => string.Equals(x.EntityType, entityType, StringComparison.OrdinalIgnoreCase))
-                    ?? Array.Find(declared, x => x.EntityType is null);
-
-                return (
-                    EntityType: entityType.ToLowerInvariant(),
-                    Operation: match?.Operation ?? SchemaOperationResolver.Resolve(context.ApiDescription.HttpMethod));
-            })
-            .ToArray();
+        // The same resolution the request goes through, so the document cannot say a request may be denied for
+        // something other than what would actually deny it.
+        return SchemaOperationResolver.Resolve(governed.EntityTypes, declared, context.ApiDescription.HttpMethod);
     }
 }

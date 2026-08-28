@@ -12,21 +12,13 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 /// Exercises a locked mutation through the real request pipeline. The id names nothing, so the only response that
 /// can precede the action running is the lockdown denial - reaching the action would answer with a not found.
 /// </summary>
-public class DeletingADataTypeIsForbiddenTests : ManagementApiTest<DeleteDataTypeController>
+public class DeletingADataTypeIsForbiddenTests : SchemaLockdownApiTest<DeleteDataTypeController>
 {
     protected override Expression<Func<DeleteDataTypeController, object>> MethodSelector { get; set; }
         = x => x.Delete(CancellationToken.None, Guid.Empty);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder.SchemaLockdownConfigurators().Add<LockDataTypesConfigurator>();
-
-    [SetUp]
-    public override void Setup()
-    {
-        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
-        base.Setup();
-        AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true).GetAwaiter().GetResult();
-    }
 
     [Test]
     public async Task Delete_Returns_Forbidden()

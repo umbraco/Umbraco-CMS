@@ -20,21 +20,13 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 /// the action would answer with a not found.
 /// </remarks>
 public class CreatingATemplateForADocumentTypeIsForbiddenWhenTemplatesAreLockedTests
-    : ManagementApiTest<CreateDocumentTypeTemplateController>
+    : SchemaLockdownApiTest<CreateDocumentTypeTemplateController>
 {
     protected override Expression<Func<CreateDocumentTypeTemplateController, object>> MethodSelector { get; set; }
         = x => x.CreateTemplate(CancellationToken.None, Guid.Empty, null!);
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
         => builder.SchemaLockdownConfigurators().Add<LockTemplatesOnlyConfigurator>();
-
-    [SetUp]
-    public override void Setup()
-    {
-        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
-        base.Setup();
-        AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true).GetAwaiter().GetResult();
-    }
 
     [Test]
     public async Task Create_Returns_Forbidden()

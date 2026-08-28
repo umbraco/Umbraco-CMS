@@ -7,9 +7,9 @@ using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.SchemaLockdown;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown.Configurators;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 
@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.SchemaLockdown;
 /// Regression test: <see cref="MoveDictionaryController"/> was not covered by the old per-controller
 /// production-mode attribute mechanism, which motivated moving enforcement onto <see cref="DictionaryControllerBase"/> instead.
 /// </summary>
-public class MovingADictionaryItemIsForbiddenTests : ManagementApiTest<MoveDictionaryController>
+public class MovingADictionaryItemIsForbiddenTests : SchemaLockdownApiTest<MoveDictionaryController>
 {
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
@@ -31,7 +31,6 @@ public class MovingADictionaryItemIsForbiddenTests : ManagementApiTest<MoveDicti
     [SetUp]
     public override void Setup()
     {
-        InMemoryConfiguration["Umbraco:CMS:WebRouting:UmbracoApplicationUrl"] = "https://localhost";
         base.Setup();
         CreateDictionaryItem().GetAwaiter().GetResult();
     }
@@ -44,8 +43,6 @@ public class MovingADictionaryItemIsForbiddenTests : ManagementApiTest<MoveDicti
         Assert.IsTrue(result.Success);
 
         MethodSelector = x => x.Move(CancellationToken.None, _dictionaryKey, null);
-
-        await AuthenticateClientAsync(Client, "admin@test.com", "1234567890", true);
     }
 
     [Test]
@@ -59,5 +56,15 @@ public class MovingADictionaryItemIsForbiddenTests : ManagementApiTest<MoveDicti
         var response = await Client.PutAsync(Url, JsonContent.Create(moveModel));
 
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    /// <summary>
+    /// Locks dictionary items, and nothing else.
+    /// </summary>
+    private sealed class LockDictionaryItemsConfigurator : ISchemaLockdownConfigurator
+    {
+        /// <inheritdoc />
+        public void Configure(ISchemaRestrictionsBuilder builder)
+            => builder.BlockMutations(Constants.UdiEntityType.DictionaryItem);
     }
 }
