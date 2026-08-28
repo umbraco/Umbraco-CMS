@@ -15,8 +15,11 @@ namespace Umbraco.Cms.Search.Provider.Examine.BackgroundJobs;
 /// </summary>
 internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
 {
-    // Gives the server a chance to finish starting up before potentially resource-intensive index rebuilds begin.
-    private static readonly TimeSpan _startupDelay = TimeSpan.FromMinutes(2);
+    // Until the check has run once, the job stays schedulable so it can retry while the runtime is still
+    // installing or upgrading. RunJobAsync retires the job by setting an infinite period afterwards.
+    private static readonly TimeSpan _retryPeriod = TimeSpan.FromMinutes(1);
+
+    private static readonly ServerRole[] _allServerRoles = Enum.GetValues<ServerRole>();
 
     private readonly IExamineManager _examineManager;
     private readonly IActiveIndexManager _activeIndexManager;
@@ -24,6 +27,7 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
     private readonly ILogger<IndexRebuildJob> _logger;
     private readonly IOriginProvider _originProvider;
     private readonly IndexOptions _options;
+    private int _hasRun;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexRebuildJob"/> class.
@@ -41,7 +45,7 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
         IOptions<IndexOptions> options,
         ILogger<IndexRebuildJob> logger,
         IOriginProvider originProvider)
-        : base(Timeout.InfiniteTimeSpan)
+        : base(_retryPeriod)
     {
         _examineManager = examineManager;
         _activeIndexManager = activeIndexManager;
@@ -55,20 +59,34 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
     /// <remarks>
     /// Gives the server a chance to finish starting up before potentially resource-intensive index rebuilds begin.
     /// </remarks>
-    public override TimeSpan Delay => _startupDelay;
+    public override TimeSpan Delay => TimeSpan.FromMinutes(2);
 
     /// <summary>
     /// Gets the server roles on which this job runs.
     /// </summary>
     /// <remarks>
-    /// Every server maintains its own local Lucene indexes, so the check must run on every server role, not just the scheduling publisher.
+    /// Every server maintains its own local Lucene indexes, so the check must run on every server role, not just the
+    /// scheduling publisher. <see cref="ServerRole.Unknown"/> is included deliberately: a server whose role has not
+    /// been resolved yet still needs its own indexes.
     /// </remarks>
-    public override ServerRole[] ServerRoles => Enum.GetValues<ServerRole>();
+    public override ServerRole[] ServerRoles => _allServerRoles;
 
     /// <inheritdoc />
+    /// <remarks>
+    /// Only reached once the runtime is running, the server role matches and this is the main domain, so a single pass
+    /// is enough - subsequent invocations are no-ops.
+    /// </remarks>
     public override Task RunJobAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Boot detected, determining indexes to rebuild");
+        // Setting the period below does not take effect until the wait after this one, so the loop would otherwise
+        // schedule a second pass - which would re-queue rebuilds that are still in flight and therefore not yet
+        // visible as existing indexes.
+        if (Interlocked.CompareExchange(ref _hasRun, 1, 0) != 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        _logger.LogInformation("Runtime is ready, determining indexes to rebuild.");
 
         var origin = _originProvider.GetCurrent();
         foreach (ContentIndexRegistration indexRegistration in _options.GetContentIndexRegistrations())
@@ -77,7 +95,7 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
 
             if (_examineManager.TryGetIndex(activePhysicalName, out IIndex? index))
             {
-                // Check if active physical index exists, if it does, we can skip rebuilding
+                // Check if active physical index exists, if it does, we can skip rebuilding.
                 if (index.IndexExists())
                 {
                     continue;
@@ -91,6 +109,10 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
 
             _contentIndexingService.Rebuild(indexRegistration.IndexAlias, origin);
         }
+
+        // Retire the job so it doesn't run again, since the check has been performed once.
+        Period = Timeout.InfiniteTimeSpan;
+        _logger.LogInformation("Index rebuild check complete, no further runs are scheduled.");
 
         return Task.CompletedTask;
     }

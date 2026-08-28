@@ -45,12 +45,66 @@ public class IndexRebuildJobTests
     }
 
     [Test]
-    public void Job_Runs_Once_After_Startup_Delay()
+    public void Job_Is_Delayed_To_Let_The_Server_Finish_Starting_Up()
     {
         IndexRebuildJob sut = CreateSut();
 
-        Assert.AreEqual(Timeout.InfiniteTimeSpan, sut.Period);
         Assert.AreEqual(TimeSpan.FromMinutes(2), sut.Delay);
+    }
+
+    [Test]
+    public void Job_Remains_Scheduled_Until_It_Has_Run()
+    {
+        IndexRebuildJob sut = CreateSut();
+
+        // The job is skipped entirely while the runtime is still installing or upgrading, so it has to stay
+        // schedulable until a pass actually happens - otherwise the single attempt is lost.
+        Assert.AreNotEqual(Timeout.InfiniteTimeSpan, sut.Period);
+        Assert.Greater(sut.Period, TimeSpan.Zero);
+    }
+
+    [Test]
+    public async Task Job_Retires_Itself_After_Rebuilding()
+    {
+        IIndex index = CreateIndex(exists: false);
+        _examineManager.Setup(x => x.TryGetIndex(PhysicalIndexName, out index)).Returns(true);
+
+        IndexRebuildJob sut = CreateSut();
+        Assert.AreNotEqual(Timeout.InfiniteTimeSpan, sut.Period);
+
+        await sut.RunJobAsync(CancellationToken.None);
+
+        Assert.AreEqual(Timeout.InfiniteTimeSpan, sut.Period);
+    }
+
+    [Test]
+    public async Task Job_Only_Rebuilds_On_The_First_Run()
+    {
+        IIndex index = CreateIndex(exists: false);
+        _examineManager.Setup(x => x.TryGetIndex(PhysicalIndexName, out index)).Returns(true);
+
+        IndexRebuildJob sut = CreateSut();
+
+        // Changing the period does not take effect until the wait after the current one, so the scheduler can call
+        // back before the job has retired. A second pass must not re-queue rebuilds that are still in flight.
+        await sut.RunJobAsync(CancellationToken.None);
+        await sut.RunJobAsync(CancellationToken.None);
+
+        _contentIndexingService.Verify(x => x.Rebuild(IndexAlias, CurrentOrigin), Times.Once);
+    }
+
+    [Test]
+    public async Task Job_Retires_Itself_When_No_Index_Needs_Rebuilding()
+    {
+        IIndex index = CreateIndex(exists: true);
+        _examineManager.Setup(x => x.TryGetIndex(PhysicalIndexName, out index)).Returns(true);
+
+        IndexRebuildJob sut = CreateSut();
+        Assert.AreNotEqual(Timeout.InfiniteTimeSpan, sut.Period);
+
+        await sut.RunJobAsync(CancellationToken.None);
+
+        Assert.AreEqual(Timeout.InfiniteTimeSpan, sut.Period);
     }
 
     [Test]
