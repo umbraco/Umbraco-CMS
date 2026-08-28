@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -13,7 +12,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 /// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentBlueprint)]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
-[SchemaEntityType(Constants.UdiEntityType.DocumentBlueprint)]
 public abstract class DocumentBlueprintControllerBase : ContentControllerBase
 {
     protected IActionResult DocumentBlueprintNotFound()
