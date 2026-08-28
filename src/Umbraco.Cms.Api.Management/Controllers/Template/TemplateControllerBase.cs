@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.SchemaLockdown;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Template)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
+[SchemaEntityType(Constants.UdiEntityType.Template)]
 public class TemplateControllerBase : ManagementApiControllerBase
 {
     protected IActionResult TemplateOperationStatusResult(TemplateOperationStatus status) =>
