@@ -21927,6 +21927,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Schema-Lockdown": {
+                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-group:update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -22089,6 +22095,12 @@
                   },
                   "nullable": true
                 }
+              },
+              "Umb-Schema-Lockdown": {
+                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-group:update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -22230,6 +22242,12 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              },
+              "Umb-Schema-Lockdown": {
+                "description": "Present when schema lockdown denied the request, naming the entity type and the operation it was denied for, for example \"member-group:update\". Absent when the response has another cause.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
