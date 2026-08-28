@@ -24,7 +24,9 @@ namespace Umbraco.Cms.Core.Services;
 public class PreviewService : IPreviewService
 {
     private readonly ICookieManager _cookieManager;
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
     private readonly IPreviewTokenGenerator _previewTokenGenerator;
+#pragma warning restore CS0618 // Type or member is obsolete
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IRequestCache _requestCache;
     private readonly GlobalSettings _globalSettings;
@@ -41,7 +43,9 @@ public class PreviewService : IPreviewService
     /// <param name="requestAccessor">The request accessor for determining the current request scheme.</param>
     public PreviewService(
         ICookieManager cookieManager,
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
         IPreviewTokenGenerator previewTokenGenerator,
+#pragma warning restore CS0618 // Type or member is obsolete
         IServiceScopeFactory serviceScopeFactory,
         IRequestCache requestCache,
         IOptions<GlobalSettings> globalSettings,
