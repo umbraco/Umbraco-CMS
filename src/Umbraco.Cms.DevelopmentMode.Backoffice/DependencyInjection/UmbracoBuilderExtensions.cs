@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -110,16 +111,33 @@ public static class UmbracoBuilderExtensions
         {
             if (modelsModeConfigured is false)
             {
+                // Reported once rather than on each options instance, as several are built per application and
+                // again whenever configuration reloads.
+                var reported = 0;
+
                 // Generating models at runtime is only possible because this package supplies the factory for it,
                 // so this package owns the mode when the site has expressed no preference. Core cannot default to
                 // a mode it has no way to satisfy on its own.
-                builder.Services.PostConfigure<ModelsBuilderSettings>(settings =>
+                builder.Services.AddOptions<ModelsBuilderSettings>().PostConfigure<ILoggerFactory>((settings, loggerFactory) =>
                 {
                     // A mode set in code is not visible in configuration, but has been applied by the time this
                     // runs, so raise only a mode still left at its default rather than overriding that choice.
-                    if (settings.ModelsMode == Constants.ModelsBuilder.ModelsModes.Nothing)
+                    if (settings.ModelsMode != Constants.ModelsBuilder.ModelsModes.Nothing)
                     {
-                        settings.ModelsMode = ModelsModeConstants.InMemoryAuto;
+                        return;
+                    }
+
+                    settings.ModelsMode = ModelsModeConstants.InMemoryAuto;
+
+                    if (Interlocked.Exchange(ref reported, 1) == 0)
+                    {
+                        loggerFactory
+                            .CreateLogger(typeof(InMemoryModelFactory).Namespace!)
+                            .LogInformation(
+                                "No ModelsBuilder mode is configured, so the {PackageName} package has raised it from the {DefaultModelsMode} default to {ModelsMode}.",
+                                "Umbraco.Cms.DevelopmentMode.Backoffice",
+                                Constants.ModelsBuilder.ModelsModes.Nothing,
+                                ModelsModeConstants.InMemoryAuto);
                     }
                 });
             }
