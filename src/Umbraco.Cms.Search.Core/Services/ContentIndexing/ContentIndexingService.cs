@@ -101,6 +101,8 @@ internal sealed class ContentIndexingService : IContentIndexingService
             return;
         }
 
+        _logger.LogInformation("Queued rebuild of index {IndexAlias}", indexRegistration.IndexAlias);
+
         _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken => await RebuildAsync(indexRegistration, cancellationToken));
     }
 
@@ -111,6 +113,8 @@ internal sealed class ContentIndexingService : IContentIndexingService
         {
             return;
         }
+
+        _logger.LogInformation("Starting rebuild of index {IndexAlias}", indexRegistration.IndexAlias);
 
         await _eventAggregator.PublishAsync(new IndexRebuildStartingNotification(indexRegistration.IndexAlias), cancellationToken);
 

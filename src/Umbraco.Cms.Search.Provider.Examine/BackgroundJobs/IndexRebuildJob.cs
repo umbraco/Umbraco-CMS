@@ -89,7 +89,6 @@ internal sealed class IndexRebuildJob : RecurringBackgroundJobBase
                 continue;
             }
 
-            _logger.LogInformation("Rebuilding index {IndexRegistrationIndexAlias}", indexRegistration.IndexAlias);
             _contentIndexingService.Rebuild(indexRegistration.IndexAlias, origin);
         }
 
