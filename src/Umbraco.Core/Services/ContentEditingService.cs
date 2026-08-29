@@ -475,22 +475,7 @@ internal sealed class ContentEditingService
                 return ContentEditingOperationStatus.Success;
             }
 
-            return publishResult.Result switch
-            {
-                PublishResultType.FailedPublishCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
-                PublishResultType.FailedPublishAwaitingRelease => ContentEditingOperationStatus.AwaitingRelease,
-                PublishResultType.FailedPublishCultureAwaitingRelease => ContentEditingOperationStatus.CultureAwaitingRelease,
-                PublishResultType.FailedPublishHasExpired => ContentEditingOperationStatus.HasExpired,
-                PublishResultType.FailedPublishCultureHasExpired => ContentEditingOperationStatus.CultureHasExpired,
-                PublishResultType.FailedPublishPathNotPublished => ContentEditingOperationStatus.PathNotPublished,
-                PublishResultType.FailedPublishContentInvalid => ContentEditingOperationStatus.ContentInvalid,
-                PublishResultType.FailedPublishNothingToPublish => ContentEditingOperationStatus.NothingToPublish,
-                PublishResultType.FailedPublishMandatoryCultureMissing => ContentEditingOperationStatus.MandatoryCultureMissing,
-                PublishResultType.FailedPublishConcurrencyViolation => ContentEditingOperationStatus.ConcurrencyViolation,
-                PublishResultType.FailedPublishUnsavedChanges => ContentEditingOperationStatus.UnsavedChanges,
-                PublishResultType.FailedPublishIsTrashed => ContentEditingOperationStatus.InTrash,
-                _ => ContentEditingOperationStatus.Unknown,
-            };
+            return ToContentEditingOperationStatus(publishResult.Result);
         }
         catch (Exception ex)
         {
@@ -498,4 +483,22 @@ internal sealed class ContentEditingService
             return ContentEditingOperationStatus.Unknown;
         }
     }
+
+    private static ContentEditingOperationStatus ToContentEditingOperationStatus(PublishResultType resultType)
+        => resultType switch
+        {
+            PublishResultType.FailedPublishCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+            PublishResultType.FailedPublishAwaitingRelease => ContentEditingOperationStatus.AwaitingRelease,
+            PublishResultType.FailedPublishCultureAwaitingRelease => ContentEditingOperationStatus.CultureAwaitingRelease,
+            PublishResultType.FailedPublishHasExpired => ContentEditingOperationStatus.HasExpired,
+            PublishResultType.FailedPublishCultureHasExpired => ContentEditingOperationStatus.CultureHasExpired,
+            PublishResultType.FailedPublishPathNotPublished => ContentEditingOperationStatus.PathNotPublished,
+            PublishResultType.FailedPublishContentInvalid => ContentEditingOperationStatus.ContentInvalid,
+            PublishResultType.FailedPublishNothingToPublish => ContentEditingOperationStatus.NothingToPublish,
+            PublishResultType.FailedPublishMandatoryCultureMissing => ContentEditingOperationStatus.MandatoryCultureMissing,
+            PublishResultType.FailedPublishConcurrencyViolation => ContentEditingOperationStatus.ConcurrencyViolation,
+            PublishResultType.FailedPublishUnsavedChanges => ContentEditingOperationStatus.UnsavedChanges,
+            PublishResultType.FailedPublishIsTrashed => ContentEditingOperationStatus.InTrash,
+            _ => ContentEditingOperationStatus.Unknown,
+        };
 }

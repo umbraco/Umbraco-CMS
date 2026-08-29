@@ -14,7 +14,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.Content;
 public abstract class ContentControllerBase : ManagementApiControllerBase
 {
     protected IActionResult ContentEditingOperationStatusResult(ContentEditingOperationStatus status)
-        => OperationStatusResult(status, problemDetailsBuilder => status switch
+        => ContentEditingPublishOperationStatusResult(status)
+           ?? OperationStatusResult(status, problemDetailsBuilder => status switch
         {
             ContentEditingOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
@@ -97,46 +98,6 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Cannot move a referenced content item to the recycle bin")
                 .WithDetail("Cannot move a referenced content item to the recycle bin, while the setting ContentSettings.DisableDeleteWhenReferenced is enabled.")
                 .Build()),
-            ContentEditingOperationStatus.AwaitingRelease => BadRequest(problemDetailsBuilder
-                .WithTitle("Content is awaiting release")
-                .WithDetail("The content item could not be published because it is scheduled for release.")
-                .Build()),
-            ContentEditingOperationStatus.CultureAwaitingRelease => BadRequest(problemDetailsBuilder
-                .WithTitle("Culture is awaiting release")
-                .WithDetail("The content item could not be published because one or more cultures are scheduled for release.")
-                .Build()),
-            ContentEditingOperationStatus.HasExpired => BadRequest(problemDetailsBuilder
-                .WithTitle("Content has expired")
-                .WithDetail("The content item could not be published because it has expired.")
-                .Build()),
-            ContentEditingOperationStatus.CultureHasExpired => BadRequest(problemDetailsBuilder
-                .WithTitle("Culture has expired")
-                .WithDetail("The content item could not be published because one or more cultures have expired.")
-                .Build()),
-            ContentEditingOperationStatus.PathNotPublished => BadRequest(problemDetailsBuilder
-                .WithTitle("Path not published")
-                .WithDetail("The content item could not be published because its parent is not published.")
-                .Build()),
-            ContentEditingOperationStatus.ContentInvalid => BadRequest(problemDetailsBuilder
-                .WithTitle("Content is invalid")
-                .WithDetail("The content item could not be published because it is invalid.")
-                .Build()),
-            ContentEditingOperationStatus.NothingToPublish => BadRequest(problemDetailsBuilder
-                .WithTitle("Nothing to publish")
-                .WithDetail("The content item has no publishable values.")
-                .Build()),
-            ContentEditingOperationStatus.MandatoryCultureMissing => BadRequest(problemDetailsBuilder
-                .WithTitle("Mandatory culture missing")
-                .WithDetail("The content item could not be published because a mandatory culture is missing.")
-                .Build()),
-            ContentEditingOperationStatus.ConcurrencyViolation => Conflict(problemDetailsBuilder
-                .WithTitle("Concurrency violation")
-                .WithDetail("The content item was modified by another operation.")
-                .Build()),
-            ContentEditingOperationStatus.UnsavedChanges => BadRequest(problemDetailsBuilder
-                .WithTitle("Unsaved changes")
-                .WithDetail("The content item has unsaved changes that must be saved before publishing.")
-                .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
                 problemDetailsBuilder
@@ -146,6 +107,62 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Unknown content operation status.")
                 .Build()),
         });
+
+    private IActionResult? ContentEditingPublishOperationStatusResult(ContentEditingOperationStatus status)
+        => status switch
+        {
+            ContentEditingOperationStatus.AwaitingRelease => OperationStatusResult(status, problemDetailsBuilder =>
+                BadRequest(problemDetailsBuilder
+                    .WithTitle("Content is awaiting release")
+                    .WithDetail("The content item could not be published because it is scheduled for release.")
+                    .Build())),
+            ContentEditingOperationStatus.CultureAwaitingRelease => OperationStatusResult(status, problemDetailsBuilder =>
+                BadRequest(problemDetailsBuilder
+                    .WithTitle("Culture is awaiting release")
+                    .WithDetail("The content item could not be published because one or more cultures are scheduled for release.")
+                    .Build())),
+            ContentEditingOperationStatus.HasExpired => OperationStatusResult(status, problemDetailsBuilder =>
+                BadRequest(problemDetailsBuilder
+                    .WithTitle("Content has expired")
+                    .WithDetail("The content item could not be published because it has expired.")
+                    .Build())),
+            ContentEditingOperationStatus.CultureHasExpired => OperationStatusResult(status, problemDetailsBuilder =>
+                BadRequest(problemDetailsBuilder
+                    .WithTitle("Culture has expired")
+                    .WithDetail("The content item could not be published because one or more cultures have expired.")
+                    .Build())),
+            ContentEditingOperationStatus.PathNotPublished => OperationStatusResult(status, problemDetailsBuilder =>
+                BadRequest(problemDetailsBuilder
+                    .WithTitle("Path not published")
+                    .WithDetail("The content item could not be published because its parent is not published.")
+                    .Build())),
+            ContentEditingOperationStatus.ContentInvalid => OperationStatusResult(status, problemDetailsBuilder =>
+                BadRequest(problemDetailsBuilder
+                    .WithTitle("Content is invalid")
+                    .WithDetail("The content item could not be published because it is invalid.")
+                    .Build())),
+            ContentEditingOperationStatus.NothingToPublish => OperationStatusResult(status, problemDetailsBuilder =>
+                BadRequest(problemDetailsBuilder
+                    .WithTitle("Nothing to publish")
+                    .WithDetail("The content item has no publishable values.")
+                    .Build())),
+            ContentEditingOperationStatus.MandatoryCultureMissing => OperationStatusResult(status, problemDetailsBuilder =>
+                BadRequest(problemDetailsBuilder
+                    .WithTitle("Mandatory culture missing")
+                    .WithDetail("The content item could not be published because a mandatory culture is missing.")
+                    .Build())),
+            ContentEditingOperationStatus.ConcurrencyViolation => OperationStatusResult(status, problemDetailsBuilder =>
+                Conflict(problemDetailsBuilder
+                    .WithTitle("Concurrency violation")
+                    .WithDetail("The content item was modified by another operation.")
+                    .Build())),
+            ContentEditingOperationStatus.UnsavedChanges => OperationStatusResult(status, problemDetailsBuilder =>
+                BadRequest(problemDetailsBuilder
+                    .WithTitle("Unsaved changes")
+                    .WithDetail("The content item has unsaved changes that must be saved before publishing.")
+                    .Build())),
+            _ => null,
+        };
 
     protected IActionResult GetReferencesOperationStatusResult(GetReferencesOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
