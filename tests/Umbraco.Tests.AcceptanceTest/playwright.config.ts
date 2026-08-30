@@ -144,6 +144,17 @@ export default defineConfig({
         ignoreHTTPSErrors: true,
         storageState: STORAGE_STATE
       }
+    },
+    {
+      name: 'webRoutingConfig',
+      testMatch: 'WebRoutingConfig/*.spec.ts',
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        ignoreHTTPSErrors: true,
+        storageState: STORAGE_STATE
+      }
     }
   ],
 });
