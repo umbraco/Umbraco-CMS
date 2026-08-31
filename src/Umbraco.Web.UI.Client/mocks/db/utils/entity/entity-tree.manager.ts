@@ -23,7 +23,7 @@ export class UmbMockEntityTreeManager<T extends { id: string; parent?: { id: str
 
 	/** Excludes trashed items by default (no-op if there's no `isTrashed`). Overridden to show only trashed items. */
 	protected _isItemVisible(item: T): boolean {
-		return !('isTrashed' in item) || !(item as { isTrashed?: boolean }).isTrashed;
+		return !(item as { isTrashed?: boolean }).isTrashed;
 	}
 
 	protected _getVisibleItems(): Array<T> {
