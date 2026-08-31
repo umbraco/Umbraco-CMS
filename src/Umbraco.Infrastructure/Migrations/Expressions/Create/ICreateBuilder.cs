@@ -36,20 +36,20 @@ public interface ICreateBuilder : IFluentBuilder
     ///     Begins building a CREATE TABLE expression for the specified table.
     /// </summary>
     /// <param name="tableName">The name of the table to create.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateTableWithColumnBuilder"/> to define columns for the new table.</returns>
+    /// <returns>An <see cref="ICreateTableWithColumnBuilder"/> to define columns for the new table.</returns>
     ICreateTableWithColumnBuilder Table(string tableName);
 
     /// <summary>
     ///     Begins building an expression to create a new column in a database table.
     /// </summary>
     /// <param name="columnName">The name of the column to create.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateColumnOnTableBuilder" /> to continue building the column definition on the table.</returns>
+    /// <returns>An <see cref="ICreateColumnOnTableBuilder" /> to continue building the column definition on the table.</returns>
     ICreateColumnOnTableBuilder Column(string columnName);
 
     /// <summary>
     /// Begins building a 'Create Foreign Key' expression for a database migration.
     /// </summary>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateForeignKeyFromTableBuilder" /> that allows further configuration of the foreign key.</returns>
+    /// <returns>An <see cref="ICreateForeignKeyFromTableBuilder" /> that allows further configuration of the foreign key.</returns>
     ICreateForeignKeyFromTableBuilder ForeignKey();
 
     /// <summary>
@@ -57,34 +57,34 @@ public interface ICreateBuilder : IFluentBuilder
     /// </summary>
     /// <param name="foreignKeyName">The name of the foreign key to create.</param>
     /// <returns>
-    /// An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateForeignKeyFromTableBuilder" /> that allows further configuration of the foreign key.
+    /// An <see cref="ICreateForeignKeyFromTableBuilder" /> that allows further configuration of the foreign key.
     /// </returns>
     ICreateForeignKeyFromTableBuilder ForeignKey(string foreignKeyName);
 
     /// <summary>
     /// Creates and returns a builder for constructing a Create Index expression.
     /// </summary>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateIndexForTableBuilder" /> used to further define the index creation.</returns>
+    /// <returns>An <see cref="ICreateIndexForTableBuilder" /> used to further define the index creation.</returns>
     ICreateIndexForTableBuilder Index();
 
     /// <summary>
     /// Creates and returns a builder for constructing a Create Index expression with the specified name.
     /// </summary>
     /// <param name="indexName">The name of the index to create.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateIndexForTableBuilder" /> used to further define the index creation.</returns>
+    /// <returns>An <see cref="ICreateIndexForTableBuilder" /> used to further define the index creation.</returns>
     ICreateIndexForTableBuilder Index(string indexName);
 
     /// <summary>
     ///     Builds a Create Primary Key expression.
     /// </summary>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateConstraintOnTableBuilder" /> to further define the primary key constraint.</returns>
+    /// <returns>An <see cref="ICreateConstraintOnTableBuilder" /> to further define the primary key constraint.</returns>
     ICreateConstraintOnTableBuilder PrimaryKey();
 
     /// <summary>
     ///     Begins building an expression to create a primary key constraint with the specified name.
     /// </summary>
     /// <param name="primaryKeyName">The name of the primary key constraint to create.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateConstraintOnTableBuilder" /> for further configuration of the primary key constraint.</returns>
+    /// <returns>An <see cref="ICreateConstraintOnTableBuilder" /> for further configuration of the primary key constraint.</returns>
     ICreateConstraintOnTableBuilder PrimaryKey(string primaryKeyName);
 
     /// <summary>
@@ -102,7 +102,7 @@ public interface ICreateBuilder : IFluentBuilder
     /// <summary>
     ///     Builds a Create Unique Constraint expression.
     /// </summary>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateConstraintOnTableBuilder" /> to further define the unique constraint.</returns>
+    /// <returns>An <see cref="ICreateConstraintOnTableBuilder" /> to further define the unique constraint.</returns>
     ICreateConstraintOnTableBuilder UniqueConstraint();
 
     /// <summary>
@@ -116,6 +116,6 @@ public interface ICreateBuilder : IFluentBuilder
     ///     Begins building a CREATE CONSTRAINT expression for the specified constraint name.
     /// </summary>
     /// <param name="constraintName">The name of the constraint to create.</param>
-    /// <returns>An <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ICreateConstraintOnTableBuilder" /> that can be used to further define the constraint.</returns>
+    /// <returns>An <see cref="ICreateConstraintOnTableBuilder" /> that can be used to further define the constraint.</returns>
     ICreateConstraintOnTableBuilder Constraint(string constraintName);
 }

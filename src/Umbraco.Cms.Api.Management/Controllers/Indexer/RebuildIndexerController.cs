@@ -2,7 +2,10 @@ using Asp.Versioning;
 using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Api.Management.Services;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.Services;
 
@@ -17,6 +20,7 @@ public class RebuildIndexerController : IndexerControllerBase
     private readonly ILogger<RebuildIndexerController> _logger;
     private readonly IIndexingRebuilderService _indexingRebuilderService;
     private readonly IExamineManager _examineManager;
+    private readonly IMemberIndexAuthorizer _memberIndexAuthorizer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RebuildIndexerController"/> class.
@@ -24,14 +28,37 @@ public class RebuildIndexerController : IndexerControllerBase
     /// <param name="logger">The <see cref="ILogger{RebuildIndexerController}"/> used for logging.</param>
     /// <param name="indexingRebuilderService">The <see cref="IIndexingRebuilderService"/> responsible for rebuilding search indexes.</param>
     /// <param name="examineManager">The <see cref="IExamineManager"/> instance for managing Examine indexes.</param>
+    /// <param name="memberIndexAuthorizer">The <see cref="IMemberIndexAuthorizer"/> used to authorize access to member data.</param>
+    [ActivatorUtilitiesConstructor]
     public RebuildIndexerController(
         ILogger<RebuildIndexerController> logger,
         IIndexingRebuilderService indexingRebuilderService,
-        IExamineManager examineManager)
+        IExamineManager examineManager,
+        IMemberIndexAuthorizer memberIndexAuthorizer)
     {
         _logger = logger;
         _indexingRebuilderService = indexingRebuilderService;
         _examineManager = examineManager;
+        _memberIndexAuthorizer = memberIndexAuthorizer;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RebuildIndexerController"/> class.
+    /// </summary>
+    /// <param name="logger">The <see cref="ILogger{RebuildIndexerController}"/> used for logging.</param>
+    /// <param name="indexingRebuilderService">The <see cref="IIndexingRebuilderService"/> responsible for rebuilding search indexes.</param>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> instance for managing Examine indexes.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public RebuildIndexerController(
+        ILogger<RebuildIndexerController> logger,
+        IIndexingRebuilderService indexingRebuilderService,
+        IExamineManager examineManager)
+        : this(
+            logger,
+            indexingRebuilderService,
+            examineManager,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberIndexAuthorizer>())
+    {
     }
 
     /// <summary>
@@ -61,6 +88,14 @@ public class RebuildIndexerController : IndexerControllerBase
             };
 
             return NotFound(invalidModelProblem);
+        }
+
+        // Rebuilding a member index acts on member data, so it additionally requires access to the
+        // members section - consistent with the index being hidden from users without that access.
+        if (_memberIndexAuthorizer.IsMemberIndex(index)
+            && await _memberIndexAuthorizer.HasAccessAsync(User) is false)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         if (!_indexingRebuilderService.CanRebuild(index.Name))

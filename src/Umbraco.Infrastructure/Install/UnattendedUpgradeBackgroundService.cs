@@ -4,6 +4,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
 
@@ -25,6 +26,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     private readonly ComponentCollection _components;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly IMigrationCoordinator _coordinator;
+    private readonly IContentRoutingReadiness _contentRoutingReadiness;
     private readonly ILogger<UnattendedUpgradeBackgroundService> _logger;
 
     /// <summary>
@@ -35,6 +37,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
     /// <param name="components">The component collection to initialize after migration completes.</param>
     /// <param name="hostApplicationLifetime">The host application lifetime for registering started/stopped callbacks.</param>
     /// <param name="coordinator">Coordinates migration leadership across servers in a load-balanced environment.</param>
+    /// <param name="contentRoutingReadiness">Signals when per-server content-routing initialization has completed.</param>
     /// <param name="logger">The logger.</param>
     public UnattendedUpgradeBackgroundService(
         IRuntimeState runtimeState,
@@ -42,6 +45,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         ComponentCollection components,
         IHostApplicationLifetime hostApplicationLifetime,
         IMigrationCoordinator coordinator,
+        IContentRoutingReadiness contentRoutingReadiness,
         ILogger<UnattendedUpgradeBackgroundService> logger)
     {
         _runtimeState = runtimeState;
@@ -49,6 +53,7 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         _components = components;
         _hostApplicationLifetime = hostApplicationLifetime;
         _coordinator = coordinator;
+        _contentRoutingReadiness = contentRoutingReadiness;
         _logger = logger;
     }
 
@@ -118,6 +123,11 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
         {
             await _components.InitializeAsync(false, stoppingToken);
             await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(_runtimeState.Level, false), stoppingToken);
+
+            // Seeding has completed: the front-end may now route content. Until this point the runtime has
+            // been at Run (set above) while the content/URL/domain caches were still being seeded, so the
+            // front-end was gated to the maintenance page to avoid serving — and caching — a negative result.
+            _contentRoutingReadiness.MarkReady();
 
             _hostApplicationLifetime.ApplicationStarted.Register(
                 () => _eventAggregator.Publish(new UmbracoApplicationStartedNotification(false)));

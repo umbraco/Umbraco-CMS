@@ -22,11 +22,9 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				this._forceShowExpand = has;
 				this.requestUpdate('_forceShowExpand', oldValue);
 			});
+			this.observe(this.#api.drillableCollection, (drillable) => (this._drillableCollection = drillable));
 			this.observe(this.#api.icon, (icon) => (this.#icon = icon || ''));
 			this.observe(this.#api.flags, (flags) => (this._flags = flags || []));
-			// Observe noAccess from context and update base class property (_noAccess).
-			// This enables access restriction behavior (click prevention) and styling from the base class.
-			this.observe(this.#api.noAccess, (noAccess) => (this._noAccess = noAccess));
 		}
 
 		super.api = value;
@@ -39,11 +37,14 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 	private _name = '';
 
 	/**
-	 * @internal
 	 * Indicates whether the document is a draft, this is controlled internally but present as an attribute as it affects styling.
+	 * @internal
 	 */
 	@property({ type: Boolean, reflect: true, attribute: 'draft' })
 	protected _isDraft = false;
+
+	@state()
+	private _drillableCollection = false;
 
 	#icon: string | null | undefined;
 
@@ -58,17 +59,19 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	override _renderExpandSymbol = () => {
-		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
-		// `this._forceShowExpand` is equivalent to hasCollection for this element.
-		if (this._isMenu && this._forceShowExpand) {
-			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
-		} else {
-			return undefined;
-		}
+		// The list icon replaces the expand arrow only where activating it drills into the Collection — see
+		// `drillableCollection`. Where it would do nothing, the normal caret is rendered and the children expand, so a
+		// subtree is never made unreachable by an affordance that cannot act.
+		if (!this._drillableCollection) return undefined;
+		return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 	};
 
 	override renderLabel() {
-		return html`<span id="label" slot="label" class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}>
+		return html`<span
+			id="label"
+			slot="label"
+			class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}
+			@dblclick=${this._handleDblClick}>
 			${this._name}
 		</span> `;
 	}

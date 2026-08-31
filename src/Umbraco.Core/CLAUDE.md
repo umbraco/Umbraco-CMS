@@ -4,7 +4,7 @@
 
 **Umbraco.Core** is the foundational layer of Umbraco CMS, containing the core domain models, services interfaces, events/notifications system, and essential abstractions. This project has NO database implementation and minimal external dependencies - it focuses on defining contracts and business logic.
 
-**Package ID**: `Umbraco.Cms.Core`  
+**Package ID**: `Umbraco.Cms.Core`
 **Namespace**: `Umbraco.Cms.Core`
 
 ### What Lives Here vs. Other Projects
@@ -91,12 +91,12 @@ public interface IContentService
     Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(...);
 }
 
-// Implementation lives in Umbraco.Infrastructure
+// Implementation lives in Umbraco.Core/Services/ (see root CLAUDE.md §5)
 // Service operations return Attempt<T, TStatus> for typed results
 ```
 
 **Key conventions**:
-- Interfaces in Umbraco.Core, implementations in Umbraco.Infrastructure
+- Interfaces in Umbraco.Core; most service implementations live in Umbraco.Core/Services/ too, moving to Umbraco.Infrastructure only when a concrete dependency requires it (see root CLAUDE.md §5)
 - Use `Attempt<TResult, TStatus>` for operations that can fail with specific reasons
 - OperationStatus enums provide detailed failure reasons
 - Services are registered via DI in builder extensions
@@ -133,6 +133,23 @@ builder.AddNotificationHandler<ContentSavedNotification, MyNotificationHandler>(
 
 **Key interface**: `IEventAggregator` - publishes notifications to handlers
 
+#### Durable handlers vs. distributed-cache-only publishers
+
+A handler that only implements `INotificationHandler<T>` / `INotificationAsyncHandler<T>`
+is **silently skipped** when the notification is dispatched through a publisher restricted to
+distributed-cache handlers — i.e. `ScopedNotificationPublisher<IDistributedCacheNotificationHandler>`.
+Umbraco Deploy installs exactly such a publisher on its restore/import scopes, and `EventAggregator`
+filters handlers with `.Where(x => x is TNotificationHandler)`.
+
+If a handler must run for **every** change — especially durable database writes that back the
+in-memory cache — implement `IDistributedCacheNotificationHandler` (sync) or
+`IDistributedCacheAsyncNotificationHandler<T>` (async) instead. These derive from the plain handler
+interfaces, so the handler still fires on normal publishes *and* survives the distributed-cache-only
+filter. No DI change is needed — filtering is by resolved instance type.
+
+When you do this, ensure the handler is safe in the extra scopes it now runs in — e.g. guard against
+DB writes on read-only `Subscriber` servers (see `DocumentUrlService.SkipDatabaseWrites()`).
+
 ### 3. Composer Pattern (DI Registration)
 
 Composers register services and configure the application, this is to make the system easily extendible by package developers and implementors.
@@ -145,10 +162,10 @@ public class MyComposer : IComposer
     {
         // Register services
         builder.Services.AddSingleton<IMyService, MyService>();
-        
+
         // Add to collections
         builder.PropertyEditors().Add<MyPropertyEditor>();
-        
+
         // Register notification handlers
         builder.AddNotificationHandler<ContentSavedNotification, MyHandler>();
     }
@@ -185,14 +202,14 @@ IEntity                     - Base: Id, Key, CreateDate, UpdateDate
 public class MyService
 {
     private readonly ICoreScopeProvider _scopeProvider;
-    
+
     public void DoWork()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        
+
         // Do database work
         // Access repositories
-        
+
         scope.Complete(); // Commit transaction
     }
 }
@@ -212,12 +229,12 @@ Property editors define how data is edited and stored:
 public class MyPropertyEditor : IDataEditor
 {
     public string Alias => "My.PropertyEditor";
-    
+
     public IDataValueEditor GetValueEditor()
     {
         return new MyDataValueEditor();
     }
-    
+
     public IConfigurationEditor GetConfigurationEditor()
     {
         return new MyConfigurationEditor();
@@ -240,12 +257,12 @@ public class MyEntityCacheRefresher : CacheRefresherBase<MyEntityCacheRefresher>
 {
     public override Guid RefresherUniqueId => new Guid("...");
     public override string Name => "My Entity Cache Refresher";
-    
+
     public override void RefreshAll()
     {
         // Clear all cache
     }
-    
+
     public override void Refresh(int id)
     {
         // Clear cache for specific entity
@@ -317,6 +334,8 @@ Configuration models in `/Configuration/Models`:
 - `DeliveryApiSettings` - Delivery API configuration
 - Access via `IOptionsMonitor<TSettings>`
 
+**Only top-level settings are bound as options.** A settings class is bound to configuration *only* when it has an explicit `AddUmbracoOptions<T>()` registration in `UmbracoBuilder.Configuration.cs` (the `[UmbracoOptions]` attribute alone does nothing — nothing scans for it). A **nested** settings class exposed as a property of another settings class (e.g. `ContentSettings.Imaging`, `SecuritySettings.UserPassword`) is populated as part of binding its parent — it is *not* independently bound. Do **not** inject a nested settings type directly as `IOptions<TNested>`/`IOptionsSnapshot<TNested>`: with no registration the options system silently hands back a **default-constructed** instance and all user configuration is ignored. Instead inject the parent and read the nested property (`_contentSettings.Imaging`). The `UserPassword`/`MemberPassword` settings that *are* separately registered are a legacy exception slated for removal (see the `TODO (V18)` in `UmbracoBuilder.Configuration.cs`); don't copy that pattern for new nested settings.
+
 ## Dependencies
 
 ### What Umbraco.Core Depends On
@@ -351,7 +370,7 @@ public enum MyOperationStatus
     ValidationFailed
 }
 
-// 3. Implement in Umbraco.Infrastructure
+// 3. Implement in Umbraco.Core/Services/ (or Umbraco.Infrastructure if it needs Infrastructure concerns)
 // 4. Register in a Composer
 builder.Services.AddScoped<IMyService, MyService>();
 ```
@@ -369,7 +388,7 @@ public class MyContentHandler : INotificationHandler<ContentSavingNotification>
         {
             // Validate, modify, or react
         }
-        
+
         // Cancel if needed (for cancellable notifications)
         // notification.Cancel = true;
     }
@@ -389,7 +408,7 @@ public class MyPropertyEditor : DataEditor
     public MyPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
     { }
-    
+
     protected override IDataValueEditor CreateValueEditor()
     {
         return DataValueEditorFactory.Create<MyValueEditor>(Attribute!);
@@ -407,21 +426,21 @@ public class MyService
 {
     private readonly IContentService _contentService;
     private readonly ICoreScopeProvider _scopeProvider;
-    
+
     public async Task UpdateContentAsync(Guid key)
     {
         using var scope = _scopeProvider.CreateCoreScope();
-        
+
         IContent? content = _contentService.GetById(key);
         if (content == null)
             return;
-        
+
         // Modify content
         content.SetValue("propertyAlias", "new value");
-        
+
         // Save (triggers notifications)
         var result = _contentService.Save(content);
-        
+
         scope.Complete();
     }
 }
@@ -500,6 +519,8 @@ Internal types are accessible in test projects for more thorough testing.
 6. **Culture handling** - Many operations require explicit culture parameter
 7. **Published vs Draft** - `IContent` is draft, `IPublishedContent` is published
 8. **Constants** - Use constants instead of magic strings (property editor aliases, etc.)
+9. **Distributed-cache-only publishers skip plain handlers** - handlers doing durable work (e.g. DB writes) must implement `IDistributedCacheNotificationHandler` / `IDistributedCacheAsyncNotificationHandler<T>`, or they won't fire under Umbraco Deploy and similar restricted scopes.
+10. **Outbound HTTP** - new code injects `IHttpClientFactory` and uses a named client from `AddHttpClients()`; `SharedHttpClient` is only a shim for call sites that can't take that dependency without a breaking change. Never publish an `HttpClient` before configuring it, or mutate a shared one's `DefaultRequestHeaders` after first use - `HttpHeaders` isn't thread safe.
 
 ## Navigation Tips
 
@@ -519,4 +540,4 @@ Internal types are accessible in test projects for more thorough testing.
 
 ---
 
-**Remember**: Umbraco.Core is about **defining what**, not **implementing how**. Keep implementations in Infrastructure!
+**Remember**: Umbraco.Core defines the contracts. Domain **service** implementations mostly live here too (`Services/`); repository and other Infrastructure-backed implementations live in Umbraco.Infrastructure. See root CLAUDE.md §5.

@@ -35,8 +35,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 		super.connectedCallback();
 
 		if (this.editor) {
-			this.editor.on('selectionUpdate', this.#onEditorUpdate);
-			this.editor.on('update', this.#onEditorUpdate);
+			this.editor.on('transaction', this.#onEditorUpdate);
 		}
 	}
 
@@ -44,8 +43,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 		super.disconnectedCallback();
 
 		if (this.editor) {
-			this.editor.off('selectionUpdate', this.#onEditorUpdate);
-			this.editor.off('update', this.#onEditorUpdate);
+			this.editor.off('transaction', this.#onEditorUpdate);
 		}
 	}
 

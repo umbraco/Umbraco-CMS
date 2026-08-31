@@ -265,8 +265,16 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			position: relative;
 			user-select: none;
 			background-color: var(--uui-color-surface);
-			outline: 1px solid var(--uui-color-border);
+			border: 1px solid var(--uui-color-border);
+			border-radius: var(--uui-border-radius);
 		}
+		:host(:not([disabled]):hover) {
+			border-color: var(--uui-color-border-standalone);
+		}
+		:host(:not([disabled]):focus-within) {
+			border-color: var(--uui-color-border-emphasis);
+		}
+
 		/* Wrapper is used to make the focal point position responsive to the image size */
 		#wrapper {
 			position: relative;

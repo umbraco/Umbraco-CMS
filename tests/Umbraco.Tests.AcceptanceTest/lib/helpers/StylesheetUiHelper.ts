@@ -61,7 +61,7 @@ export class StylesheetUiHelper extends UiBaseLocators{
 
   async openStylesheetByNameAtRoot(stylesheetName: string) {
     await this.reloadStylesheetTree();
-    await this.click(this.page.getByLabel(stylesheetName, {exact: true}));
+    await this.clickTreeItemWithName(stylesheetName);
   }
 
   async reloadStylesheetTree() {
@@ -78,7 +78,7 @@ export class StylesheetUiHelper extends UiBaseLocators{
   async goToStylesheet(stylesheetName: string) {
     await this.goToSection(ConstantHelper.sections.settings);
     await this.reloadStylesheetTree();
-    await this.click(this.page.getByLabel(stylesheetName, {exact: true}));
+    await this.clickTreeItemWithName(stylesheetName);
   }
 
   async clickConfirmToDeleteButtonAndWaitForStylesheetToBeDeleted() {

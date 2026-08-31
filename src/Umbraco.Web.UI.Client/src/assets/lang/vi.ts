@@ -328,6 +328,8 @@ export default {
 		isSensitiveValue:
 			'Giá trị này bị ẩn. Nếu bạn cần quyền truy cập để xem giá trị này, vui lòng liên hệ với quản trị viên trang web của bạn.',
 		isSensitiveValue_short: 'Giá trị này bị ẩn.',
+		isSensitiveValueNotice:
+			'Nếu bạn cần quyền truy cập để xem các giá trị bị ẩn, vui lòng liên hệ với quản trị viên trang web của bạn.',
 		languagesToPublish: 'Bạn muốn xuất bản ngôn ngữ nào?',
 		languagesToSendForApproval: 'Bạn muốn gửi ngôn ngữ nào để phê duyệt?',
 		languagesToSchedule: 'Bạn muốn lên lịch ngôn ngữ nào?',
@@ -354,6 +356,8 @@ export default {
 		selectAllVariants: 'Chọn tất cả các biến thể',
 		saveModalTitle: 'Lưu',
 		saveAndPublishModalTitle: 'Lưu và xuất bản',
+		saveAndPublishDescendantsModalTitle: 'Lưu và xuất bản cùng với các phần tử con',
+		saveAndScheduleModalTitle: 'Lưu và lên lịch xuất bản',
 		publishModalTitle: 'Xuất bản',
 	},
 	blueprints: {
@@ -388,6 +392,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Nhấp để tải lên',
+		browseFilesAction: 'Duyệt tệp',
+		dropFilesOr: 'Kéo và thả tệp phương tiện vào đây<br />hoặc',
 		orClickHereToUpload: 'hoặc nhấp vào đây để chọn tệp',
 		disallowedFileType: 'Không thể tải lên tệp này, nó không có loại tệp được phê duyệt',
 		disallowedMediaType: "Không thể tải lên tệp này, loại phương tiện có bí danh '%0%' không được phép ở đây",
@@ -535,7 +541,8 @@ export default {
 		confirmremoveusageof: 'Bạn có chắc chắn muốn xóa việc sử dụng <strong>%0%</strong> không?',
 		confirmlogout: 'Bạn có chắc chắn muốn đăng xuất?',
 		confirmSure: 'Bạn có chắc chắn?',
-		cannotTrashWhenReferenced: (name: string) => `<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> không thể được chuyển vào Thùng rác vì nó được tham chiếu bởi các mục khác.`,
 		confirmTrash: (name: string) => `Bạn có chắc chắn muốn di chuyển <strong>${name}</strong> vào Thùng rác?`,
 		cannotBulkTrashWhenReferenced: (total: number) =>
 			`<strong>${total} ${total === 1 ? 'mục' : 'các mục'}</strong> đã chọn không thể được chuyển vào Thùng rác vì ít nhất một mục được tham chiếu bởi nội dung khác.`,
@@ -904,6 +911,8 @@ export default {
 		no: 'Không',
 		nodeName: 'Tên nút',
 		notFound: 'Không tìm thấy',
+		noResults: 'Không có kết quả',
+		noResultsFor: (query: string) => `Không tìm thấy kết quả cho "${query}".`,
 		of: 'của',
 		off: 'Tắt',
 		ok: 'OK',
@@ -1414,6 +1423,7 @@ export default {
 	},
 	sections: {
 		content: 'Nội dung',
+		library: 'Thư viện',
 		media: 'Phương tiện',
 		member: 'Thành viên',
 		packages: 'Gói mở rộng',
@@ -1735,8 +1745,18 @@ export default {
 		chooseChildNode: 'Chọn nút con',
 		compositionsDescription:
 			'Kế thừa các tab và thuộc tính từ một loại tài liệu hiện có. Các tab mới sẽ được thêm vào loại tài liệu hiện tại hoặc được hợp nhất nếu một tab có tên giống hệt tồn tại.',
+		compositionsDescriptionMediaType:
+			'Kế thừa các tab và thuộc tính từ một loại phương tiện hiện có. Các tab mới sẽ được thêm vào loại phương tiện hiện tại hoặc được hợp nhất nếu một tab có tên giống hệt tồn tại.',
+		compositionsDescriptionMemberType:
+			'Kế thừa các tab và thuộc tính từ một loại thành viên hiện có. Các tab mới sẽ được thêm vào loại thành viên hiện tại hoặc được hợp nhất nếu một tab có tên giống hệt tồn tại.',
 		compositionInUse: 'Loại nội dung này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMediaType:
+			'Loại phương tiện này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
+		compositionInUseMemberType:
+			'Loại thành viên này đang được sử dụng trong một thành phần, vì vậy không thể tự tạo thành phần.',
 		noAvailableCompositions: 'Không có loại nội dung nào có sẵn để sử dụng làm thành phần.',
+		noAvailableCompositionsMediaType: 'Không có loại phương tiện nào có sẵn để sử dụng làm thành phần.',
+		noAvailableCompositionsMemberType: 'Không có loại thành viên nào có sẵn để sử dụng làm thành phần.',
 		compositionRemoveWarning:
 			'Việc xóa một thành phần sẽ xóa tất cả dữ liệu thuộc tính liên quan. Khi bạn lưu loại tài liệu, sẽ không có cách nào quay lại.',
 		availableEditors: 'Tạo mới',
@@ -1774,6 +1794,10 @@ export default {
 		compositionUsageHeading: 'Loại tài liệu này đang được sử dụng ở đâu?',
 		compositionUsageSpecification:
 			'Loại tài liệu này hiện đang được sử dụng trong thành phần của các loại nội dung sau:',
+		compositionUsageSpecificationMediaType:
+			'Loại phương tiện này hiện đang được sử dụng trong thành phần của các loại phương tiện sau:',
+		compositionUsageSpecificationMemberType:
+			'Loại thành viên này hiện đang được sử dụng trong thành phần của các loại thành viên sau:',
 		variantsHeading: 'Biến thể',
 		cultureVariantHeading: 'Cho phép thay đổi theo văn hóa',
 		segmentVariantHeading: 'Cho phép phân đoạn',
@@ -2812,5 +2836,10 @@ export default {
 		resetUrlHeadline: 'Đặt lại URL?',
 		resetUrlMessage: 'Bạn có chắc chắn muốn đặt lại URL này không?',
 		resetUrlLabel: 'Đặt lại',
+	},
+	picker: {
+		browseTab: 'Duyệt',
+		searchTab: 'Tìm kiếm',
+		selectedCount: (count: number) => `Đã chọn ${count} mục`,
 	},
 } as UmbLocalizationDictionary;

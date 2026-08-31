@@ -27,14 +27,14 @@ export const manifests: Array<ManifestUfmFilter> = [
 		alias: 'Umb.Filter.StripHtml',
 		name: 'Strip HTML UFM Filter',
 		api: () => import('./strip-html.filter.js'),
-		meta: { alias: 'strip-html' },
+		meta: { alias: 'stripHtml' },
 	},
 	{
 		type: 'ufmFilter',
 		alias: 'Umb.Filter.TitleCase',
 		name: 'Title Case UFM Filter',
 		api: () => import('./title-case.filter.js'),
-		meta: { alias: 'title-case' },
+		meta: { alias: 'titleCase' },
 	},
 	{
 		type: 'ufmFilter',
@@ -55,6 +55,6 @@ export const manifests: Array<ManifestUfmFilter> = [
 		alias: 'Umb.Filter.WordLimit',
 		name: 'Word Limit UFM Filter',
 		api: () => import('./word-limit.filter.js'),
-		meta: { alias: 'word-limit' },
+		meta: { alias: 'wordLimit' },
 	},
 ];

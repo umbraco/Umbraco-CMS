@@ -66,8 +66,8 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 		this.#paginationManager.setPageSize(100);
 
-		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPage = number));
-		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number));
+		this.observe(this.#paginationManager.currentPage, (number) => (this._currentPage = number), null);
+		this.observe(this.#paginationManager.totalPages, (number) => (this._totalPages = number), null);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(':entityType')
@@ -249,7 +249,9 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 						${this._searchResults?.map((rowData) => {
 							const indexType = rowData.fields?.find((field) => field.name === '__IndexType')?.values?.join(', ') ?? '';
 							this.#entityType = this.#getEntityTypeFromIndexType(indexType);
-							const unique = rowData.fields?.find((field) => field.name === this._resolvedUniqueKeyFieldName)?.values?.join(', ') ?? '';
+							const unique =
+								rowData.fields?.find((field) => field.name === this._resolvedUniqueKeyFieldName)?.values?.join(', ') ??
+								'';
 
 							return html`<uui-table-row>
 								<uui-table-cell> ${rowData.score} </uui-table-cell>

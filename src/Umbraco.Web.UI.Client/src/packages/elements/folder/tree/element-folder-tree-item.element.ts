@@ -7,12 +7,7 @@ import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 export class UmbElementFolderTreeItemElement extends UmbTreeItemElementBase<
 	UmbElementFolderTreeItemModel,
 	UmbElementFolderTreeItemContext
-> {
-	public override set api(value: UmbElementFolderTreeItemContext | undefined) {
-		this.observe(value?.noAccess, (noAccess) => (this._noAccess = noAccess ?? false));
-		super.api = value;
-	}
-}
+> {}
 
 export { UmbElementFolderTreeItemElement as element };
 

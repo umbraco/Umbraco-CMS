@@ -222,6 +222,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Haz clic para subir archivos',
+		browseFilesAction: 'Explorar archivos',
+		dropFilesOr: 'Arrastra y suelta archivos multimedia aquí<br />o',
 	},
 	member: {
 		createNewMember: 'Crear nuevo miembro',
@@ -527,6 +529,8 @@ export default {
 		new: 'Nuevo',
 		next: 'Próximo',
 		no: 'No',
+		noResults: 'Sin resultados',
+		noResultsFor: (query: string) => `Ningún resultado para "${query}".`,
 		of: 'de',
 		off: 'Desactivado',
 		ok: 'OK',
@@ -886,20 +890,14 @@ export default {
 		editscript: 'Editar fichero de script',
 	},
 	sections: {
-		concierge: 'Conserje',
 		content: 'Contenido',
-		courier: 'Mensajero',
-		developer: 'Desarrollador',
-		installer: 'Asistente de configuración de Umbraco',
+		library: 'Biblioteca',
 		media: 'Media',
 		member: 'Miembros',
-		newsletters: 'Boletín informativo',
+		packages: 'Paquetes',
 		settings: 'Ajustes',
-		statistics: 'Estadísticas',
 		translation: 'Traducción',
 		users: 'Usuarios',
-		help: 'Ayuda',
-		packages: 'Paquetes',
 	},
 	settings: {
 		defaulttemplate: 'Plantilla por defecto',
@@ -1126,9 +1124,16 @@ export default {
 		chooseChildNode: 'Elegir nodo hijo',
 		compositionsDescription:
 			'Heredar pestañas y propiedades de un tipo de documento existente. Nuevas pestañas serán añadidas al tipo de documento actual o mezcladas si una pestaña con nombre idéntico ya existe.',
-		compositionInUse:
-			'Este tipo de contenido es usado en una composición, y por tanto no puede no puede ser compuesto.',
+		compositionsDescriptionMediaType:
+			'Heredar pestañas y propiedades de un tipo de medio existente. Nuevas pestañas serán añadidas al tipo de medio actual o mezcladas si una pestaña con nombre idéntico ya existe.',
+		compositionsDescriptionMemberType:
+			'Heredar pestañas y propiedades de un tipo de miembro existente. Nuevas pestañas serán añadidas al tipo de miembro actual o mezcladas si una pestaña con nombre idéntico ya existe.',
+		compositionInUse: 'Este tipo de contenido es usado en una composición, y por tanto no puede ser compuesto.',
+		compositionInUseMediaType: 'Este tipo de medio es usado en una composición, y por tanto no puede ser compuesto.',
+		compositionInUseMemberType: 'Este tipo de miembro es usado en una composición, y por tanto no puede ser compuesto.',
 		noAvailableCompositions: 'No hay tipos de contenido disponibles para usar como composición.',
+		noAvailableCompositionsMediaType: 'No hay tipos de medio disponibles para usar como composición.',
+		noAvailableCompositionsMemberType: 'No hay tipos de miembro disponibles para usar como composición.',
 		availableEditors: 'Editores disponibles',
 		reuse: 'Reusar',
 		editorSettings: 'Configuración de editor',
@@ -1457,5 +1462,10 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: 'Seleccionar todo',
 		deselectAllLogLevelFilters: 'Deseleccionar todo',
+	},
+	picker: {
+		browseTab: 'Explorar',
+		searchTab: 'Buscar',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento seleccionado' : 'elementos seleccionados'}`,
 	},
 } as UmbLocalizationDictionary;

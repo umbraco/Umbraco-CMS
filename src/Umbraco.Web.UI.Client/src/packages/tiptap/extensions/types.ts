@@ -35,7 +35,7 @@ export interface UmbTiptapExtensionArgs {
 	/**
 	 * The data type configuration for the property editor that the editor is used for.
 	 * You can populate this manually if you are using the editor outside of a property editor with the {@link UmbPropertyEditorConfigCollection} object.
-	 * @remark This is only available when the editor is used in a property editor or populated manually.
+	 * @remarks This is only available when the editor is used in a property editor or populated manually.
 	 */
 	configuration?: UmbPropertyEditorConfigCollection;
 }

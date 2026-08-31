@@ -1,11 +1,4 @@
-import {
-	customElement,
-	html,
-	ifDefined,
-	property,
-	state,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ifDefined, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { ensureSlash } from '@umbraco-cms/backoffice/router';
 import { debounce } from '@umbraco-cms/backoffice/utils';

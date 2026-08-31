@@ -157,6 +157,8 @@ export default {
 	},
 	media: {
 		clickToUpload: '點選以便上傳',
+		browseFilesAction: '瀏覽檔案',
+		dropFilesOr: '將媒體拖放至此處<br />或',
 		orClickHereToUpload: '或按這裡選擇檔案',
 		maxFileSize: '檔案大小上限為',
 	},
@@ -403,6 +405,8 @@ export default {
 		new: '新的',
 		next: '下一步',
 		no: '否',
+		noResults: '沒有結果',
+		noResultsFor: (query: string) => `找不到 "${query}" 的結果。`,
 		of: '屬於',
 		ok: '確定',
 		open: '打開',
@@ -692,20 +696,13 @@ export default {
 		editscript: '編輯腳本',
 	},
 	sections: {
-		concierge: 'Concierge',
 		content: '內容',
-		courier: 'Courier',
-		developer: '開發',
-		installer: '設定精靈',
+		library: '資源庫',
 		media: '媒體',
 		member: '會員',
-		newsletters: '消息',
 		settings: '設置',
-		statistics: '統計',
 		translation: '翻譯',
 		users: '用戶',
-		help: '說明',
-		forms: '表單',
 	},
 	settings: {
 		defaulttemplate: '預設範本',
@@ -856,8 +853,16 @@ export default {
 		chooseChildNode: '選擇子節點',
 		compositionsDescription:
 			'從已存在的文檔類別中繼承選項卡以及屬性。新選項卡將被新增至目前文檔種類或合併至已存在同名的選項卡中。',
+		compositionsDescriptionMediaType:
+			'從已存在的媒體類別中繼承選項卡以及屬性。新選項卡將被新增至目前媒體種類或合併至已存在同名的選項卡中。',
+		compositionsDescriptionMemberType:
+			'從已存在的會員類別中繼承選項卡以及屬性。新選項卡將被新增至目前會員種類或合併至已存在同名的選項卡中。',
 		compositionInUse: '此內容種類已經用於集合中，因此不能重複添加本身。',
+		compositionInUseMediaType: '此媒體種類已經用於集合中，因此不能重複添加本身。',
+		compositionInUseMemberType: '此會員種類已經用於集合中，因此不能重複添加本身。',
 		noAvailableCompositions: '沒有可用於集合的內容種類。',
+		noAvailableCompositionsMediaType: '沒有可用於集合的媒體種類。',
+		noAvailableCompositionsMemberType: '沒有可用於集合的會員種類。',
 		availableEditors: '可用的編輯器',
 		reuse: '重複使用',
 		editorSettings: '編輯器設定',
@@ -1055,5 +1060,10 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: '全選',
 		deselectAllLogLevelFilters: '取消全選',
+	},
+	picker: {
+		browseTab: '瀏覽',
+		searchTab: '搜尋',
+		selectedCount: (count: number) => `已選取 ${count} 個項目`,
 	},
 } as UmbLocalizationDictionary;

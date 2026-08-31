@@ -9,10 +9,11 @@ namespace Umbraco.Cms.Core.Models.Navigation;
 public sealed class NavigationNode
 {
     private static readonly Comparison<(Guid Key, int SortOrder)> _sortBySortOrder =
-        static (a, b) => a.SortOrder.CompareTo(b.SortOrder);
+        static (a, b) => CompareBySortOrderThenKey(a.SortOrder, a.Key, b.SortOrder, b.Key);
 
     private readonly ConcurrentHashSet<Guid> _children;
 
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     /// Cached snapshot of <see cref="Children"/> ordered by each child's <c>SortOrder</c>.
     /// </summary>
@@ -25,6 +26,7 @@ public sealed class NavigationNode
     /// cannot finish after a concurrent invalidation has cleared it.
     /// </remarks>
     private Guid[]? _orderedChildren;
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
 
     private readonly Lock _orderedChildrenLock = new();
 
@@ -91,6 +93,22 @@ public sealed class NavigationNode
     /// <param name="childKey">The key of the child node to add.</param>
     /// <exception cref="KeyNotFoundException">Thrown when the child key is not found in the navigation structure.</exception>
     public void AddChild(ConcurrentDictionary<Guid, NavigationNode> navigationStructure, Guid childKey)
+        => AddChild(navigationStructure, childKey, appendAsLastItem: true);
+
+    /// <summary>
+    ///     Adds a child node to this node, optionally preserving the child's existing <see cref="SortOrder"/>.
+    /// </summary>
+    /// <param name="navigationStructure">The navigation structure dictionary containing all nodes.</param>
+    /// <param name="childKey">The key of the child node to add.</param>
+    /// <param name="appendAsLastItem">
+    ///     When <c>true</c>, the child's <see cref="SortOrder"/> is set so it sorts after its existing
+    ///     siblings (the behaviour required when a node is newly created or moved). When <c>false</c>,
+    ///     the child's <see cref="SortOrder"/> is left untouched — used when rebuilding the structure
+    ///     from persisted data, where each node already carries the sort order loaded from the database
+    ///     and the load order (parent-first, by path) must not be allowed to redefine it.
+    /// </param>
+    /// <exception cref="KeyNotFoundException">Thrown when the child key is not found in the navigation structure.</exception>
+    internal void AddChild(ConcurrentDictionary<Guid, NavigationNode> navigationStructure, Guid childKey, bool appendAsLastItem)
     {
         if (navigationStructure.TryGetValue(childKey, out NavigationNode? child) is false)
         {
@@ -99,8 +117,10 @@ public sealed class NavigationNode
 
         child.Parent = Key;
 
-        // Add it as the last item
-        child.SortOrder = _children.Count;
+        if (appendAsLastItem)
+        {
+            child.SortOrder = _children.Count;
+        }
 
         _children.Add(childKey);
 
@@ -154,6 +174,8 @@ public sealed class NavigationNode
         return BuildOrderedChildren(navigationStructure);
     }
 
+
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     ///     Invalidates the cached ordered-children snapshot.
     /// </summary>
@@ -163,6 +185,7 @@ public sealed class NavigationNode
     ///     child <c>SortOrder</c> and so is stale after such an update).
     /// </remarks>
     internal void InvalidateOrderedChildren()
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
     {
         lock (_orderedChildrenLock)
         {
@@ -208,5 +231,29 @@ public sealed class NavigationNode
             _orderedChildren = result;
             return result;
         }
+    }
+
+    /// <summary>
+    ///     Defines the canonical sibling ordering: by <c>SortOrder</c>, then by key as a tie-break.
+    /// </summary>
+    /// <param name="sortOrderA">The sort order of the first node.</param>
+    /// <param name="keyA">The key of the first node, used as the tie-break when sort orders are equal.</param>
+    /// <param name="sortOrderB">The sort order of the second node.</param>
+    /// <param name="keyB">The key of the second node, used as the tie-break when sort orders are equal.</param>
+    /// <returns>
+    ///     A negative value if the first node sorts before the second, a positive value if it sorts
+    ///     after, and zero only when both the sort order and key are equal.
+    /// </returns>
+    /// <remarks>
+    ///     The key tie-break keeps ordering deterministic across rebuilds when sibling sort orders
+    ///     collide — which well-formed Umbraco data avoids, but corrupt/legacy data can produce.
+    ///     The <see cref="List{T}"/> sort used to order children is not a stable sort, so without a
+    ///     total order the relative position of tied siblings would be arbitrary and could differ
+    ///     from one rebuild to the next. Shared so every sibling-ordering call site stays in sync.
+    /// </remarks>
+    internal static int CompareBySortOrderThenKey(int sortOrderA, Guid keyA, int sortOrderB, Guid keyB)
+    {
+        var bySortOrder = sortOrderA.CompareTo(sortOrderB);
+        return bySortOrder != 0 ? bySortOrder : keyA.CompareTo(keyB);
     }
 }

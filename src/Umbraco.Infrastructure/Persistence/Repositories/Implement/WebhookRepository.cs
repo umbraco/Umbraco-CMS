@@ -183,7 +183,7 @@ public class WebhookRepository : IWebhookRepository
     /// Asynchronously updates the specified webhook and its related references in the database.
     /// </summary>
     /// <param name="webhook">The webhook entity to update.</param>
-    /// <returns>A task that represents the asynchronous update operation.</returns
+    /// <returns>A task that represents the asynchronous update operation.</returns>
     public async Task UpdateAsync(IWebhook webhook)
     {
         webhook.UpdatingEntity();

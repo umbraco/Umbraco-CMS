@@ -1,6 +1,8 @@
 import UmbTiptapToolbarDefaultExtensionApi from '../../extensions/default-tiptap-toolbar-api.js';
 import type { Editor } from '../../externals.js';
 import type { UmbTiptapToolbarValue } from '../types.js';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- referenced only via {@link} in JSDoc below
+import type { UmbInputTiptapElement } from '../input-tiptap/input-tiptap.element.js';
 import { css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -34,6 +36,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 	@property({ attribute: false })
 	toolbar: UmbTiptapToolbarValue = [[[]]];
+
+	@property({ type: Boolean, reflect: true })
+	scrolling = false;
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -122,7 +127,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			right: 0;
 			padding: var(--uui-size-3);
 			z-index: 9999999;
+		}
 
+		:host([scrolling]) {
 			box-shadow:
 				0 2px 2px -2px rgba(34, 47, 62, 0.1),
 				0 8px 8px -4px rgba(34, 47, 62, 0.07);

@@ -217,7 +217,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUmbracoApplicationLifetime, AspNetCoreUmbracoApplicationLifetime>();
         builder.Services.AddUnique<IApplicationShutdownRegistry, AspNetCoreApplicationShutdownRegistry>();
         builder.Services.AddTransient<IIpAddressUtilities, IpAddressUtilities>();
+#pragma warning disable CS0618 // Type or member is obsolete - all usage has been removed up in V19
         builder.Services.AddUnique<IPreviewTokenGenerator, UserBasedPreviewTokenGenerator>();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         return builder;
     }
@@ -254,6 +256,11 @@ public static partial class UmbracoBuilderExtensions
         {
             var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.HttpClients.Headers.UserAgentProductName, productVersion));
+        });
+        builder.Services.AddHttpClient(Constants.HttpClients.News, client =>
+        {
+            client.DefaultRequestHeaders.UserAgent.TryParseAdd(Constants.HttpClients.Headers.UserAgentProductName);
+            client.Timeout = TimeSpan.FromSeconds(20);
         });
         return builder;
     }

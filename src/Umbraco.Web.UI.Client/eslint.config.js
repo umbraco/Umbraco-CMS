@@ -2,7 +2,7 @@
 
 import js from '@eslint/js';
 import globals from 'globals';
-import importPlugin from 'eslint-plugin-import';
+import importPlugin from 'eslint-plugin-import-x';
 import localRules from 'eslint-plugin-local-rules';
 import storybook from 'eslint-plugin-storybook';
 import wcPlugin from 'eslint-plugin-wc';
@@ -48,14 +48,26 @@ export default [
 			semi: ['warn', 'always'],
 			'prettier/prettier': ['warn', { endOfLine: 'auto' }],
 			'no-var': 'error',
-			'import/namespace': 'off',
-			'import/no-unresolved': 'off',
-			'import/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
-			'import/no-self-import': 'error',
-			'import/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
+			'import-x/namespace': 'off',
+			'import-x/no-unresolved': 'off',
+			// Off: this codebase deliberately gives many classes/elements both a named export and a
+			// `export default` (the default is required for manifest-driven dynamic `js: () => import(...)`
+			// loading). The rule then flags every plain `import Foo from './foo.js'` of that class elsewhere,
+			// forcing `import { Foo } from './foo.js'` for no behavioural benefit.
+			'import-x/no-named-as-default': 'off',
+			// Off: false-positives on barrel files that reach the same underlying binding via two `export *`
+			// paths (e.g. an index.ts re-exporting both a submodule barrel and that submodule's constants
+			// directly) — harmless per the ES module spec, but the rule doesn't resolve to the original
+			// declaration before comparing names.
+			'import-x/export': 'off',
+			'import-x/order': ['warn', { groups: ['builtin', 'parent', 'sibling', 'index', 'external'] }],
+			'import-x/no-self-import': 'error',
+			'import-x/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
 			'local-rules/enforce-manifest-alias': 'warn',
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/no-unsafe-localize': 'error',
+			'local-rules/no-unknown-localization-key': 'error',
+			'local-rules/enforce-null-observe-alias-in-constructor': 'error',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{
@@ -66,9 +78,40 @@ export default [
 				'warn',
 				{
 					// allow all tags from https://github.com/runem/web-component-analyzer
-					definedTags: ['element', 'attr', 'fires', 'prop', 'slot', 'cssprop', 'csspart'],
+					// plus the schema-annotation tags used by `typescript-json-schema` on manifest/extension
+					// type definitions (see https://github.com/YousefED/typescript-json-schema) and a couple
+					// of informal tags (`optional`, `observable`, `note`) already established in this codebase
+					definedTags: [
+						'element',
+						'attr',
+						'fires',
+						'prop',
+						'slot',
+						'cssprop',
+						'csspart',
+						'title',
+						'examples',
+						'required',
+						'minProperties',
+						'optional',
+						'observable',
+						'note',
+						'TJS-type',
+						'TJS-ignore',
+					],
 				},
 			],
+		},
+		settings: {
+			jsdoc: {
+				structuredTags: {
+					// Web-component custom events are documented as `@fires {EventType} name - description`
+					// (per web-component-analyzer) and are often kebab-case (e.g. `slice-update`), which the
+					// default "namepath" name role rejects — relax both the type and name checks.
+					fires: { name: 'text', type: true, required: ['name'] },
+					event: { name: 'text' },
+				},
+			},
 		},
 	},
 
@@ -87,6 +130,11 @@ export default [
 		},
 		...importPlugin.flatConfigs.typescript,
 		rules: {
+			// import-x/named is off in the plugin's own typescript preset (spread above), but that preset's
+			// `rules` is a sibling key here and gets overwritten by this literal — restate it explicitly.
+			// TS type-checking already covers "does this import exist"; the rule's own resolution is prone
+			// to false negatives on deep/cyclic re-export barrels.
+			'import-x/named': 'off',
 			'no-unused-vars': 'off', //Let '@typescript-eslint/no-unused-vars' catch the errors to allow unused function parameters (ex: in interfaces)
 			'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 			'@typescript-eslint/no-non-null-assertion': 'off',
@@ -173,6 +221,26 @@ export default [
 					format: null,
 				},
 			],
+		},
+	},
+	{
+		// Localization dictionaries aren't type-checked (see the `ignores` above), so
+		// `enforce-manifest-alias`'s type-aware manifest detection can't run here and it falls back to a
+		// structural check (any object with sibling `alias`/`type` keys). Several translation entries happen
+		// to have both keys (e.g. a "Type" label and an "Alias" label in the same dictionary section),
+		// which the fallback misreads as unaliased manifests.
+		files: ['src/assets/lang/*.ts'],
+		rules: {
+			'local-rules/enforce-manifest-alias': 'off',
+		},
+	},
+	{
+		// This file is annotated for `typescript-json-schema` (https://github.com/YousefED/typescript-json-schema),
+		// whose `@examples` values are multi-line JSON literals — valid for the schema generator, but the
+		// jsdoc comment parser reads the array/object brackets as an (invalid) tag name spanning lines.
+		files: ['src/json-schema/**/*.ts'],
+		rules: {
+			'jsdoc/valid-types': 'off',
 		},
 	},
 	{

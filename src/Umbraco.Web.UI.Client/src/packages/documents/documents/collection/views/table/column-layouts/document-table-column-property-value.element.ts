@@ -1,7 +1,7 @@
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
-import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentVariantState } from '../../../../variant-state.js';
+import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 
@@ -49,7 +49,7 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 			case 'contentTypeAlias':
 				return { value: item.documentType.alias };
 			case 'createDate':
-				return { value: this._createDate?.toLocaleString() };
+				return { value: this._createDate?.toLocaleString(this.localize.lang()) };
 			case 'creator':
 			case 'owner':
 				return { value: item.creator };
@@ -58,7 +58,7 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 			case 'sortOrder':
 				return { value: item.sortOrder };
 			case 'updateDate':
-				return { value: this._updateDate?.toLocaleString() };
+				return { value: this._updateDate?.toLocaleString(this.localize.lang()) };
 			case 'updater':
 				return { value: item.updater };
 			default: {
@@ -76,7 +76,9 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 			this.column.labelTemplate,
 			() => html`<umb-ufm-render inline .markdown=${this.column.labelTemplate} .value=${{ value }}></umb-ufm-render>`,
 			() =>
-				editorAlias ? html`<umb-value-summary-extension .valueType=${editorAlias} .value=${value}></umb-value-summary-extension>` : value,
+				editorAlias
+					? html`<umb-value-summary-extension .valueType=${editorAlias} .value=${value}></umb-value-summary-extension>`
+					: value,
 		);
 	}
 }

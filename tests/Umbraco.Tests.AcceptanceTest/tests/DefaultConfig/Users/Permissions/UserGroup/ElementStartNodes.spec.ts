@@ -14,7 +14,7 @@ const elementTypeName = 'TestElementType';
 let elementTypeId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
-  elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName);
+  elementTypeId = await umbracoApi.documentType.createEmptyElementType(elementTypeName, true);
   rootFolderId = await umbracoApi.element.createDefaultElementFolder(rootFolderName);
   childElementOneId = await umbracoApi.element.createDefaultElementWithParent(childElementOneName, elementTypeId, rootFolderId);
   await umbracoApi.element.createDefaultElementWithParent(childElementTwoName, elementTypeId, rootFolderId);
@@ -62,7 +62,6 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
   // Assert
   await umbracoUi.library.isElementInTreeVisible(rootFolderName);
   await umbracoUi.library.goToElementWithName(rootFolderName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for workspace to load
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
   await umbracoUi.library.openElementCaretButtonForName(rootFolderName);
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementOneName);

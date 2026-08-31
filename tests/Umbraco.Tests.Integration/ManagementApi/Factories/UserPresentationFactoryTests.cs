@@ -6,10 +6,12 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -33,6 +35,8 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
 
     public IMediaService MediaService => GetRequiredService<IMediaService>();
 
+    public IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
+
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         services.AddTransient<IUserPresentationFactory, UserPresentationFactory>();
@@ -48,8 +52,22 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         services.AddSingleton<IPermissionMapper, DocumentPropertyValuePermissionMapper>();
         services.AddSingleton<IPermissionPresentationMapper, DocumentPropertyValuePermissionMapper>();
 
+        services.AddSingleton<IPermissionMapper, ElementPermissionMapper>();
+        services.AddSingleton<IPermissionPresentationMapper, ElementPermissionMapper>();
+
         services.AddSingleton<IPermissionMapper, CustomPermissionMapper>();
         services.AddSingleton<IPermissionPresentationMapper, CustomPermissionMapper>();
+
+        // Decorate the stock element permission service so we can prove the factory routes fallback permissions
+        // through IElementPermissionService. Granular resolution still delegates to the real implementation,
+        // so the granular aggregation test is unaffected.
+        services.AddSingleton<IElementPermissionService>(sp =>
+            new FallbackFilteringElementPermissionService(ActivatorUtilities.CreateInstance<ElementPermissionService>(sp)));
+
+        // Same decoration for the element container permission service, to prove the factory also routes
+        // fallback permissions through IElementContainerPermissionService.
+        services.AddSingleton<IElementContainerPermissionService>(sp =>
+            new FallbackFilteringElementContainerPermissionService(ActivatorUtilities.CreateInstance<ElementContainerPermissionService>(sp)));
     }
 
     [Test]
@@ -322,6 +340,207 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         Assert.IsTrue(customPermission2.Verbs.ContainsAll(["B", "C"]));
     }
 
+    [Test]
+    public async Task Can_Create_Current_User_Response_Model_With_Aggregated_Element_Permissions()
+    {
+        // Create an element content type and an element instance.
+        var contentType = ContentTypeBuilder.CreateBasicContentType(
+            name: Guid.NewGuid().ToString(),
+            alias: Guid.NewGuid().ToString());
+        contentType.IsElement = true;
+        contentType.AllowedInLibrary = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var createResult = await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                ParentKey = null,
+                Variants = [new VariantModel { Name = "Test Element" }],
+            },
+            Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success, $"Failed to create element with status {createResult.Status}.");
+        var elementKey = createResult.Result.Content!.Key;
+
+        // One group assigns granular permissions to the element; the other only provides default (fallback) permissions.
+        var groupOne = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [],
+            ["A", "B", "C"],
+            [
+                new ElementGranularPermission
+                {
+                    Key = elementKey,
+                    Permission = "A",
+                },
+                new ElementGranularPermission
+                {
+                    Key = elementKey,
+                    Permission = "E",
+                }
+            ],
+            Constants.System.Root);
+        var groupTwo = await CreateUserGroup(
+            "Group Two",
+            "groupTwo",
+            [],
+            ["A", "B", "D"],
+            [],
+            Constants.System.Root);
+
+        var user = await CreateUser([groupOne.Key, groupTwo.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+
+        // One aggregated permission for the single element that has granular permissions assigned.
+        var elementPermissions = model.Permissions.OfType<ElementPermissionPresentationModel>().ToArray();
+        Assert.That(elementPermissions, Has.Length.EqualTo(1));
+
+        // The element has explicit granular permissions from group one (A, E) and inherits group two's
+        // fallback permissions (A, B, D), so the aggregate is the union of both.
+        var elementPermission = elementPermissions.Single(x => x.Element.Id == elementKey);
+        Assert.That(elementPermission.Verbs, Is.EquivalentTo(new[] { "A", "B", "D", "E" }));
+    }
+
+    [Test]
+    public async Task Can_Create_Current_User_Response_Model_Filtering_Element_Fallback_Permissions_Through_Service()
+    {
+        // A group whose default (fallback) permissions include the element verb that the decorator strips.
+        var group = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [],
+            [FallbackFilteringElementPermissionService.StrippedVerb, "Umb.Element.Read"],
+            [],
+            Constants.System.Root);
+        var user = await CreateUser([group.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+
+        // The factory routed the fallback set through IElementPermissionService, so the stripped verb is gone
+        // while other fallback verbs remain. This is what hides default-permission actions (e.g. Trash) in the UI.
+        Assert.That(model.FallbackPermissions, Does.Not.Contain(FallbackFilteringElementPermissionService.StrippedVerb));
+        Assert.That(model.FallbackPermissions, Contains.Item("Umb.Element.Read"));
+    }
+
+    [Test]
+    public async Task Can_Create_Current_User_Response_Model_Filtering_ElementContainer_Fallback_Permissions_Through_Service()
+    {
+        // A group whose default (fallback) permissions include the container verb that the decorator strips.
+        var group = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [],
+            [FallbackFilteringElementContainerPermissionService.StrippedVerb, "Umb.ElementContainer.Read"],
+            [],
+            Constants.System.Root);
+        var user = await CreateUser([group.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+
+        // The factory routed the fallback set through IElementContainerPermissionService, so the stripped verb is
+        // gone while other fallback verbs remain. This is what hides default-permission actions (e.g. Create) in the UI.
+        Assert.That(model.FallbackPermissions, Does.Not.Contain(FallbackFilteringElementContainerPermissionService.StrippedVerb));
+        Assert.That(model.FallbackPermissions, Contains.Item("Umb.ElementContainer.Read"));
+    }
+
+    [Test]
+    public async Task Cannot_Reinstate_Or_Add_Fallback_Permissions_Filtered_By_Another_Permission_Service()
+    {
+        // The element verb the element permission service strips, which the container permission service then puts
+        // back. Only removals are honoured, so the verb stays out no matter which service asked for it back.
+        var group = await CreateUserGroup(
+            "Group One",
+            "groupOne",
+            [],
+            [FallbackFilteringElementContainerPermissionService.ReinstatedVerb, "Umb.Element.Read"],
+            [],
+            Constants.System.Root);
+        var user = await CreateUser([group.Key]);
+
+        var model = await UserPresentationFactory.CreateCurrentUserResponseModelAsync(user);
+
+        Assert.Multiple(() =>
+        {
+            // Each service filters its own copy of the unfiltered set and the results are intersected, so filtering is
+            // order-independent - a later service cannot resurrect a verb an earlier one removed.
+            Assert.That(model.FallbackPermissions, Does.Not.Contain(FallbackFilteringElementContainerPermissionService.ReinstatedVerb));
+
+            // A verb that was never in the aggregated set is discarded too.
+            Assert.That(model.FallbackPermissions, Does.Not.Contain(FallbackFilteringElementContainerPermissionService.AddedVerb));
+
+            Assert.That(model.FallbackPermissions, Contains.Item("Umb.Element.Read"));
+        });
+    }
+
+    private sealed class FallbackFilteringElementContainerPermissionService : IElementContainerPermissionService
+    {
+        public const string StrippedVerb = "Umb.ElementContainer.Create";
+
+        // Verbs this service tries to put back into the set: one the element permission service removes, and one that
+        // was never in the aggregated set at all. Neither should reach the client - the factory honours removals only.
+        public const string ReinstatedVerb = FallbackFilteringElementPermissionService.StrippedVerb;
+
+        public const string AddedVerb = "Umb.ElementContainer.Injected";
+
+        private readonly IElementContainerPermissionService _inner;
+
+        public FallbackFilteringElementContainerPermissionService(IElementContainerPermissionService inner) => _inner = inner;
+
+        public async Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
+        {
+            ISet<string> filtered = await _inner.FilterFallbackPermissionsAsync(user, fallbackPermissions);
+            filtered.Remove(StrippedVerb);
+            filtered.Add(ReinstatedVerb);
+            filtered.Add(AddedVerb);
+            return filtered;
+        }
+
+        public Task<ElementAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> containerKeys, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeAccessAsync(user, containerKeys, permissionsToCheck);
+
+        public Task<ElementAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeRootAccessAsync(user, permissionsToCheck);
+
+        public Task<ElementAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeBinAccessAsync(user, permissionsToCheck);
+    }
+
+    private sealed class FallbackFilteringElementPermissionService : IElementPermissionService
+    {
+        public const string StrippedVerb = "Umb.Element.Delete";
+
+        private readonly IElementPermissionService _inner;
+
+        public FallbackFilteringElementPermissionService(IElementPermissionService inner) => _inner = inner;
+
+        public Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> elementKeys)
+            => _inner.GetPermissionsAsync(user, elementKeys);
+
+        public async Task<ISet<string>> FilterFallbackPermissionsAsync(IUser user, ISet<string> fallbackPermissions)
+        {
+            ISet<string> filtered = await _inner.FilterFallbackPermissionsAsync(user, fallbackPermissions);
+            filtered.Remove(StrippedVerb);
+            return filtered;
+        }
+
+        public Task<ElementAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> elementKeys, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeAccessAsync(user, elementKeys, permissionsToCheck);
+
+        public Task<ElementAuthorizationStatus> AuthorizeDescendantsAccessAsync(IUser user, Guid parentKey, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeDescendantsAccessAsync(user, parentKey, permissionsToCheck);
+
+        public Task<ElementAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeRootAccessAsync(user, permissionsToCheck);
+
+        public Task<ElementAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<string> permissionsToCheck)
+            => _inner.AuthorizeBinAccessAsync(user, permissionsToCheck);
+
+        public Task<ElementAuthorizationStatus> AuthorizeCultureAccessAsync(IUser user, ISet<string> culturesToCheck)
+            => _inner.AuthorizeCultureAccessAsync(user, culturesToCheck);
+    }
+
     private class CustomGranularPermission : IGranularPermission
     {
         public const string ContextType = "Custom";
@@ -334,7 +553,7 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
 
         public override bool Equals(object? obj)
         {
-            if (ReferenceEquals(null, obj))
+            if (obj is null)
             {
                 return false;
             }

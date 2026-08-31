@@ -12,7 +12,7 @@ import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localiza
 export default {
 	sections: {
 		content: 'Conţinut',
-		forms: 'Formulare',
+		library: 'Bibliotecă',
 		media: 'Media',
 		member: 'Membrii',
 		packages: 'Pachete',
@@ -63,5 +63,12 @@ export default {
 	user: {
 		confirmNewPassword: 'Confirmați parola nouă',
 		confirmPassword: 'Confirmați parola',
+	},
+	picker: {
+		selectedCount: (count: number) => {
+			if (count === 1) return '1 element selectat';
+			if (count % 100 >= 1 && count % 100 <= 19) return `${count} elemente selectate`;
+			return `${count} de elemente selectate`;
+		},
 	},
 } as UmbLocalizationDictionary;

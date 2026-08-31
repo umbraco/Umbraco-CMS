@@ -183,6 +183,8 @@ export default {
 		logoff: 'Sair',
 		logout: 'Logout',
 		next: 'Próximo',
+		noResults: 'Nenhum resultado',
+		noResultsFor: (query: string) => `Nenhum resultado para "${query}".`,
 		password: 'Senha',
 		pleasewait: 'Um momento por favor...',
 		previous: 'Prévio',
@@ -284,8 +286,7 @@ export default {
 		lockoutWillOccur: 'Você está inativo e logout irá ocorrer automaticamente em',
 		renewSession: 'Renovar agora para salvar seu trabalho',
 	},
-	login: {
-	},
+	login: {},
 	main: {
 		dashboard: 'Painel',
 		sections: 'Seções',
@@ -375,14 +376,8 @@ export default {
 		editscript: 'Editar arquivo de script',
 	},
 	sections: {
-		concierge: 'Porteiro',
-		courier: 'Mensageiro',
-		developer: 'Desenvolvedor',
-		installer: 'Assistente de Configuração Umbraco',
 		media: 'Mídia',
-		newsletters: 'Boletins Informativos',
 		settings: 'Configurações',
-		statistics: 'Estatísticas',
 		users: 'Usuários',
 	},
 	settings: {
@@ -551,5 +546,10 @@ export default {
 	},
 	logViewer: {
 		selectAllLogLevelFilters: 'Selecionar tudo',
+	},
+	picker: {
+		browseTab: 'Procurar',
+		searchTab: 'Pesquisar',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item selecionado' : 'itens selecionados'}`,
 	},
 } as UmbLocalizationDictionary;

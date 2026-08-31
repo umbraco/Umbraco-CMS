@@ -1,4 +1,5 @@
 import { UmbSubmittableWorkspaceContextBase } from '../submittable/index.js';
+import { umbWorkspaceWillNavigateAway } from '../utils/check-will-navigate-away.function.js';
 import { UmbEntityWorkspaceDataManager } from '../entity/entity-workspace-data-manager.js';
 import type { UmbSubmittableTreeEntityWorkspaceContext } from '../contexts/tokens/index.js';
 import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
@@ -28,11 +29,11 @@ const LOADING_STATE_UNIQUE = 'umbLoadingEntityDetail';
 const FORBIDDEN_STATE_UNIQUE = 'umbForbiddenEntityDetail';
 
 export abstract class UmbEntityDetailWorkspaceContextBase<
-		DetailModelType extends UmbEntityModel = UmbEntityModel,
-		DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
-		CreateArgsType extends
-			UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> = UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
-	>
+	DetailModelType extends UmbEntityModel = UmbEntityModel,
+	DetailRepositoryType extends UmbDetailRepository<DetailModelType> = UmbDetailRepository<DetailModelType>,
+	CreateArgsType extends UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType> =
+		UmbEntityDetailWorkspaceContextCreateArgs<DetailModelType>,
+>
 	extends UmbSubmittableWorkspaceContextBase<DetailModelType>
 	implements UmbSubmittableTreeEntityWorkspaceContext
 {
@@ -42,7 +43,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	/**
 	 * @description Data manager for the workspace.
 	 * @protected
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected readonly _data = new UmbEntityWorkspaceDataManager<DetailModelType>(this);
 
@@ -109,6 +110,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.addValidationContext(this.validationContext);
 		this.#entityContext.setEntityType(args.entityType);
 		window.addEventListener('willchangestate', this.#onWillNavigate);
+		window.addEventListener('beforeunload', this.#onBeforeUnload);
 		this.#observeRepository(args.detailRepositoryAlias);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
@@ -243,9 +245,22 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
+	 * Requests the latest persisted version of the entity from the server WITHOUT applying it to the
+	 * workspace state, and returns the processed data.
+	 * @returns { Promise<DetailModelType> } The latest persisted data.
+	 */
+	public async loadWithoutPersist(): Promise<DetailModelType> {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is not set');
+		const { data, error } = await this._detailRepository!.requestByUnique(unique);
+		if (error || !data) throw new Error('Error loading entity', { cause: error });
+		return await this._processIncomingData(data);
+	}
+
+	/**
 	 * Method to check if the workspace data is loaded.
-	 * @returns { Promise<any> | undefined } true if the workspace data is loaded.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @returns { Promise<UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>> | undefined } true if the workspace data is loaded.
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	public isLoaded(): Promise<any> | undefined {
 		return this._getDataPromise;
@@ -258,7 +273,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @param {UmbEntityUnique} args.parent.unique The unique identifier of the parent entity.
 	 * @param {string} args.parent.entityType The entity type of the parent entity.
 	 * @param {Partial<DetailModelType>} args.preset The preset data.
-	 * @returns { Promise<any> | undefined } The data of the scaffold.
+	 * @returns { Promise<DetailModelType | undefined> } The data of the scaffold.
 	 */
 	public async createScaffold(args: CreateArgsType) {
 		this.resetState();
@@ -317,7 +332,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	/**
 	 * Deletes the entity.
-	 * @param unique The unique identifier of the entity to delete.
+	 * @param {string} unique The unique identifier of the entity to delete.
 	 */
 	async delete(unique: string) {
 		await this.#init;
@@ -329,13 +344,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @protected
 	 * @param {string | URL} newUrl The new url that the workspace is navigating to.
 	 * @returns {boolean} true if the workspace is navigating away.
-	 * @memberof UmbEntityWorkspaceContextBase
+	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
 	protected _checkWillNavigateAway(newUrl: string | URL): boolean {
-		if (newUrl instanceof URL) {
-			newUrl = newUrl.href;
-		}
-		return !newUrl.includes(this.routes.getActiveLocalPath());
+		return umbWorkspaceWillNavigateAway(this.routes, this.getUnique(), newUrl);
 	}
 
 	protected async _create(currentData: DetailModelType, parent: UmbEntityModel) {
@@ -343,7 +355,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 		const { error, data } = await this._detailRepository.create(currentData, parent.unique);
 		if (error || !data) {
-			throw error?.message ?? 'Repository did not return data after create.';
+			throw new Error('Repository did not return data after create.', { cause: error });
 		}
 
 		this.#entityContext.setUnique(data.unique);
@@ -372,7 +384,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	protected async _update(currentData: DetailModelType) {
 		const { error, data } = await this._detailRepository!.save(currentData);
 		if (error || !data) {
-			throw error?.message ?? 'Repository did not return data after create.';
+			throw new Error('Entity Detail Repository failed saving', { cause: error });
 		}
 
 		this._data.setPersisted(data);
@@ -424,6 +436,13 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		}
 
 		return true;
+	};
+
+	#onBeforeUnload = (e: BeforeUnloadEvent) => {
+		if (this.getHasUnpersistedChanges()) {
+			e.preventDefault();
+			e.returnValue = '';
+		}
 	};
 
 	/**
@@ -491,6 +510,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 
 	public override destroy(): void {
 		window.removeEventListener('willchangestate', this.#onWillNavigate);
+		window.removeEventListener('beforeunload', this.#onBeforeUnload);
 		this.#eventContext?.removeEventListener(
 			UmbEntityUpdatedEvent.TYPE,
 			this.#onEntityUpdatedEvent as unknown as EventListener,

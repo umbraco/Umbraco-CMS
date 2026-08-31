@@ -194,6 +194,33 @@ public interface IMediaService : IContentServiceBase<IMedia>
     Attempt<OperationResult?> Move(IMedia media, int parentId, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Moves an <see cref="IMedia" /> object to a new location, optionally leaving its descendants behind.
+    /// </summary>
+    /// <param name="media">The <see cref="IMedia" /> to move.</param>
+    /// <param name="parentId">Id of the Media's new Parent.</param>
+    /// <param name="includeDescendants">
+    ///     Whether to move the descendants of the media along with it. When restoring media out of the recycle bin
+    ///     this can be set to <c>false</c> to restore only the media item itself, leaving its descendants in the
+    ///     recycle bin as top-level bin items.
+    /// </param>
+    /// <param name="userId">Id of the User moving the Media.</param>
+    /// <returns>True if moving succeeded, otherwise False.</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - the int-userId overloads still default to SuperUserId; there is no non-obsolete int equivalent until it is removed in v18
+    Attempt<OperationResult?> Move(IMedia media, int parentId, bool includeDescendants, int userId = Constants.Security.SuperUserId)
+#pragma warning restore CS0618 // Type or member is obsolete
+    {
+        // Only the whole-tree move can be satisfied by delegating to the existing method; there is no way to honour
+        // includeDescendants: false without the concrete implementation, so fail fast rather than silently move
+        // the descendants after all.
+        if (includeDescendants is false)
+        {
+            throw new NotImplementedException("This IMediaService implementation does not support moving without descendants. Override the Move overload that takes an includeDescendants parameter to support it.");
+        }
+
+        return Move(media, parentId, userId);
+    }
+
+    /// <summary>
     ///     Deletes an <see cref="IMedia" /> object by moving it to the Recycle Bin
     /// </summary>
     /// <param name="media">The <see cref="IMedia" /> to delete</param>
@@ -337,6 +364,22 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="userId"></param>
     /// <returns>True if sorting succeeded, otherwise False</returns>
     bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Sorts the children of a parent by persisting the supplied (already ordered) child identifiers
+    ///     as the new sort order, in a single set-based update.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent, or <see cref="Constants.System.Root"/> for the root.</param>
+    /// <param name="orderedChildIds">The child media identifiers, in the desired order.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    /// <returns>The operation result.</returns>
+    /// <remarks>
+    ///     Unlike <see cref="Sort(IEnumerable{IMedia}, int)" />, this does not load the children or fire per-item
+    ///     save/sort notifications; it persists the order directly and refreshes the affected cache branch.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    OperationResult SortChildren(int parentId, IReadOnlyList<int> orderedChildIds, int userId = Constants.Security.SuperUserId)
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
