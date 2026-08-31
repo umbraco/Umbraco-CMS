@@ -87,8 +87,27 @@
 
   class UmbWebsitePreviewElement extends HTMLElement {
     connectedCallback() {
-      if (this.shadowRoot) return;
-      this.#render();
+      if (!this.shadowRoot) {
+        this.#render();
+      }
+
+      // Re-shown on every connection: moving the host in the DOM closes the popover.
+      this.#show();
+    }
+
+    // Promotes the badge to the top layer, so host page stacking contexts cannot cover it.
+    #show() {
+      const badge = this.shadowRoot?.getElementById("umbracoPreviewBadge");
+
+      if (typeof badge?.showPopover !== "function" || badge.matches(":popover-open")) {
+        return;
+      }
+
+      try {
+        badge.showPopover();
+      } catch {
+        // Older browsers without popover support still render the badge in normal flow.
+      }
     }
 
     async #endPreview() {
