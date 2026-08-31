@@ -266,8 +266,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
 
     // Block List Editor and Block Grid Editor
     this.addBlockBtn = page.locator('umb-input-block-type #blocks').getByLabel('open');
-    this.minAmountTxt = page.getByLabel('Low value');
-    this.maxAmountTxt = page.getByLabel('High value');
+    this.minAmountTxt = page.getByTestId('property:validationLimit').getByLabel('Low value');
+    this.maxAmountTxt = page.getByTestId('property:validationLimit').getByLabel('High value');
     this.singleBlockModeBtn = this.page.locator('umb-property-layout').filter({hasText: 'Single block mode'}).locator('#toggle');
     this.liveEditingModeBtn = this.page.locator('umb-property-layout').filter({hasText: 'Live editing'}).locator('#toggle');
     this.inlineEditingModeBtn = this.page.locator('umb-property-layout').filter({hasText: 'Inline editing'}).locator('#toggle');

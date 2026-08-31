@@ -12,8 +12,11 @@ export class RedirectManagementApiHelper {
     return await response.json(); 
   }
 
+  /**
+   * @returns the raw {@link APIResponse}, not parsed JSON — the endpoint responds 200 with no body,
+   * and parsing that as JSON throws "Unexpected end of JSON input".
+   */
   async delete(id: string) {
-    // The endpoint responds 200 with no body — parsing it as JSON throws "Unexpected end of JSON input".
     return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/redirect-management/' + id);
   }
 
