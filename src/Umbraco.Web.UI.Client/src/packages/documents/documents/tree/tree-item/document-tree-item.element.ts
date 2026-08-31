@@ -85,10 +85,10 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		return html`<span
 			id="label"
 			slot="label"
-			class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}
-			@dblclick=${this._handleDblClick}>
-			${this._name}
-		</span>`;
+			class=${classMap({ draft: this._isDraft })}
+			@dblclick=${this._handleDblClick}
+			>${this._name}</span
+		>`;
 	}
 
 	protected override _renderLoadPrevButton() {
@@ -132,6 +132,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				flex-grow: 1;
 				flex-shrink: 1;
 			}
+
 			.peek-child {
 				position: relative;
 				display: block;
