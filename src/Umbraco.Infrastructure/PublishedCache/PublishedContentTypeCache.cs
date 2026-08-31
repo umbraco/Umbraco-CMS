@@ -376,7 +376,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             PublishedItemType.Content => _contentTypeService is null ? null : _contentTypeService.GetAsync(key).GetAwaiter().GetResult(),
             PublishedItemType.Element => _contentTypeService is null ? null : _contentTypeService.GetAsync(key).GetAwaiter().GetResult(),
             PublishedItemType.Media => _mediaTypeService?.Get(key),
-            PublishedItemType.Member => _memberTypeService?.Get(key),
+            PublishedItemType.Member => _memberTypeService?.GetAsync(key).GetAwaiter().GetResult(),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
         };
         if (contentType == null)
@@ -395,7 +395,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             PublishedItemType.Content => _contentTypeService is null ? null : _contentTypeService.GetAsync(alias).GetAwaiter().GetResult(),
             PublishedItemType.Element => _contentTypeService is null ? null : _contentTypeService.GetAsync(alias).GetAwaiter().GetResult(),
             PublishedItemType.Media => _mediaTypeService?.Get(alias),
-            PublishedItemType.Member => _memberTypeService?.Get(alias),
+            PublishedItemType.Member => _memberTypeService?.GetAsync(alias).GetAwaiter().GetResult(),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
         };
         if (contentType == null)
@@ -414,7 +414,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             PublishedItemType.Content => _contentTypeService is null ? null : _contentTypeService.GetAsync(id).GetAwaiter().GetResult(),
             PublishedItemType.Element => _contentTypeService is null ? null : _contentTypeService.GetAsync(id).GetAwaiter().GetResult(),
             PublishedItemType.Media => _mediaTypeService?.Get(id),
-            PublishedItemType.Member => _memberTypeService?.Get(id),
+            PublishedItemType.Member => _memberTypeService?.GetAsync(id).GetAwaiter().GetResult(),
             _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
         };
         if (contentType == null)

@@ -31,7 +31,7 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
 
         // re-get
-        memberType = MemberTypeService.Get(memberType.Id);
+        memberType = await MemberTypeService.GetAsync(memberType.Id);
         foreach (var p in memberType.PropertyTypes)
         {
             Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
@@ -48,7 +48,7 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         await MemberTypeService.UpdateAsync(memberType, Constants.Security.SuperUserKey);
 
         // re-get
-        memberType = MemberTypeService.Get(memberType.Id);
+        memberType = await MemberTypeService.GetAsync(memberType.Id);
         foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
         {
             Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
@@ -64,7 +64,7 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
 
         // re-get
-        memberType = MemberTypeService.Get(memberType.Id);
+        memberType = await MemberTypeService.GetAsync(memberType.Id);
         foreach (var p in memberType.PropertyTypes)
         {
             Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
@@ -81,7 +81,7 @@ internal sealed class MemberTypeServiceTests : UmbracoIntegrationTest
         await MemberTypeService.UpdateAsync(memberType, Constants.Security.SuperUserKey);
 
         // re-get
-        memberType = MemberTypeService.Get(memberType.Id);
+        memberType = await MemberTypeService.GetAsync(memberType.Id);
         foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
         {
             Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));

@@ -1846,7 +1846,7 @@ public static class PublishedContentExtensions
     {
         IContentTypeBase? type = contentTypeService.GetAsync(alias).GetAwaiter().GetResult()
                                  ?? mediaTypeService.Get(alias)
-                                 ?? (IContentTypeBase?)memberTypeService.Get(alias);
+                                 ?? (IContentTypeBase?)memberTypeService.GetAsync(alias).GetAwaiter().GetResult();
         Dictionary<string, string> fields = GetAliasesAndNames(type);
 
         // ensure the standard fields are there
