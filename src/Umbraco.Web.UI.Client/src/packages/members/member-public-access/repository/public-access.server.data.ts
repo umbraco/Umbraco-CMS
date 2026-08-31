@@ -6,7 +6,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Document Public Access that fetches data from the server
  * @class UmbDocumentPublicAccessServerDataSource
- * @implements {RepositoryDetailDataSource}
  */
 export class UmbDocumentPublicAccessServerDataSource {
 	#host: UmbControllerHost;
@@ -22,8 +21,8 @@ export class UmbDocumentPublicAccessServerDataSource {
 
 	/**
 	 * Creates the Public Access for the given Document unique
-	 * @param {string} unique
-	 * @param {PublicAccessRequestModel} data
+	 * @param {string} unique - The unique identifier of the Document
+	 * @param {PublicAccessRequestModel} data - The Public Access settings to create
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
 	async create(unique: string, data: PublicAccessRequestModel) {
@@ -33,7 +32,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 
 	/**
 	 * Fetches the Public Access for the given Document unique
-	 * @param {string} unique
+	 * @param {string} unique - The unique identifier of the Document
 	 * @param {boolean} includeAncestors - Whether to include ancestor Public Access settings in the response
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
@@ -41,14 +40,16 @@ export class UmbDocumentPublicAccessServerDataSource {
 		if (!unique) throw new Error('unique is missing');
 		// NOTE: The entity will not be present, when fetching Public Access for a descendant of a protected Document.
 		//       This is a perfectly valid scenario, which is handled in the view. In other words, just use tryExecute here.
-		return tryExecute(this.#host, DocumentService.getDocumentByIdPublicAccess({ path: { id: unique }, query: { includeAncestors } }));
+		return tryExecute(
+			this.#host,
+			DocumentService.getDocumentByIdPublicAccess({ path: { id: unique }, query: { includeAncestors } }),
+		);
 	}
 
 	/**
 	 * Updates Public Access for the given Document unique
-	 * @param {string} unique
-	 * @param {PublicAccessRequestModel} data
-	 * @param body
+	 * @param {string} unique - The unique identifier of the Document
+	 * @param {PublicAccessRequestModel} body - The Public Access settings to update
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
 	async update(unique: string, body: PublicAccessRequestModel) {
@@ -58,7 +59,7 @@ export class UmbDocumentPublicAccessServerDataSource {
 
 	/**
 	 * Deletes Public Access for the given Document unique
-	 * @param {string} unique
+	 * @param {string} unique - The unique identifier of the Document
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
 	async delete(unique: string) {

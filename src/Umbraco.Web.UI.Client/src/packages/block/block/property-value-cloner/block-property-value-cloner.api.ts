@@ -9,8 +9,7 @@ export type UmbBlockPropertyValueClonerArgs = {
 export abstract class UmbBlockPropertyValueCloner<
 	ValueType extends UmbBlockValueType,
 	LayoutEntryType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
-> implements UmbPropertyValueCloner<ValueType>
-{
+> implements UmbPropertyValueCloner<ValueType> {
 	#contentIdUpdatedCallback?: UmbBlockPropertyValueClonerArgs['contentIdUpdatedCallback'];
 
 	#propertyEditorAlias: string;

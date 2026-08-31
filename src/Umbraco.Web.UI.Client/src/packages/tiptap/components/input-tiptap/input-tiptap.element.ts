@@ -11,6 +11,7 @@ import {
 	customElement,
 	html,
 	property,
+	query,
 	repeat,
 	state,
 	unsafeCSS,
@@ -39,7 +40,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	// modal portal, not as descendants of this element, so context is the only channel that reaches
 	// them; upwards it is a property and an `interaction-memories-change` event.
 	readonly #interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
-	readonly #interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(this, this.#interactionMemoryScope.memory);
+	readonly #interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(
+		this,
+		this.#interactionMemoryScope.memory,
+	);
 
 	/**
 	 * The memories held by the modals opened from this input, e.g. the last-used folder in a media
@@ -114,6 +118,21 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	@state()
 	private _statusbar: UmbTiptapStatusbarValue = [[], []];
 
+	@state()
+	private _scrolling = false;
+
+	@query('umb-tiptap-toolbar')
+	private _toolbarElement?: HTMLElement;
+
+	// Detects the toolbar sticking by watching it drop below full visibility,
+	// regardless of which ancestor is the one actually scrolling.
+	#scrollObserver = new IntersectionObserver(
+		([entry]) => {
+			this._scrolling = entry.intersectionRatio < 1;
+		},
+		{ threshold: 1 },
+	);
+
 	constructor() {
 		super();
 
@@ -129,6 +148,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		this.#observeStylesheetRootPath();
 		await this.#loadExtensions();
 		await this.#loadEditor();
+		await this.updateComplete;
+		if (this._toolbarElement) this.#scrollObserver.observe(this._toolbarElement);
 	}
 
 	protected override updated(changedProperties: Map<string, unknown>) {
@@ -295,7 +316,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				data-mark="tiptap-toolbar"
 				.toolbar=${this._toolbar}
 				.editor=${this._editor}
-				.configuration=${this.configuration}>
+				.configuration=${this.configuration}
+				.scrolling=${this._scrolling}>
 			</umb-tiptap-toolbar>
 		`;
 	}
@@ -316,6 +338,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	override destroy(): void {
 		this._editor?.destroy();
 		this._editor = undefined;
+		this.#scrollObserver.disconnect();
 	}
 
 	static override readonly styles = [

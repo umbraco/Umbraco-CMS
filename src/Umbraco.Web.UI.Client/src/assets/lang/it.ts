@@ -302,6 +302,8 @@ export default {
 		isSensitiveValue:
 			"Questo valore è nascosto. Se hai bisogno dell'accesso per visualizzare questo valore contatta l'amministratore del sito.",
 		isSensitiveValue_short: 'Questo valore è nascosto.',
+		isSensitiveValueNotice:
+			"Se hai bisogno dell'accesso per visualizzare i valori nascosti contatta l'amministratore del sito.",
 		languagesToPublishForFirstTime:
 			'Quali lingue vorresti pubblicare? Tutte le lingue con contenuto vengono\n      salvate!\n    ',
 		languagesToPublish: 'Quali lingue vorresti pubblicare?',
@@ -347,6 +349,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Clicca per caricare',
+		browseFilesAction: 'Sfoglia file',
+		dropFilesOr: 'Trascina qui i file multimediali<br />o',
 		orClickHereToUpload: 'o clicca qui per scegliere i files',
 		dragFilesHereToUpload: 'Puoi trascinare i file qui per caricarli.',
 		disallowedFileType: 'Impossibile caricare questo file, non ha un tipo di file approvato',
@@ -783,6 +787,8 @@ export default {
 		new: 'Nuovo',
 		next: 'Successivo',
 		no: 'No',
+		noResults: 'Nessun risultato',
+		noResultsFor: (query: string) => `Nessun risultato per "${query}".`,
 		of: 'di',
 		off: 'Off',
 		ok: 'Ok',
@@ -1580,8 +1586,10 @@ export default {
 		tabHasNoSortOrder: 'la scheda non ha un ordine',
 		compositionUsageHeading: 'Dove è usata questa composizione?',
 		compositionUsageSpecification: 'Questa composizione è usata nella composizione dei seguenti tipi di contenuto:',
-		compositionUsageSpecificationMediaType: 'Questa composizione è usata nella composizione dei seguenti tipi di media:',
-		compositionUsageSpecificationMemberType: 'Questa composizione è usata nella composizione dei seguenti tipi di membro:',
+		compositionUsageSpecificationMediaType:
+			'Questa composizione è usata nella composizione dei seguenti tipi di media:',
+		compositionUsageSpecificationMemberType:
+			'Questa composizione è usata nella composizione dei seguenti tipi di membro:',
 		variantsHeading: 'Consenti variazioni',
 		cultureVariantHeading: 'Consenti variazioni in base alla lingua',
 		segmentVariantHeading: 'Consenti segmentazione',
@@ -2302,5 +2310,10 @@ export default {
 	treeSearch: {
 		searchResult: 'oggetto trovato',
 		searchResults: 'oggetti trovati',
+	},
+	picker: {
+		browseTab: 'Sfoglia',
+		searchTab: 'Cerca',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'elemento selezionato' : 'elementi selezionati'}`,
 	},
 } as UmbLocalizationDictionary;
