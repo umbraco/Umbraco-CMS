@@ -198,9 +198,13 @@ export class DocumentApiHelper {
   async getDocumentUrlByCulture(id: string, culture: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
     const urls = await response.json();
-    const urlInfo = urls[0].urlInfos.find(info => info.culture === culture);
+    const urlInfo = urls[0]?.urlInfos?.find(info => info.culture === culture);
 
-    return urlInfo ? urlInfo.url : null;
+    if (!urlInfo?.url) {
+      throw new Error(`No URL found for document '${id}' and culture '${culture}'.`);
+    }
+
+    return urlInfo.url;
   }
 
   async moveToRecycleBin(id: string) {
@@ -1628,6 +1632,8 @@ export class DocumentApiHelper {
   }
 
   async createVariantDocumentWithTemplateAndParent(documentTypeId: string, templateId: string, name: string, cultures: string[], parentId?: string) {
+    await this.ensureNameNotExists(name);
+
     const documentBuilder = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
       .withTemplateId(templateId);
