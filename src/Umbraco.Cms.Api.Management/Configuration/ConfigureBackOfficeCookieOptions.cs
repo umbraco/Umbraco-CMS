@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using OpenIddict.Abstractions;
-using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -141,15 +140,13 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 // ensure the thread culture is set
                 backOfficeIdentity?.EnsureCulture();
 
-                EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
-
-                // An explicit keep-alive request renews the ticket for an actively-working user,
-                // regardless of KeepUserLoggedIn. This is what lets the session-timeout warning offer
-                // a working "Stay logged in" action even when the session has a fixed expiry.
-                // Scoped strictly to this one endpoint so we never set ShouldRenew unconditionally
-                // (see the note below the SecurityStampValidator call — that would break the
-                // validation-interval behaviour and AllowConcurrentLogins enforcement).
-                if (ctx.Request.Path.StartsWithSegments(Paths.BackOfficeApi.KeepAliveEndpoint, StringComparison.OrdinalIgnoreCase))
+                // Any request bearing a valid back-office identity renews the ticket. This is safe for
+                // AllowConcurrentLogins enforcement: ConfigureSecurityStampOptions forces ValidationInterval
+                // to zero when concurrent logins are disallowed, so the stamp check below still runs on
+                // effectively every request (any positive time gap exceeds a zero interval) regardless of
+                // how often we reset IssuedUtc here. What matters is that the reset below stays *after* the
+                // ValidateAsync call, so this request's own interval check reads the pre-renewal IssuedUtc.
+                if (backOfficeIdentity != null)
                 {
                     ctx.ShouldRenew = true;
                 }
@@ -169,14 +166,11 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
 
                 await securityStampValidator.ValidateAsync(ctx);
 
-                // Only reset timestamps when a renewal was already triggered (by the SecurityStampValidator
-                // or by EnsureTicketRenewalIfKeepUserLoggedIn above).
+                // Only reset timestamps when a renewal was actually triggered (i.e. there was a valid
+                // identity, or the SecurityStampValidator decided to refresh the principal on its own).
                 // When the SecurityStampValidator refreshes the principal, it sets ShouldRenew but updates
                 // IssuedUtc without updating ExpiresUtc, causing the effective cookie lifetime to shrink
                 // with each validation. The manual reset here fixes that drift.
-                // IMPORTANT: Do NOT unconditionally set ShouldRenew or reset IssuedUtc - doing so prevents
-                // the SecurityStampValidator from ever exceeding its ValidationInterval during active use,
-                // which breaks AllowConcurrentLogins enforcement.
                 if (ctx.ShouldRenew)
                 {
                     DateTimeOffset now = _timeProvider.GetUtcNow();
@@ -326,33 +320,4 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
     // when authorizing clients like Postman or Swagger UI.
     private static bool ShouldBeTreatedAsXhr(HttpRequest request)
         => IsXhr(request) || (IsManagementApiRequest(request) && HasClientId(request) is false);
-
-    /// <summary>
-    ///     Ensures the ticket is renewed if the <see cref="SecuritySettings.KeepUserLoggedIn" /> is set to true
-    ///     and the current request is for the get user seconds endpoint
-    /// </summary>
-    /// <param name="context">The <see cref="CookieValidatePrincipalContext" /></param>
-    private void EnsureTicketRenewalIfKeepUserLoggedIn(CookieValidatePrincipalContext context)
-    {
-        if (!_securitySettings.KeepUserLoggedIn)
-        {
-            return;
-        }
-
-        DateTimeOffset currentUtc = _timeProvider.GetUtcNow();
-        DateTimeOffset? issuedUtc = context.Properties.IssuedUtc;
-        DateTimeOffset? expiresUtc = context.Properties.ExpiresUtc;
-
-        if (expiresUtc.HasValue && issuedUtc.HasValue)
-        {
-            TimeSpan timeElapsed = currentUtc.Subtract(issuedUtc.Value);
-            TimeSpan timeRemaining = expiresUtc.Value.Subtract(currentUtc);
-
-            // if it's time to renew, then do it
-            if (timeRemaining < timeElapsed)
-            {
-                context.ShouldRenew = true;
-            }
-        }
-    }
 }
