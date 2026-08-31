@@ -72,6 +72,7 @@ export class UmbEntityRecycleBin<MockType extends UmbMockRecycleBinnableModel> {
 		const models = ids.map((id) => this.read(id)).filter((model) => !!model) as Array<MockType>;
 
 		models.forEach((model) => {
+			if (!model.isTrashed) return;
 			model.parent = destination !== undefined ? destination : (model.originalParent ?? null);
 			model.originalParent = null;
 			model.isTrashed = false;
