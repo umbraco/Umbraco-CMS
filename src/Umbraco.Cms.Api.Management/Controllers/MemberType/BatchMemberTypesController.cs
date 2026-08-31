@@ -45,7 +45,7 @@ public class BatchMemberTypesController : MemberTypeControllerBase
             return Ok(new BatchResponseModel<MemberTypeResponseModel>());
         }
 
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(requestedIds);
+        IEnumerable<IMemberType> memberTypes = await _memberTypeService.GetManyAsync(requestedIds);
 
         List<IMemberType> ordered = OrderByRequestedIds(memberTypes, requestedIds);
 

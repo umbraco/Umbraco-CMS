@@ -183,7 +183,7 @@ public class UmbProfileControllerTests
         _memberServiceMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(member.Object);
 
         var memberType = new Mock<IMemberType>();
-        _memberTypeServiceMock.Setup(x => x.Get(It.IsAny<int>())).Returns(memberType.Object);
+        _memberTypeServiceMock.Setup(x => x.GetAsync(It.IsAny<int>())).ReturnsAsync(memberType.Object);
     }
 
     private UmbProfileController CreateController()

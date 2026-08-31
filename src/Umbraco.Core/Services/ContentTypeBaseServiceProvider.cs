@@ -59,7 +59,7 @@ public class ContentTypeBaseServiceProvider : IContentTypeBaseServiceProvider
             case IMedia _:
                 return _mediaTypeService.Get(contentBase.Key);
             case IMember _:
-                return _memberTypeService.Get(contentBase.Key);
+                return _memberTypeService.GetAsync(contentBase.Key).GetAwaiter().GetResult();
             default:
                 throw new ArgumentException(
                     $"Invalid contentBase type: {contentBase.GetType().FullName}",

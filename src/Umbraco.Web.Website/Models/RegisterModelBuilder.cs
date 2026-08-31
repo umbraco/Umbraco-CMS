@@ -54,7 +54,7 @@ public class RegisterModelBuilder : MemberModelBuilderBase
     public RegisterModel Build()
     {
         var providedOrDefaultMemberTypeAlias = _memberTypeAlias ?? Constants.Conventions.MemberTypes.DefaultAlias;
-        IMemberType? memberType = MemberTypeService.Get(providedOrDefaultMemberTypeAlias);
+        IMemberType? memberType = MemberTypeService.GetAsync(providedOrDefaultMemberTypeAlias).GetAwaiter().GetResult();
         if (memberType == null)
         {
             throw new InvalidOperationException(

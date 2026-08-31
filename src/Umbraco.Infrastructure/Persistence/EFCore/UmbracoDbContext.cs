@@ -96,6 +96,8 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<PropertyTypeDto> PropertyTypes { get; set; }
 
+    public required DbSet<MemberPropertyTypeDto> MemberPropertyTypes { get; set; }
+
     public required DbSet<DataTypeDto> DataTypes { get; set; }
 
     public required DbSet<RedirectUrlDto> RedirectUrls { get; set; }

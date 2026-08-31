@@ -45,16 +45,16 @@ public class SearchMemberTypeItemController : MemberTypeItemControllerBase
     [ProducesResponseType(typeof(PagedModel<MemberTypeItemResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Searches member type items.")]
     [EndpointDescription("Searches member type items by the provided query with pagination support.")]
-    public Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
+    public async Task<IActionResult> Search(CancellationToken cancellationToken, string query, int skip = 0, int take = 100)
     {
         PagedModel<IEntitySlim> searchResult = _entitySearchService.Search(UmbracoObjectTypes.MemberType, query, skip, take);
         if (searchResult.Items.Any() is false)
         {
-            return Task.FromResult<IActionResult>(Ok(new PagedModel<MemberTypeItemResponseModel> { Total = searchResult.Total }));
+            return Ok(new PagedModel<MemberTypeItemResponseModel> { Total = searchResult.Total });
         }
 
         Guid[] keys = searchResult.Items.Select(item => item.Key).ToArray();
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(keys);
+        IEnumerable<IMemberType> memberTypes = await _memberTypeService.GetManyAsync(keys);
         IEnumerable<IMemberType> orderedMemberTypes = OrderByRequestedIds(memberTypes, keys);
 
         var result = new PagedModel<MemberTypeItemResponseModel>
@@ -63,6 +63,6 @@ public class SearchMemberTypeItemController : MemberTypeItemControllerBase
             Total = searchResult.Total,
         };
 
-        return Task.FromResult<IActionResult>(Ok(result));
+        return Ok(result);
     }
 }

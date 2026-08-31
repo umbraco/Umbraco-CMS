@@ -11,6 +11,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -27,7 +29,8 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
     {
         var commonRepository = GetRequiredService<IContentTypeCommonRepository>();
         var languageRepository = GetRequiredService<ILanguageRepository>();
-        return new MemberTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
+        var efCoreScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
+        return new MemberTypeRepository(AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>(), efCoreScopeAccessor);
     }
 
     [Test]
@@ -271,6 +274,30 @@ internal sealed class MemberTypeRepositoryTest : UmbracoIntegrationTest
             var m2Ids = memberType2.PropertyTypes.Select(x => x.Id).ToArray();
 
             Assert.IsFalse(m1Ids.Any(m2Ids.Contains));
+        }
+    }
+
+    [Test]
+    public void Can_Persist_Member_Type_Property_Metadata()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+
+            var memberType = (MemberType)MemberTypeBuilder.CreateSimpleMemberType();
+            memberType.SetMemberCanEditProperty("title", true);
+            memberType.SetMemberCanViewProperty("title", false);
+            memberType.SetIsSensitiveProperty("title", true);
+
+            repository.Save(memberType);
+            scope.Complete();
+
+            var sut = (MemberType)repository.Get(memberType.Id);
+
+            Assert.That(sut.MemberCanEditProperty("title"), Is.True);
+            Assert.That(sut.MemberCanViewProperty("title"), Is.False);
+            Assert.That(sut.IsSensitiveProperty("title"), Is.True);
         }
     }
 
