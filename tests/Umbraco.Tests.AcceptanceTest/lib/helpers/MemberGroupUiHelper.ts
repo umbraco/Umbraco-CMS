@@ -44,8 +44,11 @@ export class MemberGroupUiHelper extends UiBaseLocators {
 
   async clickMemberGroupLinkByName(memberGroupName: string) {
     const memberGroupLink = this.page.getByRole('link', {name: memberGroupName});
+    // A group created via the API right before this runs can lag behind the sidebar's list; re-clicking
+    // an already-open sidebar button doesn't refetch it, so reload the page to force a fresh fetch.
     await expect(async () => {
       if (!(await memberGroupLink.isVisible())) {
+        await this.page.reload();
         await this.clickMemberGroupsSidebarButton();
       }
       await expect(memberGroupLink).toBeVisible({timeout: ConstantHelper.timeout.short});
