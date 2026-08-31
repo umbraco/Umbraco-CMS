@@ -137,19 +137,19 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				display: block;
 				flex-grow: 0;
 				flex-shrink: 0;
-				width: calc((1 + var(--umb-tree-item-indent, 0)) * var(--uui-size-4));
+				width: calc((2 + var(--umb-tree-item-indent, 0)) * var(--uui-size-4));
 			}
 			.peek-child::after {
 				content: '';
 				position: absolute;
 				z-index: 1;
-				top: 9px;
-				right: -7px;
-				border-left: 1px solid var(--uui-color-interactive);
-				border-bottom: 1px solid var(--uui-color-interactive);
+				top: -11px;
+				right: 3px;
+				border-left: 1px solid var(--uui-color-border-standalone);
+				border-bottom: 1px solid var(--uui-color-border-standalone);
 				border-bottom-left-radius: var(--uui-border-radius);
-				width: 9px;
-				height: 9px;
+				width: 16px;
+				height: 28px;
 			}
 		`,
 	];
