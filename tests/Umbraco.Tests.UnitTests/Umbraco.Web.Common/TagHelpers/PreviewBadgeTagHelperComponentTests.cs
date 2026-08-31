@@ -73,26 +73,11 @@ public class PreviewBadgeTagHelperComponentTests
         Assert.That(output.PostContent.GetContent(), Does.Contain(@"<script nonce=""s0m3-n0nc3"" src="""));
     }
 
-    [Test]
-    public void Badge_Omits_Nonce_When_Not_Available()
+    [TestCase(true, TestName = "Badge omits nonce when the service is registered but yields none")]
+    [TestCase(false, TestName = "Badge omits nonce when the service is not registered")]
+    public void Badge_Omits_Nonce_When_Unavailable(bool registerCspNonceService)
     {
-        PreviewBadgeTagHelperComponent component = CreateComponent(nonce: null);
-        TagHelperOutput output = CreateOutput("body");
-
-        component.Process(CreateContext(), output);
-
-        var content = output.PostContent.GetContent();
-        Assert.Multiple(() =>
-        {
-            Assert.That(content, Does.Contain(@"<script src="""));
-            Assert.That(content, Does.Not.Contain("nonce"));
-        });
-    }
-
-    [Test]
-    public void Badge_Omits_Nonce_When_Service_Is_Not_Registered()
-    {
-        PreviewBadgeTagHelperComponent component = CreateComponent(nonce: null, registerCspNonceService: false);
+        PreviewBadgeTagHelperComponent component = CreateComponent(nonce: null, registerCspNonceService);
         TagHelperOutput output = CreateOutput("body");
 
         component.Process(CreateContext(), output);

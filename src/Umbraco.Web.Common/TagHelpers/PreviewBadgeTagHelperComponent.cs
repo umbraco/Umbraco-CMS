@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Razor.TagHelpers;
@@ -60,9 +61,7 @@ public class PreviewBadgeTagHelperComponent : TagHelperComponent
             return;
         }
 
-        if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext) is false
-            || umbracoContext.InPreviewMode is false
-            || umbracoContext.PublishedRequest is null)
+        if (TryGetPreviewingUmbracoContext(out IUmbracoContext? umbracoContext) is false)
         {
             return;
         }
@@ -81,7 +80,12 @@ public class PreviewBadgeTagHelperComponent : TagHelperComponent
             // a valid culture code provided in the querystring of this URL. But just to be sure of prevention
             // of an XSS vulnerability we'll HTML encode here too. An expected URL is untouched by this encoding.
             System.Web.HttpUtility.HtmlEncode(httpContext.Request.GetEncodedUrl()),
-            umbracoContext.PublishedRequest.PublishedContent?.Key,
+            umbracoContext.PublishedRequest?.PublishedContent?.Key,
             _cspNonceService?.GetNonceAttribute() ?? string.Empty));
     }
+
+    private bool TryGetPreviewingUmbracoContext([NotNullWhen(true)] out IUmbracoContext? umbracoContext)
+        => _umbracoContextAccessor.TryGetUmbracoContext(out umbracoContext)
+           && umbracoContext.InPreviewMode
+           && umbracoContext.PublishedRequest is not null;
 }
