@@ -1,8 +1,9 @@
 !(() => {
   "use strict";
 
-  // Quick exit if within an iframe.
-  if (window.self !== window.top) return;
+  // Quick exit if within an iframe. Compared against `window` rather than `window.self`, because
+  // `self` is [Replaceable] — a site script assigning to it silently breaks this check (#23505).
+  if (window !== window.top) return;
 
   const styles = `
 .umbraco-preview-badge {
@@ -86,6 +87,7 @@
 
   class UmbWebsitePreviewElement extends HTMLElement {
     connectedCallback() {
+      if (this.shadowRoot) return;
       this.#render();
     }
 
@@ -140,5 +142,7 @@
     }
   }
 
-  window.customElements.define("umb-website-preview", UmbWebsitePreviewElement);
+  if (!window.customElements.get("umb-website-preview")) {
+    window.customElements.define("umb-website-preview", UmbWebsitePreviewElement);
+  }
 })();
