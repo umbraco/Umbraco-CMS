@@ -139,7 +139,7 @@ export abstract class UmbTreeItemElementBase<
 	@state()
 	protected _isSelected = false;
 
-	@state()
+	@property({ type: Boolean, attribute: 'has-children', reflect: true })
 	private _hasChildren = false;
 
 	@state()

@@ -104,16 +104,26 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		...UmbTreeItemElementBase.styles,
 		css`
 			:host {
-				--umb-tree-item-indent: calc(var(--uui-menu-item-indent, 0) + 1);
+				--uui-menu-item-flat-structure: 0;
+				--umb-tree-item-indent: var(--uui-menu-item-indent, 0);
 			}
 
-			/* A collapsible collection is peeked, not drilled into — its children stay at its own indent rather than one level deeper. */
-			:host([collection]) uui-menu-item::slotted(*:not([name])) {
-				--uui-menu-item-indent: var(--umb-tree-item-indent, 0);
-				--uui-menu-item-flat-structure: 1;
-			}
 			:host([collection]) uui-menu-item {
 				--uui-menu-item-child-indent: 0;
+			}
+			:host([has-children]) uui-menu-item {
+				--umb-menu-item-child-flat-structure: 0;
+			}
+			:host([collection]) uui-menu-item {
+				--umb-menu-item-child-flat-structure: 0;
+			}
+			:host(:not([collection]):not([has-children])) uui-menu-item {
+				--uui-menu-item-flat-structure: var(--umb-menu-item-child-flat-structure, 0);
+			}
+
+			:host([collection]) umb-tree-item {
+				--umb-menu-item-child-flat-structure: 1;
+				--umb-tree-item-indent: 0;
 			}
 
 			:host([draft]) #label {
@@ -143,14 +153,13 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			.peek-child::after {
 				content: '';
 				position: absolute;
-				z-index: 1;
 				top: -11px;
-				right: 3px;
+				right: -8px;
 				border-left: 1px solid var(--uui-color-border-standalone);
 				border-bottom: 1px solid var(--uui-color-border-standalone);
 				border-bottom-left-radius: var(--uui-border-radius);
-				width: 16px;
-				height: 28px;
+				width: 15px;
+				height: 29px;
 			}
 		`,
 	];
