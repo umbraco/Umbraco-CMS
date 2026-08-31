@@ -32,21 +32,19 @@ test.beforeEach(async ({umbracoApi}) => {
   const childDocumentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithTemplateAndAllowedChildNode(childDocumentTypeName, renderTemplateId, false, grandchildDocumentTypeId);
   const rootDocumentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithTemplateAndAllowedChildNode(rootDocumentTypeName, renderTemplateId, true, childDocumentTypeId);
 
-  rootContentId = await umbracoApi.document.createVariantDocumentWithParent(rootDocumentTypeId, renderTemplateId, rootContentName, cultures);
+  rootContentId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(rootDocumentTypeId, renderTemplateId, rootContentName, cultures);
   await umbracoApi.document.publishWithCultures(rootContentId, cultures);
-  const publishedChildId = await umbracoApi.document.createVariantDocumentWithParent(childDocumentTypeId, renderTemplateId, publishedChildName, cultures, rootContentId);
+  const publishedChildId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(childDocumentTypeId, renderTemplateId, publishedChildName, cultures, rootContentId);
   await umbracoApi.document.publishWithCultures(publishedChildId, cultures);
-  unpublishedChildId = await umbracoApi.document.createVariantDocumentWithParent(childDocumentTypeId, renderTemplateId, unpublishedChildName, cultures, rootContentId);
+  unpublishedChildId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(childDocumentTypeId, renderTemplateId, unpublishedChildName, cultures, rootContentId);
   await umbracoApi.document.publishWithCultures(unpublishedChildId, cultures);
-  const grandchildId = await umbracoApi.document.createVariantDocumentWithParent(grandchildDocumentTypeId, renderTemplateId, grandchildContentName, cultures, unpublishedChildId);
+  const grandchildId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(grandchildDocumentTypeId, renderTemplateId, grandchildContentName, cultures, unpublishedChildId);
   await umbracoApi.document.publishWithCultures(grandchildId, cultures);
 
-  const domainsData = await umbracoApi.document.getDomains(rootContentId);
-  domainsData.domains = [
+  await umbracoApi.document.updateDomainsForVariantDocument(rootContentId, [
     {domainName: '/en', isoCode: englishIsoCode},
     {domainName: '/da', isoCode: danishIsoCode}
-  ];
-  await umbracoApi.document.updateDomains(rootContentId, domainsData);
+  ]);
 });
 
 test.afterEach(async ({umbracoApi}) => {

@@ -1627,7 +1627,7 @@ export class DocumentApiHelper {
     return await this.publish(id, publishScheduleData);
   }
 
-  async createVariantDocumentWithParent(documentTypeId: string, templateId: string, name: string, cultures: string[], parentId?: string) {
+  async createVariantDocumentWithTemplateAndParent(documentTypeId: string, templateId: string, name: string, cultures: string[], parentId?: string) {
     const documentBuilder = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
       .withTemplateId(templateId);
