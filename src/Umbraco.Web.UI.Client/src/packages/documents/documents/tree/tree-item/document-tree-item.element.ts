@@ -88,7 +88,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			class=${classMap({ draft: this._isDraft, noAccess: this._noAccess })}
 			@dblclick=${this._handleDblClick}>
 			${this._name}
-		</span> `;
+		</span>`;
 	}
 
 	protected override _renderLoadPrevButton() {
