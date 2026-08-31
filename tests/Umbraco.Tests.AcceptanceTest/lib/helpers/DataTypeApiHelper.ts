@@ -1489,9 +1489,10 @@ export class DataTypeApiHelper {
     const dataTypeData = await this.getByName(dataTypeName);
     const itemsValue = dataTypeData.values.find(item => item.alias === 'items');
     const colorItem = itemsValue?.value?.find(item => item.value === color);
-    if (colorItem) {
-      colorItem.label = label;
+    if (!colorItem) {
+      throw new Error(`No item with color '${color}' found on data type '${dataTypeName}'.`);
     }
+    colorItem.label = label;
     return await this.update(dataTypeData.id, dataTypeData);
   }
 
