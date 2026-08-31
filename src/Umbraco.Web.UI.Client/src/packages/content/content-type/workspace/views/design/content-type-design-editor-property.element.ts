@@ -195,7 +195,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			return html`
 				<div id="header">
 					<umb-input-with-alias
-						name="name"
+						name="propertyTypeName"
 						id="name-alias-input"
 						required
 						.placeholder=${this.localize.term('placeholders_label')}
@@ -210,11 +210,10 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 					<slot name="action-menu"></slot>
 					<p>
 						<uui-textarea
-							label="description"
-							name="description"
 							data-mark="input:description"
 							id="description-input"
-							placeholder=${this.localize.term('placeholders_enterDescription')}
+							.label=${this.localize.term('general_description')}
+							.placeholder=${this.localize.term('placeholders_enterDescription')}
 							.value=${this.property.description ?? ''}
 							@input=${(e: CustomEvent) => {
 								if (e.target) this.#singleValueUpdate('description', (e.target as HTMLInputElement).value);
@@ -437,8 +436,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 			#header umb-input-with-alias {
 				--uui-input-border-color: transparent;
 			}
-			#name-alias-input,
-			#description-input {
+			#header umb-input-with-alias,
+			#header uui-textarea {
 				width: 100%;
 			}
 

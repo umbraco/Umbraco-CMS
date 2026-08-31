@@ -9,8 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoFixture.AutoMoq" />
-    <PackageReference Include="AutoFixture.NUnit3" />
     <PackageReference Include="Moq" />
     <PackageReference Include="NUnit" />
   </ItemGroup>

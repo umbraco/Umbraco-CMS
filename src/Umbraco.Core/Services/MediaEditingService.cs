@@ -87,7 +87,15 @@ internal sealed class MediaEditingService
 
     /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MediaCreateModel createModel)
-        => await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
+    {
+        ContentEditingOperationStatus creationAllowedStatus = await ValidateCreationAllowedAsync(createModel);
+        if (creationAllowedStatus != ContentEditingOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(creationAllowedStatus, new ContentValidationResult());
+        }
+
+        return await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<MediaCreateResult, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
@@ -162,20 +170,32 @@ internal sealed class MediaEditingService
         => await HandleMoveAsync(key, parentKey, userKey);
 
     /// <inheritdoc />
+    [Obsolete("Use the overload that takes an includeDescendants parameter instead. Scheduled for removal in Umbraco 19.")]
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleMoveAsync(key, parentKey, userKey, true);
+        => await RestoreAsync(key, parentKey, userKey, true);
+
+    /// <inheritdoc />
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey, bool includeDescendants)
+        => await HandleMoveAsync(key, parentKey, userKey, true, includeDescendants);
 
     /// <inheritdoc />
     public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
     /// <inheritdoc />
+    public async Task<ContentEditingOperationStatus> SortByFieldAsync(Guid? parentKey, ContentSortField field, Direction direction, Guid userKey)
+
+        // Media never varies by culture, so children are always ordered by the invariant name.
+        => await HandleSortByFieldAsync(parentKey, field, direction, culture: null, userKey);
+
+
+    /// <inheritdoc />
     protected override IMedia New(string name, int parentId, IMediaType mediaType)
         => new Models.Media(name, parentId, mediaType);
 
     /// <inheritdoc />
-    protected override OperationResult? Move(IMedia media, int newParentId, int userId)
-        => ContentService.Move(media, newParentId, userId).Result;
+    protected override OperationResult? Move(IMedia media, int newParentId, bool includeDescendants, int userId)
+        => ContentService.Move(media, newParentId, includeDescendants, userId).Result;
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException">Copy is not supported for media items.</exception>
@@ -191,8 +211,8 @@ internal sealed class MediaEditingService
         => ContentService.Delete(media, userId).Result;
 
     /// <inheritdoc />
-    protected override IEnumerable<IMedia> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total)
-        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total);
+    protected override IEnumerable<IMedia> GetPagedChildren(int parentId, int pageIndex, int pageSize, Ordering? ordering, out long total)
+        => ContentService.GetPagedChildren(parentId, pageIndex, pageSize, out total, filter: null, ordering: ordering);
 
     /// <inheritdoc />
     protected override ContentEditingOperationStatus Sort(IEnumerable<IMedia> items, int userId)
@@ -201,6 +221,13 @@ internal sealed class MediaEditingService
         return result
             ? ContentEditingOperationStatus.Success
             : ContentEditingOperationStatus.CancelledByNotification;
+    }
+
+    /// <inheritdoc />
+    protected override ContentEditingOperationStatus SortChildrenInBulk(int parentId, IReadOnlyList<int> orderedChildIds, int userId)
+    {
+        OperationResult result = ContentService.SortChildren(parentId, orderedChildIds, userId);
+        return OperationResultToOperationStatus(result);
     }
 
     /// <summary>

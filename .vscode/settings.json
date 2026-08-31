@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "backoffice",
+    "drillable",
     "pickable",
     "Pickable",
     "Umbraco",
@@ -11,5 +12,8 @@
   "eslint.workingDirectories": [
     "./src/Umbraco.Web.UI.Client/",
     "./src/Umbraco.Web.UI.Login/"
-  ]
+  ],
+  "sonarlint.connectedMode.project": {
+    "projectKey": "umbraco_Umbraco-CMS"
+  }
 }

@@ -3,7 +3,7 @@
 TypeScript/Lit login SPA for Umbraco CMS backoffice authentication. Provides the `<umb-auth>` web component used in the login page, supporting local login, MFA, password reset, and user invitation flows.
 
 **Project Type**: TypeScript Library (Vite)
-**Runtime**: Node.js (see `.nvmrc`), npm >= 10.9
+**Runtime**: Node.js >= 24.13, npm >= 11
 **Output**: ES Module library → `../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login/`
 **Dependencies**: Lit, Vite, MSW (Login does **not** declare an npm dep on `@umbraco-cms/backoffice` — see below)
 
@@ -11,7 +11,7 @@ TypeScript/Lit login SPA for Umbraco CMS backoffice authentication. Provides the
 
 ## ⚠️ Type resolution against the sibling Umbraco.Web.UI.Client
 
-Login uses the in-repo Client's TypeScript source for types via **generated `tsconfig.json` path aliases**, not via an npm dependency. This keeps Login's types aligned with the in-repo v18 backoffice (UUI 2.0 etc.) without waiting for an npm release.
+Login uses the in-repo Client's TypeScript source for types via **generated `tsconfig.json` path aliases**, not via an npm dependency. This keeps Login's types aligned with the in-repo backoffice of whichever branch it sits on (UUI 2.x etc.) without waiting for an npm release.
 
 **The three layers:**
 
@@ -215,10 +215,11 @@ Form waits for localization availability before rendering. Retries 40 times with
 
 ### External Dependencies
 
-- `@umbraco-cms/backoffice` - Umbraco UI components, Lit element base, backoffice API services
 - `vite` - Build tooling
 - `typescript` - Type checking
 - `msw` - API mocking (dev only)
+
+`@umbraco-cms/backoffice` is **not** an npm dependency — its types resolve from the sibling Client's source via generated tsconfig path aliases. It supplies the UI components, the Lit element base, and the backoffice API services (`SecurityService`, `UserService`) that replaced the generated client.
 
 ### Known Technical Debt
 
@@ -277,4 +278,4 @@ Built files go to:
 | -------------------------- | ------------------------------------- |
 | `Umbraco.Cms.StaticAssets` | Receives built output                 |
 | `Umbraco.Web.UI.Client`    | Backoffice SPA (similar architecture) |
-| `@umbraco-cms/backoffice`  | NPM dependency for UI components      |
+| `@umbraco-cms/backoffice`  | Type source via tsconfig path aliases (not an npm dep) |

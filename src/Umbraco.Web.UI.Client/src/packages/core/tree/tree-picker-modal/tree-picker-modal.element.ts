@@ -1,14 +1,38 @@
 import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
 import type { UmbTreeElement } from '../tree.element.js';
-import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
+import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbTreeStartNode } from '../types.js';
+import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
+import type { ManifestTree } from '../extensions/types.js';
+import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
-import { customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	customElement,
+	html,
+	ifDefined,
+	nothing,
+	query,
+	repeat,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
+import { UmbPickerModalBaseElement, type UmbPickerSearchFieldElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+
+const TREE_MEMORY_UNIQUE = 'UmbTreeItemPickerTree';
+const LOCATION_MEMORY_UNIQUE = 'UmbTreeItemPickerLocation';
+
+interface UmbTreeBreadcrumbItem {
+	unique: string | null;
+	entityType: string;
+	name: string;
+}
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbPickerModalBaseElement<
@@ -27,33 +51,69 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	private _hasSelection: boolean = false;
 
 	@state()
+	private _selectionCount: number = 0;
+
+	@state()
 	private _createPath?: string;
 
 	@state()
 	private _createLabel?: string;
 
 	@state()
-	private _searchQuery?: string;
+	private _isSearchable: boolean = false;
+
+	@state()
+	private _activeTab: 'browse' | 'search' = 'browse';
 
 	@state()
 	private _treeExpansion: UmbEntityExpansionModel = [];
+
+	@state()
+	private _treeInteractionMemories?: Array<UmbInteractionMemoryModel>;
+
+	@state()
+	private _currentLocation?: UmbTreeStartNode;
+
+	@state()
+	private _breadcrumb: Array<UmbTreeBreadcrumbItem> = [];
+
+	@query('umb-picker-search-field')
+	private _searchField?: UmbPickerSearchFieldElement;
+
+	@state()
+	private _treeAlias?: string;
+	private _initialStartNode?: UmbTreeStartNode;
+	private _repository?: UmbTreeRepository;
+	private _breadcrumbLoaded = false;
+	private _breadcrumbLoadPromise?: Promise<void>;
 
 	protected _pickerContext = new UmbTreeItemPickerContext(this);
 
 	constructor() {
 		super();
 		this._pickerContext.selection.setSelectable(true);
-		this.observe(this._pickerContext.selection.hasSelection, (hasSelection) => {
-			this._hasSelection = hasSelection;
-		});
+		this.observe(
+			this._pickerContext.selection.hasSelection,
+			(hasSelection) => {
+				this._hasSelection = hasSelection;
+			},
+			null,
+		);
 		this.#observePickerSelection();
 		this.#observeSearch();
 		this.#observeExpansion();
+		this.#observeTreeInteractionMemories();
 	}
 
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#initCreateAction();
+		this.addEventListener(UmbTreeItemOpenEvent.TYPE, this.#onTreeItemOpen);
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.removeEventListener(UmbTreeItemOpenEvent.TYPE, this.#onTreeItemOpen);
 	}
 
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
@@ -75,6 +135,20 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				...this._selectionConfiguration,
 				multiple,
 			};
+
+			if (this.data?.treeAlias && this.data.treeAlias !== this._treeAlias) {
+				this._treeAlias = this.data.treeAlias;
+				this._initialStartNode = this.data.startNode;
+				this._currentLocation = this.data.startNode;
+				this._breadcrumb = [];
+				this._breadcrumbLoaded = false;
+				this._breadcrumbLoadPromise = undefined;
+				this.#initRepository(this.data.treeAlias);
+			}
+
+			if (this.data?.treeExpansion !== undefined) {
+				this._pickerContext.expansion.setExpansion(this.data.treeExpansion);
+			}
 		}
 
 		if (_changedProperties.has('value')) {
@@ -87,10 +161,141 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		}
 	}
 
+	#initRepository(treeAlias: string) {
+		const treeManifest = umbExtensionsRegistry.getByAlias<ManifestTree>(treeAlias);
+		const repositoryAlias = treeManifest?.meta?.repositoryAlias;
+		if (!repositoryAlias) return;
+
+		new UmbExtensionApiInitializer<ManifestRepository<UmbTreeRepository>>(
+			this,
+			umbExtensionsRegistry,
+			repositoryAlias,
+			[this],
+			async (permitted, ctrl) => {
+				this._repository = permitted ? ctrl.api : undefined;
+				if (this._repository && !this._breadcrumbLoaded) {
+					this._breadcrumbLoaded = true;
+					this._breadcrumbLoadPromise = this.#loadInitialBreadcrumb();
+					await this._breadcrumbLoadPromise;
+					await this.#restoreLocationFromMemory();
+				}
+			},
+		);
+	}
+
+	async #loadInitialBreadcrumb() {
+		if (!this._repository) return;
+
+		if (this._initialStartNode) {
+			const { data } = await this._repository.requestTreeItemAncestors({
+				treeItem: this._initialStartNode,
+			});
+			const items = data ?? [];
+			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
+			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
+			this._breadcrumb = sliced.map((item) => ({
+				unique: item.unique,
+				entityType: item.entityType,
+				name: item.name,
+			}));
+		} else {
+			const { data: root } = await this._repository.requestTreeRoot();
+			if (root) {
+				this._breadcrumb = [{ unique: null, entityType: root.entityType, name: root.name }];
+			}
+		}
+	}
+
+	#onTreeItemOpen = async (event: UmbTreeItemOpenEvent) => {
+		event.stopPropagation();
+		const { unique, entityType } = event;
+		await this.#navigateToLocation({ unique, entityType });
+		this.#setLocationInInteractionMemory();
+	};
+
+	async #navigateToLocation(entity: UmbTreeStartNode) {
+		this._currentLocation = entity;
+		if (!this._repository) return;
+
+		await this._breadcrumbLoadPromise;
+
+		const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
+		const items = data ?? [];
+
+		if (this._initialStartNode) {
+			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
+			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
+			this._breadcrumb = sliced.map((item) => ({
+				unique: item.unique,
+				entityType: item.entityType,
+				name: item.name,
+			}));
+		} else {
+			const root = this._breadcrumb[0];
+			this._breadcrumb = [
+				...(root ? [root] : []),
+				...items.map((item) => ({
+					unique: item.unique,
+					entityType: item.entityType,
+					name: item.name,
+				})),
+			];
+		}
+	}
+
+	#setLocationInInteractionMemory() {
+		if (!this._currentLocation) {
+			this._pickerContext.interactionMemory.deleteMemory(LOCATION_MEMORY_UNIQUE);
+			return;
+		}
+		const memory: UmbInteractionMemoryModel = {
+			unique: LOCATION_MEMORY_UNIQUE,
+			value: {
+				entity: {
+					unique: this._currentLocation.unique,
+					entityType: this._currentLocation.entityType,
+				},
+			},
+		};
+		this._pickerContext.interactionMemory.setMemory(memory);
+	}
+
+	#getLocationFromInteractionMemory(): UmbTreeStartNode | undefined {
+		const memory = this._pickerContext.interactionMemory.getMemory(LOCATION_MEMORY_UNIQUE);
+		return memory?.value?.entity;
+	}
+
+	async #restoreLocationFromMemory() {
+		const entity = this.#getLocationFromInteractionMemory();
+		if (!entity || !this._repository) return;
+
+		if (this._initialStartNode) {
+			const { data } = await this._repository.requestTreeItemAncestors({ treeItem: entity });
+			const isWithinStartNode = (data ?? []).some((a) => a.unique === this._initialStartNode!.unique);
+			if (!isWithinStartNode) return;
+		}
+
+		await this.#navigateToLocation(entity);
+	}
+
+	#onBreadcrumbItemClick(index: number) {
+		if (index === this._breadcrumb.length - 1) return;
+
+		const item = this._breadcrumb[index];
+		if (index === 0 && !this._initialStartNode) {
+			this._currentLocation = undefined;
+		} else {
+			this._currentLocation = { unique: item.unique!, entityType: item.entityType };
+		}
+		this._breadcrumb = this._breadcrumb.slice(0, index + 1);
+		this.#setLocationInInteractionMemory();
+	}
+
 	#observePickerSelection() {
 		this.observe(
 			this._pickerContext.selection.selection,
 			(selection) => {
+				this._selectionCount = selection.length;
 				this.updateValue({ selection });
 				this.requestUpdate();
 			},
@@ -100,11 +305,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 
 	#observeSearch() {
 		this.observe(
-			this._pickerContext.search.query,
-			(query) => {
-				this._searchQuery = query?.query;
+			this._pickerContext.search.searchable,
+			(isSearchable) => {
+				this._isSearchable = isSearchable ?? false;
 			},
-			'umbPickerSearchQueryObserver',
+			'umbPickerSearchableObserver',
 		);
 	}
 
@@ -115,6 +320,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				this._treeExpansion = value;
 			},
 			'umbTreeItemPickerExpansionObserver',
+		);
+	}
+
+	#observeTreeInteractionMemories() {
+		this.observe(
+			this._pickerContext.interactionMemory.memory(TREE_MEMORY_UNIQUE),
+			(memory) => {
+				this._treeInteractionMemories = memory?.memories;
+			},
+			'umbTreePickerInteractionMemoriesObserver',
 		);
 	}
 
@@ -172,49 +387,131 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this._pickerContext.expansion.setExpansion(expansion);
 	}
 
+	#onTreeInteractionMemoriesChange(event: Event) {
+		event.stopPropagation();
+		const tree = event.currentTarget as UmbTreeElement;
+		const memories = tree.interactionMemories;
+		if (memories.length > 0) {
+			this._pickerContext.interactionMemory.setMemory({ unique: TREE_MEMORY_UNIQUE, memories });
+		} else {
+			this._pickerContext.interactionMemory.deleteMemory(TREE_MEMORY_UNIQUE);
+		}
+	}
+
 	#searchSelectableFilter = () => true;
+
+	async #setActiveTab(tab: 'browse' | 'search') {
+		if (this._activeTab === tab) return;
+		this._activeTab = tab;
+
+		if (tab === 'search') {
+			await this.updateComplete;
+			this._searchField?.focus();
+		}
+	}
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('general_choose')}>
-				${this.#renderSearch()} ${this.#renderTree()} ${this.#renderActions()}
+			<umb-body-layout headline=${this.localize.string(this.data?.headline ?? '#general_choose')}>
+				${this.#renderTabs()}
+				<div id="browse" ?hidden=${this._activeTab !== 'browse'}>${this.#renderTree()}</div>
+				<div id="search" ?hidden=${this._activeTab !== 'search'}>${this.#renderSearch()}</div>
+				${this.#renderSelectionCount()} ${this.#renderActions()}
 			</umb-body-layout>
 		`;
 	}
+
+	#renderTabs() {
+		if (!this._isSearchable) return nothing;
+
+		return html`
+			<uui-tab-group slot="navigation">
+				${this.#renderTab('browse', 'picker_browseTab', 'icon-list')}
+				${this.#renderTab('search', 'picker_searchTab', 'icon-search')}
+			</uui-tab-group>
+		`;
+	}
+
+	// The label is passed as both property and child text: `uui-tab` renders its `label` in the default
+	// slot, which the whitespace of a multi-line template would otherwise occupy.
+	#renderTab(tab: 'browse' | 'search', labelKey: string, icon: string) {
+		const label = this.localize.term(labelKey);
+
+		return html`<uui-tab
+			label=${label}
+			?active=${this._activeTab === tab}
+			@click=${() => this.#setActiveTab(tab)}
+			data-mark="picker:tab:${tab}">
+			<umb-icon slot="icon" name=${icon}></umb-icon>
+			${label}
+		</uui-tab>`;
+	}
+
 	#renderSearch() {
+		if (!this._isSearchable) return nothing;
+
 		const selectableFilter =
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
 
 		return html`
-			<umb-picker-search-field></umb-picker-search-field>
+			<umb-picker-search-field .alias=${this._treeAlias}></umb-picker-search-field>
 			<umb-picker-search-result .pickableFilter=${selectableFilter}></umb-picker-search-result>
 		`;
 	}
 
 	#renderTree() {
-		if (this._searchQuery) {
-			return nothing;
-		}
+		return html`
+			${this.#renderBreadcrumb()}
+			<umb-tree
+				alias=${ifDefined(this.data?.treeAlias)}
+				.props=${{
+					showToolbar: true,
+					drillable: true,
+					hideTreeItemActions: true,
+					hideTreeRoot: this.data?.hideTreeRoot,
+					expandTreeRoot: this.data?.expandTreeRoot,
+					selectionConfiguration: this._selectionConfiguration,
+					filter: this.data?.filter,
+					selectableFilter: this.data?.pickableFilter,
+					startNode: this._currentLocation,
+					foldersOnly: this.data?.foldersOnly,
+					expansion: this._treeExpansion,
+					interactionMemories: this._treeInteractionMemories,
+				}}
+				@selected=${this.#onTreeItemSelected}
+				@deselected=${this.#onTreeItemDeselected}
+				@expansion-change=${this.#onTreeItemExpansionChange}
+				@interaction-memories-change=${this.#onTreeInteractionMemoriesChange}></umb-tree>
+		`;
+	}
+
+	#renderBreadcrumb() {
+		if (!this._breadcrumb.length) return nothing;
 
 		return html`
-			<uui-box>
-				<umb-tree
-					alias=${ifDefined(this.data?.treeAlias)}
-					.props=${{
-						hideTreeItemActions: true,
-						hideTreeRoot: this.data?.hideTreeRoot,
-						expandTreeRoot: this.data?.expandTreeRoot,
-						selectionConfiguration: this._selectionConfiguration,
-						filter: this.data?.filter,
-						selectableFilter: this.data?.pickableFilter,
-						startNode: this.data?.startNode,
-						foldersOnly: this.data?.foldersOnly,
-						expansion: this._treeExpansion,
-					}}
-					@selected=${this.#onTreeItemSelected}
-					@deselected=${this.#onTreeItemDeselected}
-					@expansion-change=${this.#onTreeItemExpansionChange}></umb-tree
-			></uui-box>
+			<div id="breadcrumb">
+				<uui-breadcrumbs>
+					${repeat(
+						this._breadcrumb,
+						(item) => item.unique ?? 'root',
+						(item, index) => html`
+							<uui-breadcrumb-item
+								?last-item=${index === this._breadcrumb.length - 1}
+								@click=${() => this.#onBreadcrumbItemClick(index)}>
+								${this.localize.string(item.name)}
+							</uui-breadcrumb-item>
+						`,
+					)}
+				</uui-breadcrumbs>
+			</div>
+		`;
+	}
+
+	#renderSelectionCount() {
+		if (!this._selectionConfiguration.multiple || !this._hasSelection) return nothing;
+
+		return html`
+			<div id="selection-info" slot="footer">${this.localize.term('picker_selectedCount', this._selectionCount)}</div>
 		`;
 	}
 
@@ -229,7 +526,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 							href=${this._createPath}></uui-button>`
 					: nothing}
 				<uui-button
-					label=${this.localize.term('general_choose')}
+					label=${this.localize.string(this.data?.confirmLabel ?? '#general_choose')}
 					look="primary"
 					color="positive"
 					@click=${this._submitModal}
@@ -237,6 +534,37 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			</div>
 		`;
 	}
+
+	static override styles = css`
+		uui-tab-group {
+			--uui-tab-divider: var(--uui-color-border);
+			border-left: 1px solid var(--uui-color-border);
+			border-right: 1px solid var(--uui-color-border);
+		}
+
+		#breadcrumb {
+			margin-bottom: var(--uui-size-space-4);
+		}
+
+		uui-breadcrumbs {
+			overflow: hidden;
+			min-width: 0;
+		}
+
+		uui-breadcrumb-item:not([last-item]) {
+			cursor: pointer;
+		}
+
+		#selection-info {
+			display: flex;
+			align-items: center;
+			box-sizing: border-box;
+			width: 100%;
+			padding: var(--uui-size-space-4) var(--uui-size-space-6);
+			background-color: var(--uui-color-selected);
+			color: var(--uui-color-selected-contrast);
+		}
+	`;
 }
 
 export default UmbTreePickerModalElement;

@@ -49,13 +49,7 @@ internal sealed class DeliveryApiContentIndexPopulator : IndexPopulator
         _deliveryApiContentIndexHelper.EnumerateApplicableDescendantsForContentIndex(
             Constants.System.Root,
             descendants =>
-            {
-                ValueSet[] valueSets = _deliveryContentIndexValueSetBuilder.GetValueSets(descendants).ToArray();
-                foreach (IIndex index in indexes)
-                {
-                    index.IndexItems(valueSets);
-                }
-            });
+                ValueSetIndexer.IndexItems(indexes, _deliveryContentIndexValueSetBuilder.GetValueSets(descendants)));
     }
 
     public override bool IsRegistered(IIndex index)

@@ -127,7 +127,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 
 				if (searchApi) {
 					const searcher: GlobalSearchers = {
-						name: controller.manifest.meta?.label || controller.manifest.name,
+						name: this.localize.string(controller.manifest.meta?.label) || controller.manifest.name,
 						api: searchApi,
 						alias: controller.alias,
 						sectionAlias: controller.manifest.meta?.sectionAlias,

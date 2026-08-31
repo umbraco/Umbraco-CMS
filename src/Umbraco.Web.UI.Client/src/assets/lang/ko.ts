@@ -300,6 +300,8 @@ export default {
 		new: '새로',
 		next: '다음',
 		no: '아니요',
+		noResults: '결과 없음',
+		noResultsFor: (query: string) => `"${query}"에 대한 결과가 없습니다.`,
 		of: '의',
 		ok: '완료',
 		open: '열기',
@@ -547,16 +549,11 @@ export default {
 		editscript: '스크립트 파일 편집',
 	},
 	sections: {
-		concierge: '안내',
 		content: '컨텐츠',
-		courier: '가이드',
-		developer: '개발도구',
-		installer: 'Umbraco 설치마법사',
+		library: '라이브러리',
 		media: '미디어',
 		member: '구성원',
-		newsletters: '뉴스레터',
 		settings: '세팅',
-		statistics: '통계',
 		translation: '변환',
 		users: '사용자',
 	},
@@ -793,5 +790,10 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: '모두 선택',
 		deselectAllLogLevelFilters: '모두 선택 해제',
+	},
+	picker: {
+		browseTab: '찾아보기',
+		searchTab: '검색',
+		selectedCount: (count: number) => `${count}개 선택됨`,
 	},
 } as UmbLocalizationDictionary;

@@ -54,6 +54,7 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
+	 * @attr
 	 * @default
 	 */
 	@property({ type: Number })
@@ -66,15 +67,17 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
+	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
 	 * @type {number}
+	 * @attr
 	 * @default
 	 */
 	@property({ type: Number })
@@ -87,10 +90,11 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
+	 * @attr
 	 * @default
 	 */
-	@property({ type: String, attribute: 'min-message' })
+	@property({ type: String, attribute: 'max-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Array })
@@ -148,9 +152,9 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), '_observeSelection');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), '_observerItems');
-		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), '_observeStatuses');
+		this.observe(this.#pickerContext.selection, (selection) => (this.value = selection.join(',')), null);
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), null);
+		this.observe(this.#pickerContext.statuses, (statuses) => (this._statuses = statuses), null);
 	}
 
 	protected override getFormElement() {

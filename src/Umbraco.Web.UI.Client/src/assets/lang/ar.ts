@@ -293,6 +293,7 @@ export default {
 		includeUnpublished: 'تضمين عناصر المحتوى غير المنشورة.',
 		isSensitiveValue: 'هذه القيمة مخفية. إذا كنت بحاجة إلى الوصول لعرض هذه القيمة، يرجى الاتصال بمدير موقعك.',
 		isSensitiveValue_short: 'هذه القيمة مخفية.',
+		isSensitiveValueNotice: 'إذا كنت بحاجة إلى الوصول لعرض القيم المخفية، يرجى الاتصال بمدير موقعك.',
 		languagesToPublish: 'ما اللغات التي ترغب في نشرها؟',
 		languagesToSendForApproval: 'ما اللغات التي ترغب في إرسالها للموافقة؟',
 		languagesToSchedule: 'ما اللغات التي ترغب في جدولتها؟',
@@ -329,6 +330,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'انقر لتحميل',
+		browseFilesAction: 'تصفح الملفات',
+		dropFilesOr: 'اسحب الوسائط وأسقطها هنا<br />أو',
 		orClickHereToUpload: 'أو انقر هنا لاختيار الملفات',
 		disallowedFileType: 'لا يمكن تحميل هذا الملف، فهو لا يحتوي على نوع ملف معتمد',
 		disallowedMediaType: "لا يمكن تحميل هذا الملف، نوع الوسائط باللقب '%0%' غير مسموح به هنا",
@@ -1259,6 +1262,7 @@ export default {
 	},
 	sections: {
 		content: 'المحتوى',
+		library: 'المكتبة',
 		media: 'الوسائط',
 		member: 'الأعضاء',
 		packages: 'الحزم',
@@ -1556,8 +1560,16 @@ export default {
 		chooseChildNode: 'اختر العقدة الفرعية',
 		compositionsDescription:
 			'ارث التبويبات والخصائص من نوع مستند موجود. سيتم إضافة التبويبات الجديدة إلى نوع الوثيقة الحالي أو دمجها إذا كان هناك تبويب بنفس الاسم.',
+		compositionsDescriptionMediaType:
+			'ارث التبويبات والخصائص من نوع وسائط موجود. سيتم إضافة التبويبات الجديدة إلى نوع الوسائط الحالي أو دمجها إذا كان هناك تبويب بنفس الاسم.',
+		compositionsDescriptionMemberType:
+			'ارث التبويبات والخصائص من نوع عضو موجود. سيتم إضافة التبويبات الجديدة إلى نوع العضو الحالي أو دمجها إذا كان هناك تبويب بنفس الاسم.',
 		compositionInUse: 'هذا النوع من المحتوى قيد الاستخدام في تركيب، وبالتالي لا يمكن تركيبه بنفسه.\n    ',
+		compositionInUseMediaType: 'هذا النوع من الوسائط قيد الاستخدام في تركيب، وبالتالي لا يمكن تركيبه بنفسه.\n    ',
+		compositionInUseMemberType: 'هذا النوع من الأعضاء قيد الاستخدام في تركيب، وبالتالي لا يمكن تركيبه بنفسه.\n    ',
 		noAvailableCompositions: 'لا توجد أنواع محتوى متاحة لاستخدامها كتركيب.',
+		noAvailableCompositionsMediaType: 'لا توجد أنواع وسائط متاحة لاستخدامها كتركيب.',
+		noAvailableCompositionsMemberType: 'لا توجد أنواع أعضاء متاحة لاستخدامها كتركيب.',
 		compositionRemoveWarning:
 			'إزالة التركيب ستؤدي إلى حذف جميع بيانات الخصائص المرتبطة. بمجرد حفظ نوع الوثيقة لا يوجد طريق للعودة.',
 		availableEditors: 'إنشاء جديد',
@@ -1591,6 +1603,8 @@ export default {
 		tabHasNoSortOrder: 'التبويب ليس له ترتيب فرز',
 		compositionUsageHeading: 'أين يتم استخدام هذا التركيب؟',
 		compositionUsageSpecification: 'يتم استخدام هذا التركيب حاليًا في تركيب أنواع المحتوى التالية:\n    ',
+		compositionUsageSpecificationMediaType: 'يتم استخدام هذا التركيب حاليًا في تركيب أنواع الوسائط التالية:\n    ',
+		compositionUsageSpecificationMemberType: 'يتم استخدام هذا التركيب حاليًا في تركيب أنواع الأعضاء التالية:\n    ',
 		variantsHeading: 'السماح بالاختلافات',
 		cultureVariantHeading: 'السماح بالاختلاف حسب الثقافة',
 		segmentVariantHeading: 'السماح بالتجزئة',

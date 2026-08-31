@@ -3,7 +3,7 @@ import type { UmbSearchRepository, UmbSearchResultItemModel } from '@umbraco-cms
 
 export interface UmbPickerSearchableDataSource<
 	SearchResultItemType extends UmbSearchResultItemModel = UmbSearchResultItemModel,
-> extends UmbPickerDataSource,
-		UmbSearchRepository<SearchResultItemType> {
+>
+	extends UmbPickerDataSource, UmbSearchRepository<SearchResultItemType> {
 	searchPickableFilter?: (searchItem: SearchResultItemType) => boolean;
 }

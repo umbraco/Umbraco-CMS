@@ -18,6 +18,7 @@ export default {
 		changeDataType: 'Datatype aanpassen',
 		copy: 'Kopiëren',
 		create: 'Nieuw',
+		createFor: (name: string) => (name ? `Item aanmaken voor ${name}` : 'Aanmaken'),
 		export: 'Export',
 		createPackage: 'Nieuwe package',
 		createGroup: 'Groep maken',
@@ -56,6 +57,7 @@ export default {
 		setGroup: 'Groep instellen',
 		sort: 'Sorteren',
 		translate: 'Vertalen',
+		trash: 'Verwijderen',
 		update: 'Bijwerken',
 		setPermissions: 'Rechten instellen',
 		unlock: 'Deblokkeer',
@@ -300,6 +302,8 @@ export default {
 		isSensitiveValue:
 			'Deze waarde is verborgen. Indien u toegang nodig heeft om deze waarde te bekijken,\n      neem dan contact op met uw websitebeheerder.\n    ',
 		isSensitiveValue_short: 'Deze waarde is verborgen',
+		isSensitiveValueNotice:
+			'Indien u toegang nodig heeft om de verborgen waarden te bekijken, neem dan contact op met uw websitebeheerder.',
 		languagesToPublish: 'Welke talen wil je publiceren?',
 		languagesToSendForApproval: 'Welke talen wil je ter goedkeuring verzenden?',
 		languagesToSchedule: 'Welke talen wil je plannen?',
@@ -318,6 +322,8 @@ export default {
 		createFromClipboard: 'Plakken vanaf het klembord',
 		nodeIsInTrash: 'Dit item is in de prullenbak',
 		saveModalTitle: 'Opslaan',
+		saveAndPublishDescendantsModalTitle: 'Opslaan en publiceren met onderliggende nodes',
+		saveAndScheduleModalTitle: 'Opslaan en publicatie plannen',
 	},
 	blueprints: {
 		createBlueprintFrom: 'Nieuw Inhoudssjabloon aanmaken voor <em>%0%</em>',
@@ -331,6 +337,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Klik om te uploaden',
+		browseFilesAction: 'Blader door bestanden',
+		dropFilesOr: 'Sleep media hierheen<br />of',
 		orClickHereToUpload: 'Of klik hier om bestanden te kiezen',
 		disallowedFileType: 'Kan dit bestand niet uploaden, het heeft niet het juiste bestandstype',
 		maxFileSize: 'Maximale bestandsgrootte is',
@@ -739,6 +747,8 @@ export default {
 		new: 'Nieuw',
 		next: 'Volgende',
 		no: 'Nee',
+		noResults: 'Geen resultaten',
+		noResultsFor: (query: string) => `Geen resultaat voor "${query}".`,
 		of: 'of',
 		off: 'Uit',
 		ok: 'OK',
@@ -944,7 +954,7 @@ export default {
 		greeting5: 'Welkom',
 		greeting6: 'Welkom',
 		instruction: 'log hieronder in',
-		signInWith: 'Inloggen met',
+		signInWith: 'Inloggen met {0}',
 		timeout: 'Sessie is verlopen',
 		forgottenPassword: 'Wachtwoord vergeten?',
 		forgottenPasswordInstruction:
@@ -1188,7 +1198,7 @@ export default {
 	},
 	sections: {
 		content: 'Inhoud',
-		forms: 'Formulieren',
+		library: 'Bibliotheek',
 		media: 'Media',
 		member: 'Leden',
 		packages: 'Packages',
@@ -1475,9 +1485,19 @@ export default {
 		chooseChildNode: 'Kies onderliggende node',
 		compositionsDescription:
 			'Overgeërfde tabs en properties van een bestaand documenttype. Nieuwe tabs\n      worden toegevoegd aan het huidige documenttype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
+		compositionsDescriptionMediaType:
+			'Overgeërfde tabs en properties van een bestaand mediatype. Nieuwe tabs\n      worden toegevoegd aan het huidige mediatype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
+		compositionsDescriptionMemberType:
+			'Overgeërfde tabs en properties van een bestaand lidtype. Nieuwe tabs\n      worden toegevoegd aan het huidige lidtype of samengevoegd als een tab met dezelfde naam al bestaat.\n    ',
 		compositionInUse:
 			'Dit contenttype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
+		compositionInUseMediaType:
+			'Dit mediatype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
+		compositionInUseMemberType:
+			'Dit lidtype wordt gebruikt in een compositie en kan daarom niet zelf een\n      compositie worden.\n    ',
 		noAvailableCompositions: 'Er zijn geen contenttypen beschikbaar om als compositie te gebruiken.',
+		noAvailableCompositionsMediaType: 'Er zijn geen mediatypen beschikbaar om als compositie te gebruiken.',
+		noAvailableCompositionsMemberType: 'Er zijn geen lidtypen beschikbaar om als compositie te gebruiken.',
 		compositionRemoveWarning:
 			'Een compositie verwijderen zal alle bijbehorende eigenschapsdata ook\n      verwijderen. Zodra je het documenttype hebt opgeslagen is er geen weg meer terug.\n    ',
 		availableEditors: 'Beschikbare editors',
@@ -1515,6 +1535,10 @@ export default {
 		compositionUsageHeading: 'Waar wordt deze compositie gebruikt?',
 		compositionUsageSpecification:
 			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende inhoudstypen:\n    ',
+		compositionUsageSpecificationMediaType:
+			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende mediatypen:\n    ',
+		compositionUsageSpecificationMemberType:
+			'Deze samenstelling wordt momenteel gebruikt bij de samenstelling van de\n      volgende lidtypen:\n    ',
 		variantsHeading: 'Variaties toestaan',
 		cultureVariantHeading: 'Variëren per cultuur toestaan',
 		segmentVariantHeading: 'Segmentatie toestaan',
@@ -2188,5 +2212,10 @@ export default {
 		manageHeadline: 'Hoe beheer ik Inhoudssjablonen?',
 		manageDescription:
 			'U kunt Inhoudssjablonen bewerken en verwijderen vanuit de boomstructuur\n      "inhoudssjablonen" in de sectie Instellingen. Vouw het documenttype uit waarop de Inhoudssjabloon is gebaseerd en\n      klik erop om het te bewerken of te verwijderen.\n    ',
+	},
+	picker: {
+		browseTab: 'Bladeren',
+		searchTab: 'Zoeken',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} geselecteerd`,
 	},
 } as UmbLocalizationDictionary;

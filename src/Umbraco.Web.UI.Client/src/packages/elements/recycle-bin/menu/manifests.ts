@@ -1,3 +1,8 @@
+import {
+	UMB_ELEMENT_OR_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_READ,
+} from '../../user-permissions/constants.js';
+import { UMB_USER_PERMISSION_ELEMENT_FOLDER_READ } from '../../folder/user-permissions/constants.js';
 import { UMB_CURRENT_USER_ALLOW_ELEMENT_RECYCLE_BIN_CONDITION_ALIAS } from '../conditions/allow-element-recycle-bin.condition.js';
 import { UMB_ELEMENT_MENU_ALIAS } from '../../menu/constants.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from '../../workspace/constants.js';
@@ -20,7 +25,14 @@ const menuItem: ManifestMenuItemTreeKind = {
 		menus: [UMB_ELEMENT_MENU_ALIAS],
 		treeAlias: UMB_ELEMENT_RECYCLE_BIN_TREE_ALIAS,
 	},
-	conditions: [{ alias: UMB_CURRENT_USER_ALLOW_ELEMENT_RECYCLE_BIN_CONDITION_ALIAS }],
+	conditions: [
+		{ alias: UMB_CURRENT_USER_ALLOW_ELEMENT_RECYCLE_BIN_CONDITION_ALIAS },
+		{
+			alias: UMB_ELEMENT_OR_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+			element: { allOf: [UMB_USER_PERMISSION_ELEMENT_READ] },
+			folder: { allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_READ] },
+		},
+	],
 };
 
 const workspaceContext: ManifestWorkspaceContextMenuStructureKind = {

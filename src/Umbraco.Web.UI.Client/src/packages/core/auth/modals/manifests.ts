@@ -1,6 +1,6 @@
-import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 import UmbAppAuthModalElement from './umb-app-auth-modal.element.js';
 import UmbAuthTimeoutModalElement from './umb-auth-timeout-modal.element.js';
+import type { ManifestModal } from '@umbraco-cms/backoffice/modal';
 
 export const manifests: Array<ManifestModal> = [
 	{

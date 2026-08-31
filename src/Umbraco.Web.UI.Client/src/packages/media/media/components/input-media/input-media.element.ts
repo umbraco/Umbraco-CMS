@@ -10,11 +10,10 @@ import {
 	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
-import { UmbInteractionMemoriesChangeEvent } from '@umbraco-cms/backoffice/interaction-memory';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbSorterController, UmbSorterResolvePlacementAsGrid } from '@umbraco-cms/backoffice/sorter';
@@ -25,8 +24,7 @@ import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 import '@umbraco-cms/backoffice/imaging';
 
-const elementName = 'umb-input-media';
-@customElement(elementName)
+@customElement('umb-input-media')
 export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(UmbLitElement) {
 	#sorter = new UmbSorterController<string>(this, {
 		getUniqueOfElement: (element) => {
@@ -72,12 +70,12 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	/**
 	 * Min validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -95,7 +93,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	/**
 	 * Max validation message.
-	 * @type {boolean}
+	 * @type {string}
 	 * @attr
 	 * @default
 	 */
@@ -154,14 +152,11 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 	@property({ type: Array, attribute: false })
 	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
-		return this.#pickerInputContext.interactionMemory.getAllMemories();
+		return this.#interactionMemoryManager.getMemories();
 	}
 	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
-		this.#interactionMemories = value;
-		value?.forEach((memory) => this.#pickerInputContext.interactionMemory.setMemory(memory));
+		this.#interactionMemoryManager.setMemories(value);
 	}
-
-	#interactionMemories?: Array<UmbInteractionMemoryModel> = [];
 
 	@state()
 	private _editMediaPath = '';
@@ -170,6 +165,10 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	private _cards: Array<UmbMediaCardItemModel> = [];
 
 	#pickerInputContext = new UmbMediaPickerInputContext(this);
+	#interactionMemoryManager = new UmbEntityInputInteractionMemoryManager(
+		this,
+		this.#pickerInputContext.interactionMemory,
+	);
 
 	constructor() {
 		super();
@@ -183,27 +182,17 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				this._editMediaPath = routeBuilder({});
 			});
 
-		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')));
-
-		this.observe(this.#pickerInputContext.selectedItems, async (selectedItems) => {
-			const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
-			if (selectedItems?.length && !missingCards.length) return;
-
-			this._cards = selectedItems ?? [];
-		});
+		this.observe(this.#pickerInputContext.selection, (selection) => (this.value = selection.join(',')), null);
 
 		this.observe(
-			this.#pickerInputContext.interactionMemory.memories,
-			(memories) => {
-				// only dispatch the event if the interaction memories have actually changed
-				const isIdentical = jsonStringComparison(memories, this.#interactionMemories);
+			this.#pickerInputContext.selectedItems,
+			async (selectedItems) => {
+				const missingCards = selectedItems.filter((item) => !this._cards.find((card) => card.unique === item.unique));
+				if (selectedItems?.length && !missingCards.length) return;
 
-				if (!isIdentical) {
-					this.#interactionMemories = memories;
-					this.dispatchEvent(new UmbInteractionMemoriesChangeEvent());
-				}
+				this._cards = selectedItems ?? [];
 			},
-			'_observeMemories',
+			null,
 		);
 
 		this.addValidator(
@@ -293,10 +282,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				href="${ifDefined(href)}"
 				?readonly=${this.readonly}
 				?disabled=${!this._editMediaPath}>
-				<umb-imaging-thumbnail
-					unique=${item.unique}
-					alt=${item.name}
-					icon=${item.mediaType.icon}></umb-imaging-thumbnail>
+				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
@@ -363,6 +349,6 @@ export { UmbInputMediaElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbInputMediaElement;
+		'umb-input-media': UmbInputMediaElement;
 	}
 }

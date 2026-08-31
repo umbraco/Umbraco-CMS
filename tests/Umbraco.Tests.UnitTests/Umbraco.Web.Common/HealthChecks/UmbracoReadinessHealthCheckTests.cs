@@ -26,11 +26,11 @@ public class UmbracoReadinessHealthCheckTests
     [TestCase(RuntimeLevel.Install)]
     [TestCase(RuntimeLevel.Upgrade)]
     [TestCase(RuntimeLevel.BootFailed)]
-    public async Task CheckHealthAsync_WhenLevelIsNotRun_ReturnsDegraded(RuntimeLevel level)
+    public async Task CheckHealthAsync_WhenLevelIsNotRun_ReturnsUnhealthy(RuntimeLevel level)
     {
         var check = CreateCheck(level);
         HealthCheckResult result = await check.CheckHealthAsync(null!);
-        Assert.That(result.Status, Is.EqualTo(HealthStatus.Degraded));
+        Assert.That(result.Status, Is.EqualTo(HealthStatus.Unhealthy));
     }
 
     [Test]

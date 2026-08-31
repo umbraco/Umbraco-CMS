@@ -240,6 +240,7 @@ test('can add multiple languages to a user group', async ({umbracoApi, umbracoUi
   expect(await umbracoApi.userGroup.doesUserGroupContainLanguage(userGroupName, 'da')).toBeTruthy();
 
   // Clean
+  await umbracoApi.userGroup.ensureNameNotExists(userGroupName); // Need to delete user group before deleting language
   await umbracoApi.language.ensureNameNotExists(danishLanguage);
 })
 

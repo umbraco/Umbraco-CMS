@@ -282,6 +282,6 @@ public class CreateTableBuilder : ExpressionBuilderBase<CreateTableExpression, I
     }
 
     /// <summary>Gets the column definition for the current column type.</summary>
-    /// <returns>The <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.ColumnDefinition"/> representing the current column.</returns>
+    /// <returns>The <see cref="ColumnDefinition"/> representing the current column.</returns>
     public override ColumnDefinition GetColumnForType() => CurrentColumn;
 }

@@ -1,4 +1,5 @@
 ﻿import { manifest as schemaManifest } from './Umbraco.ElementPicker.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 const propertyEditorUi: ManifestPropertyEditorUi = {
@@ -15,11 +16,20 @@ const propertyEditorUi: ManifestPropertyEditorUi = {
 		settings: {
 			properties: [
 				{
+					alias: 'allowedContentTypes',
+					label: 'Accepted types',
+					description: 'Limit to specific types',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentTypePicker',
+					config: [{ alias: 'onlyPickElementTypes', value: true }],
+					weight: 10,
+				},
+				{
 					alias: 'validationLimit',
 					label: 'Amount',
+					description: 'Set a required range of items',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
 					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
-					weight: 100,
+					weight: 20,
 				},
 				{
 					alias: 'startNodeId',
@@ -30,11 +40,11 @@ const propertyEditorUi: ManifestPropertyEditorUi = {
 						{ alias: 'folderOnly', value: true },
 						{ alias: 'validationLimit', value: { min: 0, max: 1 } },
 					],
-					weight: 110,
+					weight: 30,
 				},
 			],
 		},
 	},
 };
 
-export const manifests: Array<UmbExtensionManifest> = [propertyEditorUi, schemaManifest];
+export const manifests: Array<UmbExtensionManifest> = [propertyEditorUi, schemaManifest, ...valueSummaryManifests];

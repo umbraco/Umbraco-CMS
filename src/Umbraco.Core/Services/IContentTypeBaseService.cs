@@ -86,10 +86,15 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     IEnumerable<TItem> GetDescendants(int id, bool andSelf); // parent-child axis
 
     /// <summary>
-    ///     Gets all content types that are composed of a given content type.
+    ///     Gets all content types that are composed of a given content type (both composition users and inheritance children).
     /// </summary>
     /// <param name="id">The identifier of the composition content type.</param>
     /// <returns>A collection of content types that use the specified composition.</returns>
+    /// <remarks>
+    ///     To restrict the result to a single relationship kind use the
+    ///     <see cref="Umbraco.Extensions.ContentTypeServiceExtensions.GetComposedOf{TItem}(IContentTypeBaseService{TItem}, int, ComposedOfType)" />
+    ///     extension.
+    /// </remarks>
     IEnumerable<TItem> GetComposedOf(int id); // composition axis
 
     /// <summary>
@@ -276,6 +281,16 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// Returns all the content types allowed in the library.
     /// </summary>
     Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(int skip, int take);
+
+    /// <summary>
+    /// Returns all the content types allowed in the library.
+    /// </summary>
+    /// <param name="parentKey">The parent container key, or <c>null</c> at the library root.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <param name="take">The number of items to take.</param>
+    // TODO (V20): Remove default implementation.
+    Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(Guid? parentKey, int skip, int take)
+        => GetAllAllowedInLibraryAsync(skip, take);
 
     /// <summary>
     /// Returns all content types allowed as children for a given content type key.

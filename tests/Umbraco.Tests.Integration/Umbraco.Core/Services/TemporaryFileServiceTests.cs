@@ -8,7 +8,7 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
@@ -16,11 +16,9 @@ public class TemporaryFileServiceTests : UmbracoIntegrationTest
 {
     private ITemporaryFileService TemporaryFileService => GetRequiredService<ITemporaryFileService>();
 
-    public static void ConfigureAllowedUploadedFileExtensions(IUmbracoBuilder builder)
-    {
+    public static void ConfigureAllowedUploadedFileExtensions(IUmbracoBuilder builder) =>
         builder.Services.Configure<ContentSettings>(config =>
             config.AllowedUploadedFileExtensions = new HashSet<string> { "txt" });
-    }
 
     [Test]
     [ConfigureBuilder(ActionName = nameof(ConfigureAllowedUploadedFileExtensions))]
@@ -41,7 +39,7 @@ public class TemporaryFileServiceTests : UmbracoIntegrationTest
                 writer.Flush();
                 stream.Position = 0;
                 return stream;
-            }
+            },
         };
         var createAttempt = await TemporaryFileService.CreateAsync(model);
         Assert.IsTrue(createAttempt.Success);
@@ -82,7 +80,7 @@ public class TemporaryFileServiceTests : UmbracoIntegrationTest
                 writer.Flush();
                 stream.Position = 0;
                 return stream;
-            }
+            },
         };
         var createAttempt = await TemporaryFileService.CreateAsync(model);
         Assert.IsFalse(createAttempt.Success);

@@ -3,11 +3,15 @@ import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
 import type { AnyExtension } from '../../externals.js';
 import type { UmbTiptapExtensionApi } from '../../extensions/types.js';
 import type { UmbTiptapStatusbarValue, UmbTiptapToolbarValue } from '../types.js';
+import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
+import { UmbInteractionMemoryScopeContext } from '@umbraco-cms/backoffice/interaction-memory';
+import type { UmbInteractionMemoryModel } from '@umbraco-cms/backoffice/interaction-memory';
 import {
 	css,
 	customElement,
 	html,
 	property,
+	query,
 	repeat,
 	state,
 	unsafeCSS,
@@ -26,23 +30,38 @@ import '../statusbar/tiptap-statusbar.element.js';
 
 const TIPTAP_CORE_EXTENSION_ALIAS = 'Umb.Tiptap.RichTextEssentials';
 
-/**
- * The default root path for the stylesheets on the server.
- * This is used as a fallback if the server configuration is not available.
- */
-const DEFAULT_STYLESHEET_ROOT_PATH = '/css';
+const RTE_CONTENT_STYLESHEET = '/umbraco/backoffice/css/rte-content.css';
 
 @customElement('umb-input-tiptap')
 export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof UmbLitElement, string>(UmbLitElement) {
-	#context = new UmbTiptapRteContext(this);
+	readonly #context = new UmbTiptapRteContext(this);
+
+	// Holds what the modals opened from this input remember between opens. They are rendered in the
+	// modal portal, not as descendants of this element, so context is the only channel that reaches
+	// them; upwards it is a property and an `interaction-memories-change` event.
+	readonly #interactionMemoryScope = new UmbInteractionMemoryScopeContext(this);
+	readonly #interactionMemoryBridge = new UmbEntityInputInteractionMemoryManager(
+		this,
+		this.#interactionMemoryScope.memory,
+	);
+
+	/**
+	 * The memories held by the modals opened from this input, e.g. the last-used folder in a media
+	 * picker opened from the RTE toolbar. Bridged from the interaction-memory scope this input provides.
+	 * @type {(Array<UmbInteractionMemoryModel> | undefined)}
+	 * @attr
+	 */
+	@property({ type: Array, attribute: false })
+	public get interactionMemories(): Array<UmbInteractionMemoryModel> | undefined {
+		return this.#interactionMemoryBridge.getMemories();
+	}
+	public set interactionMemories(value: Array<UmbInteractionMemoryModel> | undefined) {
+		this.#interactionMemoryBridge.setMemories(value);
+	}
 
 	#hasToolbar = false;
 
 	#hasStatusbar = false;
-
-	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
-
-	#stylesheetRootPath = DEFAULT_STYLESHEET_ROOT_PATH;
 
 	@property({ type: String })
 	override set value(value: string) {
@@ -82,6 +101,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	readonly = false;
 
 	@state()
+	private _stylesheets = new Set([RTE_CONTENT_STYLESHEET]);
+
+	@state()
 	private _editor?: Editor;
 
 	@state()
@@ -96,6 +118,21 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	@state()
 	private _statusbar: UmbTiptapStatusbarValue = [[], []];
 
+	@state()
+	private _scrolling = false;
+
+	@query('umb-tiptap-toolbar')
+	private _toolbarElement?: HTMLElement;
+
+	// Detects the toolbar sticking by watching it drop below full visibility,
+	// regardless of which ancestor is the one actually scrolling.
+	#scrollObserver = new IntersectionObserver(
+		([entry]) => {
+			this._scrolling = entry.intersectionRatio < 1;
+		},
+		{ threshold: 1 },
+	);
+
 	constructor() {
 		super();
 
@@ -107,9 +144,12 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	protected override async firstUpdated() {
-		await this.#loadStylesheetPath();
+		// no need to await observing the stylesheet root path.
+		this.#observeStylesheetRootPath();
 		await this.#loadExtensions();
 		await this.#loadEditor();
+		await this.updateComplete;
+		if (this._toolbarElement) this.#scrollObserver.observe(this._toolbarElement);
 	}
 
 	protected override updated(changedProperties: Map<string, unknown>) {
@@ -127,12 +167,23 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		return this._editor?.isEmpty ?? false;
 	}
 
-	async #loadStylesheetPath() {
-		return this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
-			if (stylesheetRootPath) {
-				this.#stylesheetRootPath = stylesheetRootPath;
-			}
-		}).asPromise();
+	#observeStylesheetRootPath() {
+		this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
+			if (stylesheetRootPath === undefined) return;
+			this.#applyConfiguredStylesheets();
+		});
+	}
+
+	#applyConfiguredStylesheets() {
+		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
+		if (!stylesheets?.length) return;
+
+		const linkHrefs = stylesheets.map((stylesheet) => this.#context.resolveStylesheetHref(stylesheet));
+
+		// Reassign a new Set so Lit's `@state()` identity check detects the change and re-renders;
+		// `Set.add()` would mutate in place and the configured stylesheets could be missed if the
+		// editor finishes loading before this (parallel) path resolves.
+		this._stylesheets = new Set([RTE_CONTENT_STYLESHEET, ...linkHrefs]);
 	}
 
 	async #loadExtensions() {
@@ -169,17 +220,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	async #loadEditor() {
 		const element = this.shadowRoot?.querySelector('#editor');
 		if (!element) return;
-
-		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
-		if (stylesheets?.length) {
-			stylesheets.forEach((stylesheet) => {
-				const linkHref =
-					stylesheet.startsWith('http') || stylesheet.startsWith(this.#stylesheetRootPath)
-						? stylesheet
-						: `${this.#stylesheetRootPath}${stylesheet}`;
-				this.#stylesheets.add(linkHref);
-			});
-		}
 
 		const tiptapExtensions = new Map<string, AnyExtension>();
 		const collectedStyles: Array<CSSResultGroup> = [];
@@ -252,16 +292,20 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderStyles() {
-		if (!this._extensionStyles) return;
 		return html`
 			${repeat(
-				this.#stylesheets,
+				this._stylesheets,
 				(stylesheet) => stylesheet,
 				(stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`,
 			)}
-			<style>
-				${this._extensionStyles}
-			</style>
+			${when(
+				this._extensionStyles,
+				(styles) => html`
+					<style>
+						${styles}
+					</style>
+				`,
+			)}
 		`;
 	}
 
@@ -272,7 +316,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 				data-mark="tiptap-toolbar"
 				.toolbar=${this._toolbar}
 				.editor=${this._editor}
-				.configuration=${this.configuration}>
+				.configuration=${this.configuration}
+				.scrolling=${this._scrolling}>
 			</umb-tiptap-toolbar>
 		`;
 	}
@@ -293,6 +338,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	override destroy(): void {
 		this._editor?.destroy();
 		this._editor = undefined;
+		this.#scrollObserver.disconnect();
 	}
 
 	static override readonly styles = [

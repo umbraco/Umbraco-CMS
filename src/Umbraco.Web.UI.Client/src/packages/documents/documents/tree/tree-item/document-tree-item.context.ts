@@ -1,5 +1,5 @@
 import type { UmbDocumentTreeItemModel, UmbDocumentTreeRootModel } from '../types.js';
-import { UmbDocumentItemDataResolver } from '../../item/index.js';
+import { UmbDocumentTreeItemDataResolver } from '../document-tree-item-data-resolver.js';
 import { UmbDefaultTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
@@ -17,7 +17,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#ancestorsContext = new UmbAncestorsEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
-	#item = new UmbDocumentItemDataResolver(this);
+	#item = new UmbDocumentTreeItemDataResolver(this);
 
 	readonly name = this.#item.name;
 	readonly icon = this.#item.icon;
@@ -35,15 +35,34 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	// TODO: Move to API
 	readonly ancestors = this._treeItem.asObservablePart((item) => item?.ancestors ?? []);
 	readonly isTrashed = this._treeItem.asObservablePart((item) => item?.isTrashed ?? false);
-	readonly noAccess = this._treeItem.asObservablePart((item) => item?.noAccess ?? false);
+
+	// A collection is only browsed via its Collection view when the user can actually access it.
+	// When the node is a "no access" ancestor of the user's start node, it must remain expandable
+	// in the tree so the user can browse down to their start node.
+	readonly #collapsibleCollection = mergeObservables(
+		[this.hasCollection, this.noAccess],
+		([hasCollection, noAccess]) => hasCollection && !noAccess,
+	);
+
+	/**
+	 * Whether the collection replaces expansion for this item.
+	 *
+	 * Drilling into a collection needs somewhere to drill: the menu navigates to the Collection view by path, and a host
+	 * that drills into items takes the user into it. A tree with neither can do no more than expand, so it keeps the
+	 * expand caret and its children — the subtree would otherwise be unreachable.
+	 */
+	public readonly drillableCollection = mergeObservables(
+		[this.#collapsibleCollection, this.isMenu, this.drillable],
+		([collapsibleCollection, isMenu, drillable]) => collapsibleCollection && (isMenu || drillable),
+	);
 
 	override setIsMenu(isMenu: boolean) {
 		super.setIsMenu(isMenu);
 		if (isMenu) {
 			this.observe(
-				this.hasCollection,
-				(hasCollection) => {
-					if (hasCollection) {
+				this.#collapsibleCollection,
+				(collapsibleCollection) => {
+					if (collapsibleCollection) {
 						this._treeItemChildrenManager.setTargetTakeSize(1, 1);
 
 						this.observe(
@@ -55,6 +74,8 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 							},
 							'observeCollectionHasActiveDescendant',
 						);
+					} else {
+						this.removeUmbControllerByAlias('observeCollectionHasActiveDescendant');
 					}
 				},
 				'_whenMenuObserveHasCollection',
@@ -65,13 +86,21 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.observe(this.isTrashed, (isTrashed) => {
-			this.#isTrashedContext.setIsTrashed(isTrashed);
-		});
+		this.observe(
+			this.isTrashed,
+			(isTrashed) => {
+				this.#isTrashedContext.setIsTrashed(isTrashed);
+			},
+			null,
+		);
 
-		this.observe(this.ancestors, (ancestors) => {
-			this.#ancestorsContext.setAncestors(ancestors);
-		});
+		this.observe(
+			this.ancestors,
+			(ancestors) => {
+				this.#ancestorsContext.setAncestors(ancestors);
+			},
+			null,
+		);
 	}
 
 	public override setTreeItem(treeItem: UmbDocumentTreeItemModel | undefined) {
@@ -89,20 +118,37 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override showChildren() {
-		if (this.getIsMenu() && this.#item.getHasCollection()) {
-			// Collections cannot be expanded via a menu, instead we open the Collection for the user.
-			this.#openCollection();
+		if (this.#getDrillableCollection()) {
+			this.#activateCollection();
 			return;
 		}
 		super.showChildren();
 	}
 
 	public override hideChildren() {
-		if (this.getIsMenu() && this.#item.getHasCollection()) {
-			// Collections in a menu will collapse when already showing children, and instead we open the Collection for the user.
-			this.#openCollection();
+		if (this.#getDrillableCollection()) {
+			this.#activateCollection();
+			return;
 		}
 		super.hideChildren();
+	}
+
+	// Collections cannot be expanded/collapsed. In a menu we navigate to the Collection view via the path;
+	// elsewhere we ask the host to drill into the item, which only happens where the host declared that it does.
+	#activateCollection() {
+		if (this.getIsMenu()) {
+			this.#openCollection();
+		} else {
+			this.open();
+		}
+	}
+
+	#getCollapsibleCollection(): boolean {
+		return this.#item.getHasCollection() && this.getTreeItem()?.noAccess !== true;
+	}
+
+	#getDrillableCollection(): boolean {
+		return this.#getCollapsibleCollection() && (this.getIsMenu() || this.getDrillable());
 	}
 
 	#openCollection() {

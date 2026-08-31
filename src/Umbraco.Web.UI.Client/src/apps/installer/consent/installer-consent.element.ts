@@ -80,6 +80,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 		return html`
 			<uui-slider
 				${umbFocus()}
+				autocomplete="off"
 				@input=${this._handleChange}
 				name="telemetryLevel"
 				label="telemetry-level"

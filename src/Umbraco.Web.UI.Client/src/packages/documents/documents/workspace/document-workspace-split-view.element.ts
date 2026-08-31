@@ -102,7 +102,8 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 									.loading=${this._loading}
 									.displayNavigation=${view.index === this._variants!.length - 1}
 									.overrides=${this._overrides}
-									.splitViewIndex=${view.index}>
+									.splitViewIndex=${view.index}
+									.hasCustomVariantSelector=${true}>
 									<umb-icon slot="icon" name=${ifDefined(this._icon)}></umb-icon>
 									<umb-document-workspace-split-view-variant-selector
 										slot="variant-selector"></umb-document-workspace-split-view-variant-selector>

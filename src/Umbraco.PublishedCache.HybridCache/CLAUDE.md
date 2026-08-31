@@ -60,7 +60,7 @@ Umbraco.PublishedCache.HybridCache/
 ├── Services/
 │   ├── DocumentCacheService.cs            # Content caching service (372 lines)
 │   ├── MediaCacheService.cs               # Media caching service
-│   ├── MemberCacheService.cs              # Member caching service
+│   ├── MemberCacheService.cs              # Maps members (not cached, see below)
 │   └── DomainCacheService.cs              # Domain caching service
 ├── CacheManager.cs                        # ICacheManager facade (27 lines)
 ├── ContentCacheNode.cs                    # Cache entry model (24 lines)
@@ -262,6 +262,18 @@ Uses `SqlContext.Templates` for cached SQL generation with optimized joins acros
 
 HybridCache API is experimental (suppressed with `#pragma warning disable EXTEXP0018`).
 
+### Members Are Mapped, Not Cached
+
+`IPublishedMemberCache` is the odd one out: it does not use HybridCache or `cmsContentNu` at all.
+`MemberCache.Get(IMember)` goes to `MemberCacheService.Get`, which calls
+`IPublishedContentFactory.ToPublishedMember` to map the supplied `IMember` entity on the fly. `IPublishedMember`
+exposes the underlying `IMember`, which cannot be reconstructed from a cache row, so the entity is required
+regardless — there is nothing a cached row could save. Nothing reads member rows, and the rebuild does not write
+them.
+
+Consequence for anything touching the rebuild: its arms are documents, media and elements - never members. A site upgraded
+from a version that did write member rows keeps them until its next *full* rebuild, which clears the whole table.
+
 ### Draft vs Published Caching
 
 - **Draft cache key**: `"{key}+draft"`
@@ -273,9 +285,56 @@ HybridCache API is experimental (suppressed with `#pragma warning disable EXTEXP
 
 Before returning cached content, verifies ancestor path is published via `_publishStatusQueryService.HasPublishedAncestorPath()`. Returns null if parent unpublished.
 
-### In-Memory Content Cache (DocumentCacheService.cs line 39)
+### In-Memory Content Cache (the L0 converted-content cache)
 
-Secondary `ConcurrentDictionary<string, IPublishedContent>` caches converted objects, since `ContentCacheNode` to `IPublishedContent` conversion is expensive.
+The converted `IPublishedElement` objects are cached behind `IConvertedPublishedContentCache<TKey, TValue>`
+(`Services/IConvertedPublishedContentCache.cs`), used by `DocumentCacheService` (`<string, IPublishedContent>`),
+`MediaCacheService` (`<Guid, IPublishedContent>`) and `ElementCacheService` (`<string, IPublishedElement>`).
+This is the single insert/remove/clear path for the L0 cache, and each implementation tracks both the entry
+count and an approximate retained byte total. The implementation is chosen per service by
+`IConvertedPublishedContentCacheFactory` (injected into all three services) from the configured maximum.
+
+The cache is **unbounded by default** — `UnboundedConvertedPublishedContentCache<TKey, TValue>`, a plain
+`ConcurrentDictionary` only evicted on content change / explicit clear, so walking the whole published tree
+(Delivery API crawl, sitemap, warm-up) retains the whole tree's converted form.
+
+A **bounded, scan-resistant** mode is available as an **opt-in package**,
+`Umbraco.Cms.PublishedCache.HybridCache.Bounded` (`src/Umbraco.PublishedCache.HybridCache.Bounded`). It is
+**not** part of the default install — that keeps its `BitFaster.Caching` dependency (the W-TinyLFU
+`ConcurrentLfu` backing) out of every site's dependency graph. Installing the package registers
+`IBoundedConvertedPublishedContentCacheFactory` (via an auto-discovered `IComposer`); then setting
+`CacheSettings.Entry.Document.MaximumLocalCacheItems` / `...Media.MaximumLocalCacheItems` /
+`...Element.MaximumLocalCacheItems` makes the
+corresponding L0 cache bounded, so frequently requested content is retained while rarely accessed content is
+evicted and a one-off full-tree walk cannot grow it without bound. If a maximum is configured but the
+package is absent, the default factory logs a `Warning` and falls back to unbounded (it never fails to boot).
+Default `null` preserves the unbounded behaviour; the observability below quantifies it either way.
+
+### Memory observability
+
+The in-memory structures whose footprint scales with the size of the content tree implement
+`IMemoryCacheSizeReporter` (`Umbraco.Cms.Core.Cache`), exposing an approximate retained **entry count** and
+(where cheaply derivable) an approximate **byte** estimate:
+
+| Reporter (`CacheName`) | Structure | Byte estimate |
+|------------------------|-----------|---------------|
+| `Published content (converted, L0)` | `DocumentCacheService` L0 cache | running total of per-entry node-size estimates |
+| `Published media (converted, L0)` | `MediaCacheService` L0 cache | running total of per-entry node-size estimates |
+| `Published elements (converted, L0)` | `ElementCacheService` L0 cache | running total of per-entry node-size estimates |
+| `Document URL segments` | `DocumentUrlService._documentUrlCache` (≈ documents × cultures × draft/published) | sampled structural estimate |
+| `Document navigation` / `Media navigation` / `Element navigation` | the in-memory navigation trees (active + recycle bin) | sampled structural estimate |
+
+`MemoryCacheSizeReportingJob` (a recurring job, all server roles, 1-minute period) logs each count and byte
+estimate plus `GC.GetTotalMemory` and `Environment.WorkingSet` **at `Debug` level** — enable `Debug` for
+`Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.MemoryCacheSizeReportingJob` to capture, e.g. during a
+reindex or crawl. Counts/bytes are a **trend/attribution** signal (a value that climbs and never falls
+indicates unbounded retention). The byte figures are coarse approximations, **not** a heap measurement: the
+L0 estimate is an *underlying-content lower bound* (`ContentCacheNodeSizeEstimator` sums the source node's
+stored content without decompressing or walking the converted graph, so it omits the property-editor-driven
+conversion blow-up); true per-object bytes come from a GC dump. Note the tiers: **L0** is the
+converted-`IPublishedContent` cache reported above; **L1** is Microsoft HybridCache's in-process tier of
+`ContentCacheNode` entries (behind L0); **L2** is the optional distributed tier. The HybridCache **L1** has
+no exposed count/size — measure it from the GC dump until a sized backing cache is wired up.
 
 ### Known Technical Debt
 

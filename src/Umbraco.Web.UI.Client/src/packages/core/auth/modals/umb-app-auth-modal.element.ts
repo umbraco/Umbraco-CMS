@@ -1,6 +1,6 @@
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
 import { UMB_AUTH_CONTEXT } from '../auth.context.token.js';
+import type { UmbModalAppAuthConfig, UmbModalAppAuthValue } from './umb-app-auth-modal.token.js';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 import '../components/umb-auth-view.element.js';

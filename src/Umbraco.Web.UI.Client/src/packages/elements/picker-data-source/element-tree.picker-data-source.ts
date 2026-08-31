@@ -1,11 +1,15 @@
 import { UmbElementFolderItemRepository } from '../folder/repository/item/element-folder-item.repository.js';
 import { UmbElementItemRepository } from '../item/repository/element-item.repository.js';
 import { UmbElementTreeRepository } from '../tree/element-tree.repository.js';
-import type { UmbElementTreeChildrenOfRequestArgs, UmbElementTreeRootItemsRequestArgs } from '../tree/types.js';
-import { getConfigValue } from '@umbraco-cms/backoffice/utils';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type {
+	UmbElementTreeChildrenOfRequestArgs,
+	UmbElementTreeRootItemsRequestArgs,
+	UmbElementTreeItemModel,
+} from '../tree/types.js';
 import { UmbElementFolderItemDataResolver } from '../folder/data-resolver/element-folder-item-data-resolver.js';
 import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
+import { getConfigValue } from '@umbraco-cms/backoffice/utils';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
@@ -20,6 +24,7 @@ import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 export class UmbElementTreePickerDataSource extends UmbControllerBase implements UmbPickerTreeDataSource {
+	#allowedContentTypeIds?: Array<string>;
 	#dataType?: { unique: string };
 	#elementItem = new UmbElementItemRepository(this);
 	#folderItem = new UmbElementFolderItemRepository(this);
@@ -44,6 +49,7 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 	setConfig(config: UmbConfigCollectionModel | undefined) {
 		this.#folderOnly = Boolean(getConfigValue(config, 'folderOnly'));
 		this.#startNode = getConfigValue(config, 'startNode');
+		this.#allowedContentTypeIds = getConfigValue(config, 'allowedContentTypeIds');
 	}
 
 	async requestTreeStartNode() {
@@ -80,5 +86,14 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 		return this.#folderOnly ? this.#folderItem.requestItems(uniques) : this.#elementItem.requestItems(uniques);
 	}
 
-	treePickableFilter = (treeItem: UmbTreeItemModel): boolean => treeItem.isFolder === this.#folderOnly;
+	treePickableFilter = (treeItem: UmbTreeItemModel): boolean => {
+		if (treeItem.isFolder !== this.#folderOnly) return false;
+
+		if (!this.#folderOnly && this.#allowedContentTypeIds?.length) {
+			const elementItem = treeItem as UmbElementTreeItemModel;
+			return this.#allowedContentTypeIds.includes(elementItem.documentType.unique);
+		}
+
+		return true;
+	};
 }

@@ -19,6 +19,12 @@ export const manifest: ManifestPropertyEditorUi = {
 					description: 'Limit to only pick Element Types',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
+				{
+					alias: 'onlyPickDocumentTypes',
+					label: 'Only Document Types',
+					description: 'Limit to only pick Document Types',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				},
 			],
 		},
 	},

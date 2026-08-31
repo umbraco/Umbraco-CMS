@@ -288,6 +288,8 @@ export default {
 		isSensitiveValue:
 			'Bu değer gizlidir. Bu değeri görüntülemek için erişime ihtiyacınız varsa, lütfen web sitesi yöneticinizle iletişime geçin.',
 		isSensitiveValue_short: 'Bu değer gizlidir.',
+		isSensitiveValueNotice:
+			'Gizli değerleri görüntülemek için erişime ihtiyacınız varsa, lütfen web sitesi yöneticinizle iletişime geçin.',
 		languagesToPublish: 'Hangi dilleri yayınlamak istersiniz?',
 		languagesToSendForApproval: 'Onay için hangi dilleri göndermek istersiniz?',
 		languagesToSchedule: 'Hangi dilleri planlamak istersiniz?',
@@ -319,6 +321,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Yüklemek için tıklayın',
+		browseFilesAction: 'Dosyalara göz at',
+		dropFilesOr: 'Medyayı buraya sürükleyip bırakın<br />veya',
 		orClickHereToUpload: 'veya dosyaları seçmek için burayı tıklayın',
 		disallowedFileType: 'Bu dosya yüklenemiyor, onaylanmış bir dosya türüne sahip değil',
 		maxFileSize: 'Maksimum dosya boyutu',
@@ -713,6 +717,8 @@ export default {
 		new: 'Yeni',
 		next: 'Sonraki',
 		no: 'Hayır',
+		noResults: 'Sonuç yok',
+		noResultsFor: (query: string) => `"${query}" için sonuç bulunamadı.`,
 		of: 'arasında',
 		off: 'Kapalı',
 		ok: 'Tamam',
@@ -1095,19 +1101,12 @@ export default {
 		editscript: 'Komut dosyasını düzenle',
 	},
 	sections: {
-		concierge: 'Konsiyerj',
 		content: 'İçerik',
-		courier: 'Kurye',
-		developer: 'Geliştirici',
-		forms: 'Formlar',
-		help: 'Yardım',
-		installer: 'Umbraco Yapılandırma Sihirbazı',
+		library: 'Kitaplık',
 		media: 'Medya',
 		member: 'Üyeler',
-		newsletters: 'Bültenler',
 		packages: 'Paketler',
 		settings: 'Ayarlar',
-		statistics: 'İstatistikler',
 		translation: 'Çeviri',
 		users: 'Kullanıcılar',
 	},
@@ -1363,8 +1362,16 @@ export default {
 		chooseChildNode: 'Alt düğümü seçin',
 		compositionsDescription:
 			'Mevcut bir belge türünden sekmeleri ve özellikleri devralın. Mevcut belge türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.',
+		compositionsDescriptionMediaType:
+			'Mevcut bir medya türünden sekmeleri ve özellikleri devralın. Mevcut medya türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.',
+		compositionsDescriptionMemberType:
+			'Mevcut bir üye türünden sekmeleri ve özellikleri devralın. Mevcut üye türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.',
 		compositionInUse: 'Bu içerik türü bir bestede kullanıldığından kendi başına oluşturulamaz.',
+		compositionInUseMediaType: 'Bu medya türü bir bestede kullanıldığından kendi başına oluşturulamaz.',
+		compositionInUseMemberType: 'Bu üye türü bir bestede kullanıldığından kendi başına oluşturulamaz.',
 		noAvailableCompositions: 'Beste olarak kullanılabilecek içerik türü yok.',
+		noAvailableCompositionsMediaType: 'Beste olarak kullanılabilecek medya türü yok.',
+		noAvailableCompositionsMemberType: 'Beste olarak kullanılabilecek üye türü yok.',
 		compositionRemoveWarning:
 			'Bir kompozisyonun kaldırılması, ilişkili tüm özellik verilerini silecektir. Belge türünü kaydettikten sonra geri dönüş yoktur.',
 		availableEditors: 'Yeni oluştur',
@@ -1399,6 +1406,10 @@ export default {
 		tabHasNoSortOrder: 'sekmesinde sıralama düzeni yok',
 		compositionUsageHeading: 'Bu beste nerede kullanılıyor?',
 		compositionUsageSpecification: 'Bu beste şu anda aşağıdaki içerik türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMediaType:
+			'Bu beste şu anda aşağıdaki medya türlerinin oluşturulmasında kullanılmaktadır:',
+		compositionUsageSpecificationMemberType:
+			'Bu beste şu anda aşağıdaki üye türlerinin oluşturulmasında kullanılmaktadır:',
 		cultureVariantHeading: 'Kültüre göre değişikliklere izin ver',
 		segmentVariantHeading: 'Segmentasyona izin ver',
 		cultureVariantLabel: 'Kültüre göre değişiklik yapın',
@@ -1962,5 +1973,10 @@ export default {
 		manageHeadline: 'İçerik Şablonlarını nasıl yönetirim?',
 		manageDescription:
 			'Ayarlar bölümündeki "İçerik Şablonları" ağacından İçerik Şablonlarını düzenleyebilir ve silebilirsiniz. İçerik Şablonunun dayandığı Belge Türünü genişletin ve düzenlemek veya silmek için tıklayın.',
+	},
+	picker: {
+		browseTab: 'Gözat',
+		searchTab: 'Ara',
+		selectedCount: (count: number) => `${count} öğe seçildi`,
 	},
 } as UmbLocalizationDictionary;

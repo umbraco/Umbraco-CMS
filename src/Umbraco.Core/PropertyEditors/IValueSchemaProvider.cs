@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// for programmatic content creation, validation, and tooling support.
 /// </para>
 /// <para>
-/// Implementations should return the schema for the incoming value (what <see cref="IDataValueEditor.FromEditor"/>
-/// receives via <see cref="ContentPropertyData.Value"/>), not the stored/database model (what
-/// <see cref="IDataValueEditor.FromEditor"/> produces) or the published model (what
+/// Implementations should return the schema for the incoming value (what <see cref="Models.IDataValueEditor.FromEditor"/>
+/// receives via <see cref="Models.Editors.ContentPropertyData.Value"/>), not the stored/database model (what
+/// <see cref="Models.IDataValueEditor.FromEditor"/> produces) or the published model (what
 /// <see cref="IPropertyValueConverter"/> produces).
 /// </para>
 /// </remarks>
@@ -46,7 +46,7 @@ public interface IValueSchemaProvider
     /// </returns>
     /// <remarks>
     /// <para>
-    /// The returned schema should describe the structure that <see cref="IDataValueEditor.FromEditor"/> receives
+    /// The returned schema should describe the structure that <see cref="Models.IDataValueEditor.FromEditor"/> receives
     /// (i.e., what the Management API accepts).
     /// </para>
     /// <para>

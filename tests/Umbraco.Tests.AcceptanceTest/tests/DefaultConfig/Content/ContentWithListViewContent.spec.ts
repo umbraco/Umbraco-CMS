@@ -99,9 +99,9 @@ test('can publish content with a child in the list', async ({umbracoApi, umbraco
   await umbracoUi.content.goToContentWithName(contentName);
 
   // Act
-  // Currently necessary
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+  // A child cannot be published while its parent is unpublished, so wait for the parent to actually be published first.
+  await umbracoApi.document.waitUntilDocumentIsPublished(documentId);
   await umbracoUi.content.goToContentInListViewWithName(childContentName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
@@ -157,7 +157,7 @@ test('child is removed from list after child content is deleted', async ({umbrac
   await umbracoUi.content.openContentCaretButtonForName(contentName);
   await umbracoUi.content.clickActionsMenuForContent(childContentName);
   await umbracoUi.content.clickTrashActionMenuOption();
-  await umbracoUi.content.clickConfirmTrashButton();
+  await umbracoUi.content.clickConfirmTrashButtonAndWaitForContentToBeTrashed();
 
   // Assert
   await umbracoUi.content.goToContentWithName(contentName);

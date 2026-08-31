@@ -570,11 +570,7 @@ internal partial class UserService : RepositoryService, IUserService
 
         if (identityCreationResult.Succeded is false)
         {
-            // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
-            // But there should be more information in the message.
-            return Attempt.FailWithStatus(
-                UserOperationStatus.UnknownFailure,
-                new UserCreationResult { Error = new ValidationResult(identityCreationResult.ErrorMessage) });
+            return MapCreationFailure(identityCreationResult);
         }
 
         // The user is now created, so we can fetch it to map it to a result model with our generated password.
@@ -606,6 +602,20 @@ internal partial class UserService : RepositoryService, IUserService
         };
 
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, creationResult);
+    }
+
+    private static Attempt<UserCreationResult, UserOperationStatus> MapCreationFailure(IdentityCreationResult identityCreationResult)
+    {
+        if (identityCreationResult.CancelledByNotification)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.CancelledByNotification, new UserCreationResult());
+        }
+
+        // If we fail from something in Identity we can't know exactly why, so we have to resolve to returning an unknown failure.
+        // But there should be more information in the message.
+        return Attempt.FailWithStatus(
+            UserOperationStatus.UnknownFailure,
+            new UserCreationResult { Error = new ValidationResult(identityCreationResult.ErrorMessage) });
     }
 
     /// <inheritdoc/>
@@ -1020,12 +1030,10 @@ internal partial class UserService : RepositoryService, IUserService
             return UserOperationStatus.AvatarFileNotFound;
         }
 
-        const string allowedAvatarFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
-
         // This shouldn't really be necessary since we're just gonna use it to generate a hash, but that's how it was.
         var avatarFileName = avatarTemporaryFile.FileName.ToSafeFileName(_shortStringHelper);
-        var extension = Path.GetExtension(avatarFileName)[1..];
-        if(allowedAvatarFileTypes.Contains(extension) is false || _contentSettings.DisallowedUploadedFileExtensions.Contains(extension))
+        var extension = avatarFileName.GetFileExtension().TrimStart(Constants.CharArrays.Period);
+        if (_contentSettings.IsAllowedImageFileType(extension) is false)
         {
             return UserOperationStatus.InvalidAvatar;
         }
