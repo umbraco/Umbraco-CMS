@@ -107,14 +107,6 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     }
 
     /// <summary>
-    /// Sets any properties on the collection response models that are not automatically mapped from the content items.
-    /// </summary>
-    /// <param name="contentCollection">The paged model containing the content items and configuration used to generate the collection response models.</param>
-    /// <param name="collectionResponseModels">The list of collection response models to set unmapped properties on.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    protected virtual Task SetUnmappedProperties(ListViewPagedModel<TContent> contentCollection, List<TCollectionResponseModel> collectionResponseModels) => Task.CompletedTask;
-
-    /// <summary>
     /// Gets the navigation structure for the collection's item type, used to resolve whether each item has children.
     /// </summary>
     /// <remarks>
@@ -127,6 +119,14 @@ public abstract class ContentCollectionPresentationFactory<TContent, TCollection
     /// absent from the main structure, so a collection viewed under a trashed ancestor still resolves correctly.
     /// </summary>
     protected virtual IRecycleBinNavigationQueryService? RecycleBinNavigationQueryService => null;
+
+    /// <summary>
+    /// Sets any properties on the collection response models that are not automatically mapped from the content items.
+    /// </summary>
+    /// <param name="contentCollection">The paged model containing the content items and configuration used to generate the collection response models.</param>
+    /// <param name="collectionResponseModels">The list of collection response models to set unmapped properties on.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    protected virtual Task SetUnmappedProperties(ListViewPagedModel<TContent> contentCollection, List<TCollectionResponseModel> collectionResponseModels) => Task.CompletedTask;
 
     private void PopulateHasChildren(List<TCollectionResponseModel> models)
     {
