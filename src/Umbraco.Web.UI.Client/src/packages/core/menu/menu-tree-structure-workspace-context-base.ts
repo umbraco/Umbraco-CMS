@@ -10,6 +10,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -36,6 +38,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
 	#isModalContext: boolean = false;
 	#isNew: boolean | undefined = undefined;
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
@@ -45,6 +48,12 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
 			this.#isModalContext = modalContext !== undefined;
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = instance;
+			this.#addEventListeners();
 		});
 
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
@@ -76,6 +85,26 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 			);
 		});
 	}
+
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+		if (event.getEntityType() !== this.#workspaceContext?.getEntityType()) return;
+		if (event.getUnique() !== this.#workspaceContext?.getUnique()) return;
+		this.#requestStructure();
+	};
 
 	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
@@ -209,6 +238,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	}
 
 	override destroy(): void {
+		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();
 		this.#parent.destroy();

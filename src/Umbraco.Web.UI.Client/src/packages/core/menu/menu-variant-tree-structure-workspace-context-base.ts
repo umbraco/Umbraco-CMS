@@ -17,6 +17,8 @@ import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -47,6 +49,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#isNew: boolean | undefined = undefined;
 	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	#workspaceActiveVariantId?: UmbVariantId;
+	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -58,6 +61,12 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
 			this.#isModalContext = modalContext !== undefined;
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#removeEventListeners();
+			this.#actionEventContext = instance;
+			this.#addEventListeners();
 		});
 
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
@@ -130,6 +139,26 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			unique,
 		});
 	}
+
+	#addEventListeners() {
+		this.#actionEventContext?.addEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#removeEventListeners() {
+		this.#actionEventContext?.removeEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureForEntityRequest as EventListener,
+		);
+	}
+
+	#onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
+		if (event.getEntityType() !== this.#workspaceContext?.getEntityType()) return;
+		if (event.getUnique() !== this.#workspaceContext?.getUnique()) return;
+		this.#requestStructure();
+	};
 
 	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
@@ -271,6 +300,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	}
 
 	override destroy(): void {
+		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();
 		this.#parent.destroy();
