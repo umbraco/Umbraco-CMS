@@ -62,11 +62,29 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		// TODO: Investigate whether some of these interceptors (e.g. addUmbGeneratedResourceInterceptor,
 		// addForbiddenResponseInterceptor, addUmbNotificationsInterceptor, addErrorInterceptor) belong
 		// somewhere else, since they are not auth-specific.
+		this.addSessionActivityInterceptor(client);
 		this.addAuthResponseInterceptor(client);
 		this.addForbiddenResponseInterceptor(client);
 		this.addUmbGeneratedResourceInterceptor(client);
 		this.addUmbNotificationsInterceptor(client);
 		this.addErrorInterceptor(client);
+	}
+
+	/**
+	 * Interceptor which signals the auth layer that a request succeeded. The server renews the session
+	 * on any request carrying a valid session, so this is what lets the auth layer keep its own expiry
+	 * bookkeeping in step with the server without a request of its own.
+	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
+	 * @internal
+	 */
+	addSessionActivityInterceptor(client: typeof umbHttpClient) {
+		client.interceptors.response.use((response): Response => {
+			if (response.ok) {
+				this.#signaler.signalActivity();
+			}
+
+			return response;
+		});
 	}
 
 	/**

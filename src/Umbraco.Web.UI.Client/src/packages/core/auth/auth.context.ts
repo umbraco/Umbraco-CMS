@@ -39,6 +39,10 @@ export class UmbAuthContext extends UmbContextBase {
 	#session = new UmbObjectState<UmbAuthSession | undefined>(undefined);
 	readonly session$ = this.#session.asObservable();
 
+	// The window the current session's expiry describes, remembered so activity can slide the expiry
+	// forward locally. Milliseconds, because activity is timestamped from the wall clock.
+	#sessionWindowInMs?: number;
+
 	// Cross-tab coordination
 	#channel: BroadcastChannel;
 
@@ -136,6 +140,12 @@ export class UmbAuthContext extends UmbContextBase {
 					this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
 					break;
 				}
+				case 'sessionUpdate': {
+					// Another tab learned a fresher expiry, typically by sliding it on activity. The auth
+					// cookie is shared between tabs, so the renewal applies here too.
+					this.#applySessionExpiry(evt.data.expiresAt, evt.data.sessionWindowInMs);
+					break;
+				}
 				case 'sessionCleared':
 					this.#session.setValue(undefined);
 					break;
@@ -164,6 +174,13 @@ export class UmbAuthContext extends UmbContextBase {
 				// Only time out if the user is currently authorized
 				if (this.getIsAuthorized()) {
 					this.timeOut();
+				}
+			});
+			// Every request bearing the session renews it server-side, so follow that here rather than
+			// counting down to the expiry the session started out with.
+			this.observe(signaler?.activityDetectedAt, (activityDetectedAt) => {
+				if (activityDetectedAt) {
+					this.#slideSessionExpiry(activityDetectedAt);
 				}
 			});
 		});
@@ -620,11 +637,60 @@ export class UmbAuthContext extends UmbContextBase {
 	 * @param {number} issuedAt The timestamp when the session was issued.
 	 */
 	#setSessionLocally(expiresIn: number | undefined, issuedAt: number) {
+		this.#applySessionExpiry(expiresIn === undefined ? undefined : issuedAt + expiresIn);
+	}
+
+	/**
+	 * Sets the in-memory session to a known expiry and remembers the window it describes.
+	 * @param {number | undefined} expiresAt When the session expires (unix seconds), or undefined when
+	 * the expiry is unknown.
+	 * @param {number} [sessionWindowInMs] The window the expiry describes, for callers that already know
+	 * it. Defaults to the time still to run, which is the whole window whenever an expiry is learned:
+	 * every request bearing the session re-issues it for another full window, so a just-learned expiry
+	 * belongs to a just-started one. That makes the remembered window exactly as accurate as the expiry
+	 * it came from, and never more optimistic.
+	 */
+	#applySessionExpiry(expiresAt: number | undefined, sessionWindowInMs?: number) {
+		this.#sessionWindowInMs =
+			expiresAt === undefined ? undefined : (sessionWindowInMs ?? expiresAt * 1000 - Date.now());
+
 		// Cookie auth: the session has a single, server-owned expiry (the auth cookie's), so both
 		// timestamps are the same — the historical access-vs-refresh token split (and its ×4
 		// multiplier) no longer applies. TODO (V21): drop the deprecated accessTokenExpiresAt.
-		const expiresAt = expiresIn === undefined ? undefined : issuedAt + expiresIn;
 		this.#session.setValue({ accessTokenExpiresAt: expiresAt, expiresAt });
+	}
+
+	/**
+	 * Slides the in-memory session expiry forward to mirror the renewal the server performs for any
+	 * request bearing the session. Deliberately no round trip of its own: the renewal already happened
+	 * on the request that produced this activity, so only the local bookkeeping is behind.
+	 * @param {number} activityAt The timestamp (ms) of the response whose request renewed the session.
+	 */
+	#slideSessionExpiry(activityAt: number) {
+		const session = this.#session.getValue();
+		const sessionWindowInMs = this.#sessionWindowInMs;
+
+		// Without a session, or with an expiry we never knew, there is nothing to slide — an unknown
+		// expiry stays unknown rather than becoming a guess (see #establishSessionFromServer).
+		if (!session?.expiresAt || sessionWindowInMs === undefined) {
+			return;
+		}
+
+		// Rounded up, so that the expiry keeps up with activity instead of being rounded back to the
+		// second it was already set to. The timeout controller's own safety margin covers the sub-second
+		// optimism that adds.
+		const expiresAt = Math.ceil((activityAt + sessionWindowInMs) / 1000);
+
+		// The expiry only ever moves forward. This also settles what a burst of requests costs: they
+		// resolve to the expiry that is already set, so nothing is published for them.
+		if (expiresAt <= session.expiresAt) {
+			return;
+		}
+
+		this.#applySessionExpiry(expiresAt, sessionWindowInMs);
+
+		// Peer tabs share the cookie, so their expiry moved too — they just didn't make the request.
+		this.#channel.postMessage({ type: 'sessionUpdate', ...this.#session.getValue(), sessionWindowInMs });
 	}
 
 	async #makeLinkTokenRequest(provider: string) {
