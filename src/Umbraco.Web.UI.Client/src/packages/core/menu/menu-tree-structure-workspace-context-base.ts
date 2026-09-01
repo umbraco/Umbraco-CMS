@@ -107,10 +107,19 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	}
 
 	#onReloadStructureForEntityRequest = (event: UmbRequestReloadStructureForEntityEvent) => {
-		if (event.getEntityType() !== this.#workspaceContext?.getEntityType()) return;
-		if (event.getUnique() !== this.#workspaceContext?.getUnique()) return;
+		if (!this.#isCurrentEntityOrAncestor(event.getEntityType(), event.getUnique())) return;
 		this.#requestStructure();
 	};
+
+	#isCurrentEntityOrAncestor(entityType: string, unique: string | null): boolean {
+		if (entityType === this.#workspaceContext?.getEntityType() && unique === this.#workspaceContext?.getUnique()) {
+			return true;
+		}
+
+		return this.#ancestorContext
+			.getAncestors()
+			.some((ancestor) => ancestor.entityType === entityType && ancestor.unique === unique);
+	}
 
 	async #requestStructureImpl() {
 		const requestId = ++this.#structureRequestId;

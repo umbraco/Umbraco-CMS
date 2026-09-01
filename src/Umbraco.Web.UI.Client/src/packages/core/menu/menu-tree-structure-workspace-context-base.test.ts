@@ -135,6 +135,39 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 			});
 		});
 
+		it('re-requests ancestors when the event matches a currently displayed ancestor (e.g. an ancestor was renamed elsewhere)', async () => {
+			UmbTestTreeRepository.ancestors = [
+				createTestAncestorItem({ unique: 'parent-unique', entityType: 'test-entity-type' }),
+			];
+
+			dispatchReloadStructure();
+			await aTimeout(150);
+
+			expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(2);
+
+			// The event is for the ancestor, not the open entity itself.
+			dispatchReloadStructure({ unique: 'parent-unique' });
+			await aTimeout(150);
+
+			expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(3);
+		});
+
+		it('does not re-request ancestors when the event is for an entity that is neither the open entity nor a currently displayed ancestor', async () => {
+			UmbTestTreeRepository.ancestors = [
+				createTestAncestorItem({ unique: 'parent-unique', entityType: 'test-entity-type' }),
+			];
+
+			dispatchReloadStructure();
+			await aTimeout(150);
+
+			expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(2);
+
+			dispatchReloadStructure({ unique: 'unrelated-unique' });
+			await aTimeout(150);
+
+			expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(2);
+		});
+
 		it('does not re-request ancestors when the event is for a different unique', async () => {
 			dispatchReloadStructure({ unique: 'some-other-unique' });
 			await aTimeout(150);
