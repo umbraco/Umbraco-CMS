@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
@@ -19,6 +20,7 @@ public class DocumentCollectionPresentationFactoryTests
     private Mock<IPublicAccessService> _publicAccessService = null!;
     private Mock<IEntityService> _entityService = null!;
     private Mock<IUserService> _userService = null!;
+    private Mock<IDocumentNavigationQueryService> _navigationQueryService = null!;
     private DocumentCollectionPresentationFactory _factory = null!;
 
     [SetUp]
@@ -28,6 +30,7 @@ public class DocumentCollectionPresentationFactoryTests
         _publicAccessService = new Mock<IPublicAccessService>();
         _entityService = new Mock<IEntityService>();
         _userService = new Mock<IUserService>();
+        _navigationQueryService = new Mock<IDocumentNavigationQueryService>();
 
         // Default: return empty user list for any batch call
         _userService.Setup(x => x.GetUsersById(It.IsAny<int[]>()))
@@ -38,7 +41,8 @@ public class DocumentCollectionPresentationFactoryTests
             new FlagProviderCollection(() => Enumerable.Empty<IFlagProvider>()),
             _publicAccessService.Object,
             _entityService.Object,
-            _userService.Object);
+            _userService.Object,
+            _navigationQueryService.Object);
     }
 
     [Test]
@@ -319,6 +323,122 @@ public class DocumentCollectionPresentationFactoryTests
 
         // Per-item profile resolution should never be called
         _userService.Verify(x => x.GetProfileById(It.IsAny<int>()), Times.Never);
+    }
+
+    [Test]
+    public async Task PopulateHasChildren_Flags_Items_That_Have_Children()
+    {
+        // Arrange - a mixed set, so that flagging all or none is visibly wrong.
+        var contentKey1 = Guid.NewGuid();
+        var contentKey2 = Guid.NewGuid();
+        var contentKey3 = Guid.NewGuid();
+
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey1, contentKey2, contentKey3);
+
+        SetupHasChildren(contentKey1, true);
+        SetupHasChildren(contentKey2, false);
+        SetupHasChildren(contentKey3, true);
+
+        // Act
+        List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
+
+        // Assert
+        Assert.IsTrue(result[0].HasChildren);
+        Assert.IsFalse(result[1].HasChildren);
+        Assert.IsTrue(result[2].HasChildren);
+    }
+
+    [Test]
+    public async Task PopulateHasChildren_Flags_Trashed_Items_From_Recycle_Bin_Structure()
+    {
+        // Trashed items are removed from the main navigation structure, so the recycle bin structure
+        // has to be consulted for them.
+        var contentKey = Guid.NewGuid();
+
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey);
+
+        SetupHasChildren(contentKey, hasChildren: false, inStructure: false);
+        _navigationQueryService
+            .Setup(x => x.TryGetHasChildrenInBin(contentKey, out It.Ref<bool>.IsAny))
+            .Returns((Guid _, out bool hasChildren) =>
+            {
+                hasChildren = true;
+                return true;
+            });
+
+        List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
+
+        Assert.IsTrue(result[0].HasChildren);
+    }
+
+    [Test]
+    public async Task PopulateHasChildren_Handles_Items_Missing_From_Both_Structures()
+    {
+        var contentKey = Guid.NewGuid();
+
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey);
+
+        SetupHasChildren(contentKey, hasChildren: false, inStructure: false);
+        _navigationQueryService
+            .Setup(x => x.TryGetHasChildrenInBin(contentKey, out It.Ref<bool>.IsAny))
+            .Returns((Guid _, out bool hasChildren) =>
+            {
+                hasChildren = false;
+                return false;
+            });
+
+        List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
+
+        Assert.IsFalse(result[0].HasChildren);
+    }
+
+    [Test]
+    public async Task PopulateHasChildren_Skips_Recycle_Bin_For_Items_In_Main_Structure()
+    {
+        var contentKey = Guid.NewGuid();
+
+        ListViewPagedModel<IContent> contentCollection = SetupCollection(contentKey);
+
+        SetupHasChildren(contentKey, hasChildren: false);
+
+        await _factory.CreateCollectionModelAsync(contentCollection);
+
+        _navigationQueryService.Verify(
+            x => x.TryGetHasChildrenInBin(It.IsAny<Guid>(), out It.Ref<bool>.IsAny),
+            Times.Never);
+    }
+
+    private void SetupHasChildren(Guid key, bool hasChildren, bool inStructure = true)
+        => _navigationQueryService
+            .Setup(x => x.TryGetHasChildren(key, out It.Ref<bool>.IsAny))
+            .Returns((Guid _, out bool result) =>
+            {
+                result = hasChildren;
+                return inStructure;
+            });
+
+    private ListViewPagedModel<IContent> SetupCollection(params Guid[] keys)
+    {
+        IContent[] items = keys
+            .Select((key, index) => CreateContentMock(key, id: (index + 1) * 10, path: $"-1,100,{(index + 1) * 10}"))
+            .ToArray();
+
+        _mapper.Setup(m => m.MapEnumerable<IContent, DocumentCollectionResponseModel>(
+                It.IsAny<IEnumerable<IContent>>(),
+                It.IsAny<Action<MapperContext>>()))
+            .Returns(keys.Select(key => new DocumentCollectionResponseModel { Id = key }).ToList());
+
+        _publicAccessService.Setup(x => x.GetAll())
+            .Returns(Enumerable.Empty<PublicAccessEntry>());
+
+        _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
+            .Returns(Array.Empty<Guid>());
+
+        return new ListViewPagedModel<IContent>
+        {
+            Items = new PagedModel<IContent>(items.Length, items),
+            ListViewConfiguration = new ListViewConfiguration(),
+        };
     }
 
     private static IContent CreateContentMock(Guid key, int id, string path, int creatorId = 0, int writerId = 0)
