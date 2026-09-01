@@ -41,7 +41,7 @@ export class UmbContentPropertyDatasetContext<
 	constructor(
 		host: UmbControllerHost,
 		dataOwner: UmbContentWorkspaceContext<ContentModel, ContentTypeModel, VariantModelType>,
-		variantId?: UmbVariantId,
+		variantId: UmbVariantId,
 	) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, dataOwner, variantId);
