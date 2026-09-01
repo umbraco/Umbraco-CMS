@@ -19,6 +19,9 @@
     <ProjectReference Include="..\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Api.Management\Umbraco.Cms.Api.Management.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Search.BackOffice\Umbraco.Cms.Search.BackOffice.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Search.DeliveryApi\Umbraco.Cms.Search.DeliveryApi.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Search.Provider.Examine\Umbraco.Cms.Search.Provider.Examine.csproj" />
   </ItemGroup>
 
   <ItemGroup>

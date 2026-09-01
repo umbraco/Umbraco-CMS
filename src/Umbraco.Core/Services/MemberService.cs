@@ -898,8 +898,8 @@ namespace Umbraco.Cms.Core.Services
             }
 
             // Login is not a member update: UpdateDate is intentionally left untouched, and the
-            // IndexableFieldsChanged state flag tells the Examine indexing handler to skip the
-            // re-index since no indexed field has changed.
+            // IndexableFieldsChanged state flag tells search indexing to skip the re-index since
+            // no indexed field has changed.
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
             savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
             savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);

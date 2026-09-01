@@ -633,42 +633,6 @@
 		<key alias="changeKeyError"><![CDATA[La chiave '%0%' esiste già.]]></key>
 		<key alias="overviewTitle">Panoramica del Dizionario</key>
 	</area>
-	<area alias="examineManagement">
-		<key alias="configuredSearchers">Searchers configurati</key>
-		<key alias="configuredSearchersDescription">
-			<![CDATA[Visualizza le proprietà e gli strumenti per ogni Searcher configurato (per esempio un multi-index searcher)]]>
-		</key>
-		<key alias="fieldValues">Valori del campo</key>
-		<key alias="healthStatus">Stato di salute</key>
-		<key alias="healthStatusDescription"><![CDATA[Lo stato di salute dell'index e se può essere letto]]></key>
-		<key alias="indexers">Indexers</key>
-		<key alias="indexInfo">Index info</key>
-		<key alias="indexInfoDescription"><![CDATA[Elenca le proprietà dell'index]]></key>
-		<key alias="manageIndexes">Gestisci gli indexes di Examine</key>
-		<key alias="manageIndexesDescription">
-			Permette di visualizzare i dettagli di ogni index e fornisce alcuni strumenti
-			per gestire gli index
-		</key>
-		<key alias="rebuildIndex">Ricostruisci index</key>
-		<key alias="rebuildIndexWarning">
-			<![CDATA[
-      Questo causerà la ricostruzione dell'index.<br />
-      A seconda della quantità di contenuti presenti nel tuo sito, potrebbe volerci un po' di tempo.<br />
-      Non è consigliabile ricostruire un indice durante i periodi di elevato traffico del sito Web o quando gli editor modificano i contenuti.
-     ]]>
-		</key>
-		<key alias="searchers">Searchers</key>
-		<key alias="searchDescription">Cerca nell'index e visualizza i risultati</key>
-		<key alias="tools">Strumenti</key>
-		<key alias="toolsDescription">Strumenti per gestire l'index</key>
-		<key alias="fields">Campi</key>
-		<key alias="indexCannotRead"><![CDATA[L'indice non può essere letto e dovrà essere ricostruito]]></key>
-		<key alias="processIsTakingLonger">
-			<![CDATA[Il processo sta impiegando più tempo del previsto, controlla il log di Umbraco per vedere se ci sono stati errori durante questa operazione]]>
-		</key>
-		<key alias="indexCannotRebuild"><![CDATA[Questo indice non può essere ricostruito perché non ha assegnato]]></key>
-		<key alias="iIndexPopulator">IIndexPopulator</key>
-	</area>
 	<area alias="placeholders">
 		<key alias="username">Inserisci il tuo username</key>
 		<key alias="password">Inserisci la tua password</key>
@@ -2792,7 +2756,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="contentRedirectManager">Gestione Redirect URL</key>
 		<key alias="mediaFolderBrowser">Contenuto</key>
 		<key alias="settingsWelcome">Benvenuto</key>
-		<key alias="settingsExamine">Gestione Examine</key>
 		<key alias="settingsPublishedStatus">Stato di pubblicazione</key>
 		<key alias="settingsModelsBuilder">Models Builder</key>
 		<key alias="settingsHealthCheck">Health Check</key>
