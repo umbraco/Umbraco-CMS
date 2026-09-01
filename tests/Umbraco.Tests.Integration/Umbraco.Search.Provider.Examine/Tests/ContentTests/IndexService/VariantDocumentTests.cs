@@ -1,3 +1,4 @@
+using System.Globalization;
 using Examine;
 using Examine.Search;
 using NUnit.Framework;
@@ -102,11 +103,14 @@ public class VariantDocumentTests : IndexTestBase
         IOrdering queryBuilder = index.Searcher.CreateQuery().All();
         queryBuilder.SelectField(field);
         ISearchResults results = queryBuilder.Execute();
+
+        // the index stores values culture invariantly, so the expected value must be formatted the same way
+        var expectedValue = Convert.ToString(value, CultureInfo.InvariantCulture);
         var result = results
             .SelectMany(x => x.Values.Values)
-            .First(x => x == value.ToString());
+            .First(x => x == expectedValue);
         Assert.That(results, Is.Not.Empty);
-        Assert.That(result, Is.EqualTo(value.ToString()));
+        Assert.That(result, Is.EqualTo(expectedValue));
     }
 
     [TestCase("title", "updatedTitle", "en-US")]
