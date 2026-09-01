@@ -14,7 +14,8 @@ export class UmbElementDataValueVariantsController<ModelType extends UmbElementD
 		[],
 		(v) => v.culture + ':' + v.segment,
 	);
-	variants = this.#variants.asObservable();
+	/** An observable of the current variants that has values in the data. */
+	public readonly variants = this.#variants.asObservable();
 
 	constructor(host: UmbControllerHost, dataManager: UmbElementWorkspaceDataManager<ModelType>) {
 		super(host);
