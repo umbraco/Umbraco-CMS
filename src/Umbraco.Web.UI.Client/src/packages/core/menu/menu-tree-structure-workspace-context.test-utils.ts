@@ -26,8 +26,11 @@ export class UmbTestSubmittableTreeEntityWorkspaceContext {
 	readonly unique = this.#unique.asObservable();
 	readonly entityType = this.#entityType.asObservable();
 	readonly isNew = this.#isNew.asObservable();
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	readonly _internal_createUnderParent = new UmbObjectState<UmbEntityModel | undefined>(undefined).asObservable();
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	readonly _internal_createUnderParentEntityUnique = this.#createUnderParentUnique.asObservable();
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	readonly _internal_createUnderParentEntityType = this.#createUnderParentEntityType.asObservable();
 
 	constructor(host: UmbControllerHost) {
