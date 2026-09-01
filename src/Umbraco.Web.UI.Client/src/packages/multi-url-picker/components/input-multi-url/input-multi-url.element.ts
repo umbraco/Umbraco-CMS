@@ -189,7 +189,9 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 
 	// A link's name and URL only depend on its unique, so they are requested once per unique. This
 	// spares every link that is merely moved or re-assigned unchanged — such as on a re-order — from
-	// being looked up again.
+	// being looked up again. A unique is marked before its lookup starts, so a second render does not
+	// fire the same request while the first is in flight, and un-marked again if nothing came back,
+	// so a lookup that failed can be retried.
 	#requestedNameUniques = new Set<string>();
 	#requestedUrlUniques = new Set<string>();
 
@@ -304,7 +306,10 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 				return;
 		}
 
-		if (!url) return;
+		if (!url) {
+			this.#requestedUrlUniques.delete(unique);
+			return;
+		}
 
 		this._resolvedLinkUrls = [...this._resolvedLinkUrls, { unique, url }];
 	}
@@ -328,7 +333,10 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 				return;
 		}
 
-		if (!name) return;
+		if (!name) {
+			this.#requestedNameUniques.delete(unique);
+			return;
+		}
 
 		this._resolvedLinkNames = [...this._resolvedLinkNames, { unique, name }];
 	}
