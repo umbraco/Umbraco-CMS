@@ -147,6 +147,34 @@ test('cannot add number of block element greater than the maximum amount', async
   await umbracoUi.content.isAddBlockElementButtonWithLabelVisible(customDataTypeName, 'Add', false);
 });
 
+test('cannot publish content with fewer block elements than the minimum amount', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const minAmount = 1;
+  const customDataTypeId = await umbracoApi.dataType.createBlockListWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, minAmount, 0);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isErrorNotificationVisible();
+
+  // Add a block and publish succeeds
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickBlockElementWithName(elementTypeName);
+  await umbracoUi.content.clickCreateModalButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  const blockListValue = contentData.values.find(item => item.value);
+  expect(blockListValue).toBeTruthy();
+});
+
 test('can set the label of block element in the content', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const blockLabel = 'Test Block Label';

@@ -1152,14 +1152,14 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createImageMediaPickerDataType(name: string, minValue = 0, maxValue = 1, enableLocalFocalPoint = false, ignoreUserStartNodes = false) {
+  async createImageMediaPickerDataType(name: string, minValue = 0, maxValue = 1, enableLocalFocalPoint = false, ignoreUserStartNodes = false, multiple = false) {
     await this.ensureNameNotExists(name);
     const mediaType = await this.api.mediaType.getByName('Image');
 
     const dataType = new MediaPickerDataTypeBuilder()
       .withName(name)
       .withFilter(mediaType.id)
-      .withMultiple(false)
+      .withMultiple(multiple)
       .withMinValue(minValue)
       .withMaxValue(maxValue)
       .withEnableLocalFocalPoint(enableLocalFocalPoint)
@@ -1295,6 +1295,18 @@ export class DataTypeApiHelper {
 
     const dataType = new DecimalDataTypeBuilder()
       .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDecimalWithMinMax(name: string, min: number, max: number) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new DecimalDataTypeBuilder()
+      .withName(name)
+      .withMin(min)
+      .withMax(max)
       .build();
 
     return await this.save(dataType);
@@ -1998,6 +2010,18 @@ export class DataTypeApiHelper {
 
     const dataType = new NumericDataTypeBuilder()
       .withName(name)
+      .build();
+
+    return await this.save(dataType);
+  }
+
+  async createDefaultNumericWithMinMax(name: string, min: number, max: number) {
+    await this.ensureNameNotExists(name);
+
+    const dataType = new NumericDataTypeBuilder()
+      .withName(name)
+      .withMin(min)
+      .withMax(max)
       .build();
 
     return await this.save(dataType);

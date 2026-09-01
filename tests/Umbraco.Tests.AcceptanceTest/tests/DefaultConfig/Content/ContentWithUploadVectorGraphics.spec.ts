@@ -4,16 +4,19 @@ import {expect} from "@playwright/test";
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Upload Vector Graphics';
+const customDataTypeName = 'Custom Upload Vector Graphics';
 const uploadVectorGraphicsPath = './fixtures/mediaLibrary/';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with the upload vector graphics data type', async ({umbracoApi, umbracoUi}) => {
@@ -100,6 +103,27 @@ test('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) =>
 
   // Assert
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values).toEqual([]);
+});
+
+test('cannot upload a file with a disallowed extension', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const dataTypeId = await umbracoApi.dataType.createUploadDataType(customDataTypeName, ['pdf']);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  // The data type only allows pdf, so an svg file is rejected without ever leaving the empty dropzone state -
+  // there is currently no visible error message for this, only the absence of the uploaded file.
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.uploadFile(uploadVectorGraphicsPath + 'VectorGraphics.svg');
+  await umbracoUi.content.isInputDropzoneVisible(true);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
+
+  // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);
 });

@@ -61,6 +61,38 @@ test('can edit property value from composition in content', async ({umbracoApi, 
   expect(contentData.values[0].value).toEqual(text);
 });
 
+test('cannot publish content with a mandatory property inherited via composition left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const mandatoryCompositionDocumentTypeName = 'MandatoryCompositionDocumentType';
+  const text = 'This is a required property value';
+  await umbracoApi.documentType.ensureNameNotExists(mandatoryCompositionDocumentTypeName);
+  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+  const mandatoryCompositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(mandatoryCompositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName, false, false, true);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, mandatoryCompositionDocumentTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isErrorNotificationVisible();
+
+  // Fill the inherited value and publish succeeds
+  await umbracoUi.content.enterTextstring(text);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBePublished();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
+  expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
+  expect(contentData.values[0].value).toEqual(text);
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(mandatoryCompositionDocumentTypeName);
+});
+
 test('can publish content with a document type that has a composition', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const text = 'Published composition value';
