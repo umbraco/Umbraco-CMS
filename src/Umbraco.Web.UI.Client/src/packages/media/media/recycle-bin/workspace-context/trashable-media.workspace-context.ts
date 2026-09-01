@@ -18,5 +18,3 @@ export class UmbTrashableMediaWorkspaceContext extends UmbTrashableEntityWorkspa
 		return UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 }
-
-export { UmbTrashableMediaWorkspaceContext as api };
