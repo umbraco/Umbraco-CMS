@@ -33,6 +33,7 @@ export class UmbElementDataValueVariantsController<ModelType extends UmbElementD
 	async #retrieveVariantsInData(current: ModelType) {
 		// Get a flat map of values:
 		const variants = await new UmbPropertyValueFlatMapperController(this).flatMapMany(current.values, (property) => {
+			// Be aware that a value of `false` or `""` or `[]` is not captured here:
 			if (property.value) {
 				return { culture: property.culture, segment: property.segment };
 			}
