@@ -9,6 +9,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	UmbBasicState,
 	UmbBooleanState,
+	UmbObjectState,
 	classEqualMemoization,
 	createObservablePart,
 	mergeObservables,
@@ -31,14 +32,16 @@ export abstract class UmbElementPropertyDatasetContext<
 	implements UmbPropertyDatasetContext
 {
 	protected readonly _dataOwner: DataOwnerType;
-	#variantId: UmbVariantId;
 	public getVariantId() {
-		return this.#variantId;
+		return this.#currentVariantId.getValue() ?? UmbVariantId.CreateInvariant();
 	}
 
-	abstract name: Observable<string | undefined>;
-	abstract culture: Observable<string | null | undefined>;
-	abstract segment: Observable<string | null | undefined>;
+	#currentVariantId = new UmbObjectState<UmbVariantId | undefined>(undefined);
+	public readonly variantId = this.#currentVariantId.asObservable();
+	public readonly culture = this.#currentVariantId.asObservablePart((x) => x?.culture);
+	public readonly segment = this.#currentVariantId.asObservablePart((x) => x?.segment);
+
+	abstract readonly name: Observable<string | undefined>;
 
 	#propertyVariantIdPromise?: Promise<never>;
 	#propertyVariantIdPromiseResolver?: () => void;
@@ -66,8 +69,17 @@ export abstract class UmbElementPropertyDatasetContext<
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, UMB_PROPERTY_DATASET_CONTEXT);
 		this._dataOwner = dataOwner;
-		this.#variantId = variantId ?? UmbVariantId.CreateInvariant();
-		this.#variantContext.setVariantId(this.#variantId);
+
+		variantId ??= UmbVariantId.CreateInvariant();
+		this.#currentVariantId.setValue(variantId);
+
+		this.observe(
+			this.variantId,
+			(variantId) => {
+				this.#variantContext.setVariantId(variantId);
+			},
+			null,
+		);
 
 		this.#propertyVariantIdPromise = new Promise((resolve) => {
 			this.#propertyVariantIdPromiseResolver = resolve as unknown as () => void;
@@ -75,7 +87,7 @@ export abstract class UmbElementPropertyDatasetContext<
 		});
 
 		this.observe(
-			this._dataOwner.readOnlyGuard.isPermittedForVariant(this.#variantId),
+			this._dataOwner.readOnlyGuard.isPermittedForVariant(this.getVariantId()),
 			(isReadOnly) => {
 				this._readOnly.setValue(isReadOnly);
 			},
@@ -100,9 +112,10 @@ export abstract class UmbElementPropertyDatasetContext<
 	}
 
 	#createPropertyVariantId(property: UmbPropertyTypeModel) {
+		const variantId = this.getVariantId();
 		return UmbVariantId.Create({
-			culture: property.variesByCulture ? this.#variantId.culture : null,
-			segment: property.variesBySegment ? this.#variantId.segment : null,
+			culture: property.variesByCulture ? variantId.culture : null,
+			segment: property.variesBySegment ? variantId.segment : null,
 		});
 	}
 

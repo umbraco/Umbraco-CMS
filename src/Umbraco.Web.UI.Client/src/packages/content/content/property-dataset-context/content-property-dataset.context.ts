@@ -20,11 +20,6 @@ export class UmbContentPropertyDatasetContext<
 	//
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 
-	#currentVariantId = new UmbObjectState<UmbVariantId | undefined>(undefined);
-	public readonly variantId = this.#currentVariantId.asObservable();
-	public readonly culture = this.#currentVariantId.asObservablePart((x) => x?.culture);
-	public readonly segment = this.#currentVariantId.asObservablePart((x) => x?.segment);
-
 	#currentVariant = new UmbObjectState<VariantModelType | undefined>(undefined);
 	public readonly currentVariant = this.#currentVariant.asObservable();
 	public readonly name = this.#currentVariant.asObservablePart((x) => x?.name);
@@ -47,8 +42,6 @@ export class UmbContentPropertyDatasetContext<
 		super(host, dataOwner, variantId);
 
 		this.#pathAddendum.setAddendum(variantId ? variantId.toString() : '');
-
-		this.#currentVariantId.setValue(variantId);
 
 		this.observe(
 			this.variantId.pipe(
