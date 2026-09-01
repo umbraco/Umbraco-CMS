@@ -128,7 +128,16 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 	});
 
 	describe('reload on trash/restore', () => {
-		it('reloads the workspace when the trashed entity matches', async () => {
+		it('does not reload the workspace when the trashed entity matches (redirects instead)', async () => {
+			dispatchTrashed();
+			await aTimeout(0);
+
+			expect(workspaceContext.reloadCallCount).to.equal(0);
+		});
+
+		it('reloads the workspace when the trashed entity matches and is hosted in a modal', async () => {
+			workspaceContext.modalContext = { data: {} };
+
 			dispatchTrashed();
 			await aTimeout(0);
 
@@ -170,6 +179,8 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 			expect(history.replaceStateCalls).to.have.lengthOf(1);
 			expect(history.replaceStateCalls[0].url).to.equal('/test/edit/parent-unique');
 			expect(history.pushStateCalls).to.have.lengthOf(0);
+			// Redirecting shouldn't also reload — reload() is for the modal (stay-put) case only.
+			expect(workspaceContext.reloadCallCount).to.equal(0);
 		});
 
 		it('redirects to the fallback path when the trashed entity had no parent (root)', async () => {
@@ -183,6 +194,7 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 			expect(history.pushStateCalls).to.have.lengthOf(1);
 			expect(history.pushStateCalls[0].url).to.equal('/test/root');
 			expect(history.replaceStateCalls).to.have.lengthOf(0);
+			expect(workspaceContext.reloadCallCount).to.equal(0);
 		});
 
 		it('does not redirect when hosted in a modal, but still reloads', async () => {

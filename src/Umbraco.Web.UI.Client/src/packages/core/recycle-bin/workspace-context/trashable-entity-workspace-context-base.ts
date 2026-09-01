@@ -100,19 +100,20 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 
 	#onTrashed = (event: UmbEntityTrashedEvent) => {
 		if (!this.#isMatchingEvent(event)) return;
-		this.#workspaceContext?.reload();
 
+		// Only reload when staying put (a modal), to refresh the visible trashed state — when redirecting away,
+		// the new data isn't needed here.
 		const unique = event.getUnique();
-		if (unique) {
+		if (unique && !this.#workspaceContext?.modalContext) {
 			this.#redirectToParent(unique);
+			return;
 		}
+
+		this.#workspaceContext?.reload();
 	};
 
 	async #redirectToParent(unique: string) {
 		if (!this.#workspaceContext) return;
-
-		// Don't redirect a workspace hosted in a modal (e.g. opened from a picker) — it should stay put, readonly.
-		if (this.#workspaceContext.modalContext) return;
 
 		if (!this.#recycleBinRepositoryAlias) throw new Error('Recycle bin repository alias is not set');
 		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
