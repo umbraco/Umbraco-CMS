@@ -273,7 +273,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				if (!varies) {
 					return [
 						{
-							variant: variants.find((x) => x.culture === null && !(x as any).segment),
+							variant: variants.find((x) => x.culture === null),
 							language: languages.find((x) => x.isDefault),
 							culture: null,
 							segment: null,
@@ -286,7 +286,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				if (variesByCulture && !variesBySegment) {
 					return languages.map((language) => {
 						return {
-							variant: variants.find((x) => x.culture === language.unique && !(x as any).segment),
+							variant: variants.find((x) => x.culture === language.unique),
 							language,
 							culture: language.unique,
 							segment: null,
@@ -325,7 +325,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				if (variesByCulture && variesBySegment) {
 					return languages.flatMap((language) => {
 						const culture = {
-							variant: variants.find((x) => x.culture === language.unique && !(x as any).segment),
+							variant: variants.find((x) => x.culture === language.unique),
 							language,
 							culture: language.unique,
 							segment: null,
@@ -533,12 +533,12 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variants = this._data.getCurrent()?.variants;
 		if (!variants) return;
 		if (variantId) {
-			return variants.find((x) => variantId.culture === x.culture && !(x as any).segment)?.name;
+			return variants.find((x) => variantId.culture === x.culture)?.name;
 		}
 		// Get the first active variant's name
 		const activeVariant = this.splitView.getActiveVariants()[0];
 		if (activeVariant) {
-			return variants.find((x) => activeVariant.culture === x.culture && !(x as any).segment)?.name;
+			return variants.find((x) => activeVariant.culture === x.culture)?.name;
 		}
 		// Fallback to first variant if no active variant is set, and it is not a segment variant, since segments should not exist as varaint-entries. [NL]
 		if (variants[0] && !(variants[0] as any).segment) {
@@ -571,7 +571,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			}
 			// Explicit variant requested
 			return this._data.createObservablePartOfCurrent(
-				(data) => data?.variants?.find((x) => x.culture === variantId.culture && !(x as any).segment)?.name ?? '',
+				(data) => data?.variants?.find((x) => x.culture === variantId.culture)?.name ?? '',
 			);
 		}
 		// No variant specified - observe first active variant's name
@@ -581,7 +581,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				// Segments cannot have a name, so we return an empty string for them. [NL]
 				return '';
 			}
-			return variants.find((x) => x.culture === activeVariant.culture && !(x as any).segment)?.name ?? '';
+			return variants.find((x) => x.culture === activeVariant.culture)?.name ?? '';
 		});
 	}
 
@@ -626,7 +626,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			return this._data.createObservablePartOfCurrent(() => undefined);
 		}
 		return this._data.createObservablePartOfCurrent((data) =>
-			data?.variants?.find((x) => variantId.culture === x.culture && !(x as any).segment),
+			data?.variants?.find((x) => variantId.culture === x.culture),
 		);
 	}
 
@@ -641,7 +641,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			// Segments cannot have a variant-data, so we return undefined for them. [NL]
 			return undefined;
 		}
-		return this._data.getCurrent()?.variants?.find((x) => variantId.culture === x.culture && !(x as any).segment);
+		return this._data.getCurrent()?.variants?.find((x) => variantId.culture === x.culture);
 	}
 
 	public getVariants(): Array<VariantModelType> | undefined {
@@ -877,7 +877,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			throw new Error('One or more selected variants have not been created');
 		}
 		// Check variants have a name (prevents potential segment variants to be taken into account):
-		const variantsWithoutAName = saveData.variants.filter((x) => !x.name && !(x as any).segment);
+		const variantsWithoutAName = saveData.variants.filter((x) => !x.name);
 		if (variantsWithoutAName.length > 0) {
 			const validationContext = await this.getContext(UMB_VALIDATION_CONTEXT);
 			if (!validationContext) {
