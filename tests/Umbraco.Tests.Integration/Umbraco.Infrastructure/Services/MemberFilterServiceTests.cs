@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -26,6 +27,34 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
     private IMemberService MemberService => GetRequiredService<IMemberService>();
 
     private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
+    private IMemberGroupService MemberGroupService => GetRequiredService<IMemberGroupService>();
+
+    [Test]
+    public async Task Filter_Returns_Group_Keys_For_Both_Stores()
+    {
+        // Arrange — one group shared by a content member and an external member.
+        MemberService.AddRole("FilterGroupKeysGroup");
+        IMemberGroup group = MemberGroupService.GetByName("FilterGroupKeysGroup")!;
+
+        await CreateContentMemberAsync("content@test.com", "content-user");
+        IMember? contentMember = MemberService.GetByEmail("content@test.com");
+        MemberService.AssignRoles([contentMember!.Id], ["FilterGroupKeysGroup"]);
+
+        await CreateExternalMemberAsync("external@test.com", "external-user");
+        ExternalMemberIdentity? externalMember = await ExternalMemberService.GetByUsernameAsync("external-user");
+        await ExternalMemberService.AssignRolesAsync(externalMember!.Key, ["FilterGroupKeysGroup"]);
+
+        // Act
+        PagedModel<MemberFilterItem> result = await MemberFilterService.FilterAsync(new MemberFilter());
+
+        // Assert — both members report the shared group's key.
+        Assert.AreEqual(2, result.Total);
+        foreach (MemberFilterItem item in result.Items)
+        {
+            Assert.That(item.Groups, Does.Contain(group.Key));
+        }
+    }
 
     [Test]
     public async Task Filter_Returns_Content_Members()
