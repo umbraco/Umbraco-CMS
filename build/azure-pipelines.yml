@@ -378,12 +378,15 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-          - task: DotNetCoreCLI@2
+          - script: dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
             displayName: Run dotnet test
+          - task: PublishTestResults@2
+            displayName: Publish test results
+            condition: succeededOrFailed()
             inputs:
-              command: test
-              projects: "tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj"
-              arguments: "--configuration $(buildConfiguration) --no-build"
+              testResultsFormat: VSTest
+              testResultsFiles: "*.trx"
+              searchFolder: $(Agent.TempDirectory)/testresults
               testRunTitle: Unit Tests - $(Agent.OS)
 
   - stage: Integration
@@ -448,20 +451,26 @@ stages:
               useGlobalJson: true
 
           # Test
-          - task: DotNetCoreCLI@2
-            displayName: Run dotnet test
+          - ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
+              - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "$(testFilter)" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
+                displayName: Run dotnet test
+          - ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
+              - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
+                displayName: Run dotnet test
+          - ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
+              - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "$(testFilter)" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
+                displayName: Run dotnet test
+          - ${{ else }}:
+              - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
+                displayName: Run dotnet test
+          - task: PublishTestResults@2
+            displayName: Publish test results
+            condition: succeededOrFailed()
             inputs:
-              command: test
-              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              testResultsFormat: VSTest
+              testResultsFiles: "*.trx"
+              searchFolder: $(Agent.TempDirectory)/testresults
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
-              ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
-              ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
-              ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
-              ${{ else }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
       # Search Integration Tests (SQLite)
       - job:
         timeoutInMinutes: 60
@@ -491,12 +500,15 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
-          - task: DotNetCoreCLI@2
+          - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
             displayName: Run dotnet test
+          - task: PublishTestResults@2
+            displayName: Publish test results
+            condition: succeededOrFailed()
             inputs:
-              command: test
-              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
-              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build'
+              testResultsFormat: VSTest
+              testResultsFiles: "*.trx"
+              searchFolder: $(Agent.TempDirectory)/testresults
               testRunTitle: Search Integration Tests SQLite - $(Agent.OS)
       # Integration Tests (SQL Server)
       - job:
@@ -598,20 +610,26 @@ stages:
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
           # Test
-          - task: DotNetCoreCLI@2
-            displayName: Run dotnet test
+          - ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
+              - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "$(testFilter)" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
+                displayName: Run dotnet test
+          - ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
+              - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
+                displayName: Run dotnet test
+          - ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
+              - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "$(testFilter)" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
+                displayName: Run dotnet test
+          - ${{ else }}:
+              - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
+                displayName: Run dotnet test
+          - task: PublishTestResults@2
+            displayName: Publish test results
+            condition: succeededOrFailed()
             inputs:
-              command: test
-              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              testResultsFormat: VSTest
+              testResultsFiles: "*.trx"
+              searchFolder: $(Agent.TempDirectory)/testresults
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              ${{ if and(eq(variables['Agent.OS'],'Windows_NT'), or(variables.releaseTestFilter, parameters.forceReleaseTestFilter)) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
-              ${{ elseif eq(variables['Agent.OS'],'Windows_NT') }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.integrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
-              ${{ elseif or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
-                arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
-              ${{ else }}:
-                arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
 
           # Stop SQL Server
           - pwsh: docker stop mssql
@@ -686,12 +704,15 @@ stages:
             displayName: Start SQL Server LocalDB (Windows)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
-          - task: DotNetCoreCLI@2
+          - script: dotnet test tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj --filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build --report-trx --results-directory $(Agent.TempDirectory)/testresults
             displayName: Run dotnet test
+          - task: PublishTestResults@2
+            displayName: Publish test results
+            condition: succeededOrFailed()
             inputs:
-              command: test
-              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
-              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build'
+              testResultsFormat: VSTest
+              testResultsFiles: "*.trx"
+              searchFolder: $(Agent.TempDirectory)/testresults
               testRunTitle: Search Integration Tests SQL Server - $(Agent.OS)
 
           - pwsh: docker stop mssql

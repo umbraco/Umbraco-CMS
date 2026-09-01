@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
+    <OutputType>Exe</OutputType>
     <PackageId>Umbraco.Cms.Tests.Integration</PackageId>
     <Title>Umbraco CMS - Integration tests</Title>
     <Description>Contains helper classes for integration tests with Umbraco CMS, including all internal integration tests.</Description>
@@ -30,7 +31,7 @@
   <ItemGroup>
     <PackageReference Include="Bogus" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
     <PackageReference Include="Moq" />
     <PackageReference Include="NUnit3TestAdapter" PrivateAssets="all" />
   </ItemGroup>
