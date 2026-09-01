@@ -540,8 +540,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		if (activeVariant) {
 			return variants.find((x) => activeVariant.culture === x.culture)?.name;
 		}
-		// Fallback to first variant if no active variant is set, and it is not a segment variant, since segments should not exist as varaint-entries. [NL]
-		if (variants[0] && !(variants[0] as any).segment) {
+		// Fallback to first variant if no active variant is set. [NL]
+		if (variants[0]) {
 			return variants[0].name;
 		}
 		return undefined;
