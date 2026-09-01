@@ -32,6 +32,18 @@ class TestTrashableEntityWorkspaceContext extends UmbTrashableEntityWorkspaceCon
 	}
 }
 
+/** Configured with a repository alias that is never registered, so `#redirectToParent` always rejects. */
+class TestTrashableEntityWorkspaceContextWithMissingRepository extends UmbTrashableEntityWorkspaceContextBase {
+	constructor(host: UmbControllerHost) {
+		super(host);
+		this._setRecycleBinRepositoryAlias('Umb.Test.TrashableEntityWorkspaceContextBase.MissingRecycleBinRepository');
+	}
+
+	protected override getRedirectPath(): string {
+		return '/test/never-reached';
+	}
+}
+
 describe('UmbTrashableEntityWorkspaceContextBase', () => {
 	let host: UmbTestRecycleBinControllerHostElement;
 	let actionEventContext: UmbActionEventContext;
@@ -230,6 +242,28 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 			expect(UmbTestRecycleBinRepository.requestOriginalParentCalls).to.have.lengthOf(0);
 			expect(history.pushStateCalls).to.have.lengthOf(0);
 			expect(history.replaceStateCalls).to.have.lengthOf(0);
+		});
+	});
+
+	describe('redirect failure', () => {
+		it('falls back to reloading in place when the redirect rejects', async () => {
+			const failHost = new UmbTestRecycleBinControllerHostElement();
+			document.body.appendChild(failHost);
+
+			const failActionEventContext = new UmbActionEventContext(failHost);
+			const failWorkspaceContext = new UmbTestTrashableEntityWorkspaceContext(failHost);
+			new UmbContextProviderController(failHost, UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT, failWorkspaceContext as never);
+			new TestTrashableEntityWorkspaceContextWithMissingRepository(failHost);
+			await aTimeout(0);
+
+			failActionEventContext.dispatchEvent(
+				new UmbEntityTrashedEvent({ unique: 'test-unique', entityType: 'test-entity-type' }),
+			);
+			await aTimeout(50);
+
+			expect(failWorkspaceContext.reloadCallCount).to.equal(1);
+
+			document.body.removeChild(failHost);
 		});
 	});
 

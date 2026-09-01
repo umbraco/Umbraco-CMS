@@ -105,7 +105,10 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 		// the new data isn't needed here.
 		const unique = event.getUnique();
 		if (unique && !this.#workspaceContext?.modalContext) {
-			this.#redirectToParent(unique);
+			this.#redirectToParent(unique).catch((error) => {
+				console.error('Failed to redirect after trashing, reloading in place instead:', error);
+				this.#workspaceContext?.reload();
+			});
 			return;
 		}
 
