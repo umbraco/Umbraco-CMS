@@ -80,6 +80,11 @@ public class GlobalSettings
     internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
 
     /// <summary>
+    ///     The default value for the <see cref="NotFoundViewPath" /> setting.
+    /// </summary>
+    internal const string StaticNotFoundViewPath = "~/umbraco/UmbracoWebsite/NotFound.cshtml";
+
+    /// <summary>
     ///     The default value for the <see cref="DistributedLockingReadLockDefaultTimeout" /> setting.
     /// </summary>
     internal const string StaticDistributedLockingReadLockDefaultTimeout = "00:01:00";
@@ -106,6 +111,11 @@ public class GlobalSettings
     ///     The default value for the <see cref="UpgradingViewPath" /> setting.
     /// </summary>
     internal const string StaticUpgradingViewPath = "~/umbraco/UmbracoWebsite/Upgrading.cshtml";
+
+    /// <summary>
+    ///     The default value for the <see cref="MaintenanceViewPath" /> setting.
+    /// </summary>
+    internal const string StaticMaintenanceViewPath = "~/umbraco/UmbracoWebsite/Maintenance.cshtml";
 
     /// <summary>
     ///     Gets or sets a value for the reserved URLs (must end with a comma).
@@ -245,6 +255,13 @@ public class GlobalSettings
     public string NoNodesViewPath { get; set; } = StaticNoNodesViewPath;
 
     /// <summary>
+    ///     Gets or sets a value for the path to the view shown when a request cannot be rendered, because no document
+    ///     matches the URL or the matched document has no template.
+    /// </summary>
+    [DefaultValue(StaticNotFoundViewPath)]
+    public string NotFoundViewPath { get; set; } = StaticNotFoundViewPath;
+
+    /// <summary>
     ///     Gets or sets a value for the database server registrar settings.
     /// </summary>
     public DatabaseServerRegistrarSettings DatabaseServerRegistrar { get; set; } = new();
@@ -328,4 +345,11 @@ public class GlobalSettings
     /// </summary>
     [DefaultValue(StaticUpgradingViewPath)]
     public string UpgradingViewPath { get; set; } = StaticUpgradingViewPath;
+
+    /// <summary>
+    ///     Gets or sets the view path shown while an upgrade is pending and awaiting an administrator
+    ///     (<see cref="RuntimeLevel.Upgrade"/>).
+    /// </summary>
+    [DefaultValue(StaticMaintenanceViewPath)]
+    public string MaintenanceViewPath { get; set; } = StaticMaintenanceViewPath;
 }
