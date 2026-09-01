@@ -565,10 +565,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public name(variantId?: UmbVariantId): Observable<string> {
 		if (variantId) {
-			if (variantId.segment) {
-				// Segments cannot have a name, so we return an empty string for them. [NL]
-				return this._data.createObservablePartOfCurrent(() => '');
-			}
 			// Explicit variant requested
 			return this._data.createObservablePartOfCurrent(
 				(data) => data?.variants?.find((x) => x.culture === variantId.culture)?.name ?? '',
@@ -577,10 +573,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		// No variant specified - observe first active variant's name
 		return mergeObservables([this.splitView.activeVariantByIndex(0), this.variants], ([activeVariant, variants]) => {
 			if (!activeVariant || !variants) return '';
-			if (activeVariant.segment) {
-				// Segments cannot have a name, so we return an empty string for them. [NL]
-				return '';
-			}
 			return variants.find((x) => x.culture === activeVariant.culture)?.name ?? '';
 		});
 	}
