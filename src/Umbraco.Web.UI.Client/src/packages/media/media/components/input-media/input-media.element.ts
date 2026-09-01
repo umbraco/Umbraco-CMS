@@ -283,7 +283,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				?readonly=${this.readonly}
 				?disabled=${!this._editMediaPath}>
 				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
-				${this.#renderFileExtension(item)} ${this.#renderIsTrashed(item)}
+				${this.#renderFileExtension(item)}${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
 		`;
