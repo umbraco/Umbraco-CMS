@@ -45,17 +45,13 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 
 		actionEventContext = new UmbActionEventContext(host);
 		workspaceContext = new UmbTestSubmittableTreeEntityWorkspaceContext(host);
-		new UmbContextProviderController(
-			host,
-			UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT,
-			workspaceContext as never,
-		);
+		new UmbContextProviderController(host, UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, workspaceContext as never);
 
 		context = new TestMenuTreeStructureWorkspaceContext(host);
 
 		workspaceContext.setEntityType('test-entity-type');
 		workspaceContext.setUnique('test-unique');
-		await aTimeout(50);
+		await aTimeout(150);
 	});
 
 	afterEach(() => {
@@ -84,7 +80,7 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 		];
 
 		dispatchReloadStructure();
-		await aTimeout(50);
+		await aTimeout(150);
 
 		const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
 		expect(parentContext?.getParent()).to.deep.equal({ unique: 'parent-unique', entityType: 'test-entity-type' });
@@ -98,7 +94,7 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 			];
 
 			dispatchReloadStructure();
-			await aTimeout(50);
+			await aTimeout(150);
 
 			expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(2);
 
@@ -111,14 +107,14 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 
 		it('does not re-request ancestors when the event is for a different unique', async () => {
 			dispatchReloadStructure({ unique: 'some-other-unique' });
-			await aTimeout(50);
+			await aTimeout(150);
 
 			expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(1);
 		});
 
 		it('does not re-request ancestors when the event is for a different entity type', async () => {
 			dispatchReloadStructure({ entityType: 'some-other-entity-type' });
-			await aTimeout(50);
+			await aTimeout(150);
 
 			expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(1);
 		});
@@ -132,7 +128,7 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 				createTestAncestorItem({ unique: 'new-parent-unique', entityType: 'test-entity-type' }),
 			];
 			dispatchReloadStructure();
-			await aTimeout(50);
+			await aTimeout(150);
 
 			expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(1);
 		});

@@ -13,7 +13,7 @@ import {
 	UMB_WORKSPACE_EDIT_PATH_PATTERN,
 	UMB_WORKSPACE_EDIT_VARIANT_PATH_PATTERN,
 } from '@umbraco-cms/backoffice/workspace';
-import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -50,6 +50,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	#workspaceActiveVariantId?: UmbVariantId;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#structureRequestId = 0;
+
+	// Coalesces the unique/isNew/reload-event triggers when they fire in quick succession.
+	#requestStructure = debounce(() => this.#requestStructureImpl(), 100);
 
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
@@ -160,7 +164,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		this.#requestStructure();
 	};
 
-	async #requestStructure() {
+	async #requestStructureImpl() {
+		const requestId = ++this.#structureRequestId;
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew
 			? this.#workspaceContext?._internal_createUnderParentEntityUnique
@@ -223,6 +228,9 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			// Guard: this context may have been destroyed while the async requests were in flight
 			// (e.g. a condition such as IS_NOT_TRASHED flips before the API response arrives).
 			if (!this._host) return;
+
+			// Guard: a newer request has superseded this one; its result would already be stale.
+			if (requestId !== this.#structureRequestId) return;
 
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
@@ -300,6 +308,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	}
 
 	override destroy(): void {
+		this.#requestStructure.cancel();
 		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();

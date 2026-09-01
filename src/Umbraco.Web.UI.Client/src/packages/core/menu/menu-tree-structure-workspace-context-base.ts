@@ -8,7 +8,7 @@ import { UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/back
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { debounce, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -39,6 +39,10 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	#isModalContext: boolean = false;
 	#isNew: boolean | undefined = undefined;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	#structureRequestId = 0;
+
+	// Coalesces the unique/isNew/reload-event triggers when they fire in quick succession.
+	#requestStructure = debounce(() => this.#requestStructureImpl(), 100);
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
 		super(host, UMB_MENU_STRUCTURE_WORKSPACE_CONTEXT);
@@ -106,7 +110,8 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		this.#requestStructure();
 	};
 
-	async #requestStructure() {
+	async #requestStructureImpl() {
+		const requestId = ++this.#structureRequestId;
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew
 			? this.#workspaceContext?._internal_createUnderParentEntityUnique
@@ -173,6 +178,9 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		// Guard: this context may have been destroyed while the async requests were in flight.
 		if (!this._host) return;
 
+		// Guard: a newer request has superseded this one; its result would already be stale.
+		if (requestId !== this.#structureRequestId) return;
+
 		if (ancestorData) {
 			this.#setAncestorData(ancestorData);
 		}
@@ -238,6 +246,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	}
 
 	override destroy(): void {
+		this.#requestStructure.cancel();
 		this.#removeEventListeners();
 		super.destroy();
 		this.#structure.destroy();
