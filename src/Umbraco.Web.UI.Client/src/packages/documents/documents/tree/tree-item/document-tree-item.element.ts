@@ -105,6 +105,7 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		css`
 			:host {
 				--uui-menu-item-flat-structure: 0;
+				/** Keep the external value of --uui-menu-item-indent for the peek-child element [NL] */
 				--umb-tree-item-indent: var(--uui-menu-item-indent, 0);
 			}
 
@@ -119,11 +120,6 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 			}
 			:host(:not([collection]):not([has-children])) uui-menu-item {
 				--uui-menu-item-flat-structure: var(--umb-menu-item-child-flat-structure, 0);
-			}
-
-			:host([collection]) umb-tree-item {
-				--umb-menu-item-child-flat-structure: 1;
-				--umb-tree-item-indent: 0;
 			}
 
 			:host([draft]) #label {
@@ -142,6 +138,10 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				flex-grow: 1;
 				flex-shrink: 1;
 			}
+			:host([collection]) umb-tree-item {
+				--umb-menu-item-child-flat-structure: 1;
+				--umb-tree-item-indent: 0;
+			}
 
 			.peek-child {
 				position: relative;
@@ -149,16 +149,17 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 				flex-grow: 0;
 				flex-shrink: 0;
 				width: calc((2 + var(--umb-tree-item-indent, 0)) * var(--uui-size-4));
+				margin-right: 3px;
 			}
 			.peek-child::after {
 				content: '';
 				position: absolute;
 				top: -11px;
-				right: -8px;
+				right: -9px;
 				border-left: 1px solid var(--uui-color-border-standalone);
 				border-bottom: 1px solid var(--uui-color-border-standalone);
 				border-bottom-left-radius: var(--uui-border-radius);
-				width: 15px;
+				width: 16px;
 				height: 29px;
 			}
 		`,
