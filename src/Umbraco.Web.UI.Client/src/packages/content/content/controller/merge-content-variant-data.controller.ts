@@ -236,24 +236,9 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 
 					return draftVariant;
 				} else {
-					// TODO: Check if this promise is needed: [NL]
 					return persistedVariant;
 				}
 			})
 			.filter((x) => x !== undefined) as Array<VariantModel>;
-
-		/*
-		return draftVariants
-			.map((variant) => {
-				// Should this variant be saved?
-				if (variantsToStore.some((x) => x.compare(variant))) {
-					return variant;
-				} else {
-					// If not, then we will tru to find the variant in the persisted data and use that instead.
-					return persistedVariants?.find((x) => x.culture === variant.culture && x.segment === variant.segment);
-				}
-			})
-			.filter((x) => x !== undefined) as Array<VariantModel>;
-			*/
 	}
 }
