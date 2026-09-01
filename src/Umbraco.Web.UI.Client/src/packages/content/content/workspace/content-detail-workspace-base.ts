@@ -385,7 +385,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.observe(
 			observeMultiple([this.splitView.activeVariantByIndex(0), this.variants]),
 			([activeVariant, variants]) => {
-				const variantName = variants.find((v) => v.culture === activeVariant?.culture && !(v as any).segment)?.name;
+				const variantName = variants.find((v) => v.culture === activeVariant?.culture)?.name;
 				this.view.setTitle(variantName);
 			},
 			null,
