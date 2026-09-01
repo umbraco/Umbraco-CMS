@@ -23,6 +23,12 @@ export interface UmbTableItem {
 	data: Array<UmbTableItemData>;
 	selectable?: boolean;
 	active?: boolean;
+	/**
+	 * Overrides the table-wide select-only behaviour for this row.
+	 * `true` always makes the row select-only, `false` always keeps its content interactive.
+	 * When left `undefined`, the row follows the table: select-only while a selection is in progress, or when the table is configured as select-only.
+	 */
+	selectOnly?: boolean;
 	/** When set, the row shows a children indicator. The nested options control what activating it does. */
 	childrenIndicator?: {
 		/** When set, the indicator becomes an anchor linking to this href. */
@@ -113,7 +119,7 @@ export class UmbTableSortedEvent extends Event {
  *  @fires {UmbTableSelectedEvent} selected - fires when a row is selected
  *  @fires {UmbTableDeselectedEvent} deselected - fires when a row is deselected
  *  @fires {UmbTableOrderedEvent} sort - fires when a column order is changed
- *  @augments LitElement
+ *  @augments UmbLitElement
  */
 @customElement('umb-table')
 export class UmbTableElement extends UmbLitElement {
@@ -309,7 +315,10 @@ export class UmbTableElement extends UmbLitElement {
 			throw new Error('Select all is not allowed in the current table configuration.');
 		}
 
-		this.selection = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
+		// Merge the current page's selectable rows into the existing selection so selections
+		// accumulate across pages rather than replacing the previous page's selection.
+		const currentPageIds = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
+		this.selection = [...new Set([...this.selection, ...currentPageIds])];
 		this._selectionMode = true;
 		this.dispatchEvent(new UmbTableSelectedEvent());
 	}
@@ -319,8 +328,10 @@ export class UmbTableElement extends UmbLitElement {
 			throw new Error('Select all is not allowed in the current table configuration.');
 		}
 
-		this.selection = [];
-		this._selectionMode = false;
+		// Only remove the current page's rows, leaving any selection from other pages intact.
+		const currentPageIds = new Set(this.items.map((item) => item.id));
+		this.selection = this.selection.filter((id) => !currentPageIds.has(id));
+		this._selectionMode = this.selection.length > 0;
 		this.dispatchEvent(new UmbTableDeselectedEvent());
 	}
 
@@ -394,6 +405,12 @@ export class UmbTableElement extends UmbLitElement {
 
 	private _renderHeaderCheckboxCell() {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
+		// Compute the header state against the current page only — the selection can span multiple
+		// pages, so comparing its total length against the page size gives the wrong state.
+		const selectableIds = this.items.filter((item) => this.#isSelectableItem(item)).map((item) => item.id);
+		const selectionSet = new Set(this.selection);
+		const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectionSet.has(id));
+		const indeterminate = !allSelected && selectableIds.some((id) => selectionSet.has(id));
 		return html`
 			<uui-table-head-cell style="--uui-table-cell-padding: 0; text-align: center;">
 				${when(
@@ -403,8 +420,8 @@ export class UmbTableElement extends UmbLitElement {
 							aria-label=${this.localize.term('general_selectAll')}
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
-							?checked=${this.selection.length === this.items.length}
-							?indeterminate=${this.selection.length > 0 && this.selection.length < this.items.length}></uui-checkbox>
+							?checked=${allSelected}
+							?indeterminate=${indeterminate}></uui-checkbox>
 					`,
 				)}
 			</uui-table-head-cell>
@@ -413,12 +430,14 @@ export class UmbTableElement extends UmbLitElement {
 
 	private _renderRow = (item: UmbTableItem) => {
 		const isItemSelectable = this.#isSelectableItem(item);
+		const selectionMode = this._selectionMode || this.config.selectOnly === true;
 		return html`
 			<uui-table-row
 				${ref(this.#getRowRenderedCallback(item))}
 				data-sortable-id=${item.id}
 				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
-				?select-only=${this._selectionMode || this.config.selectOnly}
+				?data-selection-mode=${selectionMode}
+				?select-only=${item.selectOnly ?? selectionMode}
 				?selected=${this._isSelected(item.id)}
 				?active=${item.active ?? false}
 				@selected=${() => this._selectRow(item)}
@@ -566,14 +585,14 @@ export class UmbTableElement extends UmbLitElement {
 			uui-table-row[selectable]:focus umb-icon,
 			uui-table-row[selectable]:focus-within umb-icon,
 			uui-table-row[selectable]:hover umb-icon,
-			uui-table-row[select-only] umb-icon {
+			uui-table-row[data-selection-mode] umb-icon {
 				display: none;
 			}
 
 			uui-table-row[selectable]:focus uui-checkbox,
 			uui-table-row[selectable]:focus-within uui-checkbox,
 			uui-table-row[selectable]:hover uui-checkbox,
-			uui-table-row[select-only] uui-checkbox {
+			uui-table-row[data-selection-mode] uui-checkbox {
 				display: inline-block;
 			}
 

@@ -123,6 +123,6 @@ export { UmbDataTypeTreeItemTableCollectionViewElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-data-type-tree-item-table-collection-view']: UmbDataTypeTreeItemTableCollectionViewElement;
+		'umb-data-type-tree-item-table-collection-view': UmbDataTypeTreeItemTableCollectionViewElement;
 	}
 }

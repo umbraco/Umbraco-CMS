@@ -1,3 +1,4 @@
+import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './context/document-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
@@ -6,8 +7,10 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbDocumentVariantOptionModel } from '../types.js';
-import { UMB_WORKSPACE_PATH_VARIANT_DELIMITER } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbWorkspaceStaleVariantRedirectController,
+	UMB_WORKSPACE_PATH_VARIANT_DELIMITER,
+} from '@umbraco-cms/backoffice/workspace';
 
 // TODO: Refactor across all four content workspace editors (document, document blueprint, media, member) to use a base component. [NL]
 // TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
@@ -53,6 +56,12 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
+	readonly #staleVariantRedirect = new UmbWorkspaceStaleVariantRedirectController(this, {
+		getWorkspaceRoute: () => this.#workspaceRoute,
+		getVariants: () => this.#variants,
+		getAppCulture: () => this.#appCulture,
+	});
+
 	#observeVariants() {
 		this.observe(
 			this.#workspaceContext
@@ -67,6 +76,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			(variants) => {
 				this.#variants = variants;
 				this.#generateRoutes();
+				this.#staleVariantRedirect.redirect();
 			},
 			'_observeVariants',
 		);
@@ -197,6 +207,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {
 		this.#workspaceRoute = e.target.absoluteRouterPath;
 		this.#workspaceContext?.splitView.setWorkspaceRoute(this.#workspaceRoute);
+		this.#staleVariantRedirect.redirect();
 	};
 
 	override render() {

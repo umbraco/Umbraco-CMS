@@ -22,6 +22,7 @@ export default {
 		chooseWhereToMove: 'Choose where to move',
 		clear: 'Clear',
 		copy: 'Duplicate',
+		copyInProgress: 'Duplication in progress - please wait...',
 		copyTo: 'Duplicate to',
 		create: 'Create',
 		createFor: (name: string) => (name ? `Create item for ${name}` : 'Create'),
@@ -29,6 +30,7 @@ export default {
 		createGroup: 'Create group',
 		createPackage: 'Create Package',
 		delete: 'Delete',
+		deleteInProgress: 'Deletion in progress - please wait...',
 		disable: 'Disable',
 		editContent: 'Edit content',
 		editSettings: 'Edit settings',
@@ -47,6 +49,7 @@ export default {
 		liveEdit: 'Edit in Canvas',
 		logout: 'Exit',
 		move: 'Move to',
+		moveInProgress: 'Move in progress - please wait...',
 		notify: 'Notifications',
 		protect: 'Public Access',
 		publish: 'Publish',
@@ -223,8 +226,8 @@ export default {
 		sendtopublishvariant: 'Content sent for publishing for languages: %0%',
 		sort: 'Sort child items performed by user',
 		custom: '%0%',
-		contentversionpreventcleanup: 'Clean up disabled for version: %0%',
-		contentversionenablecleanup: 'Clean up enabled for version: %0%',
+		contentversionpreventcleanup: 'Cleanup disabled for version: %0%',
+		contentversionenablecleanup: 'Cleanup enabled for version: %0%',
 		smallAssignDomain: 'Assign Hostname',
 		smallCopy: 'Copy',
 		smallPublish: 'Publish',
@@ -300,9 +303,9 @@ export default {
 		publishedPendingChanges: 'Published (pending changes)',
 		publishStatus: 'Publication Status',
 		publishDescendantsHelp:
-			'Publish <strong>%0%</strong> and all items underneath and thereby making their content publicly available.',
+			'Save and publish <strong>%0%</strong> and publish all items underneath thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
-			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
+			'Save and publish variants and publish variants of same type underneath thereby making their content publicly available.',
 		noVariantsToProcess: 'There are no available variants',
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
@@ -354,6 +357,7 @@ export default {
 		isSensitiveValue:
 			'This value is hidden. If you need access to view this value please contact your website administrator.',
 		isSensitiveValue_short: 'This value is hidden.',
+		isSensitiveValueNotice: 'If you need access to view the hidden values, contact your website administrator.',
 		languagesToPublish: 'What languages would you like to publish?',
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
@@ -380,6 +384,8 @@ export default {
 		selectAllVariants: 'Select all variants',
 		saveModalTitle: 'Save',
 		saveAndPublishModalTitle: 'Save and publish',
+		saveAndPublishDescendantsModalTitle: 'Save and publish with descendants',
+		saveAndScheduleModalTitle: 'Save and schedule publishing',
 		publishModalTitle: 'Publish',
 		openSplitViewForVariant: (variant: string) => `Open ${variant} in split view`,
 		sharedAcrossCultures: 'Shared across cultures',
@@ -418,6 +424,8 @@ export default {
 	},
 	media: {
 		clickToUpload: 'Click to upload',
+		browseFilesAction: 'Browse files',
+		dropFilesOr: 'Drag and drop media here<br />or',
 		orClickHereToUpload: 'or click here to choose files',
 		disallowedFileType: 'Cannot upload this file, it does not have an approved file type',
 		disallowedFileExtension: (extension: string) =>
@@ -578,6 +586,7 @@ export default {
 		confirmdeleteNumberOfItems: 'Are you sure you want to delete <strong>%0%</strong> of <strong>%1%</strong> items',
 		confirmdisable: 'Are you sure you want to disable',
 		confirmremove: 'Are you sure you want to remove',
+		confirmRemoveItem: (name: string) => `Are you sure you want to remove${name ? ` <strong>${name}</strong>` : ''}?`,
 		confirmremoveusageof: 'Are you sure you want to remove the usage of <strong>%0%</strong>',
 		confirmlogout: 'Are you sure?',
 		confirmSure: 'Are you sure?',
@@ -875,6 +884,7 @@ export default {
 		by: 'by',
 		cancel: 'Cancel',
 		cellMargin: 'Cell margin',
+		changeView: 'Change view',
 		choose: 'Choose',
 		clear: 'Clear',
 		close: 'Close',
@@ -956,7 +966,10 @@ export default {
 		next: 'Next',
 		no: 'No',
 		nodeName: 'Node Name',
+		none: 'None',
 		notFound: 'Not found',
+		noResults: 'No results',
+		noResultsFor: (query: string) => `No result for "${query}".`,
 		of: 'of',
 		off: 'Off',
 		ok: 'OK',
@@ -1022,6 +1035,7 @@ export default {
 		username: 'Username',
 		value: 'Value',
 		view: 'View',
+		weight: 'Weight',
 		welcome: 'Welcome...',
 		width: 'Width',
 		yes: 'Yes',
@@ -1414,6 +1428,9 @@ export default {
 		contentPublishedFailedReqCultureValidationError:
 			"Validation failed for required language '%0%'. This language was saved but not published.",
 	},
+	unpublish: {
+		inProgress: 'Unpublishing in progress - please wait...',
+	},
 	colorpicker: {
 		noColors: 'You have not configured any approved colours',
 	},
@@ -1495,7 +1512,7 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
-		selectAction: "Select Property Editor",
+		selectAction: 'Select Property Editor',
 	},
 	propertyEditorUIGroups: {
 		advanced: 'Advanced',
@@ -1693,10 +1710,13 @@ export default {
 			'There is no hostname configured for %0%, please contact an administrator, see log for more information',
 		copySuccessMessage: 'Your system information has successfully been copied to the clipboard',
 		cannotCopyInformation: 'Could not copy your system information to the clipboard',
+		cannotCopyToClipboard: 'Could not copy to the clipboard',
 		webhookSaved: 'Webhook saved',
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
+		editMultiContentPublishedPartialText: '%0% of %1% documents published.',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',
 		editMultiElementPublishedText: '%0% elements published',
+		editMultiContentUnpublishedPartialText: '%0% of %1% documents unpublished.',
 		editMultiElementUnpublishedText: '%0% elements unpublished',
 		editVariantUnpublishedText: '%0% unpublished and is no longer visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
@@ -1977,14 +1997,14 @@ export default {
 		removeChildNodeWarning:
 			'Removing a child node will limit the editors options to create different content types beneath a node.',
 		usingEditor: 'using this editor will get updated with the new settings.',
-		historyCleanupHeading: 'History clean up',
-		historyCleanupDescription: 'Allow overriding the global history clean up settings.',
+		historyCleanupHeading: 'History cleanup',
+		historyCleanupDescription: 'Allow overriding the global history cleanup settings.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Keep all versions newer than days',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Keep latest version per day for days',
-		historyCleanupPreventCleanup: 'Prevent clean up',
-		historyCleanupEnableCleanup: 'Enable clean up',
+		historyCleanupPreventCleanup: 'Prevent cleanup',
+		historyCleanupEnableCleanup: 'Enable cleanup',
 		historyCleanupGloballyDisabled:
-			'<strong>NOTE!</strong> The clean up of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
+			'<strong>NOTE!</strong> The clean up of historical content versions is disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collection: 'Collection',
@@ -2162,6 +2182,11 @@ export default {
 		tableViewLabel: 'Table',
 		children: 'Children',
 		noItems: 'No items',
+	},
+	picker: {
+		browseTab: 'Browse',
+		searchTab: 'Search',
+		selectedCount: (count: number) => `${count} ${count === 1 ? 'item' : 'items'} selected`,
 	},
 	update: {
 		updateAvailable: 'New update ready',
@@ -2551,11 +2576,14 @@ export default {
 		autocompleteLabel: 'Autocomplete',
 	},
 	recycleBin: {
+		restoreItemTo: (from: string, to: string) => `Restore <strong>${from}</strong> to <strong>${to}</strong>`,
 		contentTrashed: 'Trashed content with Id: {0} related to original parent content with Id: {1}',
 		mediaTrashed: 'Trashed media with Id: {0} related to original parent media item with Id: {1}',
 		itemCannotBeRestored: 'Cannot automatically restore this item',
 		itemCannotBeRestoredHelpText:
-			'There is no location where this item can be automatically restored. You can move the item manually using the tree below.',
+			'There is no location where this item can be automatically restored. You can select a new location below.',
+		restoreToTitle: 'Restore to',
+		selectRestoreLocation: 'Select location',
 		wasRestored: 'was restored under',
 	},
 	relationType: {
@@ -2743,6 +2771,9 @@ export default {
 		confirmDeleteHeadline: 'Delete from clipboard',
 		confirmDeleteDescription: 'Are you sure you want to delete <strong>{0}</strong> from the clipboard?',
 		confirmClearDescription: 'Are you sure you want to clear the clipboard?',
+		confirmPasteHeadline: 'Paste from clipboard',
+		confirmPasteOverwriteMessage: (name: string) =>
+			`The property already contains a value. Paste from the property action will overwrite the current value. Do you want to replace the current value with <strong>${name}</strong>?`,
 		copySuccessHeadline: 'Copied to clipboard',
 	},
 	propertyActions: {

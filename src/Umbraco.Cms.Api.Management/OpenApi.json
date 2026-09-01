@@ -2940,7 +2940,7 @@
         ],
         "summary": "Validates updating a document.",
         "description": "Validates the request model for updating a document without actually updating it.",
-        "operationId": "PutUmbracoManagementApiV1.1DocumentByIdValidate1.1",
+        "operationId": "PutDocumentByIdValidate",
         "parameters": [
           {
             "name": "id",
@@ -17026,11 +17026,13 @@
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
+                  }
                 }
               }
             }
@@ -29636,11 +29638,13 @@
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
+                  }
                 }
               }
             }
@@ -29721,11 +29725,13 @@
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
+                  }
                 }
               }
             }
@@ -44256,7 +44262,8 @@
           "message",
           "provider",
           "culture",
-          "url"
+          "url",
+          "isExternal"
         ],
         "type": "object",
         "properties": {
@@ -44268,6 +44275,9 @@
           },
           "provider": {
             "type": "string"
+          },
+          "isExternal": {
+            "type": "boolean"
           },
           "culture": {
             "type": [
@@ -54307,6 +54317,13 @@
           },
           "statusCode": {
             "type": "string"
+          },
+          "httpStatusCode": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "isSuccessStatusCode": {
             "type": "boolean"

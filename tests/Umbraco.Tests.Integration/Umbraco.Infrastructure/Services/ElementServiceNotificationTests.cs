@@ -140,7 +140,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
     {
         // A combined save-and-publish must still raise the paired Saved notification, just like a plain Save does
         // (https://github.com/umbraco/Umbraco-CMS/issues/23523).
-        Element element = new Element("content", -1, _elementType);
+        IElement element = new Element("content", -1, _elementType);
 
         var savedWasCalled = false;
         var publishedWasCalled = false;
@@ -160,10 +160,10 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            var result = ElementService.SaveAndPublish(element, []);
+            PublishResult result = ElementService.SaveAndPublish(element, []);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
-            Assert.IsTrue(publishedWasCalled);
+            Assert.IsTrue(publishedWasCalled, "ElementPublishedNotification should fire when saving and publishing.");
         }
         finally
         {
@@ -178,7 +178,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
         await MakeElementTypeVariant();
 
-        Element element = new Element("content", -1, _elementType);
+        IElement element = new Element("content", -1, _elementType);
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
 
@@ -199,7 +199,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            var result = ElementService.SaveAndPublish(element, ["en-US", "fr-FR"]);
+            PublishResult result = ElementService.SaveAndPublish(element, ["en-US", "fr-FR"]);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
         }
@@ -217,7 +217,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         await LanguageService.CreateAsync(new Language("fr-FR", "French (France)"), Constants.Security.SuperUserKey);
         await MakeElementTypeVariant();
 
-        Element element = new Element("content", -1, _elementType);
+        IElement element = new Element("content", -1, _elementType);
         element.SetCultureName("hello", "en-US");
         element.SetCultureName("bonjour", "fr-FR");
 
@@ -230,8 +230,6 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
             Assert.IsNotNull(notification.SavedCultures);
             Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
-
-            // both cultures were changed, so both are reported as saved - even though only en-US is being published
             CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[saved.Key]);
 
             savedWasCalled = true;
@@ -243,8 +241,6 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
             Assert.IsNotNull(notification.PublishedCultures);
             Assert.IsTrue(notification.PublishedCultures.ContainsKey(published.Key));
-
-            // only en-US was published
             CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.PublishedCultures[published.Key]);
 
             publishedWasCalled = true;
@@ -252,7 +248,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         try
         {
-            var result = ElementService.SaveAndPublish(element, ["en-US"]);
+            PublishResult result = ElementService.SaveAndPublish(element, ["en-US"]);
             Assert.IsTrue(result.Success);
             Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
             Assert.IsTrue(publishedWasCalled, "ElementPublishedNotification should fire when saving and publishing.");

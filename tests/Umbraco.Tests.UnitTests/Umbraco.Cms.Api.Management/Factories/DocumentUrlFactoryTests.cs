@@ -2,7 +2,9 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -90,5 +92,45 @@ public class DocumentUrlFactoryTests
         await factory.CreateUrlSetsAsync([content]);
 
         provider.Verify(x => x.GetAllAsync(content, null), Times.Once);
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Preview_Url_Surfaces_IsExternal_From_Provider(bool isExternal)
+    {
+        const string providerAlias = "testPreviewProvider";
+        var content = CreateContent();
+        var previewUrlInfo = UrlInfo.AsUrl("https://headless.example/preview", providerAlias, isExternal: isExternal);
+        var factory = CreatePreviewFactory(providerAlias, previewUrlInfo);
+
+        DocumentUrlInfo? result = await factory.GetPreviewUrlAsync(content, providerAlias, culture: null, segment: null);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(isExternal, result!.IsExternal);
+        Assert.AreEqual("https://headless.example/preview", result.Url);
+    }
+
+    private static DocumentUrlFactory CreatePreviewFactory(string providerAlias, UrlInfo previewUrlInfo)
+    {
+        var urlProvider = new Mock<IUrlProvider>();
+        urlProvider.SetupGet(x => x.Alias).Returns(providerAlias);
+        urlProvider
+            .Setup(x => x.GetPreviewUrlAsync(It.IsAny<IContent>(), It.IsAny<string?>(), It.IsAny<string?>()))
+            .ReturnsAsync(previewUrlInfo);
+
+        var backOfficeSecurity = new Mock<IBackOfficeSecurity>();
+        backOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(Mock.Of<IUser>());
+        var securityAccessor = new Mock<IBackOfficeSecurityAccessor>();
+        securityAccessor.SetupGet(x => x.BackOfficeSecurity).Returns(backOfficeSecurity.Object);
+
+        var previewService = new Mock<IPreviewService>();
+        previewService.Setup(x => x.TryEnterPreviewAsync(It.IsAny<IUser>())).ReturnsAsync(true);
+
+        return new DocumentUrlFactory(
+            Mock.Of<IPublishedUrlInfoProvider>(),
+            new UrlProviderCollection(() => [urlProvider.Object]),
+            previewService.Object,
+            securityAccessor.Object,
+            NullLogger<DocumentUrlFactory>.Instance);
     }
 }
