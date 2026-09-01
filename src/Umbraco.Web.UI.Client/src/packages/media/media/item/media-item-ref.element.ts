@@ -58,9 +58,18 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 	}
 
 	#getHref(item: UmbMediaItemModel) {
-		if (!this._editPath) return;
+		// No `_editPath` means the modal route registration couldn't reach a parent route context
+		// (e.g. this ref is rendered inside a non-routable modal). The workspace is still reachable, just
+		// not as a route relative to this host, so link to it by its absolute path instead.
+		if (!this._editPath) return UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.unique });
 		const path = UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
 		return `${this._editPath}/${path}`;
+	}
+
+	// An absolute href leaves whatever the host is showing (a modal, a workspace with unsaved changes), so
+	// open it in a new tab. A route-relative href stays within the current view and navigates in place.
+	#getTarget() {
+		return this._editPath ? undefined : '_blank';
 	}
 
 	override render() {
@@ -70,7 +79,8 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 			<uui-ref-node
 				name=${this.item.name}
 				href=${ifDefined(this.#getHref(this.item))}
-				?readonly=${this.readonly || !this._userHasSectionAccess || !this._editPath}
+				target=${ifDefined(this.#getTarget())}
+				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
