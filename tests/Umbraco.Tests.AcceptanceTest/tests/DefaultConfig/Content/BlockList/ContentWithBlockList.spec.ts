@@ -7,11 +7,15 @@ const customDataTypeName = 'Custom Block List';
 const elementTypeName = 'BlockListElement';
 const propertyInBlock = 'Textstring';
 const groupName = 'testGroup';
+const numericElementTypeName = 'NumericBlockElement';
+const numericDataTypeName = 'Numeric With Min And Max';
 let elementTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.documentType.ensureNameNotExists(numericElementTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(numericDataTypeName);
   const textStringData = await umbracoApi.dataType.getByName(propertyInBlock);
   elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, propertyInBlock, textStringData.id);
 });
@@ -20,7 +24,9 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(numericElementTypeName);
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(numericDataTypeName);
 });
 
 test('can create content with an empty block list', async ({umbracoApi, umbracoUi}) => {
@@ -393,4 +399,29 @@ test('can move away from a content node with a block list after making no change
   // Assert
   // We do this to make sure that there is no discard changes button visible, if the discard changes was visible, we would not be able to go to the document type
   await umbracoUi.documentType.goToDocumentType(documentTypeName);
+});
+
+test('cannot create a block when a property value exceeds the configured maximum', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const numericDataTypeId = await umbracoApi.dataType.createDefaultNumericWithMinMax(numericDataTypeName, 1, 10);
+  const numericElementTypeId = await umbracoApi.documentType.createDefaultElementType(numericElementTypeName, groupName, numericDataTypeName, numericDataTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, numericElementTypeId);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickAddBlockElementButton();
+  await umbracoUi.content.clickBlockElementWithName(numericElementTypeName);
+  await umbracoUi.content.enterBlockPropertyValue(numericDataTypeName, '999');
+  await umbracoUi.content.clickCreateModalButton();
+
+  // Assert
+  // The modal stays open with the app's own validation copy and the block is never created -
+  // the invalid value never reaches saved content
+  await umbracoUi.content.isTextWithMessageVisible("Value must be less than or equal to '10'.");
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.values).toEqual([]);
 });

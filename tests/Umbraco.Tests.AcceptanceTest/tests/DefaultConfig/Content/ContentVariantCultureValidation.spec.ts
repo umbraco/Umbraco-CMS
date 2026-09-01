@@ -119,3 +119,22 @@ test('can publish english variant from actions menu when danish has empty mandat
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
 });
+
+test('can unpublish english variant while danish still has an empty mandatory field', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const contentData = await umbracoApi.document.getByName(contentName);
+  await umbracoApi.document.publish(contentData.id, {publishSchedules: [{culture: 'en-US'}]});
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuForContent(contentName);
+  await umbracoUi.content.clickUnpublishActionMenuOption();
+  await umbracoUi.content.clickConfirmToUnpublishButton();
+
+  // Assert
+  await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
+  await umbracoUi.content.isErrorNotificationVisible(false);
+  const updatedContentData = await umbracoApi.document.getByName(contentName);
+  expect(updatedContentData.variants.find(variant => variant.culture === 'en-US').state).toBe('Draft');
+});
