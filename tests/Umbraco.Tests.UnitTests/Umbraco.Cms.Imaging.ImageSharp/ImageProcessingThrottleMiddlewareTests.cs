@@ -77,6 +77,25 @@ public class ImageProcessingThrottleMiddlewareTests
     }
 
     [Test]
+    public async Task InvokeAsync_WhenMemoryIsNotConstrained_DoesNotThrottle()
+    {
+        var probe = new ConcurrencyProbe();
+
+        // Ample memory for a single processor: the processor count already bounds concurrent
+        // decodes, so the gate steps aside rather than serialising requests the cache could serve.
+        var middleware = CreateUnconstrainedMiddleware(probe.HandleAsync);
+
+        Task[] requests = Send(middleware, () => CreateContext(ImagePath, ("width", "400")));
+
+        await WaitUntilAsync(() => probe.Current >= RequestCount);
+
+        probe.Release();
+        await Task.WhenAll(requests);
+
+        Assert.That(probe.Peak, Is.EqualTo(RequestCount));
+    }
+
+    [Test]
     public async Task InvokeAsync_ReleasesTheSlot_WhenTheRequestThrows()
     {
         var shouldThrow = true;
@@ -128,6 +147,23 @@ public class ImageProcessingThrottleMiddlewareTests
             next,
             Options.Create(settings),
             new[] { processor.Object });
+    }
+
+    private static ImageProcessingThrottleMiddleware CreateUnconstrainedMiddleware(RequestDelegate next)
+    {
+        // Derived settings (zero) against 2 GB and a single processor, so memory is not the binding
+        // constraint and no limit is enforced.
+        var settings = new ImagingSettings { Memory = new ImagingMemorySettings() };
+
+        var processor = new Mock<IImageWebProcessor>();
+        processor.SetupGet(x => x.Commands).Returns(new[] { "width", "height" });
+
+        return new ImageProcessingThrottleMiddleware(
+            next,
+            Options.Create(settings),
+            new[] { processor.Object },
+            availableMemoryBytes: 2048L * 1024 * 1024,
+            processorCount: 1);
     }
 
     private static Task[] Send(ImageProcessingThrottleMiddleware middleware, Func<DefaultHttpContext> context)
