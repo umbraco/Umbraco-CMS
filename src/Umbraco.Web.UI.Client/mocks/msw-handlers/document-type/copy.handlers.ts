@@ -1,7 +1,7 @@
 const { http, HttpResponse } = window.MockServiceWorker;
-import { umbDataTypeMockDb } from '../../db/data-type.db.js';
+import { umbDocumentTypeMockDb } from '../../db/document-type.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { CopyDataTypeRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { CopyDocumentTypeRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const copyHandlers = [
@@ -9,11 +9,11 @@ export const copyHandlers = [
 		const id = params.id as string;
 		if (!id) return new HttpResponse(null, { status: 400, statusText: 'no id found' });
 
-		const requestBody = (await request.json()) as CopyDataTypeRequestModel;
+		const requestBody = (await request.json()) as CopyDocumentTypeRequestModel;
 		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
 
 		// A missing/null target means "copy to the tree root" — target isn't required.
-		const newIds = umbDataTypeMockDb.tree.copy([id], requestBody.target?.id ?? null);
+		const newIds = umbDocumentTypeMockDb.tree.copy([id], requestBody.target?.id ?? null);
 
 		return new HttpResponse(null, { status: 201, headers: { Location: newIds[0] } });
 	}),
