@@ -60,8 +60,7 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 
 		context = new TestTrashableEntityWorkspaceContext(host);
 
-		// Let the constructor's consumeContext callbacks resolve, including the initial `isTrashed` emission
-		// (undefined on a fresh fake), which harmlessly calls removeRule() once as a no-op baseline — clear it so
+		// The initial (undefined) `isTrashed` emission calls removeRule() once as a no-op baseline — clear it so
 		// each test's assertions only see calls made by that test's own actions.
 		await aTimeout(0);
 		workspaceContext.readOnlyGuardRuleCalls.length = 0;

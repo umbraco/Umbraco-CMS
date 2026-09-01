@@ -125,17 +125,14 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 		const entityType = this.#workspaceContext.getEntityType();
 
 		if (parentUnique) {
-			// Changing the URL under the same edit/:unique route re-triggers that route's own setup(), which loads
-			// the new unique itself — see UmbWorkspaceIsNewRedirectController/UmbServerFileRenameWorkspaceRedirectController.
-			// If the parent has meanwhile become inaccessible, that load falls through to the workspace's normal
-			// forbidden/not-found rendering, same as any other broken deep link.
+			// replaceState: staying within the same edit/:unique route, whose own setup() re-triggers on URL change
+			// and loads the new unique — an inaccessible parent falls through to the normal forbidden/not-found state.
 			window.history.replaceState(null, '', this.getRedirectPath({ entity: { entityType, unique: parentUnique } }));
 			return;
 		}
 
-		// No parent — the entity was at the root. Leaving the workspace entirely for a different top-level route,
-		// so this is a new history entry (matching how UmbEntityDetailWorkspaceEditorElement leaves the workspace
-		// on delete), not a replaceState within the same workspace route.
+		// pushState: no parent means leaving the workspace entirely for a different top-level route, so this is a
+		// new history entry rather than replacing the current one.
 		window.history.pushState(null, '', this.getRedirectPath({ entity: { entityType, unique: null } }));
 	}
 

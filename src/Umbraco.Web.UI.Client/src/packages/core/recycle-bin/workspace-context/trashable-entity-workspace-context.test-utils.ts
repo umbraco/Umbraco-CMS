@@ -109,8 +109,8 @@ export const createTestRecycleBinRepositoryManifest = (alias: string): ManifestA
 
 /**
  * Monkey-patches `window.history.pushState`/`replaceState` to record calls instead of navigating — this project
- * does not use sinon, so history calls are asserted against plain recorded-call arrays (see
- * `document-tree-item.context.test.ts` for the established precedent). Call `restore()` in `afterEach`.
+ * does not use sinon, so history calls are asserted against plain recorded-call arrays. Call `restore()` in
+ * `afterEach`.
  * @returns {object} The recorded call arrays, and a `restore()` function to undo the monkey-patch.
  */
 export function stubHistory() {

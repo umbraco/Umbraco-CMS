@@ -21,10 +21,8 @@ import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/uti
 @customElement('umb-test-media-recycle-bin-host')
 class UmbTestHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-// A minimal `UmbTrashableEntityWorkspaceContext` stand-in for a real UmbMediaWorkspaceContext — the base class's own
-// behaviour (readonly guard, reload, event matching) is already covered by
-// trashable-entity-workspace-context-base.test.ts; this only needs to satisfy the token's discriminator and report its
-// configured unique/entityType.
+// Only needs to satisfy the token's discriminator and report its configured unique/entityType — the base class's
+// own trash/restore/readonly behaviour is tested separately, not here.
 class FakeMediaWorkspaceContext implements UmbTrashableEntityWorkspaceContext {
 	#host: UmbControllerHost;
 	readonly workspaceAlias = 'Umb.Test.MediaWorkspace';
