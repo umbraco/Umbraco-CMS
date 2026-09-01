@@ -272,5 +272,46 @@ describe('UmbAuthContext', () => {
 			await context.validateToken();
 			expect(fetchCalls).to.have.lengthOf(2);
 		});
+
+		it('does not time out a session established while an older refresh was still in flight', async () => {
+			const now = Math.floor(Date.now() / 1000);
+
+			// The session that is about to be rejected server-side
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 60, expiresAt: now + 240 });
+			await aTimeout(50);
+
+			let resolveFetch!: (response: Response) => void;
+			let fetchStarted!: () => void;
+			const fetchInFlight = new Promise<void>((resolve) => {
+				fetchStarted = resolve;
+			});
+			window.fetch = (() => {
+				fetchStarted();
+				return new Promise<Response>((resolve) => {
+					resolveFetch = resolve;
+				});
+			}) as typeof window.fetch;
+
+			const refreshPromise = context.validateToken();
+
+			// Wait for /token to actually be in flight — the refresh queues behind a Web Lock,
+			// so superseding the session before then would just make the queued caller skip it.
+			await fetchInFlight;
+
+			// A fresh sign-in completes and supersedes the session being refreshed
+			channel.postMessage({ type: 'sessionUpdate', accessTokenExpiresAt: now + 600, expiresAt: now + 900 });
+			await aTimeout(50);
+
+			let timeOutCalls = 0;
+			context.timeOut = () => {
+				timeOutCalls++;
+			};
+
+			resolveFetch(invalidGrantResponse());
+			await refreshPromise;
+
+			expect(timeOutCalls).to.equal(0);
+			expect(context.getIsAuthorized()).to.be.true;
+		});
 	});
 });
