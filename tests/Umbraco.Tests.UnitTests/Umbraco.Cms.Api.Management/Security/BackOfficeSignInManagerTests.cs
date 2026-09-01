@@ -185,7 +185,7 @@ public class BackOfficeSignInManagerTests
     ///     login's email address can be one that is not permitted to sign in to the back office.
     /// </remarks>
     [Test]
-    public async Task Cannot_Auto_Link_External_Login_To_A_User_Of_A_Kind_That_Cannot_Sign_In()
+    public async Task Cannot_Auto_Link_External_Login_To_An_Api_User()
     {
         // Arrange
         BackOfficeSignInManager sut = CreateSut();
@@ -201,7 +201,7 @@ public class BackOfficeSignInManagerTests
     }
 
     [Test]
-    public async Task Cannot_Sign_In_A_User_Of_A_Kind_That_Cannot_Sign_In()
+    public async Task Cannot_Sign_In_An_Api_User()
     {
         // Arrange
         BackOfficeSignInManager sut = CreateSut();
