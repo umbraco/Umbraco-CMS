@@ -116,10 +116,33 @@ public class ImagingMemorySettings
             return MaximumConcurrentProcessing;
         }
 
-        long budgetBytes = availableMemoryBytes / ConcurrencyMemoryShareDivisor;
-        long derived = budgetBytes / (EstimatedMegabytesPerImage * OneMegabyte);
-
         // Decoding is CPU bound, so more concurrency than processors buys nothing but memory.
-        return (int)Math.Clamp(derived, 1, Math.Max(processorCount, 1));
+        return (int)Math.Clamp(DeriveConcurrentProcessing(availableMemoryBytes), 1, Math.Max(processorCount, 1));
     }
+
+    /// <summary>
+    /// Gets a value indicating whether the number of images processed concurrently needs to be
+    /// bounded on this host.
+    /// </summary>
+    /// <param name="availableMemoryBytes">
+    /// The memory available to the process, honouring any container limit. Typically
+    /// <see cref="GCMemoryInfo.TotalAvailableMemoryBytes" />.
+    /// </param>
+    /// <param name="processorCount">The number of processors available to the process.</param>
+    /// <returns>
+    /// <c>true</c> when a limit is configured explicitly, or when the memory budget cannot cover as
+    /// many concurrent decodes as the processors would otherwise run; otherwise <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    /// Decoding is CPU bound, so the processor count already caps how many images decode at once.
+    /// A concurrency limit only earns its keep when memory is the tighter constraint - a container
+    /// with a low limit relative to its core count. Everywhere else - an uncapped host, or a host
+    /// with few cores relative to its memory - bounding concurrency would only add latency to
+    /// requests the cache can serve without protecting against anything.
+    /// </remarks>
+    public bool RequiresConcurrencyLimit(long availableMemoryBytes, int processorCount)
+        => MaximumConcurrentProcessing > 0 || DeriveConcurrentProcessing(availableMemoryBytes) < processorCount;
+
+    private static long DeriveConcurrentProcessing(long availableMemoryBytes)
+        => availableMemoryBytes / ConcurrencyMemoryShareDivisor / (EstimatedMegabytesPerImage * OneMegabyte);
 }

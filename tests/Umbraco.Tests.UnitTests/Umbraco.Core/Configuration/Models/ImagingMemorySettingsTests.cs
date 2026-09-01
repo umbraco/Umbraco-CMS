@@ -82,4 +82,41 @@ public class ImagingMemorySettingsTests
 
         Assert.That(settings.ResolveMaximumConcurrentProcessing(16 * OneMegabyte, 1), Is.EqualTo(1));
     }
+
+    [Test]
+    public void RequiresConcurrencyLimit_WhenConfigured_IsAlwaysTrue()
+    {
+        var settings = new ImagingMemorySettings { MaximumConcurrentProcessing = 4 };
+
+        // Explicit configuration is honoured even on a host with memory to spare.
+        Assert.That(settings.RequiresConcurrencyLimit(64L * 1024 * OneMegabyte, 4), Is.True);
+    }
+
+    // Memory is the binding constraint: it affords fewer concurrent decodes than there are
+    // processors, so an unbounded page of thumbnails would exhaust it.
+    [TestCase(384, 28)] // Many cores, little memory - the container that gets OOM-killed.
+    [TestCase(256, 8)]
+    [TestCase(1024, 32)]
+    public void RequiresConcurrencyLimit_WhenMemoryIsTheBindingConstraint_IsTrue(
+        int availableMegabytes,
+        int processorCount)
+    {
+        var settings = new ImagingMemorySettings();
+
+        Assert.That(settings.RequiresConcurrencyLimit(availableMegabytes * OneMegabyte, processorCount), Is.True);
+    }
+
+    // The processor count already bounds concurrent decodes below what memory could hold, so a
+    // limit would only add latency without preventing anything.
+    [TestCase(512, 4)] // Derived concurrency equals the processor count - not strictly constrained.
+    [TestCase(2048, 4)]
+    [TestCase(65536, 8)]
+    public void RequiresConcurrencyLimit_WhenMemoryIsNotTheBindingConstraint_IsFalse(
+        int availableMegabytes,
+        int processorCount)
+    {
+        var settings = new ImagingMemorySettings();
+
+        Assert.That(settings.RequiresConcurrencyLimit(availableMegabytes * OneMegabyte, processorCount), Is.False);
+    }
 }
