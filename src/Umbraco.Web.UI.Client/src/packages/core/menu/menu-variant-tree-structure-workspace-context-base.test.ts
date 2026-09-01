@@ -55,6 +55,8 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 	});
 
 	afterEach(() => {
+		// Cancels any pending debounced fetch so it doesn't leak into a later test.
+		context.destroy();
 		document.body.removeChild(host);
 	});
 
@@ -110,9 +112,6 @@ describe('UmbMenuVariantTreeStructureWorkspaceContextBase', () => {
 			expect(UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(callCountBeforeNavigate);
 			expect(parentContext?.getParent()).to.equal(undefined);
 			expect(ancestorContext?.getAncestors()).to.deep.equal([]);
-
-			// Cancel the pending debounced fetch so it doesn't leak into a later test.
-			context.destroy();
 		});
 	});
 
