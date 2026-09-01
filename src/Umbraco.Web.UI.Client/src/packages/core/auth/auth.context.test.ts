@@ -127,6 +127,127 @@ describe('UmbAuthContext', () => {
 		});
 	});
 
+	// The server renews the session for any request that carries it, so the countdown has to follow
+	// ordinary back office activity rather than the expiry the session started out with. The renewal
+	// has already happened on the response being handled, so this must cost no request of its own —
+	// hence no fetch stubbing here: a request would reach the network and fail the run.
+	describe('Session expiry on activity', () => {
+		type UmbTestResponseInterceptor = (
+			response: Response,
+			request: Request,
+			options: unknown,
+		) => Response | Promise<Response>;
+
+		const SESSION_LENGTH_IN_SECONDS = 1200;
+
+		let channel: BroadcastChannel;
+		let peerMessages: Array<Record<string, unknown>>;
+		let peerChannel: BroadcastChannel;
+
+		beforeEach(() => {
+			// The interceptor signals activity through a context it provides on the host, and context
+			// requests only resolve for an attached host.
+			document.body.appendChild(hostElement);
+
+			channel = new BroadcastChannel('umb:auth');
+			peerMessages = [];
+			peerChannel = new BroadcastChannel('umb:auth');
+			peerChannel.onmessage = (evt: MessageEvent) => peerMessages.push(evt.data);
+		});
+
+		afterEach(() => {
+			channel.close();
+			peerChannel.close();
+			hostElement.remove();
+		});
+
+		function getLatestExpiresAt(): number | undefined {
+			let expiresAt: number | undefined;
+			context.session$.subscribe((session) => (expiresAt = session?.expiresAt)).unsubscribe();
+			return expiresAt;
+		}
+
+		/** Configures a client that only records the response interceptors bound to it. */
+		function collectResponseInterceptors(): Array<UmbTestResponseInterceptor> {
+			const interceptors: Array<UmbTestResponseInterceptor> = [];
+			const fakeClient = {
+				buildUrl: () => '',
+				getConfig: () => ({}),
+				request: () => Promise.resolve({}) as never,
+				interceptors: {
+					request: { use: () => {} },
+					response: { use: (fn: UmbTestResponseInterceptor) => interceptors.push(fn) },
+				},
+				setConfig: (config: Record<string, unknown>) => config,
+			};
+
+			context.configureClient(fakeClient as never);
+			return interceptors;
+		}
+
+		async function establishSession(): Promise<number> {
+			channel.postMessage({
+				type: 'authorized',
+				expiresIn: SESSION_LENGTH_IN_SECONDS,
+				issuedAt: Math.floor(Date.now() / 1000),
+			});
+			await aTimeout(50);
+
+			return getLatestExpiresAt()!;
+		}
+
+		async function receiveResponse(status: number): Promise<void> {
+			let response = new Response(null, { status });
+			const request = new Request('http://localhost/umbraco/management/api/v1/some-resource');
+			for (const interceptor of collectResponseInterceptors()) {
+				response = await interceptor(response, request, {});
+			}
+			await aTimeout(50);
+		}
+
+		it('slides the expiry forward when a request succeeds', async () => {
+			const expiresAt = await establishSession();
+
+			await receiveResponse(200);
+
+			expect(getLatestExpiresAt()).to.be.greaterThan(expiresAt);
+		});
+
+		it('leaves the expiry alone when a request fails', async () => {
+			const expiresAt = await establishSession();
+
+			await receiveResponse(404);
+
+			expect(getLatestExpiresAt()).to.equal(expiresAt);
+		});
+
+		// Peer tabs share the auth cookie, so the renewal applied to them as well — they just did not
+		// make the request that triggered it.
+		it('tells peer tabs about the slid expiry', async () => {
+			const expiresAt = await establishSession();
+
+			await receiveResponse(200);
+
+			const sessionUpdates = peerMessages.filter((message) => message.type === 'sessionUpdate');
+			expect(sessionUpdates).to.have.lengthOf(1);
+			expect(sessionUpdates[0].expiresAt).to.equal(getLatestExpiresAt());
+			expect(sessionUpdates[0].expiresAt).to.be.greaterThan(expiresAt);
+		});
+
+		// A session whose expiry the server never reported gets no countdown at all (see the timeout
+		// controller), and activity must not turn that into a guessed one.
+		it('does not invent an expiry for a session that has none', async () => {
+			channel.postMessage({ type: 'authorized', expiresIn: undefined, issuedAt: Math.floor(Date.now() / 1000) });
+			await aTimeout(50);
+
+			await receiveResponse(200);
+
+			expect(context.getIsAuthorized()).to.be.true;
+			expect(getLatestExpiresAt()).to.be.undefined;
+			expect(peerMessages.filter((message) => message.type === 'sessionUpdate')).to.be.empty;
+		});
+	});
+
 	describe('Lifecycle', () => {
 		it('can be destroyed without errors', () => {
 			expect(() => context.destroy()).to.not.throw();
