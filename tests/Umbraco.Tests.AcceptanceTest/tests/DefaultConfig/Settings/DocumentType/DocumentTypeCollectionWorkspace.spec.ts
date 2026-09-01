@@ -76,7 +76,7 @@ test('can create a document type folder using create options', {tag: '@release'}
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(documentFolderName);
-  await umbracoUi.documentType.clickCreateFolderButton();
+  await umbracoUi.documentType.clickCreateFolderButtonAndWaitForDocumentTypeToBeCreated();
 
   // Assert
   expect(await umbracoApi.documentType.doesNameExist(documentFolderName)).toBeTruthy();
@@ -167,7 +167,7 @@ test('can create a document type folder in a folder using create options', async
   await umbracoUi.documentType.clickCreateActionMenuOption();
   await umbracoUi.documentType.clickCreateDocumentFolderButton();
   await umbracoUi.documentType.enterFolderName(childFolderName);
-  await umbracoUi.documentType.clickCreateFolderButton();
+  await umbracoUi.documentType.clickCreateFolderButtonAndWaitForDocumentTypeToBeCreated();
 
   // Assert
   const folder = await umbracoApi.documentType.getByName(childFolderName);
