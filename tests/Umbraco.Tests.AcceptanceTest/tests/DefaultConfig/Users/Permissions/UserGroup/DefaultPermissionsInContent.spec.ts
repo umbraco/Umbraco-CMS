@@ -286,7 +286,7 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-test('can not set permissions with set permissions permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('does not show an actions menu when no document actions are available', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsDocumentPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
