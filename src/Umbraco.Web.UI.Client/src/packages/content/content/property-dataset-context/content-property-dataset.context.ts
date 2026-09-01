@@ -6,6 +6,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityVariantModel, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+import { of, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbContentPropertyDatasetContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
@@ -18,14 +19,17 @@ export class UmbContentPropertyDatasetContext<
 > {
 	//
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
+
+	#currentVariantId = new UmbObjectState<UmbVariantId | undefined>(undefined);
+	public readonly variantId = this.#currentVariantId.asObservable();
+	public readonly culture = this.#currentVariantId.asObservablePart((x) => x?.culture);
+	public readonly segment = this.#currentVariantId.asObservablePart((x) => x?.segment);
+
 	#currentVariant = new UmbObjectState<VariantModelType | undefined>(undefined);
-	currentVariant = this.#currentVariant.asObservable();
+	public readonly currentVariant = this.#currentVariant.asObservable();
+	public readonly name = this.#currentVariant.asObservablePart((x) => x?.name);
 
-	name = this.#currentVariant.asObservablePart((x) => x?.name);
-	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
-	segment = this.#currentVariant.asObservablePart(() => this.getVariantId().segment);
-
-	readonly IS_CONTENT = true;
+	public readonly IS_CONTENT = true;
 
 	getName(): string | undefined {
 		return this._dataOwner.getName(this.getVariantId());
@@ -44,10 +48,13 @@ export class UmbContentPropertyDatasetContext<
 
 		this.#pathAddendum.setAddendum(variantId ? variantId.toString() : '');
 
+		this.#currentVariantId.setValue(variantId);
+
 		this.observe(
-			this._dataOwner.variantById(this.getVariantId()),
+			this.variantId.pipe(
+				switchMap((variantId) => (variantId ? this._dataOwner.variantById(variantId) : of(undefined))),
+			),
 			async (variantInfo) => {
-				if (!variantInfo) return;
 				this.#currentVariant.setValue(variantInfo);
 			},
 			null,
