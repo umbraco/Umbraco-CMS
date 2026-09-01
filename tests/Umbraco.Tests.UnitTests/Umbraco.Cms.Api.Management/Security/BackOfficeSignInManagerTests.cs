@@ -13,6 +13,7 @@ using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -179,6 +180,52 @@ public class BackOfficeSignInManagerTests
             ((AutoLinkSignInResult)actual).Errors);
     }
 
+    /// <remarks>
+    ///     Email addresses are unique across all users regardless of their kind, so the user matched on the external
+    ///     login's email address can be one that is not permitted to sign in to the back office.
+    /// </remarks>
+    [Test]
+    public async Task Cannot_Auto_Link_External_Login_To_A_User_Of_A_Kind_That_Cannot_Sign_In()
+    {
+        // Arrange
+        BackOfficeSignInManager sut = CreateSut();
+        BackOfficeIdentityUser existingUser = CreateUser(UserKind.Api);
+        _userManager.Setup(x => x.FindByEmailAsync(TestEmail)).ReturnsAsync(existingUser);
+
+        // Act
+        SignInResult actual = await sut.ExternalLoginSignInAsync(CreateExternalLoginInfoWithEmail(), false);
+
+        // Assert
+        Assert.AreSame(AutoLinkSignInResult.FailedUnsupportedUserKind, actual);
+        _userManager.Verify(x => x.AddLoginAsync(existingUser, It.IsAny<UserLoginInfo>()), Times.Never);
+    }
+
+    [Test]
+    public async Task Cannot_Sign_In_A_User_Of_A_Kind_That_Cannot_Sign_In()
+    {
+        // Arrange
+        BackOfficeSignInManager sut = CreateSut();
+
+        // Act
+        var actual = await sut.CanSignInAsync(CreateUser(UserKind.Api));
+
+        // Assert
+        Assert.IsFalse(actual);
+    }
+
+    [Test]
+    public async Task Can_Sign_In_A_Default_User()
+    {
+        // Arrange
+        BackOfficeSignInManager sut = CreateSut();
+
+        // Act
+        var actual = await sut.CanSignInAsync(CreateUser());
+
+        // Assert
+        Assert.IsTrue(actual);
+    }
+
     private BackOfficeSignInManager CreateSut(ExternalSignInAutoLinkOptions? autoLinkOptions = null)
     {
         _userManager = MockUserManager();
@@ -216,8 +263,8 @@ public class BackOfficeSignInManagerTests
             Mock.Of<IBackOfficeUserPasswordChecker>(),
             Options.Create(new GlobalSettings()));
 
-    private static BackOfficeIdentityUser CreateUser()
-        => BackOfficeIdentityUser.CreateNew(new GlobalSettings(), TestEmail, TestEmail, "en-US", "Test User");
+    private static BackOfficeIdentityUser CreateUser(UserKind kind = UserKind.Default)
+        => BackOfficeIdentityUser.CreateNew(new GlobalSettings(), TestEmail, TestEmail, "en-US", "Test User", kind: kind);
 
     private static IBackOfficeExternalLoginProviders MockExternalLoginProviders(ExternalSignInAutoLinkOptions? autoLinkOptions)
     {

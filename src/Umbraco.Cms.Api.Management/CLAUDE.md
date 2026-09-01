@@ -387,6 +387,13 @@ protected async Task<IActionResult> HandleRequest(request, Func<Task<IActionResu
 - Google, Microsoft, OpenID Connect providers
 - Auto-linking with `ExternalSignInAutoLinkOptions`
 - **Critical**: Validate external claims before auto-linking users
+- **Only `UserKind.Default` users can sign in.** Auto-linking matches on the external login's email
+  address, and emails are unique across all users regardless of kind — so the match can be an API
+  user, which is non-interactive by design. Refused both at the link
+  (`AutoLinkSignInResult.FailedUnsupportedUserKind`) and at sign in (`CanSignInAsync`).
+- **Nothing consumes the result types** in `Security/AutoLinkSignInResult.cs`:
+  `BackOfficeController.AuthorizeExternal` collapses every failure into a default challenge, so the
+  reason reaches the logs but not the user. Members have their own same-named nested copies.
 
 ### Input Validation
 **FluentValidation** used throughout:
