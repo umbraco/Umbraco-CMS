@@ -120,7 +120,7 @@ export class UmbContentWorkspaceDataManager<
 		const currentData = this.getCurrent();
 		if (!currentData) throw new Error('Data is missing');
 
-		const variant = currentData.variants.find((x) => (x.culture = null));
+		const variant = currentData.variants.find((x) => x.culture === null);
 		// Cause we are invariant, we will just overwrite all variants with this one:
 		const newVariants = [
 			{
