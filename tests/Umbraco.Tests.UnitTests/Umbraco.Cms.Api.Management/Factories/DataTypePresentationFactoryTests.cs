@@ -51,8 +51,8 @@ public class DataTypePresentationFactoryTests
         var result = await factory.CreateAsync(requestModel);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ValueStorageType.Ntext, result.Result.DatabaseType);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.DatabaseType, Is.EqualTo(ValueStorageType.Ntext));
     }
 
     [Test]
@@ -78,8 +78,8 @@ public class DataTypePresentationFactoryTests
         var result = await factory.CreateAsync(requestModel);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ValueStorageType.Nvarchar, result.Result.DatabaseType);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.DatabaseType, Is.EqualTo(ValueStorageType.Nvarchar));
     }
 
     [Test]
@@ -101,8 +101,8 @@ public class DataTypePresentationFactoryTests
         var result = await factory.CreateAsync(requestModel);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ValueStorageType.Nvarchar, result.Result.DatabaseType);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.DatabaseType, Is.EqualTo(ValueStorageType.Nvarchar));
     }
 
     [Test]
@@ -137,8 +137,8 @@ public class DataTypePresentationFactoryTests
         var result = await factory.CreateAsync(requestModel);
 
         // Assert - the save succeeds and falls back to the value editor's value type.
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ValueStorageType.Ntext, result.Result.DatabaseType);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.DatabaseType, Is.EqualTo(ValueStorageType.Ntext));
     }
 
     [Test]
@@ -170,8 +170,8 @@ public class DataTypePresentationFactoryTests
         var result = await factory.CreateAsync(requestModel, current);
 
         // Assert
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ValueStorageType.Ntext, result.Result.DatabaseType);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.DatabaseType, Is.EqualTo(ValueStorageType.Ntext));
     }
 
     private DataTypePresentationFactory CreateFactory(IDataEditor editor)

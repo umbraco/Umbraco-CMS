@@ -100,7 +100,7 @@ public abstract class UserStartNodeEntitiesServiceTestsBase : UmbracoIntegration
     {
         var user = await CreateUser(startNodeIds);
         var paths = GetStartNodePaths(user);
-        Assert.IsNotNull(paths);
+        Assert.That(paths, Is.Not.Null);
         return paths;
     }
 
@@ -111,7 +111,7 @@ public abstract class UserStartNodeEntitiesServiceTestsBase : UmbracoIntegration
     {
         var user = await CreateUser(startNodeIds);
         var ids = CalculateStartNodeIds(user);
-        Assert.IsNotNull(ids);
+        Assert.That(ids, Is.Not.Null);
         return ids;
     }
 
@@ -127,7 +127,7 @@ public abstract class UserStartNodeEntitiesServiceTestsBase : UmbracoIntegration
             new UsersToUserGroupManipulationModel(UserGroup.Key, [user.Key]),
             Constants.Security.SuperUserKey);
 
-        Assert.IsTrue(attempt.Success);
+        Assert.That(attempt.Success, Is.True);
         return user;
     }
 

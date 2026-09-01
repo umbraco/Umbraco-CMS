@@ -109,8 +109,8 @@ public class MemberManagerTests
         var identityResult = await sut.CreateAsync(fakeUser);
 
         // assert
-        Assert.IsFalse(identityResult.Succeeded);
-        Assert.IsFalse(!identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.False);
+        Assert.That(!identityResult.Errors.Any(), Is.False);
     }
 
     [Test]
@@ -143,8 +143,8 @@ public class MemberManagerTests
         var identityResult = await sut.CreateAsync(fakeUser);
 
         // assert
-        Assert.IsTrue(identityResult.Succeeded);
-        Assert.IsFalse(identityResult.Errors.Any());
+        Assert.That(identityResult.Succeeded, Is.True);
+        Assert.That(identityResult.Errors.Any(), Is.False);
     }
 
     [Test]
@@ -171,7 +171,7 @@ public class MemberManagerTests
         var result = await sut.ValidateCredentialsAsync(fakeUser.UserName, password);
 
         // assert
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -199,7 +199,7 @@ public class MemberManagerTests
         var result = await sut.ValidateCredentialsAsync(fakeUser.UserName, password);
 
         // assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -226,7 +226,7 @@ public class MemberManagerTests
         var result = await sut.ValidateCredentialsAsync(fakeUser.UserName, password);
 
         // assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -242,7 +242,7 @@ public class MemberManagerTests
         var result = await sut.ValidateCredentialsAsync("testUser", password);
 
         // assert
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     [Test]
@@ -270,9 +270,9 @@ public class MemberManagerTests
         var result = await sut.ChangePasswordAsync(fakeUser, currentPassword, newPassword);
 
         // assert
-        Assert.IsFalse(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
         var passwordMismatchError = result.Errors.FirstOrDefault(e => e.Code == nameof(IdentityErrorDescriber.PasswordMismatch));
-        Assert.IsNotNull(passwordMismatchError);
+        Assert.That(passwordMismatchError, Is.Not.Null);
     }
 
     [Test]
@@ -308,8 +308,8 @@ public class MemberManagerTests
         IdentityResult result = await sut.ResetPasswordAsync(externalUser, "any-token", "newPassword123!");
 
         // Assert
-        Assert.IsFalse(result.Succeeded);
-        Assert.IsTrue(result.Errors.Any(e => e.Code == "ExternalMemberCannotResetPassword"));
+        Assert.That(result.Succeeded, Is.False);
+        Assert.That(result.Errors.Any(e => e.Code == "ExternalMemberCannotResetPassword"), Is.True);
     }
 
     private static MemberIdentityUser CreateValidUser() =>

@@ -76,18 +76,18 @@ internal sealed class BackOfficeUserStoreTests : UmbracoIntegrationTest
             UserName = "test@test.com",
         };
         var createResult = await userStore.CreateAsync(user);
-        Assert.IsTrue(createResult.Succeeded);
-        Assert.IsFalse(user.IsApproved);
+        Assert.That(createResult.Succeeded, Is.True);
+        Assert.That(user.IsApproved, Is.False);
 
         // update
         user.IsApproved = true;
         var saveResult = await userStore.UpdateAsync(user);
-        Assert.IsTrue(saveResult.Succeeded);
-        Assert.IsTrue(user.IsApproved);
+        Assert.That(saveResult.Succeeded, Is.True);
+        Assert.That(user.IsApproved, Is.True);
 
         // get get
         user = await userStore.FindByIdAsync(user.Id);
-        Assert.IsTrue(user.IsApproved);
+        Assert.That(user.IsApproved, Is.True);
     }
 
     [Test]
@@ -107,8 +107,8 @@ internal sealed class BackOfficeUserStoreTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Succeeded);
-            Assert.IsTrue(result.Errors.Any(e => e.Code == nameof(UserOperationStatus.CancelledByNotification)));
+            Assert.That(result.Succeeded, Is.False);
+            Assert.That(result.Errors.Any(e => e.Code == nameof(UserOperationStatus.CancelledByNotification)), Is.True);
         });
     }
 

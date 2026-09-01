@@ -25,7 +25,7 @@ public class LanguageBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(expected.Name, language.IsoCode);
-        Assert.AreEqual(expected.EnglishName, language.CultureName);
+        Assert.That(language.IsoCode, Is.EqualTo(expected.Name));
+        Assert.That(language.CultureName, Is.EqualTo(expected.EnglishName));
     }
 }

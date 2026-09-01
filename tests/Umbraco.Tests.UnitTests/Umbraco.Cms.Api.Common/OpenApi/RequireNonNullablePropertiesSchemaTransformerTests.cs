@@ -57,9 +57,9 @@ public class RequireNonNullablePropertiesSchemaTransformerTests
         await _transformer.TransformAsync(schema, context, CancellationToken.None);
 
         // Assert
-        Assert.IsNotNull(schema.Required);
-        Assert.IsTrue(schema.Required.Contains("name"));
-        Assert.IsTrue(schema.Required.Contains("age"));
+        Assert.That(schema.Required, Is.Not.Null);
+        Assert.That(schema.Required.Contains("name"), Is.True);
+        Assert.That(schema.Required.Contains("age"), Is.True);
     }
 
     [Test]
@@ -82,7 +82,7 @@ public class RequireNonNullablePropertiesSchemaTransformerTests
         await _transformer.TransformAsync(schema, context, CancellationToken.None);
 
         // Assert - Should still have only one "name" entry
-        Assert.AreEqual(1, schema.Required.Count(r => r == "name"));
+        Assert.That(schema.Required.Count(r => r == "name"), Is.EqualTo(1));
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class RequireNonNullablePropertiesSchemaTransformerTests
         await _transformer.TransformAsync(schema, context, CancellationToken.None);
 
         // Assert - Nullable property should not be required
-        Assert.IsFalse(schema.Required?.Contains("optionalName") ?? false);
+        Assert.That(schema.Required?.Contains("optionalName") ?? false, Is.False);
     }
 
     [Test]
@@ -121,7 +121,7 @@ public class RequireNonNullablePropertiesSchemaTransformerTests
 
         // Act & Assert - Should not throw
         await _transformer.TransformAsync(schema, context, CancellationToken.None);
-        Assert.IsNotNull(schema.Required); // Required is initialized even with no properties
+        Assert.That(schema.Required, Is.Not.Null); // Required is initialized even with no properties
     }
 
     [Test]
@@ -159,7 +159,7 @@ public class RequireNonNullablePropertiesSchemaTransformerTests
         await _transformer.TransformAsync(schema, context, CancellationToken.None);
 
         // Assert - Should be required based on schema type (not nullable)
-        Assert.IsTrue(schema.Required?.Contains("$type") ?? false);
+        Assert.That(schema.Required?.Contains("$type") ?? false, Is.True);
     }
 
     [Test]
@@ -181,7 +181,7 @@ public class RequireNonNullablePropertiesSchemaTransformerTests
         await _transformer.TransformAsync(schema, context, CancellationToken.None);
 
         // Assert - Should not be required (nullable schema type)
-        Assert.IsFalse(schema.Required?.Contains("unknownProp") ?? false);
+        Assert.That(schema.Required?.Contains("unknownProp") ?? false, Is.False);
     }
 
     #region Test Helper Classes

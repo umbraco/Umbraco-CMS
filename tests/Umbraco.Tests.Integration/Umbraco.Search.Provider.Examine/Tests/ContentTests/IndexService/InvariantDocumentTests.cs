@@ -20,7 +20,7 @@ public class InvariantDocumentTests : IndexTestBase
         IIndex index = GetIndex(GetIndexAlias(publish));
 
         ISearchResult[] results = index.Searcher.CreateQuery().All().Execute().ToArray();
-        Assert.That(results.Length, Is.EqualTo(1));
+        Assert.That(results, Has.Length.EqualTo(1));
         Assert.That(results[0].Id, Is.EqualTo(RootKey.ToString()));
     }
 
@@ -143,7 +143,7 @@ public class InvariantDocumentTests : IndexTestBase
         queryBuilder.SelectField(Constants.SystemFields.AggregatedTexts);
         ISearchResults results = queryBuilder.Execute();
         Assert.That(results, Is.Not.Empty);
-        Assert.That(results.First().AllValues.First(x => x.Key == Constants.SystemFields.AggregatedTexts).Value.Contains("The root title"), Is.True);
+        Assert.That(results.First().AllValues.First(x => x.Key == Constants.SystemFields.AggregatedTexts).Value, Does.Contain("The root title"));
     }
 
     [TestCase(true)]

@@ -26,7 +26,7 @@ public class DelayCalculatorTests
 
         TimeSpan result = DelayCalculator.GetDelay(firstRunTime, cronTabParser, logger, now, TimeSpan.Zero);
 
-        Assert.AreEqual(expectedDelayInMinutes, result.TotalMinutes);
+        Assert.That(result.TotalMinutes, Is.EqualTo(expectedDelayInMinutes));
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class DelayCalculatorTests
 
         TimeSpan result = DelayCalculator.GetDelay("30 12 * * *", cronTabParser, logger, now, defaultDelay);
 
-        Assert.AreEqual(defaultDelay.TotalMinutes, result.TotalMinutes);
+        Assert.That(result.TotalMinutes, Is.EqualTo(defaultDelay.TotalMinutes));
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class DelayCalculatorTests
 
         TimeSpan result = DelayCalculator.GetDelay(string.Empty, cronTabParser, logger, now, defaultDelay);
 
-        Assert.AreEqual(defaultDelay, result);
+        Assert.That(result, Is.EqualTo(defaultDelay));
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class DelayCalculatorTests
 
         TimeSpan result = DelayCalculator.GetDelay("invalid", cronTabParser, logger.Object, now, defaultDelay);
 
-        Assert.AreEqual(defaultDelay, result);
+        Assert.That(result, Is.EqualTo(defaultDelay));
         logger.Verify(
             l => l.Log(
                 It.Is<LogLevel>(y => y == LogLevel.Warning),
@@ -86,6 +86,6 @@ public class DelayCalculatorTests
         // "30 12 * * *" = 12:30 daily. From 12:00, that's 30 minutes.
         TimeSpan result = DelayCalculator.GetDelay("30 12 * * *", cronTabParser, logger, timeProvider, TimeSpan.Zero);
 
-        Assert.AreEqual(30, result.TotalMinutes);
+        Assert.That(result.TotalMinutes, Is.EqualTo(30));
     }
 }

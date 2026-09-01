@@ -27,22 +27,22 @@ public class PathValidationTests
             .Build();
 
         // it's empty with no id so we need to allow it
-        Assert.IsTrue(entity.ValidatePath());
+        Assert.That(entity.ValidatePath(), Is.True);
 
         entity.Id = 1234;
 
         // it has an id but no path, so we can't allow it
-        Assert.IsFalse(entity.ValidatePath());
+        Assert.That(entity.ValidatePath(), Is.False);
 
         entity.Path = "-1";
 
         // invalid path
-        Assert.IsFalse(entity.ValidatePath());
+        Assert.That(entity.ValidatePath(), Is.False);
 
         entity.Path = string.Concat("-1,", entity.Id);
 
         // valid path
-        Assert.IsTrue(entity.ValidatePath());
+        Assert.That(entity.ValidatePath(), Is.True);
     }
 
     [Test]
@@ -84,7 +84,7 @@ public class PathValidationTests
         entity.EnsureValidPath(Mock.Of<ILogger<EntitySlim>>(), umbracoEntity => null, umbracoEntity => { });
 
         // works because it's under the root
-        Assert.AreEqual("-1,1234", entity.Path);
+        Assert.That(entity.Path, Is.EqualTo("-1,1234"));
     }
 
     [Test]
@@ -101,7 +101,7 @@ public class PathValidationTests
             umbracoEntity => { });
 
         // works because the parent was found
-        Assert.AreEqual("-1,888,1234", entity.Path);
+        Assert.That(entity.Path, Is.EqualTo("-1,888,1234"));
     }
 
     [Test]
@@ -150,9 +150,9 @@ public class PathValidationTests
         // this will recursively fix all paths
         entity.EnsureValidPath(Mock.Of<ILogger<IUmbracoEntity>>(), GetParent, umbracoEntity => { });
 
-        Assert.AreEqual("-1,999", parentA.Path);
-        Assert.AreEqual("-1,999,888", parentB.Path);
-        Assert.AreEqual("-1,999,888,777", parentC.Path);
-        Assert.AreEqual("-1,999,888,777,1234", entity.Path);
+        Assert.That(parentA.Path, Is.EqualTo("-1,999"));
+        Assert.That(parentB.Path, Is.EqualTo("-1,999,888"));
+        Assert.That(parentC.Path, Is.EqualTo("-1,999,888,777"));
+        Assert.That(entity.Path, Is.EqualTo("-1,999,888,777,1234"));
     }
 }

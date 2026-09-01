@@ -48,10 +48,10 @@ public class UriProviderTests
 
         Attempt<Uri, UserOperationStatus> result = await sut.CreateForgotPasswordUriAsync(_user.Object);
 
-        Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.Result.IsAbsoluteUri);
-        Assert.AreEqual("https", result.Result.Scheme);
-        Assert.AreEqual("my-site.com", result.Result.Host);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.IsAbsoluteUri, Is.True);
+        Assert.That(result.Result.Scheme, Is.EqualTo("https"));
+        Assert.That(result.Result.Host, Is.EqualTo("my-site.com"));
         Assert.That(result.Result.AbsolutePath, Does.StartWith("/umbraco/login"));
         Assert.That(result.Result.Query, Does.Contain("flow=reset-password"));
     }
@@ -68,8 +68,8 @@ public class UriProviderTests
 
         Attempt<Uri, UserOperationStatus> result = await sut.CreateForgotPasswordUriAsync(_user.Object);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserOperationStatus.ApplicationUrlNotConfigured, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserOperationStatus.ApplicationUrlNotConfigured));
         _userManager.Verify(m => m.GeneratePasswordResetTokenAsync(It.IsAny<IUser>()), Times.Never());
     }
 
@@ -89,10 +89,10 @@ public class UriProviderTests
 
         Attempt<Uri, UserOperationStatus> result = await sut.CreateInviteUriAsync(_user.Object);
 
-        Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.Result.IsAbsoluteUri);
-        Assert.AreEqual("https", result.Result.Scheme);
-        Assert.AreEqual("my-site.com", result.Result.Host);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.IsAbsoluteUri, Is.True);
+        Assert.That(result.Result.Scheme, Is.EqualTo("https"));
+        Assert.That(result.Result.Host, Is.EqualTo("my-site.com"));
         Assert.That(result.Result.AbsolutePath, Does.StartWith("/umbraco/login"));
         Assert.That(result.Result.Query, Does.Contain("flow=invite-user"));
     }
@@ -109,8 +109,8 @@ public class UriProviderTests
 
         Attempt<Uri, UserOperationStatus> result = await sut.CreateInviteUriAsync(_user.Object);
 
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(UserOperationStatus.ApplicationUrlNotConfigured, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(UserOperationStatus.ApplicationUrlNotConfigured));
         _userManager.Verify(m => m.GenerateEmailConfirmationTokenAsync(It.IsAny<IUser>()), Times.Never());
     }
 }

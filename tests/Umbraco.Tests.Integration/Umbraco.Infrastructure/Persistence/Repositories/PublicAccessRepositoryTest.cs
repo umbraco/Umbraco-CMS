@@ -44,7 +44,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             repo.Delete(entry);
 
             entry = repo.Get(entry.Key);
-            Assert.IsNull(entry);
+            Assert.That(entry, Is.Null);
         }
     }
 
@@ -65,19 +65,19 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
 
             var found = repo.GetMany().ToArray();
 
-            Assert.AreEqual(1, found.Length);
-            Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
-            Assert.AreEqual(content[1].Id, found[0].LoginNodeId);
-            Assert.AreEqual(content[2].Id, found[0].NoAccessNodeId);
-            Assert.IsTrue(found[0].HasIdentity);
-            Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
-            Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
-            Assert.AreEqual(1, found[0].Rules.Count());
-            Assert.AreEqual("test", found[0].Rules.First().RuleValue);
-            Assert.AreEqual("RoleName", found[0].Rules.First().RuleType);
-            Assert.AreNotEqual(default(DateTime), found[0].Rules.First().CreateDate);
-            Assert.AreNotEqual(default(DateTime), found[0].Rules.First().UpdateDate);
-            Assert.IsTrue(found[0].Rules.First().HasIdentity);
+            Assert.That(found, Has.Length.EqualTo(1));
+            Assert.That(found[0].ProtectedNodeId, Is.EqualTo(content[0].Id));
+            Assert.That(found[0].LoginNodeId, Is.EqualTo(content[1].Id));
+            Assert.That(found[0].NoAccessNodeId, Is.EqualTo(content[2].Id));
+            Assert.That(found[0].HasIdentity, Is.True);
+            Assert.That(found[0].CreateDate, Is.Not.EqualTo(default(DateTime)));
+            Assert.That(found[0].UpdateDate, Is.Not.EqualTo(default(DateTime)));
+            Assert.That(found[0].Rules.Count(), Is.EqualTo(1));
+            Assert.That(found[0].Rules.First().RuleValue, Is.EqualTo("test"));
+            Assert.That(found[0].Rules.First().RuleType, Is.EqualTo("RoleName"));
+            Assert.That(found[0].Rules.First().CreateDate, Is.Not.EqualTo(default(DateTime)));
+            Assert.That(found[0].Rules.First().UpdateDate, Is.Not.EqualTo(default(DateTime)));
+            Assert.That(found[0].Rules.First().HasIdentity, Is.True);
         }
     }
 
@@ -103,17 +103,17 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
 
             var found = repo.GetMany().ToArray();
 
-            Assert.AreEqual(1, found.Length);
-            Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
-            Assert.AreEqual(content[1].Id, found[0].LoginNodeId);
-            Assert.AreEqual(content[2].Id, found[0].NoAccessNodeId);
-            Assert.IsTrue(found[0].HasIdentity);
-            Assert.AreNotEqual(default(DateTime), found[0].CreateDate);
-            Assert.AreNotEqual(default(DateTime), found[0].UpdateDate);
-            CollectionAssert.AreEquivalent(found[0].Rules, entry.Rules);
-            Assert.AreNotEqual(default(DateTime), found[0].Rules.First().CreateDate);
-            Assert.AreNotEqual(default(DateTime), found[0].Rules.First().UpdateDate);
-            Assert.IsTrue(found[0].Rules.First().HasIdentity);
+            Assert.That(found, Has.Length.EqualTo(1));
+            Assert.That(found[0].ProtectedNodeId, Is.EqualTo(content[0].Id));
+            Assert.That(found[0].LoginNodeId, Is.EqualTo(content[1].Id));
+            Assert.That(found[0].NoAccessNodeId, Is.EqualTo(content[2].Id));
+            Assert.That(found[0].HasIdentity, Is.True);
+            Assert.That(found[0].CreateDate, Is.Not.EqualTo(default(DateTime)));
+            Assert.That(found[0].UpdateDate, Is.Not.EqualTo(default(DateTime)));
+            Assert.That(entry.Rules, Is.EquivalentTo(found[0].Rules));
+            Assert.That(found[0].Rules.First().CreateDate, Is.Not.EqualTo(default(DateTime)));
+            Assert.That(found[0].Rules.First().UpdateDate, Is.Not.EqualTo(default(DateTime)));
+            Assert.That(found[0].Rules.First().HasIdentity, Is.True);
         }
     }
 
@@ -141,8 +141,8 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             // re-get
             entry = repo.Get(entry.Key);
 
-            Assert.AreEqual("blah", entry.Rules.First().RuleValue);
-            Assert.AreEqual("asdf", entry.Rules.First().RuleType);
+            Assert.That(entry.Rules.First().RuleValue, Is.EqualTo("blah"));
+            Assert.That(entry.Rules.First().RuleType, Is.EqualTo("asdf"));
         }
     }
 
@@ -163,7 +163,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             // re-get
             entry = repo.Get(entry.Key);
 
-            Assert.IsNotNull(entry);
+            Assert.That(entry, Is.Not.Null);
         }
     }
 
@@ -216,13 +216,13 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             }
 
             var found = repo.GetMany().ToArray();
-            Assert.AreEqual(10, found.Length);
+            Assert.That(found, Has.Length.EqualTo(10));
 
             foreach (var publicAccessEntry in found)
             {
                 var matched = allEntries.First(x => x.Key == publicAccessEntry.Key);
 
-                Assert.AreEqual(matched.Rules.Count(), publicAccessEntry.Rules.Count());
+                Assert.That(publicAccessEntry.Rules.Count(), Is.EqualTo(matched.Rules.Count()));
             }
         }
     }
@@ -246,7 +246,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             repo.Save(entry2);
 
             var found = repo.GetMany(entry1.Key).ToArray();
-            Assert.AreEqual(1, found.Count());
+            Assert.That(found.Count(), Is.EqualTo(1));
         }
     }
 
@@ -287,10 +287,10 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             var first = repo.Get(entry.Key);
             var second = repo.Get(entry.Key);
 
-            Assert.IsNotNull(first);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first!.Key, second!.Key);
-            Assert.AreNotSame(first, second);
+            Assert.That(first, Is.Not.Null);
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.Key, Is.EqualTo(first!.Key));
+            Assert.That(second, Is.Not.SameAs(first));
         }
     }
 
@@ -307,14 +307,14 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
             repo.Save(entry);
 
             var first = repo.Get(entry.Key);
-            Assert.IsNotNull(first);
+            Assert.That(first, Is.Not.Null);
             var originalNodeId = first!.ProtectedNodeId;
             first.ClearRules();
 
             var second = repo.Get(entry.Key);
-            Assert.IsNotNull(second);
-            Assert.AreEqual(originalNodeId, second!.ProtectedNodeId);
-            Assert.AreEqual(1, second.Rules.Count(), "Mutation of a returned entity should not affect the cached copy");
+            Assert.That(second, Is.Not.Null);
+            Assert.That(second!.ProtectedNodeId, Is.EqualTo(originalNodeId));
+            Assert.That(second.Rules.Count(), Is.EqualTo(1), "Mutation of a returned entity should not affect the cached copy");
         }
     }
 }

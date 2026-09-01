@@ -26,7 +26,7 @@ public class ColorListValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class ColorListValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class ColorListValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(2, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -75,8 +75,8 @@ public class ColorListValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
-        Assert.IsTrue(result.First().ErrorMessage.Contains("ffffff, 000000, ff00aa"));
+        Assert.That(result.Count(), Is.EqualTo(1));
+        Assert.That(result.First().ErrorMessage, Does.Contain("ffffff, 000000, ff00aa"));
     }
 
     [Test]
@@ -92,6 +92,6 @@ public class ColorListValidatorTest
                 null,
                 null,
                 PropertyValidationContext.Empty());
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result.Count(), Is.EqualTo(1));
     }
 }

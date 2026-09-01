@@ -49,17 +49,17 @@ public class MappingTests
         var thing1 = new Thing1 { Value = "value" };
         var thing2 = mapper.Map<Thing1, Thing2>(thing1);
 
-        Assert.IsNotNull(thing2);
-        Assert.AreEqual("value", thing2.Value);
+        Assert.That(thing2, Is.Not.Null);
+        Assert.That(thing2.Value, Is.EqualTo("value"));
 
         thing2 = mapper.Map<Thing2>(thing1);
 
-        Assert.IsNotNull(thing2);
-        Assert.AreEqual("value", thing2.Value);
+        Assert.That(thing2, Is.Not.Null);
+        Assert.That(thing2.Value, Is.EqualTo("value"));
 
         thing2 = new Thing2();
         mapper.Map(thing1, thing2);
-        Assert.AreEqual("value", thing2.Value);
+        Assert.That(thing2.Value, Is.EqualTo("value"));
     }
 
     [Test]
@@ -73,24 +73,24 @@ public class MappingTests
         Thing1[] thing1 = { thing1A, thing1B };
         var thing2 = mapper.Map<IEnumerable<Thing1>, IEnumerable<Thing2>>(thing1).ToList();
 
-        Assert.IsNotNull(thing2);
-        Assert.AreEqual(2, thing2.Count);
-        Assert.AreEqual("valueA", thing2[0].Value);
-        Assert.AreEqual("valueB", thing2[1].Value);
+        Assert.That(thing2, Is.Not.Null);
+        Assert.That(thing2, Has.Count.EqualTo(2));
+        Assert.That(thing2[0].Value, Is.EqualTo("valueA"));
+        Assert.That(thing2[1].Value, Is.EqualTo("valueB"));
 
         thing2 = mapper.Map<IEnumerable<Thing2>>(thing1).ToList();
 
-        Assert.IsNotNull(thing2);
-        Assert.AreEqual(2, thing2.Count);
-        Assert.AreEqual("valueA", thing2[0].Value);
-        Assert.AreEqual("valueB", thing2[1].Value);
+        Assert.That(thing2, Is.Not.Null);
+        Assert.That(thing2, Has.Count.EqualTo(2));
+        Assert.That(thing2[0].Value, Is.EqualTo("valueA"));
+        Assert.That(thing2[1].Value, Is.EqualTo("valueB"));
 
         thing2 = mapper.MapEnumerable<Thing1, Thing2>(thing1).ToList();
 
-        Assert.IsNotNull(thing2);
-        Assert.AreEqual(2, thing2.Count);
-        Assert.AreEqual("valueA", thing2[0].Value);
-        Assert.AreEqual("valueB", thing2[1].Value);
+        Assert.That(thing2, Is.Not.Null);
+        Assert.That(thing2, Has.Count.EqualTo(2));
+        Assert.That(thing2[0].Value, Is.EqualTo("valueA"));
+        Assert.That(thing2[1].Value, Is.EqualTo("valueB"));
     }
 
     [Test]
@@ -102,17 +102,17 @@ public class MappingTests
         var thing3 = new Thing3 { Value = "value" };
         var thing2 = mapper.Map<Thing3, Thing2>(thing3);
 
-        Assert.IsNotNull(thing2);
-        Assert.AreEqual("value", thing2.Value);
+        Assert.That(thing2, Is.Not.Null);
+        Assert.That(thing2.Value, Is.EqualTo("value"));
 
         thing2 = mapper.Map<Thing2>(thing3);
 
-        Assert.IsNotNull(thing2);
-        Assert.AreEqual("value", thing2.Value);
+        Assert.That(thing2, Is.Not.Null);
+        Assert.That(thing2.Value, Is.EqualTo("value"));
 
         thing2 = new Thing2();
         mapper.Map(thing3, thing2);
-        Assert.AreEqual("value", thing2.Value);
+        Assert.That(thing2.Value, Is.EqualTo("value"));
     }
 
     [Test]
@@ -167,8 +167,8 @@ public class MappingTests
             var thing2 = mapper.Map<Thing2>(thing3);
             Console.WriteLine($"{DateTime.Now:O} mapped");
 
-            Assert.IsNotNull(thing2);
-            Assert.AreEqual("value", thing2.Value);
+            Assert.That(thing2, Is.Not.Null);
+            Assert.That(thing2.Value, Is.EqualTo("value"));
         }
         finally
         {
@@ -186,10 +186,10 @@ public class MappingTests
 
         var thing6 = mapper.Map<Thing5, Thing6>(thing5);
 
-        Assert.IsNotNull(thing6);
-        Assert.AreEqual(Thing6Enum.Apple, thing6.Fruit1);
-        Assert.AreEqual(Thing6Enum.Banana, thing6.Fruit2);
-        Assert.AreEqual(Thing6Enum.Cherry, thing6.Fruit3);
+        Assert.That(thing6, Is.Not.Null);
+        Assert.That(thing6.Fruit1, Is.EqualTo(Thing6Enum.Apple));
+        Assert.That(thing6.Fruit2, Is.EqualTo(Thing6Enum.Banana));
+        Assert.That(thing6.Fruit3, Is.EqualTo(Thing6Enum.Cherry));
     }
 
     [Test]
@@ -202,8 +202,8 @@ public class MappingTests
 
         var thing8 = mapper.Map<Thing7, Thing8>(thing7);
 
-        Assert.IsNotNull(thing8);
-        Assert.IsNull(thing8.Things);
+        Assert.That(thing8, Is.Not.Null);
+        Assert.That(thing8.Things, Is.Null);
     }
 
     private class Thing1

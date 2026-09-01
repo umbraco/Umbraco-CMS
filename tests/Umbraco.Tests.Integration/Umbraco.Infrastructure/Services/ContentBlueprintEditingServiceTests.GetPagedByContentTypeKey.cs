@@ -28,14 +28,14 @@ public partial class ContentBlueprintEditingServiceTests
         var pagedResult = result.Result;
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-            Assert.IsNotNull(pagedResult);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
+            Assert.That(pagedResult, Is.Not.Null);
         });
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, pagedResult.Items.Count());
-            Assert.AreEqual(5, pagedResult.Total);
+            Assert.That(pagedResult.Items.Count(), Is.EqualTo(2));
+            Assert.That(pagedResult.Total, Is.EqualTo(5));
         });
     }
 
@@ -46,9 +46,9 @@ public partial class ContentBlueprintEditingServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(ContentEditingOperationStatus.ContentTypeNotFound, result.Status);
-            Assert.IsNull(result.Result);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.ContentTypeNotFound));
+            Assert.That(result.Result, Is.Null);
         });
     }
 }

@@ -87,7 +87,7 @@ public class BackOfficeClaimsPrincipalFactoryTests
         var claimsPrincipal = await sut.CreateAsync(_testUser);
 
         var umbracoBackOfficeIdentity = claimsPrincipal.Identity as ClaimsIdentity;
-        Assert.IsNotNull(umbracoBackOfficeIdentity);
+        Assert.That(umbracoBackOfficeIdentity, Is.Not.Null);
     }
 
     [TestCase(ClaimTypes.NameIdentifier, TestUserId)]
@@ -98,8 +98,8 @@ public class BackOfficeClaimsPrincipalFactoryTests
 
         var claimsPrincipal = await sut.CreateAsync(_testUser);
 
-        Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue.ToString()));
-        Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue.ToString()));
+        Assert.That(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue.ToString()), Is.True);
+        Assert.That(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue.ToString()), Is.True);
     }
 
     [Test]
@@ -115,8 +115,8 @@ public class BackOfficeClaimsPrincipalFactoryTests
 
         var claimsPrincipal = await sut.CreateAsync(_testUser);
 
-        Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
-        Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue));
+        Assert.That(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue), Is.True);
+        Assert.That(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue), Is.True);
     }
 
     [Test]
@@ -133,7 +133,7 @@ public class BackOfficeClaimsPrincipalFactoryTests
 
         var claimsPrincipal = await sut.CreateAsync(_testUser);
 
-        Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
+        Assert.That(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue), Is.True);
     }
 
     [Test]
@@ -155,7 +155,7 @@ public class BackOfficeClaimsPrincipalFactoryTests
 
         var claimsPrincipal = await sut.CreateAsync(_testUser);
 
-        Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue));
+        Assert.That(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue), Is.True);
     }
 
     private BackOfficeClaimsPrincipalFactory CreateSut() => new(

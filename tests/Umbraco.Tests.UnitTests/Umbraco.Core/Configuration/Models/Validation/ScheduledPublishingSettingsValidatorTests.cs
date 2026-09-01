@@ -14,7 +14,7 @@ public class ScheduledPublishingSettingsValidatorTests
     public void Can_Validate_Default_Configuration()
     {
         var result = Validate(new ScheduledPublishingSettings());
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [TestCase(0)]
@@ -22,7 +22,7 @@ public class ScheduledPublishingSettingsValidatorTests
     public void Cannot_Validate_Zero_Or_Negative_Period(int seconds)
     {
         var result = Validate(new ScheduledPublishingSettings { Period = TimeSpan.FromSeconds(seconds) });
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     [Test]
@@ -34,7 +34,7 @@ public class ScheduledPublishingSettingsValidatorTests
             Period = TimeSpan.FromSeconds(7),
             AlignToClock = false,
         });
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [TestCase(1)]
@@ -52,7 +52,7 @@ public class ScheduledPublishingSettingsValidatorTests
             Period = TimeSpan.FromSeconds(seconds),
             AlignToClock = true,
         });
-        Assert.True(result.Succeeded);
+        Assert.That(result.Succeeded, Is.True);
     }
 
     [TestCase(7)]
@@ -66,7 +66,7 @@ public class ScheduledPublishingSettingsValidatorTests
             Period = TimeSpan.FromSeconds(seconds),
             AlignToClock = true,
         });
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     [Test]
@@ -77,7 +77,7 @@ public class ScheduledPublishingSettingsValidatorTests
             Period = TimeSpan.FromMilliseconds(500),
             AlignToClock = true,
         });
-        Assert.False(result.Succeeded);
+        Assert.That(result.Succeeded, Is.False);
     }
 
     private static Microsoft.Extensions.Options.ValidateOptionsResult Validate(ScheduledPublishingSettings options)

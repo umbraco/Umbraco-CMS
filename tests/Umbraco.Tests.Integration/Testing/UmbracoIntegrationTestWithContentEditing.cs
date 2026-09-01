@@ -62,7 +62,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
         ContentTypeCreateModel = ContentTypeEditingBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateKey: template.Key);
         var contentTypeAttempt = await ContentTypeEditingService.CreateAsync(ContentTypeCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(contentTypeAttempt.Success);
+        Assert.That(contentTypeAttempt.Success, Is.True);
 
         var contentTypeResult = contentTypeAttempt.Result;
         ContentTypeUpdateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(contentTypeResult); ContentTypeUpdateModel.AllowedContentTypes = new[]
@@ -70,13 +70,13 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
             new ContentTypeSort(contentTypeResult.Key, 0, ContentTypeCreateModel.Alias),
         };
         var updatedContentTypeResult = await ContentTypeEditingService.UpdateAsync(contentTypeResult, ContentTypeUpdateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updatedContentTypeResult.Success);
+        Assert.That(updatedContentTypeResult.Success, Is.True);
         ContentType = updatedContentTypeResult.Result;
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         Textpage = ContentEditingBuilder.CreateSimpleContent(ContentType.Key);
         var createContentResultTextPage = await ContentEditingService.CreateAsync(Textpage, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createContentResultTextPage.Success);
+        Assert.That(createContentResultTextPage.Success, Is.True);
 
         if (!Textpage.Key.HasValue)
         {
@@ -94,7 +94,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
         PublishedTextPage = ContentEditingBuilder.CreateSimpleContent(ContentType.Key, "Published Page");
         var createContentResultPublishPage = await ContentEditingService.CreateAsync(PublishedTextPage, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createContentResultPublishPage.Success);
+        Assert.That(createContentResultPublishPage.Success, Is.True);
 
         if (!PublishedTextPage.Key.HasValue)
         {
@@ -107,12 +107,12 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
         }
 
         var publishResult = await ContentPublishingService.PublishAsync(PublishedTextPage.Key.Value, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
+        Assert.That(publishResult.Success, Is.True);
 
         // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1055
         Subpage1 = ContentEditingBuilder.CreateSimpleContent(ContentType.Key, "Text Page 1", Textpage.Key);
         var createContentResultSubPage1 = await ContentEditingService.CreateAsync(Subpage1, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createContentResultSubPage1.Success);
+        Assert.That(createContentResultSubPage1.Success, Is.True);
         if (!Subpage1.Key.HasValue)
         {
             throw new InvalidOperationException("The content page key is null.");
@@ -125,7 +125,7 @@ public abstract class UmbracoIntegrationTestWithContentEditing : UmbracoIntegrat
 
         Subpage2 = ContentEditingBuilder.CreateSimpleContent(ContentType.Key, "Text Page 2", Textpage.Key);
         var createContentResultSubPage2 = await ContentEditingService.CreateAsync(Subpage2, Constants.Security.SuperUserKey);
-        Assert.IsTrue(createContentResultSubPage2.Success);
+        Assert.That(createContentResultSubPage2.Success, Is.True);
         if (!Subpage2.Key.HasValue)
         {
             throw new InvalidOperationException("The content page key is null.");

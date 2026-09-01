@@ -60,21 +60,21 @@ internal class RichTextEditorWithReusableContentTests : BlockEditorWithReusableC
 
         var publishedContent = GetPublishedContent(content.Key);
         var property = publishedContent.GetProperty("blocks");
-        Assert.IsNotNull(property);
+        Assert.That(property, Is.Not.Null);
 
         var propertyValue = property.GetDeliveryApiValue(false, "en-US") as RichTextModel;
-        Assert.IsNotNull(propertyValue);
+        Assert.That(propertyValue, Is.Not.Null);
 
         var blocks = propertyValue.Blocks.ToArray();
-        Assert.AreEqual(1, blocks.Length);
+        Assert.That(blocks, Has.Length.EqualTo(1));
 
         var block = blocks.First();
-        Assert.AreEqual(reusableElementKey, block.Content.Id);
-        Assert.AreEqual(2, block.Content.Properties.Count);
+        Assert.That(block.Content.Id, Is.EqualTo(reusableElementKey));
+        Assert.That(block.Content.Properties, Has.Count.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("The reusable invariant text", block.Content.Properties["invariantText"]);
-            Assert.AreEqual("The reusable variant text", block.Content.Properties["variantText"]);
+            Assert.That(block.Content.Properties["invariantText"], Is.EqualTo("The reusable invariant text"));
+            Assert.That(block.Content.Properties["variantText"], Is.EqualTo("The reusable variant text"));
         });
     }
 

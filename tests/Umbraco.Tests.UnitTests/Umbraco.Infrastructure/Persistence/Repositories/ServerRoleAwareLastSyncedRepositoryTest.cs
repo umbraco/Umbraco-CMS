@@ -53,7 +53,7 @@ public class ServerRoleAwareLastSyncedRepositoryTest
         var sut = CreateSut();
         var result = await sut.GetInternalIdAsync();
 
-        Assert.AreEqual(99, result);
+        Assert.That(result, Is.EqualTo(99));
     }
 
     [Test]

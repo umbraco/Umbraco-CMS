@@ -40,7 +40,7 @@ public partial class StringExtensionsTests
     public void IsLowerCase_ReturnsExpectedResult(char ch, bool expected)
     {
         var result = ch.IsLowerCase();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 
     [TestCase('A', true)]
@@ -74,6 +74,6 @@ public partial class StringExtensionsTests
     public void IsUpperCase_ReturnsExpectedResult(char ch, bool expected)
     {
         var result = ch.IsUpperCase();
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

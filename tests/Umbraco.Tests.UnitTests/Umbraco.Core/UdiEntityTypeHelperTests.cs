@@ -24,11 +24,11 @@ public class UdiEntityTypeHelperTests
 
     [TestCaseSource(nameof(MappedUmbracoObjectTypes))]
     public void FromUmbracoObjectType_RoundTripsThroughToUmbracoObjectType(UmbracoObjectTypes value, string udiType)
-        => Assert.AreEqual(value, UdiEntityTypeHelper.ToUmbracoObjectType(udiType));
+        => Assert.That(UdiEntityTypeHelper.ToUmbracoObjectType(udiType), Is.EqualTo(value));
 
     [TestCaseSource(nameof(MappedUdiEntityTypes))]
     public void ToUmbracoObjectType_RoundTripsThroughFromUmbracoObjectType(string udiType, UmbracoObjectTypes value)
-        => Assert.AreEqual(udiType, UdiEntityTypeHelper.FromUmbracoObjectType(value));
+        => Assert.That(UdiEntityTypeHelper.FromUmbracoObjectType(value), Is.EqualTo(udiType));
 
     [TestCaseSource(nameof(AllUmbracoObjectTypes))]
     public void UmbracoObjectType_HasUdiMappingOrIsExplicitlyExcluded(UmbracoObjectTypes value)

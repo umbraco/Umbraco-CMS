@@ -56,7 +56,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
+        Assert.That(_nextCalled, Is.True);
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
+        Assert.That(_nextCalled, Is.True);
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
+        Assert.That(_nextCalled, Is.True);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
+        Assert.That(_nextCalled, Is.True);
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
+        Assert.That(_nextCalled, Is.True);
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
+        Assert.That(_nextCalled, Is.True);
     }
 
     /// <summary>
@@ -141,7 +141,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsFalse(_nextCalled);
+        Assert.That(_nextCalled, Is.False);
         Assert.That(context.Response.StatusCode, Is.EqualTo(302));
         Assert.That(
             context.Response.Headers.Location.ToString(),
@@ -160,7 +160,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsFalse(_nextCalled);
+        Assert.That(_nextCalled, Is.False);
         Assert.That(context.Response.StatusCode, Is.EqualTo(401));
         Assert.That(context.Response.Headers["WWW-Authenticate"].ToString(), Is.EqualTo("Basic realm=\"Umbraco login\""));
     }
@@ -180,7 +180,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
+        Assert.That(_nextCalled, Is.True);
     }
 
     /// <summary>
@@ -199,7 +199,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsFalse(_nextCalled);
+        Assert.That(_nextCalled, Is.False);
         Assert.That(context.Response.StatusCode, Is.EqualTo(401));
     }
 
@@ -220,7 +220,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsFalse(_nextCalled);
+        Assert.That(_nextCalled, Is.False);
         Assert.That(context.Response.StatusCode, Is.EqualTo(302));
         Assert.That(
             context.Response.Headers.Location.ToString(),
@@ -244,7 +244,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsFalse(_nextCalled);
+        Assert.That(_nextCalled, Is.False);
         Assert.That(context.Response.StatusCode, Is.EqualTo(302));
         Assert.That(
             context.Response.Headers.Location.ToString(),
@@ -264,7 +264,7 @@ public class BasicAuthenticationMiddlewareTests
         // No auth scheme registered, no Basic header — should return 401 without throwing
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsFalse(_nextCalled);
+        Assert.That(_nextCalled, Is.False);
         Assert.That(context.Response.StatusCode, Is.EqualTo(401));
     }
 
@@ -283,7 +283,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsFalse(_nextCalled);
+        Assert.That(_nextCalled, Is.False);
         Assert.That(context.Response.StatusCode, Is.EqualTo(401));
     }
 
@@ -308,7 +308,7 @@ public class BasicAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(httpContext, NextDelegate());
 
-        Assert.IsFalse(_nextCalled);
+        Assert.That(_nextCalled, Is.False);
         Assert.That(httpContext.Response.StatusCode, Is.EqualTo(401));
     }
 

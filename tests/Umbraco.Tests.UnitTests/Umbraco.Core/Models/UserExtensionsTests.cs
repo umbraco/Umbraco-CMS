@@ -43,7 +43,7 @@ public class UserExtensionsTests
             .Returns<UmbracoObjectTypes, int[]>((type, ids) =>
                 new[] { new TreeEntityPath { Id = startNodeId, Path = startNodePath } });
 
-        Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object, AppCaches.Disabled));
+        Assert.That(user.HasPathAccess(content, esmock.Object, AppCaches.Disabled), Is.EqualTo(outcome));
     }
 
     [TestCase("", "1", "1")] // single user start, top level

@@ -27,7 +27,7 @@ public class CacheInstructionsPruningJobTests
     {
         var timeBetweenPruneOperations = TimeSpan.FromMinutes(2);
         var job = CreateCacheInstructionsPruningJob(timeBetweenPruneOperations);
-        Assert.AreEqual(timeBetweenPruneOperations, job.Period, "The run period should be the same as 'TimeBetweenPruneOperations'.");
+        Assert.That(job.Period, Is.EqualTo(timeBetweenPruneOperations), "The run period should be the same as 'TimeBetweenPruneOperations'.");
     }
 
     [Test]

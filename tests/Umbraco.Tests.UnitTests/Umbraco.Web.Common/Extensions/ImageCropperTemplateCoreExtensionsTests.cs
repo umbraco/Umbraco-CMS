@@ -25,7 +25,7 @@ public class ImageCropperTemplateCoreExtensionsTests
             imageCropMode: ImageCropMode.Crop,
             cropAlias: "Missing");
 
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]

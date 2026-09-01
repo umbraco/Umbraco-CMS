@@ -78,11 +78,11 @@ internal sealed class DocumentHybridCacheBoundedTests : UmbracoIntegrationTestWi
         {
             ContentCreateModel page = ContentEditingBuilder.CreateSimpleContent(ContentType.Key, $"Bounded Page {i}");
             var created = await ContentEditingService.CreateAsync(page, Constants.Security.SuperUserKey);
-            Assert.IsTrue(created.Success);
+            Assert.That(created.Success, Is.True);
 
             Guid key = page.Key!.Value;
             var published = await ContentPublishingService.PublishAsync(key, [new CulturePublishScheduleModel()], Constants.Security.SuperUserKey);
-            Assert.IsTrue(published.Success);
+            Assert.That(published.Success, Is.True);
 
             keys.Add(key);
         }

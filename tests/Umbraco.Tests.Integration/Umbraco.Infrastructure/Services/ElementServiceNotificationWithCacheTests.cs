@@ -79,8 +79,8 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(createAttempt.Success);
-            Assert.IsNotNull(createAttempt.Result.Content);
+            Assert.That(createAttempt.Success, Is.True);
+            Assert.That(createAttempt.Result.Content, Is.Not.Null);
         });
 
         var savingWasCalled = false;
@@ -95,8 +95,8 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("Updated name", saved.Name);
-                Assert.AreEqual("Initial name", element.Name);
+                Assert.That(saved.Name, Is.EqualTo("Updated name"));
+                Assert.That(element.Name, Is.EqualTo("Initial name"));
             });
         };
 
@@ -109,8 +109,8 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("Updated name", saved.Name);
-                Assert.AreEqual("Updated name", element.Name);
+                Assert.That(saved.Name, Is.EqualTo("Updated name"));
+                Assert.That(element.Name, Is.EqualTo("Updated name"));
             });
         };
 
@@ -128,12 +128,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(updateAttempt.Success);
-                Assert.IsNotNull(updateAttempt.Result.Content);
+                Assert.That(updateAttempt.Success, Is.True);
+                Assert.That(updateAttempt.Result.Content, Is.Not.Null);
             });
 
-            Assert.IsTrue(savingWasCalled);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savingWasCalled, Is.True);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -169,12 +169,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(moveAttempt.Success);
-                Assert.AreEqual(moveAttempt.Result, ContentEditingOperationStatus.Success);
+                Assert.That(moveAttempt.Success, Is.True);
+                Assert.That(moveAttempt.Result, Is.EqualTo(ContentEditingOperationStatus.Success));
             });
 
-            Assert.IsTrue(movingWasCalled);
-            Assert.IsTrue(movedWasCalled);
+            Assert.That(movingWasCalled, Is.True);
+            Assert.That(movedWasCalled, Is.True);
         }
         finally
         {
@@ -183,7 +183,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         }
 
         element = (await ElementEditingService.GetAsync(element.Key))!;
-        Assert.AreEqual(container.Id, element.ParentId);
+        Assert.That(element.ParentId, Is.EqualTo(container.Id));
     }
 
     [Test]
@@ -217,12 +217,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(moveAttempt.Success);
-                Assert.AreEqual(moveAttempt.Result, ContentEditingOperationStatus.CancelledByNotification);
+                Assert.That(moveAttempt.Success, Is.False);
+                Assert.That(moveAttempt.Result, Is.EqualTo(ContentEditingOperationStatus.CancelledByNotification));
             });
 
-            Assert.IsTrue(movingWasCalled);
-            Assert.IsFalse(movedWasCalled);
+            Assert.That(movingWasCalled, Is.True);
+            Assert.That(movedWasCalled, Is.False);
         }
         finally
         {
@@ -231,7 +231,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         }
 
         element = (await ElementEditingService.GetAsync(element.Key))!;
-        Assert.AreEqual(Constants.System.Root, element.ParentId);
+        Assert.That(element.ParentId, Is.EqualTo(Constants.System.Root));
     }
 
     [Test]
@@ -253,7 +253,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         ElementNotificationHandler.DeletingElement = _ => deletingWasCalled = true;
         ElementNotificationHandler.DeletedElement = _ => deletedWasCalled = true;
 
-        Assert.IsNotNull(EntityService.Get(element.Key, UmbracoObjectTypes.Element));
+        Assert.That(EntityService.Get(element.Key, UmbracoObjectTypes.Element), Is.Not.Null);
 
         try
         {
@@ -261,12 +261,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(moveAttempt.Success);
-                Assert.AreEqual(ContentEditingOperationStatus.Success, moveAttempt.Status);
+                Assert.That(moveAttempt.Success, Is.True);
+                Assert.That(moveAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
             });
 
-            Assert.IsTrue(deletingWasCalled);
-            Assert.IsTrue(deletedWasCalled);
+            Assert.That(deletingWasCalled, Is.True);
+            Assert.That(deletedWasCalled, Is.True);
         }
         finally
         {
@@ -274,7 +274,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
             ElementNotificationHandler.DeletedElement = null;
         }
 
-        Assert.IsNull(EntityService.Get(element.Key, UmbracoObjectTypes.Element));
+        Assert.That(EntityService.Get(element.Key, UmbracoObjectTypes.Element), Is.Null);
    }
 
     [Test]
@@ -306,12 +306,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(deleteAttempt.Success);
-                Assert.AreEqual(ContentEditingOperationStatus.CancelledByNotification, deleteAttempt.Status);
+                Assert.That(deleteAttempt.Success, Is.False);
+                Assert.That(deleteAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.CancelledByNotification));
             });
 
-            Assert.IsTrue(deletingWasCalled);
-            Assert.IsFalse(deletedWasCalled);
+            Assert.That(deletingWasCalled, Is.True);
+            Assert.That(deletedWasCalled, Is.False);
         }
         finally
         {
@@ -320,7 +320,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         }
 
         element = (await ElementEditingService.GetAsync(element.Key))!;
-        Assert.NotNull(element);
+        Assert.That(element, Is.Not.Null);
     }
 
     [Test]
@@ -336,7 +336,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
             },
             Constants.Security.SuperUserKey)).Result.Content!;
 
-        Assert.IsNotNull(element);
+        Assert.That(element, Is.Not.Null);
         var elementKey = element.Key;
         var elementPath = element.Path;
 
@@ -349,27 +349,27 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
             {
                 movingWasCalled = true;
                 var moveInfo = notification.MoveInfoCollection.Single();
-                Assert.AreEqual(elementKey, moveInfo.Entity.Key);
-                Assert.AreEqual(elementPath, moveInfo.OriginalPath);
+                Assert.That(moveInfo.Entity.Key, Is.EqualTo(elementKey));
+                Assert.That(moveInfo.OriginalPath, Is.EqualTo(elementPath));
             };
             ElementNotificationHandler.MovedElementToRecycleBin = notification =>
             {
                 movedWasCalled = true;
                 var moveInfo = notification.MoveInfoCollection.Single();
-                Assert.AreEqual(elementKey, moveInfo.Entity.Key);
-                Assert.AreEqual(elementPath, moveInfo.OriginalPath);
+                Assert.That(moveInfo.Entity.Key, Is.EqualTo(elementKey));
+                Assert.That(moveInfo.OriginalPath, Is.EqualTo(elementPath));
             };
 
             var moveAttempt = await ElementEditingService.MoveToRecycleBinAsync(element.Key, Constants.Security.SuperUserKey);
 
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(moveAttempt.Success);
-                Assert.AreEqual(moveAttempt.Result, ContentEditingOperationStatus.Success);
+                Assert.That(moveAttempt.Success, Is.True);
+                Assert.That(moveAttempt.Result, Is.EqualTo(ContentEditingOperationStatus.Success));
             });
 
-            Assert.IsTrue(movingWasCalled);
-            Assert.IsTrue(movedWasCalled);
+            Assert.That(movingWasCalled, Is.True);
+            Assert.That(movedWasCalled, Is.True);
         }
         finally
         {
@@ -378,7 +378,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         }
 
         element = (await ElementEditingService.GetAsync(element.Key))!;
-        Assert.AreEqual(Constants.System.RecycleBinElement, element.ParentId);
+        Assert.That(element.ParentId, Is.EqualTo(Constants.System.RecycleBinElement));
     }
 
     [Test]
@@ -410,12 +410,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(moveAttempt.Success);
-                Assert.AreEqual(moveAttempt.Result, ContentEditingOperationStatus.CancelledByNotification);
+                Assert.That(moveAttempt.Success, Is.False);
+                Assert.That(moveAttempt.Result, Is.EqualTo(ContentEditingOperationStatus.CancelledByNotification));
             });
 
-            Assert.IsTrue(movingWasCalled);
-            Assert.IsFalse(movedWasCalled);
+            Assert.That(movingWasCalled, Is.True);
+            Assert.That(movedWasCalled, Is.False);
         }
         finally
         {
@@ -424,7 +424,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         }
 
         element = (await ElementEditingService.GetAsync(element.Key))!;
-        Assert.AreEqual(Constants.System.Root, element.ParentId);
+        Assert.That(element.ParentId, Is.EqualTo(Constants.System.Root));
     }
 
     [Test]
@@ -454,12 +454,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(moveAttempt.Success);
-                Assert.AreEqual(ContentEditingOperationStatus.Success, moveAttempt.Status);
+                Assert.That(moveAttempt.Success, Is.True);
+                Assert.That(moveAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
             });
 
-            Assert.IsTrue(deletingWasCalled);
-            Assert.IsTrue(deletedWasCalled);
+            Assert.That(deletingWasCalled, Is.True);
+            Assert.That(deletedWasCalled, Is.True);
         }
         finally
         {
@@ -499,12 +499,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(deleteAttempt.Success);
-                Assert.AreEqual(ContentEditingOperationStatus.CancelledByNotification, deleteAttempt.Status);
+                Assert.That(deleteAttempt.Success, Is.False);
+                Assert.That(deleteAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.CancelledByNotification));
             });
 
-            Assert.IsTrue(deletingWasCalled);
-            Assert.IsFalse(deletedWasCalled);
+            Assert.That(deletingWasCalled, Is.True);
+            Assert.That(deletedWasCalled, Is.False);
         }
         finally
         {
@@ -513,7 +513,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
         }
 
         element = (await ElementEditingService.GetAsync(element.Key))!;
-        Assert.NotNull(element);
+        Assert.That(element, Is.Not.Null);
     }
 
     [Test]
@@ -541,12 +541,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsTrue(copyAttempt.Success);
-                Assert.AreEqual(copyAttempt.Status, ContentEditingOperationStatus.Success);
+                Assert.That(copyAttempt.Success, Is.True);
+                Assert.That(copyAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
             });
 
-            Assert.IsTrue(copyingWasCalled);
-            Assert.IsTrue(copiedWasCalled);
+            Assert.That(copyingWasCalled, Is.True);
+            Assert.That(copiedWasCalled, Is.True);
         }
         finally
         {
@@ -584,12 +584,12 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
 
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(copyAttempt.Success);
-                Assert.AreEqual(copyAttempt.Status, ContentEditingOperationStatus.CancelledByNotification);
+                Assert.That(copyAttempt.Success, Is.False);
+                Assert.That(copyAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.CancelledByNotification));
             });
 
-            Assert.IsTrue(copyingWasCalled);
-            Assert.IsFalse(copiedWasCalled);
+            Assert.That(copyingWasCalled, Is.True);
+            Assert.That(copiedWasCalled, Is.False);
         }
         finally
         {
@@ -597,7 +597,7 @@ internal sealed class ElementServiceNotificationWithCacheTests : UmbracoIntegrat
             ElementNotificationHandler.CopiedElement = null;
         }
 
-        Assert.AreEqual(1, EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count());
+        Assert.That(EntityService.GetRootEntities(UmbracoObjectTypes.Element).Count(), Is.EqualTo(1));
     }
 
     internal sealed class ElementNotificationHandler :

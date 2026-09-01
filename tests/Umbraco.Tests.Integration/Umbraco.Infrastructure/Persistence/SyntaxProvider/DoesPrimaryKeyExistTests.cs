@@ -25,7 +25,7 @@ internal sealed class DoesPrimaryKeyExistTests : UmbracoIntegrationTest
 
         var result = database.SqlContext.SqlSyntax.DoesPrimaryKeyExist(database, "foo", "PK_foo");
 
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -41,7 +41,7 @@ internal sealed class DoesPrimaryKeyExistTests : UmbracoIntegrationTest
 
         var result = database.SqlContext.SqlSyntax.DoesPrimaryKeyExist(database, "foo", "PK_does_not_exist");
 
-        Assert.IsFalse(result);
+        Assert.That(result, Is.False);
     }
 
     private CreateBuilder GetBuilder(IUmbracoDatabase db)

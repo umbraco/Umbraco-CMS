@@ -74,9 +74,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "*" }));
 
             savedWasCalled = true;
         };
@@ -84,7 +84,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Save(element);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -115,11 +115,11 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
 
             // captured at raise-time even though the entity's change tracking has been reset by persistence
-            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "en-US" }));
 
             savedWasCalled = true;
         };
@@ -127,7 +127,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Save(element);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -149,9 +149,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "*" }));
 
             savedWasCalled = true;
         };
@@ -161,9 +161,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             PublishResult result = ElementService.SaveAndPublish(element, []);
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
-            Assert.IsTrue(publishedWasCalled, "ElementPublishedNotification should fire when saving and publishing.");
+            Assert.That(result.Success, Is.True);
+            Assert.That(savedWasCalled, Is.True, "ElementSavedNotification should fire when saving and publishing.");
+            Assert.That(publishedWasCalled, Is.True, "ElementPublishedNotification should fire when saving and publishing.");
         }
         finally
         {
@@ -188,11 +188,11 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
 
             // both cultures were changed as part of the save-and-publish, so both are reported as saved
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             savedWasCalled = true;
         };
@@ -200,8 +200,8 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             PublishResult result = ElementService.SaveAndPublish(element, ["en-US", "fr-FR"]);
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
+            Assert.That(result.Success, Is.True);
+            Assert.That(savedWasCalled, Is.True, "ElementSavedNotification should fire when saving and publishing.");
         }
         finally
         {
@@ -228,9 +228,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement saved = notification.SavedEntities.First();
 
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(saved.Key));
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[saved.Key]);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(saved.Key), Is.True);
+            Assert.That(notification.SavedCultures[saved.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             savedWasCalled = true;
         };
@@ -239,9 +239,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement published = notification.PublishedEntities.First();
 
-            Assert.IsNotNull(notification.PublishedCultures);
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(published.Key));
-            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.PublishedCultures[published.Key]);
+            Assert.That(notification.PublishedCultures, Is.Not.Null);
+            Assert.That(notification.PublishedCultures.ContainsKey(published.Key), Is.True);
+            Assert.That(notification.PublishedCultures[published.Key], Is.EquivalentTo(new[] { "en-US" }));
 
             publishedWasCalled = true;
         };
@@ -249,9 +249,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             PublishResult result = ElementService.SaveAndPublish(element, ["en-US"]);
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(savedWasCalled, "ElementSavedNotification should fire when saving and publishing.");
-            Assert.IsTrue(publishedWasCalled, "ElementPublishedNotification should fire when saving and publishing.");
+            Assert.That(result.Success, Is.True);
+            Assert.That(savedWasCalled, Is.True, "ElementSavedNotification should fire when saving and publishing.");
+            Assert.That(publishedWasCalled, Is.True, "ElementPublishedNotification should fire when saving and publishing.");
         }
         finally
         {
@@ -272,9 +272,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement published = notification.PublishedEntities.First();
 
-            Assert.IsNotNull(notification.PublishedCultures);
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(published.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.PublishedCultures[published.Key]);
+            Assert.That(notification.PublishedCultures, Is.Not.Null);
+            Assert.That(notification.PublishedCultures.ContainsKey(published.Key), Is.True);
+            Assert.That(notification.PublishedCultures[published.Key], Is.EquivalentTo(new[] { "*" }));
 
             publishedWasCalled = true;
         };
@@ -282,7 +282,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Publish(element, ["*"]);
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -310,9 +310,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement published = notification.PublishedEntities.First();
 
-            Assert.IsNotNull(notification.PublishedCultures);
-            Assert.IsTrue(notification.PublishedCultures.ContainsKey(published.Key));
-            CollectionAssert.AreEquivalent(new[] { "fr-FR" }, notification.PublishedCultures[published.Key]);
+            Assert.That(notification.PublishedCultures, Is.Not.Null);
+            Assert.That(notification.PublishedCultures.ContainsKey(published.Key), Is.True);
+            Assert.That(notification.PublishedCultures[published.Key], Is.EquivalentTo(new[] { "fr-FR" }));
 
             publishedWasCalled = true;
         };
@@ -320,7 +320,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Publish(element, new[] { "fr-FR" });
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -341,9 +341,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "*" }));
 
             unpublishedWasCalled = true;
         };
@@ -351,7 +351,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Unpublish(element);
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {
@@ -382,9 +382,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
             IElement published = notification.PublishedEntities.First();
 
             // unpublishing a single culture is performed as a publish operation
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(published.Key));
-            CollectionAssert.AreEquivalent(new[] { "fr-FR" }, notification.UnpublishedCultures[published.Key]);
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(published.Key), Is.True);
+            Assert.That(notification.UnpublishedCultures[published.Key], Is.EquivalentTo(new[] { "fr-FR" }));
 
             publishedWasCalled = true;
         };
@@ -392,7 +392,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Unpublish(element, "fr-FR");
-            Assert.IsTrue(publishedWasCalled);
+            Assert.That(publishedWasCalled, Is.True);
         }
         finally
         {
@@ -422,11 +422,11 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
 
             // unpublishing the whole element reports every culture that was published, not an empty/partial set
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             unpublishedWasCalled = true;
         };
@@ -434,7 +434,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Unpublish(element, "*");
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {
@@ -459,13 +459,13 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         ElementNotificationHandler.SavedElement = notification =>
         {
-            Assert.IsNotNull(notification.SavedCultures);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
 
             // the culture map is keyed per element, so each element reports only its own changed cultures
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(elementOne.Key));
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(elementTwo.Key));
-            CollectionAssert.AreEquivalent(new[] { "en-US" }, notification.SavedCultures[elementOne.Key]);
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[elementTwo.Key]);
+            Assert.That(notification.SavedCultures.ContainsKey(elementOne.Key), Is.True);
+            Assert.That(notification.SavedCultures.ContainsKey(elementTwo.Key), Is.True);
+            Assert.That(notification.SavedCultures[elementOne.Key], Is.EquivalentTo(new[] { "en-US" }));
+            Assert.That(notification.SavedCultures[elementTwo.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             savedWasCalled = true;
         };
@@ -473,7 +473,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Save(new[] { elementOne, elementTwo });
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -498,8 +498,8 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         ElementNotificationHandler.SavedElement = notification =>
         {
             // the save tracked cultures and found none changed, so the map is present but empty - not null
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsEmpty(notification.SavedCultures);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures, Is.Empty);
 
             savedWasCalled = true;
         };
@@ -507,7 +507,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Save(element);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -529,8 +529,8 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         ElementNotificationHandler.SavedElement = notification =>
         {
             // invariant elements report the "*" marker only when they changed; a no-op re-save reports nothing
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsEmpty(notification.SavedCultures);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures, Is.Empty);
 
             savedWasCalled = true;
         };
@@ -538,7 +538,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Save(element);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -560,9 +560,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         ElementNotificationHandler.SavedElement = notification =>
         {
-            Assert.IsNotNull(notification.SavedCultures);
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(element.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[element.Key]);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
+            Assert.That(notification.SavedCultures.ContainsKey(element.Key), Is.True);
+            Assert.That(notification.SavedCultures[element.Key], Is.EquivalentTo(new[] { "*" }));
 
             savedWasCalled = true;
         };
@@ -570,7 +570,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Save(element);
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -603,14 +603,14 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
 
         ElementNotificationHandler.SavedElement = notification =>
         {
-            Assert.IsNotNull(notification.SavedCultures);
+            Assert.That(notification.SavedCultures, Is.Not.Null);
 
             // the per-element map keeps each element's cultures separate - the invariant "*" marker is not
             // conflated with the variant element's specific cultures (which a flat list could not represent)
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(invariantElement.Key));
-            Assert.IsTrue(notification.SavedCultures.ContainsKey(variantElement.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.SavedCultures[invariantElement.Key]);
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.SavedCultures[variantElement.Key]);
+            Assert.That(notification.SavedCultures.ContainsKey(invariantElement.Key), Is.True);
+            Assert.That(notification.SavedCultures.ContainsKey(variantElement.Key), Is.True);
+            Assert.That(notification.SavedCultures[invariantElement.Key], Is.EquivalentTo(new[] { "*" }));
+            Assert.That(notification.SavedCultures[variantElement.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             savedWasCalled = true;
         };
@@ -618,7 +618,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Save(new[] { invariantElement, variantElement });
-            Assert.IsTrue(savedWasCalled);
+            Assert.That(savedWasCalled, Is.True);
         }
         finally
         {
@@ -642,9 +642,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
-            CollectionAssert.AreEquivalent(new[] { "*" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "*" }));
 
             unpublishedWasCalled = true;
         };
@@ -652,7 +652,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Delete(element);
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {
@@ -682,11 +682,11 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
 
             // deleting a published element reports every culture that was published
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             unpublishedWasCalled = true;
         };
@@ -694,7 +694,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.Delete(element);
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {
@@ -721,9 +721,9 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         {
             IElement unpublished = notification.UnpublishedEntities.First();
 
-            Assert.IsNotNull(notification.UnpublishedCultures);
-            Assert.IsTrue(notification.UnpublishedCultures.ContainsKey(unpublished.Key));
-            CollectionAssert.AreEquivalent(new[] { "en-US", "fr-FR" }, notification.UnpublishedCultures[unpublished.Key]);
+            Assert.That(notification.UnpublishedCultures, Is.Not.Null);
+            Assert.That(notification.UnpublishedCultures.ContainsKey(unpublished.Key), Is.True);
+            Assert.That(notification.UnpublishedCultures[unpublished.Key], Is.EquivalentTo(new[] { "en-US", "fr-FR" }));
 
             unpublishedWasCalled = true;
         };
@@ -731,7 +731,7 @@ internal sealed class ElementServiceNotificationTests : UmbracoIntegrationTest
         try
         {
             ElementService.DeleteOfTypes(new[] { _elementType.Id });
-            Assert.IsTrue(unpublishedWasCalled);
+            Assert.That(unpublishedWasCalled, Is.True);
         }
         finally
         {

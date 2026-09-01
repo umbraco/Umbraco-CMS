@@ -1,5 +1,5 @@
 using System.Web;
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -43,7 +43,7 @@ public class ContentFinderByPageIdQueryTests
 
         var result = await lookup.TryFindContent(publishedRequestBuilder);
 
-        Assert.IsTrue(result);
-        Assert.AreEqual(publishedRequestBuilder.PublishedContent!.Id, nodeMatch);
+        Assert.That(result, Is.True);
+        Assert.That(nodeMatch, Is.EqualTo(publishedRequestBuilder.PublishedContent!.Id));
     }
 }

@@ -56,7 +56,7 @@ public class UmbracoRequestPathsTests
 
         var uri = new Uri("http://test.com" + url);
         var result = umbracoRequestPaths.IsClientSideRequest(uri.AbsolutePath);
-        Assert.AreEqual(assert, result);
+        Assert.That(result, Is.EqualTo(assert));
     }
 
     [Test]
@@ -71,7 +71,7 @@ public class UmbracoRequestPathsTests
         // This URL is invalid. Default to false when the extension cannot be determined
         var uri = new Uri("http://test.com/installing-modules+foobar+\"yipee\"");
         var result = umbracoRequestPaths.IsClientSideRequest(uri.AbsolutePath);
-        Assert.AreEqual(false, result);
+        Assert.That(result, Is.EqualTo(false));
     }
 
     [TestCase("http://www.domain.com/umbraco/preview/frame?id=1234", "", true)]
@@ -102,7 +102,7 @@ public class UmbracoRequestPathsTests
             hostingEnvironment,
             Options.Create(_umbracoRequestPathsOptions),
             Options.Create(_deliveryApiSettings));
-        Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
+        Assert.That(umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath), Is.EqualTo(expected));
     }
 
     [TestCase("http://www.domain.com/some/path", false)]
@@ -121,7 +121,7 @@ public class UmbracoRequestPathsTests
             hostingEnvironment,
             Options.Create(umbracoRequestPathsOptions),
             Options.Create(_deliveryApiSettings));
-        Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
+        Assert.That(umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath), Is.EqualTo(expected));
     }
 
     [TestCase("/favicon.ico", true)]
@@ -140,6 +140,6 @@ public class UmbracoRequestPathsTests
 
         var uri = new Uri("http://test.com" + url);
         var result = umbracoRequestPaths.IsClientSideRequest(uri.AbsolutePath);
-        Assert.AreEqual(assert, result);
+        Assert.That(result, Is.EqualTo(assert));
     }
 }

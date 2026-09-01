@@ -31,7 +31,7 @@ public class GetDocumentPermissionsCurrentUserControllerTests : ManagementApiUse
         var response = await ContentEditingService.CreateAsync(
             ContentEditingBuilder.CreateBasicContent(contentType.Key, null),
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(response.Success, $"Failed to create content with status {response.Status}.");
+        Assert.That(response.Success, Is.True, $"Failed to create content with status {response.Status}.");
         _documentKey = response.Result.Content!.Key;
     }
 

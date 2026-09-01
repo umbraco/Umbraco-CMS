@@ -25,9 +25,9 @@ public class MemberIdentityUserTests
         var result = user.GetProfileData<TestProfile>(_caseInsensitiveOptions);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("Test", result!.Name);
-        Assert.AreEqual(30, result.Age);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Name, Is.EqualTo("Test"));
+        Assert.That(result.Age, Is.EqualTo(30));
     }
 
     [Test]
@@ -43,9 +43,9 @@ public class MemberIdentityUserTests
         var result = user.GetProfileData<TestProfile>();
 
         // Assert — properties are default because the keys don't match.
-        Assert.IsNotNull(result);
-        Assert.IsNull(result!.Name);
-        Assert.AreEqual(0, result.Age);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Name, Is.Null);
+        Assert.That(result.Age, Is.EqualTo(0));
     }
 
     [Test]
@@ -61,9 +61,9 @@ public class MemberIdentityUserTests
         var result = user.GetProfileData<TestProfile>();
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("Test", result!.Name);
-        Assert.AreEqual(30, result.Age);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.Name, Is.EqualTo("Test"));
+        Assert.That(result.Age, Is.EqualTo(30));
     }
 
     [Test]
@@ -76,7 +76,7 @@ public class MemberIdentityUserTests
         var result = user.GetProfileData<TestProfile>();
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -89,7 +89,7 @@ public class MemberIdentityUserTests
         var result = user.GetProfileData<TestProfile>();
 
         // Assert
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -105,9 +105,9 @@ public class MemberIdentityUserTests
         var result = user.GetProfileData<Dictionary<string, string>>();
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("Green", result!["favouriteColor"]);
-        Assert.AreEqual("London", result["homeCity"]);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!["favouriteColor"], Is.EqualTo("Green"));
+        Assert.That(result["homeCity"], Is.EqualTo("London"));
     }
 
     [Test]
@@ -122,7 +122,7 @@ public class MemberIdentityUserTests
         // Assert — dirty tracking is load-bearing for MemberUserStore.UpdateExternalMemberAsync
         // to detect OnExternalLogin callback refreshes and route to the full update path rather
         // than the lightweight login path (which would otherwise lose the ProfileData change).
-        Assert.IsTrue(user.IsPropertyDirty(nameof(MemberIdentityUser.ProfileData)));
+        Assert.That(user.IsPropertyDirty(nameof(MemberIdentityUser.ProfileData)), Is.True);
     }
 
     [Test]
@@ -138,7 +138,7 @@ public class MemberIdentityUserTests
         user.ProfileData = """{"name":"Test"}""";
 
         // Assert
-        Assert.IsFalse(user.IsPropertyDirty(nameof(MemberIdentityUser.ProfileData)));
+        Assert.That(user.IsPropertyDirty(nameof(MemberIdentityUser.ProfileData)), Is.False);
     }
 
     [Test]
@@ -154,7 +154,7 @@ public class MemberIdentityUserTests
         user.ProfileData = """{"name":"Test"}""";
 
         // Assert
-        Assert.IsFalse(user.IsPropertyDirty(nameof(MemberIdentityUser.ProfileData)));
+        Assert.That(user.IsPropertyDirty(nameof(MemberIdentityUser.ProfileData)), Is.False);
     }
 
     private class TestProfile

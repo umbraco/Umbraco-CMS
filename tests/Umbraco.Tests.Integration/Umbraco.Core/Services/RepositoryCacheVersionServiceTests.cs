@@ -24,7 +24,7 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
     public async Task Cache_Is_Initially_Synced()
     {
         var isSynced = await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>();
-        Assert.IsTrue(isSynced, "Cache should be initially synced.");
+        Assert.That(isSynced, Is.True, "Cache should be initially synced.");
     }
 
     [Test]
@@ -32,13 +32,13 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
     {
         using var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true);
         var initial = await RepositoryCacheVersionRepository.GetAsync(GetCacheKey());
-        Assert.IsNull(initial?.Version, "Initial cache version should be null before update.");
+        Assert.That(initial?.Version, Is.Null, "Initial cache version should be null before update.");
 
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
 
         var cacheVersion = await RepositoryCacheVersionRepository.GetAsync(GetCacheKey());
-        Assert.IsNotNull(cacheVersion, "Cache version should exist in the database after update.");
-        Assert.IsFalse(string.IsNullOrEmpty(cacheVersion.Version), "Cache version string should not be null or empty.");
+        Assert.That(cacheVersion, Is.Not.Null, "Cache version should exist in the database after update.");
+        Assert.That(string.IsNullOrEmpty(cacheVersion.Version), Is.False, "Cache version string should not be null or empty.");
     }
 
     [Test]
@@ -49,7 +49,7 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
         var isSynced = await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>();
 
         // We should be synced now.
-        Assert.IsTrue(isSynced);
+        Assert.That(isSynced, Is.True);
 
         using (var scope = CoreScopeProvider.CreateCoreScope())
         {
@@ -60,7 +60,7 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
 
         // Now the cache should be out of sync
         isSynced = await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>();
-        Assert.IsFalse(isSynced, "Cache should be out of sync after remote update.");
+        Assert.That(isSynced, Is.False, "Cache should be out of sync after remote update.");
     }
 
     [Test]
@@ -73,7 +73,7 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
         {
             initialVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
         }
-        Assert.IsNotNull(initialVersion, "Initial cache version should not be null.");
+        Assert.That(initialVersion, Is.Not.Null, "Initial cache version should not be null.");
 
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
         string? updatedVersion;
@@ -81,9 +81,9 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
         {
             updatedVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
         }
-        Assert.IsNotNull(updatedVersion, "Updated cache version should not be null.");
+        Assert.That(updatedVersion, Is.Not.Null, "Updated cache version should not be null.");
 
-        Assert.AreNotEqual(initialVersion, updatedVersion, "Cache version should be updated.");
+        Assert.That(updatedVersion, Is.Not.EqualTo(initialVersion), "Cache version should be updated.");
     }
 
     [Test]
@@ -93,13 +93,13 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
 
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
         var firstVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
-        Assert.IsNotNull(firstVersion);
+        Assert.That(firstVersion, Is.Not.Null);
 
         // Second call within the same scope must be a no-op.
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
         var secondVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
 
-        Assert.AreEqual(firstVersion, secondVersion, "Second call within the same scope must not write a new version.");
+        Assert.That(secondVersion, Is.EqualTo(firstVersion), "Second call within the same scope must not write a new version.");
     }
 
     [Test]
@@ -111,7 +111,7 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
             await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
             firstScopeVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
         }
-        Assert.IsNotNull(firstScopeVersion);
+        Assert.That(firstScopeVersion, Is.Not.Null);
 
         // After the scope exits the deduplication state is cleared; a new scope must be able to write.
         string? secondScopeVersion;
@@ -121,8 +121,8 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
             secondScopeVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
         }
 
-        Assert.IsNotNull(secondScopeVersion);
-        Assert.AreNotEqual(firstScopeVersion, secondScopeVersion, "A new scope must produce a fresh version after the previous scope exited.");
+        Assert.That(secondScopeVersion, Is.Not.Null);
+        Assert.That(secondScopeVersion, Is.Not.EqualTo(firstScopeVersion), "A new scope must produce a fresh version after the previous scope exited.");
     }
 
     [Test]
@@ -137,8 +137,8 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
 
         var contentVersionAfterFirst = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
         var mediaVersionAfterFirst = (await RepositoryCacheVersionRepository.GetAsync(mediaKey))?.Version;
-        Assert.IsNotNull(contentVersionAfterFirst);
-        Assert.IsNotNull(mediaVersionAfterFirst);
+        Assert.That(contentVersionAfterFirst, Is.Not.Null);
+        Assert.That(mediaVersionAfterFirst, Is.Not.Null);
 
         // Second calls — must be no-ops for each type independently.
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
@@ -147,8 +147,8 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
         var contentVersionAfterSecond = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
         var mediaVersionAfterSecond = (await RepositoryCacheVersionRepository.GetAsync(mediaKey))?.Version;
 
-        Assert.AreEqual(contentVersionAfterFirst, contentVersionAfterSecond, "Second IContent call in same scope must not write a new version.");
-        Assert.AreEqual(mediaVersionAfterFirst, mediaVersionAfterSecond, "Second IMedia call in same scope must not write a new version.");
+        Assert.That(contentVersionAfterSecond, Is.EqualTo(contentVersionAfterFirst), "Second IContent call in same scope must not write a new version.");
+        Assert.That(mediaVersionAfterSecond, Is.EqualTo(mediaVersionAfterFirst), "Second IMedia call in same scope must not write a new version.");
     }
 
     [Test]
@@ -163,16 +163,16 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
         var mediaKey = ((RepositoryCacheVersionService)RepositoryCacheVersionService).GetCacheKey<IMedia>();
         var mediaVersion = (await RepositoryCacheVersionRepository.GetAsync(mediaKey))?.Version;
 
-        Assert.IsNotNull(contentVersion);
-        Assert.IsNotNull(mediaVersion);
-        Assert.AreNotEqual(contentVersion, mediaVersion, "Cache versions should be unique for different repository types.");
+        Assert.That(contentVersion, Is.Not.Null);
+        Assert.That(mediaVersion, Is.Not.Null);
+        Assert.That(mediaVersion, Is.Not.EqualTo(contentVersion), "Cache versions should be unique for different repository types.");
     }
 
     [Test]
     public async Task SetCachesSyncedAsync_RestoresSyncAfterRemoteUpdate()
     {
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
-        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>());
+        Assert.That(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), Is.True);
 
         // Simulate a remote update — local service is now out of sync.
         using (var scope = CoreScopeProvider.CreateCoreScope())
@@ -181,12 +181,12 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
             scope.Complete();
         }
 
-        Assert.IsFalse(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), "Expected out of sync after remote update.");
+        Assert.That(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), Is.False, "Expected out of sync after remote update.");
 
         // Re-sync from the database.
         await RepositoryCacheVersionService.SetCachesSyncedAsync();
 
-        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), "Expected in sync after SetCachesSyncedAsync.");
+        Assert.That(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), Is.True, "Expected in sync after SetCachesSyncedAsync.");
     }
 
     [Test]
@@ -202,11 +202,11 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
 
         // First check: local has no version, DB has one → service initialises from DB and returns true.
         var isSynced = await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>();
-        Assert.IsTrue(isSynced, "Should be synced when local is uninitialised but DB has a version.");
+        Assert.That(isSynced, Is.True, "Should be synced when local is uninitialised but DB has a version.");
 
         // Second check: local version now matches DB version → still synced.
         isSynced = await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>();
-        Assert.IsTrue(isSynced, "Should remain synced on subsequent checks.");
+        Assert.That(isSynced, Is.True, "Should remain synced on subsequent checks.");
     }
 
     [Test]
@@ -215,8 +215,8 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IMedia>();
 
-        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>());
-        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IMedia>());
+        Assert.That(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), Is.True);
+        Assert.That(await RepositoryCacheVersionService.IsCacheSyncedAsync<IMedia>(), Is.True);
 
         var mediaKey = ((RepositoryCacheVersionService)RepositoryCacheVersionService).GetCacheKey<IMedia>();
 
@@ -232,13 +232,13 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
             scope.Complete();
         }
 
-        Assert.IsFalse(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), "IContent should be out of sync.");
-        Assert.IsFalse(await RepositoryCacheVersionService.IsCacheSyncedAsync<IMedia>(), "IMedia should be out of sync.");
+        Assert.That(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), Is.False, "IContent should be out of sync.");
+        Assert.That(await RepositoryCacheVersionService.IsCacheSyncedAsync<IMedia>(), Is.False, "IMedia should be out of sync.");
 
         await RepositoryCacheVersionService.SetCachesSyncedAsync();
 
-        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), "IContent should be synced after SetCachesSyncedAsync.");
-        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IMedia>(), "IMedia should be synced after SetCachesSyncedAsync.");
+        Assert.That(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), Is.True, "IContent should be synced after SetCachesSyncedAsync.");
+        Assert.That(await RepositoryCacheVersionService.IsCacheSyncedAsync<IMedia>(), Is.True, "IMedia should be synced after SetCachesSyncedAsync.");
     }
 
     private RepositoryCacheVersion GetRepositoryRandomCacheVersion()

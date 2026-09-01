@@ -87,11 +87,11 @@ public class ControllerActionSearcherTests
         var httpContext = new DefaultHttpContext();
 
         var result = query.Find<IRenderController>(httpContext, controller, action);
-        Assert.IsTrue(matches == (result != null));
+        Assert.That(matches, Is.EqualTo((result != null)));
         if (matches)
         {
-            Assert.IsTrue(result.ActionName.InvariantEquals(resultAction), "expected {0} does not match resulting action {1}", resultAction, result.ActionName);
-            Assert.IsTrue(result.ControllerName.InvariantEquals(controller), "expected {0} does not match resulting controller {1}", controller, result.ControllerName);
+            Assert.That(result.ActionName.InvariantEquals(resultAction), Is.True, $"expected {resultAction} does not match resulting action {result.ActionName}");
+            Assert.That(result.ControllerName.InvariantEquals(controller), Is.True, $"expected {controller} does not match resulting controller {result.ControllerName}");
         }
     }
 }

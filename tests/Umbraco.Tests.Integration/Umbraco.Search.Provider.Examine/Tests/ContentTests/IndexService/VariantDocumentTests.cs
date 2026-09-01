@@ -142,7 +142,7 @@ public class VariantDocumentTests : IndexTestBase
         ISearchResults results = queryBuilder.Execute();
 
         Assert.That(results, Is.Not.Empty);
-        Assert.That(results.SelectMany(r => r.Values.Values).Contains(expectedValue), Is.True);
+        Assert.That(results.SelectMany(r => r.Values.Values), Does.Contain(expectedValue));
     }
 
     [TestCase(true, "en-US", "segment-1", "body-segment-1")]

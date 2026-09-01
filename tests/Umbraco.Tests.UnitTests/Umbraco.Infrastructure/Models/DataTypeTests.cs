@@ -26,26 +26,26 @@ public class DataTypeTests
 
         var clone = (DataType)dtd.DeepClone();
 
-        Assert.AreNotSame(clone, dtd);
-        Assert.AreEqual(clone, dtd);
-        Assert.AreEqual(clone.CreateDate, dtd.CreateDate);
-        Assert.AreEqual(clone.CreatorId, dtd.CreatorId);
-        Assert.AreEqual(clone.DatabaseType, dtd.DatabaseType);
-        Assert.AreEqual(clone.Id, dtd.Id);
-        Assert.AreEqual(clone.Key, dtd.Key);
-        Assert.AreEqual(clone.Level, dtd.Level);
-        Assert.AreEqual(clone.Name, dtd.Name);
-        Assert.AreEqual(clone.ParentId, dtd.ParentId);
-        Assert.AreEqual(clone.Path, dtd.Path);
-        Assert.AreEqual(clone.SortOrder, dtd.SortOrder);
-        Assert.AreEqual(clone.Trashed, dtd.Trashed);
-        Assert.AreEqual(clone.UpdateDate, dtd.UpdateDate);
+        Assert.That(dtd, Is.Not.SameAs(clone));
+        Assert.That(dtd, Is.EqualTo(clone));
+        Assert.That(dtd.CreateDate, Is.EqualTo(clone.CreateDate));
+        Assert.That(dtd.CreatorId, Is.EqualTo(clone.CreatorId));
+        Assert.That(dtd.DatabaseType, Is.EqualTo(clone.DatabaseType));
+        Assert.That(dtd.Id, Is.EqualTo(clone.Id));
+        Assert.That(dtd.Key, Is.EqualTo(clone.Key));
+        Assert.That(dtd.Level, Is.EqualTo(clone.Level));
+        Assert.That(dtd.Name, Is.EqualTo(clone.Name));
+        Assert.That(dtd.ParentId, Is.EqualTo(clone.ParentId));
+        Assert.That(dtd.Path, Is.EqualTo(clone.Path));
+        Assert.That(dtd.SortOrder, Is.EqualTo(clone.SortOrder));
+        Assert.That(dtd.Trashed, Is.EqualTo(clone.Trashed));
+        Assert.That(dtd.UpdateDate, Is.EqualTo(clone.UpdateDate));
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
         foreach (var propertyInfo in allProps)
         {
-            Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(dtd, null));
+            Assert.That(propertyInfo.GetValue(dtd, null), Is.EqualTo(propertyInfo.GetValue(clone, null)));
         }
     }
 

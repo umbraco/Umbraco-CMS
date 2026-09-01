@@ -106,9 +106,9 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: string.Empty);
 
-        Assert.IsNotNull(response);
-        Assert.IsTrue(response!.Properties.ContainsKey("contentPicker"));
-        Assert.IsNull(response.Properties["contentPicker"], "Reference to a disallowed content type should render as an explicit null.");
+        Assert.That(response, Is.Not.Null);
+        Assert.That(response!.Properties.ContainsKey("contentPicker"), Is.True);
+        Assert.That(response.Properties["contentPicker"], Is.Null, "Reference to a disallowed content type should render as an explicit null.");
     }
 
     [Test]
@@ -118,10 +118,10 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: string.Empty);
 
-        Assert.IsNotNull(response);
+        Assert.That(response, Is.Not.Null);
         var reference = response!.Properties["contentPicker"] as IApiContent;
-        Assert.IsNotNull(reference, "Reference to an allowed content type should be rendered.");
-        Assert.AreEqual(target.Key, reference!.Id);
+        Assert.That(reference, Is.Not.Null, "Reference to an allowed content type should be rendered.");
+        Assert.That(reference!.Id, Is.EqualTo(target.Key));
     }
 
     [Test]
@@ -132,10 +132,10 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
-        Assert.IsNotNull(response);
+        Assert.That(response, Is.Not.Null);
         var reference = response!.Properties["contentPicker"] as IApiContent;
-        Assert.IsNotNull(reference, "Protected content should still be rendered as a reference.");
-        Assert.IsEmpty(reference!.Properties, "Property values of protected content must not leak when the request has no access.");
+        Assert.That(reference, Is.Not.Null, "Protected content should still be rendered as a reference.");
+        Assert.That(reference!.Properties, Is.Empty, "Property values of protected content must not leak when the request has no access.");
     }
 
     [Test]
@@ -147,11 +147,11 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
-        Assert.IsNotNull(response);
+        Assert.That(response, Is.Not.Null);
         var reference = response!.Properties["contentPicker"] as IApiContent;
-        Assert.IsNotNull(reference);
-        Assert.IsNotEmpty(reference!.Properties, "Protected content should expose its property values when member has access.");
-        Assert.IsTrue(reference.Properties.ContainsKey("title"));
+        Assert.That(reference, Is.Not.Null);
+        Assert.That(reference!.Properties, Is.Not.Empty, "Protected content should expose its property values when member has access.");
+        Assert.That(reference.Properties.ContainsKey("title"), Is.True);
     }
 
     [Test]
@@ -161,11 +161,11 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
-        Assert.IsNotNull(response);
+        Assert.That(response, Is.Not.Null);
         var reference = response!.Properties["contentPicker"] as IApiContent;
-        Assert.IsNotNull(reference);
-        Assert.IsNotEmpty(reference!.Properties, "Unprotected content should expose its property values when expanded.");
-        Assert.IsTrue(reference.Properties.ContainsKey("title"));
+        Assert.That(reference, Is.Not.Null);
+        Assert.That(reference!.Properties, Is.Not.Empty, "Unprotected content should expose its property values when expanded.");
+        Assert.That(reference.Properties.ContainsKey("title"), Is.True);
     }
 
     [Test]
@@ -176,10 +176,10 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: string.Empty);
 
-        Assert.IsNotNull(response);
+        Assert.That(response, Is.Not.Null);
         var references = (response!.Properties["multiNodeTreePicker"] as IEnumerable<IApiContent>)?.ToArray();
-        Assert.IsNotNull(references, "The multi-node tree picker value should be a collection of content references.");
-        Assert.IsEmpty(references!, "A reference to a disallowed content type should be excluded from the collection.");
+        Assert.That(references, Is.Not.Null, "The multi-node tree picker value should be a collection of content references.");
+        Assert.That(references!, Is.Empty, "A reference to a disallowed content type should be excluded from the collection.");
     }
 
     [Test]
@@ -189,11 +189,11 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: string.Empty);
 
-        Assert.IsNotNull(response);
+        Assert.That(response, Is.Not.Null);
         var references = (response!.Properties["multiNodeTreePicker"] as IEnumerable<IApiContent>)?.ToArray();
-        Assert.IsNotNull(references);
-        Assert.AreEqual(1, references!.Length);
-        Assert.AreEqual(target.Key, references[0].Id);
+        Assert.That(references, Is.Not.Null);
+        Assert.That(references!, Has.Length.EqualTo(1));
+        Assert.That(references[0].Id, Is.EqualTo(target.Key));
     }
 
     [Test]
@@ -204,11 +204,11 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
-        Assert.IsNotNull(response);
+        Assert.That(response, Is.Not.Null);
         var references = (response!.Properties["multiNodeTreePicker"] as IEnumerable<IApiContent>)?.ToArray();
-        Assert.IsNotNull(references);
-        Assert.AreEqual(1, references!.Length, "Protected content should still be rendered as a reference.");
-        Assert.IsEmpty(references[0].Properties, "Property values of protected content must not leak when the request has no access.");
+        Assert.That(references, Is.Not.Null);
+        Assert.That(references!, Has.Length.EqualTo(1), "Protected content should still be rendered as a reference.");
+        Assert.That(references[0].Properties, Is.Empty, "Property values of protected content must not leak when the request has no access.");
     }
 
     [Test]
@@ -220,12 +220,12 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
-        Assert.IsNotNull(response);
+        Assert.That(response, Is.Not.Null);
         var references = (response!.Properties["multiNodeTreePicker"] as IEnumerable<IApiContent>)?.ToArray();
-        Assert.IsNotNull(references);
-        Assert.AreEqual(1, references!.Length);
-        Assert.IsNotEmpty(references[0].Properties, "Protected content should expose its property values when member has access.");
-        Assert.IsTrue(references[0].Properties.ContainsKey("title"));
+        Assert.That(references, Is.Not.Null);
+        Assert.That(references!, Has.Length.EqualTo(1));
+        Assert.That(references[0].Properties, Is.Not.Empty, "Protected content should expose its property values when member has access.");
+        Assert.That(references[0].Properties.ContainsKey("title"), Is.True);
     }
 
     [Test]
@@ -235,12 +235,12 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
 
         IApiContentResponse? response = BuildHostResponse(host, expand: "properties[$all]");
 
-        Assert.IsNotNull(response);
+        Assert.That(response, Is.Not.Null);
         var references = (response!.Properties["multiNodeTreePicker"] as IEnumerable<IApiContent>)?.ToArray();
-        Assert.IsNotNull(references);
-        Assert.AreEqual(1, references!.Length);
-        Assert.IsNotEmpty(references[0].Properties, "Unprotected content should expose its property values when expanded.");
-        Assert.IsTrue(references[0].Properties.ContainsKey("title"));
+        Assert.That(references, Is.Not.Null);
+        Assert.That(references!, Has.Length.EqualTo(1));
+        Assert.That(references[0].Properties, Is.Not.Empty, "Unprotected content should expose its property values when expanded.");
+        Assert.That(references[0].Properties.ContainsKey("title"), Is.True);
     }
 
     private IApiContentResponse? BuildHostResponse(IContent host, string expand)
@@ -250,7 +250,7 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
         UmbracoContextAccessor.Clear();
         IUmbracoContext umbracoContext = UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
         IPublishedContent? publishedHost = umbracoContext.Content?.GetById(host.Key);
-        Assert.IsNotNull(publishedHost);
+        Assert.That(publishedHost, Is.Not.Null);
 
         return ApiContentResponseBuilder.Build(publishedHost!);
     }
@@ -323,7 +323,7 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
     {
         var targetContentType = ContentTypeEditingBuilder.CreateSimpleContentType(alias: TargetContentTypeAlias, name: "Target Page");
         var targetContentTypeResult = await ContentTypeEditingService.CreateAsync(targetContentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(targetContentTypeResult.Success);
+        Assert.That(targetContentTypeResult.Success, Is.True);
 
         var targetCreateModel = ContentEditingBuilder.CreateContentWithOneInvariantProperty(
             targetContentType.Key!.Value,
@@ -331,14 +331,14 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
             "title",
             "The title value");
         var targetResult = await ContentEditingService.CreateAsync(targetCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(targetResult.Success);
+        Assert.That(targetResult.Success, Is.True);
         IContent target = targetResult.Result.Content!;
 
         var targetPublish = await ContentPublishingService.PublishAsync(
             target.Key,
             [new CulturePublishScheduleModel { Culture = "*" }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(targetPublish.Success);
+        Assert.That(targetPublish.Success, Is.True);
 
         return target;
     }
@@ -346,7 +346,7 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
     private async Task<IContent> CreateAndPublishHostAsync(ContentTypeCreateModel hostContentType, string propertyAlias, object propertyValue)
     {
         var hostContentTypeResult = await ContentTypeEditingService.CreateAsync(hostContentType, Constants.Security.SuperUserKey);
-        Assert.IsTrue(hostContentTypeResult.Success);
+        Assert.That(hostContentTypeResult.Success, Is.True);
 
         var hostCreateModel = ContentEditingBuilder.CreateContentWithOneInvariantProperty(
             hostContentType.Key!.Value,
@@ -354,14 +354,14 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
             propertyAlias,
             propertyValue);
         var hostResult = await ContentEditingService.CreateAsync(hostCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(hostResult.Success);
+        Assert.That(hostResult.Success, Is.True);
         IContent host = hostResult.Result.Content!;
 
         var hostPublish = await ContentPublishingService.PublishAsync(
             host.Key,
             [new CulturePublishScheduleModel { Culture = "*" }],
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(hostPublish.Success);
+        Assert.That(hostPublish.Success, Is.True);
 
         return host;
     }
@@ -402,7 +402,7 @@ internal sealed class OutputExpansionStrategyAccessControlTests : UmbracoIntegra
     {
         PublicAccessRule[] rules = [new PublicAccessRule { RuleType = "TestType", RuleValue = "TestVal" }];
         var result = PublicAccessService.Save(new PublicAccessEntry(content, content, content, rules));
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
     }
 
     private void SetRequest(string expand)

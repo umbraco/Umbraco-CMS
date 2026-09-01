@@ -32,7 +32,7 @@ internal sealed class MediaHybridCacheScopeTests : UmbracoIntegrationTestWithMed
 
         // Assert
         // media should still be in cache, as we rolled scope back.
-        Assert.IsNotNull(media);
+        Assert.That(media, Is.Not.Null);
     }
 
     [Test]
@@ -49,7 +49,7 @@ internal sealed class MediaHybridCacheScopeTests : UmbracoIntegrationTestWithMed
 
         // Assert
         // Media should still be in cache, as we rolled scope back.
-        Assert.IsNotNull(media);
+        Assert.That(media, Is.Not.Null);
     }
 
     [Test]
@@ -67,7 +67,7 @@ internal sealed class MediaHybridCacheScopeTests : UmbracoIntegrationTestWithMed
 
         // Assert
         // Media  should not be in cache, as we completed the scope for delete.
-        Assert.IsNull(media);
+        Assert.That(media, Is.Null);
     }
 
     [Test]
@@ -85,6 +85,6 @@ internal sealed class MediaHybridCacheScopeTests : UmbracoIntegrationTestWithMed
 
         // Assert
         // Media  should not be in cache, as we completed the scope for delete.
-        Assert.IsNull(textPage);
+        Assert.That(textPage, Is.Null);
     }
 }

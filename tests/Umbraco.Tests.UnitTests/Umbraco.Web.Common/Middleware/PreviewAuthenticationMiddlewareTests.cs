@@ -48,8 +48,8 @@ public class PreviewAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
-        Assert.IsTrue(context.User.Identities.Any(i => i.IsAuthenticated && i.AuthenticationType == Constants.Security.BackOfficeAuthenticationType));
+        Assert.That(_nextCalled, Is.True);
+        Assert.That(context.User.Identities.Any(i => i.IsAuthenticated && i.AuthenticationType == Constants.Security.BackOfficeAuthenticationType), Is.True);
         _previewSessionServiceMock.Verify(x => x.Start(), Times.Once);
     }
 
@@ -68,8 +68,8 @@ public class PreviewAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
-        Assert.IsFalse(context.User.Identities.Any(i => i.IsAuthenticated && i.AuthenticationType == Constants.Security.BackOfficeAuthenticationType));
+        Assert.That(_nextCalled, Is.True);
+        Assert.That(context.User.Identities.Any(i => i.IsAuthenticated && i.AuthenticationType == Constants.Security.BackOfficeAuthenticationType), Is.False);
         _previewSessionServiceMock.Verify(x => x.Start(), Times.Never);
     }
 
@@ -86,8 +86,8 @@ public class PreviewAuthenticationMiddlewareTests
 
         await _middleware.InvokeAsync(context, NextDelegate());
 
-        Assert.IsTrue(_nextCalled);
-        Assert.IsFalse(context.User.Identities.Any(i => i.IsAuthenticated && i.AuthenticationType == Constants.Security.BackOfficeAuthenticationType));
+        Assert.That(_nextCalled, Is.True);
+        Assert.That(context.User.Identities.Any(i => i.IsAuthenticated && i.AuthenticationType == Constants.Security.BackOfficeAuthenticationType), Is.False);
         _previewSessionServiceMock.Verify(x => x.Start(), Times.Never);
     }
 

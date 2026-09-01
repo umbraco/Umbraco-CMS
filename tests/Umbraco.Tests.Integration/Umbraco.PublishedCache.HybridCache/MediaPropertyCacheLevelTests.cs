@@ -26,12 +26,12 @@ public class MediaPropertyCacheLevelTests : PropertyCacheLevelTestsBase
 
         var mediaTypeCreateModel = MediaTypeEditingBuilder.CreateMediaTypeWithOneProperty(propertyAlias: "title");
         var mediaTypeAttempt = await MediaTypeEditingService.CreateAsync(mediaTypeCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(mediaTypeAttempt.Success);
+        Assert.That(mediaTypeAttempt.Success, Is.True);
 
         var mediaCreateModel = MediaEditingBuilder.CreateMediaWithAProperty(mediaTypeAttempt.Result.Key, "My Media", null, propertyAlias: "title", propertyValue: "The title");
         mediaCreateModel.Key = _mediaKey;
         var mediaAttempt = await MediaEditingService.CreateAsync(mediaCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(mediaAttempt.Success);
+        Assert.That(mediaAttempt.Success, Is.True);
     }
 
     [TestCase(PropertyCacheLevel.None, 1, 10)]
@@ -42,20 +42,20 @@ public class MediaPropertyCacheLevelTests : PropertyCacheLevelTestsBase
         PropertyValueLevelDetectionTestsConverter.SetCacheLevel(cacheLevel);
 
         var publishedContent1 = await MediaCacheService.GetByKeyAsync(_mediaKey);
-        Assert.IsNotNull(publishedContent1);
+        Assert.That(publishedContent1, Is.Not.Null);
 
         var publishedContent2 = await MediaCacheService.GetByKeyAsync(_mediaKey);
-        Assert.IsNotNull(publishedContent2);
+        Assert.That(publishedContent2, Is.Not.Null);
 
-        Assert.AreSame(publishedContent1,  publishedContent2);
+        Assert.That(publishedContent2, Is.SameAs(publishedContent1));
 
         var titleValue1 = publishedContent1.Value<string>("title");
-        Assert.IsNotNull(titleValue1);
+        Assert.That(titleValue1, Is.Not.Null);
 
         var titleValue2 = publishedContent2.Value<string>("title");
-        Assert.IsNotNull(titleValue2);
+        Assert.That(titleValue2, Is.Not.Null);
 
-        Assert.AreEqual(titleValue1,  titleValue2);
+        Assert.That(titleValue2, Is.EqualTo(titleValue1));
 
         // fetch title values 10 times in total, 5 times from each published content instance
         titleValue1 = publishedContent1.Value<string>("title");
@@ -68,8 +68,8 @@ public class MediaPropertyCacheLevelTests : PropertyCacheLevelTestsBase
         titleValue2 = publishedContent2.Value<string>("title");
         titleValue2 = publishedContent2.Value<string>("title");
 
-        Assert.AreEqual(expectedSourceConverts, PropertyValueLevelDetectionTestsConverter.SourceConverts);
-        Assert.AreEqual(expectedInterConverts, PropertyValueLevelDetectionTestsConverter.InterConverts);
+        Assert.That(PropertyValueLevelDetectionTestsConverter.SourceConverts, Is.EqualTo(expectedSourceConverts));
+        Assert.That(PropertyValueLevelDetectionTestsConverter.InterConverts, Is.EqualTo(expectedInterConverts));
     }
 
     [TestCase(PropertyCacheLevel.None)]
@@ -80,10 +80,10 @@ public class MediaPropertyCacheLevelTests : PropertyCacheLevelTestsBase
         PropertyValueLevelDetectionTestsConverter.SetCacheLevel(cacheLevel);
 
         var publishedContent1 = await MediaCacheService.GetByKeyAsync(_mediaKey);
-        Assert.IsNotNull(publishedContent1);
+        Assert.That(publishedContent1, Is.Not.Null);
 
         var titleValue1 = publishedContent1.Value<string>("title");
-        Assert.AreEqual("The title", titleValue1);
+        Assert.That(titleValue1, Is.EqualTo("The title"));
 
         // save the media to trigger a cache refresh for the media
         var mediaAttempt = await MediaEditingService.UpdateAsync(
@@ -94,18 +94,18 @@ public class MediaPropertyCacheLevelTests : PropertyCacheLevelTestsBase
                 Variants = [new() { Name = publishedContent1.Name }],
             },
             Constants.Security.SuperUserKey);
-        Assert.IsTrue(mediaAttempt.Success);
+        Assert.That(mediaAttempt.Success, Is.True);
 
         var publishedContent2 = await MediaCacheService.GetByKeyAsync(_mediaKey);
-        Assert.IsNotNull(publishedContent2);
+        Assert.That(publishedContent2, Is.Not.Null);
 
-        Assert.AreNotSame(publishedContent1,  publishedContent2);
+        Assert.That(publishedContent2, Is.Not.SameAs(publishedContent1));
 
         var titleValue2 = publishedContent2.Value<string>("title");
-        Assert.AreEqual("New title", titleValue2);
+        Assert.That(titleValue2, Is.EqualTo("New title"));
 
         // expect conversions for each published content instance, due to the cache refresh
-        Assert.AreEqual(2, PropertyValueLevelDetectionTestsConverter.SourceConverts);
-        Assert.AreEqual(2, PropertyValueLevelDetectionTestsConverter.InterConverts);
+        Assert.That(PropertyValueLevelDetectionTestsConverter.SourceConverts, Is.EqualTo(2));
+        Assert.That(PropertyValueLevelDetectionTestsConverter.InterConverts, Is.EqualTo(2));
     }
 }

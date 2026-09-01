@@ -118,25 +118,25 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
-        Assert.NotNull(savedBlocksValue);
+        Assert.That(savedBlocksValue, Is.Not.Null);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
 
         // the Danish and invariant values should be updated regardless of the executing user
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("#1: The second content value in Danish", blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value);
-            Assert.AreEqual("#1: The second invariant settings value", blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("#1: The second settings value in Danish", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#1: The second content value in Danish"));
+            Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The second invariant settings value"));
+            Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#1: The second settings value in Danish"));
 
-            Assert.AreEqual("#2: The second invariant content value", blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("#2: The second content value in Danish", blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value);
-            Assert.AreEqual("#2: The second invariant settings value", blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("#2: The second settings value in Danish", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The second invariant content value"));
+            Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#2: The second content value in Danish"));
+            Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The second invariant settings value"));
+            Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#2: The second settings value in Danish"));
         });
 
         // limited user access means English and German should not have been updated - changes should be rolled back to the initial block values
@@ -144,30 +144,30 @@ internal partial class BlockListElementLevelVariationTests
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("#1: The first content value in English", blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The first settings value in English", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The first content value in German", blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#1: The first settings value in German", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The first content value in English"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The first settings value in English"));
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The first content value in German"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The first settings value in German"));
 
-                Assert.AreEqual("#2: The first content value in English", blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The first settings value in English", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The first content value in German", blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#2: The first settings value in German", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The first content value in English"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The first settings value in English"));
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The first content value in German"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The first settings value in German"));
             });
         }
         else
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("#1: The second content value in English", blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The second settings value in English", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The second content value in German", blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#1: The second settings value in German", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The second content value in English"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The second settings value in English"));
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The second content value in German"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The second settings value in German"));
 
-                Assert.AreEqual("#2: The second content value in English", blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The second settings value in English", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The second content value in German", blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#2: The second settings value in German", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The second content value in English"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The second settings value in English"));
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The second content value in German"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The second settings value in German"));
             });
         }
     }
@@ -255,25 +255,25 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
-        Assert.NotNull(savedBlocksValue);
+        Assert.That(savedBlocksValue, Is.Not.Null);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
 
         // the Danish and invariant values should be updated regardless of the executing user
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("#1: The second invariant content value", blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("#1: The second content value in Danish", blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value);
-            Assert.AreEqual("#1: The second invariant settings value", blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("#1: The second settings value in Danish", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The second invariant content value"));
+            Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#1: The second content value in Danish"));
+            Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The second invariant settings value"));
+            Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#1: The second settings value in Danish"));
 
-            Assert.AreEqual("#2: The second invariant content value", blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("#2: The second content value in Danish", blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value);
-            Assert.AreEqual("#2: The second invariant settings value", blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("#2: The second settings value in Danish", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The second invariant content value"));
+            Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#2: The second content value in Danish"));
+            Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The second invariant settings value"));
+            Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#2: The second settings value in Danish"));
         });
 
         // limited user access means English and German should not have been updated - changes should be rolled back to the initial block values
@@ -281,26 +281,26 @@ internal partial class BlockListElementLevelVariationTests
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(2, blockListValue.ContentData[0].Values.Count);
-                Assert.AreEqual(2, blockListValue.ContentData[1].Values.Count);
+                Assert.That(blockListValue.ContentData[0].Values, Has.Count.EqualTo(2));
+                Assert.That(blockListValue.ContentData[1].Values, Has.Count.EqualTo(2));
             });
         }
         else
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(4, blockListValue.ContentData[0].Values.Count);
-                Assert.AreEqual(4, blockListValue.ContentData[1].Values.Count);
+                Assert.That(blockListValue.ContentData[0].Values, Has.Count.EqualTo(4));
+                Assert.That(blockListValue.ContentData[1].Values, Has.Count.EqualTo(4));
 
-                Assert.AreEqual("#1: The second content value in English", blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The second settings value in English", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The second content value in German", blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#1: The second settings value in German", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The second content value in English"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The second settings value in English"));
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The second content value in German"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The second settings value in German"));
 
-                Assert.AreEqual("#2: The second content value in English", blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The second settings value in English", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The second content value in German", blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#2: The second settings value in German", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The second content value in English"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The second settings value in English"));
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The second content value in German"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The second settings value in German"));
             });
         }
     }
@@ -407,21 +407,21 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
-        Assert.NotNull(savedBlocksValue);
+        Assert.That(savedBlocksValue, Is.Not.Null);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
 
         // the Danish values should be updated regardless of the executing user
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("#1: The second content value in Danish", blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value);
-            Assert.AreEqual("#1: The second settings value in Danish", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#1: The second content value in Danish"));
+            Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#1: The second settings value in Danish"));
 
-            Assert.AreEqual("#2: The second content value in Danish", blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value);
-            Assert.AreEqual("#2: The second settings value in Danish", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#2: The second content value in Danish"));
+            Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#2: The second settings value in Danish"));
         });
 
         // limited user access means invariant, English and German should not have been updated - changes should be rolled back to the initial block values
@@ -430,38 +430,38 @@ internal partial class BlockListElementLevelVariationTests
             Assert.Multiple(() =>
             {
 
-                Assert.AreEqual("#1: The first invariant content value", blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#1: The first invariant settings value", blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#1: The first content value in English", blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The first settings value in English", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The first content value in German", blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#1: The first settings value in German", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The first invariant content value"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The first invariant settings value"));
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The first content value in English"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The first settings value in English"));
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The first content value in German"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The first settings value in German"));
 
-                Assert.AreEqual("#2: The first invariant content value", blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#2: The first invariant settings value", blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#2: The first content value in English", blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The first settings value in English", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The first content value in German", blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#2: The first settings value in German", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The first invariant content value"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The first invariant settings value"));
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The first content value in English"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The first settings value in English"));
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The first content value in German"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The first settings value in German"));
             });
         }
         else
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("#1: The second invariant content value", blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#1: The second invariant settings value", blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#1: The second content value in English", blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The second settings value in English", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The second content value in German", blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#1: The second settings value in German", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The second invariant content value"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The second invariant settings value"));
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The second content value in English"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The second settings value in English"));
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The second content value in German"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The second settings value in German"));
 
-                Assert.AreEqual("#2: The second invariant content value", blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#2: The second invariant settings value", blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#2: The second content value in English", blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The second settings value in English", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The second content value in German", blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#2: The second settings value in German", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The second invariant content value"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The second invariant settings value"));
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The second content value in English"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The second settings value in English"));
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The second content value in German"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The second settings value in German"));
             });
         }
     }
@@ -547,7 +547,7 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
@@ -556,34 +556,34 @@ internal partial class BlockListElementLevelVariationTests
         // limited user access means invariant data is inaccessible since AllowEditInvariantFromNonDefault is disabled
         if (updateWithLimitedUserAccess)
         {
-            Assert.IsNull(blockListValue);
+            Assert.That(blockListValue, Is.Null);
         }
         else
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(4, blockListValue.ContentData[0].Values.Count);
-                Assert.AreEqual(4, blockListValue.ContentData[1].Values.Count);
+                Assert.That(blockListValue.ContentData[0].Values, Has.Count.EqualTo(4));
+                Assert.That(blockListValue.ContentData[1].Values, Has.Count.EqualTo(4));
 
-                Assert.AreEqual("#1: The second invariant content value", blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#1: The second invariant settings value", blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#1: The second content value in English", blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The second settings value in English", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#1: The second content value in German", blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#1: The second settings value in German", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The second invariant content value"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#1: The second invariant settings value"));
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The second content value in English"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#1: The second settings value in English"));
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The second content value in German"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#1: The second settings value in German"));
 
-                Assert.AreEqual("#2: The second invariant content value", blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#2: The second invariant settings value", blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value);
-                Assert.AreEqual("#2: The second content value in English", blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The second settings value in English", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("#2: The second content value in German", blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value);
-                Assert.AreEqual("#2: The second settings value in German", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The second invariant content value"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == null).Value, Is.EqualTo("#2: The second invariant settings value"));
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The second content value in English"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("#2: The second settings value in English"));
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The second content value in German"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("#2: The second settings value in German"));
 
-                Assert.AreEqual("#1: The second content value in Danish", blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value);
-                Assert.AreEqual("#1: The second settings value in Danish", blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value);
+                Assert.That(blockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#1: The second content value in Danish"));
+                Assert.That(blockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#1: The second settings value in Danish"));
 
-                Assert.AreEqual("#2: The second content value in Danish", blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value);
-                Assert.AreEqual("#2: The second settings value in Danish", blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value);
+                Assert.That(blockListValue.ContentData[1].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#2: The second content value in Danish"));
+                Assert.That(blockListValue.SettingsData[1].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("#2: The second settings value in Danish"));
             });
         }
     }
@@ -699,11 +699,11 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
-        Assert.NotNull(savedBlocksValue);
+        Assert.That(savedBlocksValue, Is.Not.Null);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
 
         if (updateWithLimitedUserAccess)
@@ -711,21 +711,21 @@ internal partial class BlockListElementLevelVariationTests
             Assert.Multiple(() =>
             {
                 // new one can't be added
-                Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == newContentElementKey));
-                Assert.AreEqual(0, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
-                Assert.AreEqual(0, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == newContentElementKey), Is.EqualTo(0));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)), Is.EqualTo(0));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)), Is.EqualTo(0));
 
                 // can't remove first
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
-                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
-                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)), Is.EqualTo(4));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)), Is.EqualTo(4));
 
                 // second wasn't touched
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey));
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey));
-                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
-                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)), Is.EqualTo(4));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)), Is.EqualTo(4));
             });
         }
         else
@@ -733,21 +733,21 @@ internal partial class BlockListElementLevelVariationTests
             Assert.Multiple(() =>
             {
                 // add new one, did not add settings
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == newContentElementKey));
-                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
-                Assert.AreEqual(0, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == newContentElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)), Is.EqualTo(4));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)), Is.EqualTo(0));
 
                 // first one removed
-                Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
-                Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
-                Assert.AreEqual(0, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
-                Assert.AreEqual(0, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey), Is.EqualTo(0));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey), Is.EqualTo(0));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)), Is.EqualTo(0));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)), Is.EqualTo(0));
 
                 // second wasn't touched
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey));
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey));
-                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
-                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)), Is.EqualTo(4));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)), Is.EqualTo(4));
             });
         }
     }
@@ -861,21 +861,21 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
-        Assert.NotNull(savedBlocksValue);
+        Assert.That(savedBlocksValue, Is.Not.Null);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
 
         // In both cases we are allowed to change the invariant structure
         // But the amount of new cultured values we can add differs
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == newContentElementKey));
-            Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
-            Assert.AreEqual(0, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
-            Assert.AreEqual(updateWithLimitedUserAccess ? 2 : 4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)));
+            Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == newContentElementKey), Is.EqualTo(1));
+            Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey), Is.EqualTo(0));
+            Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey), Is.EqualTo(0));
+            Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#new") == true)), Is.EqualTo(updateWithLimitedUserAccess ? 2 : 4));
         });
     }
 
@@ -964,7 +964,7 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
@@ -972,12 +972,12 @@ internal partial class BlockListElementLevelVariationTests
         // limited user access means English and German should not have been updated - changes should be rolled back to the initial block values
         if (updateWithLimitedUserAccess)
         {
-            Assert.NotNull(savedBlocksValue);
-            Assert.AreEqual(serializedBlockListValue, savedBlocksValue);
+            Assert.That(savedBlocksValue, Is.Not.Null);
+            Assert.That(savedBlocksValue, Is.EqualTo(serializedBlockListValue));
         }
         else
         {
-            Assert.IsNull(savedBlocksValue);
+            Assert.That(savedBlocksValue, Is.Null);
         }
     }
 
@@ -1079,11 +1079,11 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
-        Assert.NotNull(savedBlocksValue);
+        Assert.That(savedBlocksValue, Is.Not.Null);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
 
         if (updateWithLimitedUserAccess)
@@ -1092,20 +1092,20 @@ internal partial class BlockListElementLevelVariationTests
             {
 
                 // Should only have removed the danish value
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
-                Assert.AreEqual(3, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
-                Assert.AreEqual(3, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
-                Assert.AreEqual(0, blockListValue.ContentData.First().Values.Count(value => value.Culture == "da-DK"));
-                Assert.AreEqual(1, blockListValue.ContentData.First().Values.Count(value => value.Culture == "en-US"));
-                Assert.AreEqual(0, blockListValue.SettingsData.First().Values.Count(value => value.Culture == "da-DK"));
-                Assert.AreEqual(1, blockListValue.SettingsData.First().Values.Count(value => value.Culture == "en-US"));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)), Is.EqualTo(3));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)), Is.EqualTo(3));
+                Assert.That(blockListValue.ContentData.First().Values.Count(value => value.Culture == "da-DK"), Is.EqualTo(0));
+                Assert.That(blockListValue.ContentData.First().Values.Count(value => value.Culture == "en-US"), Is.EqualTo(1));
+                Assert.That(blockListValue.SettingsData.First().Values.Count(value => value.Culture == "da-DK"), Is.EqualTo(0));
+                Assert.That(blockListValue.SettingsData.First().Values.Count(value => value.Culture == "en-US"), Is.EqualTo(1));
 
                 // second wasn't touched
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey));
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey));
-                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
-                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)), Is.EqualTo(4));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)), Is.EqualTo(4));
             });
         }
         else
@@ -1113,20 +1113,20 @@ internal partial class BlockListElementLevelVariationTests
             Assert.Multiple(() =>
             {
                 // both danish and english should be removed
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey));
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey));
-                Assert.AreEqual(2, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
-                Assert.AreEqual(2, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)));
-                Assert.AreEqual(0, blockListValue.ContentData.First().Values.Count(value => value.Culture == "da-DK"));
-                Assert.AreEqual(0, blockListValue.ContentData.First().Values.Count(value => value.Culture == "en-US"));
-                Assert.AreEqual(0, blockListValue.SettingsData.First().Values.Count(value => value.Culture == "da-DK"));
-                Assert.AreEqual(0, blockListValue.SettingsData.First().Values.Count(value => value.Culture == "en-US"));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == firstContentElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == firstSettingsElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)), Is.EqualTo(2));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#1") == true)), Is.EqualTo(2));
+                Assert.That(blockListValue.ContentData.First().Values.Count(value => value.Culture == "da-DK"), Is.EqualTo(0));
+                Assert.That(blockListValue.ContentData.First().Values.Count(value => value.Culture == "en-US"), Is.EqualTo(0));
+                Assert.That(blockListValue.SettingsData.First().Values.Count(value => value.Culture == "da-DK"), Is.EqualTo(0));
+                Assert.That(blockListValue.SettingsData.First().Values.Count(value => value.Culture == "en-US"), Is.EqualTo(0));
 
                 // second wasn't touched
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey));
-                Assert.AreEqual(1, blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey));
-                Assert.AreEqual(4, blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
-                Assert.AreEqual(4, blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.SettingsKey == secondSettingsElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.Layout[Constants.PropertyEditors.Aliases.BlockList].Count(layoutItem => layoutItem.ContentKey == secondContentElementKey), Is.EqualTo(1));
+                Assert.That(blockListValue.ContentData.Sum(contentData => contentData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)), Is.EqualTo(4));
+                Assert.That(blockListValue.SettingsData.Sum(settingsData => settingsData.Values.Count(value => value.Value?.ToString()?.StartsWith("#2") == true)), Is.EqualTo(4));
             });
         }
     }
@@ -1238,28 +1238,28 @@ internal partial class BlockListElementLevelVariationTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, userKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         content = ContentService.GetById(content.Key);
         var savedBlocksValue = content?.Properties["blocks"]?.GetValue()?.ToString();
-        Assert.NotNull(savedBlocksValue);
+        Assert.That(savedBlocksValue, Is.Not.Null);
         blockListValue = JsonSerializer.Deserialize<BlockListValue>(savedBlocksValue);
 
         var nestedBlocksPropertyValue = blockListValue.ContentData
             .FirstOrDefault()?.Values
             .FirstOrDefault(v => v.Alias == "nestedBlocks")?.Value?.ToString();
-        Assert.IsNotNull(nestedBlocksPropertyValue);
+        Assert.That(nestedBlocksPropertyValue, Is.Not.Null);
         var nestedBlockListValue = JsonSerializer.Deserialize<BlockListValue>(nestedBlocksPropertyValue);
 
 
         // the Danish and invariant values should be updated regardless of the executing user
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("The second nested invariant content value", nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("The second nested content value in Danish", nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.That(nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("The second nested invariant content value"));
+            Assert.That(nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("The second nested content value in Danish"));
 
-            Assert.AreEqual("The second nested invariant settings value", nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value);
-            Assert.AreEqual("The second nested settings value in Danish", nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value);
+            Assert.That(nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == null).Value, Is.EqualTo("The second nested invariant settings value"));
+            Assert.That(nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "da-DK").Value, Is.EqualTo("The second nested settings value in Danish"));
         });
 
         // limited user access means English and German should not have been updated - changes should be rolled back to the initial block values
@@ -1267,22 +1267,22 @@ internal partial class BlockListElementLevelVariationTests
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The first nested content value in English", nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("The first nested content value in German", nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("The first nested content value in English"));
+                Assert.That(nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("The first nested content value in German"));
 
-                Assert.AreEqual("The first nested settings value in English", nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("The first nested settings value in German", nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("The first nested settings value in English"));
+                Assert.That(nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("The first nested settings value in German"));
             });
         }
         else
         {
             Assert.Multiple(() =>
             {
-                Assert.AreEqual("The second nested content value in English", nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("The second nested content value in German", nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("The second nested content value in English"));
+                Assert.That(nestedBlockListValue.ContentData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("The second nested content value in German"));
 
-                Assert.AreEqual("The second nested settings value in English", nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value);
-                Assert.AreEqual("The second nested settings value in German", nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value);
+                Assert.That(nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "en-US").Value, Is.EqualTo("The second nested settings value in English"));
+                Assert.That(nestedBlockListValue.SettingsData[0].Values.Single(v => v.Culture == "de-DE").Value, Is.EqualTo("The second nested settings value in German"));
             });
         }
     }
@@ -1318,29 +1318,29 @@ internal partial class BlockListElementLevelVariationTests
         var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
 
         var blockListValue = valueEditor.ToEditor(content!.Properties["blocks"]!) as BlockListValue;
-        Assert.IsNotNull(blockListValue);
+        Assert.That(blockListValue, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.ContentData.Count);
-            Assert.AreEqual(2, blockListValue.ContentData.First().Values.Count);
+            Assert.That(blockListValue.ContentData, Has.Count.EqualTo(1));
+            Assert.That(blockListValue.ContentData.First().Values, Has.Count.EqualTo(2));
             var invariantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "invariantText");
             var variantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "variantText");
-            Assert.IsNull(invariantValue.Culture);
-            Assert.AreEqual("en-US", variantValue.Culture);
+            Assert.That(invariantValue.Culture, Is.Null);
+            Assert.That(variantValue.Culture, Is.EqualTo("en-US"));
         });
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.SettingsData.Count);
-            Assert.AreEqual(2, blockListValue.SettingsData.First().Values.Count);
+            Assert.That(blockListValue.SettingsData, Has.Count.EqualTo(1));
+            Assert.That(blockListValue.SettingsData.First().Values, Has.Count.EqualTo(2));
             var invariantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "invariantText");
             var variantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "variantText");
-            Assert.IsNull(invariantValue.Culture);
-            Assert.AreEqual("en-US", variantValue.Culture);
+            Assert.That(invariantValue.Culture, Is.Null);
+            Assert.That(variantValue.Culture, Is.EqualTo("en-US"));
         });
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.Expose.Count);
-            Assert.AreEqual("en-US", blockListValue.Expose.First().Culture);
+            Assert.That(blockListValue.Expose, Has.Count.EqualTo(1));
+            Assert.That(blockListValue.Expose.First().Culture, Is.EqualTo("en-US"));
         });
     }
 
@@ -1377,29 +1377,29 @@ internal partial class BlockListElementLevelVariationTests
         var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
 
         var blockListValue = valueEditor.ToEditor(content!.Properties["blocks"]!) as BlockListValue;
-        Assert.IsNotNull(blockListValue);
+        Assert.That(blockListValue, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.ContentData.Count);
-            Assert.AreEqual(2, blockListValue.ContentData.First().Values.Count);
+            Assert.That(blockListValue.ContentData, Has.Count.EqualTo(1));
+            Assert.That(blockListValue.ContentData.First().Values, Has.Count.EqualTo(2));
             var invariantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "invariantText");
             var variantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "variantText");
-            Assert.IsNull(invariantValue.Culture);
-            Assert.AreEqual("en-US", variantValue.Culture);
+            Assert.That(invariantValue.Culture, Is.Null);
+            Assert.That(variantValue.Culture, Is.EqualTo("en-US"));
         });
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.SettingsData.Count);
-            Assert.AreEqual(2, blockListValue.SettingsData.First().Values.Count);
+            Assert.That(blockListValue.SettingsData, Has.Count.EqualTo(1));
+            Assert.That(blockListValue.SettingsData.First().Values, Has.Count.EqualTo(2));
             var invariantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "invariantText");
             var variantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "variantText");
-            Assert.IsNull(invariantValue.Culture);
-            Assert.AreEqual("en-US", variantValue.Culture);
+            Assert.That(invariantValue.Culture, Is.Null);
+            Assert.That(variantValue.Culture, Is.EqualTo("en-US"));
         });
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.Expose.Count);
-            Assert.AreEqual("en-US", blockListValue.Expose.First().Culture);
+            Assert.That(blockListValue.Expose, Has.Count.EqualTo(1));
+            Assert.That(blockListValue.Expose.First().Culture, Is.EqualTo("en-US"));
         });
     }
 
@@ -1438,31 +1438,31 @@ internal partial class BlockListElementLevelVariationTests
         var valueEditor = (BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor)blockListDataType.Editor!.GetValueEditor();
 
         var blockListValue = valueEditor.ToEditor(content!.Properties["blocks"]!) as BlockListValue;
-        Assert.IsNotNull(blockListValue);
+        Assert.That(blockListValue, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.ContentData.Count);
-            Assert.AreEqual(2, blockListValue.ContentData.First().Values.Count);
+            Assert.That(blockListValue.ContentData, Has.Count.EqualTo(1));
+            Assert.That(blockListValue.ContentData.First().Values, Has.Count.EqualTo(2));
             var invariantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "invariantText");
             var variantValue = blockListValue.ContentData.First().Values.First(value => value.Alias == "variantText");
-            Assert.IsNull(invariantValue.Culture);
-            Assert.IsNull(variantValue.Culture);
-            Assert.AreEqual("Variant content in English", variantValue.Value);
+            Assert.That(invariantValue.Culture, Is.Null);
+            Assert.That(variantValue.Culture, Is.Null);
+            Assert.That(variantValue.Value, Is.EqualTo("Variant content in English"));
         });
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.SettingsData.Count);
-            Assert.AreEqual(2, blockListValue.SettingsData.First().Values.Count);
+            Assert.That(blockListValue.SettingsData, Has.Count.EqualTo(1));
+            Assert.That(blockListValue.SettingsData.First().Values, Has.Count.EqualTo(2));
             var invariantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "invariantText");
             var variantValue = blockListValue.SettingsData.First().Values.First(value => value.Alias == "variantText");
-            Assert.IsNull(invariantValue.Culture);
-            Assert.IsNull(variantValue.Culture);
-            Assert.AreEqual("Variant settings in English", variantValue.Value);
+            Assert.That(invariantValue.Culture, Is.Null);
+            Assert.That(variantValue.Culture, Is.Null);
+            Assert.That(variantValue.Value, Is.EqualTo("Variant settings in English"));
         });
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockListValue.Expose.Count);
-            Assert.IsNull(blockListValue.Expose.First().Culture);
+            Assert.That(blockListValue.Expose, Has.Count.EqualTo(1));
+            Assert.That(blockListValue.Expose.First().Culture, Is.Null);
         });
     }
 
@@ -1472,7 +1472,7 @@ internal partial class BlockListElementLevelVariationTests
         var userService = GetRequiredService<IUserService>();
 
         var danish = await LanguageService.GetAsync("da-DK");
-        Assert.IsNotNull(danish);
+        Assert.That(danish, Is.Not.Null);
 
         var user = UserBuilder.CreateUser();
         userService.Save(user);
@@ -1482,7 +1482,7 @@ internal partial class BlockListElementLevelVariationTests
         group.AddAllowedLanguage(danish.Id);
 
         var userGroupResult = await userGroupService.CreateAsync(group, Constants.Security.SuperUserKey, [user.Key]);
-        Assert.IsTrue(userGroupResult.Success);
+        Assert.That(userGroupResult.Success, Is.True);
 
         return user;
     }

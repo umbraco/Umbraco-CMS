@@ -15,16 +15,16 @@ public partial class ElementContainerServiceTests
         var result = await ElementContainerService.UpdateAsync(key, "Root Container UPDATED", Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
         var updated = await ElementContainerService.GetAsync(key);
-        Assert.NotNull(updated);
+        Assert.That(updated, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Root Container UPDATED", updated.Name);
-            Assert.AreEqual(Constants.System.Root, updated.ParentId);
+            Assert.That(updated.Name, Is.EqualTo("Root Container UPDATED"));
+            Assert.That(updated.ParentId, Is.EqualTo(Constants.System.Root));
         });
     }
 
@@ -37,16 +37,16 @@ public partial class ElementContainerServiceTests
         var result = await ElementContainerService.UpdateAsync(child.Key, "Child Container UPDATED", Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+            Assert.That(result.Success, Is.True);
+            Assert.That(result.Status, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
         EntityContainer updated = await ElementContainerService.GetAsync(child.Key);
-        Assert.NotNull(updated);
+        Assert.That(updated, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("Child Container UPDATED", updated.Name);
-            Assert.AreEqual(root.Id, updated.ParentId);
+            Assert.That(updated.Name, Is.EqualTo("Child Container UPDATED"));
+            Assert.That(updated.ParentId, Is.EqualTo(root.Id));
         });
     }
 }

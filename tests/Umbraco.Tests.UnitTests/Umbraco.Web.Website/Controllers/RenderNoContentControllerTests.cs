@@ -32,8 +32,8 @@ public class RenderNoContentControllerTests
 
         var result = controller.Index() as RedirectResult;
 
-        Assert.IsNotNull(result);
-        Assert.AreEqual("~/", result.Url);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Url, Is.EqualTo("~/"));
     }
 
     [Test]
@@ -57,11 +57,11 @@ public class RenderNoContentControllerTests
         var controller = new RenderNoContentController(mockHostingEnvironment.Object, globalSettings, mockUrlService.Object);
 
         var result = controller.Index() as ViewResult;
-        Assert.IsNotNull(result);
-        Assert.AreEqual(viewPath, result.ViewName);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.ViewName, Is.EqualTo(viewPath));
 
         var model = result.Model as NoNodesViewModel;
-        Assert.IsNotNull(model);
-        Assert.AreEqual(umbracoPath, model.UmbracoPath);
+        Assert.That(model, Is.Not.Null);
+        Assert.That(model.UmbracoPath, Is.EqualTo(umbracoPath));
     }
 }

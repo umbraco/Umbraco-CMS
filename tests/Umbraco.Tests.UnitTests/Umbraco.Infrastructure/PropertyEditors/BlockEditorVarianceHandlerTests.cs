@@ -22,8 +22,8 @@ public class BlockEditorVarianceHandlerTests
             ContentVariation.Culture,
             ContentVariation.Culture,
             new BlockPropertyValue { Culture = null });
-        Assert.IsNotNull(result);
-        Assert.AreEqual("da-DK", result.Culture);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Culture, Is.EqualTo("da-DK"));
     }
 
     [Test]
@@ -33,8 +33,8 @@ public class BlockEditorVarianceHandlerTests
             ContentVariation.Nothing,
             ContentVariation.Nothing,
             new BlockPropertyValue { Culture = "da-DK" });
-        Assert.IsNotNull(result);
-        Assert.IsNull(result.Culture);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Culture, Is.Null);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class BlockEditorVarianceHandlerTests
             ContentVariation.Nothing,
             ContentVariation.Nothing,
             new BlockPropertyValue { Culture = "en-US" });
-        Assert.IsNull(result);
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -59,7 +59,7 @@ public class BlockEditorVarianceHandlerTests
 
         var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue);
 
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -77,8 +77,8 @@ public class BlockEditorVarianceHandlerTests
         var variation = result.Single();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(element.Key, variation.ContentKey);
-            Assert.AreEqual("da-DK", variation.Culture);
+            Assert.That(variation.ContentKey, Is.EqualTo(element.Key));
+            Assert.That(variation.Culture, Is.EqualTo("da-DK"));
         });
     }
 
@@ -97,8 +97,8 @@ public class BlockEditorVarianceHandlerTests
         var variation = result.Single();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(element.Key, variation.ContentKey);
-            Assert.IsNull(variation.Culture);
+            Assert.That(variation.ContentKey, Is.EqualTo(element.Key));
+            Assert.That(variation.Culture, Is.Null);
         });
     }
 
@@ -121,8 +121,8 @@ public class BlockEditorVarianceHandlerTests
         var variation = result.Single();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(element.Key, variation.ContentKey);
-            Assert.IsNull(variation.Culture);
+            Assert.That(variation.ContentKey, Is.EqualTo(element.Key));
+            Assert.That(variation.Culture, Is.Null);
         });
     }
 
@@ -141,8 +141,8 @@ public class BlockEditorVarianceHandlerTests
         var variation = result.Single();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(element.Key, variation.ContentKey);
-            Assert.AreEqual("da-DK", variation.Culture);
+            Assert.That(variation.ContentKey, Is.EqualTo(element.Key));
+            Assert.That(variation.Culture, Is.EqualTo("da-DK"));
         });
     }
 
@@ -161,8 +161,8 @@ public class BlockEditorVarianceHandlerTests
         var variation = result.Single();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(element.Key, variation.ContentKey);
-            Assert.IsNull(variation.Culture);
+            Assert.That(variation.ContentKey, Is.EqualTo(element.Key));
+            Assert.That(variation.Culture, Is.Null);
         });
     }
 
@@ -181,8 +181,8 @@ public class BlockEditorVarianceHandlerTests
         var variation = result.Single();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("da-DK", variation.Culture);
-            Assert.AreEqual("my-segment", variation.Segment);
+            Assert.That(variation.Culture, Is.EqualTo("da-DK"));
+            Assert.That(variation.Segment, Is.EqualTo("my-segment"));
         });
     }
 
@@ -197,7 +197,7 @@ public class BlockEditorVarianceHandlerTests
 
         ExecuteAlignExposeVariance(owner, blockValue);
 
-        Assert.AreEqual(null, blockValue.Expose.First().Culture);
+        Assert.That(blockValue.Expose.First().Culture, Is.EqualTo(null));
     }
 
     [Test]
@@ -214,8 +214,8 @@ public class BlockEditorVarianceHandlerTests
         Assert.Multiple(() =>
         {
             var alignedExpose = blockValue.Expose.First();
-            Assert.AreEqual("en-US", alignedExpose.Culture);
-            Assert.AreEqual("segment-one", alignedExpose.Segment);
+            Assert.That(alignedExpose.Culture, Is.EqualTo("en-US"));
+            Assert.That(alignedExpose.Segment, Is.EqualTo("segment-one"));
         });
     }
 
@@ -230,7 +230,7 @@ public class BlockEditorVarianceHandlerTests
 
         ExecuteAlignExposeVariance(owner, blockValue);
 
-        Assert.AreEqual("da-DK", blockValue.Expose.First().Culture);
+        Assert.That(blockValue.Expose.First().Culture, Is.EqualTo("da-DK"));
     }
 
     [Test]
@@ -242,8 +242,8 @@ public class BlockEditorVarianceHandlerTests
         var result = await ExecuteAlignPropertyVarianceAsync(ContentVariation.Nothing, propertyValues, null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, result.Count);
-            Assert.IsNull(result.First().Culture);
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result.First().Culture, Is.Null);
         });
     }
 
@@ -257,7 +257,7 @@ public class BlockEditorVarianceHandlerTests
             [],
             [new() { ContentKey = Guid.NewGuid(), Culture = "da-DK" }]);
         ExecuteAlignExposeVariance(owner, blockValue);
-        Assert.IsEmpty(blockValue.Expose);
+        Assert.That(blockValue.Expose, Is.Empty);
     }
 
     [Test]
@@ -273,7 +273,7 @@ public class BlockEditorVarianceHandlerTests
             (contentDataKey, "da-DK", null));
         var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, values, expose);
         ExecuteAlignExposeVariance(owner, blockValue);
-        Assert.AreEqual(1, blockValue.Expose.Count);
+        Assert.That(blockValue.Expose, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -288,8 +288,8 @@ public class BlockEditorVarianceHandlerTests
         ExecuteAlignExposeVariance(owner, blockValue);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, blockValue.Expose.Count);
-            Assert.IsNull(blockValue.Expose.First().Culture);
+            Assert.That(blockValue.Expose, Has.Count.EqualTo(1));
+            Assert.That(blockValue.Expose.First().Culture, Is.Null);
         });
     }
 
@@ -314,9 +314,9 @@ public class BlockEditorVarianceHandlerTests
         ExecuteAlignExposeVariance(owner, blockValue);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, blockValue.Expose.Count);
-            Assert.IsTrue(blockValue.Expose.Any(e => e.Culture == "da-DK"));
-            Assert.IsTrue(blockValue.Expose.Any(e => e.Culture == "en-US"));
+            Assert.That(blockValue.Expose, Has.Count.EqualTo(2));
+            Assert.That(blockValue.Expose.Any(e => e.Culture == "da-DK"), Is.True);
+            Assert.That(blockValue.Expose.Any(e => e.Culture == "en-US"), Is.True);
         });
     }
 

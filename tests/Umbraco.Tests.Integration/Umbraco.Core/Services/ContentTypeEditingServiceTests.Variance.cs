@@ -34,10 +34,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             ? ElementService.GetById(instance.Key)
             : ContentService.GetById(instance.Key);
 
-        Assert.IsNotNull(reloaded);
-        Assert.AreEqual("invariant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+        Assert.That(reloaded, Is.Not.Null);
+        Assert.That(reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture), Is.EqualTo("invariant value"));
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias), Is.Null);
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"), Is.Null);
     }
 
     [TestCase(false)]
@@ -62,10 +62,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             ? ElementService.GetById(instance.Key)
             : ContentService.GetById(instance.Key);
 
-        Assert.IsNotNull(reloaded);
-        Assert.AreEqual("default lang value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+        Assert.That(reloaded, Is.Not.Null);
+        Assert.That(reloaded!.GetValue<string>(VarianceTestPropertyAlias), Is.EqualTo("default lang value"));
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias, defaultCulture), Is.Null);
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"), Is.Null);
     }
 
     [TestCase(false)]
@@ -119,10 +119,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             ? ElementService.GetById(instance.Key)
             : ContentService.GetById(instance.Key);
 
-        Assert.IsNotNull(reloaded);
-        Assert.AreEqual("composed invariant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+        Assert.That(reloaded, Is.Not.Null);
+        Assert.That(reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture), Is.EqualTo("composed invariant value"));
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias), Is.Null);
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"), Is.Null);
     }
 
     [TestCase(false)]
@@ -176,10 +176,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             ? ElementService.GetById(instance.Key)
             : ContentService.GetById(instance.Key);
 
-        Assert.IsNotNull(reloaded);
-        Assert.AreEqual("composed variant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+        Assert.That(reloaded, Is.Not.Null);
+        Assert.That(reloaded!.GetValue<string>(VarianceTestPropertyAlias), Is.EqualTo("composed variant value"));
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias, defaultCulture), Is.Null);
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"), Is.Null);
     }
 
     // Composing type variance is fixed at Culture from creation and is never itself updated below -
@@ -233,10 +233,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             ? ElementService.GetById(instance.Key)
             : ContentService.GetById(instance.Key);
 
-        Assert.IsNotNull(reloaded);
-        Assert.AreEqual("composed invariant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+        Assert.That(reloaded, Is.Not.Null);
+        Assert.That(reloaded!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture), Is.EqualTo("composed invariant value"));
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias), Is.Null);
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"), Is.Null);
     }
 
     [TestCase(false)]
@@ -286,10 +286,10 @@ internal sealed partial class ContentTypeEditingServiceTests
             ? ElementService.GetById(instance.Key)
             : ContentService.GetById(instance.Key);
 
-        Assert.IsNotNull(reloaded);
-        Assert.AreEqual("composed variant value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
-        Assert.IsNull(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+        Assert.That(reloaded, Is.Not.Null);
+        Assert.That(reloaded!.GetValue<string>(VarianceTestPropertyAlias), Is.EqualTo("composed variant value"));
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias, defaultCulture), Is.Null);
+        Assert.That(reloaded.GetValue<string>(VarianceTestPropertyAlias, "da-DK"), Is.Null);
     }
 
     [TestCase(false)]
@@ -328,19 +328,19 @@ internal sealed partial class ContentTypeEditingServiceTests
         IPublishableContentBase? reloadedDraft = isElement
             ? ElementService.GetById(instance.Key)
             : ContentService.GetById(instance.Key);
-        Assert.IsNotNull(reloadedDraft);
-        Assert.AreEqual("draft edited value", reloadedDraft!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
-        Assert.IsNull(reloadedDraft.GetValue<string>(VarianceTestPropertyAlias));
-        Assert.IsNull(reloadedDraft.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+        Assert.That(reloadedDraft, Is.Not.Null);
+        Assert.That(reloadedDraft!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture), Is.EqualTo("draft edited value"));
+        Assert.That(reloadedDraft.GetValue<string>(VarianceTestPropertyAlias), Is.Null);
+        Assert.That(reloadedDraft.GetValue<string>(VarianceTestPropertyAlias, "da-DK"), Is.Null);
 
         var publishedVersionId = reloadedDraft.PublishedVersionId;
         IPublishableContentBase? publishedVersion = isElement
             ? ElementService.GetVersions(instance.Id).FirstOrDefault(v => v.VersionId == publishedVersionId)
             : ContentService.GetVersions(instance.Id).FirstOrDefault(v => v.VersionId == publishedVersionId);
-        Assert.IsNotNull(publishedVersion, "Expected the originally-published version to still exist after the variance change.");
-        Assert.AreEqual("published value", publishedVersion!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture));
-        Assert.IsNull(publishedVersion.GetValue<string>(VarianceTestPropertyAlias));
-        Assert.IsNull(publishedVersion.GetValue<string>(VarianceTestPropertyAlias, "da-DK"));
+        Assert.That(publishedVersion, Is.Not.Null, "Expected the originally-published version to still exist after the variance change.");
+        Assert.That(publishedVersion!.GetValue<string>(VarianceTestPropertyAlias, defaultCulture), Is.EqualTo("published value"));
+        Assert.That(publishedVersion.GetValue<string>(VarianceTestPropertyAlias), Is.Null);
+        Assert.That(publishedVersion.GetValue<string>(VarianceTestPropertyAlias, "da-DK"), Is.Null);
     }
 
     [TestCase(false)]
@@ -381,9 +381,9 @@ internal sealed partial class ContentTypeEditingServiceTests
             ? ElementService.GetById(instance.Key)
             : ContentService.GetById(instance.Key);
 
-        Assert.IsNotNull(reloaded);
-        Assert.AreEqual("default value", reloaded!.GetValue<string>(VarianceTestPropertyAlias));
-        Assert.IsFalse(reloaded.Edited, "The only pending edit was in a culture discarded by the variance change, so the content should no longer be considered edited.");
+        Assert.That(reloaded, Is.Not.Null);
+        Assert.That(reloaded!.GetValue<string>(VarianceTestPropertyAlias), Is.EqualTo("default value"));
+        Assert.That(reloaded.Edited, Is.False, "The only pending edit was in a culture discarded by the variance change, so the content should no longer be considered edited.");
     }
 
     private async Task<IContentType> CreateVarianceCapableType(bool isElement, ContentVariation propertyVariation = ContentVariation.Nothing)

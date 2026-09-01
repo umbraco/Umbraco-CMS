@@ -44,7 +44,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(legacyHtml);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     [Test]
@@ -82,7 +82,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(html);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     // PascalCase type — historic mis-cased values written by the (now fixed) ConvertLocalLinks migration for Umbraco 15 (see #22597).
@@ -111,7 +111,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(html);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     [TestCase("#some-anchor")]
@@ -152,7 +152,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(html);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     [Test]
@@ -177,7 +177,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(legacyHtml);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     [Test]
@@ -202,7 +202,7 @@ public class ApiRichTextMarkupParserTests
 
         var parsedHtml = parser.Parse(markup);
 
-        Assert.AreEqual(expectedOutput, parsedHtml);
+        Assert.That(parsedHtml, Is.EqualTo(expectedOutput));
     }
 
     [Test]
@@ -237,7 +237,7 @@ public class ApiRichTextMarkupParserTests
         _imageUrlTokenGenerator.Verify(
             g => g.RefreshSignature("https://localhost:44331/media/bdofwokn/77gtp8fbrxmgkefatp10aw.webp?width=500&amp;hmac=stale"),
             Times.Once);
-        StringAssert.Contains(@"src=""FRESH_URL""", parsedHtml);
+        Assert.That(parsedHtml, Does.Contain(@"src=""FRESH_URL"""));
     }
 
     private ApiRichTextMarkupParser BuildDefaultSut(Dictionary<Guid, MockData> mockData)

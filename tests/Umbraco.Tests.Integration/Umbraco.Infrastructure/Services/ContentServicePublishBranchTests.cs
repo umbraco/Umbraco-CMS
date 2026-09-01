@@ -151,7 +151,7 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
             PublishResultType.SuccessPublish);
 
         ii21 = ContentService.GetById(ii21.Id);
-        Assert.IsTrue(ii21.Published);
+        Assert.That(ii21.Published, Is.True);
     }
 
     [Test]
@@ -189,8 +189,8 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         var r = ContentService.PublishBranch(vRoot, PublishBranchFilter.Default, vRoot.AvailableCultures.ToArray())
             .ToArray(); // no culture specified so "*" is used, so all cultures
-        Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
-        Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
+        Assert.That(r[0].Result, Is.EqualTo(PublishResultType.SuccessPublishAlready));
+        Assert.That(r[1].Result, Is.EqualTo(PublishResultType.SuccessPublishCulture));
     }
 
     [Test]
@@ -227,8 +227,8 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         var saveResult = ContentService.Save(iv1);
 
         var r = ContentService.PublishBranch(vRoot, PublishBranchFilter.Default, ["de"]).ToArray();
-        Assert.AreEqual(PublishResultType.SuccessPublishAlready, r[0].Result);
-        Assert.AreEqual(PublishResultType.SuccessPublishCulture, r[1].Result);
+        Assert.That(r[0].Result, Is.EqualTo(PublishResultType.SuccessPublishAlready));
+        Assert.That(r[1].Result, Is.EqualTo(PublishResultType.SuccessPublishCulture));
     }
 
     [Test]
@@ -294,16 +294,16 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         ContentService.Save(iv1); // now iv1 has drafts in all cultures
 
         // validate - everything published for root, because no culture was specified = all
-        Assert.IsTrue(vRoot.Published);
-        Assert.IsTrue(vRoot.IsCulturePublished("de"));
-        Assert.IsTrue(vRoot.IsCulturePublished("ru"));
-        Assert.IsTrue(vRoot.IsCulturePublished("es"));
+        Assert.That(vRoot.Published, Is.True);
+        Assert.That(vRoot.IsCulturePublished("de"), Is.True);
+        Assert.That(vRoot.IsCulturePublished("ru"), Is.True);
+        Assert.That(vRoot.IsCulturePublished("es"), Is.True);
 
         // validate - only some cultures published for iv1
-        Assert.IsTrue(iv1.Published);
-        Assert.IsTrue(iv1.IsCulturePublished("de"));
-        Assert.IsTrue(iv1.IsCulturePublished("ru"));
-        Assert.IsFalse(iv1.IsCulturePublished("es"));
+        Assert.That(iv1.Published, Is.True);
+        Assert.That(iv1.IsCulturePublished("de"), Is.True);
+        Assert.That(iv1.IsCulturePublished("ru"), Is.True);
+        Assert.That(iv1.IsCulturePublished("es"), Is.False);
 
         r = ContentService.PublishBranch(vRoot, PublishBranchFilter.Default, ["de"]).ToArray();
 
@@ -320,25 +320,25 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         Reload(ref iv2);
 
         // validate - root
-        Assert.IsTrue(vRoot.Published);
-        Assert.IsTrue(vRoot.IsCulturePublished("de"));
-        Assert.IsFalse(vRoot.IsCultureEdited("de")); // no drafts, this was just published
-        Assert.IsTrue(vRoot.IsCulturePublished("ru"));
-        Assert.IsTrue(vRoot.IsCultureEdited("ru")); // has draft
-        Assert.IsTrue(vRoot.IsCulturePublished("es"));
-        Assert.IsTrue(vRoot.IsCultureEdited("es")); // has draft
+        Assert.That(vRoot.Published, Is.True);
+        Assert.That(vRoot.IsCulturePublished("de"), Is.True);
+        Assert.That(vRoot.IsCultureEdited("de"), Is.False); // no drafts, this was just published
+        Assert.That(vRoot.IsCulturePublished("ru"), Is.True);
+        Assert.That(vRoot.IsCultureEdited("ru"), Is.True); // has draft
+        Assert.That(vRoot.IsCulturePublished("es"), Is.True);
+        Assert.That(vRoot.IsCultureEdited("es"), Is.True); // has draft
 
-        Assert.AreEqual("changed", vRoot.GetValue("ip", published: true)); // publishing de implies publishing invariants
-        Assert.AreEqual("changed.de", vRoot.GetValue("vp", "de", published: true));
+        Assert.That(vRoot.GetValue("ip", published: true), Is.EqualTo("changed")); // publishing de implies publishing invariants
+        Assert.That(vRoot.GetValue("vp", "de", published: true), Is.EqualTo("changed.de"));
 
         // validate - de and ru are published, es has not been published
-        Assert.IsTrue(iv1.Published);
-        Assert.IsTrue(iv1.IsCulturePublished("de"));
-        Assert.IsTrue(iv1.IsCulturePublished("ru"));
-        Assert.IsFalse(iv1.IsCulturePublished("es"));
-        Assert.AreEqual("changed", iv1.GetValue("ip", published: true));
-        Assert.AreEqual("changed.de", iv1.GetValue("vp", "de", published: true));
-        Assert.AreEqual("iv1.ru", iv1.GetValue("vp", "ru", published: true));
+        Assert.That(iv1.Published, Is.True);
+        Assert.That(iv1.IsCulturePublished("de"), Is.True);
+        Assert.That(iv1.IsCulturePublished("ru"), Is.True);
+        Assert.That(iv1.IsCulturePublished("es"), Is.False);
+        Assert.That(iv1.GetValue("ip", published: true), Is.EqualTo("changed"));
+        Assert.That(iv1.GetValue("vp", "de", published: true), Is.EqualTo("changed.de"));
+        Assert.That(iv1.GetValue("vp", "ru", published: true), Is.EqualTo("iv1.ru"));
     }
 
     private async Task<(IContent IRoot, IContent Ii1, IContent Iv11)> Can_Publish_Mixed_Branch()
@@ -370,8 +370,8 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
         ContentService.Save(iv11);
         var xxx = ContentService.Publish(iv11, new[] { "de", "ru" });
 
-        Assert.AreEqual("iv11.de", iv11.GetValue("vp", "de", published: true));
-        Assert.AreEqual("iv11.ru", iv11.GetValue("vp", "ru", published: true));
+        Assert.That(iv11.GetValue("vp", "de", published: true), Is.EqualTo("iv11.de"));
+        Assert.That(iv11.GetValue("vp", "ru", published: true), Is.EqualTo("iv11.ru"));
 
         iv11.SetValue("ip", "changed");
         iv11.SetValue("vp", "changed.de", "de");
@@ -401,10 +401,10 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         // the invariant child has been published
         // the variant child has been published for 'de' only
-        Assert.AreEqual("changed", ii1.GetValue("ip", published: true));
-        Assert.AreEqual("changed", iv11.GetValue("ip", published: true));
-        Assert.AreEqual("changed.de", iv11.GetValue("vp", "de", published: true));
-        Assert.AreEqual("iv11.ru", iv11.GetValue("vp", "ru", published: true));
+        Assert.That(ii1.GetValue("ip", published: true), Is.EqualTo("changed"));
+        Assert.That(iv11.GetValue("ip", published: true), Is.EqualTo("changed"));
+        Assert.That(iv11.GetValue("vp", "de", published: true), Is.EqualTo("changed.de"));
+        Assert.That(iv11.GetValue("vp", "ru", published: true), Is.EqualTo("iv11.ru"));
     }
 
     [Test]
@@ -427,10 +427,10 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         // the invariant child has been published
         // the variant child has been published for 'de' and 'ru'
-        Assert.AreEqual("changed", ii1.GetValue("ip", published: true));
-        Assert.AreEqual("changed", iv11.GetValue("ip", published: true));
-        Assert.AreEqual("changed.de", iv11.GetValue("vp", "de", published: true));
-        Assert.AreEqual("changed.ru", iv11.GetValue("vp", "ru", published: true));
+        Assert.That(ii1.GetValue("ip", published: true), Is.EqualTo("changed"));
+        Assert.That(iv11.GetValue("ip", published: true), Is.EqualTo("changed"));
+        Assert.That(iv11.GetValue("vp", "de", published: true), Is.EqualTo("changed.de"));
+        Assert.That(iv11.GetValue("vp", "ru", published: true), Is.EqualTo("changed.ru"));
     }
 
     [TestCase(PublishBranchFilter.Default)]
@@ -597,12 +597,12 @@ internal sealed class ContentServicePublishBranchTests : UmbracoIntegrationTest
             Console.WriteLine(string.Join(", ", values.Select(x => getter(x).ToString())));
         }
 
-        Assert.AreEqual(expected.Length, values.Length);
+        Assert.That(values, Has.Length.EqualTo(expected.Length));
 
         for (var i = 0; i < values.Length; i++)
         {
             var value = getter(values[i]);
-            Assert.AreEqual(expected[i], value, $"Expected {expected[i]} at {i} but got {value}.");
+            Assert.That(value, Is.EqualTo(expected[i]), $"Expected {expected[i]} at {i} but got {value}.");
         }
     }
 

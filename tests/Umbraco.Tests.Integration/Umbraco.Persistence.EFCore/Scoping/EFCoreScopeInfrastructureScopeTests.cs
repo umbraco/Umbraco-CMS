@@ -25,23 +25,23 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
     [Test]
     public void CanCreateNestedInfrastructureScope()
     {
-        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        Assert.That(EFCoreScopeAccessor.AmbientScope, Is.Null);
         using (IEFCoreScope<TestUmbracoDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
-            Assert.IsInstanceOf<EFCoreScope<TestUmbracoDbContext>>(scope);
-            Assert.IsNotNull(EFCoreScopeAccessor.AmbientScope);
-            Assert.IsNotNull(InfrastructureScopeAccessor.AmbientScope);
-            Assert.AreSame(scope, EFCoreScopeAccessor.AmbientScope);
+            Assert.That(scope, Is.InstanceOf<EFCoreScope<TestUmbracoDbContext>>());
+            Assert.That(EFCoreScopeAccessor.AmbientScope, Is.Not.Null);
+            Assert.That(InfrastructureScopeAccessor.AmbientScope, Is.Not.Null);
+            Assert.That(EFCoreScopeAccessor.AmbientScope, Is.SameAs(scope));
             using (var infrastructureScope = InfrastructureScopeProvider.CreateScope())
             {
-                Assert.AreSame(infrastructureScope, InfrastructureScopeAccessor.AmbientScope);
+                Assert.That(InfrastructureScopeAccessor.AmbientScope, Is.SameAs(infrastructureScope));
             }
 
-            Assert.IsNotNull(InfrastructureScopeAccessor.AmbientScope);
+            Assert.That(InfrastructureScopeAccessor.AmbientScope, Is.Not.Null);
         }
 
-        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
-        Assert.IsNull(InfrastructureScopeAccessor.AmbientScope);
+        Assert.That(EFCoreScopeAccessor.AmbientScope, Is.Null);
+        Assert.That(InfrastructureScopeAccessor.AmbientScope, Is.Null);
     }
 
     [Test]
@@ -60,14 +60,14 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
                 childScope.Database.Execute("INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>(
                     "SELECT name FROM tmp3 WHERE id=1");
-                Assert.AreEqual("a", n);
+                Assert.That(n, Is.EqualTo("a"));
                 childScope.Complete();
             }
 
             await parentScope.ExecuteWithContextAsync<Task>(async database =>
             {
                 string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.AreEqual("a", result);
+                Assert.That(result, Is.EqualTo("a"));
             });
 
 
@@ -80,7 +80,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
                 string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.IsNotNull(result);
+                Assert.That(result, Is.Not.Null);
             });
         }
     }
@@ -100,7 +100,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
 
                     string? result =
                         await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                    Assert.AreEqual("a", result);
+                    Assert.That(result, Is.EqualTo("a"));
                 });
 
                 scope.Complete();
@@ -115,7 +115,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
                 string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.IsNotNull(result);
+                Assert.That(result, Is.Not.Null);
             });
         }
     }
@@ -138,14 +138,14 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
             {
                 scope.Database.Execute("INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
                 string n = ScopeAccessor.AmbientScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.AreEqual("a", n);
+                Assert.That(n, Is.EqualTo("a"));
             }
 
             await parentScope.ExecuteWithContextAsync<Task>(async database =>
             {
                 // Should still be in transaction and not rolled back yet
                 string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.AreEqual("a", result);
+                Assert.That(result, Is.EqualTo("a"));
             });
 
             parentScope.Complete();
@@ -158,7 +158,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
             {
                 // Should still be in transaction and not rolled back yet
                 string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.IsNull(result);
+                Assert.That(result, Is.Null);
             });
         }
     }
@@ -185,11 +185,11 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
                     await database.Database.ExecuteSqlAsync($"INSERT INTO tmp3 (id, name) VALUES (1, 'a')");
 
                     string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                    Assert.AreEqual("a", result);
+                    Assert.That(result, Is.EqualTo("a"));
                 });
 
                 string n = parentScope.Database.ExecuteScalar<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.AreEqual("a", n);
+                Assert.That(n, Is.EqualTo("a"));
             }
 
             parentScope.Complete();
@@ -201,7 +201,7 @@ internal sealed class EFCoreScopeInfrastructureScopeTests : UmbracoIntegrationTe
             await scope.ExecuteWithContextAsync<Task>(async database =>
             {
                 string? result = await database.Database.ExecuteScalarAsync<string>("SELECT name FROM tmp3 WHERE id=1");
-                Assert.IsNull(result);
+                Assert.That(result, Is.Null);
             });
         }
     }

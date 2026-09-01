@@ -67,7 +67,7 @@ public class TouchServerJobTests
 
         // The touch job must run on every role (including Unknown/Subscriber); otherwise a server whose role
         // has not yet been elected would never register itself and the role could never be determined.
-        CollectionAssert.AreEquivalent(Enum.GetValues<ServerRole>(), sut.ServerRoles);
+        Assert.That(sut.ServerRoles, Is.EquivalentTo(Enum.GetValues<ServerRole>()));
     }
 
     [Test]
@@ -75,7 +75,7 @@ public class TouchServerJobTests
     {
         var waitTimeBetweenCalls = TimeSpan.FromSeconds(42);
         var sut = CreateTouchServerTask(waitTimeBetweenCalls: waitTimeBetweenCalls);
-        Assert.AreEqual(waitTimeBetweenCalls, sut.Period);
+        Assert.That(sut.Period, Is.EqualTo(waitTimeBetweenCalls));
     }
 
     [Test]
@@ -91,7 +91,7 @@ public class TouchServerJobTests
             Task runTask = sut.RunJobAsync(CancellationToken.None);
             Task winner = await Task.WhenAny(runTask, Task.Delay(TimeSpan.FromSeconds(10)));
 
-            Assert.AreSame(runTask, winner, "RunJobAsync did not return after the touch timed out.");
+            Assert.That(winner, Is.SameAs(runTask), "RunJobAsync did not return after the touch timed out.");
             await runTask; // Must complete without throwing so the loop continues.
 
             VerifyErrorLogged();
@@ -143,7 +143,7 @@ public class TouchServerJobTests
 
         // First run hangs and times out, leaving the touch in-flight.
         await sut.RunJobAsync(CancellationToken.None);
-        Assert.AreEqual(1, Volatile.Read(ref touchCount));
+        Assert.That(Volatile.Read(ref touchCount), Is.EqualTo(1));
 
         // Release the stalled call; once its task completes the next run must start a fresh touch — i.e. the job
         // self-heals without a recycle. Retry briefly to avoid racing the in-flight task's completion.
@@ -163,7 +163,7 @@ public class TouchServerJobTests
             }
         }
 
-        Assert.IsTrue(resumed, "Touching did not resume after the stalled call completed.");
+        Assert.That(resumed, Is.True, "Touching did not resume after the stalled call completed.");
         VerifyServerTouchedTimes(Times.Exactly(2));
     }
 

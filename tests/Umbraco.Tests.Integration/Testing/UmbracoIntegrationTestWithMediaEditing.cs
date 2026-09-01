@@ -61,7 +61,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
     {
         CustomMediaTypeCreateModel = MediaTypeEditingBuilder.CreateMediaTypeWithOneProperty();
         var mediaTypeTestAttempt = await MediaTypeEditingService.CreateAsync(CustomMediaTypeCreateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(mediaTypeTestAttempt.Success);
+        Assert.That(mediaTypeTestAttempt.Success, Is.True);
         CustomMediaType = mediaTypeTestAttempt.Result;
 
         // Gets all media types
@@ -80,12 +80,12 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         folderMediaTypeAllowedContentTypes.Add(new ContentTypeSort(key: mediaTypeTestAttempt.Result.Key, sortOrder: folderMediaTypeAllowedContentTypes.Count, alias: CustomMediaTypeCreateModel.Alias));
         updateModel.AllowedContentTypes = folderMediaTypeAllowedContentTypes;
         var updatedFolderMediaTypeAttempt = MediaTypeEditingService.UpdateAsync(folderMediaType, updateModel, Constants.Security.SuperUserKey);
-        Assert.IsTrue(updatedFolderMediaTypeAttempt.Result.Success);
+        Assert.That(updatedFolderMediaTypeAttempt.Result.Success, Is.True);
 
         // Create and Save RootFolder
         RootFolder = MediaEditingBuilder.CreateSimpleMedia(folderMediaType.Key, "RootFolder", null);
         var rootFolderAttempt = await MediaEditingService.CreateAsync(RootFolder, Constants.Security.SuperUserKey);
-        Assert.IsTrue(rootFolderAttempt.Success);
+        Assert.That(rootFolderAttempt.Success, Is.True);
         if (rootFolderAttempt.Result.Content != null)
         {
             RootFolderId = rootFolderAttempt.Result.Content.Id;
@@ -94,7 +94,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         // Create and Save RootImage
         RootImage = MediaEditingBuilder.CreateSimpleMedia(imageMediaType.Key, "RootImage", null);
         var rootImageAttempt = await MediaEditingService.CreateAsync(RootImage, Constants.Security.SuperUserKey);
-        Assert.IsTrue(rootImageAttempt.Success);
+        Assert.That(rootImageAttempt.Success, Is.True);
         if (rootImageAttempt.Result.Content != null)
         {
             RootImageId = rootImageAttempt.Result.Content.Id;
@@ -103,7 +103,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         // Create and Save SubFolder1
         SubFolder1 = MediaEditingBuilder.CreateSimpleMedia(folderMediaType.Key, "SubFolder1", RootFolder.Key);
         var subFolder1Attempt = await MediaEditingService.CreateAsync(SubFolder1, Constants.Security.SuperUserKey);
-        Assert.IsTrue(subFolder1Attempt.Success);
+        Assert.That(subFolder1Attempt.Success, Is.True);
         if (subFolder1Attempt.Result.Content != null)
         {
             SubFolder1Id = subFolder1Attempt.Result.Content.Id;
@@ -112,7 +112,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         // Create and Save SubFolder2
         SubFolder2 = MediaEditingBuilder.CreateSimpleMedia(folderMediaType.Key, "SubFolder2", RootFolder.Key);
         var subFolder2Attempt = await MediaEditingService.CreateAsync(SubFolder2, Constants.Security.SuperUserKey);
-        Assert.IsTrue(subFolder2Attempt.Success);
+        Assert.That(subFolder2Attempt.Success, Is.True);
         if (subFolder2Attempt.Result.Content != null)
         {
             SubFolder2Id = subFolder2Attempt.Result.Content.Id;
@@ -121,7 +121,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         // Create and Save SubImage
         SubImage = MediaEditingBuilder.CreateSimpleMedia(imageMediaType.Key, "SubImage", RootFolder.Key);
         var subImageAttempt = await MediaEditingService.CreateAsync(SubImage, Constants.Security.SuperUserKey);
-        Assert.IsTrue(subImageAttempt.Success);
+        Assert.That(subImageAttempt.Success, Is.True);
         if (subImageAttempt.Result.Content != null)
         {
             SubImageId = subImageAttempt.Result.Content.Id;
@@ -130,7 +130,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         // Create and Save SubTestMedia
         SubTestMedia = MediaEditingBuilder.CreateMediaWithAProperty(mediaTypeTestAttempt.Result.Key, "SubTestMedia", RootFolder.Key, "testProperty", "This is a test");
         var subTestMediaAttempt = await MediaEditingService.CreateAsync(SubTestMedia, Constants.Security.SuperUserKey);
-        Assert.IsTrue(subTestMediaAttempt.Success);
+        Assert.That(subTestMediaAttempt.Success, Is.True);
         if (subTestMediaAttempt.Result.Content != null)
         {
             SubTestMediaId = subTestMediaAttempt.Result.Content.Id;
@@ -139,7 +139,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         // Create and Save SubSubImage
         SubSubImage = MediaEditingBuilder.CreateSimpleMedia(imageMediaType.Key, "SubSubImage", SubFolder1.Key);
         var subSubImageAttempt = await MediaEditingService.CreateAsync(SubSubImage, Constants.Security.SuperUserKey);
-        Assert.IsTrue(subSubImageAttempt.Success);
+        Assert.That(subSubImageAttempt.Success, Is.True);
         if (subSubImageAttempt.Result.Content != null)
         {
             SubSubImageId = subSubImageAttempt.Result.Content.Id;
@@ -148,7 +148,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         // Create and Save SubSubFile
         SubSubFile = MediaEditingBuilder.CreateSimpleMedia(imageMediaType.Key, "SubSubFile", SubFolder1.Key);
         var subSubFileAttempt = await MediaEditingService.CreateAsync(SubSubFile, Constants.Security.SuperUserKey);
-        Assert.IsTrue(subSubFileAttempt.Success);
+        Assert.That(subSubFileAttempt.Success, Is.True);
         if (subSubFileAttempt.Result.Content != null)
         {
             SubSubFileId = subSubFileAttempt.Result.Content.Id;

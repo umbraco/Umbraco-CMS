@@ -37,9 +37,9 @@ public class HashGeneratorTests
         var hashFalse1 = Generate(true, "hello", "worlD");
         var hashFalse2 = Generate(true, "hEllo", "world");
 
-        Assert.AreEqual(hash1, hash2);
-        Assert.AreNotEqual(hash1, hashFalse1);
-        Assert.AreNotEqual(hash1, hashFalse2);
+        Assert.That(hash2, Is.EqualTo(hash1));
+        Assert.That(hashFalse1, Is.Not.EqualTo(hash1));
+        Assert.That(hashFalse2, Is.Not.EqualTo(hash1));
     }
 
     [Test]
@@ -50,9 +50,9 @@ public class HashGeneratorTests
         var hashFalse1 = Generate(false, "hello", "worlD");
         var hashFalse2 = Generate(false, "hEllo", "world");
 
-        Assert.AreEqual(hash1, hash2);
-        Assert.AreEqual(hash1, hashFalse1);
-        Assert.AreEqual(hash1, hashFalse2);
+        Assert.That(hash2, Is.EqualTo(hash1));
+        Assert.That(hashFalse1, Is.EqualTo(hash1));
+        Assert.That(hashFalse2, Is.EqualTo(hash1));
     }
 
     private DirectoryInfo PrepareFolder()
@@ -76,9 +76,9 @@ public class HashGeneratorTests
         {
             combiner1.AddCaseInsensitiveString("Hello");
             combiner2.AddCaseInsensitiveString("hello");
-            Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+            Assert.That(combiner2.GenerateHash(), Is.EqualTo(combiner1.GenerateHash()));
             combiner2.AddCaseInsensitiveString("world");
-            Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+            Assert.That(combiner2.GenerateHash(), Is.Not.EqualTo(combiner1.GenerateHash()));
         }
     }
 
@@ -90,9 +90,9 @@ public class HashGeneratorTests
         {
             combiner1.AddInt(1234);
             combiner2.AddInt(1234);
-            Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+            Assert.That(combiner2.GenerateHash(), Is.EqualTo(combiner1.GenerateHash()));
             combiner2.AddInt(1);
-            Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+            Assert.That(combiner2.GenerateHash(), Is.Not.EqualTo(combiner1.GenerateHash()));
         }
     }
 
@@ -104,9 +104,9 @@ public class HashGeneratorTests
         var dt = DateTime.Now;
         combiner1.AddDateTime(dt);
         combiner2.AddDateTime(dt);
-        Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+        Assert.That(combiner2.GenerateHash(), Is.EqualTo(combiner1.GenerateHash()));
         combiner2.AddDateTime(DateTime.Now);
-        Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+        Assert.That(combiner2.GenerateHash(), Is.Not.EqualTo(combiner1.GenerateHash()));
     }
 
     [Test]
@@ -137,12 +137,12 @@ public class HashGeneratorTests
 
         combiner3.AddFile(new FileInfo(file2Path));
 
-        Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
-        Assert.AreNotEqual(combiner1.GenerateHash(), combiner3.GenerateHash());
+        Assert.That(combiner2.GenerateHash(), Is.EqualTo(combiner1.GenerateHash()));
+        Assert.That(combiner3.GenerateHash(), Is.Not.EqualTo(combiner1.GenerateHash()));
 
         combiner2.AddFile(new FileInfo(file2Path));
 
-        Assert.AreNotEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+        Assert.That(combiner2.GenerateHash(), Is.Not.EqualTo(combiner1.GenerateHash()));
     }
 
     [Test]
@@ -164,7 +164,7 @@ public class HashGeneratorTests
 
         combiner2.AddFolder(dir);
 
-        Assert.AreEqual(combiner1.GenerateHash(), combiner2.GenerateHash());
+        Assert.That(combiner2.GenerateHash(), Is.EqualTo(combiner1.GenerateHash()));
 
         // now add a file to the folder
         var file2Path = Path.Combine(dir.FullName, "hastest2.txt");
@@ -177,6 +177,6 @@ public class HashGeneratorTests
 
         combiner3.AddFolder(dir);
 
-        Assert.AreNotEqual(combiner1.GenerateHash(), combiner3.GenerateHash());
+        Assert.That(combiner3.GenerateHash(), Is.Not.EqualTo(combiner1.GenerateHash()));
     }
 }

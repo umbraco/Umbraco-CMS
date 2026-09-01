@@ -85,19 +85,19 @@ public class DocumentCollectionPresentationFactoryTests
         List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
 
         // Assert
-        Assert.AreEqual(3, result.Count);
-        Assert.IsTrue(result[0].IsProtected, "Content 1 should be protected (ancestor 100 is protected)");
-        Assert.IsTrue(result[1].IsProtected, "Content 2 should be protected (ancestor 200 is protected)");
-        Assert.IsFalse(result[2].IsProtected, "Content 3 should not be protected (no protected ancestor)");
+        Assert.That(result, Has.Count.EqualTo(3));
+        Assert.That(result[0].IsProtected, Is.True, "Content 1 should be protected (ancestor 100 is protected)");
+        Assert.That(result[1].IsProtected, Is.True, "Content 2 should be protected (ancestor 200 is protected)");
+        Assert.That(result[2].IsProtected, Is.False, "Content 3 should not be protected (no protected ancestor)");
 
         // Verify GetAll was called once (batched) and IsProtected was never called per-item
         _publicAccessService.Verify(x => x.GetAll(), Times.Once);
         _publicAccessService.Verify(x => x.IsProtected(It.IsAny<IContent>()), Times.Never);
 
         // Verify ancestors are set for all items
-        Assert.AreEqual(ancestorKey, result[0].Ancestors.First().Id);
-        Assert.AreEqual(ancestorKey, result[1].Ancestors.First().Id);
-        Assert.AreEqual(ancestorKey, result[2].Ancestors.First().Id);
+        Assert.That(result[0].Ancestors.First().Id, Is.EqualTo(ancestorKey));
+        Assert.That(result[1].Ancestors.First().Id, Is.EqualTo(ancestorKey));
+        Assert.That(result[2].Ancestors.First().Id, Is.EqualTo(ancestorKey));
     }
 
     [Test]
@@ -135,9 +135,9 @@ public class DocumentCollectionPresentationFactoryTests
         List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
 
         // Assert
-        Assert.AreEqual(2, result.Count);
-        Assert.IsFalse(result[0].IsProtected);
-        Assert.IsFalse(result[1].IsProtected);
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0].IsProtected, Is.False);
+        Assert.That(result[1].IsProtected, Is.False);
     }
 
     [Test]
@@ -174,9 +174,9 @@ public class DocumentCollectionPresentationFactoryTests
         List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
 
         // Assert
-        Assert.AreEqual(2, result.Count);
-        Assert.IsTrue(result[0].IsProtected, "Matching content should be protected");
-        Assert.IsFalse(result[1].IsProtected, "Orphan item should remain default (not protected)");
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0].IsProtected, Is.True, "Matching content should be protected");
+        Assert.That(result[1].IsProtected, Is.False, "Orphan item should remain default (not protected)");
     }
 
     [Test]
@@ -211,7 +211,7 @@ public class DocumentCollectionPresentationFactoryTests
         List<DocumentCollectionResponseModel> result = await _factory.CreateCollectionModelAsync(contentCollection);
 
         // Assert
-        Assert.IsTrue(result[0].IsProtected, "Content should be protected when its own node is the protected node");
+        Assert.That(result[0].IsProtected, Is.True, "Content should be protected when its own node is the protected node");
     }
 
     [Test]
@@ -255,9 +255,9 @@ public class DocumentCollectionPresentationFactoryTests
         _entityService.Verify(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true), Times.Once);
 
         // All items share the same ancestors
-        Assert.AreEqual(ancestorKey, result[0].Ancestors.First().Id);
-        Assert.AreEqual(ancestorKey, result[1].Ancestors.First().Id);
-        Assert.AreEqual(ancestorKey, result[2].Ancestors.First().Id);
+        Assert.That(result[0].Ancestors.First().Id, Is.EqualTo(ancestorKey));
+        Assert.That(result[1].Ancestors.First().Id, Is.EqualTo(ancestorKey));
+        Assert.That(result[2].Ancestors.First().Id, Is.EqualTo(ancestorKey));
     }
 
     [Test]

@@ -22,14 +22,14 @@ public class IntegerValidatorTests
         var result = validator.Validate(value, ValueTypes.Integer, null, PropertyValidationContext.Empty());
         if (expectedSuccess)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
-            Assert.IsTrue(validationResult.ErrorMessage.Contains("is not a valid integer"));
+            Assert.That(validationResult.ErrorMessage, Does.Contain("is not a valid integer"));
         }
     }
 
@@ -51,20 +51,20 @@ public class IntegerValidatorTests
         var result = validator.Validate(value, ValueTypes.Integer, null, PropertyValidationContext.Empty());
         if (expectedResult == RangeResult.Success)
         {
-            Assert.IsEmpty(result);
+            Assert.That(result, Is.Empty);
         }
         else
         {
-            Assert.AreEqual(1, result.Count());
+            Assert.That(result.Count(), Is.EqualTo(1));
 
             var validationResult = result.First();
             if (expectedResult == RangeResult.BelowMin)
             {
-                Assert.IsTrue(validationResult.ErrorMessage.Contains("less than the minimum allowed value"));
+                Assert.That(validationResult.ErrorMessage, Does.Contain("less than the minimum allowed value"));
             }
             else if (expectedResult == RangeResult.AboveMax)
             {
-                Assert.IsTrue(validationResult.ErrorMessage.Contains("greater than the maximum allowed value"));
+                Assert.That(validationResult.ErrorMessage, Does.Contain("greater than the maximum allowed value"));
             }
         }
     }

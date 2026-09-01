@@ -22,7 +22,7 @@ public class FileStreamSecurityValidatorTests
         var validationResult = sut.IsConsideredSafe(memoryStream);
 
         // Assert
-        Assert.IsTrue(validationResult);
+        Assert.That(validationResult, Is.True);
     }
 
     [Test]
@@ -48,7 +48,7 @@ public class FileStreamSecurityValidatorTests
         var validationResult = sut.IsConsideredSafe(memoryStream);
 
         // Assert
-        Assert.IsTrue(validationResult);
+        Assert.That(validationResult, Is.True);
     }
 
     [Test]
@@ -83,7 +83,7 @@ public class FileStreamSecurityValidatorTests
         var validationResult = sut.IsConsideredSafe(memoryStream);
 
         // Assert
-        Assert.IsTrue(validationResult);
+        Assert.That(validationResult, Is.True);
     }
 
     [Test]
@@ -118,6 +118,6 @@ public class FileStreamSecurityValidatorTests
         var validationResult = sut.IsConsideredSafe(memoryStream);
 
         // Assert
-        Assert.IsFalse(validationResult);
+        Assert.That(validationResult, Is.False);
     }
 }

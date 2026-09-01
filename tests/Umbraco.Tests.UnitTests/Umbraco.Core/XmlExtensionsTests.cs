@@ -19,7 +19,7 @@ public class XmlExtensionsTests
 
         var xmlNode = cdata.GetXmlNode(xdoc);
 
-        Assert.AreEqual("hello world", xmlNode.InnerText);
+        Assert.That(xmlNode.InnerText, Is.EqualTo("hello world"));
     }
 
     [Test]
@@ -30,7 +30,7 @@ public class XmlExtensionsTests
 
         var xmlNode = cdata.GetXmlNode(xdoc);
 
-        Assert.AreEqual("hello world", xmlNode.InnerText);
+        Assert.That(xmlNode.InnerText, Is.EqualTo("hello world"));
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class XmlExtensionsTests
 
         var xmlNode = cdata.GetXmlNode(xdoc);
 
-        Assert.AreEqual("hello world", xmlNode.InnerText);
-        Assert.AreEqual(xml, xdoc.OuterXml);
+        Assert.That(xmlNode.InnerText, Is.EqualTo("hello world"));
+        Assert.That(xdoc.OuterXml, Is.EqualTo(xml));
     }
 }

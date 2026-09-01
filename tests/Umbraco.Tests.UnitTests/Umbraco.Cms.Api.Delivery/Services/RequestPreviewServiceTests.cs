@@ -26,6 +26,6 @@ public class RequestPreviewServiceTests
 
         var result = sut.IsPreview();
 
-        Assert.AreEqual(expected, result);
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

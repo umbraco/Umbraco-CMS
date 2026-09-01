@@ -87,12 +87,12 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
     [TestCase("da-DK")]
     public void First_Root_Without_StartItem(string culture)
     {
-        Assert.IsEmpty(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString());
+        Assert.That(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString(), Is.Empty);
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName["Root 1"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName["Root 1"].Key));
     }
 
     [TestCase("en-US")]
@@ -100,12 +100,12 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
     [ConfigureBuilder(ActionName = nameof(ConfigureIncludeTopLevelNodeInPath))]
     public void First_Root_Without_StartItem_With_Top_Level_Node_Included(string culture)
     {
-        Assert.IsEmpty(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString());
+        Assert.That(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString(), Is.Empty);
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName["Root 1"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName["Root 1"].Key));
     }
 
     [TestCase(1, "en-US")]
@@ -116,12 +116,12 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
     [TestCase(3, "da-DK")]
     public void First_Root_Child_Without_StartItem(int child, string culture)
     {
-        Assert.IsEmpty(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString());
+        Assert.That(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString(), Is.Empty);
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}-{culture.ToLowerInvariant()}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root 1/Child {child}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root 1/Child {child}"].Key));
     }
 
     [TestCase(1, 1, "en-US")]
@@ -138,12 +138,12 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
     [TestCase(3, 1, "da-DK")]
     public void First_Root_Grandchild_Without_StartItem(int child, int grandchild, string culture)
     {
-        Assert.IsEmpty(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString());
+        Assert.That(GetRequiredService<IHttpContextAccessor>().HttpContext!.Request.Headers["Start-Item"].ToString(), Is.Empty);
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}-{culture.ToLowerInvariant()}/grandchild-{grandchild}-{culture.ToLowerInvariant()}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root 1/Child {child}/Grandchild {grandchild}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root 1/Child {child}/Grandchild {grandchild}"].Key));
     }
 
     [TestCase(1, "en-US")]
@@ -158,8 +158,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase(1, "en-US")]
@@ -175,8 +175,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase(1, 1, "en-US")]
@@ -197,8 +197,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}-{culture.ToLowerInvariant()}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}/Child {child}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}/Child {child}"].Key));
     }
 
     [TestCase(1, 1, "en-US")]
@@ -220,8 +220,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}-{culture.ToLowerInvariant()}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}/Child {child}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}/Child {child}"].Key));
     }
 
     [TestCase(1, 1, 1, "en-US")]
@@ -242,8 +242,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath($"/child-{child}-{culture.ToLowerInvariant()}/grandchild-{grandchild}-{culture.ToLowerInvariant()}");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}/Child {child}/Grandchild {grandchild}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}/Child {child}/Grandchild {grandchild}"].Key));
     }
 
     [TestCase("/", 1, "en-US")]
@@ -258,8 +258,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath(path);
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase("/", 1, "en-US")]
@@ -273,8 +273,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath(path);
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase(1, "en-US")]
@@ -290,8 +290,8 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         SetVariationContext(culture);
 
         var content = ApiContentPathResolver.ResolveContentPath("/");
-        Assert.IsNotNull(content);
-        Assert.AreEqual(_contentByName[$"Root {root}"].Key, content.Key);
+        Assert.That(content, Is.Not.Null);
+        Assert.That(content.Key, Is.EqualTo(_contentByName[$"Root {root}"].Key));
     }
 
     [TestCase("/a", 1, "en-US")]
@@ -311,7 +311,7 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
         SetRequestStartItem($"root-{root}-{culture.ToLowerInvariant()}");
 
         var content = ApiContentPathResolver.ResolveContentPath(path);
-        Assert.IsNull(content);
+        Assert.That(content, Is.Null);
     }
 
     [TestCase("/a")]
@@ -321,6 +321,6 @@ public class ApiContentPathResolverVariantTests : ApiContentPathResolverTestBase
     public void Non_Existant_Descendant_By_Path_Without_StartItem(string path)
     {
         var content = ApiContentPathResolver.ResolveContentPath(path);
-        Assert.IsNull(content);
+        Assert.That(content, Is.Null);
     }
 }

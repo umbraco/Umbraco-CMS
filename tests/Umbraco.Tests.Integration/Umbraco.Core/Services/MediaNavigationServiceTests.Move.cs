@@ -35,17 +35,17 @@ internal sealed partial class MediaNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(updatedParentKey);
-            Assert.AreNotEqual(originalParentKey, updatedParentKey);
-            Assert.AreEqual(targetParentKey, updatedParentKey);
+            Assert.That(updatedParentKey, Is.Not.Null);
+            Assert.That(updatedParentKey, Is.Not.EqualTo(originalParentKey));
+            Assert.That(updatedParentKey, Is.EqualTo(targetParentKey));
 
             // Verifies that the parent's children have been updated
-            Assert.AreEqual(beforeMoveInitialParentDescendants.Count - (afterMoveDescendants.Count + 1), afterMoveInitialParentDescendants.Count);
-            Assert.AreEqual(beforeMoveTargetParentChildren.Count + 1, afterMoveTargetParentChildren.Count);
+            Assert.That(afterMoveInitialParentDescendants, Has.Count.EqualTo(beforeMoveInitialParentDescendants.Count - (afterMoveDescendants.Count + 1)));
+            Assert.That(afterMoveTargetParentChildren, Has.Count.EqualTo(beforeMoveTargetParentChildren.Count + 1));
 
             // Verifies that the descendants are the same before and after the move
-            Assert.AreEqual(beforeMoveDescendants.Count, afterMoveDescendants.Count);
-            Assert.AreEqual(beforeMoveDescendants, afterMoveDescendants);
+            Assert.That(afterMoveDescendants, Has.Count.EqualTo(beforeMoveDescendants.Count));
+            Assert.That(afterMoveDescendants, Is.EqualTo(beforeMoveDescendants));
         });
     }
 
@@ -81,17 +81,17 @@ internal sealed partial class MediaNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsNull(updatedParentKey);
-            Assert.AreNotEqual(originalParentKey, updatedParentKey);
-            Assert.AreEqual(targetParentKey, updatedParentKey);
+            Assert.That(updatedParentKey, Is.Null);
+            Assert.That(updatedParentKey, Is.Not.EqualTo(originalParentKey));
+            Assert.That(updatedParentKey, Is.EqualTo(targetParentKey));
 
             // Verifies that the parent's children have been updated
-            Assert.AreEqual(beforeMoveInitialParentDescendants.Count - (afterMoveDescendants.Count + 1), afterMoveInitialParentDescendants.Count);
-            Assert.AreEqual(beforeMoveRootSiblings.Count + 1, afterMoveRootSiblings.Count);
+            Assert.That(afterMoveInitialParentDescendants, Has.Count.EqualTo(beforeMoveInitialParentDescendants.Count - (afterMoveDescendants.Count + 1)));
+            Assert.That(afterMoveRootSiblings, Has.Count.EqualTo(beforeMoveRootSiblings.Count + 1));
 
             // Verifies that the descendants are the same before and after the move
-            Assert.AreEqual(beforeMoveDescendants.Count, afterMoveDescendants.Count);
-            Assert.AreEqual(beforeMoveDescendants, afterMoveDescendants);
+            Assert.That(afterMoveDescendants, Has.Count.EqualTo(beforeMoveDescendants.Count));
+            Assert.That(afterMoveDescendants, Is.EqualTo(beforeMoveDescendants));
         });
     }
 
@@ -112,12 +112,12 @@ internal sealed partial class MediaNavigationServiceTests
         if (targetParentKey is null)
         {
             MediaNavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys);
-            Assert.AreEqual(nodeToMove, rootKeys.Last());
+            Assert.That(rootKeys.Last(), Is.EqualTo(nodeToMove));
         }
         else
         {
             MediaNavigationQueryService.TryGetChildrenKeys(targetParentKey.Value, out IEnumerable<Guid> childrenKeys);
-            Assert.AreEqual(nodeToMove, childrenKeys.Last());
+            Assert.That(childrenKeys.Last(), Is.EqualTo(nodeToMove));
         }
     }
 
@@ -138,8 +138,8 @@ internal sealed partial class MediaNavigationServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, siblingsKeysAfterMovingList.Count);
-            Assert.AreEqual(SubAlbum1.Key, siblingsKeysAfterMovingList[0]);
+            Assert.That(siblingsKeysAfterMovingList, Has.Count.EqualTo(1));
+            Assert.That(siblingsKeysAfterMovingList[0], Is.EqualTo(SubAlbum1.Key));
         });
 
         // Create a new sibling under the same parent
@@ -153,9 +153,9 @@ internal sealed partial class MediaNavigationServiceTests
         // Verify sibling order after creating the new media
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(2, siblingsKeysAfterCreationList.Count);
-            Assert.AreEqual(SubAlbum1.Key, siblingsKeysAfterMovingList[0]);
-            Assert.AreEqual(key, siblingsKeysAfterCreationList[1]);
+            Assert.That(siblingsKeysAfterCreationList, Has.Count.EqualTo(2));
+            Assert.That(siblingsKeysAfterMovingList[0], Is.EqualTo(SubAlbum1.Key));
+            Assert.That(siblingsKeysAfterCreationList[1], Is.EqualTo(key));
         });
     }
 }

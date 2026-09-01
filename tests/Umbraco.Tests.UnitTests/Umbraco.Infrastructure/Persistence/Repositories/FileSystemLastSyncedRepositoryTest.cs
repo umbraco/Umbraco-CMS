@@ -36,7 +36,7 @@ public class FileSystemLastSyncedRepositoryTest
     {
         var repo = CreateRepository();
         var value = await repo.GetInternalIdAsync();
-        Assert.IsNull(value);
+        Assert.That(value, Is.Null);
     }
 
     [Test]
@@ -44,7 +44,7 @@ public class FileSystemLastSyncedRepositoryTest
     {
         var repo = CreateRepository();
         var value = await repo.GetExternalIdAsync();
-        Assert.IsNull(value);
+        Assert.That(value, Is.Null);
     }
 
     [Test]
@@ -59,7 +59,7 @@ public class FileSystemLastSyncedRepositoryTest
         await repo.SaveInternalIdAsync(testId);
 
         var value = await repo.GetInternalIdAsync();
-        Assert.AreEqual(testId, value);
+        Assert.That(value, Is.EqualTo(testId));
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class FileSystemLastSyncedRepositoryTest
         await repo.SaveExternalIdAsync(testId);
 
         var value = await repo.GetExternalIdAsync();
-        Assert.AreEqual(testId, value);
+        Assert.That(value, Is.EqualTo(testId));
     }
 
     [Test]
@@ -88,8 +88,8 @@ public class FileSystemLastSyncedRepositoryTest
         await repo.SaveInternalIdAsync(100);
         await repo.SaveExternalIdAsync(200);
 
-        Assert.AreEqual(100, await repo.GetInternalIdAsync());
-        Assert.AreEqual(200, await repo.GetExternalIdAsync());
+        Assert.That(await repo.GetInternalIdAsync(), Is.EqualTo(100));
+        Assert.That(await repo.GetExternalIdAsync(), Is.EqualTo(200));
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class FileSystemLastSyncedRepositoryTest
         var repo2 = CreateRepository();
         var value = await repo2.GetInternalIdAsync();
 
-        Assert.AreEqual(testId, value);
+        Assert.That(value, Is.EqualTo(testId));
     }
 
     [Test]
@@ -123,7 +123,7 @@ public class FileSystemLastSyncedRepositoryTest
         var repo2 = CreateRepository();
         var value = await repo2.GetExternalIdAsync();
 
-        Assert.AreEqual(testId, value);
+        Assert.That(value, Is.EqualTo(testId));
     }
 
     [Test]
@@ -133,7 +133,7 @@ public class FileSystemLastSyncedRepositoryTest
         await repo.GetInternalIdAsync();
 
         var distCacheFolder = Path.Combine(_tempPath, "DistCache");
-        Assert.IsTrue(Directory.Exists(distCacheFolder));
+        Assert.That(Directory.Exists(distCacheFolder), Is.True);
     }
 
     [Test]
@@ -148,7 +148,7 @@ public class FileSystemLastSyncedRepositoryTest
         await repo.DeleteEntriesOlderThanAsync(DateTime.Now + TimeSpan.FromDays(1));
 
         var value = await repo.GetExternalIdAsync();
-        Assert.AreEqual(42, value);
+        Assert.That(value, Is.EqualTo(42));
     }
 
     private FileSystemLastSyncedRepository CreateRepository()

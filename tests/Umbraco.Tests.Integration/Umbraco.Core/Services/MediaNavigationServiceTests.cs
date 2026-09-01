@@ -76,7 +76,7 @@ internal sealed partial class MediaNavigationServiceTests : MediaNavigationServi
         var nodeExists = MediaNavigationQueryService.TryGetParentKey(notCreatedAlbumKey, out _);
 
         // Assert
-        Assert.IsFalse(nodeExists);
+        Assert.That(nodeExists, Is.False);
     }
 
     [Test]
@@ -96,9 +96,9 @@ internal sealed partial class MediaNavigationServiceTests : MediaNavigationServi
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, imageChildrenList.Count);
-            Assert.AreEqual(2, folderChildrenList.Count);
-            Assert.AreEqual(3, allChildrenList.Count);
+            Assert.That(imageChildrenList, Has.Count.EqualTo(1));
+            Assert.That(folderChildrenList, Has.Count.EqualTo(2));
+            Assert.That(allChildrenList, Has.Count.EqualTo(3));
         });
     }
 }

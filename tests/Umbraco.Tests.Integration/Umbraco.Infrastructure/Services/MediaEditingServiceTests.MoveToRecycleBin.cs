@@ -24,13 +24,13 @@ internal sealed partial class MediaEditingServiceTests
         Relate(referencer, mediaToTrash);
 
         var moveAttempt = await MediaEditingService.MoveToRecycleBinAsync(mediaToTrash.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(moveAttempt.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced, moveAttempt.Status);
+        Assert.That(moveAttempt.Success, Is.False);
+        Assert.That(moveAttempt.Status, Is.EqualTo(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced));
 
         // Verify the item was not moved.
         var media = await MediaEditingService.GetAsync(mediaToTrash.Key);
-        Assert.IsNotNull(media);
-        Assert.IsFalse(media.Trashed);
+        Assert.That(media, Is.Not.Null);
+        Assert.That(media.Trashed, Is.False);
     }
 
     // Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22661.
@@ -46,17 +46,17 @@ internal sealed partial class MediaEditingServiceTests
         var deleter = await CreateAdminUserAsync("deleter");
 
         var media = await CreateFolderMediaAsync("Media To Trash", creator.Key);
-        Assert.AreEqual(creator.Id, media.CreatorId);
-        Assert.AreEqual(creator.Id, media.WriterId);
+        Assert.That(media.CreatorId, Is.EqualTo(creator.Id));
+        Assert.That(media.WriterId, Is.EqualTo(creator.Id));
 
         var trashAttempt = await MediaEditingService.MoveToRecycleBinAsync(media.Key, deleter.Key);
-        Assert.IsTrue(trashAttempt.Success);
+        Assert.That(trashAttempt.Success, Is.True);
 
         var trashedMedia = await MediaEditingService.GetAsync(media.Key);
-        Assert.IsNotNull(trashedMedia);
-        Assert.IsTrue(trashedMedia.Trashed);
-        Assert.AreEqual(creator.Id, trashedMedia.CreatorId, "CreatorId must not change on trash.");
-        Assert.AreEqual(deleter.Id, trashedMedia.WriterId, "WriterId must reflect the user who trashed the item.");
+        Assert.That(trashedMedia, Is.Not.Null);
+        Assert.That(trashedMedia.Trashed, Is.True);
+        Assert.That(trashedMedia.CreatorId, Is.EqualTo(creator.Id), "CreatorId must not change on trash.");
+        Assert.That(trashedMedia.WriterId, Is.EqualTo(deleter.Id), "WriterId must reflect the user who trashed the item.");
     }
 
     [Test]
@@ -66,7 +66,7 @@ internal sealed partial class MediaEditingServiceTests
         var media = await CreateFolderMediaAsync("Media To Trash");
 
         var trashAttempt = await MediaEditingService.MoveToRecycleBinAsync(media.Key, deleter.Key);
-        Assert.IsTrue(trashAttempt.Success);
+        Assert.That(trashAttempt.Success, Is.True);
 
         var moveEntries = await AuditService.GetItemsByEntityAsync(
             media.Id,
@@ -74,7 +74,7 @@ internal sealed partial class MediaEditingServiceTests
             take: 100,
             auditTypeFilter: [AuditType.Move]);
 
-        Assert.AreEqual(1, moveEntries.Items.Count(), "Expected one AuditType.Move entry for the trash operation.");
-        Assert.AreEqual(deleter.Id, moveEntries.Items.Single().UserId);
+        Assert.That(moveEntries.Items.Count(), Is.EqualTo(1), "Expected one AuditType.Move entry for the trash operation.");
+        Assert.That(moveEntries.Items.Single().UserId, Is.EqualTo(deleter.Id));
     }
 }

@@ -31,9 +31,9 @@ internal sealed class DomainCacheServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, withoutWildcards.Length);
-            Assert.AreEqual(assigned.Id, withoutWildcards[0].Id);
-            Assert.AreEqual(2, withWildcards.Length);
+            Assert.That(withoutWildcards, Has.Length.EqualTo(1));
+            Assert.That(withoutWildcards[0].Id, Is.EqualTo(assigned.Id));
+            Assert.That(withWildcards, Has.Length.EqualTo(2));
         });
     }
 
@@ -58,8 +58,9 @@ internal sealed class DomainCacheServiceTests
 
                 // Fail loudly if the test never releases the load: returning anyway would let the test
                 // pass while the synchronization it depends on silently broke (and hide any hang).
-                Assert.IsTrue(
+                Assert.That(
                     releaseLoad.Wait(TimeSpan.FromSeconds(10)),
+                    Is.True,
                     "Timed out waiting for the gated domain load to be released.");
 
                 return [configuredDomain];
@@ -71,7 +72,7 @@ internal sealed class DomainCacheServiceTests
         // The first caller triggers initialization and blocks inside the gated load.
         Task<Domain[]> firstCaller = Task.Run(() => sut.GetAll(false).ToArray());
 
-        Assert.IsTrue(loadStarted.Wait(TimeSpan.FromSeconds(10)), "Initialization did not start.");
+        Assert.That(loadStarted.Wait(TimeSpan.FromSeconds(10)), Is.True, "Initialization did not start.");
 
         // A second caller arrives while initialization is still in progress.
         Task<Domain[]> secondCaller = Task.Run(() =>
@@ -81,7 +82,7 @@ internal sealed class DomainCacheServiceTests
             return sut.GetAll(false).ToArray();
         });
 
-        Assert.IsTrue(secondCallerReady.Wait(TimeSpan.FromSeconds(10)), "Second caller did not start.");
+        Assert.That(secondCallerReady.Wait(TimeSpan.FromSeconds(10)), Is.True, "Second caller did not start.");
 
         // A correctly initialized cache makes the second caller block until the gated load completes, so it
         // cannot finish while the load is still held. Observing an empty cache would instead let it return
@@ -98,9 +99,9 @@ internal sealed class DomainCacheServiceTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(completedWhileLoadGated, "Second caller returned before initialization completed - it observed an empty domain cache.");
-            Assert.AreEqual(1, firstResult.Length, "The caller that initialized the cache should see the configured domain.");
-            Assert.AreEqual(1, secondResult.Length, "A caller racing with initialization must not observe an empty domain cache.");
+            Assert.That(completedWhileLoadGated, Is.False, "Second caller returned before initialization completed - it observed an empty domain cache.");
+            Assert.That(firstResult, Has.Length.EqualTo(1), "The caller that initialized the cache should see the configured domain.");
+            Assert.That(secondResult, Has.Length.EqualTo(1), "A caller racing with initialization must not observe an empty domain cache.");
         });
     }
 
@@ -115,7 +116,7 @@ internal sealed class DomainCacheServiceTests
         var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
 
         // Trigger the initial (empty) load.
-        Assert.IsEmpty(sut.GetAll(true));
+        Assert.That(sut.GetAll(true), Is.Empty);
 
         // A Refresh payload for a previously unknown domain adds it to the cache.
         domainService.Setup(x => x.GetById(5)).Returns(CreateDomain(5, "https://site.example/", 2002, "en-US", isWildcard: false));
@@ -129,13 +130,13 @@ internal sealed class DomainCacheServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, afterAdd.Length, "Refreshing an unknown domain should add it to the cache.");
-            Assert.AreEqual("https://site.example/", afterAdd[0].Name);
-            Assert.AreEqual(2002, afterAdd[0].ContentId);
+            Assert.That(afterAdd, Has.Length.EqualTo(1), "Refreshing an unknown domain should add it to the cache.");
+            Assert.That(afterAdd[0].Name, Is.EqualTo("https://site.example/"));
+            Assert.That(afterAdd[0].ContentId, Is.EqualTo(2002));
 
-            Assert.AreEqual(1, afterUpdate.Length, "Refreshing an existing domain must update in place, not add a duplicate.");
-            Assert.AreEqual("https://renamed.example/", afterUpdate[0].Name);
-            Assert.AreEqual(3003, afterUpdate[0].ContentId);
+            Assert.That(afterUpdate, Has.Length.EqualTo(1), "Refreshing an existing domain must update in place, not add a duplicate.");
+            Assert.That(afterUpdate[0].Name, Is.EqualTo("https://renamed.example/"));
+            Assert.That(afterUpdate[0].ContentId, Is.EqualTo(3003));
         });
     }
 
@@ -154,7 +155,7 @@ internal sealed class DomainCacheServiceTests
         var sut = new DomainCacheService(domainService.Object, CreateScopeProvider());
 
         // The initial lazy load sees both domains.
-        Assert.AreEqual(2, sut.GetAll(false).Count());
+        Assert.That(sut.GetAll(false).Count(), Is.EqualTo(2));
 
         // A domain is removed at the source, then a RefreshAll rebuilds the whole cache from scratch.
         current.Remove(second);
@@ -164,8 +165,8 @@ internal sealed class DomainCacheServiceTests
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(1, afterRefreshAll.Length, "RefreshAll should fully replace the cache, dropping removed domains.");
-            Assert.AreEqual(first.Id, afterRefreshAll[0].Id);
+            Assert.That(afterRefreshAll, Has.Length.EqualTo(1), "RefreshAll should fully replace the cache, dropping removed domains.");
+            Assert.That(afterRefreshAll[0].Id, Is.EqualTo(first.Id));
         });
     }
 

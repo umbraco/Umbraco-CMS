@@ -39,7 +39,7 @@ public class BackOfficeSignInManagerTests
         SignInResult actual = await sut.ExternalLoginSignInAsync(CreateExternalLoginInfo(), false);
 
         // Assert
-        Assert.AreSame(SignInResult.Failed, actual);
+        Assert.That(actual, Is.SameAs(SignInResult.Failed));
     }
 
     [Test]
@@ -52,7 +52,7 @@ public class BackOfficeSignInManagerTests
         SignInResult actual = await sut.ExternalLoginSignInAsync(CreateExternalLoginInfo(), false);
 
         // Assert
-        Assert.AreSame(AutoLinkSignInResult.FailedNoEmail, actual);
+        Assert.That(actual, Is.SameAs(AutoLinkSignInResult.FailedNoEmail));
     }
 
     [Test]
@@ -69,7 +69,7 @@ public class BackOfficeSignInManagerTests
         SignInResult actual = await sut.ExternalLoginSignInAsync(loginInfo, false);
 
         // Assert
-        Assert.AreSame(AutoLinkSignInResult.FailedNoName, actual);
+        Assert.That(actual, Is.SameAs(AutoLinkSignInResult.FailedNoName));
     }
 
     [Test]
@@ -87,8 +87,8 @@ public class BackOfficeSignInManagerTests
         SignInResult actual = await sut.ExternalLoginSignInAsync(CreateExternalLoginInfoWithEmail(), false);
 
         // Assert
-        Assert.IsInstanceOf<AutoLinkSignInResult>(actual);
-        Assert.AreEqual("callback blew up", ((AutoLinkSignInResult)actual).Errors.Single());
+        Assert.That(actual, Is.InstanceOf<AutoLinkSignInResult>());
+        Assert.That(((AutoLinkSignInResult)actual).Errors.Single(), Is.EqualTo("callback blew up"));
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class BackOfficeSignInManagerTests
         SignInResult actual = await sut.ExternalLoginSignInAsync(CreateExternalLoginInfoWithEmail(), false);
 
         // Assert
-        Assert.AreSame(ExternalLoginSignInResult.NotAllowed, actual);
+        Assert.That(actual, Is.SameAs(ExternalLoginSignInResult.NotAllowed));
     }
 
     [Test]
@@ -124,8 +124,8 @@ public class BackOfficeSignInManagerTests
             false);
 
         // Assert
-        Assert.IsInstanceOf<AutoLinkSignInResult>(actual);
-        Assert.AreEqual("cannot create", ((AutoLinkSignInResult)actual).Errors.Single());
+        Assert.That(actual, Is.InstanceOf<AutoLinkSignInResult>());
+        Assert.That(((AutoLinkSignInResult)actual).Errors.Single(), Is.EqualTo("cannot create"));
     }
 
     /// <remarks>
@@ -149,8 +149,8 @@ public class BackOfficeSignInManagerTests
         SignInResult actual = await sut.ExternalLoginSignInAsync(CreateExternalLoginInfoWithEmail(), false);
 
         // Assert
-        Assert.IsInstanceOf<AutoLinkSignInResult>(actual);
-        Assert.AreEqual("cannot link", ((AutoLinkSignInResult)actual).Errors.Single());
+        Assert.That(actual, Is.InstanceOf<AutoLinkSignInResult>());
+        Assert.That(((AutoLinkSignInResult)actual).Errors.Single(), Is.EqualTo("cannot link"));
         _userManager.Verify(x => x.DeleteAsync(existingUser), Times.Once);
     }
 
@@ -173,10 +173,10 @@ public class BackOfficeSignInManagerTests
         SignInResult actual = await sut.ExternalLoginSignInAsync(CreateExternalLoginInfoWithEmail(), false);
 
         // Assert
-        Assert.IsInstanceOf<AutoLinkSignInResult>(actual);
-        CollectionAssert.AreEquivalent(
-            new[] { "cannot link", "cannot delete" },
-            ((AutoLinkSignInResult)actual).Errors);
+        Assert.That(actual, Is.InstanceOf<AutoLinkSignInResult>());
+        Assert.That(
+            ((AutoLinkSignInResult)actual).Errors,
+            Is.EquivalentTo(new[] { "cannot link", "cannot delete" }));
     }
 
     private BackOfficeSignInManager CreateSut(ExternalSignInAutoLinkOptions? autoLinkOptions = null)

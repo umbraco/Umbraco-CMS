@@ -52,7 +52,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by Id should hit the database.
         repository.Get(dataType.Id);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -60,7 +60,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache.
         repository.Get(dataType.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -87,7 +87,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by key should hit the database.
         repository.Get(dataType.Key);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -95,7 +95,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache.
         repository.Get(dataType.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -119,16 +119,16 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Initial and subsequent requests should use the cache, since the cache by Id and Key was populated on save.
         repository.Get(dataType.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(dataType.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(dataType.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(dataType.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -155,7 +155,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by ID should hit the database.
         repository.Get(dataType.Id);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -163,10 +163,10 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(dataType.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(dataType.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -193,7 +193,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Initial request by key should hit the database.
         repository.Get(dataType.Key);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -201,10 +201,10 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent requests should use the cache, since the cache by Id and Key was populated on retrieval.
         repository.Get(dataType.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
 
         repository.Get(dataType.Id);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     [Test]
@@ -219,12 +219,12 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         var dataType = CreateDataType(repository);
         var retrievedDataType = repository.Get(dataType.Key);
-        Assert.IsNotNull(retrievedDataType);
+        Assert.That(retrievedDataType, Is.Not.Null);
 
         repository.Delete(dataType);
 
         retrievedDataType = repository.Get(dataType.Key);
-        Assert.IsNull(retrievedDataType);
+        Assert.That(retrievedDataType, Is.Null);
     }
 
     [Test]
@@ -251,8 +251,8 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // First GetAll should hit the database and populate the cache.
         var first = repository.GetMany().ToArray();
-        Assert.IsNotEmpty(first);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(first, Is.Not.Empty);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -266,8 +266,8 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
         // Before the fix for #21756, GUID entries inflated the prefix-based count, causing
         // validation to fail and triggering a full re-query from the database (SqlCount >> 1).
         var second = repository.GetMany().ToArray();
-        Assert.IsNotEmpty(second);
-        Assert.AreEqual(1, database.SqlCount);
+        Assert.That(second, Is.Not.Empty);
+        Assert.That(database.SqlCount, Is.EqualTo(1));
     }
 
     /// <summary>
@@ -300,7 +300,7 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // GetMany should return the saved data type without throwing.
         var result = guidRepo.GetMany().ToArray();
-        Assert.IsNotEmpty(result);
+        Assert.That(result, Is.Not.Empty);
         Assert.That(result.Any(dt => dt.Key == dataType.Key));
     }
 
@@ -330,8 +330,8 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // GetMany with specific GUIDs should hit the database and populate the GUID cache.
         var result = guidRepo.GetMany(dataType.Key).ToArray();
-        Assert.IsNotEmpty(result);
-        Assert.Greater(database.SqlCount, 0);
+        Assert.That(result, Is.Not.Empty);
+        Assert.That(database.SqlCount, Is.GreaterThan(0));
 
         // Reset counter.
         database.EnableSqlCount = false;
@@ -339,9 +339,9 @@ internal sealed class DataTypeRepositoryTest : UmbracoIntegrationTest
 
         // Subsequent Get by the same GUID should be served from the GUID cache.
         var cached = guidRepo.Get(dataType.Key);
-        Assert.IsNotNull(cached);
-        Assert.AreEqual(dataType.Key, cached!.Key);
-        Assert.AreEqual(0, database.SqlCount);
+        Assert.That(cached, Is.Not.Null);
+        Assert.That(cached!.Key, Is.EqualTo(dataType.Key));
+        Assert.That(database.SqlCount, Is.EqualTo(0));
     }
 
     private static AppCaches CreateAppCaches() =>

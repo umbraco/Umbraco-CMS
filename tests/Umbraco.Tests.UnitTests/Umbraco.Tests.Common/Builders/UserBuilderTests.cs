@@ -56,20 +56,20 @@ public class UserBuilderTests
             .Build();
 
         // Assert
-        Assert.AreEqual(testId, user.Id);
-        Assert.AreEqual(testKey, user.Key);
-        Assert.AreEqual(testName, user.Name);
-        Assert.AreEqual(testCreateDate, user.CreateDate);
-        Assert.AreEqual(testUpdateDate, user.UpdateDate);
-        Assert.AreEqual(testFailedPasswordAttempts, user.FailedPasswordAttempts);
-        Assert.AreEqual(testIsApproved, user.IsApproved);
-        Assert.AreEqual(testIsLockedOut, user.IsLockedOut);
-        Assert.AreEqual(testLastLockoutDate, user.LastLockoutDate);
-        Assert.AreEqual(testLastLoginDate, user.LastLoginDate);
-        Assert.AreEqual(testLastPasswordChangeDate, user.LastPasswordChangeDate);
-        Assert.AreEqual(testComments, user.Comments);
-        Assert.AreEqual(testSessionTimeout, user.SessionTimeout);
-        Assert.AreEqual(testStartContentIds, user.StartContentIds);
-        Assert.AreEqual(testStartMediaIds, user.StartMediaIds);
+        Assert.That(user.Id, Is.EqualTo(testId));
+        Assert.That(user.Key, Is.EqualTo(testKey));
+        Assert.That(user.Name, Is.EqualTo(testName));
+        Assert.That(user.CreateDate, Is.EqualTo(testCreateDate));
+        Assert.That(user.UpdateDate, Is.EqualTo(testUpdateDate));
+        Assert.That(user.FailedPasswordAttempts, Is.EqualTo(testFailedPasswordAttempts));
+        Assert.That(user.IsApproved, Is.EqualTo(testIsApproved));
+        Assert.That(user.IsLockedOut, Is.EqualTo(testIsLockedOut));
+        Assert.That(user.LastLockoutDate, Is.EqualTo(testLastLockoutDate));
+        Assert.That(user.LastLoginDate, Is.EqualTo(testLastLoginDate));
+        Assert.That(user.LastPasswordChangeDate, Is.EqualTo(testLastPasswordChangeDate));
+        Assert.That(user.Comments, Is.EqualTo(testComments));
+        Assert.That(user.SessionTimeout, Is.EqualTo(testSessionTimeout));
+        Assert.That(user.StartContentIds, Is.EqualTo(testStartContentIds));
+        Assert.That(user.StartMediaIds, Is.EqualTo(testStartMediaIds));
     }
 }

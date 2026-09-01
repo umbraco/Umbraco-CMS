@@ -19,26 +19,26 @@ public class DeepCloneableListTests
         var cloned = list.DeepClone() as DeepCloneableList<TestClone>;
 
         // Test that each item in the sequence is equal - based on the equality comparer of TestClone (i.e. it's ID)
-        Assert.IsTrue(list.SequenceEqual(cloned));
+        Assert.That(list.SequenceEqual(cloned), Is.True);
 
         // Test that each instance in the list is not the same one
         foreach (var item in list)
         {
             var clone = cloned.Single(x => x.Id == item.Id);
-            Assert.AreNotSame(item, clone);
+            Assert.That(clone, Is.Not.SameAs(item));
         }
 
         // Clone again from the clone - since it's clone once the items should be the same
         var cloned2 = cloned.DeepClone() as DeepCloneableList<TestClone>;
 
         // Test that each item in the sequence is equal - based on the equality comparer of TestClone (i.e. it's ID)
-        Assert.IsTrue(cloned.SequenceEqual(cloned2));
+        Assert.That(cloned.SequenceEqual(cloned2), Is.True);
 
         // Test that each instance in the list is the same one
         foreach (var item in cloned)
         {
             var clone = cloned2.Single(x => x.Id == item.Id);
-            Assert.AreSame(item, clone);
+            Assert.That(clone, Is.SameAs(item));
         }
     }
 
@@ -49,9 +49,9 @@ public class DeepCloneableListTests
 
         var cloned = list.DeepClone() as DeepCloneableList<TestClone>;
 
-        Assert.IsNotNull(cloned);
-        Assert.AreNotSame(list, cloned);
-        Assert.AreEqual(list.Count, cloned.Count);
+        Assert.That(cloned, Is.Not.Null);
+        Assert.That(cloned, Is.Not.SameAs(list));
+        Assert.That(cloned, Has.Count.EqualTo(list.Count));
     }
 
     [Test]
@@ -63,7 +63,7 @@ public class DeepCloneableListTests
 
         foreach (var item in cloned)
         {
-            Assert.IsTrue(item.IsClone);
+            Assert.That(item.IsClone, Is.True);
         }
     }
 
@@ -75,13 +75,13 @@ public class DeepCloneableListTests
         var cloned = (DeepCloneableList<TestClone>)list.DeepClone();
 
         // Test that each item in the sequence is equal - based on the equality comparer of TestClone (i.e. it's ID)
-        Assert.IsTrue(list.SequenceEqual(cloned));
+        Assert.That(list.SequenceEqual(cloned), Is.True);
 
         // Test that each instance in the list is not the same one
         foreach (var item in list)
         {
             var clone = cloned.Single(x => x.Id == item.Id);
-            Assert.AreNotSame(item, clone);
+            Assert.That(clone, Is.Not.SameAs(item));
         }
     }
 }

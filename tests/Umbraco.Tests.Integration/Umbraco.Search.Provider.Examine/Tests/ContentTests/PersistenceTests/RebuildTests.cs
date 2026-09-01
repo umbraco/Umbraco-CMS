@@ -140,7 +140,7 @@ public class RebuildTests : UmbracoIntegrationTest
 
             Assert.That(rootDocAfter, Is.Not.Null);
             Assert.That(rootDocAfter.Fields.Length, Is.GreaterThan(0));
-            Assert.That(rootDocAfter.Fields.Length, Is.EqualTo(rootFieldsBefore.Length));
+            Assert.That(rootDocAfter.Fields, Has.Length.EqualTo(rootFieldsBefore.Length));
         }
     }
 

@@ -44,7 +44,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var valueConverter = MediaPickerWithCropsValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType), Is.EqualTo(typeof(IEnumerable<IApiMediaWithCrops>)));
 
         var inter = serializer.Serialize(new[]
         {
@@ -65,17 +65,17 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         });
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var first = result.Single();
         ValidateMedia(first, "My media", "my-media", ".jpg", 200, 400, 800);
         ValidateFocalPoint(first.FocalPoint, .2m, .4m);
-        Assert.NotNull(first.Crops);
-        Assert.AreEqual(1, first.Crops.Count());
+        Assert.That(first.Crops, Is.Not.Null);
+        Assert.That(first.Crops.Count(), Is.EqualTo(1));
         ValidateCrop(first.Crops.First(), "one", 200, 100, 1m, 2m, 10m, 20m);
-        Assert.NotNull(first.Properties);
-        Assert.AreEqual(1, first.Properties.Count);
-        Assert.AreEqual("My alt text", first.Properties["altText"]);
+        Assert.That(first.Properties, Is.Not.Null);
+        Assert.That(first.Properties, Has.Count.EqualTo(1));
+        Assert.That(first.Properties["altText"], Is.EqualTo("My alt text"));
     }
 
     [Test]
@@ -88,7 +88,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var valueConverter = MediaPickerWithCropsValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType), Is.EqualTo(typeof(IEnumerable<IApiMediaWithCrops>)));
 
         var inter = serializer.Serialize(new[]
         {
@@ -123,28 +123,28 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         });
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
-        Assert.NotNull(result);
-        Assert.AreEqual(2, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(2));
         var first = result.First();
         var last = result.Last();
 
         ValidateMedia(first, "My media", "my-media", ".jpg", 200, 400, 800);
         ValidateFocalPoint(first.FocalPoint, .2m, .4m);
-        Assert.NotNull(first.Crops);
-        Assert.AreEqual(1, first.Crops.Count());
+        Assert.That(first.Crops, Is.Not.Null);
+        Assert.That(first.Crops.Count(), Is.EqualTo(1));
         ValidateCrop(first.Crops.First(), "one", 200, 100, 1m, 2m, 10m, 20m);
-        Assert.NotNull(first.Properties);
-        Assert.AreEqual(1, first.Properties.Count);
-        Assert.AreEqual("My alt text", first.Properties["altText"]);
+        Assert.That(first.Properties, Is.Not.Null);
+        Assert.That(first.Properties, Has.Count.EqualTo(1));
+        Assert.That(first.Properties["altText"], Is.EqualTo("My alt text"));
 
         ValidateMedia(last, "My other media", "my-other-media", ".png", 800, 600, 200);
         ValidateFocalPoint(last.FocalPoint, .8m, .6m);
-        Assert.NotNull(last.Crops);
-        Assert.AreEqual(1, last.Crops.Count());
+        Assert.That(last.Crops, Is.Not.Null);
+        Assert.That(last.Crops.Count(), Is.EqualTo(1));
         ValidateCrop(last.Crops.First(), "one", 200, 100, 40m, 20m, 2m, 1m);
-        Assert.NotNull(last.Properties);
-        Assert.AreEqual(1, last.Properties.Count);
-        Assert.AreEqual("My other alt text", last.Properties["altText"]);
+        Assert.That(last.Properties, Is.Not.Null);
+        Assert.That(last.Properties, Has.Count.EqualTo(1));
+        Assert.That(last.Properties["altText"], Is.EqualTo("My other alt text"));
     }
 
     [Test]
@@ -170,7 +170,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var valueConverter = MediaPickerWithCropsValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType), Is.EqualTo(typeof(IEnumerable<IApiMediaWithCrops>)));
 
         var inter = serializer.Serialize(new[]
         {
@@ -190,8 +190,8 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         });
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var mediaWithCrops = result.Single();
         ValidateMedia(mediaWithCrops, "Some media", "some-media", ".123", 123, 456, 789);
 
@@ -199,8 +199,8 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         ValidateFocalPoint(mediaWithCrops.FocalPoint, .9m, .1m);
 
         // media crops should be merged with local crops
-        Assert.NotNull(mediaWithCrops.Crops);
-        Assert.AreEqual(2, mediaWithCrops.Crops.Count());
+        Assert.That(mediaWithCrops.Crops, Is.Not.Null);
+        Assert.That(mediaWithCrops.Crops.Count(), Is.EqualTo(2));
 
         // local crops should be first, media crops should be last
         ValidateCrop(mediaWithCrops.Crops.First(), "one", 200, 100, 1m, 2m, 10m, 20m);
@@ -230,7 +230,7 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var serializer = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
         var valueConverter = MediaPickerWithCropsValueConverter();
-        Assert.AreEqual(typeof(IEnumerable<IApiMediaWithCrops>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType));
+        Assert.That(valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType), Is.EqualTo(typeof(IEnumerable<IApiMediaWithCrops>)));
 
         var inter = serializer.Serialize(new[]
         {
@@ -251,8 +251,8 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         });
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
-        Assert.NotNull(result);
-        Assert.AreEqual(1, result.Count());
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Count(), Is.EqualTo(1));
         var mediaWithCrops = result.Single();
         ValidateMedia(mediaWithCrops, "Some media", "some-media", ".123", 123, 456, 789);
 
@@ -260,8 +260,8 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         ValidateFocalPoint(mediaWithCrops.FocalPoint, .2m, .3m);
 
         // media crops should be discarded when merging with local crops (matching aliases, local ones take precedence)
-        Assert.NotNull(mediaWithCrops.Crops);
-        Assert.AreEqual(1, mediaWithCrops.Crops.Count());
+        Assert.That(mediaWithCrops.Crops, Is.Not.Null);
+        Assert.That(mediaWithCrops.Crops.Count(), Is.EqualTo(1));
 
         // local crops should be first, media crops should be last
         ValidateCrop(mediaWithCrops.Crops.First(), "one", 200, 100, 1m, 2m, 10m, 20m);
@@ -278,8 +278,8 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var valueConverter = MediaPickerWithCropsValueConverter();
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
-        Assert.NotNull(result);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
     }
 
     [TestCase("")]
@@ -293,8 +293,8 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         var valueConverter = MediaPickerWithCropsValueConverter();
 
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMediaWithCrops>;
-        Assert.NotNull(result);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -310,8 +310,8 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
 
         var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false);
 
-        Assert.AreEqual(typeof(MediaWithCrops<TestMediaModelOne>), result.GetType());
-        Assert.AreSame(media, ((MediaWithCrops<TestMediaModelOne>)result).Content);
+        Assert.That(result.GetType(), Is.EqualTo(typeof(MediaWithCrops<TestMediaModelOne>)));
+        Assert.That(((MediaWithCrops<TestMediaModelOne>)result).Content, Is.SameAs(media));
     }
 
     [Test]
@@ -331,16 +331,16 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         for (var iteration = 0; iteration < 2; iteration++)
         {
             var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false) as IEnumerable<MediaWithCrops>;
-            Assert.NotNull(result);
+            Assert.That(result, Is.Not.Null);
 
             var mediaWithCrops = result.ToArray();
-            Assert.AreEqual(2, mediaWithCrops.Length);
+            Assert.That(mediaWithCrops, Has.Length.EqualTo(2));
 
-            Assert.AreEqual(typeof(MediaWithCrops<TestMediaModelOne>), mediaWithCrops[0].GetType());
-            Assert.AreEqual(typeof(MediaWithCrops<TestMediaModelTwo>), mediaWithCrops[1].GetType());
+            Assert.That(mediaWithCrops[0].GetType(), Is.EqualTo(typeof(MediaWithCrops<TestMediaModelOne>)));
+            Assert.That(mediaWithCrops[1].GetType(), Is.EqualTo(typeof(MediaWithCrops<TestMediaModelTwo>)));
 
-            Assert.AreSame(firstMedia, ((MediaWithCrops<TestMediaModelOne>)mediaWithCrops[0]).Content);
-            Assert.AreSame(secondMedia, ((MediaWithCrops<TestMediaModelTwo>)mediaWithCrops[1]).Content);
+            Assert.That(((MediaWithCrops<TestMediaModelOne>)mediaWithCrops[0]).Content, Is.SameAs(firstMedia));
+            Assert.That(((MediaWithCrops<TestMediaModelTwo>)mediaWithCrops[1]).Content, Is.SameAs(secondMedia));
         }
     }
 
@@ -430,20 +430,20 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         int expectedHeight,
         int expectedBytes)
     {
-        Assert.AreEqual(expectedName, actual.Name);
-        Assert.AreEqual(expectedUrl, actual.Url);
-        Assert.AreEqual(expectedExtension, actual.Extension);
-        Assert.AreEqual(expectedWidth, actual.Width);
-        Assert.AreEqual(expectedHeight, actual.Height);
-        Assert.AreEqual(expectedBytes, actual.Bytes);
+        Assert.That(actual.Name, Is.EqualTo(expectedName));
+        Assert.That(actual.Url, Is.EqualTo(expectedUrl));
+        Assert.That(actual.Extension, Is.EqualTo(expectedExtension));
+        Assert.That(actual.Width, Is.EqualTo(expectedWidth));
+        Assert.That(actual.Height, Is.EqualTo(expectedHeight));
+        Assert.That(actual.Bytes, Is.EqualTo(expectedBytes));
 
     }
 
     private void ValidateFocalPoint(ImageFocalPoint? actual, decimal expectedLeft, decimal expectedTop)
     {
-        Assert.NotNull(actual);
-        Assert.AreEqual(expectedLeft, actual.Left);
-        Assert.AreEqual(expectedTop, actual.Top);
+        Assert.That(actual, Is.Not.Null);
+        Assert.That(actual.Left, Is.EqualTo(expectedLeft));
+        Assert.That(actual.Top, Is.EqualTo(expectedTop));
     }
 
     private void ValidateCrop(
@@ -456,14 +456,14 @@ public class MediaPickerWithCropsValueConverterTests : PropertyValueConverterTes
         decimal expectedY1,
         decimal expectedY2)
     {
-        Assert.AreEqual(expectedAlias, actual.Alias);
-        Assert.AreEqual(expectedWidth, actual.Width);
-        Assert.AreEqual(expectedHeight, actual.Height);
-        Assert.NotNull(actual.Coordinates);
-        Assert.AreEqual(expectedX1, actual.Coordinates.X1);
-        Assert.AreEqual(expectedX2, actual.Coordinates.X2);
-        Assert.AreEqual(expectedY1, actual.Coordinates.Y1);
-        Assert.AreEqual(expectedY2, actual.Coordinates.Y2);
+        Assert.That(actual.Alias, Is.EqualTo(expectedAlias));
+        Assert.That(actual.Width, Is.EqualTo(expectedWidth));
+        Assert.That(actual.Height, Is.EqualTo(expectedHeight));
+        Assert.That(actual.Coordinates, Is.Not.Null);
+        Assert.That(actual.Coordinates.X1, Is.EqualTo(expectedX1));
+        Assert.That(actual.Coordinates.X2, Is.EqualTo(expectedX2));
+        Assert.That(actual.Coordinates.Y1, Is.EqualTo(expectedY1));
+        Assert.That(actual.Coordinates.Y2, Is.EqualTo(expectedY2));
     }
 
     // two distinct media model types, shaped like the models ModelsBuilder generates, so the converter

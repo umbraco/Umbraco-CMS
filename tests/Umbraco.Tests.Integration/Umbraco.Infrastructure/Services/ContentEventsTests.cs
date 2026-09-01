@@ -297,36 +297,36 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent content51 = children5[0];
             IContent content52 = children5[1];
 
-            Assert.IsTrue(content1.Published);
-            Assert.IsFalse(content1.Edited);
+            Assert.That(content1.Published, Is.True);
+            Assert.That(content1.Edited, Is.False);
 
-            Assert.IsTrue(content2.Published);
-            Assert.IsFalse(content2.Edited);
-            Assert.IsTrue(content21.Published);
-            Assert.IsFalse(content21.Edited);
-            Assert.IsFalse(content22.Published);
-            Assert.IsTrue(content22.Edited);
+            Assert.That(content2.Published, Is.True);
+            Assert.That(content2.Edited, Is.False);
+            Assert.That(content21.Published, Is.True);
+            Assert.That(content21.Edited, Is.False);
+            Assert.That(content22.Published, Is.False);
+            Assert.That(content22.Edited, Is.True);
 
-            Assert.IsFalse(content3.Published);
-            Assert.IsTrue(content3.Edited);
-            Assert.IsFalse(content31.Published);
-            Assert.IsTrue(content31.Edited);
-            Assert.IsFalse(content32.Published);
-            Assert.IsTrue(content32.Edited);
+            Assert.That(content3.Published, Is.False);
+            Assert.That(content3.Edited, Is.True);
+            Assert.That(content31.Published, Is.False);
+            Assert.That(content31.Edited, Is.True);
+            Assert.That(content32.Published, Is.False);
+            Assert.That(content32.Edited, Is.True);
 
-            Assert.IsTrue(content4.Published);
-            Assert.IsTrue(content4.Edited);
-            Assert.IsTrue(content41.Published);
-            Assert.IsFalse(content41.Edited);
-            Assert.IsFalse(content42.Published);
-            Assert.IsTrue(content42.Edited);
+            Assert.That(content4.Published, Is.True);
+            Assert.That(content4.Edited, Is.True);
+            Assert.That(content41.Published, Is.True);
+            Assert.That(content41.Edited, Is.False);
+            Assert.That(content42.Published, Is.False);
+            Assert.That(content42.Edited, Is.True);
 
-            Assert.IsFalse(content5.Published);
-            Assert.IsTrue(content5.Edited);
-            Assert.IsTrue(content51.Published);
-            Assert.IsFalse(content51.Edited);
-            Assert.IsFalse(content52.Published);
-            Assert.IsTrue(content52.Edited);
+            Assert.That(content5.Published, Is.False);
+            Assert.That(content5.Edited, Is.True);
+            Assert.That(content51.Published, Is.True);
+            Assert.That(content51.Edited, Is.False);
+            Assert.That(content52.Published, Is.False);
+            Assert.That(content52.Edited, Is.True);
         }
 
         #endregion
@@ -391,19 +391,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - repository : refresh u=u
             // - content cache : refresh newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ResetEvents();
             content.Name = "changed";
             ContentService.Save(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
         }
 
         [Test]
@@ -414,32 +414,32 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - repository : refresh (u)
             // - content cache :: refresh newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             content.Name = "changed";
             ContentService.Save(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
 
             ResetEvents();
             content.Name = "again";
             ContentService.Save(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             i = 0;
             m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
         }
 
         [Test]
@@ -450,32 +450,32 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - repository : refresh (u)
             // - content cache :: refresh newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             content.SortOrder = 666;
             ContentService.Save(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
 
             ResetEvents();
             content.SortOrder = 667;
             ContentService.Save(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             i = 0;
             m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
         }
 
         [Test]
@@ -486,32 +486,32 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - repository : refresh (u)
             // - content cache :: refresh newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             content.Properties.First().SetValue("changed");
             ContentService.Save(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
 
             ResetEvents();
             content.Properties.First().SetValue("again");
             ContentService.Save(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             i = 0;
             m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
         }
 
         [Test]
@@ -522,21 +522,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - repository : refresh (p)
             // - content cache :: refresh published, newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ResetEvents();
             content.Name = "changed";
             ContentService.Save(content);
             ContentService.Publish(content, Array.Empty<string>());
 
-            Assert.AreEqual(4, _msgCount);
-            Assert.AreEqual(4, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(4));
+            Assert.That(_events, Has.Count.EqualTo(4));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content.Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content.Id}.u+p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentCacheRefresher/RefreshBranch/{content.Id}"));
         }
 
         [Test]
@@ -547,7 +547,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - repository : refresh (p)
             // - content cache :: refresh published, newest
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
@@ -555,14 +555,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Save(content);
             ContentService.Publish(content, Array.Empty<string>());
 
-            Assert.AreEqual(4, _msgCount);
-            Assert.AreEqual(4, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(4));
+            Assert.That(_events, Has.Count.EqualTo(4));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.p+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content.Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content.Id}.p+p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
         }
 
         [Test]
@@ -576,20 +576,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // assume that the unpublished cache is also refreshed, with the same
             // values, and deal with it.
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             content.Name = "changed";
             ContentService.Save(content);
             ResetEvents();
             ContentService.Publish(content, Array.Empty<string>());
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.u+p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.u+p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}"));
         }
 
         [Test]
@@ -600,19 +600,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - repository : refresh (u)
             // - content cache :: refresh newest, remove published
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Unpublish(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p-u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p-u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}"));
         }
 
         [Test]
@@ -623,7 +623,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // - repository : refresh (u)
             // - content cache :: refresh newest, remove published
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
             content.Name = "changed";
             ContentService.Save(content);
@@ -631,15 +631,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.Unpublish(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p-u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p-u"));
             m++;
             ////Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/Refresh/{1}", m, content.Id), _events[i++].ToString());
             ////Assert.AreEqual("changed", ContentService.GetById(((ContentCacheRefresher.JsonPayload)_events[i - 1].EventArgs).Id).Name);
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}"));
         }
 
         #endregion
@@ -663,14 +663,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.Unpublish(content1);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.p-u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.p-u"));
             m++;
             ////Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/Refresh/{1}", m, content1.Id), _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
@@ -686,13 +686,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.u+p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.u+p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString()); // repub content1
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}")); // repub content1
             /*
             var content1C = content1.Children().ToArray();
             Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished/{1}", m, content1C[0].Id), _events[i++].ToString()); // repub content1.content2
@@ -724,8 +724,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 Console.WriteLine(e);
             }
 
-            Assert.AreEqual(3, _msgCount);
-            Assert.AreEqual(3, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(3));
+            Assert.That(_events, Has.Count.EqualTo(3));
             int i = 0;
             int m = 0;
             IContent[] content1C = Children(content1).ToArray();
@@ -734,14 +734,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             // force:false => only republish the root node + nodes that are edited
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.u+p", _events[i++].ToString());        // content1 was unpublished, now published
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1.Id}.u+p"));        // content1 was unpublished, now published
 
             // change: only content4 shows here, because it has changes - others don't need to be published
             ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());    // content1/content2
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p+p", _events[i++].ToString());    // content1/content4
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p+p"));    // content1/content4
             ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());    // content1/content2/content21
             ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());    // content1/content4/content41
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString()); // repub content1
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}")); // repub content1
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -761,8 +761,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 Console.WriteLine(e);
             }
 
-            Assert.AreEqual(10, _msgCount);
-            Assert.AreEqual(10, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(10));
+            Assert.That(_events, Has.Count.EqualTo(10));
             int i = 0;
             int m = 0;
             IContent[] content1C = Children(content1).ToArray();
@@ -774,20 +774,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
 
             // force:true => all nodes are republished, refreshing all nodes - but only with changes - published w/out changes are not repub
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.u+p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1.Id}.u+p"));
             ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());
             ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p+p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u+p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u+p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u+p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u+p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p+p"));
             ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u+p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u+p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u+p"));
             ////Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[1].Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString()); // repub content1
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content5C[1].Id}.u+p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}")); // repub content1
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -802,33 +802,33 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: ?
             IContent content1 = CreateBranch();
             IContent[] content1C = Children(content1).ToArray();
-            Assert.AreEqual(4, content1C.Length);
+            Assert.That(content1C, Has.Length.EqualTo(4));
             IContent[] content1Csorted = new[] { content1C[3], content1C[0], content1C[1], content1C[2] };
 
             ResetEvents();
             ContentService.Sort(content1Csorted);
 
             IContent[] content1Cagain = Children(content1).ToArray();
-            Assert.AreEqual(4, content1Cagain.Length);
-            Assert.AreEqual(content1C[0].Id, content1Cagain[1].Id);
-            Assert.AreEqual(content1C[1].Id, content1Cagain[2].Id);
-            Assert.AreEqual(content1C[2].Id, content1Cagain[3].Id);
-            Assert.AreEqual(content1C[3].Id, content1Cagain[0].Id);
+            Assert.That(content1Cagain, Has.Length.EqualTo(4));
+            Assert.That(content1Cagain[1].Id, Is.EqualTo(content1C[0].Id));
+            Assert.That(content1Cagain[2].Id, Is.EqualTo(content1C[1].Id));
+            Assert.That(content1Cagain[3].Id, Is.EqualTo(content1C[2].Id));
+            Assert.That(content1Cagain[0].Id, Is.EqualTo(content1C[3].Id));
 
-            Assert.AreEqual(5, _msgCount);
-            Assert.AreEqual(8, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(5));
+            Assert.That(_events, Has.Count.EqualTo(8));
             int i = 0;
             int m = 0;
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString()); // content5 is not published
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString()); // content2 is published
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u", _events[i++].ToString()); // content3 is not published
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p", _events[i++].ToString()); // content4 is published + changes
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u")); // content5 is not published
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p")); // content2 is published
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u")); // content3 is not published
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p")); // content4 is published + changes
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[3].Id}", _events[i++].ToString()); // content5 is not published
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[0].Id}", _events[i++].ToString()); // content2 is published
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[1].Id}", _events[i++].ToString()); // content3 is not published
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[2].Id}", _events[i].ToString()); // content4 is published
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[3].Id}")); // content5 is not published
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[0].Id}")); // content2 is published
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[1].Id}")); // content3 is not published
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[2].Id}")); // content4 is published
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -839,29 +839,29 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // rule: ?
             IContent content1 = CreateBranch();
             IContent[] content1C = Children(content1).ToArray();
-            Assert.AreEqual(4, content1C.Length);
+            Assert.That(content1C, Has.Length.EqualTo(4));
             IContent[] content1Csorted = new[] { content1C[0], content1C[1], content1C[3], content1C[2] };
 
             ResetEvents();
             ContentService.Sort(content1Csorted);
 
             IContent[] content1Cagain = Children(content1).ToArray();
-            Assert.AreEqual(4, content1Cagain.Length);
-            Assert.AreEqual(content1C[0].Id, content1Cagain[0].Id);
-            Assert.AreEqual(content1C[1].Id, content1Cagain[1].Id);
-            Assert.AreEqual(content1C[2].Id, content1Cagain[3].Id);
-            Assert.AreEqual(content1C[3].Id, content1Cagain[2].Id);
+            Assert.That(content1Cagain, Has.Length.EqualTo(4));
+            Assert.That(content1Cagain[0].Id, Is.EqualTo(content1C[0].Id));
+            Assert.That(content1Cagain[1].Id, Is.EqualTo(content1C[1].Id));
+            Assert.That(content1Cagain[3].Id, Is.EqualTo(content1C[2].Id));
+            Assert.That(content1Cagain[2].Id, Is.EqualTo(content1C[3].Id));
 
-            Assert.AreEqual(3, _msgCount);
-            Assert.AreEqual(4, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(3));
+            Assert.That(_events, Has.Count.EqualTo(4));
             int i = 0;
             int m = 0;
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString()); // content5 is not published
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p", _events[i++].ToString()); // content4 is published + changes
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u")); // content5 is not published
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p")); // content4 is published + changes
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[3].Id}", _events[i++].ToString()); // content5 is not published
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[2].Id}", _events[i].ToString()); // content4 is published
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[3].Id}")); // content5 is not published
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content1C[2].Id}")); // content4 is published
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -877,18 +877,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void TrashUnpublishedContent()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ResetEvents();
             ContentService.MoveToRecycleBin(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}"));
         }
 
         [Test]
@@ -896,20 +896,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void UntrashUnpublishedContent()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ContentService.MoveToRecycleBin(content);
 
             ResetEvents();
             ContentService.Move(content, -1);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}"));
         }
 
         [Test]
@@ -918,21 +918,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // does 1) unpublish and 2) trash
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.MoveToRecycleBin(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p=m"));
             m++;
             ////Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RemovePublished,Refresh/{1}", m, content.Id), _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}"));
         }
 
         [Test]
@@ -941,7 +941,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // same as unpublished as it's been unpublished
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ContentService.Publish(content, content.AvailableCultures.ToArray());
             ContentService.MoveToRecycleBin(content);
@@ -949,17 +949,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.Move(content, -1);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
 
             // trashing did /pm- (published, masked)
             // un-trashing cannot re-publish so /u?- (not-published, unchanged)
             // but because we *have* to change state to unpublished, it's /ux- and not /uu-
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p-u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p-u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}"));
         }
 
         [Test]
@@ -967,7 +967,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void TrashPublishedContentWithChanges()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ContentService.Publish(content, content.AvailableCultures.ToArray());
             content.Properties.First().SetValue("changed");
@@ -976,14 +976,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.MoveToRecycleBin(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content.Id}.p=m"));
             m++;
             ////Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RemovePublished,Refresh/{1}", m, content.Id), _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}"));
         }
 
         [Test]
@@ -995,8 +995,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.MoveToRecycleBin(content1);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             int i = 0;
             int m = 0;
             IContent[] content1C = Children(content1).ToArray();
@@ -1006,22 +1006,22 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content5C = Children(content1C[3]).ToArray();
 
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u"));
 
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -1032,20 +1032,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.EmptyRecycleBin();
 
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ContentService.MoveToRecycleBin(content);
 
             ResetEvents();
             ContentService.EmptyRecycleBin();
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             var i = 0;
             var m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Remove/{content.Id}"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/Remove/{content.Id}"));
         }
 
         [Test]
@@ -1055,25 +1055,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
 
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.MoveToRecycleBin(content1);
 
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.MoveToRecycleBin(content2);
 
             ResetEvents();
             ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
 
-            Assert.AreEqual(3, _msgCount);
-            Assert.AreEqual(4, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(3));
+            Assert.That(_events, Has.Count.EqualTo(4));
             var i = 0;
             var m = 0;
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content2.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content1.Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Remove/{content2.Id}"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content2.Id}", _events[i].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}"));
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/Remove/{content2.Id}"));
         }
 
         [Test]
@@ -1083,7 +1083,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
 
             IContent content1 = CreateBranch();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
 
             ContentService.MoveToRecycleBin(content1);
 
@@ -1097,26 +1097,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             var i = 0;
             var m = 0;
 
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[3].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content4C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content4C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[2].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content3C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content3C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content2C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content2C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content5C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content5C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content1C[3].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content4C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content4C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content1C[2].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content3C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content3C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content1C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content2C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content2C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content1C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Remove/{content1.Id}"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}"));
         }
 
         #endregion
@@ -1128,18 +1128,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void DeleteUnpublishedContent()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ResetEvents();
             ContentService.Delete(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Remove/{content.Id}"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/Remove/{content.Id}"));
         }
 
         [Test]
@@ -1147,19 +1147,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void DeletePublishedContent()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Delete(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Remove/{content.Id}"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/Remove/{content.Id}"));
         }
 
         [Test]
@@ -1167,7 +1167,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void DeletePublishedContentWithChanges()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
             content.Properties.First().SetValue("changed");
             ContentService.Save(content);
@@ -1175,13 +1175,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.Delete(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Remove/{content.Id}"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/Remove/{content.Id}"));
         }
 
         [Test]
@@ -1189,23 +1189,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void DeleteMaskedPublishedContent()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             ContentService.Unpublish(content1);
 
             ResetEvents();
             ContentService.Delete(content2);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content2.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Remove/{content2.Id}"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content2.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/Remove/{content2.Id}"));
         }
 
         [Test]
@@ -1213,7 +1213,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void DeleteBranch()
         {
             IContent content1 = CreateBranch();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
 
             // get them before they are deleted!
             IContent[] content1C = Children(content1).ToArray();
@@ -1225,26 +1225,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.Delete(content1);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             int i = 0;
             int m = 0;
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[3].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content4C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content4C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[2].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content3C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content3C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content2C[1].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content2C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content5C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content5C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content1C[3].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content4C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content4C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content1C[2].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content3C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content3C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content1C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content2C[1].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content2C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Remove/{content1C[0].Id}"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Remove/{content1.Id}"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -1257,41 +1257,41 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveUnpublishedContentUnderUnpublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
         public void MovePublishedContentUnderUnpublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=m"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
@@ -1299,23 +1299,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MovePublishedContentWithChangesUnderUnpublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             content1.Properties.First().SetValue("changed");
             ContentService.Save(content1);
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=m"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
@@ -1323,21 +1323,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveUnpublishedContentUnderPublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
@@ -1345,73 +1345,73 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveUnpublishedContentUnderMasked()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent();
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
             ResetEvents();
             ContentService.Move(content1, content3.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
         public void MovePublishedContentUnderPublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
         public void MovePublishedContentUnderMasked()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent(content2.Id);
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
             ResetEvents();
             ContentService.Move(content1, content3.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=m"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
@@ -1419,52 +1419,52 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MovePublishedContentWithChangesUnderPublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             content1.Properties.First().SetValue("changed");
             ContentService.Save(content1);
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
         public void MovePublishedContentWithChangesUnderMasked()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             content1.Properties.First().SetValue("changed");
             ContentService.Save(content1);
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent(content2.Id);
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
             ResetEvents();
             ContentService.Move(content1, content3.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content1.Id}.p=m"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
         }
 
         [Test]
@@ -1472,26 +1472,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveMaskedPublishedContentUnderPublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content2, content3.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}"));
         }
 
         [Test]
@@ -1499,58 +1499,58 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveMaskedPublishedContentUnderMasked()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             IContent content4 = CreateContent(content3.Id);
-            Assert.IsNotNull(content4);
+            Assert.That(content4, Is.Not.Null);
             ContentService.Publish(content4, content4.AvailableCultures.ToArray());
             ContentService.Unpublish(content3);
 
             ResetEvents();
             ContentService.Move(content2, content4.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=m"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}"));
         }
 
         [Test]
         public void MoveMaskedPublishedContentWithChangesUnderPublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             content2.Properties.First().SetValue("changed");
             ContentService.Save(content2);
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content2, content3.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=p", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=p"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}"));
         }
 
         [Test]
@@ -1558,32 +1558,32 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveMaskedPublishedContentWithChangesUnderMasked()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             content2.Properties.First().SetValue("changed");
             ContentService.Save(content2);
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             IContent content4 = CreateContent(content3.Id);
-            Assert.IsNotNull(content4);
+            Assert.That(content4, Is.Not.Null);
             ContentService.Publish(content4, content4.AvailableCultures.ToArray());
             ContentService.Unpublish(content3);
 
             ResetEvents();
             ContentService.Move(content2, content4.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=m"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}"));
         }
 
         [Test]
@@ -1591,52 +1591,52 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveMaskedPublishedContentUnderUnpublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
 
             ResetEvents();
             ContentService.Move(content2, content3.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=m"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}"));
         }
 
         [Test]
         public void MoveMaskedPublishedContentWithChangesUnderUnpublished()
         {
             IContent content1 = CreateContent();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
             ContentService.Publish(content1, content1.AvailableCultures.ToArray());
             IContent content2 = CreateContent(content1.Id);
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             content2.Properties.First().SetValue("changed");
             ContentService.Save(content2);
             ContentService.Unpublish(content1);
             IContent content3 = CreateContent();
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
 
             ResetEvents();
             ContentService.Move(content2, content3.Id);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=m", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content2.Id}.p=m"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content2.Id}"));
         }
 
         [Test]
@@ -1644,16 +1644,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveContentBranchUnderUnpublished()
         {
             IContent content1 = CreateBranch();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
 
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             int i = 0;
             int m = 0;
             IContent[] content1C = Children(content1).ToArray();
@@ -1662,21 +1662,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -1685,17 +1685,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveContentBranchUnderPublished()
         {
             IContent content1 = CreateBranch();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
 
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ResetEvents();
             ContentService.Move(content1, content2.Id);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             int i = 0;
             int m = 0;
             IContent[] content1C = Children(content1).ToArray();
@@ -1704,21 +1704,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -1727,21 +1727,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveContentBranchUnderMasked()
         {
             IContent content1 = CreateBranch();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
 
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent(content2.Id);
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
             ResetEvents();
             ContentService.Move(content1, content3.Id);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             int i = 0;
             int m = 0;
             IContent[] content1C = Children(content1).ToArray();
@@ -1750,21 +1750,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -1773,10 +1773,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveContentBranchBackFromPublished()
         {
             IContent content1 = CreateBranch();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
 
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
 
             ContentService.Move(content1, content2.Id);
@@ -1784,8 +1784,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.Move(content1, -1);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             int i = 0;
             int m = 0;
             IContent[] content1C = Children(content1).ToArray();
@@ -1794,21 +1794,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -1817,18 +1817,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveContentBranchBackFromUnpublished()
         {
             IContent content1 = CreateBranch();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
 
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
 
             ContentService.Move(content1, content2.Id);
 
             ResetEvents();
             ContentService.Move(content1, -1);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             int i = 0;
             int m = 0;
             IContent[] content1C = Children(content1).ToArray();
@@ -1837,21 +1837,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -1860,13 +1860,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void MoveContentBranchBackFromMasked()
         {
             IContent content1 = CreateBranch();
-            Assert.IsNotNull(content1);
+            Assert.That(content1, Is.Not.Null);
 
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Publish(content2, content2.AvailableCultures.ToArray());
             IContent content3 = CreateContent(content2.Id);
-            Assert.IsNotNull(content3);
+            Assert.That(content3, Is.Not.Null);
             ContentService.Publish(content3, content3.AvailableCultures.ToArray());
             ContentService.Unpublish(content2);
 
@@ -1875,8 +1875,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ResetEvents();
             ContentService.Move(content1, -1);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             int i = 0;
             int m = 0;
             IContent[] content1C = Children(content1).ToArray();
@@ -1885,21 +1885,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] content4C = Children(content1C[2]).ToArray();
             IContent[] content5C = Children(content1C[3]).ToArray();
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1.Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p=p"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p=m"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -1912,18 +1912,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void CopyUnpublishedContent()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ResetEvents();
             IContent copy = ContentService.Copy(content, Constants.System.Root, false);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{copy.Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{copy.Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{copy.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{copy.Id}"));
         }
 
         [Test]
@@ -1931,19 +1931,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void CopyPublishedContent()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
             IContent copy = ContentService.Copy(content, Constants.System.Root, false);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{copy.Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{copy.Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{copy.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{copy.Id}"));
         }
 
         [Test]
@@ -1951,22 +1951,22 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void CopyMaskedContent()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
             IContent content2 = CreateContent();
-            Assert.IsNotNull(content2);
+            Assert.That(content2, Is.Not.Null);
             ContentService.Move(content, content2.Id);
 
             ResetEvents();
             IContent copy = ContentService.Copy(content, Constants.System.Root, false);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{copy.Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{copy.Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{copy.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{copy.Id}"));
         }
 
         [Test]
@@ -1974,7 +1974,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void CopyBranch()
         {
             IContent content = CreateBranch();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, content.AvailableCultures.ToArray());
 
             ResetEvents();
@@ -1986,26 +1986,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent[] copy4C = Children(copyC[2]).ToArray();
             IContent[] copy5C = Children(copyC[3]).ToArray();
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(14));
+            Assert.That(_events, Has.Count.EqualTo(14));
             int i = 0;
             int m = 0;
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy.Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copyC[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy2C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy2C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copyC[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy3C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy3C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copyC[2].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy4C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy4C[1].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copyC[3].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{copy5C[0].Id}.u=u", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{copy5C[1].Id}.u=u", _events[i++].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copy.Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copyC[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copy2C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copy2C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copyC[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copy3C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copy3C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copyC[2].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copy4C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copy4C[1].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copyC[3].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{copy5C[0].Id}.u=u"));
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m:000}: ContentRepository/Refresh/{copy5C[1].Id}.u=u"));
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{copy.Id}", _events[i].ToString());
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshBranch/{copy.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -2018,7 +2018,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Rollback()
         {
             IContent content = CreateContent();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
             ContentService.Publish(content, Array.Empty<string>());
             int v1 = content.VersionId;
 
@@ -2040,13 +2040,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             content.CopyFrom(ContentService.GetVersion(v2));
             ContentService.Save(content);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.That(_msgCount, Is.EqualTo(2));
+            Assert.That(_events, Has.Count.EqualTo(2));
             int i = 0;
             int m = 0;
 #pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content.Id}.p=p", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i].ToString());
+            Assert.That(_events[i++].ToString(), Is.EqualTo($"{m++:000}: ContentRepository/Refresh/{content.Id}.p=p"));
+            Assert.That(_events[i].ToString(), Is.EqualTo($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}"));
 #pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
@@ -2059,23 +2059,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void ContentRemembers()
         {
             IContent content = ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
+            Assert.That(content, Is.Not.Null);
 
             ContentService.Save(content);
-            Assert.IsFalse(content.IsPropertyDirty("Published"));
-            Assert.IsFalse(content.WasPropertyDirty("Published"));
+            Assert.That(content.IsPropertyDirty("Published"), Is.False);
+            Assert.That(content.WasPropertyDirty("Published"), Is.False);
 
             ContentService.Publish(content, Array.Empty<string>());
-            Assert.IsFalse(content.IsPropertyDirty("Published"));
-            Assert.IsTrue(content.WasPropertyDirty("Published")); // has just been published
+            Assert.That(content.IsPropertyDirty("Published"), Is.False);
+            Assert.That(content.WasPropertyDirty("Published"), Is.True); // has just been published
 
             ContentService.Publish(content, Array.Empty<string>());
-            Assert.IsFalse(content.IsPropertyDirty("Published"));
-            Assert.IsFalse(content.WasPropertyDirty("Published")); // was published already
+            Assert.That(content.IsPropertyDirty("Published"), Is.False);
+            Assert.That(content.WasPropertyDirty("Published"), Is.False); // was published already
         }
 
         [Test]
-        public void HasInitialContent() => Assert.AreEqual(5, ContentService.Count());
+        public void HasInitialContent() => Assert.That(ContentService.Count(), Is.EqualTo(5));
 
         #endregion
 

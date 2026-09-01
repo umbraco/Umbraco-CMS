@@ -29,14 +29,14 @@ public partial class MachineIdentityProviderTests
         {
             Environment.SetEnvironmentVariable(AzureWebsiteInstanceIdMachineIdentityProvider.WebsiteInstanceIdEnvironmentVariable, "abc123instanceid");
             var provider = new AzureWebsiteInstanceIdMachineIdentityProvider();
-            Assert.AreEqual("abc123instanceid", provider.GetMachineIdentifier());
+            Assert.That(provider.GetMachineIdentifier(), Is.EqualTo("abc123instanceid"));
         }
 
         [Test]
         public void WhenEnvironmentVariableIsAbsent_ReturnsNull()
         {
             var provider = new AzureWebsiteInstanceIdMachineIdentityProvider();
-            Assert.IsNull(provider.GetMachineIdentifier());
+            Assert.That(provider.GetMachineIdentifier(), Is.Null);
         }
     }
 }

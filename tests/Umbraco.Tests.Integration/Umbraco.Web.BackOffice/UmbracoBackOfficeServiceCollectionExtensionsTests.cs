@@ -21,8 +21,8 @@ internal sealed class UmbracoBackOfficeServiceCollectionExtensionsTests : Umbrac
     {
         var userStore = Services.GetService<IUserStore<BackOfficeIdentityUser>>();
 
-        Assert.IsNotNull(userStore);
-        Assert.AreEqual(typeof(BackOfficeUserStore), userStore.GetType());
+        Assert.That(userStore, Is.Not.Null);
+        Assert.That(userStore.GetType(), Is.EqualTo(typeof(BackOfficeUserStore)));
     }
 
     [Test]
@@ -30,8 +30,8 @@ internal sealed class UmbracoBackOfficeServiceCollectionExtensionsTests : Umbrac
     {
         var principalFactory = Services.GetService<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
-        Assert.IsNotNull(principalFactory);
-        Assert.AreEqual(typeof(BackOfficeClaimsPrincipalFactory), principalFactory.GetType());
+        Assert.That(principalFactory, Is.Not.Null);
+        Assert.That(principalFactory.GetType(), Is.EqualTo(typeof(BackOfficeClaimsPrincipalFactory)));
     }
 
     [Test]
@@ -39,6 +39,6 @@ internal sealed class UmbracoBackOfficeServiceCollectionExtensionsTests : Umbrac
     {
         var userManager = Services.GetService<IBackOfficeUserManager>();
 
-        Assert.NotNull(userManager);
+        Assert.That(userManager, Is.Not.Null);
     }
 }

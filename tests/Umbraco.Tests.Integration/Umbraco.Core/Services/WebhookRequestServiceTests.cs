@@ -25,11 +25,11 @@ internal sealed class WebhookRequestServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(created.Id, webhook.Id);
-            Assert.AreEqual(created.EventAlias, webhook.EventAlias);
-            Assert.AreEqual(created.RetryCount, webhook.RetryCount);
-            Assert.AreEqual(created.RequestObject, webhook.RequestObject);
-            Assert.AreEqual(created.WebhookKey, webhook.WebhookKey);
+            Assert.That(webhook.Id, Is.EqualTo(created.Id));
+            Assert.That(webhook.EventAlias, Is.EqualTo(created.EventAlias));
+            Assert.That(webhook.RetryCount, Is.EqualTo(created.RetryCount));
+            Assert.That(webhook.RequestObject, Is.EqualTo(created.RequestObject));
+            Assert.That(webhook.WebhookKey, Is.EqualTo(created.WebhookKey));
         });
     }
 
@@ -46,7 +46,7 @@ internal sealed class WebhookRequestServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(newRetryCount, webhook.RetryCount);
+            Assert.That(webhook.RetryCount, Is.EqualTo(newRetryCount));
         });
     }
 
@@ -61,7 +61,7 @@ internal sealed class WebhookRequestServiceTests : UmbracoIntegrationTest
 
         Assert.Multiple(() =>
         {
-            Assert.IsNull(webhook);
+            Assert.That(webhook, Is.Null);
         });
     }
 }

@@ -26,7 +26,7 @@ public class PreviewServiceTests
         var result = await previewService.TryEnterPreviewAsync(user);
 
         VerifyCookie(cookieManagerMock, secure: true, sameSiteMode: SameSiteMode.None);
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -38,7 +38,7 @@ public class PreviewServiceTests
         var result = await previewService.TryEnterPreviewAsync(user);
 
         VerifyCookie(cookieManagerMock, secure: false, sameSiteMode: SameSiteMode.Lax);
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class PreviewServiceTests
         var result = await previewService.TryEnterPreviewAsync(user);
 
         VerifyCookie(cookieManagerMock, secure: true, sameSiteMode: SameSiteMode.None);
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     [Test]
@@ -62,7 +62,7 @@ public class PreviewServiceTests
         var result = await previewService.TryEnterPreviewAsync(user);
 
         VerifyCookie(cookieManagerMock, secure: false, sameSiteMode: SameSiteMode.Lax);
-        Assert.IsTrue(result);
+        Assert.That(result, Is.True);
     }
 
     private static PreviewService CreatePreviewService(Mock<ICookieManager> cookieManagerMock, out IUser user, bool useHttps, string? requestUrl)

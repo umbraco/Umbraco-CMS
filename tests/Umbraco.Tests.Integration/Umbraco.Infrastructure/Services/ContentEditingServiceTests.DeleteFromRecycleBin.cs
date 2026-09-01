@@ -14,20 +14,20 @@ public partial class ContentEditingServiceTests
         await ContentEditingService.MoveToRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
 
         var result = await ContentEditingService.DeleteFromRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.Success));
 
         // re-get and verify deletion
         content = await ContentEditingService.GetAsync(content.Key);
-        Assert.IsNull(content);
+        Assert.That(content, Is.Null);
     }
 
     [Test]
     public async Task Cannot_Delete_FromRecycleBin_Non_Existing()
     {
         var result = await ContentEditingService.DeleteFromRecycleBinAsync(Guid.NewGuid(), Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 
     [TestCase(true)]
@@ -37,11 +37,11 @@ public partial class ContentEditingServiceTests
         var content = await (variant ? CreateCultureVariantContent() : CreateInvariantContent());
 
         var result = await ContentEditingService.DeleteFromRecycleBinAsync(content.Key, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotInTrash, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotInTrash));
 
         // re-get and verify that deletion did not happen
         content = await ContentEditingService.GetAsync(content.Key);
-        Assert.IsNotNull(content);
+        Assert.That(content, Is.Not.Null);
     }
 }

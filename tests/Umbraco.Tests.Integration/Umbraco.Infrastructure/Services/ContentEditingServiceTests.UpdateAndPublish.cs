@@ -13,7 +13,7 @@ public partial class ContentEditingServiceTests
     public async Task Can_UpdateAndPublish_Invariant()
     {
         var content = await CreateInvariantContent();
-        Assert.IsFalse(content.Published);
+        Assert.That(content.Published, Is.False);
 
         var updateModel = new ContentUpdateModel
         {
@@ -29,7 +29,7 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAndPublishAsync(content.Key, updateModel, [], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         VerifyUpdateAndPublish(result.Result.Content);
 
         // re-get and re-test
@@ -37,11 +37,11 @@ public partial class ContentEditingServiceTests
 
         void VerifyUpdateAndPublish(IContent? updatedContent)
         {
-            Assert.IsNotNull(updatedContent);
-            Assert.IsTrue(updatedContent.Published);
-            Assert.AreEqual("Updated Name", updatedContent.Name);
-            Assert.AreEqual("The updated title", updatedContent.GetValue<string>("title", published: true));
-            Assert.AreEqual("The updated text", updatedContent.GetValue<string>("text", published: true));
+            Assert.That(updatedContent, Is.Not.Null);
+            Assert.That(updatedContent.Published, Is.True);
+            Assert.That(updatedContent.Name, Is.EqualTo("Updated Name"));
+            Assert.That(updatedContent.GetValue<string>("title", published: true), Is.EqualTo("The updated title"));
+            Assert.That(updatedContent.GetValue<string>("text", published: true), Is.EqualTo("The updated text"));
         }
     }
 
@@ -49,7 +49,7 @@ public partial class ContentEditingServiceTests
     public async Task Can_UpdateAndPublish_Culture_Variant()
     {
         var content = await CreateCultureVariantContent();
-        Assert.IsFalse(content.Published);
+        Assert.That(content.Published, Is.False);
 
         var updateModel = new ContentUpdateModel
         {
@@ -67,7 +67,7 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAndPublishAsync(content.Key, updateModel, ["en-US", "da-DK"], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         VerifyUpdateAndPublish(result.Result.Content);
 
         // re-get and re-test
@@ -75,15 +75,15 @@ public partial class ContentEditingServiceTests
 
         void VerifyUpdateAndPublish(IContent? updatedContent)
         {
-            Assert.IsNotNull(updatedContent);
-            Assert.IsTrue(updatedContent.Published);
-            Assert.IsTrue(updatedContent.IsCulturePublished("en-US"));
-            Assert.IsTrue(updatedContent.IsCulturePublished("da-DK"));
-            Assert.AreEqual("Updated English Name", updatedContent.GetPublishName("en-US"));
-            Assert.AreEqual("Updated Danish Name", updatedContent.GetPublishName("da-DK"));
-            Assert.AreEqual("Updated invariant", updatedContent.GetValue<string>("invariantTitle", published: true));
-            Assert.AreEqual("Updated English", updatedContent.GetValue<string>("variantTitle", "en-US", published: true));
-            Assert.AreEqual("Updated Danish", updatedContent.GetValue<string>("variantTitle", "da-DK", published: true));
+            Assert.That(updatedContent, Is.Not.Null);
+            Assert.That(updatedContent.Published, Is.True);
+            Assert.That(updatedContent.IsCulturePublished("en-US"), Is.True);
+            Assert.That(updatedContent.IsCulturePublished("da-DK"), Is.True);
+            Assert.That(updatedContent.GetPublishName("en-US"), Is.EqualTo("Updated English Name"));
+            Assert.That(updatedContent.GetPublishName("da-DK"), Is.EqualTo("Updated Danish Name"));
+            Assert.That(updatedContent.GetValue<string>("invariantTitle", published: true), Is.EqualTo("Updated invariant"));
+            Assert.That(updatedContent.GetValue<string>("variantTitle", "en-US", published: true), Is.EqualTo("Updated English"));
+            Assert.That(updatedContent.GetValue<string>("variantTitle", "da-DK", published: true), Is.EqualTo("Updated Danish"));
         }
     }
 
@@ -108,7 +108,7 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAndPublishAsync(content.Key, updateModel, ["en-US"], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
         VerifyUpdateAndPublish(result.Result.Content);
 
         // re-get and re-test
@@ -116,14 +116,14 @@ public partial class ContentEditingServiceTests
 
         void VerifyUpdateAndPublish(IContent? updatedContent)
         {
-            Assert.IsNotNull(updatedContent);
-            Assert.IsTrue(updatedContent.IsCulturePublished("en-US"));
-            Assert.IsFalse(updatedContent.IsCulturePublished("da-DK"));
+            Assert.That(updatedContent, Is.Not.Null);
+            Assert.That(updatedContent.IsCulturePublished("en-US"), Is.True);
+            Assert.That(updatedContent.IsCulturePublished("da-DK"), Is.False);
 
             // both values should still be saved
-            Assert.AreEqual("Updated English", updatedContent.GetValue<string>("variantTitle", "en-US", published: true));
-            Assert.AreNotEqual("Updated Danish", updatedContent.GetValue<string>("variantTitle", "da-DK", published: true));
-            Assert.AreEqual("Updated Danish", updatedContent.GetValue<string>("variantTitle", "da-DK", published: false));
+            Assert.That(updatedContent.GetValue<string>("variantTitle", "en-US", published: true), Is.EqualTo("Updated English"));
+            Assert.That(updatedContent.GetValue<string>("variantTitle", "da-DK", published: true), Is.Not.EqualTo("Updated Danish"));
+            Assert.That(updatedContent.GetValue<string>("variantTitle", "da-DK", published: false), Is.EqualTo("Updated Danish"));
         }
     }
 
@@ -149,9 +149,9 @@ public partial class ContentEditingServiceTests
         };
 
         var createResult = await ContentEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
         var content = createResult.Result.Content!;
-        Assert.IsTrue(content.Published);
+        Assert.That(content.Published, Is.True);
 
         // now update and republish
         var updateModel = new ContentUpdateModel
@@ -168,14 +168,14 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAndPublishAsync(content.Key, updateModel, [], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var updatedContent = await ContentEditingService.GetAsync(content.Key);
-        Assert.IsNotNull(updatedContent);
-        Assert.IsTrue(updatedContent.Published);
-        Assert.AreEqual("Republished Name", updatedContent.Name);
-        Assert.AreEqual("Republished title", updatedContent.GetValue<string>("title", published: true));
-        Assert.AreEqual("Republished text", updatedContent.GetValue<string>("text", published: true));
+        Assert.That(updatedContent, Is.Not.Null);
+        Assert.That(updatedContent.Published, Is.True);
+        Assert.That(updatedContent.Name, Is.EqualTo("Republished Name"));
+        Assert.That(updatedContent.GetValue<string>("title", published: true), Is.EqualTo("Republished title"));
+        Assert.That(updatedContent.GetValue<string>("text", published: true), Is.EqualTo("Republished text"));
     }
 
     [Test]
@@ -209,9 +209,9 @@ public partial class ContentEditingServiceTests
         };
 
         var createResult = await ContentEditingService.CreateAndPublishAsync(createModel, [], Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
+        Assert.That(createResult.Success, Is.True);
         var content = createResult.Result.Content!;
-        Assert.AreEqual(template.Id, content.TemplateId);
+        Assert.That(content.TemplateId, Is.EqualTo(template.Id));
 
         // update with different template
         var updateModel = new ContentUpdateModel
@@ -229,12 +229,12 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAndPublishAsync(content.Key, updateModel, [], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
+        Assert.That(result.Success, Is.True);
 
         var updatedContent = await ContentEditingService.GetAsync(content.Key);
-        Assert.IsNotNull(updatedContent);
-        Assert.IsTrue(updatedContent.Published);
-        Assert.AreEqual(template2.Id, updatedContent.TemplateId);
+        Assert.That(updatedContent, Is.Not.Null);
+        Assert.That(updatedContent.Published, Is.True);
+        Assert.That(updatedContent.TemplateId, Is.EqualTo(template2.Id));
     }
 
     [Test]
@@ -249,8 +249,8 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAndPublishAsync(Guid.NewGuid(), updateModel, [], Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.NotFound, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.NotFound));
     }
 
     [Test]
@@ -272,8 +272,8 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAndPublishAsync(content.Key, updateModel, ["en-us"], Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Status, Is.EqualTo(ContentEditingOperationStatus.InvalidCulture));
     }
 
     [Test]
@@ -297,13 +297,13 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAndPublishAsync(content.Key, updateModel, [], Constants.Security.SuperUserKey);
-        Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.Result.Content!.Published);
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Result.Content!.Published, Is.True);
 
         // re-get and verify the label property was not changed
         var updatedContent = await ContentEditingService.GetAsync(content.Key);
-        Assert.IsNotNull(updatedContent);
-        Assert.AreEqual(labelValue, updatedContent.GetValue<string>("label"));
-        Assert.AreEqual("Updated title", updatedContent.GetValue<string>("title"));
+        Assert.That(updatedContent, Is.Not.Null);
+        Assert.That(updatedContent.GetValue<string>("label"), Is.EqualTo(labelValue));
+        Assert.That(updatedContent.GetValue<string>("title"), Is.EqualTo("Updated title"));
     }
 }

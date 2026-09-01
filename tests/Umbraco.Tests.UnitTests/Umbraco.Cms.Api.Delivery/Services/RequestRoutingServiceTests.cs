@@ -25,7 +25,7 @@ public class RequestRoutingServiceTests
             Mock.Of<IVariationContextAccessor>());
 
         var result = subject.GetContentRoute(path!);
-        Assert.IsEmpty(result);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -49,7 +49,7 @@ public class RequestRoutingServiceTests
             Mock.Of<IVariationContextAccessor>());
 
         var result = subject.GetContentRoute("/some/where");
-        Assert.AreEqual("1234/some/where", result);
+        Assert.That(result, Is.EqualTo("1234/some/where"));
     }
 
     [TestCase("some/where")]
@@ -71,7 +71,7 @@ public class RequestRoutingServiceTests
             Mock.Of<IVariationContextAccessor>());
 
         var result = subject.GetContentRoute(requestedPath);
-        Assert.AreEqual("/some/where", result);
+        Assert.That(result, Is.EqualTo("/some/where"));
     }
 
     [TestCase("some/where")]
@@ -95,7 +95,7 @@ public class RequestRoutingServiceTests
             Mock.Of<IVariationContextAccessor>());
 
         var result = subject.GetContentRoute(requestedPath);
-        Assert.AreEqual("1234/some/where", result);
+        Assert.That(result, Is.EqualTo("1234/some/where"));
     }
 
     [Test]
@@ -120,9 +120,9 @@ public class RequestRoutingServiceTests
             variationContextAccessor);
 
         var result = subject.GetContentRoute("/some/where");
-        Assert.AreEqual("1234/some/where", result);
-        Assert.IsNotNull(variationContextAccessor.VariationContext);
-        Assert.AreEqual("da-DK", variationContextAccessor.VariationContext.Culture);
+        Assert.That(result, Is.EqualTo("1234/some/where"));
+        Assert.That(variationContextAccessor.VariationContext, Is.Not.Null);
+        Assert.That(variationContextAccessor.VariationContext.Culture, Is.EqualTo("da-DK"));
     }
 
     [Test]
@@ -150,12 +150,12 @@ public class RequestRoutingServiceTests
             variationContextAccessor);
 
         var result = subject.GetContentRoute("/some/where");
-        Assert.AreEqual("1234/some/where", result);
-        Assert.IsNotNull(variationContextAccessor.VariationContext);
+        Assert.That(result, Is.EqualTo("1234/some/where"));
+        Assert.That(variationContextAccessor.VariationContext, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual("da-DK", variationContextAccessor.VariationContext.Culture);
-            Assert.AreEqual("some-segment", variationContextAccessor.VariationContext.Segment);
+            Assert.That(variationContextAccessor.VariationContext.Culture, Is.EqualTo("da-DK"));
+            Assert.That(variationContextAccessor.VariationContext.Segment, Is.EqualTo("some-segment"));
         });
     }
 
@@ -191,12 +191,12 @@ public class RequestRoutingServiceTests
             variationContextAccessor);
 
         var result = subject.GetContentRoute("/some/where");
-        Assert.AreEqual("1234/some/where", result);
-        Assert.IsNotNull(variationContextAccessor.VariationContext);
+        Assert.That(result, Is.EqualTo("1234/some/where"));
+        Assert.That(variationContextAccessor.VariationContext, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(expectedCulture, variationContextAccessor.VariationContext.Culture);
-            Assert.AreEqual(expectedSegment, variationContextAccessor.VariationContext.Segment);
+            Assert.That(variationContextAccessor.VariationContext.Culture, Is.EqualTo(expectedCulture));
+            Assert.That(variationContextAccessor.VariationContext.Segment, Is.EqualTo(expectedSegment));
         });
     }
 

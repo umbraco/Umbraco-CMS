@@ -35,9 +35,9 @@ public class HtmlImageSourceParserTests
         var imageSourceParser = new HtmlImageSourceParser(Mock.Of<IPublishedUrlProvider>(), NoopSigner());
 
         var result = imageSourceParser.FindUdisFromDataAttributes(input).ToList();
-        Assert.AreEqual(2, result.Count);
-        Assert.AreEqual(UdiParser.Parse("umb://media/D4B18427A1544721B09AC7692F35C264"), result[0]);
-        Assert.AreEqual(UdiParser.Parse("umb://media-type/B726D735E4C446D58F703F3FBCFC97A5"), result[1]);
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.That(result[0], Is.EqualTo(UdiParser.Parse("umb://media/D4B18427A1544721B09AC7692F35C264")));
+        Assert.That(result[1], Is.EqualTo(UdiParser.Parse("umb://media-type/B726D735E4C446D58F703F3FBCFC97A5")));
     }
 
     [TestCase(
@@ -134,8 +134,9 @@ public class HtmlImageSourceParserTests
     <div><img src=""?width=100"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" /></div>
 </p>");
 
-            Assert.AreEqual(
-                @"<p>
+            Assert.That(
+                result,
+                Is.EqualTo(@"<p>
 <div>
     <img src="""" />
 </div></p>
@@ -144,8 +145,7 @@ public class HtmlImageSourceParserTests
 </p>
 <p>
     <div><img src=""/media/1001/my-image.jpg?width=100"" data-udi=""umb://media/81BB2036-034F-418B-B61F-C7160D68DCD4"" /></div>
-</p>",
-                result);
+</p>"));
         }
     }
 
@@ -222,7 +222,7 @@ public class HtmlImageSourceParserTests
         parser.EnsureImageSources(text);
         timer.Stop();
 
-        Assert.IsTrue(timer.ElapsedMilliseconds <= maxMsToRun);
+        Assert.That(timer.ElapsedMilliseconds, Is.LessThanOrEqualTo(maxMsToRun));
     }
 
     [Test]
@@ -246,7 +246,7 @@ public class HtmlImageSourceParserTests
         signerMock.Verify(
             s => s.RefreshSignature("/media/1001/image.jpg?width=100&hmac=stale"),
             Times.Once);
-        StringAssert.Contains("src=\"/media/1001/image.jpg?width=100&hmac=stale&hmac=fresh\"", result);
+        Assert.That(result, Does.Contain("src=\"/media/1001/image.jpg?width=100&hmac=stale&hmac=fresh\""));
     }
 
     [Test]
@@ -260,9 +260,9 @@ public class HtmlImageSourceParserTests
 
         var result = parser.EnsureImageSources(input);
 
-        Assert.AreEqual(
-            @"<img src=""/media/1001/image.jpg?width=100"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>",
-            result);
+        Assert.That(
+            result,
+            Is.EqualTo(@"<img src=""/media/1001/image.jpg?width=100"" data-udi=""umb://media/81BB2036034F418BB61FC7160D68DCD4""/>"));
     }
 
     [Test]
@@ -274,9 +274,9 @@ public class HtmlImageSourceParserTests
         var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
         var actual = parser.EnsureImageSources(sourceHtml);
 
-        Assert.AreEqual(
-            """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg?rand=1234&width=100&height=500" /></div>""",
-            actual);
+        Assert.That(
+            actual,
+            Is.EqualTo("""<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg?rand=1234&width=100&height=500" /></div>"""));
     }
 
     [Test]
@@ -288,9 +288,9 @@ public class HtmlImageSourceParserTests
         var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
         var actual = parser.EnsureImageSources(sourceHtml);
 
-        Assert.AreEqual(
-            """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg?rand=1234" /></div>""",
-            actual);
+        Assert.That(
+            actual,
+            Is.EqualTo("""<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg?rand=1234" /></div>"""));
     }
 
     [Test]
@@ -302,8 +302,8 @@ public class HtmlImageSourceParserTests
         var parser = new HtmlImageSourceParser(guid => fakeMediaUrl, NoopSigner());
         var actual = parser.EnsureImageSources(sourceHtml);
 
-        Assert.AreEqual(
-            """<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg" /></div>""",
-            actual);
+        Assert.That(
+            actual,
+            Is.EqualTo("""<div><img data-udi="umb://media/81BB2036034F418BB61FC7160D68DCD4" src="/media/1001/image.jpg" /></div>"""));
     }
 }

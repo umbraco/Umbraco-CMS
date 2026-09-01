@@ -28,7 +28,7 @@ public class TemporaryFileServiceTests
         Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result =
             await service.CreateAsync(new CreateTemporaryFileModel { Key = Guid.NewGuid(), FileName = "no-extension" });
 
-        Assert.AreEqual(TemporaryFileOperationStatus.FileExtensionNotAllowed, result.Status);
+        Assert.That(result.Status, Is.EqualTo(TemporaryFileOperationStatus.FileExtensionNotAllowed));
     }
 
     [Test]
@@ -43,7 +43,7 @@ public class TemporaryFileServiceTests
         Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result =
             await service.CreateAsync(new CreateTemporaryFileModel { Key = Guid.NewGuid(), FileName = "image.png" });
 
-        Assert.AreEqual(TemporaryFileOperationStatus.Success, result.Status);
+        Assert.That(result.Status, Is.EqualTo(TemporaryFileOperationStatus.Success));
     }
 
     // '/' is invalid in a file name on every platform, unlike ':' which is only invalid on Windows.
@@ -60,7 +60,7 @@ public class TemporaryFileServiceTests
         Attempt<TemporaryFileModel?, TemporaryFileOperationStatus> result =
             await service.CreateAsync(new CreateTemporaryFileModel { Key = Guid.NewGuid(), FileName = fileName });
 
-        Assert.AreEqual(TemporaryFileOperationStatus.InvalidFileName, result.Status);
+        Assert.That(result.Status, Is.EqualTo(TemporaryFileOperationStatus.InvalidFileName));
     }
 
     private static TemporaryFileService CreateService(ContentSettings contentSettings)

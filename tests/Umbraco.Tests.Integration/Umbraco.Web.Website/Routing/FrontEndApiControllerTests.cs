@@ -22,10 +22,10 @@ internal sealed class FrontEndApiControllerTests : UmbracoTestServerTestBase
 
         var response = await Client.GetAsync(url);
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        Assert.IsNotNull(response.Content.Headers.ContentType?.MediaType);
-        StringAssert.StartsWith("application/json", response.Content.Headers.ContentType!.MediaType);
-        StringAssert.Contains("\"pong\"", await response.Content.ReadAsStringAsync());
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(response.Content.Headers.ContentType?.MediaType, Is.Not.Null);
+        Assert.That(response.Content.Headers.ContentType!.MediaType, Does.StartWith("application/json"));
+        Assert.That(await response.Content.ReadAsStringAsync(), Does.Contain("\"pong\""));
     }
 }
 

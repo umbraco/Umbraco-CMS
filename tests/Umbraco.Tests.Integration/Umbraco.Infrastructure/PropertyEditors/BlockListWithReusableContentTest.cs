@@ -67,16 +67,16 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var publishedContent = GetPublishedContent(content.Key);
         var value = publishedContent.Value<BlockListModel>("blocks");
-        Assert.IsNotNull(value);
-        Assert.AreEqual(1, value.Count);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value, Has.Count.EqualTo(1));
 
         var blockListItem = value.First();
-        Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+        Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-            Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-            Assert.AreEqual("The reusable variant text", blockListItem.Content.Value<string>("variantText"));
+            Assert.That(blockListItem.ContentKey, Is.EqualTo(reusableElementKey));
+            Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The reusable invariant text"));
+            Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo("The reusable variant text"));
         });
     }
 
@@ -121,17 +121,17 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var publishedContent = GetPublishedContent(content.Key);
         var value = publishedContent.Value<BlockListModel>("blocks");
-        Assert.IsNotNull(value);
-        Assert.AreEqual(3, value.Count);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value, Has.Count.EqualTo(3));
 
         foreach (var blockListItem in value)
         {
-            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-                Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual("The reusable variant text", blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.ContentKey, Is.EqualTo(reusableElementKey));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The reusable invariant text"));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo("The reusable variant text"));
             });
         }
     }
@@ -188,27 +188,27 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var publishedContent = GetPublishedContent(content.Key);
         var value = publishedContent.Value<BlockListModel>("blocks");
-        Assert.IsNotNull(value);
-        Assert.AreEqual(1, value.Count);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value, Has.Count.EqualTo(1));
 
         var blockListItem = value.First();
-        Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+        Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-            Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-            Assert.AreEqual("The reusable variant text", blockListItem.Content.Value<string>("variantText"));
+            Assert.That(blockListItem.ContentKey, Is.EqualTo(reusableElementKey));
+            Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The reusable invariant text"));
+            Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo("The reusable variant text"));
         });
 
-        Assert.IsNotNull(blockListItem.Settings);
-        Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
+        Assert.That(blockListItem.Settings, Is.Not.Null);
+        Assert.That(blockListItem.Settings.Properties.Count(), Is.EqualTo(2));
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(localElementKey, blockListItem.SettingsKey);
-            Assert.AreEqual("The local invariant text", blockListItem.Settings.Value<string>("invariantText"));
-            Assert.AreEqual("The local variant text", blockListItem.Settings.Value<string>("variantText"));
+            Assert.That(blockListItem.SettingsKey, Is.EqualTo(localElementKey));
+            Assert.That(blockListItem.Settings.Value<string>("invariantText"), Is.EqualTo("The local invariant text"));
+            Assert.That(blockListItem.Settings.Value<string>("variantText"), Is.EqualTo("The local variant text"));
         });
     }
 
@@ -268,25 +268,25 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var publishedContent = GetPublishedContent(content.Key);
         var value = publishedContent.Value<BlockListModel>("blocks");
-        Assert.IsNotNull(value);
-        Assert.AreEqual(2, value.Count);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value, Has.Count.EqualTo(2));
 
         var blockListItem = value.First();
-        Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+        Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(localElementKey, blockListItem.ContentKey);
-            Assert.AreEqual("The local invariant text", blockListItem.Content.Value<string>("invariantText"));
-            Assert.AreEqual("The local variant text", blockListItem.Content.Value<string>("variantText"));
+            Assert.That(blockListItem.ContentKey, Is.EqualTo(localElementKey));
+            Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The local invariant text"));
+            Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo("The local variant text"));
         });
 
         blockListItem = value.Last();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-            Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-            Assert.AreEqual("The reusable variant text", blockListItem.Content.Value<string>("variantText"));
+            Assert.That(blockListItem.ContentKey, Is.EqualTo(reusableElementKey));
+            Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The reusable invariant text"));
+            Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo("The reusable variant text"));
         });
     }
 
@@ -370,41 +370,41 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
         var publishedContent = GetPublishedContent(content.Key);
         var value = publishedContent.Value<BlockListModel>("blocks");
-        Assert.IsNotNull(value);
-        Assert.AreEqual(2, value.Count);
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value, Has.Count.EqualTo(2));
 
         var blockListItem = value.First();
-        Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+        Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(localElementKey, blockListItem.ContentKey);
-            Assert.AreEqual("The local invariant text", blockListItem.Content.Value<string>("invariantText"));
-            Assert.AreEqual("The local variant text", blockListItem.Content.Value<string>("variantText"));
+            Assert.That(blockListItem.ContentKey, Is.EqualTo(localElementKey));
+            Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The local invariant text"));
+            Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo("The local variant text"));
         });
 
-        Assert.IsNotNull(blockListItem.Settings);
+        Assert.That(blockListItem.Settings, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(settingsForLocalElementKey, blockListItem.SettingsKey);
-            Assert.AreEqual("The local settings invariant text", blockListItem.Settings.Value<string>("invariantText"));
-            Assert.AreEqual("The local settings variant text", blockListItem.Settings.Value<string>("variantText"));
+            Assert.That(blockListItem.SettingsKey, Is.EqualTo(settingsForLocalElementKey));
+            Assert.That(blockListItem.Settings.Value<string>("invariantText"), Is.EqualTo("The local settings invariant text"));
+            Assert.That(blockListItem.Settings.Value<string>("variantText"), Is.EqualTo("The local settings variant text"));
         });
 
         blockListItem = value.Last();
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-            Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-            Assert.AreEqual("The reusable variant text", blockListItem.Content.Value<string>("variantText"));
+            Assert.That(blockListItem.ContentKey, Is.EqualTo(reusableElementKey));
+            Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The reusable invariant text"));
+            Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo("The reusable variant text"));
         });
 
-        Assert.IsNotNull(blockListItem.Settings);
+        Assert.That(blockListItem.Settings, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(settingsForReusableElementKey, blockListItem.SettingsKey);
-            Assert.AreEqual("The reusable settings invariant text", blockListItem.Settings.Value<string>("invariantText"));
-            Assert.AreEqual("The reusable settings variant text", blockListItem.Settings.Value<string>("variantText"));
+            Assert.That(blockListItem.SettingsKey, Is.EqualTo(settingsForReusableElementKey));
+            Assert.That(blockListItem.Settings.Value<string>("invariantText"), Is.EqualTo("The reusable settings invariant text"));
+            Assert.That(blockListItem.Settings.Value<string>("variantText"), Is.EqualTo("The reusable settings variant text"));
         });
     }
 
@@ -505,25 +505,25 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
             var publishedContent = GetPublishedContent(content.Key);
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(2, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(2));
 
             var blockListItem = value.First();
-            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(localElementKey, blockListItem.ContentKey);
-                Assert.AreEqual("The local invariant text", blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual($"The local {expectedVariantText} text", blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.ContentKey, Is.EqualTo(localElementKey));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The local invariant text"));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo($"The local {expectedVariantText} text"));
             });
 
             blockListItem = value.Last();
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-                Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual($"The reusable {expectedVariantText} text", blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.ContentKey, Is.EqualTo(reusableElementKey));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The reusable invariant text"));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo($"The reusable {expectedVariantText} text"));
             });
         }
     }
@@ -594,25 +594,25 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
             var publishedContent = GetPublishedContent(content.Key);
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(2, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(2));
 
             var blockListItem = value.First();
-            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(localElementKey, blockListItem.ContentKey);
-                Assert.AreEqual("The local invariant text", blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual($"The local {expectedVariantText} text", blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.ContentKey, Is.EqualTo(localElementKey));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The local invariant text"));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo($"The local {expectedVariantText} text"));
             });
 
             blockListItem = value.Last();
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-                Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual($"The reusable {expectedVariantText} text", blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.ContentKey, Is.EqualTo(reusableElementKey));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The reusable invariant text"));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo($"The reusable {expectedVariantText} text"));
             });
         }
     }
@@ -686,25 +686,25 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
             var publishedContent = GetPublishedContent(content.Key);
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
-            Assert.AreEqual(2, value.Count);
+            Assert.That(value, Is.Not.Null);
+            Assert.That(value, Has.Count.EqualTo(2));
 
             var blockListItem = value.First();
-            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+            Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(localElementKey, blockListItem.ContentKey);
-                Assert.AreEqual("The local invariant text", blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual($"The local variant text", blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.ContentKey, Is.EqualTo(localElementKey));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The local invariant text"));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo($"The local variant text"));
             });
 
             blockListItem = value.Last();
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-                Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual($"The reusable {expectedReusableElementVariantText} text", blockListItem.Content.Value<string>("variantText"));
+                Assert.That(blockListItem.ContentKey, Is.EqualTo(reusableElementKey));
+                Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The reusable invariant text"));
+                Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo($"The reusable {expectedReusableElementVariantText} text"));
             });
         }
     }
@@ -773,25 +773,25 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
 
             var publishedContent = GetPublishedContent(content.Key);
             var value = publishedContent.Value<BlockListModel>("blocks");
-            Assert.IsNotNull(value);
+            Assert.That(value, Is.Not.Null);
 
             if (shouldExist)
             {
-                Assert.AreEqual(1, value.Count);
+                Assert.That(value, Has.Count.EqualTo(1));
 
                 var blockListItem = value.Single();
-                Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+                Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
 
                 Assert.Multiple(() =>
                 {
-                    Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-                    Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-                    Assert.AreEqual($"The reusable {expectedVariantText} text", blockListItem.Content.Value<string>("variantText"));
+                    Assert.That(blockListItem.ContentKey, Is.EqualTo(reusableElementKey));
+                    Assert.That(blockListItem.Content.Value<string>("invariantText"), Is.EqualTo("The reusable invariant text"));
+                    Assert.That(blockListItem.Content.Value<string>("variantText"), Is.EqualTo($"The reusable {expectedVariantText} text"));
                 });
             }
             else
             {
-                Assert.IsEmpty(value);
+                Assert.That(value, Is.Empty);
             }
         }
     }
@@ -830,13 +830,13 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
         var externalBlockRelations = relationService
             .GetByParent(content, Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias)
             .ToArray();
-        Assert.AreEqual(1, externalBlockRelations.Length, "Expected exactly one umbExternalBlockElement relation from the document to the element.");
+        Assert.That(externalBlockRelations, Has.Length.EqualTo(1), "Expected exactly one umbExternalBlockElement relation from the document to the element.");
 
         // And it must NOT be related via the generic umbElement relation type.
         var elementRelations = relationService
             .GetByParent(content, Constants.Conventions.RelationTypes.RelatedElementAlias)
             .ToArray();
-        Assert.AreEqual(0, elementRelations.Length, "External block content must not create a generic umbElement relation.");
+        Assert.That(elementRelations.Length, Is.EqualTo(0), "External block content must not create a generic umbElement relation.");
     }
 
     private async Task<IDataType> CreateBlockListDataType(IContentType elementType)

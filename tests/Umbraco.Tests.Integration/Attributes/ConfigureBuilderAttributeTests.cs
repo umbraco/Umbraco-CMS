@@ -29,7 +29,7 @@ public class ConfigureBuilderAttributeTests : UmbracoIntegrationTest
     public void MethodAttributeOverwritesSetupForAllCases(int testValue)
     {
         var settings = GetRequiredService<IOptions<GlobalSettings>>().Value;
-        Assert.AreEqual(TestTelemetryId, settings.Id);
+        Assert.That(settings.Id, Is.EqualTo(TestTelemetryId));
     }
 
     [TestCase(1, "IdOne")]
@@ -39,6 +39,6 @@ public class ConfigureBuilderAttributeTests : UmbracoIntegrationTest
     public void CaseAttributeOverwritesSetupForSpecificCase(int testValue, string telemetryId)
     {
         var settings = GetRequiredService<IOptions<GlobalSettings>>().Value;
-        Assert.AreEqual(telemetryId, settings.Id);
+        Assert.That(settings.Id, Is.EqualTo(telemetryId));
     }
 }
