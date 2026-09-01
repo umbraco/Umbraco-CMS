@@ -741,6 +741,10 @@ export class UiBaseLocators extends BasePage {
     await this.page.waitForTimeout(ConstantHelper.wait.short);
   }
 
+  async isSaveButtonDisabled() {
+    await this.isDisabled(this.saveBtn);
+  }
+
   async clickChooseButton() {
     await this.click(this.chooseBtn);
   }

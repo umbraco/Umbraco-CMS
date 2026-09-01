@@ -183,3 +183,37 @@ test('can search and see only allowed member types', async ({umbracoApi, umbraco
   expect(contentData.values[0].value[0]['unique']).toEqual(allowedTestMemberId);
   expect(contentData.values[0].value[0]['type']).toEqual('member');
 });
+
+test('cannot publish content with a mandatory multi node tree picker field left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const pickerTargetName = 'PickerTarget';
+  const targetDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot('PickerTargetDocumentType');
+  await umbracoApi.document.createDefaultDocument(pickerTargetName, targetDocumentTypeId);
+  const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+
+  // Set the value and publish succeeds
+  await umbracoUi.content.clickChooseButton();
+  await umbracoUi.content.selectLinkByName(pickerTargetName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
+
+  // Clean
+  await umbracoApi.document.ensureNameNotExists(pickerTargetName);
+  await umbracoApi.documentType.ensureNameNotExists('PickerTargetDocumentType');
+});

@@ -312,3 +312,25 @@ test('can restore a content item from the recycle bin', {tag: '@release'}, async
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
+
+test('cannot create content without entering a name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.clickActionsMenuAtRoot();
+  await umbracoUi.content.clickCreateActionMenuOption();
+  await umbracoUi.content.chooseDocumentType(documentTypeName);
+
+  // Assert
+  // The Save button is disabled while the name is empty - there is no way to submit a nameless document
+  await umbracoUi.content.isSaveButtonDisabled();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
+
+  // Entering a name enables saving
+  await umbracoUi.content.enterContentName(contentName);
+  await umbracoUi.content.clickSaveButtonAndWaitForContentToBeCreated();
+  expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
+});

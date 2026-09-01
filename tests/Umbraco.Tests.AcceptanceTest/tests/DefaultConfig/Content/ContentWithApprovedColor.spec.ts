@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {AliasHelper, ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -82,3 +82,32 @@ test('can create content with the custom approved color data type', {tag: '@rele
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
+test('cannot publish content with a mandatory approved color field left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const customDataTypeName = 'MandatoryApprovedColor';
+  const colorValue = 'd73737';
+  const colorLabel = 'Test Label';
+  const customDataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, colorLabel, colorValue);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
+  await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
+  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
+  // Act
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickSaveAndPublishButton();
+
+  // Assert
+  await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
+  await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
+
+  // Set the value and publish succeeds
+  await umbracoUi.content.clickApprovedColorByValue(colorValue);
+  await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
+
+  // Assert
+  const contentData = await umbracoApi.document.getByName(contentName);
+  expect(contentData.variants[0].state).toBe('Published');
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+});
