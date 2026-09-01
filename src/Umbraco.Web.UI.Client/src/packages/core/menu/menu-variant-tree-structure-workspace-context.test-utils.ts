@@ -20,19 +20,21 @@ type UmbTestVariantTreeItemModel = UmbTreeItemModel & {
  * `variants` array, since `UmbMenuVariantTreeStructureWorkspaceContextBase` reads `treeItem.variants` when
  * building the structure.
  */
-export class UmbTestVariantTreeRepository {
-	static root: UmbTreeRootModel = {
-		unique: null,
-		entityType: 'test-root-entity-type',
-		name: 'Root',
-		isFolder: false,
-		hasChildren: false,
-	} as unknown as UmbTreeRootModel;
+const DEFAULT_TEST_ROOT: UmbTreeRootModel = {
+	unique: null,
+	entityType: 'test-root-entity-type',
+	name: 'Root',
+	isFolder: false,
+	hasChildren: false,
+} as unknown as UmbTreeRootModel;
 
+export class UmbTestVariantTreeRepository {
+	static root: UmbTreeRootModel = DEFAULT_TEST_ROOT;
 	static ancestors: Array<UmbTestVariantTreeItemModel> = [];
 	static requestTreeItemAncestorsCalls: Array<UmbEntityModel> = [];
 
 	static reset() {
+		UmbTestVariantTreeRepository.root = DEFAULT_TEST_ROOT;
 		UmbTestVariantTreeRepository.ancestors = [];
 		UmbTestVariantTreeRepository.requestTreeItemAncestorsCalls = [];
 	}

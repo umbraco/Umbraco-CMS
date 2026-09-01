@@ -80,19 +80,21 @@ export class UmbTestSubmittableTreeEntityWorkspaceContext {
  * context-under-test expects. Root and ancestors are static so a test can configure the response before
  * triggering a structure request, regardless of which repository alias/instance ends up used.
  */
-export class UmbTestTreeRepository {
-	static root: UmbTreeRootModel = {
-		unique: null,
-		entityType: 'test-root-entity-type',
-		name: 'Root',
-		isFolder: false,
-		hasChildren: false,
-	} as unknown as UmbTreeRootModel;
+const DEFAULT_TEST_ROOT: UmbTreeRootModel = {
+	unique: null,
+	entityType: 'test-root-entity-type',
+	name: 'Root',
+	isFolder: false,
+	hasChildren: false,
+} as unknown as UmbTreeRootModel;
 
+export class UmbTestTreeRepository {
+	static root: UmbTreeRootModel = DEFAULT_TEST_ROOT;
 	static ancestors: Array<UmbTreeItemModel> = [];
 	static requestTreeItemAncestorsCalls: Array<UmbEntityModel> = [];
 
 	static reset() {
+		UmbTestTreeRepository.root = DEFAULT_TEST_ROOT;
 		UmbTestTreeRepository.ancestors = [];
 		UmbTestTreeRepository.requestTreeItemAncestorsCalls = [];
 	}
