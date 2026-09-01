@@ -10,7 +10,7 @@ import {
 	repeat,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { getFileExtension, splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbEntityInputInteractionMemoryManager } from '@umbraco-cms/backoffice/entity';
@@ -283,7 +283,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				?readonly=${this.readonly}
 				?disabled=${!this._editMediaPath}>
 				<umb-media-thumbnail unique=${item.unique} alt=${item.name} icon=${item.mediaType.icon}></umb-media-thumbnail>
-				${this.#renderIsTrashed(item)}
+				${this.#renderFileExtension(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions"> ${this.#renderRemoveAction(item)}</uui-action-bar>
 			</uui-card-media>
 		`;
@@ -296,6 +296,15 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 				<uui-icon name="icon-trash"></uui-icon>
 			</uui-button>
 		`;
+	}
+
+	#renderFileExtension(item: UmbMediaCardItemModel) {
+		// The item model carries no extension of its own, so it is derived from the name. An item that can hold
+		// children is a container rather than a file, and a dot in its name is part of the name — not an extension.
+		if (item.hasChildren) return nothing;
+		const extension = getFileExtension(item.name)?.toLowerCase();
+		if (!extension) return nothing;
+		return html`<uui-tag size="s" slot="tag" look="secondary" color="default">${extension}</uui-tag>`;
 	}
 
 	#renderIsTrashed(item: UmbMediaCardItemModel) {
@@ -331,6 +340,11 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 
 			uui-card-media umb-icon {
 				font-size: var(--uui-size-8);
+			}
+
+			/* The card gathers every tag into one right-aligned slot, so they need separating themselves. */
+			uui-card-media uui-tag + uui-tag {
+				margin-left: var(--uui-size-space-1);
 			}
 
 			uui-card-media[drag-placeholder] {
