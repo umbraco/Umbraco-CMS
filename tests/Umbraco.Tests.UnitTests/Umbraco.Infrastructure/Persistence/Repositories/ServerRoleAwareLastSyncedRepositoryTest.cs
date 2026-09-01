@@ -68,15 +68,45 @@ public class ServerRoleAwareLastSyncedRepositoryTest
         Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetInternalIdAsync());
     }
 
+    /// <summary>
+    /// The role can still be unresolved this early in boot. Unknown is treated the same as Subscriber:
+    /// on a read-only database it must fall back to the file system repository rather than crash.
+    /// </summary>
+    [Test]
+    public async Task Unknown_With_ReadOnly_Database_Delegates_To_FileSystemRepository()
+    {
+        _serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.Unknown);
+        _databaseReadOnlyAccessor.Setup(x => x.IsReadOnly()).Returns(true);
+
+        await _fileSystemRepository.SaveInternalIdAsync(99);
+
+        var sut = CreateSut();
+        var result = await sut.GetInternalIdAsync();
+
+        Assert.AreEqual(99, result);
+    }
+
+    [Test]
+    public void Unknown_With_Writable_Database_Delegates_To_DatabaseRepository()
+    {
+        _serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.Unknown);
+        _databaseReadOnlyAccessor.Setup(x => x.IsReadOnly()).Returns(false);
+
+        // The database repository has no ambient scope, so it throws InvalidOperationException.
+        // This proves that the call did NOT go to the file system repository.
+        var sut = CreateSut();
+        Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetInternalIdAsync());
+    }
+
     [TestCase(ServerRole.Single)]
     [TestCase(ServerRole.SchedulingPublisher)]
-    [TestCase(ServerRole.Unknown)]
     public void NonSubscriber_Delegates_To_DatabaseRepository(ServerRole role)
     {
         _serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(role);
 
         // The database repository has no ambient scope, so it throws InvalidOperationException.
-        // This proves that the call did NOT go to the file system repository.
+        // This proves that the call did NOT go to the file system repository, even without consulting
+        // IDatabaseReadOnlyAccessor first.
         var sut = CreateSut();
         Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetInternalIdAsync());
     }

@@ -1,13 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
@@ -15,9 +18,11 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Tests.Common;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Runtime;
@@ -339,9 +344,124 @@ public class CoreRuntimeTests
             Times.Once);
     }
 
+    /// <summary>
+    /// On a normal startup at Run level with an <see cref="ElectedServerRoleAccessor"/> registered,
+    /// one bounded server-role election attempt is made before the starting notification is published.
+    /// </summary>
+    [Test]
+    public async Task StartAsync_WhenRunLevel_WithElectedServerRoleAccessor_TouchesServerOnce()
+    {
+        var runtimeState = CreateMockRuntimeState(RuntimeLevel.Run);
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupAllNotifications(eventAggregator);
+
+        var registrationService = new Mock<IServerRegistrationService>();
+        IServiceProvider serviceProvider = CreateServiceProvider(registrationService.Object, useElection: true);
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, serviceProvider);
+
+        await sut.StartAsync(CancellationToken.None);
+
+        registrationService.Verify(
+            x => x.TouchServer(It.IsAny<string>(), It.IsAny<TimeSpan>()),
+            Times.Once);
+    }
+
+    /// <summary>
+    /// When a custom (non-<see cref="ElectedServerRoleAccessor"/>) role accessor is registered — e.g. supplied
+    /// by a host via <c>SetServerRegistrar{T}()</c>, or election disabled for a single server — the election
+    /// attempt must no-op rather than forcing an unwanted database write.
+    /// </summary>
+    [Test]
+    public async Task StartAsync_WhenRunLevel_WithNonElectedServerRoleAccessor_DoesNotTouchServer()
+    {
+        var runtimeState = CreateMockRuntimeState(RuntimeLevel.Run);
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupAllNotifications(eventAggregator);
+
+        var registrationService = new Mock<IServerRegistrationService>();
+        IServiceProvider serviceProvider = CreateServiceProvider(registrationService.Object, useElection: false);
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, serviceProvider);
+
+        await sut.StartAsync(CancellationToken.None);
+
+        registrationService.Verify(
+            x => x.TouchServer(It.IsAny<string>(), It.IsAny<TimeSpan>()),
+            Times.Never);
+    }
+
+    /// <summary>
+    /// Below Run level (e.g. Install, where no connection string is configured yet) the election attempt
+    /// must not run at all.
+    /// </summary>
+    [Test]
+    public async Task StartAsync_WhenNotRunLevel_DoesNotTouchServer()
+    {
+        var runtimeState = CreateMockRuntimeState(RuntimeLevel.Install);
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupAllNotifications(eventAggregator);
+
+        var registrationService = new Mock<IServerRegistrationService>();
+        IServiceProvider serviceProvider = CreateServiceProvider(registrationService.Object, useElection: true);
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, serviceProvider);
+
+        await sut.StartAsync(CancellationToken.None);
+
+        registrationService.Verify(
+            x => x.TouchServer(It.IsAny<string>(), It.IsAny<TimeSpan>()),
+            Times.Never);
+    }
+
+    /// <summary>
+    /// A failure while attempting the initial election (e.g. a genuinely read-only database) must never
+    /// propagate out of StartAsync — the role simply remains Unknown, and the starting notification still fires.
+    /// </summary>
+    [Test]
+    public async Task StartAsync_WhenElectionAttemptThrows_DoesNotFailStartup()
+    {
+        var runtimeState = CreateMockRuntimeState(RuntimeLevel.Run);
+        var eventAggregator = new Mock<IEventAggregator>();
+        SetupAllNotifications(eventAggregator);
+
+        var registrationService = new Mock<IServerRegistrationService>();
+        registrationService
+            .Setup(x => x.TouchServer(It.IsAny<string>(), It.IsAny<TimeSpan>()))
+            .Throws(new InvalidOperationException("database is read-only"));
+        IServiceProvider serviceProvider = CreateServiceProvider(registrationService.Object, useElection: true);
+
+        var sut = CreateSut(runtimeState.Object, eventAggregator.Object, serviceProvider);
+
+        Assert.DoesNotThrowAsync(() => sut.StartAsync(CancellationToken.None));
+
+        eventAggregator.Verify(
+            x => x.PublishAsync(It.IsAny<UmbracoApplicationStartingNotification>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    private static IServiceProvider CreateServiceProvider(IServerRegistrationService registrationService, bool useElection)
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(registrationService);
+        services.AddSingleton<IOptionsMonitor<GlobalSettings>>(new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()));
+
+        if (useElection)
+        {
+            services.AddSingleton<IServerRoleAccessor, ElectedServerRoleAccessor>();
+        }
+        else
+        {
+            services.AddSingleton<IServerRoleAccessor>(new SingleServerRoleAccessor());
+        }
+
+        return services.BuildServiceProvider();
+    }
+
     private static CoreRuntime CreateSut(
         IRuntimeState runtimeState,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IServiceProvider? serviceProvider = null)
     {
         var loggerFactory = NullLoggerFactory.Instance;
 
@@ -368,7 +488,7 @@ public class CoreRuntimeTests
             eventAggregator,
             Mock.Of<IHostingEnvironment>(),
             Mock.Of<IUmbracoVersion>(),
-            null,
+            serviceProvider,
             lifetime.Object);
     }
 

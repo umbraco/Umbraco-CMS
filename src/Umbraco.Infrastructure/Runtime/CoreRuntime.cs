@@ -1,8 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
@@ -11,6 +13,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
@@ -193,6 +196,16 @@ public class CoreRuntime : IRuntime
         // Initialize the components
         await _components.InitializeAsync(isRestarting, cancellationToken);
 
+        if (State.Level == RuntimeLevel.Run)
+        {
+            // Give the elected server role a chance to resolve before any UmbracoApplicationStarting/Started
+            // handler reads it. Without this, IServerRoleAccessor.CurrentServerRole is guaranteed to still be
+            // ServerRole.Unknown here, since the only thing that otherwise advances it - TouchServerJob - doesn't
+            // start its countdown until hosted services run, which is after this notification has already been
+            // awaited to completion.
+            await TryElectServerRoleOnceAsync(cancellationToken);
+        }
+
         await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level, isRestarting), cancellationToken);
 
         if (isRestarting == false)
@@ -207,6 +220,64 @@ public class CoreRuntime : IRuntime
         // normal boot the app never serves before this point. During an unattended upgrade the runtime returns
         // early above (Upgrading) and UnattendedUpgradeBackgroundService marks readiness once it finishes seeding.
         _serviceProvider?.GetService<IContentRoutingReadiness>()?.MarkReady();
+    }
+
+    /// <summary>
+    ///     Makes one bounded, best-effort attempt to elect this server's role before it can be observed as
+    ///     <see cref="ServerRole.Unknown" /> by any <see cref="UmbracoApplicationStartingNotification" /> handler.
+    /// </summary>
+    /// <remarks>
+    ///     No-ops unless the registered <see cref="IServerRoleAccessor" /> is the default
+    ///     <see cref="ElectedServerRoleAccessor" /> - a custom accessor supplied via
+    ///     <c>IUmbracoBuilder.SetServerRegistrar{T}()</c>, or <c>DisableElectionForSingleServer</c>, means there is
+    ///     nothing here for this server to elect. Never throws: a timeout or a genuinely read-only database just
+    ///     leaves the role as <see cref="ServerRole.Unknown" />, exactly as it would without this attempt.
+    /// </remarks>
+    private async Task TryElectServerRoleOnceAsync(CancellationToken cancellationToken)
+    {
+        if (_serviceProvider?.GetService<IServerRoleAccessor>() is not ElectedServerRoleAccessor)
+        {
+            return;
+        }
+
+        IServerRegistrationService registrationService = _serviceProvider.GetRequiredService<IServerRegistrationService>();
+        GlobalSettings globalSettings = _serviceProvider.GetRequiredService<IOptionsMonitor<GlobalSettings>>().CurrentValue;
+
+        var serverAddress = _hostingEnvironment.ApplicationMainUrl?.ToString();
+        if (string.IsNullOrWhiteSpace(serverAddress))
+        {
+            // No application URL is known yet this early in boot - fall back to the machine name so election can
+            // still proceed (uniqueness comes from the server identity, not this address). TouchServerJob will
+            // overwrite this placeholder with the real URL once one has been detected from a request.
+            serverAddress = Environment.MachineName;
+        }
+
+        var touchTask = Task.Run(
+            () => registrationService.TouchServer(serverAddress, globalSettings.DatabaseServerRegistrar.StaleServerTimeout),
+            cancellationToken);
+
+        // Observe the task's eventual fault so it never surfaces as an UnobservedTaskException once we stop awaiting it.
+        _ = touchTask.ContinueWith(
+            static t => _ = t.Exception,
+            CancellationToken.None,
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
+
+        try
+        {
+            await touchTask.WaitAsync(globalSettings.DatabaseServerRegistrar.TouchTimeout, cancellationToken);
+        }
+        catch (TimeoutException)
+        {
+            _logger.LogWarning(
+                "The initial server role election attempt did not complete within {TouchTimeout}. The server role remains {ServerRole} until the next scheduled attempt.",
+                globalSettings.DatabaseServerRegistrar.TouchTimeout,
+                ServerRole.Unknown);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "The initial server role election attempt failed. The server role remains {ServerRole} until the next scheduled attempt.", ServerRole.Unknown);
+        }
     }
 
     private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
