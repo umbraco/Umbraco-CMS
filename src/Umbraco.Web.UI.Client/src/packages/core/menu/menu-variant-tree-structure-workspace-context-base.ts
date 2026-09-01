@@ -93,6 +93,8 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				this.#workspaceContext?.unique,
 				(value) => {
 					if (!value) return;
+					// Clear immediately so the previous entity's breadcrumb/structure isn't shown while the new one loads.
+					this.#clearStructure();
 					this.#requestStructure();
 				},
 				'observeUnique',
@@ -241,6 +243,13 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 			}
 		}
+	}
+
+	#clearStructure() {
+		this.#structure.setValue([]);
+		this.#parent.setValue(undefined);
+		this.#parentContext.setParent(undefined);
+		this.#ancestorContext.setAncestors([]);
 	}
 
 	#setParentData(structureItems: Array<UmbVariantStructureItemModel>) {

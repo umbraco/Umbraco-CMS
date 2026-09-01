@@ -6,7 +6,7 @@ import {
 	createTestAncestorItem,
 	createTestTreeRepositoryManifest,
 } from './menu-tree-structure-workspace-context.test-utils.js';
-import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { aTimeout, expect } from '@open-wc/testing';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
@@ -84,6 +84,36 @@ describe('UmbMenuTreeStructureWorkspaceContextBase', () => {
 
 		const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
 		expect(parentContext?.getParent()).to.deep.equal({ unique: 'parent-unique', entityType: 'test-entity-type' });
+	});
+
+	describe('navigating to a different entity', () => {
+		it('clears the parent and ancestor state immediately, before the new fetch resolves (avoids a stale breadcrumb)', async () => {
+			UmbTestTreeRepository.ancestors = [
+				createTestAncestorItem({ unique: 'parent-unique', entityType: 'test-entity-type' }),
+			];
+
+			dispatchReloadStructure();
+			await aTimeout(150);
+
+			const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
+			const ancestorContext = await context.getContext(UMB_ANCESTORS_ENTITY_CONTEXT);
+			expect(parentContext?.getParent()).to.deep.equal({ unique: 'parent-unique', entityType: 'test-entity-type' });
+			expect(ancestorContext?.getAncestors()).to.deep.equal([
+				{ unique: 'parent-unique', entityType: 'test-entity-type' },
+			]);
+
+			const callCountBeforeNavigate = UmbTestTreeRepository.requestTreeItemAncestorsCalls.length;
+
+			// Navigate to a different entity. The debounce means the fetch for it hasn't even started yet.
+			workspaceContext.setUnique('other-unique');
+
+			expect(UmbTestTreeRepository.requestTreeItemAncestorsCalls).to.have.lengthOf(callCountBeforeNavigate);
+			expect(parentContext?.getParent()).to.equal(undefined);
+			expect(ancestorContext?.getAncestors()).to.deep.equal([]);
+
+			// Cancel the pending debounced fetch so it doesn't leak into a later test.
+			context.destroy();
+		});
 	});
 
 	describe('reload on UmbRequestReloadStructureForEntityEvent', () => {
