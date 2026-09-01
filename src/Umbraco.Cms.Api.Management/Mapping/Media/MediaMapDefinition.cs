@@ -130,7 +130,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueRespons
         return filePath[..lastDotIndex] + suffix + filePath[lastDotIndex..];
     }
 
-    // Umbraco.Code.MapAll -Flags
+    // Umbraco.Code.MapAll -Flags -HasChildren
     private void Map(IMedia source, MediaCollectionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
