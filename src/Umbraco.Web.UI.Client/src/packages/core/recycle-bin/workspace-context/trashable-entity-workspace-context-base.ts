@@ -56,6 +56,11 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 		});
 	}
 
+	/**
+	 * Configures which recycle-bin repository to use for parent lookups. Call this in the subclass constructor,
+	 * before any trash/restore event can fire.
+	 * @param {string} alias - The recycle-bin repository's extension alias.
+	 */
 	protected _setRecycleBinRepositoryAlias(alias: string) {
 		this.#recycleBinRepositoryAlias = alias;
 	}
