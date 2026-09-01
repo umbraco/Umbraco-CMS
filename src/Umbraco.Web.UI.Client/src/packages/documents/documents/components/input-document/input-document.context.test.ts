@@ -1,9 +1,15 @@
 import { UmbDocumentPickerInputContext } from './input-document.context.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import type { UmbDocumentItemModel } from '../../item/types.js';
 import { expect } from '@open-wc/testing';
 import { customElement } from 'lit/decorators.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantContext } from '@umbraco-cms/backoffice/variant';
+
+// The picker holds items as UmbDocumentItemModel widened with a name, see the HACK on
+// UmbDocumentPickerInputContext.
+type UmbTestPickedDocumentItemModel = UmbDocumentItemModel & { name: string };
 
 @customElement('test-document-picker-input-context-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -11,14 +17,14 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 // Exposes the protected _requestItemName method and bypasses the item manager so
 // tests do not need the repository extension to be registered.
 class UmbTestDocumentPickerInputContext extends UmbDocumentPickerInputContext {
-	#testItems = new Map<string, UmbDocumentItemModel>();
+	#testItems = new Map<string, UmbTestPickedDocumentItemModel>();
 
-	setTestItem(item: UmbDocumentItemModel) {
+	setTestItem(item: UmbTestPickedDocumentItemModel) {
 		this.#testItems.set(item.unique, item);
 	}
 
 	override getSelectedItemByUnique(unique: string) {
-		return this.#testItems.get(unique) as (UmbDocumentItemModel & { name: string }) | undefined;
+		return this.#testItems.get(unique);
 	}
 
 	async requestItemName(unique: string): Promise<string> {
@@ -26,33 +32,29 @@ class UmbTestDocumentPickerInputContext extends UmbDocumentPickerInputContext {
 	}
 }
 
-function makeItem(unique: string, name: string): UmbDocumentItemModel {
+function makeItem(unique: string, name: string): UmbTestPickedDocumentItemModel {
 	return {
-		entityType: 'document',
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
 		unique,
-		isTrashed: false,
-		isProtected: false,
-		createDate: null,
+		name,
 		documentType: {
 			unique: 'document-type-unique',
 			icon: 'icon-document',
-			collection: null,
 		},
 		hasChildren: false,
+		isProtected: false,
+		isTrashed: false,
 		parent: null,
 		flags: [],
 		variants: [
 			{
 				name,
 				culture: 'en-US',
-				segment: null,
-				state: 'Published',
-				createDate: null,
-				updateDate: null,
+				state: UmbDocumentVariantState.PUBLISHED,
 				flags: [],
 			},
 		],
-	} as unknown as UmbDocumentItemModel;
+	};
 }
 
 describe('UmbDocumentPickerInputContext._requestItemName', () => {
