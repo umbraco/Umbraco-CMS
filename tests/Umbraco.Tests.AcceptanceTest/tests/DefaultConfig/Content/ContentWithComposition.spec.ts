@@ -4,6 +4,7 @@ import {expect} from "@playwright/test";
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';
 const compositionDocumentTypeName = 'CompositionDocumentType';
+const mandatoryCompositionDocumentTypeName = 'MandatoryCompositionDocumentType';
 const dataTypeName = 'Textstring';
 const groupName = 'TestGroup';
 let compositionDocumentTypeId = null;
@@ -12,6 +13,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(mandatoryCompositionDocumentTypeName);
   await umbracoUi.goToBackOffice();
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
@@ -21,6 +23,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(mandatoryCompositionDocumentTypeName);
 });
 
 test('can create content with a document type that has a composition', async ({umbracoApi, umbracoUi}) => {
@@ -63,9 +66,7 @@ test('can edit property value from composition in content', async ({umbracoApi, 
 
 test('cannot publish content with a mandatory property inherited via composition left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const mandatoryCompositionDocumentTypeName = 'MandatoryCompositionDocumentType';
   const text = 'This is a required property value';
-  await umbracoApi.documentType.ensureNameNotExists(mandatoryCompositionDocumentTypeName);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const mandatoryCompositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(mandatoryCompositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName, false, false, true);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithACompositionAndAllowAsRoot(documentTypeName, mandatoryCompositionDocumentTypeId);
@@ -88,9 +89,6 @@ test('cannot publish content with a mandatory property inherited via composition
   expect(contentData.variants[0].state).toBe('Published');
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(dataTypeName));
   expect(contentData.values[0].value).toEqual(text);
-
-  // Clean
-  await umbracoApi.documentType.ensureNameNotExists(mandatoryCompositionDocumentTypeName);
 });
 
 test('can publish content with a document type that has a composition', async ({umbracoApi, umbracoUi}) => {

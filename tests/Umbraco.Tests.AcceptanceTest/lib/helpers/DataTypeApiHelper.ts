@@ -1152,14 +1152,14 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createImageMediaPickerDataType(name: string, minValue = 0, maxValue = 1, enableLocalFocalPoint = false, ignoreUserStartNodes = false, multiple = false) {
+  async createImageMediaPickerDataType(name: string, minValue = 0, maxValue = 1, enableLocalFocalPoint = false, ignoreUserStartNodes = false) {
     await this.ensureNameNotExists(name);
     const mediaType = await this.api.mediaType.getByName('Image');
 
     const dataType = new MediaPickerDataTypeBuilder()
       .withName(name)
       .withFilter(mediaType.id)
-      .withMultiple(multiple)
+      .withMultiple(false)
       .withMinValue(minValue)
       .withMaxValue(maxValue)
       .withEnableLocalFocalPoint(enableLocalFocalPoint)
