@@ -1272,8 +1272,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async doesBlockHaveThumbnailImage(blockName: string, thumbnailImageUrl: string) {
+    // Saving returns to the parent workspace before the card re-renders, so the default timeout can be too tight under CI load.
     const blockCardLocator = this.blockTypeCard.filter({hasText: blockName});
-    await this.hasAttribute(blockCardLocator.locator('img'), 'src', thumbnailImageUrl);
+    await this.hasAttribute(blockCardLocator.locator('img'), 'src', thumbnailImageUrl, ConstantHelper.timeout.long);
   }
 
   async addTimeZones(timeZones: string[]) {
@@ -1322,8 +1323,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async doesBlockHaveNoThumbnailImage(blockName: string) {
+    // Same post-save return-navigation delay as doesBlockHaveThumbnailImage above.
     const blockCardLocator = this.blockTypeCard.filter({hasText: blockName});
-    await expect(blockCardLocator.locator('img')).toHaveCount(0);
+    await expect(blockCardLocator.locator('img')).toHaveCount(0, {timeout: ConstantHelper.timeout.long});
   }
 
   // Dynamic Root

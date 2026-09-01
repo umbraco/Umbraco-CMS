@@ -333,6 +333,7 @@
     recycleBinMedia: '/umbraco/management/api/v1/recycle-bin/media',
     recycleBinElement: '/umbraco/management/api/v1/recycle-bin/element',
     domains: '/domains',
+    moveToRecycleBin: '/move-to-recycle-bin',
     notifications: '/notifications',
     currentUser: '/umbraco/management/api/v1/user/current',
     revoke: '/umbraco/management/api/v1/security/back-office/revoke',

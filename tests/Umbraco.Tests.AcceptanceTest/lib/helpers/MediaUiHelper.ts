@@ -216,8 +216,10 @@ export class MediaUiHelper extends UiBaseLocators {
     return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
   }
 
+  // Matched against move-to-recycle-bin alone, not the generic media endpoint: the latter also matches
+  // tree/collection GET refreshes that can resolve the wait before the trash request has actually landed.
   async clickConfirmTrashButtonAndWaitForMediaToBeTrashed() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.media, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.moveToRecycleBin, this.clickConfirmTrashButton(), ConstantHelper.statusCodes.ok);
   }
 
   async clickConfirmEmptyRecycleBinButtonAndWaitForRecycleBinToBeEmptied() {
