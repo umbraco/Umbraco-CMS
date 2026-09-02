@@ -40,6 +40,7 @@ using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Configuration;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
@@ -96,6 +97,11 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
         builder.Services.AddSingleton<IMigrationCoordinator, MigrationCoordinator>();
+
+        // Registered here (rather than alongside TouchServerJob in AddBackgroundJobs()) because
+        // UnattendedUpgradeBackgroundService, registered immediately below, needs it and this method runs in
+        // every composition path that also registers that service - AddBackgroundJobs() does not.
+        builder.Services.AddSingleton<IServerRoleElector, ServerRoleElector>();
         builder.Services.AddHostedService<UnattendedUpgradeBackgroundService>();
 
         // Database availability check.

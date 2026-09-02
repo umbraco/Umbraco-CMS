@@ -1,10 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
@@ -13,7 +11,6 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
@@ -225,29 +222,24 @@ public class CoreRuntime : IRuntime
 
     /// <summary>
     ///     Makes one bounded, best-effort attempt to elect this server's role before it can be observed as
-    ///     <see cref="ServerRole.Unknown" /> by any <see cref="UmbracoApplicationStartingNotification" /> handler.
+    ///     <see cref="Umbraco.Cms.Core.Sync.ServerRole.Unknown" /> by any
+    ///     <see cref="UmbracoApplicationStartingNotification" /> handler.
     /// </summary>
     /// <remarks>
-    ///     No-ops unless the registered <see cref="IServerRoleAccessor" /> is the default
-    ///     <see cref="ElectedServerRoleAccessor" /> - a custom accessor supplied via
-    ///     <c>IUmbracoBuilder.SetServerRegistrar{T}()</c>, or <c>DisableElectionForSingleServer</c>, means there is
-    ///     nothing here for this server to elect. Never throws: a timeout or a genuinely read-only database just
-    ///     leaves the role as <see cref="ServerRole.Unknown" />, exactly as it would without this attempt.
+    ///     Delegates to the shared <see cref="Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration.IServerRoleElector" />
+    ///     (also used by <see cref="Install.UnattendedUpgradeBackgroundService" />, which publishes
+    ///     <see cref="UmbracoApplicationStartingNotification" /> itself for the unattended-upgrade path rather than
+    ///     going through this method), resolved from the runtime's optional <see cref="IServiceProvider" /> rather
+    ///     than taken as a constructor parameter, since <see cref="CoreRuntime" /> is public API and this is an
+    ///     internal implementation detail.
     /// </remarks>
     private async Task TryElectServerRoleOnceAsync(CancellationToken cancellationToken)
     {
-        if (_serviceProvider?.GetService<IServerRoleAccessor>() is not ElectedServerRoleAccessor)
+        IServerRoleElector? serverRoleElector = _serviceProvider?.GetService<IServerRoleElector>();
+        if (serverRoleElector is not null)
         {
-            return;
+            await serverRoleElector.TryElectOnceAsync(cancellationToken);
         }
-
-        IServerRegistrationService registrationService = _serviceProvider.GetRequiredService<IServerRegistrationService>();
-        GlobalSettings globalSettings = _serviceProvider.GetRequiredService<IOptionsMonitor<GlobalSettings>>().CurrentValue;
-
-        // Shared with TouchServerJob's recurring cadence - see BoundedServerTouch. The returned (raw, unbounded)
-        // task isn't needed here: unlike the recurring job, this only ever runs once per boot, so there is no
-        // later call that would need to check whether this one is still stuck.
-        _ = await BoundedServerTouch.TryTouchAsync(registrationService, _hostingEnvironment, globalSettings, _logger, cancellationToken);
     }
 
     private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
