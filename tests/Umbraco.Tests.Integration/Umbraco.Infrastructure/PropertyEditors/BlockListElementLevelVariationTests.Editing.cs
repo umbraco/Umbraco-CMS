@@ -1474,8 +1474,9 @@ internal partial class BlockListElementLevelVariationTests
         var blockListDataType = await CreateBlockListDataType(elementType);
         var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
-        // each culture of a variant block property is stored separately. the client presets a value for every language
-        // when a block is created, so a culture's stored value also carries (empty) values for the other cultures.
+        // Each culture of this block property is stored as its own document, and a document can carry entries
+        // for cultures other than its own. The value retained must be the one for the culture being mapped,
+        // not the default language's.
         var content = CreateContent(
             contentType,
             elementType,
