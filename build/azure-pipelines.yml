@@ -411,8 +411,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             LinuxPart3Of3:
               vmImage: "ubuntu-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
             macOSPart1Of3:
               vmImage: "macOS-latest"
               # Filter tests that are part of the Umbraco.Infrastructure namespace but not part of the Umbraco.Infrastructure.Service namespace
@@ -423,8 +423,8 @@ stages:
               testFilter: "(FullyQualifiedName~Umbraco.Infrastructure.Service)"
             macOSPart3Of3:
               vmImage: "macOS-latest"
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and the ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
         pool:
           vmImage: $(vmImage)
         variables:
@@ -462,6 +462,42 @@ stages:
                 arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
               ${{ else }}:
                 arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
+      # Search Integration Tests (SQLite)
+      - job:
+        timeoutInMinutes: 60
+        displayName: Search Integration Tests (SQLite)
+        strategy:
+          matrix:
+            Linux:
+              vmImage: "ubuntu-latest"
+            macOS:
+              vmImage: "macOS-latest"
+        pool:
+          vmImage: $(vmImage)
+        variables:
+          Tests__Database__DatabaseType: "Sqlite"
+        steps:
+          - checkout: self
+            submodules: false
+            lfs: false,
+            fetchDepth: 1
+            fetchFilter: tree:0
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test
+            inputs:
+              command: test
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build'
+              testRunTitle: Search Integration Tests SQLite - $(Agent.OS)
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 180
@@ -487,8 +523,8 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
             LinuxPart1Of3:
               vmImage: "ubuntu-latest"
               SA_PASSWORD: UmbracoIntegration123!
@@ -508,8 +544,8 @@ stages:
               SA_PASSWORD: UmbracoIntegration123!
               Tests__Database__DatabaseType: SqlServer
               Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
-              # Filter tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace. So this will run all tests that are not part of the Umbraco.Infrastructure and ManagementApi namespace
-              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi)"
+              # Run all tests that are not part of the Umbraco.Infrastructure, ManagementApi, or Umbraco.Search namespaces (Umbraco.Search runs in its own Search Integration Tests job)
+              testFilter: "(FullyQualifiedName!~Umbraco.Infrastructure) & (FullyQualifiedName!~ManagementApi) & (FullyQualifiedName!~Umbraco.Search)"
         pool:
           vmImage: $(vmImage)
         steps:
@@ -578,6 +614,86 @@ stages:
                 arguments: '--filter "$(testFilter) & ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}" --configuration $(buildConfiguration) --no-build'
 
           # Stop SQL Server
+          - pwsh: docker stop mssql
+            displayName: Stop SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - pwsh: SqlLocalDB stop MSSQLLocalDB
+            displayName: Stop SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+      # Search Integration Tests (SQL Server)
+      - job:
+        timeoutInMinutes: 60
+        condition: eq(${{parameters.sqlServerIntegrationTests}}, True)
+        displayName: Search Integration Tests (SQL Server)
+        strategy:
+          matrix:
+            Windows:
+              vmImage: "windows-latest"
+              Tests__Database__DatabaseType: LocalDb
+              Tests__Database__SQLServerMasterConnectionString: N/A
+            Linux:
+              vmImage: "ubuntu-latest"
+              SA_PASSWORD: UmbracoIntegration123!
+              Tests__Database__DatabaseType: SqlServer
+              Tests__Database__SQLServerMasterConnectionString: "Server=(local);User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True"
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
+
+          - task: UseDotNet@2
+            displayName: Use .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+
+          - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$(SA_PASSWORD)" mcr.microsoft.com/mssql/server:2022-latest
+            displayName: Start SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - powershell: |
+              $maxAttempts = 12
+              $attempt = 0
+              $status = ""
+
+              while (($status -ne 'running') -and ($attempt -lt $maxAttempts)) {
+                Start-Sleep -Seconds 5
+                # We use the docker inspect command to check the status of the container. If the container is not running, we wait 5 seconds and try again. And if reaches 12 attempts, we fail the build.
+                $status = docker inspect -f '{{.State.Status}}' mssql
+
+                if ($status -ne 'running') {
+                  Write-Host "Waiting for SQL Server to be ready... Attempt $($attempt + 1)"
+                  $attempt++
+                }
+              }
+
+              if ($status -eq 'running') {
+                Write-Host "SQL Server container is running"
+                docker ps -a
+              } else {
+                Write-Host "SQL Server did not become ready in time. Last known status: $status"
+                docker logs mssql
+                exit 1
+              }
+            displayName: Wait for SQL Server to be ready (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
+          - pwsh: SqlLocalDB start MSSQLLocalDB
+            displayName: Start SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+
+          - task: DotNetCoreCLI@2
+            displayName: Run dotnet test
+            inputs:
+              command: test
+              projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
+              arguments: '--filter "FullyQualifiedName~Umbraco.Search" --configuration $(buildConfiguration) --no-build'
+              testRunTitle: Search Integration Tests SQL Server - $(Agent.OS)
+
           - pwsh: docker stop mssql
             displayName: Stop SQL Server Docker image (Linux)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))

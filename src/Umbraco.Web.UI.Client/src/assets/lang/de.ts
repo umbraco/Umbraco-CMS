@@ -314,6 +314,8 @@ export default {
 		isSensitiveValue:
 			'Dieser Wert ist verborgen.\n      Wenn Sie diesen Wert einsehen müssen, wenden Sie sich bitte an einen Administrator.\n    ',
 		isSensitiveValue_short: 'Dieser Wert ist verborgen.',
+		isSensitiveValueNotice:
+			'Wenn Sie die verborgenen Werte einsehen müssen, wenden Sie sich bitte an einen Administrator.',
 		languagesToPublish: 'Welche Sprache möchten Sie veröffentlichen?',
 		languagesToSendForApproval: 'Welche Sprachen möchten Sie zur Freigabe schicken?',
 		languagesToSchedule: 'Welche Sprachen möchten Sie zu einer bestimmten Zeit veröffentlichen?',
@@ -623,33 +625,6 @@ export default {
 		displayName: 'Name der Kultur',
 		changeKeyError: "Der Wert '%0%' ist bereits vorhanden.",
 		overviewTitle: 'Wörterbuch Übersicht',
-	},
-	examineManagement: {
-		configuredSearchers: '<em>Sucher</em> einrichten ',
-		configuredSearchersDescription:
-			'\n    Zeigt die Eigenschaften und Werkzeuge für eingerichtete <em>Sucher</em> (z.B.: multi-index searcher)',
-		fieldValues: 'Feldwerte',
-		healthStatus: 'Gesundheitsstatus',
-		healthStatusDescription: 'Der Gesundheitsstatus und Lesbarkeit des Indizes.',
-		indexers: 'Indizierer',
-		indexInfo: 'Indexinformationen',
-		contentInIndex: 'Inhalt des Indexes',
-		indexInfoDescription: 'Zeigt die Eigenschaften des Indizes',
-		manageIndexes: 'Examine Index-Verwaltung',
-		manageIndexesDescription: '\n      Index Detailanzeige und Verwaltungswerkzeuge\n    ',
-		rebuildIndex: 'Index erneuern',
-		rebuildIndexWarning:
-			'\n      Dies erzeugt den Index neu.<br />\n      Abhängig von der Inhaltsmenge Ihrer <em>Website</em> kann das eingie Zeit dauern.<br />\n      Es wird davon abgeraten, einen Index einer <em>Website</em> während hoher Auslastung- oder Inhaltbearbeitungszeiten zu erneuern.\n     ',
-		searchers: 'Sucher',
-		searchDescription: 'Durchsuche den Index und betrachte die Ergebnisse',
-		tools: 'Werkzeuge',
-		toolsDescription: 'Werkzeuge zur Indexverwaltung',
-		fields: 'Felder',
-		indexCannotRead: 'Der Index kann nicht gelesen werden und wird deshalb neu erstellt.',
-		processIsTakingLonger:
-			'Der Prozess dauert länger als erwartet, checken Sie die Umbraco Logs um zu sehen ob\n      Fehler passiert sind.\n    ',
-		indexCannotRebuild: 'Der Index kann nicht rebuilded werden weil er nicht zugewissen wurde.',
-		iIndexPopulator: 'IIndexPopulator',
 	},
 	placeholders: {
 		username: 'Benutzername eingeben',
@@ -2027,7 +2002,6 @@ export default {
 		contentRedirectManager: 'URL-Weiterleitungen verwalten',
 		mediaFolderBrowser: 'Inhalt',
 		settingsWelcome: 'Begrüßung',
-		settingsExamine: 'Examine Management',
 		settingsPublishedStatus: 'Status der Veröffentlichungen',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Systemzustand prüfen',

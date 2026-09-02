@@ -302,6 +302,8 @@ export default {
 		isSensitiveValue:
 			"Questo valore è nascosto. Se hai bisogno dell'accesso per visualizzare questo valore contatta l'amministratore del sito.",
 		isSensitiveValue_short: 'Questo valore è nascosto.',
+		isSensitiveValueNotice:
+			"Se hai bisogno dell'accesso per visualizzare i valori nascosti contatta l'amministratore del sito.",
 		languagesToPublishForFirstTime:
 			'Quali lingue vorresti pubblicare? Tutte le lingue con contenuto vengono\n      salvate!\n    ',
 		languagesToPublish: 'Quali lingue vorresti pubblicare?',
@@ -579,33 +581,6 @@ export default {
 		displayName: 'Nome della cultura',
 		changeKeyError: "La chiave '%0%' esiste già.",
 		overviewTitle: 'Panoramica del Dizionario',
-	},
-	examineManagement: {
-		configuredSearchers: 'Searchers configurati',
-		configuredSearchersDescription:
-			'Visualizza le proprietà e gli strumenti per ogni Searcher configurato (per esempio un multi-index searcher)',
-		fieldValues: 'Valori del campo',
-		healthStatus: 'Stato di salute',
-		healthStatusDescription: "Lo stato di salute dell'index e se può essere letto",
-		indexers: 'Indexers',
-		indexInfo: 'Index info',
-		indexInfoDescription: "Elenca le proprietà dell'index",
-		manageIndexes: 'Gestisci gli indexes di Examine',
-		manageIndexesDescription:
-			'Permette di visualizzare i dettagli di ogni index e fornisce alcuni strumenti\n      per gestire gli index\n    ',
-		rebuildIndex: 'Ricostruisci index',
-		rebuildIndexWarning:
-			"\n      Questo causerà la ricostruzione dell'index.<br />\n      A seconda della quantità di contenuti presenti nel tuo sito, potrebbe volerci un po' di tempo.<br />\n      Non è consigliabile ricostruire un indice durante i periodi di elevato traffico del sito Web o quando gli editor modificano i contenuti.\n     ",
-		searchers: 'Searchers',
-		searchDescription: "Cerca nell'index e visualizza i risultati",
-		tools: 'Strumenti',
-		toolsDescription: "Strumenti per gestire l'index",
-		fields: 'Campi',
-		indexCannotRead: "L'indice non può essere letto e dovrà essere ricostruito",
-		processIsTakingLonger:
-			'Il processo sta impiegando più tempo del previsto, controlla il log di Umbraco per vedere se ci sono stati errori durante questa operazione',
-		indexCannotRebuild: 'Questo indice non può essere ricostruito perché non ha assegnato',
-		iIndexPopulator: 'IIndexPopulator',
 	},
 	placeholders: {
 		username: 'Inserisci il tuo username',
@@ -2070,7 +2045,6 @@ export default {
 		contentRedirectManager: 'Gestione Redirect URL',
 		mediaFolderBrowser: 'Contenuto',
 		settingsWelcome: 'Benvenuto',
-		settingsExamine: 'Gestione Examine',
 		settingsPublishedStatus: 'Stato di pubblicazione',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',

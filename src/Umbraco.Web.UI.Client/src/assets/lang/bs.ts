@@ -300,6 +300,8 @@ export default {
 		isSensitiveValue:
 			'Ova vrijednost je skrivena. Ako vam je potreban pristup da vidite ovu vrijednost, obratite se\n       administratoru web stranice.\n    ',
 		isSensitiveValue_short: 'Ova vrijednost je skrivena.',
+		isSensitiveValueNotice:
+			'Ako vam je potreban pristup da vidite skrivene vrijednosti, obratite se administratoru web stranice.',
 		languagesToPublish: 'Koje jezike želite da objavite?',
 		languagesToSendForApproval: 'Koje jezike želite poslati na odobrenje?',
 		languagesToSchedule: 'Koje jezike želite da zakažete?',
@@ -574,34 +576,6 @@ export default {
 		displayName: 'Kultura',
 		changeKeyError: "Ključ '%0%' već postoji.",
 		overviewTitle: 'Pregled riječnika',
-	},
-	examineManagement: {
-		configuredSearchers: 'Konfigurisani pretraživači',
-		configuredSearchersDescription:
-			'Prikazuje svojstva i alate za bilo koji konfigurirani pretraživač (tj\n       višeindeksni pretraživač)\n    ',
-		fieldValues: 'Vrijednosti polja',
-		healthStatus: 'Zdravstveno stanje',
-		healthStatusDescription: 'Zdravstveno stanje indeksa i da li se može pročitati',
-		indexers: 'Indeksi',
-		indexInfo: 'Indeks info',
-		contentInIndex: 'Sadržaj u indeksu',
-		indexInfoDescription: 'Navodi svojstva indeksa',
-		manageIndexes: 'Upravljajte Examine-ovim indeksima',
-		manageIndexesDescription:
-			'Omogućava vam da vidite detalje svakog indeksa i pruža neke alate za\n       upravljanje indeksima\n    ',
-		rebuildIndex: 'Ponovo izgradi indeks',
-		rebuildIndexWarning:
-			'\n      Ovo će uzrokovati ponovnu izgradnju indeksa.<br />\n      Ovisno o tome koliko sadržaja ima na vašoj web lokaciji, to može potrajati.<br />\n      Ne preporučuje se obnavljanje indeksa u vrijeme velikog prometa na web stranici ili kada urednici uređuju sadržaj.\n     ',
-		searchers: 'Pretraživači',
-		searchDescription: 'Pretražite indeks i pogledajte rezultate',
-		tools: 'Alati',
-		toolsDescription: 'Alati za upravljanje indeksom',
-		fields: 'polja',
-		indexCannotRead: 'Indeks se ne može pročitati i morat će se ponovo izgraditi',
-		processIsTakingLonger:
-			'Proces traje duže od očekivanog, provjerite Umbraco dnevnik da vidite\n       je li bilo grešaka tokom ove operacije\n    ',
-		indexCannotRebuild: 'Ovaj indeks se ne može ponovo izgraditi jer mu nije dodijeljen',
-		iIndexPopulator: 'IIndexPopulator',
 	},
 	placeholders: {
 		username: 'Unesite svoje korisničko ime',
@@ -1967,7 +1941,6 @@ export default {
 		contentRedirectManager: 'Preusmjeravanje URL-ova',
 		mediaFolderBrowser: 'Sadržaj',
 		settingsWelcome: 'Dobrodošli',
-		settingsExamine: 'Examine menadžment',
 		settingsPublishedStatus: 'Status stranice',
 		settingsModelsBuilder: 'Generator modela',
 		settingsHealthCheck: 'Provjera zdravlja',

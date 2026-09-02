@@ -118,7 +118,7 @@ public class ContentFinderByUrl : IContentFinder
             docreq.SetPublishedContent(node);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Got content, id={NodeId}", node.Id);
+                _logger.LogDebug("Got content, id={NodeId}, key={NodeKey}", node.Id, node.Key);
             }
         }
         else

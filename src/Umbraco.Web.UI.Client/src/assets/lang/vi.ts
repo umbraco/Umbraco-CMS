@@ -328,6 +328,8 @@ export default {
 		isSensitiveValue:
 			'Giá trị này bị ẩn. Nếu bạn cần quyền truy cập để xem giá trị này, vui lòng liên hệ với quản trị viên trang web của bạn.',
 		isSensitiveValue_short: 'Giá trị này bị ẩn.',
+		isSensitiveValueNotice:
+			'Nếu bạn cần quyền truy cập để xem các giá trị bị ẩn, vui lòng liên hệ với quản trị viên trang web của bạn.',
 		languagesToPublish: 'Bạn muốn xuất bản ngôn ngữ nào?',
 		languagesToSendForApproval: 'Bạn muốn gửi ngôn ngữ nào để phê duyệt?',
 		languagesToSchedule: 'Bạn muốn lên lịch ngôn ngữ nào?',
@@ -670,38 +672,6 @@ export default {
 		displayName: 'Tên văn hóa',
 		changeKeyError: "Khóa '%0%' đã tồn tại.",
 		overviewTitle: 'Tổng quan từ điển',
-	},
-	examineManagement: {
-		configuredSearchers: 'Các tìm kiếm đã cấu hình',
-		configuredSearchersDescription:
-			'Hiển thị các thuộc tính và công cụ cho bất kỳ tìm kiếm nào đã cấu hình (ví dụ: như một tìm kiếm đa chỉ mục)',
-		fieldValues: 'Giá trị trường',
-		healthStatus: 'Trạng thái sức khỏe',
-		healthStatusDescription: 'Trạng thái sức khỏe của chỉ mục và nếu nó có thể được đọc',
-		indexers: 'Bộ lập chỉ mục',
-		indexInfo: 'Thông tin chỉ mục',
-		contentInIndex: 'Nội dung trong chỉ mục',
-		indexInfoDescription: 'Liệt kê các thuộc tính của chỉ mục',
-		manageIndexes: 'Quản lý các chỉ mục Examine',
-		manageIndexesDescription:
-			'Cho phép bạn xem chi tiết của từng chỉ mục và cung cấp một số công cụ để quản lý các chỉ mục',
-		rebuildIndex: 'Xây dựng lại chỉ mục',
-		rebuildIndexWarning:
-			'Điều này sẽ khiến chỉ mục được xây dựng lại.<br />Tùy thuộc vào lượng nội dung trên trang web của bạn, quá trình này có thể mất một thời gian.<br />Không khuyến nghị xây dựng lại chỉ mục trong thời gian lưu lượng truy cập cao hoặc khi các biên tập viên đang chỉnh sửa nội dung.',
-		searchers: 'Bộ tìm kiếm',
-		searchDescription: 'Tìm kiếm trong chỉ mục và xem kết quả',
-		tools: 'Công cụ',
-		toolsDescription: 'Công cụ quản lý chỉ mục',
-		fields: 'trường',
-		indexCannotRead: 'Không thể đọc chỉ mục và cần được xây dựng lại',
-		processIsTakingLonger:
-			'Quá trình mất nhiều thời gian hơn dự kiến, hãy kiểm tra nhật ký Umbraco để xem có lỗi nào trong quá trình này không',
-		indexCannotRebuild: 'Chỉ mục này không thể được xây dựng lại vì không có IIndexPopulator được gán',
-		iIndexPopulator: 'IIndexPopulator',
-		noResults: 'Không tìm thấy kết quả nào',
-		searchResultsFound: 'Hiển thị %0% - %1% của %2% kết quả - Trang %3% trên %4%',
-		corruptStatus: 'Phát hiện chỉ mục có khả năng bị hỏng',
-		corruptErrorDescription: 'Lỗi nhận được khi đánh giá chỉ mục:',
 	},
 	placeholders: {
 		username: 'Nhập tên người dùng...',
@@ -2371,7 +2341,6 @@ export default {
 		contentRedirectManager: 'Quản lý URL chuyển hướng',
 		mediaFolderBrowser: 'Nội dung',
 		settingsWelcome: 'Chào mừng',
-		settingsExamine: 'Quản lý Examine',
 		settingsPublishedStatus: 'Trạng thái đã xuất bản',
 		settingsModelsBuilder: 'Models Builder',
 		settingsHealthCheck: 'Health Check',
