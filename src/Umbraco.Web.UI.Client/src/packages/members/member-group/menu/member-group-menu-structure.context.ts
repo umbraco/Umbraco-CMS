@@ -1,9 +1,10 @@
+import { UMB_MEMBER_GROUP_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbMenuStructureWorkspaceContextBase, type UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbLanguageNavigationStructureWorkspaceContext extends UmbMenuStructureWorkspaceContextBase {
+export class UmbMemberGroupMenuStructureWorkspaceContext extends UmbMenuStructureWorkspaceContextBase {
 	#workspaceContext?: typeof UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
@@ -16,7 +17,7 @@ export class UmbLanguageNavigationStructureWorkspaceContext extends UmbMenuStruc
 			this.observe(
 				observeMultiple([instance.unique, instance.entityType, instance.name]),
 				([unique, entityType, name]) => this.#requestStructure(unique, entityType, name),
-				'umbLanguageMenuStructureObserver',
+				'umbMemberGroupMenuStructureObserver',
 			);
 		});
 	}
@@ -28,8 +29,8 @@ export class UmbLanguageNavigationStructureWorkspaceContext extends UmbMenuStruc
 		const items: Array<UmbStructureItemModel> = [
 			{
 				unique: null,
-				entityType: 'language-root',
-				name: '#treeHeaders_languages',
+				entityType: UMB_MEMBER_GROUP_ROOT_ENTITY_TYPE,
+				name: '#treeHeaders_memberGroups',
 				isFolder: false,
 			},
 		];
@@ -47,4 +48,4 @@ export class UmbLanguageNavigationStructureWorkspaceContext extends UmbMenuStruc
 	}
 }
 
-export { UmbLanguageNavigationStructureWorkspaceContext as api };
+export { UmbMemberGroupMenuStructureWorkspaceContext as api };
