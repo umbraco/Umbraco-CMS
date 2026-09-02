@@ -698,3 +698,45 @@ test.fixme('can allow access to all elements for a user', async ({umbracoApi, um
   const userData = await umbracoApi.user.getByName(nameOfTheUser);
   expect(userData.hasElementRootAccess).toBeTruthy();
 });
+
+test('cannot create a user with an invalid email format', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoUi.user.goToUsers();
+
+  // Act
+  await umbracoUi.user.clickCreateActionWithOptionName('User');
+  await umbracoUi.user.enterNameOfTheUser(nameOfTheUser);
+  await umbracoUi.user.enterUserEmail('invalidEmailFormat');
+  await umbracoUi.user.clickChooseButton();
+  await umbracoUi.user.clickButtonWithName(defaultUserGroupName);
+  await umbracoUi.user.clickChooseModalButton();
+  await umbracoUi.user.clickCreateUserButton();
+
+  // Assert
+  expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeFalsy();
+});
+
+test('cannot create a user with a duplicate email', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const existingUserName = 'ExistingUser';
+  await umbracoApi.user.ensureNameNotExists(existingUserName);
+  const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
+  await umbracoApi.user.createDefaultUser(existingUserName, userEmail, [userGroup.id]);
+  await umbracoUi.user.goToUsers();
+
+  // Act
+  await umbracoUi.user.clickCreateActionWithOptionName('User');
+  await umbracoUi.user.enterNameOfTheUser(nameOfTheUser);
+  await umbracoUi.user.enterUserEmail(userEmail);
+  await umbracoUi.user.clickChooseButton();
+  await umbracoUi.user.clickButtonWithName(defaultUserGroupName);
+  await umbracoUi.user.clickChooseModalButton();
+  await umbracoUi.user.clickCreateUserButton();
+
+  // Assert
+  await umbracoUi.user.isErrorNotificationVisible();
+  expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeFalsy();
+
+  // Clean
+  await umbracoApi.user.ensureNameNotExists(existingUserName);
+});

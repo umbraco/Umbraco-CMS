@@ -110,3 +110,19 @@ test('cannot create a script with an empty name', {tag: '@release'}, async ({umb
   await umbracoUi.script.isFailedStateButtonVisible();
   expect(await umbracoApi.script.doesNameExist(scriptName)).toBeFalsy();
 });
+
+test('cannot create a script with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.script.createDefaultScript(scriptName);
+  await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.script.clickActionsMenuAtRoot();
+  await umbracoUi.script.clickCreateActionMenuOption();
+  await umbracoUi.script.clickNewJavascriptFileButton();
+  await umbracoUi.script.enterScriptName(scriptName);
+  await umbracoUi.script.clickSaveButton();
+
+  // Assert
+  await umbracoUi.script.isFailedStateButtonVisible();
+});

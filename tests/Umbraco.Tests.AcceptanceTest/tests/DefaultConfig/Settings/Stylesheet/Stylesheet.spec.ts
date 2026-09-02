@@ -111,3 +111,19 @@ test('cannot create a stylesheet with an empty name', {tag: '@release'}, async (
   await umbracoUi.stylesheet.isFailedStateButtonVisible();
   expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeFalsy();
 });
+
+test('cannot create a stylesheet with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.stylesheet.clickActionsMenuAtRoot();
+  await umbracoUi.stylesheet.clickCreateActionMenuOption();
+  await umbracoUi.stylesheet.clickNewStylesheetButton();
+  await umbracoUi.stylesheet.enterStylesheetName(stylesheetName);
+  await umbracoUi.stylesheet.clickSaveButton();
+
+  // Assert
+  await umbracoUi.stylesheet.isFailedStateButtonVisible();
+});
