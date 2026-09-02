@@ -149,7 +149,6 @@ public sealed class BlockEditorVarianceHandler
             IPublishedPropertyType? propertyType = elementType.GetPropertyType(group.Key.Alias);
             if (propertyType is null)
             {
-                alignedValues.AddRange(group);
                 continue;
             }
 
