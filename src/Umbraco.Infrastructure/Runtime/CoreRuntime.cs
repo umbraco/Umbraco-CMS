@@ -11,8 +11,8 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Extensions;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -226,7 +226,7 @@ public class CoreRuntime : IRuntime
     ///     <see cref="UmbracoApplicationStartingNotification" /> handler.
     /// </summary>
     /// <remarks>
-    ///     Delegates to the shared <see cref="Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration.IServerRoleElector" />
+    ///     Delegates to the shared <see cref="IServerRoleElector" />
     ///     (also used by <see cref="Install.UnattendedUpgradeBackgroundService" />, which publishes
     ///     <see cref="UmbracoApplicationStartingNotification" /> itself for the unattended-upgrade path rather than
     ///     going through this method), resolved from the runtime's optional <see cref="IServiceProvider" /> rather

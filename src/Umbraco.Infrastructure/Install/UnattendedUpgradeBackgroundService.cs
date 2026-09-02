@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
+using Umbraco.Cms.Infrastructure.Sync;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
 
 namespace Umbraco.Cms.Infrastructure.Install;

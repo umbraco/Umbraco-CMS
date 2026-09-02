@@ -6,11 +6,11 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
+namespace Umbraco.Cms.Infrastructure.Sync;
 
 /// <summary>
 /// Shared, bounded, non-throwing attempt to touch (register) the current server. Used by both
-/// <see cref="TouchServerJob"/>'s recurring cadence and <see cref="Runtime.CoreRuntime"/>'s one-time attempt to
+/// <see cref="Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration.TouchServerJob"/>'s recurring cadence and <see cref="Runtime.CoreRuntime"/>'s one-time attempt to
 /// resolve the server role before boot notifications fire.
 /// </summary>
 internal static class BoundedServerTouch

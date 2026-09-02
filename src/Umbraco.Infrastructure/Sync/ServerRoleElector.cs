@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
+namespace Umbraco.Cms.Infrastructure.Sync;
 
 /// <inheritdoc cref="IServerRoleElector" />
 internal sealed class ServerRoleElector : IServerRoleElector

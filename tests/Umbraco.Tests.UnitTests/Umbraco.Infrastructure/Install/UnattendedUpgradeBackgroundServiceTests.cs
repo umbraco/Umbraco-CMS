@@ -13,8 +13,8 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Infrastructure.Sync;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Install;
 

@@ -3,7 +3,7 @@
 
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
+namespace Umbraco.Cms.Infrastructure.Sync;
 
 /// <summary>
 /// Makes one bounded, best-effort attempt to elect the current server's role, for callers that need to resolve

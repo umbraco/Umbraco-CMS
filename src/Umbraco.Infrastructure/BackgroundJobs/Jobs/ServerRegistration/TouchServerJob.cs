@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Sync;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 
