@@ -10,12 +10,14 @@ const number = 10;
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
   await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can create content with the numeric data type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -87,9 +89,6 @@ test('cannot publish a numeric value below the configured minimum', {tag: '@rele
   await umbracoUi.content.enterNumeric(min);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('cannot publish a numeric value above the configured maximum', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -117,9 +116,6 @@ test('cannot publish a numeric value above the configured maximum', {tag: '@rele
   await umbracoUi.content.enterNumeric(max);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can not publish a mandatory numeric with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
