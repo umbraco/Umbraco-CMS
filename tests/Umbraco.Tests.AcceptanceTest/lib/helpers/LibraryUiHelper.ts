@@ -203,7 +203,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.elementNameTxt = page.locator('#name-input input');
     this.publishBtn = page.getByLabel(/^Publish(…)?$/);
     this.unpublishBtn = page.getByLabel(/^Unpublish(…)?$/);
-    this.actionMenuForElementBtn = page.locator('#header').getByTestId('open-dropdown');
+    this.actionMenuForElementBtn = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.Element"]').getByTestId('open-dropdown');
     this.textstringTxt = page.locator('umb-property-editor-ui-text-box #input');
     this.reloadChildrenThreeDotsBtn = page.getByRole('button', {name: 'Reload children…'});
     this.elementTree = page.locator('umb-tree[alias="Umb.Tree.Element"]');
@@ -288,7 +288,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.duplicateToBtn = page.getByRole('button', {name: 'Duplicate to'});
     this.moveToBtn = page.getByRole('button', {name: 'Move to'});
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
-    this.elementTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
+    this.elementTreeRefreshBtn = page.locator('[data-mark="section-sidebar-app:Umb.SidebarMenu.Element"]').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = page.getByTestId('audit-log-action:Umb.AuditLogAction.Element.Rollback');
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
