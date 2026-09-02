@@ -488,6 +488,7 @@ declare global {
 		content_isPublished: string;
 		content_isSensitiveValue: string;
 		content_isSensitiveValue_short: string;
+		content_isSensitiveValueNotice: string;
 		content_itemChanged: string;
 		content_itemNotPublished: string;
 		content_languagesToPublish: string;
