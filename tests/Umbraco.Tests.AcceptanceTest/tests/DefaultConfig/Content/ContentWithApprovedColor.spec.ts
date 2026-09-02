@@ -8,12 +8,16 @@ const dataTypeName = 'Approved Color';
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.dataType.ensureNameNotExists('CustomApprovedColor');
+  await umbracoApi.dataType.ensureNameNotExists('MandatoryApprovedColor');
   await umbracoUi.goToBackOffice();
 });
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+  await umbracoApi.dataType.ensureNameNotExists('CustomApprovedColor');
+  await umbracoApi.dataType.ensureNameNotExists('MandatoryApprovedColor');
 });
 
 test('can create content with the approved color data type', async ({umbracoApi, umbracoUi}) => {
@@ -77,9 +81,6 @@ test('can create content with the custom approved color data type', {tag: '@rele
   expect(contentData.values[0].alias).toEqual(AliasHelper.toAlias(customDataTypeName));
   expect(contentData.values[0].value.label).toEqual(colorLabel);
   expect(contentData.values[0].value.value).toEqual('#' + colorValue);
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can not publish a mandatory approved color with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -107,7 +108,4 @@ test('can not publish a mandatory approved color with an empty value', {tag: '@r
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });

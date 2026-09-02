@@ -7,6 +7,8 @@ const customDataTypeName = 'CustomMultiNodeTreePicker';
 const allowedTestMemberName = 'Allowed Test Member';
 const notAllowedTestMemberName = 'Not Allowed Test Member';
 const notAllowedMemberTypeName = 'Not Allowed Member Type';
+const pickerTargetName = 'PickerTarget';
+const pickerTargetDocumentTypeName = 'PickerTargetDocumentType';
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
@@ -20,6 +22,8 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.member.ensureNameNotExists(allowedTestMemberName);
   await umbracoApi.member.ensureNameNotExists(notAllowedTestMemberName);
   await umbracoApi.memberType.ensureNameNotExists(notAllowedMemberTypeName);
+  await umbracoApi.document.ensureNameNotExists(pickerTargetName);
+  await umbracoApi.documentType.ensureNameNotExists(pickerTargetDocumentTypeName);
 });
 
 test('can create content with content picker with allowed types', async ({umbracoApi, umbracoUi}) => {
@@ -186,8 +190,7 @@ test('can search and see only allowed member types', async ({umbracoApi, umbraco
 
 test('can not publish a mandatory multi node tree picker with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const pickerTargetName = 'PickerTarget';
-  const targetDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot('PickerTargetDocumentType');
+  const targetDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(pickerTargetDocumentTypeName);
   await umbracoApi.document.createDefaultDocument(pickerTargetName, targetDocumentTypeId);
   const customDataTypeId = await umbracoApi.dataType.createDefaultContentPickerSourceDataType(customDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId, 'Test Group', false, false, true);
@@ -212,8 +215,4 @@ test('can not publish a mandatory multi node tree picker with an empty value', {
   // Assert
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
-
-  // Clean
-  await umbracoApi.document.ensureNameNotExists(pickerTargetName);
-  await umbracoApi.documentType.ensureNameNotExists('PickerTargetDocumentType');
 });

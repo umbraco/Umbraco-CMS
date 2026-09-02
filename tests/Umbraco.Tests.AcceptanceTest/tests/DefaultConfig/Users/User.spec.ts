@@ -4,17 +4,20 @@ import {expect} from '@playwright/test';
 const nameOfTheUser = 'TestUser';
 const userEmail = 'TestUser@EmailTest.test';
 const defaultUserGroupName = 'Writers';
+const existingUserName = 'ExistingUser';
 let userCount = null;
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();
   await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
+  await umbracoApi.user.ensureNameNotExists(existingUserName);
 });
 
 test.afterEach(async ({umbracoApi, umbracoUi}) => {
   // Waits so we can try to avoid db locks
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
+  await umbracoApi.user.ensureNameNotExists(existingUserName);
 });
 
 test('can create a user', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -718,8 +721,6 @@ test('cannot create a user with an invalid email format', async ({umbracoApi, um
 
 test('cannot create a user with a duplicate email', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const existingUserName = 'ExistingUser';
-  await umbracoApi.user.ensureNameNotExists(existingUserName);
   const userGroup = await umbracoApi.userGroup.getByName(defaultUserGroupName);
   await umbracoApi.user.createDefaultUser(existingUserName, userEmail, [userGroup.id]);
   await umbracoUi.user.goToUsers();
@@ -736,7 +737,4 @@ test('cannot create a user with a duplicate email', async ({umbracoApi, umbracoU
   // Assert
   await umbracoUi.user.isErrorNotificationVisible();
   expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeFalsy();
-
-  // Clean
-  await umbracoApi.user.ensureNameNotExists(existingUserName);
 });

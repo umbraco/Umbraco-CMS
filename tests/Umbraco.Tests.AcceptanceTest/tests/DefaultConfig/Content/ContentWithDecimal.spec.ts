@@ -44,9 +44,6 @@ test('cannot publish a decimal value below the configured minimum', {tag: '@rele
   await umbracoUi.content.enterDecimal(min);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('cannot publish a decimal value above the configured maximum', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -74,9 +71,6 @@ test('cannot publish a decimal value above the configured maximum', {tag: '@rele
   await umbracoUi.content.enterDecimal(max);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
 test('can not publish a mandatory decimal with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
