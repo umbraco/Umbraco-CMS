@@ -48,7 +48,21 @@ internal static class BoundedServerTouch
         // IServerRegistrationService.TouchServer() runs a synchronous database write and cannot observe the
         // cancellation token, so a hung connection would otherwise block the caller indefinitely. Offload it to
         // the thread pool and bound the wait so the caller survives regardless of what the database does.
-        Task touchTask = Task.Run(() => registrationService.TouchServer(serverAddress, staleServerTimeout), cancellationToken);
+        //
+        // Suppress execution context flow around the fork: this is shared infrastructure called from callers with
+        // different ambient guarantees. TouchServerJob's loop already runs under suppression (see
+        // RecurringBackgroundJobHostedService.StartAsync), but CoreRuntime and UnattendedUpgradeBackgroundService
+        // don't provide that, and by the time either reaches here it has already run several notification handlers
+        // that may hold a scope open. Without suppression, a fork that inherits a non-empty ambient scope stack
+        // would share it with the caller's own subsequent scope pushes/pops - see
+        // RecurringBackgroundJobHostedService.StartAsync for the original repro of that failure mode. The
+        // IsFlowSuppressed() check avoids double-suppressing (and throwing) when already inside a suppressed
+        // context, as TouchServerJob's is.
+        Task touchTask;
+        using (ExecutionContext.IsFlowSuppressed() ? null : (IDisposable?)ExecutionContext.SuppressFlow())
+        {
+            touchTask = Task.Run(() => registrationService.TouchServer(serverAddress, staleServerTimeout), cancellationToken);
+        }
 
         // Observe the task's eventual fault on every exit path (timeout, shutdown cancellation, or a late
         // failure once the caller has stopped awaiting it) so it never surfaces as an UnobservedTaskException.
