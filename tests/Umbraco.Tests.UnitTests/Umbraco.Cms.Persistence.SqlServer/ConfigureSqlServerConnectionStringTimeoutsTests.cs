@@ -128,6 +128,31 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
         });
     }
 
+    [Test]
+    public void Cannot_Change_Connection_String_When_A_Timeout_Is_Rejected_By_The_Builder()
+    {
+        // Validation rejects a negative timeout before it reaches here, so this only asserts that applying the
+        // timeouts is covered by the same guard as parsing the connection string.
+        var logger = new FakeLogger();
+        var options = new ConnectionStrings
+        {
+            ConnectionString = ConnectionString,
+            ProviderName = global::Umbraco.Cms.Persistence.SqlServer.Constants.ProviderName,
+        };
+
+        new ConfigureSqlServerConnectionStringTimeouts(
+                Options.Create(new GlobalSettings { DatabaseCommandTimeout = TimeSpan.FromSeconds(-1) }),
+                logger)
+            .PostConfigure(name: null, options);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ConnectionString, options.ConnectionString);
+            Assert.AreEqual(1, logger.LogEntries.Count);
+            Assert.AreEqual(LogLevel.Warning, logger.LogEntries[0].Level);
+        });
+    }
+
     private static ConnectionStrings PostConfigure(
         GlobalSettings globalSettings,
         string connectionString = ConnectionString,

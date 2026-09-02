@@ -52,6 +52,16 @@ internal sealed class ConfigureSqlServerConnectionStringTimeouts : IPostConfigur
         try
         {
             connectionStringBuilder = new SqlConnectionStringBuilder(options.ConnectionString);
+
+            if (globalSettings.DatabaseCommandTimeout is { } commandTimeout)
+            {
+                connectionStringBuilder.CommandTimeout = commandTimeout.ToConnectionStringTimeoutSeconds();
+            }
+
+            if (globalSettings.DatabaseConnectTimeout is { } connectTimeout)
+            {
+                connectionStringBuilder.ConnectTimeout = connectTimeout.ToConnectionStringTimeoutSeconds();
+            }
         }
         catch (ArgumentException exception)
         {
@@ -62,16 +72,6 @@ internal sealed class ConfigureSqlServerConnectionStringTimeouts : IPostConfigur
                 + "string instead.";
             _logger.LogWarning(exception, message);
             return;
-        }
-
-        if (globalSettings.DatabaseCommandTimeout is { } commandTimeout)
-        {
-            connectionStringBuilder.CommandTimeout = commandTimeout.ToConnectionStringTimeoutSeconds();
-        }
-
-        if (globalSettings.DatabaseConnectTimeout is { } connectTimeout)
-        {
-            connectionStringBuilder.ConnectTimeout = connectTimeout.ToConnectionStringTimeoutSeconds();
         }
 
         options.ConnectionString = connectionStringBuilder.ConnectionString;
