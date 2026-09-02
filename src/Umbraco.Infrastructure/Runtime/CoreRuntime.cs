@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
@@ -243,41 +244,10 @@ public class CoreRuntime : IRuntime
         IServerRegistrationService registrationService = _serviceProvider.GetRequiredService<IServerRegistrationService>();
         GlobalSettings globalSettings = _serviceProvider.GetRequiredService<IOptionsMonitor<GlobalSettings>>().CurrentValue;
 
-        var serverAddress = _hostingEnvironment.ApplicationMainUrl?.ToString();
-        if (string.IsNullOrWhiteSpace(serverAddress))
-        {
-            // No application URL is known yet this early in boot - fall back to the machine name so election can
-            // still proceed (uniqueness comes from the server identity, not this address). TouchServerJob will
-            // overwrite this placeholder with the real URL once one has been detected from a request.
-            serverAddress = Environment.MachineName;
-        }
-
-        var touchTask = Task.Run(
-            () => registrationService.TouchServer(serverAddress, globalSettings.DatabaseServerRegistrar.StaleServerTimeout),
-            cancellationToken);
-
-        // Observe the task's eventual fault so it never surfaces as an UnobservedTaskException once we stop awaiting it.
-        _ = touchTask.ContinueWith(
-            static t => _ = t.Exception,
-            CancellationToken.None,
-            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-            TaskScheduler.Default);
-
-        try
-        {
-            await touchTask.WaitAsync(globalSettings.DatabaseServerRegistrar.TouchTimeout, cancellationToken);
-        }
-        catch (TimeoutException)
-        {
-            _logger.LogWarning(
-                "The initial server role election attempt did not complete within {TouchTimeout}. The server role remains {ServerRole} until the next scheduled attempt.",
-                globalSettings.DatabaseServerRegistrar.TouchTimeout,
-                ServerRole.Unknown);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            _logger.LogWarning(ex, "The initial server role election attempt failed. The server role remains {ServerRole} until the next scheduled attempt.", ServerRole.Unknown);
-        }
+        // Shared with TouchServerJob's recurring cadence - see BoundedServerTouch. The returned (raw, unbounded)
+        // task isn't needed here: unlike the recurring job, this only ever runs once per boot, so there is no
+        // later call that would need to check whether this one is still stuck.
+        _ = await BoundedServerTouch.TryTouchAsync(registrationService, _hostingEnvironment, globalSettings, _logger, cancellationToken);
     }
 
     private async Task StopAsync(CancellationToken cancellationToken, bool isRestarting)
