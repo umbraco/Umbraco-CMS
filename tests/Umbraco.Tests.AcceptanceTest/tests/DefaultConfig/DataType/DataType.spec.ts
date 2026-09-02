@@ -5,6 +5,7 @@ const dataTypeName = 'TestDataType';
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(dataTypeName + ' (1)');
   await umbracoUi.goToBackOffice();
   await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
 });

@@ -13,6 +13,8 @@ const pickerTargetDocumentTypeName = 'PickerTargetDocumentType';
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(contentName);
+  await umbracoApi.document.ensureNameNotExists(pickerTargetName);
+  await umbracoApi.documentType.ensureNameNotExists(pickerTargetDocumentTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
