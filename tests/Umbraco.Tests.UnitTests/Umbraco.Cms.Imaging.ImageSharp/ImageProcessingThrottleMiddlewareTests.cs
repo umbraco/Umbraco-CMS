@@ -40,20 +40,8 @@ public class ImageProcessingThrottleMiddlewareTests
     // something the imaging middleware will process, so neither may queue behind it.
     [TestCase(ImagePath, "v", "1234")]
     [TestCase("/umbraco/management/api/v1/tree", "width", "400")]
-    public async Task InvokeAsync_NonProcessingRequests_AreNotThrottled(string path, string key, string value)
-    {
-        var probe = new ConcurrencyProbe();
-        var middleware = CreateMiddleware(probe.HandleAsync);
-
-        Task[] requests = Send(middleware, () => CreateContext(path, (key, value)));
-
-        await WaitUntilAsync(() => probe.Current >= RequestCount);
-
-        probe.Release();
-        await Task.WhenAll(requests);
-
-        Assert.That(probe.Peak, Is.EqualTo(RequestCount));
-    }
+    public Task InvokeAsync_NonProcessingRequests_AreNotThrottled(string path, string key, string value)
+        => AssertAllRequestsPassThrough(CreateMiddleware, () => CreateContext(path, (key, value)));
 
     [Test]
     public async Task InvokeAsync_RequestsWithNoPath_AreNotThrottled()
@@ -76,42 +64,16 @@ public class ImageProcessingThrottleMiddlewareTests
         Assert.That(handled, Is.True);
     }
 
+    // Ample memory for a single processor: the processor count already bounds concurrent decodes,
+    // so the gate steps aside rather than serialising requests the cache could serve.
     [Test]
-    public async Task InvokeAsync_WhenMemoryIsNotConstrained_DoesNotThrottle()
-    {
-        var probe = new ConcurrencyProbe();
+    public Task InvokeAsync_WhenMemoryIsNotConstrained_DoesNotThrottle()
+        => AssertAllRequestsPassThrough(CreateUnconstrainedMiddleware, () => CreateContext(ImagePath, ("width", "400")));
 
-        // Ample memory for a single processor: the processor count already bounds concurrent
-        // decodes, so the gate steps aside rather than serialising requests the cache could serve.
-        var middleware = CreateUnconstrainedMiddleware(probe.HandleAsync);
-
-        Task[] requests = Send(middleware, () => CreateContext(ImagePath, ("width", "400")));
-
-        await WaitUntilAsync(() => probe.Current >= RequestCount);
-
-        probe.Release();
-        await Task.WhenAll(requests);
-
-        Assert.That(probe.Peak, Is.EqualTo(RequestCount));
-    }
-
+    // An explicit limit is set, but the feature is switched off, so nothing is gated.
     [Test]
-    public async Task InvokeAsync_WhenDisabled_DoesNotThrottle()
-    {
-        var probe = new ConcurrencyProbe();
-
-        // An explicit limit is set, but the feature is switched off, so nothing is gated.
-        var middleware = CreateDisabledMiddleware(probe.HandleAsync);
-
-        Task[] requests = Send(middleware, () => CreateContext(ImagePath, ("width", "400")));
-
-        await WaitUntilAsync(() => probe.Current >= RequestCount);
-
-        probe.Release();
-        await Task.WhenAll(requests);
-
-        Assert.That(probe.Peak, Is.EqualTo(RequestCount));
-    }
+    public Task InvokeAsync_WhenDisabled_DoesNotThrottle()
+        => AssertAllRequestsPassThrough(CreateDisabledMiddleware, () => CreateContext(ImagePath, ("width", "400")));
 
     [Test]
     public async Task InvokeAsync_ReleasesTheSlot_WhenTheRequestThrows()
@@ -177,6 +139,23 @@ public class ImageProcessingThrottleMiddlewareTests
         return availableMemoryBytes is { } memoryBytes && processorCount is { } cores
             ? new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, memoryBytes, cores)
             : new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors);
+    }
+
+    private static async Task AssertAllRequestsPassThrough(
+        Func<RequestDelegate, ImageProcessingThrottleMiddleware> create,
+        Func<DefaultHttpContext> context)
+    {
+        var probe = new ConcurrencyProbe();
+        var middleware = create(probe.HandleAsync);
+
+        Task[] requests = Send(middleware, context);
+
+        await WaitUntilAsync(() => probe.Current >= RequestCount);
+
+        probe.Release();
+        await Task.WhenAll(requests);
+
+        Assert.That(probe.Peak, Is.EqualTo(RequestCount));
     }
 
     private static Task[] Send(ImageProcessingThrottleMiddleware middleware, Func<DefaultHttpContext> context)
