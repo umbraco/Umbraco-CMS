@@ -24,7 +24,7 @@ export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSid
 	override renderHeader() {
 		const label = this.localize.string(this.manifest?.meta?.label ?? '');
 		return html`
-			<div id="header">
+			<div id="header" data-mark="section-sidebar-app:${this.manifest?.alias}">
 				<h3>${label}</h3>
 				<umb-entity-actions-bundle slot="actions" .label=${label}></umb-entity-actions-bundle>
 			</div>
