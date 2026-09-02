@@ -1466,9 +1466,11 @@ internal partial class BlockListElementLevelVariationTests
         });
     }
 
-    [TestCase("en-US", "Variant content in English", "Variant settings in English")]
-    [TestCase("da-DK", "Variant content in Danish", "Variant settings in Danish")]
-    public async Task Can_Turn_Variant_Element_Invariant_For_Variant_Block_Property(string culture, string expectedContentValue, string expectedSettingsValue)
+    [TestCase("en-US", "Variant content in English", "Variant settings in English", false)]
+    [TestCase("en-US", "Variant content in English", "Variant settings in English", true)]
+    [TestCase("da-DK", "Variant content in Danish", "Variant settings in Danish", false)]
+    [TestCase("da-DK", "Variant content in Danish", "Variant settings in Danish", true)]
+    public async Task Can_Turn_Variant_Element_Invariant_For_Variant_Block_Property(string culture, string expectedContentValue, string expectedSettingsValue, bool addCarriedPropertyValues)
     {
         var elementType = CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
@@ -1483,33 +1485,45 @@ internal partial class BlockListElementLevelVariationTests
             new[]
             {
                 new BlockProperty(
-                    new List<BlockPropertyValue>
-                    {
-                        new() { Alias = "invariantText", Value = "The invariant content value" },
-                        new() { Alias = "variantText", Value = "Variant content in English", Culture = "en-US" },
-                        new() { Alias = "variantText", Value = null, Culture = "da-DK" },
-                    },
-                    new List<BlockPropertyValue>
-                    {
-                        new() { Alias = "invariantText", Value = "The invariant settings value" },
-                        new() { Alias = "variantText", Value = "Variant settings in English", Culture = "en-US" },
-                        new() { Alias = "variantText", Value = null, Culture = "da-DK" },
-                    },
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant content value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant content in English", Culture = "en-US" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried content in Danish", Culture = "da-DK" }
+                                : null,
+                        }.WhereNotNull()),
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant settings value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant settings in English", Culture = "en-US" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried settings in Danish", Culture = "da-DK" }
+                                : null,
+                        }.WhereNotNull()),
                     "en-US",
                     null),
                 new BlockProperty(
-                    new List<BlockPropertyValue>
-                    {
-                        new() { Alias = "invariantText", Value = "The invariant content value" },
-                        new() { Alias = "variantText", Value = null, Culture = "en-US" },
-                        new() { Alias = "variantText", Value = "Variant content in Danish", Culture = "da-DK" },
-                    },
-                    new List<BlockPropertyValue>
-                    {
-                        new() { Alias = "invariantText", Value = "The invariant settings value" },
-                        new() { Alias = "variantText", Value = null, Culture = "en-US" },
-                        new() { Alias = "variantText", Value = "Variant settings in Danish", Culture = "da-DK" },
-                    },
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant content value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant content in Danish", Culture = "da-DK" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried content in English", Culture = "en-US" }
+                                : null,
+                        }.WhereNotNull()),
+                    new List<BlockPropertyValue>(
+                        new[]
+                        {
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The settings content value" },
+                            new BlockPropertyValue { Alias = "variantText", Value = "Variant settings in Danish", Culture = "da-DK" },
+                            addCarriedPropertyValues
+                                ? new BlockPropertyValue { Alias = "variantText", Value = "Carried settings in English", Culture = "en-US" }
+                                : null,
+                        }.WhereNotNull()),
                     "da-DK",
                     null),
             },
