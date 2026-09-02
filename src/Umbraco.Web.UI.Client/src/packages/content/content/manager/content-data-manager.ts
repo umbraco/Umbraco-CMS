@@ -1,5 +1,5 @@
 import type { UmbContentDetailModel } from '../types.js';
-import { UmbElementWorkspaceDataManager } from './element-data-manager.js';
+import { UmbEntryWorkspaceDataManager } from './entry-data-manager.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { appendToFrozenArray, jsonStringComparison } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId, type UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
@@ -9,7 +9,7 @@ export class UmbContentWorkspaceDataManager<
 	ModelVariantType extends UmbEntityVariantModel = ModelType extends { variants: UmbEntityVariantModel[] }
 		? ModelType['variants'][0]
 		: never,
-> extends UmbElementWorkspaceDataManager<ModelType> {
+> extends UmbEntryWorkspaceDataManager<ModelType> {
 	//
 	//#repository;
 	#variantScaffold?: ModelVariantType;

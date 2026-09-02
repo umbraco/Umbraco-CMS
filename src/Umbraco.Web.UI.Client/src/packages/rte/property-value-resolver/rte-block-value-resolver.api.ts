@@ -4,11 +4,11 @@ import {
 	type UmbBlockExposeModel,
 	type UmbBlockValuesCallback,
 } from '@umbraco-cms/backoffice/block';
-import type { UmbElementValueModel } from '@umbraco-cms/backoffice/content';
+import type { UmbEntryValueModel } from '@umbraco-cms/backoffice/content';
 
 export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyEditorRteValueType> {
 	async processValues(
-		property: UmbElementValueModel<UmbPropertyEditorRteValueType>,
+		property: UmbEntryValueModel<UmbPropertyEditorRteValueType>,
 		valuesCallback: UmbBlockValuesCallback,
 	) {
 		if (property.value) {
@@ -26,7 +26,7 @@ export class UmbRteBlockValueResolver extends UmbBlockValueResolver<UmbPropertyE
 	}
 
 	async processVariants(
-		property: UmbElementValueModel<UmbPropertyEditorRteValueType>,
+		property: UmbEntryValueModel<UmbPropertyEditorRteValueType>,
 		variantsCallback: (values: Array<UmbBlockExposeModel>) => Promise<Array<UmbBlockExposeModel> | undefined>,
 	) {
 		if (property.value) {

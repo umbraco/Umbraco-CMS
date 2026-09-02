@@ -1,4 +1,4 @@
-import type { UmbElementDetailModel } from '../types.js';
+import type { UmbEntryDetailModel } from '../types.js';
 import type { UmbElementPropertyDataOwner } from './element-property-data-owner.interface.js';
 import { umbExtractVariantValues } from './merge-variant-values.function.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
@@ -21,7 +21,7 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 type UmbPropertyVariantIdMapType = Array<{ alias: string; variantId: UmbVariantId }>;
 
 export abstract class UmbElementPropertyDatasetContext<
-	ContentModel extends UmbElementDetailModel = UmbElementDetailModel,
+	ContentModel extends UmbEntryDetailModel = UmbEntryDetailModel,
 	ContentTypeModel extends UmbContentTypeModel = UmbContentTypeModel,
 	DataOwnerType extends UmbElementPropertyDataOwner<ContentModel, ContentTypeModel> = UmbElementPropertyDataOwner<
 		ContentModel,

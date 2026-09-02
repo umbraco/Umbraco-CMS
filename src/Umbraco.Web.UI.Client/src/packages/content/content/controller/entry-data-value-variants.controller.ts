@@ -1,5 +1,5 @@
-import type { UmbElementWorkspaceDataManager } from '../manager/element-data-manager.js';
-import type { UmbElementDetailModel } from '../types.js';
+import type { UmbEntryWorkspaceDataManager } from '../manager/entry-data-manager.js';
+import type { UmbEntryDetailModel } from '../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { throttleTime } from '@umbraco-cms/backoffice/external/rxjs';
@@ -7,8 +7,10 @@ import type { UmbObjectWithVariantProperties } from '@umbraco-cms/backoffice/var
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbPropertyValueFlatMapperController } from '@umbraco-cms/backoffice/property';
 
-export class UmbElementDataValueVariantsController<ModelType extends UmbElementDetailModel> extends UmbControllerBase {
-	#dataManager: UmbElementWorkspaceDataManager<ModelType>;
+export class UmbEntryDataValueVariantsController<
+	ModelType extends UmbEntryDetailModel = UmbEntryDetailModel,
+> extends UmbControllerBase {
+	#dataManager: UmbEntryWorkspaceDataManager<ModelType>;
 
 	#variants: UmbArrayState<UmbObjectWithVariantProperties> = new UmbArrayState<UmbObjectWithVariantProperties>(
 		[],
@@ -17,7 +19,7 @@ export class UmbElementDataValueVariantsController<ModelType extends UmbElementD
 	/** An observable of the current variants that has values in the data. */
 	public readonly variants = this.#variants.asObservable();
 
-	constructor(host: UmbControllerHost, dataManager: UmbElementWorkspaceDataManager<ModelType>) {
+	constructor(host: UmbControllerHost, dataManager: UmbEntryWorkspaceDataManager<ModelType>) {
 		super(host);
 		this.#dataManager = dataManager;
 

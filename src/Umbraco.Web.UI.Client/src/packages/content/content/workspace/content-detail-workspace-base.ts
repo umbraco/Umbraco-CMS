@@ -1,4 +1,4 @@
-import type { UmbContentDetailModel, UmbElementValueModel } from '../types.js';
+import type { UmbContentDetailModel, UmbEntryValueModel } from '../types.js';
 import { UmbContentCollectionManager } from '../collection/index.js';
 import { UmbContentWorkspaceDataManager } from '../manager/index.js';
 import { UmbMergeContentVariantDataController } from '../controller/merge-content-variant-data.controller.js';
@@ -6,7 +6,7 @@ import type { UmbContentVariantPickerData, UmbContentVariantPickerValue } from '
 import type { UmbContentPropertyDatasetContext } from '../property-dataset-context/index.js';
 import type { UmbContentValidationRepository } from '../repository/content-validation-repository.interface.js';
 import type { UmbContentCollectionWorkspaceContext } from '../collection/content-collection-workspace-context.interface.js';
-import { UmbElementDataValueVariantsController } from '../controller/element-data-value-variants.controller.js';
+import { UmbEntryDataValueVariantsController } from '../controller/entry-data-value-variants.controller.js';
 import type { UmbContentWorkspaceContext } from './content-workspace-context.interface.js';
 import { UmbContentDetailValidationPathTranslator } from './content-detail-validation-path-translator.js';
 import { UmbContentValidationToHintsManager } from './content-validation-to-hints.manager.js';
@@ -145,7 +145,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	public readonly variants = this._data.createObservablePartOfCurrent((data) => data?.variants ?? []);
 	public override readonly persistedData = this._data.persisted;
 
-	public readonly valueVariants = new UmbElementDataValueVariantsController(this, this._data);
+	public readonly valueVariants = new UmbEntryDataValueVariantsController(this, this._data);
 
 	/* Content Type (Structure) Data */
 	public readonly structure;
@@ -654,10 +654,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Get the values of the content
-	 * @returns {Array<UmbElementValueModel> | undefined} - The values of the content
+	 * @returns {Array<UmbEntryValueModel> | undefined} - The values of the content
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
-	public getValues(): Array<UmbElementValueModel> | undefined {
+	public getValues(): Array<UmbEntryValueModel> | undefined {
 		return this._data.getCurrent()?.values;
 	}
 
@@ -737,7 +737,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			}
 
 			// Notice the order of the properties is important for our JSON String Compare function. [NL]
-			const entry: UmbElementValueModel = {
+			const entry: UmbEntryValueModel = {
 				editorAlias,
 				...variantId.toObject(),
 				alias,

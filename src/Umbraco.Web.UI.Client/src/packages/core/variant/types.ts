@@ -28,6 +28,7 @@ export interface UmbEntityVariantModel {
 	flags: Array<UmbEntityFlag>;
 }
 
+// TODO: Remove in v.21 [NL]
 /** @deprecated use `UmbEntityVariantModel` instead */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UmbVariantModel extends UmbEntityVariantModel {}
