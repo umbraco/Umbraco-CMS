@@ -97,7 +97,13 @@ export abstract class UmbPublishableSplitViewVariantSelectorElement<
 
 	protected override _renderVariantDetails(variantOption: VariantOptionModelType) {
 		if (variantOption.segment) {
-			return nothing;
+			/*if (this._variantsWithData?.some((v) => v.compare(variantOption))) {
+				return html`Has segmented content`;
+			}*/
+			if (this._variantsWithData?.some((v) => v.segment === variantOption.segment)) {
+				return html`Has segmented content`;
+			}
+			return html`No content`;
 		}
 		return html`${this.#getVariantState(variantOption)}`;
 	}
