@@ -132,7 +132,7 @@ test('cannot upload a file with a disallowed extension', {tag: '@release'}, asyn
   expect(contentData.values).toEqual([]);
 });
 
-test('cannot publish content with a mandatory upload file left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory upload file with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadFileName = 'File.txt';
   const mineType = 'text/plain';

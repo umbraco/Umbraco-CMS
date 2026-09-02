@@ -68,7 +68,7 @@ test('can publish content with the date time with time zone picker data type', a
   expect(contentData.values[0].value.timeZone).toEqual(expectedClientTimeZone);
 });
 
-test('cannot publish content with a mandatory date time with time zone picker field left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory date time with time zone picker with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createDefaultDateTimeWithTimeZonePickerDataType(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'Test Group', false, false, true);

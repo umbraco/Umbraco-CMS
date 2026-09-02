@@ -79,7 +79,7 @@ test('cannot publish a decimal value above the configured maximum', {tag: '@rele
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('cannot publish content with a mandatory decimal field left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory decimal with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createDecimalDataType(customDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, 'Test Group', false, false, true);

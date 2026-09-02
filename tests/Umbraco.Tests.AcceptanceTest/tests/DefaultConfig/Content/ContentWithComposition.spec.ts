@@ -64,7 +64,7 @@ test('can edit property value from composition in content', async ({umbracoApi, 
   expect(contentData.values[0].value).toEqual(text);
 });
 
-test('cannot publish content with a mandatory property inherited via composition left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory property inherited via composition with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const text = 'This is a required property value';
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);

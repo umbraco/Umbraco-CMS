@@ -82,7 +82,7 @@ test('can create content with the custom approved color data type', {tag: '@rele
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('cannot publish content with a mandatory approved color field left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory approved color with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const customDataTypeName = 'MandatoryApprovedColor';
   const colorValue = 'd73737';

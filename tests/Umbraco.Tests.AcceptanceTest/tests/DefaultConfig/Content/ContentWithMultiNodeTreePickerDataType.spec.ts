@@ -184,7 +184,7 @@ test('can search and see only allowed member types', async ({umbracoApi, umbraco
   expect(contentData.values[0].value[0]['type']).toEqual('member');
 });
 
-test('cannot publish content with a mandatory multi node tree picker field left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory multi node tree picker with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const pickerTargetName = 'PickerTarget';
   const targetDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot('PickerTargetDocumentType');

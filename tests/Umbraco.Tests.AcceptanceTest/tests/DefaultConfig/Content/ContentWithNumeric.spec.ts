@@ -122,7 +122,7 @@ test('cannot publish a numeric value above the configured maximum', {tag: '@rele
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('cannot publish content with a mandatory numeric field left empty', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory numeric with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);
