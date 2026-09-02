@@ -26,8 +26,8 @@ export const TextDirection = extensions.TextDirection.extend<UmbTiptapTextDirect
 					dir: {
 						default: null,
 						parseHTML: (element) => {
-							const dir = element.getAttribute('dir');
-							return this.options.directions.some((direction) => direction === dir) ? dir : null;
+							const dir = element.getAttribute('dir') as 'ltr' | 'rtl' | 'auto' | null;
+							return dir && this.options.directions.includes(dir) ? dir : null;
 						},
 						renderHTML: (attributes) => {
 							if (!attributes.dir) {

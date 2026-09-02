@@ -34,6 +34,20 @@ describe('TextDirection', () => {
 		expect(editor.getHTML()).to.include('dir="rtl"');
 	});
 
+	it('persists an explicitly set direction (ltr)', () => {
+		editor.commands.setContent('<p>Hello</p>');
+		editor.commands.setTextDirection('ltr', { from: 0, to: editor.state.doc.content.size });
+
+		expect(editor.getHTML()).to.include('dir="ltr"');
+	});
+
+	it('persists an explicitly set direction (auto)', () => {
+		editor.commands.setContent('<p>Hello</p>');
+		editor.commands.setTextDirection('auto', { from: 0, to: editor.state.doc.content.size });
+
+		expect(editor.getHTML()).to.include('dir="auto"');
+	});
+
 	it('round-trips an authored dir attribute', () => {
 		editor.commands.setContent('<p dir="rtl">Hello</p>');
 
