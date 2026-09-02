@@ -36,10 +36,9 @@ public class GetAllRedirectUrlManagementControllerTests
     {
         await _controller.GetAll(CancellationToken.None, filter);
 
-        long total;
-        _redirectUrlService.Verify(x => x.GetAllRedirectUrls(0, 100, out total), Times.Once);
+        _redirectUrlService.Verify(x => x.GetAllRedirectUrls(0, 100, out It.Ref<long>.IsAny), Times.Once);
         _redirectUrlService.Verify(
-            x => x.SearchRedirectUrls(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), out total),
+            x => x.SearchRedirectUrls(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), out It.Ref<long>.IsAny),
             Times.Never);
     }
 
@@ -48,10 +47,9 @@ public class GetAllRedirectUrlManagementControllerTests
     {
         await _controller.GetAll(CancellationToken.None, "term");
 
-        long total;
-        _redirectUrlService.Verify(x => x.SearchRedirectUrls("term", 0, 100, out total), Times.Once);
+        _redirectUrlService.Verify(x => x.SearchRedirectUrls("term", 0, 100, out It.Ref<long>.IsAny), Times.Once);
         _redirectUrlService.Verify(
-            x => x.GetAllRedirectUrls(It.IsAny<int>(), It.IsAny<int>(), out total),
+            x => x.GetAllRedirectUrls(It.IsAny<int>(), It.IsAny<int>(), out It.Ref<long>.IsAny),
             Times.Never);
     }
 }

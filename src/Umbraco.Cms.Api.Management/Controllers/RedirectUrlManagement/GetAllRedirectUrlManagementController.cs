@@ -35,7 +35,7 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementContro
     /// Retrieves a paginated list of redirect URLs, optionally filtered by a search string.
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <param name="filter">An optional string to filter redirect URLs by matching criteria; if null or empty, all redirect URLs are returned.</param>
+    /// <param name="filter">An optional string to filter redirect URLs by matching criteria; if null, empty or whitespace, all redirect URLs are returned.</param>
     /// <param name="skip">The number of items to skip before starting to collect the result set (used for pagination).</param>
     /// <param name="take">The maximum number of items to return in the result set (used for pagination).</param>
     /// <returns>

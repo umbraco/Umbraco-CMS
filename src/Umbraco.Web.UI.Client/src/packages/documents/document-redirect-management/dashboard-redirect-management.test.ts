@@ -122,6 +122,13 @@ describe('UmbDashboardRedirectManagement row rendering', () => {
 		expect((created as HTMLElement & { date: string }).date).to.equal('2026-02-17T09:30:00Z');
 	});
 
+	it('renders a redirect with no created date', async () => {
+		const element = await renderWith([redirect({ created: undefined })]);
+
+		const created = rowsOf(element)[0].querySelectorAll('uui-table-cell')[4];
+		expect(created.textContent?.trim()).to.equal('');
+	});
+
 	it('trims the current origin from a URL, keeping the full URL on the link', async () => {
 		const url = `${window.location.origin}/some/where`;
 		const element = await renderWith([redirect({ originalUrl: url })]);
