@@ -669,6 +669,7 @@ declare global {
 		contentTypeEditor_elementDoesNotSupport: string;
 		contentTypeEditor_elementHeading: string;
 		contentTypeEditor_elementType: string;
+		contentTypeEditor_elementTypeOnlyAllowedInLibrarySupport: string;
 		contentTypeEditor_elementTypeOnlySupport: string;
 		contentTypeEditor_enableListViewDescription: string;
 		contentTypeEditor_enableListViewHeading: string;

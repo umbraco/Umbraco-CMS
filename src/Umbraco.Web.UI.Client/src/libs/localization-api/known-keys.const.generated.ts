@@ -642,6 +642,7 @@ export const KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'contentTypeEditor_elementDoesNotSupport',
 	'contentTypeEditor_elementHeading',
 	'contentTypeEditor_elementType',
+	'contentTypeEditor_elementTypeOnlyAllowedInLibrarySupport',
 	'contentTypeEditor_elementTypeOnlySupport',
 	'contentTypeEditor_enableListViewDescription',
 	'contentTypeEditor_enableListViewHeading',
