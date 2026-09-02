@@ -14,11 +14,11 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-test('can create a document blueprint from the settings menu', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create a document blueprint from the library menu', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
   await umbracoUi.goToBackOffice();
-  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.settings);
+  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.library);
 
   // Act
   await umbracoUi.documentBlueprint.clickActionsMenuAtRoot();
@@ -42,7 +42,7 @@ test('can rename a document blueprint', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentBlueprint.createDefaultDocumentBlueprint(wrongDocumentBlueprintName, documentTypeId);
   expect(await umbracoApi.documentBlueprint.doesNameExist(wrongDocumentBlueprintName)).toBeTruthy();
   await umbracoUi.goToBackOffice();
-  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.settings);
+  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.library);
 
   // Act
   await umbracoUi.documentBlueprint.goToDocumentBlueprint(wrongDocumentBlueprintName);
@@ -62,7 +62,7 @@ test('can delete a document blueprint', async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentBlueprint.createDefaultDocumentBlueprint(documentBlueprintName, documentTypeId);
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
   await umbracoUi.goToBackOffice();
-  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.settings);
+  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.library);
 
   // Act
   await umbracoUi.documentBlueprint.reloadDocumentBlueprintsTree();
@@ -89,7 +89,7 @@ test('can create a document blueprint from the content menu', {tag: '@release'},
 
   // Assert
   expect(await umbracoApi.documentBlueprint.doesNameExist(documentBlueprintName)).toBeTruthy();
-  await umbracoUi.documentBlueprint.goToSettingsTreeItem('Document Blueprints');
+  await umbracoUi.documentBlueprint.goToLibraryTreeItem('Document Blueprints');
   await umbracoUi.documentBlueprint.isDocumentBlueprintRootTreeItemVisible(documentBlueprintName, true);
 
   // Clean
@@ -101,7 +101,7 @@ test('can create a variant document blueprint', {tag: '@release'}, async ({umbra
   await umbracoApi.language.createDanishLanguage();
   await umbracoApi.documentType.createDocumentTypeWithAllowVaryByCulture(documentTypeName);
   await umbracoUi.goToBackOffice();
-  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.settings);
+  await umbracoUi.documentBlueprint.goToSection(ConstantHelper.sections.library);
 
   // Act
   await umbracoUi.documentBlueprint.clickActionsMenuAtRoot();
