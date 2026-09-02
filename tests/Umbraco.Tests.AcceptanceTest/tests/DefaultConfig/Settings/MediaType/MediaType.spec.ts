@@ -91,3 +91,18 @@ test('can delete a media type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeFalsy();
   await umbracoUi.mediaType.isMediaTypeTreeItemVisible(mediaTypeName, false);
 });
+
+test('cannot create a media type with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
+
+  // Act
+  await umbracoUi.mediaType.clickActionsMenuAtRoot();
+  await umbracoUi.mediaType.clickCreateActionMenuOption();
+  await umbracoUi.mediaType.clickMediaTypeButton();
+  await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
+  await umbracoUi.mediaType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.mediaType.isErrorNotificationVisible();
+});

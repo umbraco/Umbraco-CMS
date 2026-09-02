@@ -139,3 +139,19 @@ test('can delete a document type', {tag: '@smoke'}, async ({umbracoApi, umbracoU
   // Assert
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeFalsy();
 });
+
+test('cannot create a document type with a duplicate name', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.clickActionsMenuAtRoot();
+  await umbracoUi.documentType.clickCreateActionMenuOption();
+  await umbracoUi.documentType.clickCreateDocumentTypeButton();
+  await umbracoUi.documentType.enterDocumentTypeName(documentTypeName);
+  await umbracoUi.documentType.clickSaveButton();
+
+  // Assert
+  await umbracoUi.documentType.isErrorNotificationVisible();
+});

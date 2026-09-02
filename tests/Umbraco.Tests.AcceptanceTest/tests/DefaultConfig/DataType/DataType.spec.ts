@@ -113,3 +113,26 @@ test('can change settings', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
   // Assert
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(dataTypeName, 'maxChars', maxCharsValue)).toBeTruthy();
 });
+
+test('creating a data type with a duplicate name auto-renames it instead of failing', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const duplicateDataTypeName = dataTypeName + ' (1)';
+  await umbracoApi.dataType.ensureNameNotExists(duplicateDataTypeName);
+  await umbracoApi.dataType.createTextstringDataType(dataTypeName);
+
+  // Act
+  await umbracoUi.dataType.clickActionsMenuAtRoot();
+  await umbracoUi.dataType.clickCreateActionMenuOption();
+  await umbracoUi.dataType.clickDataTypeButton();
+  await umbracoUi.dataType.enterDataTypeName(dataTypeName);
+  await umbracoUi.dataType.clickSelectAPropertyEditorButton();
+  await umbracoUi.dataType.selectAPropertyEditor('Text Box');
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeCreated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesNameExist(duplicateDataTypeName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.dataType.ensureNameNotExists(duplicateDataTypeName);
+});
