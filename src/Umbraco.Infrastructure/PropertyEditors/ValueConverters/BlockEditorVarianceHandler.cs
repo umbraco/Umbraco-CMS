@@ -155,19 +155,24 @@ public sealed class BlockEditorVarianceHandler
             ContentVariation variation = owner.ContentType.Variations & propertyType.Variations;
             if (variation.VariesByCulture())
             {
+                // The property type and the owning content both vary by culture, ensure culture variance accordingly.
                 alignedValues.AddRange(group.Select(blockPropertyValue => VariesByCulture(blockPropertyValue)
                     ? blockPropertyValue
                     : WithCulture(blockPropertyValue, alignmentCulture)));
                 continue;
             }
 
-            // the property type no longer varies by culture, so only a single value can survive
+            // Culture variance is not applicable, so it's safe to add the values that do not vary by culture.
             alignedValues.AddRange(group.Where(blockPropertyValue => VariesByCulture(blockPropertyValue) is false));
             if (group.Any(blockPropertyValue => VariesByCulture(blockPropertyValue) is false))
             {
+                // Nothing to align here.
                 continue;
             }
 
+            // A culture variation mismatch between the stored value and the current (effective) variance, likely caused
+            // by a schema change. Only a single value can survive; prioritize an exact culture match, fallback to the
+            // default culture.
             BlockPropertyValue? valueToRetain = ValueToRetain(group, alignmentCulture, defaultCulture);
             if (valueToRetain is not null)
             {
