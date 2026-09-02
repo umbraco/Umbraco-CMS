@@ -12,6 +12,7 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MEMBER_GROUP_UNIQUES_VALUE_TYPE } from '@umbraco-cms/backoffice/member-group';
 import { UmbMemberTypeItemRepository } from '@umbraco-cms/backoffice/member-type';
 import { UmbDirection } from '@umbraco-cms/backoffice/utils';
 
@@ -38,6 +39,10 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 			name: this.localize.term('general_email'),
 			alias: 'memberEmail',
 			allowSorting: true,
+		},
+		{
+			name: this.localize.term('treeHeaders_memberGroups'),
+			alias: 'memberGroup',
 		},
 		{
 			name: this.localize.term('content_membertype'),
@@ -147,6 +152,12 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 					{
 						columnAlias: 'memberEmail',
 						value: member.email,
+					},
+					{
+						columnAlias: 'memberGroup',
+						value: html`<umb-value-summary-extension
+							.valueType=${UMB_MEMBER_GROUP_UNIQUES_VALUE_TYPE}
+							.value=${member.groups}></umb-value-summary-extension>`,
 					},
 					{
 						columnAlias: 'memberType',
