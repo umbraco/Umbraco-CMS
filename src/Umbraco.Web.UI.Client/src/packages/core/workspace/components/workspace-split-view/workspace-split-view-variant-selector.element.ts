@@ -19,7 +19,6 @@ import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbEntityVariantModel,
 	UmbEntityVariantOptionModel,
-	UmbPublishableVariantState,
 } from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
