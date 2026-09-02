@@ -123,6 +123,7 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
           "MaxHeight": 5000
         },
         "Memory": {
+          "Enabled": true,
           "MaximumPoolSizeMegabytes": 0,
           "MaximumConcurrentProcessing": 0
         }
@@ -134,13 +135,20 @@ if (_options.HMACSecretKey.Length != 0 && _requestAuthorizationUtilities is not 
 
 ### Memory Settings (`ImagingMemorySettings`)
 
-Both values default to `0`, meaning "derive from the memory available to the process"
+Both numeric values default to `0`, meaning "derive from the memory available to the process"
 (`GC.GetGCMemoryInfo().TotalAvailableMemoryBytes`, which honours a container limit).
 
-| Setting | Purpose | Derived default |
-|---------|---------|-----------------|
+| Setting | Purpose | Default |
+|---------|---------|---------|
+| `Enabled` | Master switch for imaging memory management. When `false`, neither the pool cap nor the concurrency bound is applied and ImageSharp's own memory behaviour is left untouched. | `true` |
 | `MaximumPoolSizeMegabytes` | Caps the unmanaged buffer pool ImageSharp retains between requests | available / 32, clamped to 16-64 MB |
 | `MaximumConcurrentProcessing` | Caps how many images are processed at once | (available / 2) / 64 MB, capped at processor count |
+
+The concurrency bound is a no-op except where memory is the binding constraint — a host with more
+cores than its memory can feed concurrent decodes (see `RequiresConcurrencyLimit`). On any other host
+no semaphore is created and every request passes straight through, so the default-on behaviour costs
+nothing off the OOM path. `Enabled: false` is the one-setting escape hatch for operators who would
+rather opt out of both bounds entirely.
 
 **Why these exist**: a source image is decoded at full resolution before any processor runs, and
 `ImageSharpMiddleware` only de-duplicates concurrent requests for the *same* URL. A page of distinct
