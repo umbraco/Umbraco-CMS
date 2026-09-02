@@ -195,8 +195,15 @@ export class UmbMemberWorkspaceContext
 
 	protected override async _processIncomingData(data: ContentModel): Promise<ContentModel> {
 		// External-only members have no content type — skip the base class's
-		// content type loading which would 404 on the empty Guid.
+		// content type loading which would 404 on the empty Guid. Instead, give the structure an
+		// invariant, property-less type, so this member still resolves a single invariant variant.
 		if (data.kind === UmbMemberKind.EXTERNAL_ONLY) {
+			await this.structure.createScaffold({
+				unique: data.memberType.unique,
+				variesByCulture: false,
+				variesBySegment: false,
+			});
+
 			return data;
 		}
 
