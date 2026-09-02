@@ -49,9 +49,22 @@ internal static class CommandTimeoutResolver
 
     /// <summary>
     ///     Determines whether the connection string relies on the deprecated convention of taking the command
-    ///     timeout from the connect timeout, which is the case when it sets a connect timeout but no command
-    ///     timeout.
+    ///     timeout from the connect timeout, which is the case when it sets a connect timeout and does not
+    ///     appear to configure a command timeout.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         "Does not appear to" is the accurate phrasing: a configured command timeout is detected by
+    ///         comparing what the provider derives from this connection string against what it derives from no
+    ///         connection string at all. A command timeout explicitly set to the provider's own default is
+    ///         therefore indistinguishable from one that is absent, and the connect timeout wins.
+    ///     </para>
+    ///     <para>
+    ///         That is the conservative choice, because it is what every version before the command timeout was
+    ///         honoured did. Resolving the ambiguity would mean asking each provider which keywords the
+    ///         connection string actually supplied, which is not something the ADO.NET contract exposes.
+    ///     </para>
+    /// </remarks>
     /// <param name="provider">The provider factory, or <c>null</c> when unknown.</param>
     /// <param name="connectionString">The connection string.</param>
     /// <param name="timeoutSeconds">The connect timeout to apply as the command timeout.</param>
