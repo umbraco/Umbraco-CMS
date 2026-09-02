@@ -183,6 +183,7 @@ public class Property : EntityBase, IProperty
     /// <remarks>
     ///     This method is for internal use and must be invoked by the content item.
     ///     It does not validate the value - the content item must validate first.
+    ///     The default value is published along with the value of every segment supported by the property type.
     /// </remarks>
     /// <exception cref="NotSupportedException">Thrown when attempting to publish merged culture values for culture variant properties.</exception>
     public void PublishPartialValues(IDataEditor dataEditor, string? culture)
@@ -194,8 +195,27 @@ public class Property : EntityBase, IProperty
 
         culture = culture?.NullOrWhiteSpaceAsNull();
 
-        var value = dataEditor.MergePartialPropertyValueForCulture(_pvalue?.EditedValue, _pvalue?.PublishedValue, culture);
-        PublishValue(_pvalue, value);
+        PublishPartialValue(dataEditor, _pvalue, culture);
+
+        if (_vvalues == null)
+        {
+            return;
+        }
+
+        // The property does not vary by culture, so everything that varies here is a segment value (see issue #23553).
+        IEnumerable<IPropertyValue> pvalues = _vvalues.Values
+            .Where(x => PropertyType.SupportsVariation(x.Culture, x.Segment, true));
+
+        foreach (IPropertyValue pvalue in pvalues)
+        {
+            PublishPartialValue(dataEditor, pvalue, culture);
+        }
+    }
+
+    private void PublishPartialValue(IDataEditor dataEditor, IPropertyValue? pvalue, string? culture)
+    {
+        var value = dataEditor.MergePartialPropertyValueForCulture(pvalue?.EditedValue, pvalue?.PublishedValue, culture);
+        PublishValue(pvalue, value);
     }
 
     /// <summary>
