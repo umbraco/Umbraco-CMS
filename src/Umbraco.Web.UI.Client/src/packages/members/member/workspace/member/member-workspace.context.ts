@@ -198,11 +198,16 @@ export class UmbMemberWorkspaceContext
 		// content type loading which would 404 on the empty Guid. Instead, give the structure an
 		// invariant, property-less type, so this member still resolves a single invariant variant.
 		if (data.kind === UmbMemberKind.EXTERNAL_ONLY) {
-			await this.structure.createScaffold({
+			const { error } = await this.structure.createScaffold({
 				unique: data.memberType.unique,
 				variesByCulture: false,
 				variesBySegment: false,
 			});
+
+			if (error) {
+				// Without a structure there are no variant options, and the workspace resolves to "not found".
+				console.error('Failed to scaffold the invariant member type for an external-only member:', error);
+			}
 
 			return data;
 		}
