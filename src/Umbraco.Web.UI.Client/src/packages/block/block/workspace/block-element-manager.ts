@@ -16,7 +16,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import {
 	UmbContentValidationToHintsManager,
-	UmbElementWorkspaceDataManager,
+	UmbEntryWorkspaceDataManager,
 	umbExtractVariantValues,
 	type UmbElementPropertyDataOwner,
 } from '@umbraco-cms/backoffice/content';
@@ -31,7 +31,7 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 {
 	//
 
-	readonly #data = new UmbElementWorkspaceDataManager<UmbBlockDataModel>(this);
+	readonly #data = new UmbEntryWorkspaceDataManager<UmbBlockDataModel>(this);
 	//#data = new UmbObjectState<UmbBlockDataModel | undefined>(undefined);
 	readonly data = this.#data.current;
 	#getDataPromise = new Promise<void>((resolve) => {

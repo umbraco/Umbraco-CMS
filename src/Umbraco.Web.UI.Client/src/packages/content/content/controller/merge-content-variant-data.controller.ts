@@ -2,16 +2,26 @@ import type { UmbContentLikeDetailModel, UmbPotentialContentValueModel } from '.
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbVariantId, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId, type UmbEntityVariantModel, type UmbVariantDataModel } from '@umbraco-cms/backoffice/variant';
 
 /**
  * @function defaultCompareVariantMethod
+ * @param {UmbEntityVariantModel} a - the first variant to compare.
+ * @param {UmbEntityVariantModel} b - the second variant to compare.
+ * @returns {boolean} - true if the two models are equally unique.
+ */
+function defaultCompareVariantMethod(a: UmbEntityVariantModel, b: UmbEntityVariantModel) {
+	return a.culture === b.culture;
+}
+
+/**
+ * @function defaultCompareVariantDataMethod
  * @param {UmbVariantDataModel} a - the first variant to compare.
  * @param {UmbVariantDataModel} b - the second variant to compare.
  * @returns {boolean} - true if the two models are equally unique.
  */
-function defaultCompareVariantMethod(a: UmbVariantDataModel, b: UmbVariantDataModel) {
-	return a.culture === b.culture && a.segment === b.segment;
+function defaultCompareVariantDataMethod(a: UmbVariantDataModel, b: UmbVariantDataModel) {
+	return a.culture === b.culture;
 }
 
 export class UmbMergeContentVariantDataController extends UmbControllerBase {
@@ -189,24 +199,10 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 						persistedVariants,
 						values,
 						variantsToStore,
-						api.compareVariants ?? defaultCompareVariantMethod,
+						api.compareVariants ?? defaultCompareVariantDataMethod,
 					);
 				})) ?? newValue;
 		}
-
-		/*
-		if (api.ensureVariants) {
-			// The a property values resolver resolves one value, we need to gather the persisted inner values first, and store them here:
-			//const persistedVariants = newValue ? ((await api.readVariants(newValue)) ?? []) : [];
-
-			// TODO: An expose for a Block should be invariant if the Block Content Element Type is not vary by culture.
-			// TODO: And expose determination should look for invariant expose in this case.
-			const args = {
-				selectedVariants,
-			};
-			newValue = await api.ensureVariants(newValue, args);
-		}
-			*/
 
 		// the api did not provide a value processor, so we will return the draftValue:
 		return newValue;
@@ -220,7 +216,7 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 	 * @param {(UmbVariantDataModel, UmbVariantDataModel) => boolean} compare - The compare method, which compares the unique properties of the variants.
 	 * @returns {UmbVariantDataModel[]} A new array of variants.
 	 */
-	#processVariants<VariantModel extends UmbVariantDataModel = UmbVariantDataModel>(
+	#processVariants<VariantModel extends { culture: string | null } = UmbEntityVariantModel>(
 		persistedVariants: Array<VariantModel> | undefined,
 		draftVariants: Array<VariantModel>,
 		variantsToStore: Array<UmbVariantId>,
@@ -235,29 +231,14 @@ export class UmbMergeContentVariantDataController extends UmbControllerBase {
 				const persistedVariant = persistedVariants?.find((x) => compare(x, value));
 
 				// Should this value be saved?
-				if (variantsToStore.some((x) => x.compare(value))) {
+				if (variantsToStore.some((x) => x.equal(UmbVariantId.CreateFromPartial(value)))) {
 					const draftVariant = draftVariants?.find((x) => compare(x, value));
 
 					return draftVariant;
 				} else {
-					// TODO: Check if this promise is needed: [NL]
 					return persistedVariant;
 				}
 			})
 			.filter((x) => x !== undefined) as Array<VariantModel>;
-
-		/*
-		return draftVariants
-			.map((variant) => {
-				// Should this variant be saved?
-				if (variantsToStore.some((x) => x.compare(variant))) {
-					return variant;
-				} else {
-					// If not, then we will tru to find the variant in the persisted data and use that instead.
-					return persistedVariants?.find((x) => x.culture === variant.culture && x.segment === variant.segment);
-				}
-			})
-			.filter((x) => x !== undefined) as Array<VariantModel>;
-			*/
 	}
 }

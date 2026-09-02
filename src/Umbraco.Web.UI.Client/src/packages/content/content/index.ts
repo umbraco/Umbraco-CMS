@@ -2,7 +2,7 @@ export * from './audit-log/index.js';
 export * from './collection/index.js';
 export * from './components/index.js';
 export * from './constants.js';
-export * from './controller/merge-content-variant-data.controller.js';
+export * from './controller/index.js';
 export * from './global-components/index.js';
 export * from './manager/index.js';
 export * from './property-dataset-context/index.js';

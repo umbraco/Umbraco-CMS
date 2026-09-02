@@ -1974,11 +1974,13 @@ export default {
 		allowVaryBySegment: 'Allow segmentation',
 		elementType: 'Element Type',
 		elementHeading: 'Is an Element Type',
-		elementDescription: 'An Element Type is meant to be used within other Document Types, and not in the Content tree.',
+		elementDescription: 'Use for Blocks or Reusable Elements in the Library section.',
 		elementCannotToggle:
 			'A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.',
 		elementDoesNotSupport: 'This is not applicable for an Element Type.',
 		elementTypeOnlySupport: 'This is only applicable for an Element Type.',
+		elementTypeOnlyAllowedInLibrarySupport:
+			'This is only applicable for an Element Type that is allowed in the Library.',
 		propertyHasChanges: 'You have made changes to this property. Are you sure you want to discard them?',
 		displaySettingsHeadline: 'Appearance',
 		displaySettingsLabelOnLeft: 'Label to the left',

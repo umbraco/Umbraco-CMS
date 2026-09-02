@@ -19,7 +19,6 @@ export const data: Array<UmbMockElementModel> = [
 			{
 				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
-				segment: null,
 				name: 'Simple Element',
 				createDate: '2024-01-15T10:00:00.000Z',
 				updateDate: '2024-01-15T10:00:00.000Z',
@@ -72,7 +71,6 @@ export const data: Array<UmbMockElementModel> = [
 			{
 				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
-				segment: null,
 				name: 'Element In Folder',
 				createDate: '2024-01-16T14:00:00.000Z',
 				updateDate: '2024-01-16T14:00:00.000Z',
@@ -125,7 +123,6 @@ export const data: Array<UmbMockElementModel> = [
 			{
 				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
-				segment: null,
 				name: 'Element In Subfolder 1',
 				createDate: '2024-01-16T14:00:00.000Z',
 				updateDate: '2024-01-16T14:00:00.000Z',
@@ -163,7 +160,6 @@ export const data: Array<UmbMockElementModel> = [
 			{
 				state: UmbElementVariantState.PUBLISHED_PENDING_CHANGES,
 				culture: null,
-				segment: null,
 				name: 'Element With Pending Changes',
 				createDate: '2024-01-17T08:00:00.000Z',
 				updateDate: '2024-01-18T09:00:00.000Z',
@@ -201,7 +197,6 @@ export const data: Array<UmbMockElementModel> = [
 			{
 				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
-				segment: null,
 				name: 'Element With Scheduled Publish',
 				createDate: '2024-01-17T08:00:00.000Z',
 				updateDate: '2024-01-17T08:00:00.000Z',

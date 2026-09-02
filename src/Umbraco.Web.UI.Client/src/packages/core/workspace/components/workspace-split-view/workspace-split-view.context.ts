@@ -1,4 +1,4 @@
-import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../contexts/index.js';
+import { UMB_ENTRY_WITH_VARIANTS_WORKSPACE_CONTEXT } from '../../contexts/index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -16,7 +16,7 @@ import type { UmbValidationController } from '@umbraco-cms/backoffice/validation
 export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 	//
 	#variantVariantValidationContext?: UmbValidationController;
-	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
+	#workspaceContext?: typeof UMB_ENTRY_WITH_VARIANTS_WORKSPACE_CONTEXT.TYPE;
 	public getWorkspaceContext() {
 		return this.#workspaceContext;
 	}
@@ -38,7 +38,7 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_WORKSPACE_SPLIT_VIEW_CONTEXT);
 
-		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (context) => {
+		this.consumeContext(UMB_ENTRY_WITH_VARIANTS_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
 			this.#observeVariant();
 			this.#observeIsNew();
@@ -77,8 +77,8 @@ export class UmbWorkspaceSplitViewContext extends UmbContextBase {
 				this.#datasetContext?.destroy();
 
 				if (!activeVariantInfo) return;
-
 				const variantId = UmbVariantId.Create(activeVariantInfo);
+
 				this.#variantId.setValue(variantId);
 				this.getHostElement().setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace-split-view:' + variantId.toString());
 			},
