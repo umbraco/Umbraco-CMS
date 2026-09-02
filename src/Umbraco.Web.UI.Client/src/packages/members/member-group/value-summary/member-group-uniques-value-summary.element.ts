@@ -13,8 +13,6 @@ export class UmbMemberGroupUniquesValueSummaryElement extends UmbValueSummaryEle
 	}
 }
 
-export { UmbMemberGroupUniquesValueSummaryElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-member-group-uniques-value-summary': UmbMemberGroupUniquesValueSummaryElement;
