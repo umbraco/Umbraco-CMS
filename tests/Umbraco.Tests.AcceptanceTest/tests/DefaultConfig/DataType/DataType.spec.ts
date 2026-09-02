@@ -11,6 +11,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+  await umbracoApi.dataType.ensureNameNotExists(dataTypeName + ' (1)');
 });
 
 test('can create a data type', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -117,7 +118,6 @@ test('can change settings', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => 
 test('creating a data type with a duplicate name auto-renames it instead of failing', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const duplicateDataTypeName = dataTypeName + ' (1)';
-  await umbracoApi.dataType.ensureNameNotExists(duplicateDataTypeName);
   await umbracoApi.dataType.createTextstringDataType(dataTypeName);
 
   // Act
@@ -132,7 +132,4 @@ test('creating a data type with a duplicate name auto-renames it instead of fail
   // Assert
   expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
   expect(await umbracoApi.dataType.doesNameExist(duplicateDataTypeName)).toBeTruthy();
-
-  // Clean
-  await umbracoApi.dataType.ensureNameNotExists(duplicateDataTypeName);
 });
