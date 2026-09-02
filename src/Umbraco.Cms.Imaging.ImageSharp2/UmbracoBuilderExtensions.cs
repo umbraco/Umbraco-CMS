@@ -39,11 +39,14 @@ public static class UmbracoBuilderExtensions
         // on a gen2 collection, so on a memory constrained host it sits at rest well above what the
         // site needs. Applied before the configuration is shared so nothing allocates from the
         // default pool first.
-        Configuration.Default.MemoryAllocator = MemoryAllocator.Create(new MemoryAllocatorOptions
+        if (imagingSettings.Memory.Enabled)
         {
-            MaximumPoolSizeMegabytes = imagingSettings.Memory.ResolveMaximumPoolSizeMegabytes(
-                GC.GetGCMemoryInfo().TotalAvailableMemoryBytes),
-        });
+            Configuration.Default.MemoryAllocator = MemoryAllocator.Create(new MemoryAllocatorOptions
+            {
+                MaximumPoolSizeMegabytes = imagingSettings.Memory.ResolveMaximumPoolSizeMegabytes(
+                    GC.GetGCMemoryInfo().TotalAvailableMemoryBytes),
+            });
+        }
 
         // Add default ImageSharp configuration and service implementations
         builder.Services.AddSingleton(Configuration.Default);

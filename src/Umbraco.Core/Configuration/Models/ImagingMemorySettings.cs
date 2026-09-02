@@ -17,6 +17,11 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public class ImagingMemorySettings
 {
     /// <summary>
+    /// Whether image processing memory is managed by default.
+    /// </summary>
+    internal const bool StaticEnabled = true;
+
+    /// <summary>
     /// The default maximum pool size, in megabytes. Zero means it is derived from the available memory.
     /// </summary>
     internal const int StaticMaximumPoolSizeMegabytes = 0;
@@ -58,6 +63,18 @@ public class ImagingMemorySettings
     private const int MaximumDerivedPoolSizeMegabytes = 64;
 
     private const int OneMegabyte = 1024 * 1024;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether image processing memory is managed.
+    /// </summary>
+    /// <remarks>
+    /// When enabled (the default), the pool the imaging library retains between requests is capped and
+    /// the number of images decoded at the same time is bounded on hosts where memory is the binding
+    /// constraint. Set to <c>false</c> to leave the imaging library's own memory behaviour untouched -
+    /// neither the pool cap nor the concurrency bound is applied.
+    /// </remarks>
+    [DefaultValue(StaticEnabled)]
+    public bool Enabled { get; set; } = StaticEnabled;
 
     /// <summary>
     /// Gets or sets the maximum size, in megabytes, of the pool the imaging library retains for
@@ -141,7 +158,7 @@ public class ImagingMemorySettings
     /// requests the cache can serve without protecting against anything.
     /// </remarks>
     public bool RequiresConcurrencyLimit(long availableMemoryBytes, int processorCount)
-        => MaximumConcurrentProcessing > 0 || DeriveConcurrentProcessing(availableMemoryBytes) < processorCount;
+        => Enabled && (MaximumConcurrentProcessing > 0 || DeriveConcurrentProcessing(availableMemoryBytes) < processorCount);
 
     private static long DeriveConcurrentProcessing(long availableMemoryBytes)
         => availableMemoryBytes / ConcurrencyMemoryShareDivisor / (EstimatedMegabytesPerImage * OneMegabyte);

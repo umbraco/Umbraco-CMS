@@ -119,4 +119,14 @@ public class ImagingMemorySettingsTests
 
         Assert.That(settings.RequiresConcurrencyLimit(availableMegabytes * OneMegabyte, processorCount), Is.False);
     }
+
+    [Test]
+    public void RequiresConcurrencyLimit_WhenDisabled_IsFalse()
+    {
+        // Disabled wins over both an explicit limit and a memory-constrained host - the whole
+        // feature is off.
+        var settings = new ImagingMemorySettings { Enabled = false, MaximumConcurrentProcessing = 4 };
+
+        Assert.That(settings.RequiresConcurrencyLimit(384 * OneMegabyte, 28), Is.False);
+    }
 }

@@ -96,6 +96,24 @@ public class ImageProcessingThrottleMiddlewareTests
     }
 
     [Test]
+    public async Task InvokeAsync_WhenDisabled_DoesNotThrottle()
+    {
+        var probe = new ConcurrencyProbe();
+
+        // An explicit limit is set, but the feature is switched off, so nothing is gated.
+        var middleware = CreateDisabledMiddleware(probe.HandleAsync);
+
+        Task[] requests = Send(middleware, () => CreateContext(ImagePath, ("width", "400")));
+
+        await WaitUntilAsync(() => probe.Current >= RequestCount);
+
+        probe.Release();
+        await Task.WhenAll(requests);
+
+        Assert.That(probe.Peak, Is.EqualTo(RequestCount));
+    }
+
+    [Test]
     public async Task InvokeAsync_ReleasesTheSlot_WhenTheRequestThrows()
     {
         var shouldThrow = true;
@@ -164,6 +182,22 @@ public class ImageProcessingThrottleMiddlewareTests
             new[] { processor.Object },
             availableMemoryBytes: 2048L * 1024 * 1024,
             processorCount: 1);
+    }
+
+    private static ImageProcessingThrottleMiddleware CreateDisabledMiddleware(RequestDelegate next)
+    {
+        var settings = new ImagingSettings
+        {
+            Memory = new ImagingMemorySettings { Enabled = false, MaximumConcurrentProcessing = Limit },
+        };
+
+        var processor = new Mock<IImageWebProcessor>();
+        processor.SetupGet(x => x.Commands).Returns(new[] { "width", "height" });
+
+        return new ImageProcessingThrottleMiddleware(
+            next,
+            Options.Create(settings),
+            new[] { processor.Object });
     }
 
     private static Task[] Send(ImageProcessingThrottleMiddleware middleware, Func<DefaultHttpContext> context)
