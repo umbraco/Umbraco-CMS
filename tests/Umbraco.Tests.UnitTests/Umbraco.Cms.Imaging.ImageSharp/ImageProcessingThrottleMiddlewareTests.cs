@@ -152,52 +152,31 @@ public class ImageProcessingThrottleMiddlewareTests
     }
 
     private static ImageProcessingThrottleMiddleware CreateMiddleware(RequestDelegate next)
-    {
-        var settings = new ImagingSettings
-        {
-            Memory = new ImagingMemorySettings { MaximumConcurrentProcessing = Limit },
-        };
-
-        var processor = new Mock<IImageWebProcessor>();
-        processor.SetupGet(x => x.Commands).Returns(new[] { "width", "height" });
-
-        return new ImageProcessingThrottleMiddleware(
-            next,
-            Options.Create(settings),
-            new[] { processor.Object });
-    }
-
-    private static ImageProcessingThrottleMiddleware CreateUnconstrainedMiddleware(RequestDelegate next)
-    {
-        // Derived settings (zero) against 2 GB and a single processor, so memory is not the binding
-        // constraint and no limit is enforced.
-        var settings = new ImagingSettings { Memory = new ImagingMemorySettings() };
-
-        var processor = new Mock<IImageWebProcessor>();
-        processor.SetupGet(x => x.Commands).Returns(new[] { "width", "height" });
-
-        return new ImageProcessingThrottleMiddleware(
-            next,
-            Options.Create(settings),
-            new[] { processor.Object },
-            availableMemoryBytes: 2048L * 1024 * 1024,
-            processorCount: 1);
-    }
+        => Build(next, new ImagingMemorySettings { MaximumConcurrentProcessing = Limit });
 
     private static ImageProcessingThrottleMiddleware CreateDisabledMiddleware(RequestDelegate next)
+        => Build(next, new ImagingMemorySettings { Enabled = false, MaximumConcurrentProcessing = Limit });
+
+    // Derived settings (zero) against 2 GB and a single processor, so memory is not the binding
+    // constraint and no limit is enforced.
+    private static ImageProcessingThrottleMiddleware CreateUnconstrainedMiddleware(RequestDelegate next)
+        => Build(next, new ImagingMemorySettings(), availableMemoryBytes: 2048L * 1024 * 1024, processorCount: 1);
+
+    private static ImageProcessingThrottleMiddleware Build(
+        RequestDelegate next,
+        ImagingMemorySettings memory,
+        long? availableMemoryBytes = null,
+        int? processorCount = null)
     {
-        var settings = new ImagingSettings
-        {
-            Memory = new ImagingMemorySettings { Enabled = false, MaximumConcurrentProcessing = Limit },
-        };
+        var settings = new ImagingSettings { Memory = memory };
 
         var processor = new Mock<IImageWebProcessor>();
         processor.SetupGet(x => x.Commands).Returns(new[] { "width", "height" });
+        IImageWebProcessor[] processors = { processor.Object };
 
-        return new ImageProcessingThrottleMiddleware(
-            next,
-            Options.Create(settings),
-            new[] { processor.Object });
+        return availableMemoryBytes is { } memoryBytes && processorCount is { } cores
+            ? new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors, memoryBytes, cores)
+            : new ImageProcessingThrottleMiddleware(next, Options.Create(settings), processors);
     }
 
     private static Task[] Send(ImageProcessingThrottleMiddleware middleware, Func<DefaultHttpContext> context)
