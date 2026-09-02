@@ -1,10 +1,12 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Filters;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -102,5 +104,27 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
 
     private IEntitySlim[] GetBlueprintChildren(Guid? containerKey)
         => EntityService.GetPagedChildren(containerKey, [UmbracoObjectTypes.DocumentBlueprintContainer], UmbracoObjectTypes.DocumentBlueprint, 0, 100, out _).ToArray();
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+        builder.ContentTypeFilters().Append<ExcludingContentTypeFilter>();
+    }
+
+    [SetUp]
+    public void ResetContentTypeFilter() => ExcludingContentTypeFilter.ExcludedContentTypeKey = null;
+
+    /// <summary>
+    /// Stands in for an implementor's filter, so the tests can prove the blueprint create path honours
+    /// <see cref="IContentTypeFilter.FilterAllowedForBlueprintsAsync{TItem}" />.
+    /// </summary>
+    private sealed class ExcludingContentTypeFilter : IContentTypeFilter
+    {
+        public static Guid? ExcludedContentTypeKey { get; set; }
+
+        public Task<IEnumerable<TItem>> FilterAllowedForBlueprintsAsync<TItem>(IEnumerable<TItem> contentTypes, Guid? parentKey)
+            where TItem : IContentTypeComposition
+            => Task.FromResult(contentTypes.Where(contentType => contentType.Key != ExcludedContentTypeKey));
+    }
 }
 
