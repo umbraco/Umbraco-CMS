@@ -1518,7 +1518,7 @@ internal partial class BlockListElementLevelVariationTests
                     new List<BlockPropertyValue>(
                         new[]
                         {
-                            new BlockPropertyValue { Alias = "invariantText", Value = "The settings content value" },
+                            new BlockPropertyValue { Alias = "invariantText", Value = "The invariant settings value" },
                             new BlockPropertyValue { Alias = "variantText", Value = "Variant settings in Danish", Culture = "da-DK" },
                             addCarriedPropertyValues
                                 ? new BlockPropertyValue { Alias = "variantText", Value = "Carried settings in English", Culture = "en-US" }
