@@ -127,7 +127,7 @@ internal static class CommandTimeoutResolver
         foreach (var candidate in _deprecatedConnectTimeoutKeywords)
         {
             if (connectionStringParser.TryGetValue(candidate, out var value)
-                && int.TryParse(value?.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
+                && int.TryParse(value.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
                 && parsed > 0)
             {
                 timeoutSeconds = parsed;

@@ -128,10 +128,14 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         if (CommandTimeoutResolver.TryGetDeprecatedConnectTimeout(_provider, ConnectionString, out var timeout, out var keyword))
 #pragma warning restore CS0618 // Type or member is obsolete
         {
-            _logger.LogTrace(
-                "Applying the connection string \"{Keyword}\" value of {Timeout} seconds as the command timeout.",
-                keyword,
-                timeout);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace))
+            {
+                _logger.LogTrace(
+                    "Applying the connection string \"{Keyword}\" value of {Timeout} seconds as the command timeout.",
+                    keyword,
+                    timeout);
+            }
+
             CommandTimeout = timeout;
         }
     }

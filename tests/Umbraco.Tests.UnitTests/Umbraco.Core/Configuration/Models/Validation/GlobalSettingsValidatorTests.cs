@@ -97,7 +97,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings
         {
             DatabaseCommandTimeout = TimeSpan.Zero,
-            DatabaseConnectTimeout = TimeSpan.Zero
+            DatabaseConnectTimeout = TimeSpan.Zero,
         };
 
         var result = validator.Validate("settings", options);
@@ -111,7 +111,7 @@ public class GlobalSettingsValidatorTests
         var options = new GlobalSettings
         {
             DatabaseCommandTimeout = TimeSpan.FromMinutes(5),
-            DatabaseConnectTimeout = TimeSpan.FromSeconds(30)
+            DatabaseConnectTimeout = TimeSpan.FromSeconds(30),
         };
 
         var result = validator.Validate("settings", options);

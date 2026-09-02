@@ -57,10 +57,10 @@ internal sealed class ConfigureSqlServerConnectionStringTimeouts : IPostConfigur
         {
             // The connection string cannot be rewritten, so leave it alone rather than failing to configure
             // options - which would surface as an obscure startup failure rather than a connection error.
-            _logger.LogWarning(
-                exception,
-                "The configured database timeouts could not be applied, because the connection string could not be "
-                + "parsed. Set \"Command Timeout\" and \"Connect Timeout\" in the connection string instead.");
+            const string message = "The configured database timeouts could not be applied, because the connection "
+                + "string could not be parsed. Set \"Command Timeout\" and \"Connect Timeout\" in the connection "
+                + "string instead.";
+            _logger.LogWarning(exception, message);
             return;
         }
 

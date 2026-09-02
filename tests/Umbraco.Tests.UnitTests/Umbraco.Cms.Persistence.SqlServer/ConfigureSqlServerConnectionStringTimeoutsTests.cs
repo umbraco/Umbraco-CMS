@@ -25,7 +25,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
     {
         ConnectionStrings options = PostConfigure(new GlobalSettings
         {
-            DatabaseCommandTimeout = TimeSpan.FromMinutes(5)
+            DatabaseCommandTimeout = TimeSpan.FromMinutes(5),
         });
 
         Assert.AreEqual(300, new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout);
@@ -36,7 +36,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
     {
         ConnectionStrings options = PostConfigure(new GlobalSettings
         {
-            DatabaseConnectTimeout = TimeSpan.FromMinutes(1)
+            DatabaseConnectTimeout = TimeSpan.FromMinutes(1),
         });
 
         Assert.AreEqual(60, new SqlConnectionStringBuilder(options.ConnectionString).ConnectTimeout);
@@ -48,7 +48,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
         ConnectionStrings options = PostConfigure(new GlobalSettings
         {
             DatabaseCommandTimeout = TimeSpan.FromMinutes(5),
-            DatabaseConnectTimeout = TimeSpan.FromSeconds(10)
+            DatabaseConnectTimeout = TimeSpan.FromSeconds(10),
         });
 
         var connectionStringBuilder = new SqlConnectionStringBuilder(options.ConnectionString);
@@ -75,7 +75,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
     {
         ConnectionStrings options = PostConfigure(new GlobalSettings
         {
-            DatabaseCommandTimeout = TimeSpan.Zero
+            DatabaseCommandTimeout = TimeSpan.Zero,
         });
 
         Assert.AreEqual(0, new SqlConnectionStringBuilder(options.ConnectionString).CommandTimeout);
@@ -112,7 +112,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
         var options = new ConnectionStrings
         {
             ConnectionString = unparseableConnectionString,
-            ProviderName = global::Umbraco.Cms.Persistence.SqlServer.Constants.ProviderName
+            ProviderName = global::Umbraco.Cms.Persistence.SqlServer.Constants.ProviderName,
         };
 
         new ConfigureSqlServerConnectionStringTimeouts(
@@ -136,7 +136,7 @@ public class ConfigureSqlServerConnectionStringTimeoutsTests
         var options = new ConnectionStrings
         {
             ConnectionString = connectionString,
-            ProviderName = providerName ?? global::Umbraco.Cms.Persistence.SqlServer.Constants.ProviderName
+            ProviderName = providerName ?? global::Umbraco.Cms.Persistence.SqlServer.Constants.ProviderName,
         };
 
         new ConfigureSqlServerConnectionStringTimeouts(Options.Create(globalSettings), new FakeLogger())

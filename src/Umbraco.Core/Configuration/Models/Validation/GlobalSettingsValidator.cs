@@ -82,7 +82,7 @@ public class GlobalSettingsValidator
         return true;
     }
 
-    private bool ValidateDatabaseTimeoutSetting(string settingName, TimeSpan? configuredTimeOut, out string message)
+    private static bool ValidateDatabaseTimeoutSetting(string settingName, TimeSpan? configuredTimeOut, out string message)
     {
         if (configuredTimeOut < TimeSpan.Zero)
         {

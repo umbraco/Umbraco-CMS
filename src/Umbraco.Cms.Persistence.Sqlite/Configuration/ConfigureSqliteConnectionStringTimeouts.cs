@@ -48,8 +48,7 @@ internal sealed class ConfigureSqliteConnectionStringTimeouts : IPostConfigureOp
         {
             _connectTimeoutReported = true;
             _logger.LogInformation(
-                "{ConnectTimeoutSetting} is configured but does not apply to SQLite, which has no connect timeout.",
-                "Umbraco:CMS:Global:DatabaseConnectTimeout");
+                "Umbraco:CMS:Global:DatabaseConnectTimeout is configured but does not apply to SQLite, which has no connect timeout.");
         }
 
         if (globalSettings.DatabaseCommandTimeout is not { } commandTimeout)
@@ -69,10 +68,9 @@ internal sealed class ConfigureSqliteConnectionStringTimeouts : IPostConfigureOp
         {
             // The connection string cannot be rewritten, so leave it alone rather than failing to configure
             // options - which would surface as an obscure startup failure rather than a connection error.
-            _logger.LogWarning(
-                exception,
-                "The configured database command timeout could not be applied, because the connection string could "
-                + "not be parsed. Set \"Command Timeout\" in the connection string instead.");
+            const string message = "The configured database command timeout could not be applied, because the "
+                + "connection string could not be parsed. Set \"Command Timeout\" in the connection string instead.";
+            _logger.LogWarning(exception, message);
             return;
         }
 

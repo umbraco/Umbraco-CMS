@@ -23,9 +23,15 @@ public abstract partial class AsyncMigrationBase
     {
         const int MinimumCommandTimeoutInSeconds = 300;
 
-        var effectiveCommandTimeout = database is UmbracoDatabase umbracoDatabase
-            ? umbracoDatabase.EffectiveCommandTimeout
-            : database.CommandTimeout > 0 ? database.CommandTimeout : null;
+        int? effectiveCommandTimeout;
+        if (database is UmbracoDatabase umbracoDatabase)
+        {
+            effectiveCommandTimeout = umbracoDatabase.EffectiveCommandTimeout;
+        }
+        else
+        {
+            effectiveCommandTimeout = database.CommandTimeout > 0 ? database.CommandTimeout : null;
+        }
 
         if (effectiveCommandTimeout is 0 || effectiveCommandTimeout >= MinimumCommandTimeoutInSeconds)
         {

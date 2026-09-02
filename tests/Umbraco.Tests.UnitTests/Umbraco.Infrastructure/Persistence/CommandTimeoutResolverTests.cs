@@ -6,9 +6,10 @@ using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence;
 
-[TestFixture]
 // The connect timeout fallback is obsolete but still supported, so it still needs covering.
 #pragma warning disable CS0618 // Type or member is obsolete
+
+[TestFixture]
 public class CommandTimeoutResolverTests
 {
     private static DbProviderFactory SqlServer => SqlClientFactory.Instance;
