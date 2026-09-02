@@ -58,6 +58,27 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         public UrlMode Mode { get; set; }
 
+        /// <summary>
+        /// Resolves <see cref="UrlMode.Default" /> into the mode a provider should actually apply.
+        /// </summary>
+        /// <param name="mode">The requested mode.</param>
+        /// <returns>A concrete mode; never <see cref="UrlMode.Default" />.</returns>
+        /// <remarks>
+        /// Providers are contracted to receive a concrete mode. <see cref="UrlMode.Default" /> defers to
+        /// <see cref="Mode" />, which configuration and callers can themselves set to
+        /// <see cref="UrlMode.Default" /> - leaving nothing to defer to, so fall back to the mode Umbraco
+        /// ships with.
+        /// </remarks>
+        private UrlMode ResolveMode(UrlMode mode)
+        {
+            if (mode != UrlMode.Default)
+            {
+                return mode;
+            }
+
+            return Mode == UrlMode.Default ? UrlMode.Auto : Mode;
+        }
+
         #endregion
 
         #region GetUrl
@@ -121,10 +142,7 @@ namespace Umbraco.Cms.Core.Routing
                 return Constants.Routing.Unroutable;
             }
 
-            if (mode == UrlMode.Default)
-            {
-                mode = Mode;
-            }
+            mode = ResolveMode(mode);
 
             // this the ONLY place where we deal with default culture - IUrlProvider always receive a culture
             // be nice with tests, assume things can be null, ultimately fall back to invariant
@@ -154,7 +172,7 @@ namespace Umbraco.Cms.Core.Routing
             NewDefaultUrlProvider? provider = _urlProviders.OfType<NewDefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
-                : provider.GetUrlFromRoute(route, id, umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Url?.ToString();
+                : provider.GetUrlFromRoute(route, id, umbracoContext.CleanedUmbracoUrl, ResolveMode(Mode), culture)?.Url?.ToString();
             return url ?? Constants.Routing.Unroutable;
         }
 
@@ -236,10 +254,7 @@ namespace Umbraco.Cms.Core.Routing
                 return string.Empty;
             }
 
-            if (mode == UrlMode.Default)
-            {
-                mode = Mode;
-            }
+            mode = ResolveMode(mode);
 
             // this the ONLY place where we deal with default culture - IMediaUrlProvider always receive a culture
             // be nice with tests, assume things can be null, ultimately fall back to invariant
