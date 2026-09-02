@@ -61,17 +61,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		if (data) this._trackerEnabled = data.enabled;
 	}
 
-	async #getRedirectData() {
+	async #getRedirectData(): Promise<boolean> {
 		const skip = this.page * this.itemsPerPage - this.itemsPerPage;
 		const { data } = await this.#repository.requestRedirects({
 			filter: this._filter,
 			take: this.itemsPerPage,
 			skip,
 		});
-		if (!data) return;
+		if (!data) return false;
 
 		this._total = data.total;
 		this._redirectData = data.items;
+		return true;
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
@@ -116,8 +117,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this.page = 1;
 
 		this._buttonState = 'waiting';
-		await this.#getRedirectData();
-		this._buttonState = 'success';
+		this._buttonState = (await this.#getRedirectData()) ? 'success' : 'failed';
 	}
 
 	async #showTrackerInfo() {
@@ -264,7 +264,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		const display = url.startsWith(window.location.origin) ? url.slice(window.location.origin.length) || '/' : url;
 
 		return html`
-			<a href=${url} title=${url} target="_blank">
+			<a href=${url} title=${url} target="_blank" rel="noopener noreferrer">
 				<span>${display}</span>
 			</a>
 		`;
