@@ -56,6 +56,20 @@ describe('UmbDashboardRedirectManagement', () => {
 	}
 });
 
+describe('UmbDashboardRedirectManagement initial load', () => {
+	it('does not report an absence of redirects before the first response lands', async () => {
+		const element: UmbDashboardRedirectManagementElement = await fixture(
+			html`<umb-dashboard-redirect-management></umb-dashboard-redirect-management>`,
+		);
+
+		// The request is still in flight: neither the table nor an empty state may be claimed yet.
+		expect(element.shadowRoot!.querySelector('uui-box')).to.not.exist;
+
+		await waitUntil(() => rowsOf(element).length > 0);
+		expect(element.shadowRoot!.querySelector('uui-box')).to.exist;
+	});
+});
+
 describe('UmbDashboardRedirectManagement filtering', () => {
 	let element: UmbDashboardRedirectManagementElement;
 
@@ -108,8 +122,14 @@ describe('UmbDashboardRedirectManagement row rendering', () => {
 		const element: UmbDashboardRedirectManagementElement = await fixture(
 			html`<umb-dashboard-redirect-management></umb-dashboard-redirect-management>`,
 		);
-		// Bypass the repository so the rendering of a single, known row can be asserted.
-		(element as unknown as { _redirectData: Array<UmbDocumentRedirectUrlModel> })._redirectData = data;
+		// Bypass the repository so the rendering of a single, known row can be asserted, standing in
+		// for the response that would otherwise settle the initial load.
+		const internals = element as unknown as {
+			_redirectData: Array<UmbDocumentRedirectUrlModel>;
+			_loading: boolean;
+		};
+		internals._redirectData = data;
+		internals._loading = false;
 		await element.updateComplete;
 		return element;
 	};

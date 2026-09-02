@@ -38,6 +38,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	@state()
 	private _filter?: string;
 
+	@state()
+	private _loading = true;
+
 	@property({ type: Number, attribute: 'items-per-page' })
 	itemsPerPage = 20;
 
@@ -68,6 +71,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			take: this.itemsPerPage,
 			skip,
 		});
+		this._loading = false;
 		if (!data) return false;
 
 		this._total = data.total;
@@ -173,16 +177,21 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 					</uui-tag>
 				</uui-button>
 			</div>
-			${when(
-				this._redirectData?.length,
-				() => html`
-					<uui-box id="redirect-wrapper">
-						${when(!this._trackerEnabled, () => html`<div id="grey-out"></div>`)} ${this.#renderTable()}
-					</uui-box>
-				`,
-				() => (this._filter !== undefined ? this.#renderZeroResults() : this.#renderNoRedirects()),
-			)}
-			${this.#renderPagination()}
+			${this.#renderContent()} ${this.#renderPagination()}
+		`;
+	}
+
+	#renderContent() {
+		if (this._loading) return html`<uui-loader></uui-loader>`;
+
+		if (!this._redirectData?.length) {
+			return this._filter !== undefined ? this.#renderZeroResults() : this.#renderNoRedirects();
+		}
+
+		return html`
+			<uui-box id="redirect-wrapper">
+				${when(!this._trackerEnabled, () => html`<div id="grey-out"></div>`)} ${this.#renderTable()}
+			</uui-box>
 		`;
 	}
 
