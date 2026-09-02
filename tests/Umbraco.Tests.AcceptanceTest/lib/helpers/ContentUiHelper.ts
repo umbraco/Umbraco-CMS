@@ -1127,9 +1127,7 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.sliderInput.fill(value);
   }
 
-  // Date/Time pickers (Date Picker, Date Only, Time Only, Date Time (With Time Zone)) all share the
-  // same umb-input-date component underneath, differing only in the native input type they configure -
-  // the value format (yyyy-MM-dd / HH:mm / yyyy-MM-ddTHH:mm) is up to the caller.
+  // Shared by all date/time pickers; value format depends on the configured input type.
   async enterDateInputValue(value: string) {
     await this.enterText(this.dateInputTxt, value);
   }

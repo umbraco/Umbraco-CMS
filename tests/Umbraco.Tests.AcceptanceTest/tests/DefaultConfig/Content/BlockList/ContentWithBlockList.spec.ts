@@ -419,8 +419,7 @@ test('cannot create a block when a property value exceeds the configured maximum
   await umbracoUi.content.clickCreateModalButton();
 
   // Assert
-  // The modal stays open with the app's own validation copy and the block is never created -
-  // the invalid value never reaches saved content
+  // The modal stays open and the block is never created - the invalid value is never saved
   await umbracoUi.content.isTextWithMessageVisible("Value must be less than or equal to '10'.");
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values).toEqual([]);

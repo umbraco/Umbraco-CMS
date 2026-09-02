@@ -120,8 +120,7 @@ test('cannot upload a file with a disallowed extension', {tag: '@release'}, asyn
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
-  // The data type only allows pdf, so a txt file is rejected without ever leaving the empty dropzone state -
-  // there is currently no visible error message for this, only the absence of the uploaded file.
+  // A disallowed extension is silently rejected - no error message, just an empty dropzone
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.uploadFile(uploadFilePath + 'File.txt');
   await umbracoUi.content.isInputDropzoneVisible(true);

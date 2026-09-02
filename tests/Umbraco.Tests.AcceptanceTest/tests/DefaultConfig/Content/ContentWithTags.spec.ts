@@ -96,8 +96,7 @@ test('can not publish a mandatory tags with an empty value', {tag: '@release'}, 
   await umbracoUi.content.isErrorNotificationVisible();
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Add a tag and publish succeeds - the tag input is already active for a mandatory property
-  // in its invalid state, unlike a fresh create flow where the "+" first has to be clicked.
+  // The tag input is already active here, unlike a fresh create flow where "+" must be clicked first
   await umbracoUi.content.enterTag(tagsName[0]);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 

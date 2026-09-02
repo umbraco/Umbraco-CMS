@@ -94,8 +94,7 @@ test('can not publish a mandatory decimal with an empty value', {tag: '@release'
   await umbracoUi.content.isValidationMessageVisible(ConstantHelper.validationMessages.nullValue);
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 
-  // Fill the value and publish succeeds - the mandatory check only re-runs on the next publish attempt,
-  // unlike the native range-validity messages above, which clear live as the input changes.
+  // The mandatory check only re-runs on the next publish attempt, unlike the range messages above
   await umbracoUi.content.enterDecimal(number);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
 
