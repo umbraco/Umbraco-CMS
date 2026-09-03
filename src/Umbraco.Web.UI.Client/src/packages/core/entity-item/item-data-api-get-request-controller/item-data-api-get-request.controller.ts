@@ -36,11 +36,7 @@ export class UmbItemDataApiGetRequestController<
 		if (this.#uniques.length > this.#batchSize) {
 			const chunks = batchArray<string>(this.#uniques, this.#batchSize);
 
-			// batchTryExecute wraps each chunk in tryExecute, but its declared return type omits that wrapper, so the
-			// error it resolves with is not visible without restating the shape here.
-			const results = (await batchTryExecute(this, chunks, (chunk) => this.#apiCallback({ uniques: chunk }))) as Array<
-				PromiseSettledResult<{ data?: ResponseModelType['data']; error?: UmbApiError | UmbCancelError }>
-			>;
+			const results = await batchTryExecute(this, chunks, (chunk) => this.#apiCallback({ uniques: chunk }));
 
 			// A failing chunk resolves rather than rejects, because batchTryExecute wraps each one in tryExecute.
 			// Both shapes therefore have to be read to find out what actually failed.
@@ -81,6 +77,12 @@ export class UmbItemDataApiGetRequestController<
 			});
 		}
 
-		return new UmbError(error instanceof Error ? error.message : String(error));
+		// A chunk that failed carries an UmbApiError or UmbCancelError with the status and problem details on it, so
+		// it is returned as it is - flattening it into a message would drop what the caller needs to act on it.
+		if (error instanceof Error) {
+			return error;
+		}
+
+		return new UmbError((error as { message?: string })?.message ?? String(error));
 	}
 }
