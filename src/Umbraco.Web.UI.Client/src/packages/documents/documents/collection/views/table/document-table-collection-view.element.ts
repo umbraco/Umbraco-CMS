@@ -2,9 +2,9 @@ import { UMB_DOCUMENT_COLLECTION_CONTEXT } from '../../document-collection.conte
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../../paths.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { css, customElement, html, state, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbCollectionViewElementBase } from '@umbraco-cms/backoffice/collection';
 import type { UmbCollectionColumnConfiguration } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
@@ -22,20 +22,14 @@ import './column-layouts/document-table-column-property-value.element.js';
 import './column-layouts/document-table-column-state.element.js';
 
 @customElement('umb-document-table-collection-view')
-export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
+export class UmbDocumentTableCollectionViewElement extends UmbCollectionViewElementBase<UmbDocumentCollectionItemModel> {
 	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 
 	@state()
-	private _items?: Array<UmbDocumentCollectionItemModel>;
-
-	@state()
-	private _tableConfig: UmbTableConfig = {
-		allowSelection: true,
-	};
-
-	@state()
 	private _tableColumns: Array<UmbTableColumn> = [];
+
+	#tableConfig: UmbTableConfig = { allowSelection: false, allowSelectAll: false, selectOnly: false };
 
 	#systemColumns: Array<UmbTableColumn> = [
 		{
@@ -54,9 +48,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
-
-	@state()
-	private _selection: Array<string> = [];
 
 	@state()
 	private _orderingColumn = '';
@@ -83,26 +74,8 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			this.#collectionContext.userDefinedProperties,
 			(userDefinedProperties) => {
 				this._userDefinedProperties = userDefinedProperties;
-				this.#createTableHeadings();
 			},
 			'_observeUserDefinedProperties',
-		);
-
-		this.observe(
-			this.#collectionContext.items,
-			(items) => {
-				this._items = items;
-				this.#createTableItems(this._items);
-			},
-			'_observeItems',
-		);
-
-		this.observe(
-			this.#collectionContext.selection.selection,
-			(selection) => {
-				this._selection = selection as string[];
-			},
-			'_observeSelection',
 		);
 
 		this.observe(
@@ -114,6 +87,33 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			},
 			'_observeOrdering',
 		);
+	}
+
+	override willUpdate(changedProperties: PropertyValues) {
+		super.willUpdate(changedProperties);
+
+		if (
+			changedProperties.has('_selectable') ||
+			changedProperties.has('_multiple') ||
+			changedProperties.has('_selectOnly')
+		) {
+			this.#tableConfig = {
+				allowSelection: this._selectable,
+				allowSelectAll: this._multiple,
+				selectOnly: this._selectOnly,
+			};
+		}
+
+		// The rows carry their own selectability, so they are rebuilt when selection becomes available as well.
+		if (
+			changedProperties.has('_items') ||
+			changedProperties.has('_userDefinedProperties') ||
+			changedProperties.has('_selectable') ||
+			changedProperties.has('_hideItemActions')
+		) {
+			this.#createTableHeadings();
+			this.#createTableItems();
+		}
 	}
 
 	#createTableHeadings() {
@@ -132,13 +132,13 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			this._tableColumns = [
 				...this.#systemColumns,
 				...userColumns,
-				{ name: '', alias: 'entityActions', align: 'right' },
+				...(this._hideItemActions ? [] : [{ name: '', alias: 'entityActions', align: 'right' } as UmbTableColumn]),
 			];
 		}
 	}
 
-	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
-		this._tableItems = items.map((item) => {
+	#createTableItems() {
+		this._tableItems = this._items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
 
 			const data =
@@ -165,26 +165,39 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				id: item.unique,
 				icon: item.documentType.icon,
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
+				selectable: this._isSelectableItem(item),
 				data: data,
 			};
 		});
 	}
 
-	#handleSelect(event: UmbTableSelectedEvent) {
+	#onSelected(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
-		const table = event.target as UmbTableElement;
-		const selection = table.selection;
-		this.#collectionContext?.selection.setSelection(selection);
+		const itemId = event.getItemId();
+
+		// We get the same event for both single and multiple selection.
+		if (itemId) {
+			this._selectItem(itemId);
+		} else {
+			const target = event.target as UmbTableElement;
+			this._setSelection(target.selection);
+		}
 	}
 
-	#handleDeselect(event: UmbTableDeselectedEvent) {
+	#onDeselected(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
-		const table = event.target as UmbTableElement;
-		const selection = table.selection;
-		this.#collectionContext?.selection.setSelection(selection);
+		const itemId = event.getItemId();
+
+		// We get the same event for both single and multiple deselection.
+		if (itemId) {
+			this._deselectItem(itemId);
+		} else {
+			const target = event.target as UmbTableElement;
+			this._setSelection(target.selection);
+		}
 	}
 
-	#handleOrdering(event: UmbTableOrderedEvent) {
+	#onOrdering(event: UmbTableOrderedEvent) {
 		const table = event.target as UmbTableElement;
 		const orderingColumn = table.orderingColumn;
 		const orderingDesc = table.orderingDesc;
@@ -197,15 +210,15 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	override render() {
 		return html`
 			<umb-table
-				.config=${this._tableConfig}
+				.config=${this.#tableConfig}
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
 				.orderingColumn=${this._orderingColumn}
 				.orderingDesc=${this._orderingDesc}
-				@selected=${this.#handleSelect}
-				@deselected=${this.#handleDeselect}
-				@ordered=${this.#handleOrdering}></umb-table>
+				@selected=${this.#onSelected}
+				@deselected=${this.#onDeselected}
+				@ordered=${this.#onOrdering}></umb-table>
 		`;
 	}
 

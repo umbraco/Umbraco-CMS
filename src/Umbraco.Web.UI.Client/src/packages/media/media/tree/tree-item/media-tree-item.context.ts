@@ -17,7 +17,9 @@ export class UmbMediaTreeItemContext extends UmbDefaultTreeItemContext<UmbMediaT
 			(item) => {
 				this.#isTrashedContext.setIsTrashed(item?.isTrashed || false);
 
-				const mediaTypeUnique = item?.mediaType.unique;
+				// TODO (V20): drop the `mediaType` fallback when the deprecated field is removed.
+				// eslint-disable-next-line @typescript-eslint/no-deprecated
+				const mediaTypeUnique = (item?.contentType ?? item?.mediaType)?.unique;
 
 				this.#entityContentTypeContext.setEntityType(mediaTypeUnique ? UMB_MEDIA_TYPE_ENTITY_TYPE : undefined);
 				this.#entityContentTypeContext.setUnique(mediaTypeUnique ?? undefined);

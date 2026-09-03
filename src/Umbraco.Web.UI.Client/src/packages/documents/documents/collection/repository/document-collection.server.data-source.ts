@@ -35,6 +35,13 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {
+				const contentType = {
+					unique: item.documentType.id,
+					icon: item.documentType.icon,
+					alias: item.documentType.alias,
+					collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
+				};
+
 				const model: UmbDocumentCollectionItemModel = {
 					ancestors: item.ancestors.map((ancestor) => {
 						return {
@@ -45,6 +52,9 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					unique: item.id,
 					entityType: UMB_DOCUMENT_ENTITY_TYPE,
 					creator: item.creator,
+					// TODO: DocumentCollectionResponseModel does not yet expose hasChildren.
+					// Remove the cast and the `?? false` when the Management API ships the field.
+					hasChildren: (item as { hasChildren?: boolean }).hasChildren ?? false,
 					isProtected: item.isProtected,
 					isTrashed: item.isTrashed,
 					sortOrder: item.sortOrder,
@@ -59,11 +69,9 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 							value: item.value as string,
 						};
 					}),
-					documentType: {
-						unique: item.documentType.id,
-						icon: item.documentType.icon,
-						alias: item.documentType.alias,
-					},
+					contentType,
+					// TODO (V20): remove when the deprecated `documentType` field is removed.
+					documentType: { unique: contentType.unique, icon: contentType.icon, alias: contentType.alias },
 					variants: item.variants.map((item) => {
 						return {
 							name: item.name,
