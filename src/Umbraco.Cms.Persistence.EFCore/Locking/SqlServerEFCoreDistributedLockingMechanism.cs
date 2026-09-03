@@ -157,7 +157,10 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
-                var number = await dbContext.Database.ExecuteScalarAsync<int?>($"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id={LockId}");
+                // This path can pass the timeout straight to the command, so it needs no save and restore.
+                var number = await dbContext.Database.ExecuteScalarAsync<int?>(
+                    $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id={LockId}",
+                    commandTimeOut: CommandTimeoutForLockTimeout);
 
                 if (number == null)
                 {
@@ -189,9 +192,22 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                         "A transaction with minimum ReadCommitted isolation level is required.");
                 }
 
+                // Unlike the read lock, this path has no per-command timeout hook, so the context-wide
+                // one has to be set and put back.
+                var originalCommandTimeout = dbContext.Database.GetCommandTimeout();
+                dbContext.Database.SetCommandTimeout(CommandTimeoutForLockTimeout);
+
+                int rowsAffected;
+                try
+                {
 #pragma warning disable EF1002
-                var rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
+                    rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
 #pragma warning restore EF1002
+                }
+                finally
+                {
+                    dbContext.Database.SetCommandTimeout(originalCommandTimeout);
+                }
 
                 if (rowsAffected == 0)
                 {
@@ -199,6 +215,20 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                     throw new ArgumentException($"LockObject with id={LockId} does not exist.");
                 }
             }).GetAwaiter().GetResult();
+        }
+
+        /// <remarks>
+        ///     Without this the ambient command timeout can abort the statement while the server is still
+        ///     waiting for the row lock, surfacing a raw timeout instead of a lock timeout exception.
+        /// </remarks>
+        private TimeSpan CommandTimeoutForLockTimeout
+        {
+            get
+            {
+                const int MarginInSeconds = 5;
+
+                return TimeSpan.FromSeconds(Math.Ceiling(_timeout.TotalSeconds) + MarginInSeconds);
+            }
         }
     }
 }

@@ -170,6 +170,8 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
 
                 var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId.ToString(CultureInfo.InvariantCulture)}";
 
+                var originalCommandTimeout = database.Database.GetCommandTimeout();
+
                 try
                 {
                     // imagine there is an existing writer, whilst elapsed time is < command timeout sqlite will busy loop
@@ -187,6 +189,10 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
                 catch (SqliteException ex) when (ex.IsBusyOrLocked())
                 {
                     throw new DistributedWriteLockTimeoutException(LockId);
+                }
+                finally
+                {
+                    database.Database.SetCommandTimeout(originalCommandTimeout);
                 }
             });
         }

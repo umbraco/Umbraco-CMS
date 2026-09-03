@@ -148,6 +148,8 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
 
+            BoundNextCommandByLockTimeout(db);
+
             // execute the lock timeout query and the actual query in a single server roundtrip
             var i = db.ExecuteScalar<int?>($"{lockTimeoutQuery};{query}", new { id = LockId });
 
@@ -184,6 +186,8 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
 
+            BoundNextCommandByLockTimeout(db);
+
             // execute the lock timeout query and the actual query in a single server roundtrip
             var i = db.Execute($"{lockTimeoutQuery};{query}", new { id = LockId });
 
@@ -192,6 +196,19 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
                 // ensure we are actually locking!
                 throw new ArgumentException($"LockObject with id={LockId} does not exist.");
             }
+        }
+
+        /// <remarks>
+        ///     Without this the ambient command timeout can abort the statement while the server is still
+        ///     waiting for the row lock, surfacing a raw timeout instead of a lock timeout exception.
+        ///     <see cref="NPoco.IDatabase.OneTimeCommandTimeout" /> is reset once the command executes, so it
+        ///     cannot leak into the rest of the scope.
+        /// </remarks>
+        private void BoundNextCommandByLockTimeout(IUmbracoDatabase db)
+        {
+            const int MarginInSeconds = 5;
+
+            db.OneTimeCommandTimeout = (int)Math.Ceiling(_timeout.TotalSeconds) + MarginInSeconds;
         }
     }
 }

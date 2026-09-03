@@ -621,18 +621,66 @@ internal sealed class LocksTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Lock_Exceeds_Command_Timeout()
+    [LongRunning]
+    public void Throws_Lock_Timeout_When_Command_Timeout_Is_Shorter_Than_Lock_Timeout()
     {
-        using (var scope = ScopeProvider.CreateScope())
+        if (BaseTestDatabase.IsSqlite())
         {
-            var realDb = (Database)ScopeAccessor.AmbientScope.Database;
-            realDb.CommandTimeout = 1000;
+            // For SQLite the command timeout is the lock wait, so the two cannot disagree.
+            Assert.Ignore("Doesn't apply to SQLite");
+        }
 
-            Console.WriteLine("Write lock A");
-            // TODO: In theory this would throw
-            scope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree);
-            scope.Complete();
-            Console.WriteLine("Finished Write lock A");
+        var counter = 0;
+        var gate = new ManualResetEventSlim(false);
+        var logger = GetRequiredService<ILogger<LocksTests>>();
+
+        using (ExecutionContext.SuppressFlow())
+        {
+            var t1 = Task.Run(() =>
+            {
+                using var scope = ScopeProvider.CreateScope();
+
+                _ = scope.Database; // Begin transaction
+                Interlocked.Increment(ref counter);
+                gate.Wait();
+
+                logger.LogInformation("t1 - Attempting to acquire write lock");
+                scope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+
+                logger.LogInformation("t1 - Acquired write lock, sleeping");
+                Thread.Sleep(6000); // Hold it for longer than t2 is prepared to wait.
+
+                scope.Complete();
+                logger.LogInformation("t1 - Complete transaction");
+            });
+
+            var t2 = Task.Run(() =>
+            {
+                using var scope = ScopeProvider.CreateScope();
+
+                scope.Database.CommandTimeout = 1; // Shorter than the lock timeout requested below.
+                Interlocked.Increment(ref counter);
+                gate.Wait();
+                Thread.Sleep(100); // Let the other transaction obtain the write lock first.
+
+                logger.LogInformation("t2 - Attempting to acquire read lock");
+
+                // The lock wait outlives the command timeout, so the lock timeout has to be what
+                // surfaces - not the underlying command timeout.
+                Assert.Throws<DistributedReadLockTimeoutException>(() =>
+                    scope.EagerReadLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+
+                scope.Complete();
+                logger.LogInformation("t2 - Finished read lock attempt");
+            });
+
+            while (counter < 2)
+            {
+                Thread.Sleep(10);
+            }
+
+            gate.Set();
+            Task.WaitAll(t1, t2);
         }
     }
 
