@@ -1207,12 +1207,13 @@ namespace Umbraco.Cms.Core.Services
         /// </remarks>
         public MemberExportModel? ExportMember(Guid key)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             IQuery<IMember>? query = Query<IMember>().Where(x => x.Key == key);
             IMember? member = _memberRepository.Get(query)?.FirstOrDefault();
 
             if (member == null)
             {
+                scope.Complete();
                 return null;
             }
 
@@ -1230,6 +1231,7 @@ namespace Umbraco.Cms.Core.Services
                 Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
             };
 
+            scope.Complete();
             scope.Notifications.Publish(new ExportedMemberNotification(member, model));
 
             return model;

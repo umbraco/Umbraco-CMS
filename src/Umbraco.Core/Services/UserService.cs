@@ -2363,21 +2363,24 @@ internal partial class UserService : RepositoryService, IUserService
             return UserClientCredentialsOperationStatus.InvalidClientId;
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         IEnumerable<string> currentClientIds = _userRepository.GetAllClientIds();
         if (currentClientIds.InvariantContains(clientId))
         {
+            scope.Complete();
             return UserClientCredentialsOperationStatus.DuplicateClientId;
         }
 
         IUser? user = await GetAsync(userKey);
         if (user is null || user.Kind != UserKind.Api)
         {
+            scope.Complete();
             return UserClientCredentialsOperationStatus.InvalidUser;
         }
 
         _userRepository.AddClientId(user.Id, clientId);
+        scope.Complete();
 
         return UserClientCredentialsOperationStatus.Success;
     }
@@ -2385,10 +2388,13 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public async Task<bool> RemoveClientIdAsync(Guid userKey, string clientId)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
-        return _userRepository.RemoveClientId(userId, clientId);
+        var removed = _userRepository.RemoveClientId(userId, clientId);
+        scope.Complete();
+
+        return removed;
     }
 
     /// <inheritdoc/>

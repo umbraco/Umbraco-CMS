@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Data;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -10,8 +11,8 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
@@ -20,6 +21,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
 public class HealthCheckNotifierJobTests
 {
     private Mock<IHealthCheckNotificationMethod> _mockNotificationMethod;
+    private Mock<ICoreScope> _mockScope;
 
     private const string Check1Id = "00000000-0000-0000-0000-000000000001";
     private const string Check2Id = "00000000-0000-0000-0000-000000000002";
@@ -47,6 +49,14 @@ public class HealthCheckNotifierJobTests
         var sut = CreateHealthCheckNotifier();
         await sut.ExecuteAsync();
         VerifyNotificationsSent();
+    }
+
+    [Test]
+    public async Task Completes_Scope_After_Executing_Checks()
+    {
+        var sut = CreateHealthCheckNotifier();
+        await sut.ExecuteAsync();
+        _mockScope.Verify(x => x.Complete(), Times.Once);
     }
 
     [Test]
@@ -87,7 +97,18 @@ public class HealthCheckNotifierJobTests
             new List<IHealthCheckNotificationMethod> { _mockNotificationMethod.Object });
 
 
-        var mockScopeProvider = new Mock<IScopeProvider>();
+        _mockScope = new Mock<ICoreScope>();
+        var mockScopeProvider = new Mock<ICoreScopeProvider>();
+        mockScopeProvider
+            .Setup(x => x.CreateCoreScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
+                It.IsAny<IScopedNotificationPublisher>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(_mockScope.Object);
         var mockProfilingLogger = new Mock<IProfilingLogger>();
 
         return new HealthCheckNotifierJob(

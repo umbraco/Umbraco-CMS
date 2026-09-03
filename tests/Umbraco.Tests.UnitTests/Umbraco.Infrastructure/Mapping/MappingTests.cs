@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Scoping;
-using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 using PropertyCollection = Umbraco.Cms.Core.Models.PropertyCollection;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping;
@@ -24,8 +23,10 @@ public class MappingTests
     [SetUp]
     public void MockScopeProvider()
     {
-        var scopeMock = new Mock<IScopeProvider>();
-        scopeMock.Setup(x => x.CreateScope(
+        _scopeMock = new Mock<ICoreScope>();
+
+        var scopeMock = new Mock<ICoreScopeProvider>();
+        scopeMock.Setup(x => x.CreateCoreScope(
                 It.IsAny<IsolationLevel>(),
                 It.IsAny<RepositoryCacheMode>(),
                 It.IsAny<IEventDispatcher>(),
@@ -33,12 +34,46 @@ public class MappingTests
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
-            .Returns(Mock.Of<IScope>);
+            .Returns(_scopeMock.Object);
 
         _scopeProvider = scopeMock.Object;
     }
 
-    private IScopeProvider _scopeProvider;
+    private ICoreScopeProvider _scopeProvider;
+    private Mock<ICoreScope> _scopeMock;
+
+    [Test]
+    public void Map_Completes_Scope()
+    {
+        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition1() });
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
+
+        mapper.Map<Thing2>(new Thing1 { Value = "value" });
+
+        _scopeMock.Verify(x => x.Complete(), Times.Once);
+    }
+
+    [Test]
+    public void Map_To_Existing_Target_Completes_Scope()
+    {
+        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition1() });
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
+
+        mapper.Map(new Thing1 { Value = "value" }, new Thing2());
+
+        _scopeMock.Verify(x => x.Complete(), Times.Once);
+    }
+
+    [Test]
+    public void Map_Enumerable_Completes_Scope()
+    {
+        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition1() });
+        var mapper = new UmbracoMapper(definitions, _scopeProvider, NullLogger<UmbracoMapper>.Instance);
+
+        mapper.Map<IEnumerable<Thing1>, IEnumerable<Thing2>>(new[] { new Thing1 { Value = "value" } }).ToList();
+
+        _scopeMock.Verify(x => x.Complete(), Times.Once);
+    }
 
     [Test]
     public void SimpleMap()
