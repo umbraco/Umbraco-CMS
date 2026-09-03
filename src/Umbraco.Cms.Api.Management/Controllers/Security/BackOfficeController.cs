@@ -237,6 +237,8 @@ public class BackOfficeController : SecurityControllerBase
     [EndpointSummary("Gets the pending two-factor sign-in options.")]
     [EndpointDescription("Retrieves the two-factor provider options for a sign-in that is currently pending a second factor.")]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(RequiresTwoFactorResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PendingTwoFactorInfo()
     {
         BackOfficeIdentityUser? user = await _backOfficeSignInManager.GetTwoFactorAuthenticationUserAsync();
