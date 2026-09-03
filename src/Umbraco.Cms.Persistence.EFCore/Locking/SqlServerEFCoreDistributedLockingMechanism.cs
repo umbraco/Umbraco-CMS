@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Extensions;
 
@@ -68,6 +69,15 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
     /// </summary>
     private sealed class SqlServerDistributedLock : IDistributedLock
     {
+        private const int LockRequestTimeoutError = 1222;
+
+        /// <remarks>
+        ///     The lock statement runs under a command timeout derived from the lock timeout, so a command
+        ///     that times out obtaining the lock is reported as a lock timeout too, rather than escaping
+        ///     the mechanism untranslated.
+        /// </remarks>
+        private const int CommandTimeoutError = -2;
+
         private readonly SqlServerEFCoreDistributedLockingMechanism<T> _parent;
         private readonly TimeSpan _timeout;
 
@@ -105,7 +115,7 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                         throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
                 }
             }
-            catch (SqlException ex) when (ex.Number == 1222)
+            catch (SqlException ex) when (ex.Number is LockRequestTimeoutError or CommandTimeoutError)
             {
                 if (LockType == DistributedLockType.ReadLock)
                 {
@@ -160,7 +170,7 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                 // This path can pass the timeout straight to the command, so it needs no save and restore.
                 var number = await dbContext.Database.ExecuteScalarAsync<int?>(
                     $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id={LockId}",
-                    commandTimeOut: CommandTimeoutForLockTimeout);
+                    commandTimeOut: TimeSpan.FromSeconds(CommandTimeoutSeconds));
 
                 if (number == null)
                 {
@@ -194,14 +204,16 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
 
                 // Unlike the read lock, this path has no per-command timeout hook, so the context-wide
                 // one has to be set and put back.
-                var originalCommandTimeout = dbContext.Database.GetCommandTimeout();
-                dbContext.Database.SetCommandTimeout(CommandTimeoutForLockTimeout);
+                int? originalCommandTimeout = dbContext.Database.GetCommandTimeout();
+                dbContext.Database.SetCommandTimeout(CommandTimeoutSeconds);
 
                 int rowsAffected;
                 try
                 {
 #pragma warning disable EF1002
-                    rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(@$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={LockId}");
+                    rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(
+                        @$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={{0}}",
+                        LockId);
 #pragma warning restore EF1002
                 }
                 finally
@@ -221,14 +233,6 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
         ///     Without this the ambient command timeout can abort the statement while the server is still
         ///     waiting for the row lock, surfacing a raw timeout instead of a lock timeout exception.
         /// </remarks>
-        private TimeSpan CommandTimeoutForLockTimeout
-        {
-            get
-            {
-                const int MarginInSeconds = 5;
-
-                return TimeSpan.FromSeconds(Math.Ceiling(_timeout.TotalSeconds) + MarginInSeconds);
-            }
-        }
+        private int CommandTimeoutSeconds => _timeout.ToLockCommandTimeoutSeconds();
     }
 }

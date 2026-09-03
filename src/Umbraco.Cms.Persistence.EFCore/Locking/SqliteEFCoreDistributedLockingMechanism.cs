@@ -170,7 +170,7 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
 
                 var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId.ToString(CultureInfo.InvariantCulture)}";
 
-                var originalCommandTimeout = database.Database.GetCommandTimeout();
+                int? originalCommandTimeout = database.Database.GetCommandTimeout();
 
                 try
                 {

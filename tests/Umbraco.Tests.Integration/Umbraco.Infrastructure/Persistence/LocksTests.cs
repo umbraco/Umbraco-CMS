@@ -674,13 +674,13 @@ internal sealed class LocksTests : UmbracoIntegrationTest
                 logger.LogInformation("t2 - Finished read lock attempt");
             });
 
-            while (counter < 2)
-            {
-                Thread.Sleep(10);
-            }
+            Assert.That(
+                () => counter,
+                Is.EqualTo(2).After(10000, 10),
+                "Both transactions should have begun.");
 
             gate.Set();
-            Task.WaitAll(t1, t2);
+            Assert.IsTrue(Task.WaitAll([t1, t2], TimeSpan.FromSeconds(30)), "Both lock attempts should have finished.");
         }
     }
 

@@ -60,6 +60,15 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
     private sealed class SqlServerDistributedLock : IDistributedLock
     {
+        private const int LockRequestTimeoutError = 1222;
+
+        /// <remarks>
+        ///     The lock statement runs under a command timeout derived from the lock timeout, so a command
+        ///     that times out obtaining the lock is reported as a lock timeout too, rather than escaping
+        ///     the mechanism untranslated.
+        /// </remarks>
+        private const int CommandTimeoutError = -2;
+
         private readonly SqlServerDistributedLockingMechanism _parent;
         private readonly TimeSpan _timeout;
 
@@ -92,7 +101,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
                         throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
                 }
             }
-            catch (SqlException ex) when (ex.Number == 1222)
+            catch (SqlException ex) when (ex.Number is LockRequestTimeoutError or CommandTimeoutError)
             {
                 if (LockType == DistributedLockType.ReadLock)
                 {
@@ -205,10 +214,6 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
         ///     cannot leak into the rest of the scope.
         /// </remarks>
         private void BoundNextCommandByLockTimeout(IUmbracoDatabase db)
-        {
-            const int MarginInSeconds = 5;
-
-            db.OneTimeCommandTimeout = (int)Math.Ceiling(_timeout.TotalSeconds) + MarginInSeconds;
-        }
+            => db.OneTimeCommandTimeout = _timeout.ToLockCommandTimeoutSeconds();
     }
 }
