@@ -6,7 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceContext',
 		name: 'Trashable Document Workspace Context',
-		alias: 'Umb.Context.Document.Trashable',
+		alias: 'Umb.WorkspaceContext.Document.Trashable',
 		api: UmbTrashableDocumentWorkspaceContext,
 		conditions: [
 			{
