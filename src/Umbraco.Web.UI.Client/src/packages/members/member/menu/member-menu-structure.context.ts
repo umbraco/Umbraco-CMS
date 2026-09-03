@@ -14,8 +14,8 @@ import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 /**
- * Members are invariant, so unlike the tree-based variant structure context, this hand-rolled
- * structure context does not need to resolve ancestors or track the active split-view variant.
+ * Menu structure workspace context for Member, which is invariant unlike variant-based
+ * entities such as Document or Media.
  */
 export class UmbMemberMenuStructureWorkspaceContext
 	extends UmbContextBase
