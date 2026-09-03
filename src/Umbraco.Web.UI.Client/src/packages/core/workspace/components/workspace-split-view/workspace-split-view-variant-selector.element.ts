@@ -1,4 +1,4 @@
-import type { UmbEntryWithVariantsWorkspaceContext, UmbVariantDatasetWorkspaceContext } from '../../contexts/index.js';
+import type { UmbVariantDatasetWorkspaceContext } from '../../contexts/index.js';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT } from './workspace-split-view.context.js';
 import {
 	css,
@@ -16,10 +16,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbDataPathVariantQuery, umbBindToValidation } from '@umbraco-cms/backoffice/validation';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbEntityVariantModel,
-	UmbEntityVariantOptionModel,
-} from '@umbraco-cms/backoffice/variant';
+import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
 import type { UmbHint, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
@@ -33,6 +30,10 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	@query('#popover')
 	private _popoverElement?: UUIPopoverContainerElement;
 
+	/**
+	 * Variants the workspace holds value data for, regardless of whether a variant has been created for them yet.
+	 * Populated by subclasses that know how to source value data; left `undefined` otherwise.
+	 */
 	@state()
 	protected _variantsWithData?: Array<UmbVariantId>;
 
@@ -97,6 +98,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			const workspaceContext = this.#splitViewContext?.getWorkspaceContext();
 
+			this._gotWorkspaceContext(workspaceContext);
 			this.#observeVariants(workspaceContext);
 			this.#observeActiveVariants(workspaceContext);
 			this.#observeReadOnlyCultures(workspaceContext);
@@ -149,14 +151,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	@state()
 	private _hintMap = new Map<string, UmbVariantHint>();
 
-	async #observeVariants(workspaceContext?: UmbEntryWithVariantsWorkspaceContext) {
-		this.observe(
-			workspaceContext?.valueVariants.variants,
-			(variants) => {
-				this._variantsWithData = variants?.map((variant) => UmbVariantId.Create(variant)) ?? [];
-			},
-			'_observeValueVariants',
-		);
+	async #observeVariants(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
 		this.observe(
 			workspaceContext?.variantOptions,
 			(variantOptions) => {
@@ -616,6 +611,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	protected _renderVariantDetails(variantOption: VariantOptionModelType): TemplateResult | typeof nothing {
 		return nothing;
 	}
+
+	/**
+	 * Extension point for reacting to when the workspsace context has been set.
+	 * @param {UmbVariantDatasetWorkspaceContext | undefined} [workspaceContext] - workspace context
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected _gotWorkspaceContext(workspaceContext?: UmbVariantDatasetWorkspaceContext) {}
 
 	#renderReadOnlyTag(culture?: string | null) {
 		if (culture === undefined) return nothing;

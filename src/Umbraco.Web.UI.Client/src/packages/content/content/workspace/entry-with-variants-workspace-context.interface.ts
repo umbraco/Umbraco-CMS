@@ -1,9 +1,7 @@
+import type { UmbEntryDataValueVariantsController } from '../controller/entry-data-value-variants.controller.js';
+import type { UmbEntryWithVariantsDetailModel } from '../types.js';
 import type { UmbEntryWorkspaceContext } from './entry-workspace-context.interface.js';
-import type { UmbVariantDatasetWorkspaceContext } from './variant-dataset-workspace-context.interface.js';
-import type {
-	UmbEntryDataValueVariantsController,
-	UmbEntryWithVariantsDetailModel,
-} from '@umbraco-cms/backoffice/content';
+import type { UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 
 export interface UmbEntryWithVariantsWorkspaceContext<
 	T extends UmbEntryWithVariantsDetailModel = UmbEntryWithVariantsDetailModel,
