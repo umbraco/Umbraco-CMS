@@ -1127,7 +1127,6 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.sliderInput.fill(value);
   }
 
-  // Shared by all date/time pickers; value format depends on the configured input type.
   async enterDateInputValue(value: string) {
     await this.enterText(this.dateInputTxt, value);
   }
