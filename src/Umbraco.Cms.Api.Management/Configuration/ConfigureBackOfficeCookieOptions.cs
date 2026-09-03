@@ -94,7 +94,11 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             "Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware",
             Constants.Security.BackOfficeAuthenticationType,
             "v2");
-        var ticketDataFormat = new TicketDataFormat(dataProtector);
+        // TicketDataFormat is SecureDataFormat<AuthenticationTicket> over TicketSerializer.Default and exposes no
+        // constructor taking a serializer, so the base type is constructed directly to substitute one.
+        var ticketDataFormat = new SecureDataFormat<AuthenticationTicket>(
+            new CompressedTicketSerializer(TicketSerializer.Default),
+            dataProtector);
 
         options.TicketDataFormat = new BackOfficeSecureDataFormat(_globalSettings.TimeOut, ticketDataFormat);
 
