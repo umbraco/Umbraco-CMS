@@ -96,6 +96,29 @@ export class UmbAuthContext extends UmbContextBase {
 	validateMfaCode(code: string, provider: string): Promise<MfaCodeResponse> {
 		return this.#authRepository.validateMfaCode(code, provider);
 	}
+
+	/**
+	 * Loads a pending two-factor sign-in for the current browser session (e.g. one started by an
+	 * external login provider redirecting back here) and, if found, populates the same state `login()`
+	 * sets on its own 402 response so `<umb-mfa-page>` can render normally.
+	 * @returns Whether a pending two-factor sign-in was found.
+	 */
+	async loadPendingTwoFactorInfo(): Promise<boolean> {
+		const info = await this.#authRepository.fetchPendingTwoFactorInfo();
+		if (!info) {
+			return false;
+		}
+
+		this.isMfaEnabled = true;
+		if (info.twoFactorView) {
+			this.twoFactorView = info.twoFactorView;
+		}
+		if (info.twoFactorProviders) {
+			this.mfaProviders = info.twoFactorProviders;
+		}
+
+		return true;
+	}
 }
 
 export const UMB_AUTH_CONTEXT = new UmbContextToken<UmbAuthContext>('UmbAuthContext');

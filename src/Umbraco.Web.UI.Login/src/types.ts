@@ -20,6 +20,11 @@ export type MfaCodeResponse = {
 	error?: string;
 };
 
+export type PendingTwoFactorResponse = {
+	twoFactorView?: string;
+	twoFactorProviders?: string[];
+};
+
 export type ResetPasswordResponse = {
 	error?: string;
 };
