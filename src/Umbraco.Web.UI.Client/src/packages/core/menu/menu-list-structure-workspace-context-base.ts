@@ -38,8 +38,10 @@ export abstract class UmbMenuListStructureWorkspaceContextBase
 	protected _setStructure(items: Array<UmbStructureItemModel>): void {
 		this.#structure.setValue(items);
 
+		// The parent is the item before the current one, or the current item itself if it's the only
+		// item (e.g. a "new" entity, whose ancestors are just the root).
 		const current = items[items.length - 1];
-		const parent = items.filter((item) => item.unique !== current?.unique).pop();
+		const parent = items.length > 1 ? items[items.length - 2] : current;
 		this.#parentContext.setParent(parent ? { unique: parent.unique, entityType: parent.entityType } : undefined);
 	}
 
