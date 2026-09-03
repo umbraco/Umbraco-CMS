@@ -458,8 +458,8 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
                 SettingsData = [],
                 Expose =
                 [
-                    new(contentElementKey, "en-US", null),
-                    new(contentElementKey, "da-DK", null),
+                    new(contentElementKey, "en-US"),
+                    new(contentElementKey, "da-DK"),
                 ],
             },
         };
