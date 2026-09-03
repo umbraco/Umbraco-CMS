@@ -123,6 +123,11 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// On a <see cref="ServerRole.Subscriber"/> the scheduling publisher has already persisted URL aliases to
     /// the database before issuing the cache-refresh instruction that routed us here. Re-writing them locally is
     /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
+    /// <see cref="ServerRole.Unknown"/> is deliberately NOT grouped with Subscriber here: every caller of the
+    /// database-writing methods below (<see cref="CreateOrUpdateAliasesAsync(Guid)"/> and friends) reacts to a
+    /// purely local, in-process notification fired on the server that made the edit - never something routed
+    /// from another server's cache-refresh instruction - so an unresolved role here almost always means "this
+    /// server originated the change and must persist it". Skipping would silently drop the write instead.
     /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
     /// </remarks>
     private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
