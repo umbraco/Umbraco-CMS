@@ -11,14 +11,6 @@ export default class UmbTiptapToolbarClearFormattingExtensionApi extends UmbTipt
 			return true;
 		};
 
-		const marksToClear = Object.keys(editor.schema.marks).filter((markName) => markName !== 'umbLink' && markName !== 'link');
-
-		const chain = editor.chain().focus().clearNodes();
-
-		for (const markName of marksToClear) {
-			chain.unsetMark(markName);
-		}
-
-		chain.command(unsetAttrs).run();
+		editor.chain().focus().clearNodes().unsetAllMarks().command(unsetAttrs).run();
 	}
 }
