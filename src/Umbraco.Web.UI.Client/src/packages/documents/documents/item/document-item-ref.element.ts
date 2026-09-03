@@ -88,13 +88,19 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref() {
+		if (!this._unique) return;
 		// No `_editPath` means the modal route registration couldn't reach a parent route context
-		// (e.g. this ref is rendered inside a non-routable modal). Skip rendering an href so we don't
-		// produce a broken `/edit/<guid>` link. Consumers that know they will be in such a context
-		// (like the link-picker modal) should also pass `readonly` so the ref isn't styled as clickable.
-		if (!this._unique || !this._editPath) return;
+		// (e.g. this ref is rendered inside a non-routable modal). The workspace is still reachable, just
+		// not as a route relative to this host, so link to it by its absolute path instead.
+		if (!this._editPath) return UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: this._unique });
 		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
 		return `${this._editPath}/${path}`;
+	}
+
+	// An absolute href leaves whatever the host is showing (a modal, a workspace with unsaved changes), so
+	// open it in a new tab. A route-relative href stays within the current view and navigates in place.
+	#getTarget() {
+		return this._editPath ? undefined : '_blank';
 	}
 
 	#onSelected(event: UUISelectableEvent) {
@@ -114,6 +120,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 			<uui-ref-node
 				name=${this._name}
 				href=${ifDefined(this.#getHref())}
+				target=${ifDefined(this.#getTarget())}
 				?readonly=${this.readonly}
 				?standalone=${this.standalone}
 				?select-only=${this.selectOnly}
