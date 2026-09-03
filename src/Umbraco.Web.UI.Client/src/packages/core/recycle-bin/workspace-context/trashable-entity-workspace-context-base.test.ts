@@ -229,6 +229,8 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 			const failActionEventContext = new UmbActionEventContext(failHost);
 			const failWorkspaceContext = new UmbTestTrashableEntityWorkspaceContext(failHost);
 			new UmbContextProviderController(failHost, UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT, failWorkspaceContext as never);
+			const failParentEntityContext = new UmbParentEntityContext(failHost);
+			failParentEntityContext.setParent({ unique: 'parent-unique', entityType: 'test-entity-type' });
 			new TestTrashableEntityWorkspaceContextWithThrowingRedirect(failHost);
 			await aTimeout(0);
 
@@ -238,6 +240,29 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 			await aTimeout(0);
 
 			expect(failWorkspaceContext.reloadCallCount).to.equal(1);
+
+			document.body.removeChild(failHost);
+		});
+
+		it('falls back to reloading in place when the parent entity context is not available', async () => {
+			// No UmbParentEntityContext provided on failHost — this must not be silently treated as "no parent".
+			const failHost = new UmbTestRecycleBinControllerHostElement();
+			document.body.appendChild(failHost);
+
+			const failActionEventContext = new UmbActionEventContext(failHost);
+			const failWorkspaceContext = new UmbTestTrashableEntityWorkspaceContext(failHost);
+			new UmbContextProviderController(failHost, UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT, failWorkspaceContext as never);
+			new TestTrashableEntityWorkspaceContext(failHost);
+			await aTimeout(0);
+
+			failActionEventContext.dispatchEvent(
+				new UmbEntityTrashedEvent({ unique: 'test-unique', entityType: 'test-entity-type' }),
+			);
+			await aTimeout(0);
+
+			expect(failWorkspaceContext.reloadCallCount).to.equal(1);
+			expect(history.pushStateCalls).to.have.lengthOf(0);
+			expect(history.replaceStateCalls).to.have.lengthOf(0);
 
 			document.body.removeChild(failHost);
 		});

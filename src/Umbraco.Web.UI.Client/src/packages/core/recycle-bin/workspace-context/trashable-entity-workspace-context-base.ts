@@ -117,9 +117,10 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 
 	#redirectToParent() {
 		if (!this.#workspaceContext) return;
+		if (!this.#parentEntityContext) throw new Error('Parent entity context is not available.');
 
 		const entityType = this.#workspaceContext.getEntityType();
-		const parentUnique = this.#parentEntityContext?.getParent()?.unique ?? null;
+		const parentUnique = this.#parentEntityContext.getParent()?.unique ?? null;
 
 		// Trashing doesn't delete the entity — it stays reachable, readonly, at its own edit URL. So unlike a
 		// delete or a rename, that URL is still worth keeping in history: pushState rather than replaceState.
