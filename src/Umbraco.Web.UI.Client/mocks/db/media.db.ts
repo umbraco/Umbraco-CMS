@@ -36,18 +36,12 @@ export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMediaModel>(this, treeItemMapper);
 	item = new UmbMockEntityVariantItemManager<UmbMockMediaModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMediaModel>(this, createMockMediaMapper, detailResponseMapper);
-	recycleBin = new UmbEntityRecycleBin<UmbMockMediaModel>(this.data, treeItemMapper);
+	recycleBin = new UmbEntityRecycleBin<UmbMockMediaModel>(this, treeItemMapper);
 	collection = new UmbMockMediaCollectionManager(this, collectionMapper);
 	url = new UmbMockEntityVariantUrlManager<UmbMockMediaModel>(this);
 
 	constructor(data: Array<UmbMockMediaModel>) {
 		super('media', data);
-	}
-
-	override setData(data: Array<UmbMockMediaModel>) {
-		super.setData(data);
-		// Update recycleBin's data to match - it has its own data array
-		this.recycleBin.setData(data);
 	}
 
 	getFileUrls(ids: string[]): GetMediaUrlsResponse {
@@ -147,6 +141,7 @@ const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
 const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseModel => {
 	return {
 		creator: null,
+		hasChildren: model.hasChildren,
 		id: model.id,
 		mediaType: {
 			id: model.mediaType.id,
