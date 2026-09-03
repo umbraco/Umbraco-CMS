@@ -188,17 +188,25 @@ export class DocumentApiHelper {
     return await this.unpublish(id, [culture]);
   }
 
-  async getDocumentUrl(id: string) {
+  private async getDocumentUrlInfos(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
     const urls = await response.json();
+    return urls[0]?.urlInfos ?? [];
+  }
 
-    return urls[0].urlInfos[0].url;
+  async getDocumentUrl(id: string) {
+    const urlInfos = await this.getDocumentUrlInfos(id);
+
+    if (!urlInfos[0]?.url) {
+      throw new Error(`No URL found for document '${id}'.`);
+    }
+
+    return urlInfos[0].url;
   }
 
   async getDocumentUrlByCulture(id: string, culture: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
-    const urls = await response.json();
-    const urlInfo = urls[0]?.urlInfos?.find(info => info.culture === culture);
+    const urlInfos = await this.getDocumentUrlInfos(id);
+    const urlInfo = urlInfos.find(info => info.culture === culture);
 
     if (!urlInfo?.url) {
       throw new Error(`No URL found for document '${id}' and culture '${culture}'.`);
@@ -1631,7 +1639,7 @@ export class DocumentApiHelper {
     return await this.publish(id, publishScheduleData);
   }
 
-  async createVariantDocumentWithTemplateAndParent(documentTypeId: string, templateId: string, name: string, cultures: string[], parentId?: string) {
+  async createVariantDocumentWithTemplateAndParent(name: string, documentTypeId: string, templateId: string, cultures: string[], parentId?: string) {
     await this.ensureNameNotExists(name);
 
     const documentBuilder = new DocumentBuilder()

@@ -32,13 +32,13 @@ test.beforeEach(async ({umbracoApi}) => {
   const childDocumentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithTemplateAndAllowedChildNode(childDocumentTypeName, renderTemplateId, false, grandchildDocumentTypeId);
   const rootDocumentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithTemplateAndAllowedChildNode(rootDocumentTypeName, renderTemplateId, true, childDocumentTypeId);
 
-  rootContentId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(rootDocumentTypeId, renderTemplateId, rootContentName, cultures);
+  rootContentId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(rootContentName, rootDocumentTypeId, renderTemplateId, cultures);
   await umbracoApi.document.publishWithCultures(rootContentId, cultures);
-  const publishedChildId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(childDocumentTypeId, renderTemplateId, publishedChildName, cultures, rootContentId);
+  const publishedChildId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(publishedChildName, childDocumentTypeId, renderTemplateId, cultures, rootContentId);
   await umbracoApi.document.publishWithCultures(publishedChildId, cultures);
-  childToUnpublishId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(childDocumentTypeId, renderTemplateId, childToUnpublishName, cultures, rootContentId);
+  childToUnpublishId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(childToUnpublishName, childDocumentTypeId, renderTemplateId, cultures, rootContentId);
   await umbracoApi.document.publishWithCultures(childToUnpublishId, cultures);
-  const grandchildId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(grandchildDocumentTypeId, renderTemplateId, grandchildContentName, cultures, childToUnpublishId);
+  const grandchildId = await umbracoApi.document.createVariantDocumentWithTemplateAndParent(grandchildContentName, grandchildDocumentTypeId, renderTemplateId, cultures, childToUnpublishId);
   await umbracoApi.document.publishWithCultures(grandchildId, cultures);
 
   await umbracoApi.document.updateDomainsForVariantDocument(rootContentId, [
@@ -76,5 +76,5 @@ test('a descendant is not rendered when its ancestor is unpublished in the reque
   // Assert
   // In English the published child is a descendant, but the grandchild is excluded because its ancestor is unpublished in English
   await umbracoUi.contentRender.doesContentRenderValueContainText(publishedChildName);
-  await umbracoUi.contentRender.doesContentRenderValueContainText(grandchildContentName, false, false);
+  await umbracoUi.contentRender.doesContentRenderValueNotContainText(grandchildContentName);
 });
