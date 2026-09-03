@@ -111,7 +111,7 @@ test('can remove a text file in the content', async ({umbracoApi, umbracoUi}) =>
   expect(contentData.values).toEqual([]);
 });
 
-test('cannot upload a file with a disallowed extension', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot upload a file with a disallowed extension', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createUploadDataType(customDataTypeName, ['pdf']);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
@@ -131,7 +131,7 @@ test('cannot upload a file with a disallowed extension', {tag: '@release'}, asyn
   expect(contentData.values).toEqual([]);
 });
 
-test('can not publish a mandatory upload file with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory upload file with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const uploadFileName = 'File.txt';
   const mineType = 'text/plain';

@@ -163,7 +163,7 @@ test.skip('cannot add number of block element greater than the maximum amount', 
   await umbracoUi.content.doesFormValidationMessageContainText('Maximum 0 entries, you have entered 1 too many.');
 });
 
-test('cannot publish content with fewer block elements than the minimum amount', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot publish content with fewer block elements than the minimum amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 1;
   const customDataTypeId = await umbracoApi.dataType.createBlockGridWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, minAmount, 0);

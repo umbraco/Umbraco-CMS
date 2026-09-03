@@ -153,7 +153,7 @@ test('cannot add number of block element greater than the maximum amount', async
   await umbracoUi.content.isAddBlockElementButtonWithLabelVisible(customDataTypeName, 'Add', false);
 });
 
-test('cannot publish content with fewer block elements than the minimum amount', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot publish content with fewer block elements than the minimum amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 1;
   const customDataTypeId = await umbracoApi.dataType.createBlockListWithABlockAndMinAndMaxAmount(customDataTypeName, elementTypeId, minAmount, 0);

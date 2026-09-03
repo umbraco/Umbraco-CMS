@@ -19,7 +19,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-test('cannot publish a decimal value below the configured minimum', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot publish a decimal value below the configured minimum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const min = 5;
   const max = 100;
@@ -46,7 +46,7 @@ test('cannot publish a decimal value below the configured minimum', {tag: '@rele
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
 });
 
-test('cannot publish a decimal value above the configured maximum', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot publish a decimal value above the configured maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const min = 0;
   const max = 10;
@@ -73,7 +73,7 @@ test('cannot publish a decimal value above the configured maximum', {tag: '@rele
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
 });
 
-test('can not publish a mandatory decimal with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory decimal with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createDecimalDataType(customDataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, 'Test Group', false, false, true);

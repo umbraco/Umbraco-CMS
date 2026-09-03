@@ -20,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can create content with the date picker data type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can create content with the date picker data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeId = await umbracoApi.dataType.createDefaultDateTimeDataType(dataTypeName);
@@ -64,7 +64,7 @@ test('can publish content with the date picker data type', async ({umbracoApi, u
   expect(contentData.values[0].value).toEqual(expectedValue);
 });
 
-test('can not publish a mandatory date picker with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory date picker with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createDefaultDateTimeDataType(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'Test Group', false, false, true);

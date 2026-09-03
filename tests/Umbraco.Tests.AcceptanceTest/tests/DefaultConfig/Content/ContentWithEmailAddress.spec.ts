@@ -20,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('cannot publish content with an invalid email address format', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot publish content with an invalid email address format', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createEmailAddressDataType(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId);

@@ -192,7 +192,7 @@ test('can remove a not-found content picker', {tag: '@release'}, async ({umbraco
   expect(contentData.values).toEqual([]);
 });
 
-test('can not publish a mandatory content picker with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory content picker with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);

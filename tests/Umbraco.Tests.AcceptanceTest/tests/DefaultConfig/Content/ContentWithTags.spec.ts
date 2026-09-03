@@ -81,7 +81,7 @@ test('can remove a tag in the content', async ({umbracoApi, umbracoUi}) => {
   expect(contentData.values).toEqual([]);
 });
 
-test('can not publish a mandatory tags with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory tags with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);

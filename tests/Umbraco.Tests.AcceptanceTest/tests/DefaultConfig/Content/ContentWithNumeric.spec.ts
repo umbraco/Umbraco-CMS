@@ -64,7 +64,7 @@ test('can publish content with the numeric data type', async ({umbracoApi, umbra
   expect(contentData.values[0].value).toEqual(number);
 });
 
-test('cannot publish a numeric value below the configured minimum', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot publish a numeric value below the configured minimum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const min = 5;
   const max = 100;
@@ -91,7 +91,7 @@ test('cannot publish a numeric value below the configured minimum', {tag: '@rele
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
 });
 
-test('cannot publish a numeric value above the configured maximum', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot publish a numeric value above the configured maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const min = 0;
   const max = 10;
@@ -118,7 +118,7 @@ test('cannot publish a numeric value above the configured maximum', {tag: '@rele
   await umbracoUi.content.isTextWithMessageVisible(warningMessage, false);
 });
 
-test('can not publish a mandatory numeric with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory numeric with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'Test Group', false, false, true);

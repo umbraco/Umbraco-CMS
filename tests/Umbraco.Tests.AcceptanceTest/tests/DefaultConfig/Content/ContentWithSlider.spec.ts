@@ -20,7 +20,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
 });
 
-test('can create content with the slider data type', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can create content with the slider data type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Draft';
   const dataTypeId = await umbracoApi.dataType.createSliderDataType(dataTypeName);

@@ -70,7 +70,7 @@ test('can publish content with the user picker data type', async ({umbracoApi, u
   expect(contentData.values[0].value).toEqual(userId);
 });
 
-test('can not publish a mandatory user picker with an empty value', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can not publish a mandatory user picker with an empty value', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeId, 'Test Group', false, false, true);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);

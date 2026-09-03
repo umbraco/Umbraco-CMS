@@ -107,7 +107,7 @@ test('can remove an svg file in the content', async ({umbracoApi, umbracoUi}) =>
   expect(contentData.values).toEqual([]);
 });
 
-test('cannot upload a file with a disallowed extension', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('cannot upload a file with a disallowed extension', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeId = await umbracoApi.dataType.createUploadDataType(customDataTypeName, ['pdf']);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
