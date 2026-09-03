@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -7,9 +8,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Relations;
+using Umbraco.Cms.Search.Core.NotificationHandlers;
+using Umbraco.Cms.Search.Core.Services.ContentIndexing;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
@@ -44,10 +48,12 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
     {
         base.CustomTestSetup(builder);
 
-        // creates the umbExternalBlockElement relation when the referencing document is saved/published
+        // creates the umbExternalBlockElement relation when the referencing document or element is saved/published
         builder
             .AddNotificationHandler<ContentSavedNotification, ContentRelationsUpdate>()
-            .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>();
+            .AddNotificationHandler<ContentPublishedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementSavedNotification, ContentRelationsUpdate>()
+            .AddNotificationHandler<ElementPublishedNotification, ContentRelationsUpdate>();
 
         // broadcasts ElementCacheRefresherNotification (picked up by ElementIndexingNotificationHandler) when an
         // element is saved/published/unpublished/deleted
@@ -55,7 +61,7 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
     }
 
     [Test]
-    public async Task Republishing_ReferencedElement_Reindexes_ReferencingDocument()
+    public async Task Can_Reindex_Referencing_Document_When_Referenced_Element_Is_Republished()
     {
         var (contentType, elementType) = await SetupBlockListWithElementType();
 
@@ -71,7 +77,7 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
         ContentService.Save(content);
         ContentService.Publish(content, ["*"]);
 
-        AssertPublishedBlocksText("Original text");
+        AssertPublishedBlocksTextsContain("Original text");
 
         // change the element's content and republish - the referencing document should be transparently reindexed
         IElement updatedElement = ElementService.GetById(element.Key)!;
@@ -79,21 +85,11 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
         ElementService.Save(updatedElement);
         ElementService.Publish(updatedElement, ["*"]);
 
-        AssertPublishedBlocksText("Updated text");
-
-        return;
-
-        void AssertPublishedBlocksText(string expectedText)
-        {
-            TestIndexDocument publishedDocument = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
-            IndexValue? publishedValue = publishedDocument.Fields.FirstOrDefault(f => f.FieldName == "blocks")?.Value;
-            Assert.That(publishedValue, Is.Not.Null);
-            CollectionAssert.Contains(publishedValue.Texts, expectedText);
-        }
+        AssertPublishedBlocksTextsContain("Updated text");
     }
 
     [Test]
-    public async Task Unpublishing_ReferencedElement_Removes_ItsContent_From_ReferencingDocument()
+    public async Task Can_Remove_Element_Content_From_Referencing_Document_When_Element_Is_Unpublished()
     {
         var (contentType, elementType) = await SetupBlockListWithElementType();
 
@@ -120,9 +116,91 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
         Assert.That(publishedValueAfter, Is.Null);
     }
 
-    private Content CreatePageWithExternalBlockReference(IContentType contentType, Guid externalElementKey)
+    [Test]
+    public async Task Can_Reindex_Referencing_Document_When_Transitively_Referenced_Element_Is_Republished()
     {
-        var blockListValue = new BlockListValue
+        var (contentType, elementType) = await SetupBlockListWithElementType();
+        await AddBlocksPropertyToElementType(elementType);
+
+        // the leaf element - the one that will change - is referenced not by the document directly, but by
+        // another (published) reusable element, which is the one the document actually references.
+        Element leafElement = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Leaf element")
+            .Build();
+        leafElement.SetValue("textValue", "Original leaf text");
+        ElementService.Save(leafElement);
+        ElementService.Publish(leafElement, ["*"]);
+
+        Element intermediateElement = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Intermediate element")
+            .Build();
+        intermediateElement.SetValue("textValue", "Intermediate text");
+        intermediateElement.SetValue("blocks", JsonSerializer.Serialize(ExternalBlockListValue(leafElement.Key)));
+        ElementService.Save(intermediateElement);
+        ElementService.Publish(intermediateElement, ["*"]);
+
+        Content content = CreatePageWithExternalBlockReference(contentType, intermediateElement.Key);
+        ContentService.Save(content);
+        ContentService.Publish(content, ["*"]);
+
+        AssertPublishedBlocksTextsContain("Intermediate text", "Original leaf text");
+
+        // change only the leaf element and republish - the document should be reindexed transitively, through the
+        // intermediate element, even though the document has no direct relation to the leaf element.
+        IElement updatedLeafElement = ElementService.GetById(leafElement.Key)!;
+        updatedLeafElement.SetValue("textValue", "Updated leaf text");
+        ElementService.Save(updatedLeafElement);
+        ElementService.Publish(updatedLeafElement, ["*"]);
+
+        AssertPublishedBlocksTextsContain("Intermediate text", "Updated leaf text");
+    }
+
+    [Test]
+    public async Task Cannot_Find_Referencing_Document_Through_Unpublished_Intermediate_Element()
+    {
+        var (contentType, elementType) = await SetupBlockListWithElementType();
+        await AddBlocksPropertyToElementType(elementType);
+
+        Element leafElement = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Leaf element")
+            .Build();
+        leafElement.SetValue("textValue", "Leaf text");
+        ElementService.Save(leafElement);
+        ElementService.Publish(leafElement, ["*"]);
+
+        // the intermediate element references the leaf element externally, but is only ever saved, never published
+        Element intermediateElement = new ElementBuilder()
+            .WithContentType(elementType)
+            .WithName("Intermediate element")
+            .Build();
+        intermediateElement.SetValue("textValue", "Intermediate text");
+        intermediateElement.SetValue("blocks", JsonSerializer.Serialize(ExternalBlockListValue(leafElement.Key)));
+        ElementService.Save(intermediateElement);
+
+        Content content = CreatePageWithExternalBlockReference(contentType, intermediateElement.Key);
+        ContentService.Save(content);
+        ContentService.Publish(content, ["*"]);
+
+        // call the traversal directly: the index-time flattening already excludes the unpublished intermediate
+        // element's content independently, so there is no way to observe the traversal pruning through index
+        // content alone - it must be verified directly.
+        var handler = new ElementIndexingNotificationHandler(
+            GetRequiredService<ICoreScopeProvider>(),
+            ContentIndexingService,
+            GetRequiredService<IRelationService>(),
+            GetRequiredService<IOptions<IndexingSettings>>(),
+            GetRequiredService<IOriginProvider>());
+
+        Guid[] referencingDocumentKeys = handler.FindDocumentKeysReferencingElements([leafElement.Id]);
+
+        Assert.That(referencingDocumentKeys, Is.Empty);
+    }
+
+    private static BlockListValue ExternalBlockListValue(Guid externalElementKey)
+        => new()
         {
             Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
             {
@@ -135,29 +213,21 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
             Expose = [],
         };
 
-        Content content = new ContentBuilder()
-            .WithContentType(contentType)
-            .WithName("My Page")
-            .Build();
-        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        return content;
+    private void AssertPublishedBlocksTextsContain(params string[] expectedTexts)
+    {
+        TestIndexDocument publishedDocument = IndexerAndSearcher.Dump(IndexAliases.PublishedContent).Single();
+        IndexValue? publishedValue = publishedDocument.Fields.FirstOrDefault(f => f.FieldName == "blocks")?.Value;
+        Assert.That(publishedValue, Is.Not.Null);
+        foreach (var expectedText in expectedTexts)
+        {
+            CollectionAssert.Contains(publishedValue.Texts, expectedText);
+        }
     }
 
-    private async Task<(IContentType ContentType, IContentType ElementType)> SetupBlockListWithElementType()
+    // adds a second, self-referencing "blocks" property to the given element type, so an element of this type can
+    // itself externally reference another element of the same type - used to build a transitive reference chain.
+    private async Task AddBlocksPropertyToElementType(IContentType elementType)
     {
-        IContentType elementType = new ContentTypeBuilder()
-            .WithAlias("reusableElement")
-            .WithName("Reusable Element")
-            .WithIsElement(true)
-            .AddPropertyType()
-            .WithAlias("textValue")
-            .WithName("Text")
-            .WithDataTypeId(Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-            .Done()
-            .Build();
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
-
         var blockListDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
         {
             ConfigurationData = new Dictionary<string, object>
@@ -170,24 +240,14 @@ public class ElementIndexingNotificationHandlerTests : PropertyValueHandlerTests
                     }
                 }
             },
-            Name = "My Block List",
+            Name = "My Nested Block List",
             DatabaseType = ValueStorageType.Ntext,
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow
         };
         await GetRequiredService<IDataTypeService>().CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
 
-        IContentType contentType = new ContentTypeBuilder()
-            .WithAlias("pageWithBlocks")
-            .WithName("Page With Blocks")
-            .AddPropertyType()
-            .WithAlias("blocks")
-            .WithName("blocks")
-            .WithDataTypeId(blockListDataType.Id)
-            .Done()
-            .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-
-        return (contentType, elementType);
+        elementType.AddPropertyType(new PropertyType(ShortStringHelper, blockListDataType, "blocks"));
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
     }
 }

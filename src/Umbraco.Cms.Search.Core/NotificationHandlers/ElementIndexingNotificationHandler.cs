@@ -77,11 +77,16 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
             return;
         }
 
-        var changedElementIds = payloads
-            .Where(payload => payload.ChangeTypes != TreeChangeTypes.None)
-            .Select(payload => payload.Id)
-            .Distinct()
-            .ToArray();
+        // a RefreshAll payload (Id=0, e.g. from a full element cache reload) carries no specific element id, so we
+        // cannot know which elements actually changed - conservatively treat every element ever referenced via an
+        // external block relation as changed, to avoid leaving stale flattened content behind.
+        int[] changedElementIds = payloads.Any(payload => payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+            ? GetAllReferencedElementIds()
+            : payloads
+                .Where(payload => payload.ChangeTypes != TreeChangeTypes.None)
+                .Select(payload => payload.Id)
+                .Distinct()
+                .ToArray();
 
         if (changedElementIds.Length == 0)
         {
@@ -107,7 +112,10 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
     // elements). Climbing is only continued through a published element - an unpublished element's content (and
     // anything nested below it) is not part of any document's published index, so a change below it cannot affect
     // one further up.
-    private Guid[] FindDocumentKeysReferencingElements(int[] elementIds)
+    // Internal (rather than private) so integration tests can verify the traversal directly - the pruning at an
+    // unpublished intermediate element has no observable effect on index *content* (the index-time flattening
+    // already excludes it independently), so it can only be verified by calling this method directly.
+    internal Guid[] FindDocumentKeysReferencingElements(int[] elementIds)
     {
         var documentKeys = new HashSet<Guid>();
         var visitedElementIds = new HashSet<int>(elementIds);
@@ -142,4 +150,11 @@ internal sealed class ElementIndexingNotificationHandler : IndexingNotificationH
                 batch,
                 [Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias],
                 entityType));
+
+    private int[] GetAllReferencedElementIds()
+        => _relationService
+            .GetByRelationTypeAlias(Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedExternalBlockElementAlias)
+            .Select(relation => relation.ChildId)
+            .Distinct()
+            .ToArray();
 }

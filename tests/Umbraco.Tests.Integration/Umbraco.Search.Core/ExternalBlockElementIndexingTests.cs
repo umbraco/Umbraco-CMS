@@ -1,11 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -20,12 +16,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 /// </summary>
 public class ExternalBlockElementIndexingTests : PropertyValueHandlerTestsBase
 {
-    private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
-
-    private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
-
-    private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
-
     private IElementService ElementService => GetRequiredService<IElementService>();
 
     [SetUp]
@@ -38,7 +28,7 @@ public class ExternalBlockElementIndexingTests : PropertyValueHandlerTestsBase
     }
 
     [Test]
-    public async Task Published_ExternalElement_Content_Is_Flattened_Into_PublishedIndex_Only()
+    public async Task Can_Flatten_Published_External_Element_Content_Into_Published_Index_Only()
     {
         var (contentType, elementType) = await SetupBlockListWithElementType();
 
@@ -60,7 +50,7 @@ public class ExternalBlockElementIndexingTests : PropertyValueHandlerTestsBase
     }
 
     [Test]
-    public async Task Unpublished_ExternalElement_Content_Is_Not_Flattened()
+    public async Task Cannot_Flatten_Unpublished_External_Element_Content()
     {
         var (contentType, elementType) = await SetupBlockListWithElementType();
 
@@ -91,76 +81,5 @@ public class ExternalBlockElementIndexingTests : PropertyValueHandlerTestsBase
         ElementService.Save(element);
         ElementService.Publish(element, ["*"]);
         return element.Key;
-    }
-
-    private Content CreatePageWithExternalBlockReference(IContentType contentType, Guid externalElementKey)
-    {
-        var blockListValue = new BlockListValue
-        {
-            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
-            {
-                {
-                    Constants.PropertyEditors.Aliases.BlockList,
-                    [new BlockListLayoutItem { ContentKey = externalElementKey, IsExternalContent = true }]
-                }
-            },
-            ContentData = [],
-            Expose = [],
-        };
-
-        Content content = new ContentBuilder()
-            .WithContentType(contentType)
-            .WithName("My Page")
-            .Build();
-        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
-        return content;
-    }
-
-    private async Task<(IContentType ContentType, IContentType ElementType)> SetupBlockListWithElementType()
-    {
-        IContentType elementType = new ContentTypeBuilder()
-            .WithAlias("reusableElement")
-            .WithName("Reusable Element")
-            .WithIsElement(true)
-            .AddPropertyType()
-            .WithAlias("textValue")
-            .WithName("Text")
-            .WithDataTypeId(Constants.DataTypes.Textbox)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-            .Done()
-            .Build();
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
-
-        var blockListDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
-        {
-            ConfigurationData = new Dictionary<string, object>
-            {
-                {
-                    "blocks",
-                    new BlockListConfiguration.BlockConfiguration[]
-                    {
-                        new() { ContentElementTypeKey = elementType.Key }
-                    }
-                }
-            },
-            Name = "My Block List",
-            DatabaseType = ValueStorageType.Ntext,
-            ParentId = Constants.System.Root,
-            CreateDate = DateTime.UtcNow
-        };
-        await GetRequiredService<IDataTypeService>().CreateAsync(blockListDataType, Constants.Security.SuperUserKey);
-
-        IContentType contentType = new ContentTypeBuilder()
-            .WithAlias("pageWithBlocks")
-            .WithName("Page With Blocks")
-            .AddPropertyType()
-            .WithAlias("blocks")
-            .WithName("blocks")
-            .WithDataTypeId(blockListDataType.Id)
-            .Done()
-            .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-
-        return (contentType, elementType);
     }
 }
