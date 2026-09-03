@@ -46,6 +46,8 @@ class FakeDocumentWorkspaceContext implements UmbTrashableEntityWorkspaceContext
 		return 'document';
 	}
 
+	resetUnpersistedChanges() {}
+
 	async reload() {}
 
 	destroy() {}

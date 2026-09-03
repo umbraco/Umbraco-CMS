@@ -37,6 +37,7 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 	} as unknown as UmbReadOnlyVariantGuardManager;
 
 	reloadCallCount = 0;
+	resetUnpersistedChangesCallCount = 0;
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -68,6 +69,10 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 
 	setIsNew(value: boolean | undefined) {
 		this.#isNew.setValue(value);
+	}
+
+	resetUnpersistedChanges(): void {
+		this.resetUnpersistedChangesCallCount++;
 	}
 
 	async reload() {

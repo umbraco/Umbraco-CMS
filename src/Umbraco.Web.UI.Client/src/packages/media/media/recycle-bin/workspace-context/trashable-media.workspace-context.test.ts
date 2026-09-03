@@ -46,6 +46,8 @@ class FakeMediaWorkspaceContext implements UmbTrashableEntityWorkspaceContext {
 		return 'media';
 	}
 
+	resetUnpersistedChanges() {}
+
 	async reload() {}
 
 	destroy() {}

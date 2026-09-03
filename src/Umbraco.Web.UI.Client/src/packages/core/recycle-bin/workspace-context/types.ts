@@ -11,4 +11,5 @@ export interface UmbTrashableEntityWorkspaceContext extends UmbEntityWorkspaceCo
 	readonly isNew: Observable<boolean | undefined>;
 	reload(): Promise<void>;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
+	resetUnpersistedChanges(): void;
 }

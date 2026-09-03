@@ -66,6 +66,8 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 	 * type), and the unique of the original parent to redirect to — or a `null` unique if the trashed entity had
 	 * no parent (was at the root), in which case the implementation decides where to send the user, e.g. the
 	 * section root.
+	 * @returns {string} An absolute path: the edit path for `args.entity.unique` when it's set, or an
+	 * implementation-chosen fallback path (e.g. the section root) when it's `null`.
 	 */
 	protected abstract getRedirectPath(args: { entity: UmbEntityModel }): string;
 
@@ -103,6 +105,11 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 		// Only reload when staying put (a modal), to refresh the visible trashed state — when redirecting away,
 		// the new data isn't needed here.
 		if (event.getUnique() && !this.#workspaceContext?.modalContext) {
+			// The entity is already trashed server-side by this point, so any local edits are moot — reset
+			// them first so pushState's navigation guard doesn't intercept the redirect with a "discard
+			// changes?" prompt the user never asked for.
+			this.#workspaceContext?.resetUnpersistedChanges();
+
 			try {
 				this.#redirectToParent();
 			} catch (error) {

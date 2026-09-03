@@ -186,6 +186,17 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 			expect(history.replaceStateCalls).to.have.lengthOf(0);
 		});
 
+		it('discards local changes before redirecting, so the redirect is not interrupted by unsaved changes', () => {
+			parentEntityContext.setParent({ unique: 'parent-unique', entityType: 'test-entity-type' });
+
+			dispatchTrashed();
+
+			expect(workspaceContext.resetUnpersistedChangesCallCount).to.equal(1);
+			expect(history.pushStateCalls).to.have.lengthOf(1);
+			expect(history.pushStateCalls[0].url).to.equal('/test/edit/parent-unique');
+			expect(workspaceContext.reloadCallCount).to.equal(0);
+		});
+
 		it('does not redirect for a restored entity', () => {
 			parentEntityContext.setParent({ unique: 'parent-unique', entityType: 'test-entity-type' });
 
