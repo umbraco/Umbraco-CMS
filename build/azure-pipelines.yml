@@ -898,7 +898,7 @@ stages:
             inputs:
               archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
-          - task: AzureFileCopy@4
+          - task: AzureFileCopy@6
             displayName: 'Copy C# Docs to blob storage'
             inputs:
               SourcePath: '$(Build.ArtifactStagingDirectory)/csharp-docs/*'
@@ -920,7 +920,7 @@ stages:
             inputs:
               archiveFilePatterns: $(Build.SourcesDirectory)/ui-docs.zip
               destinationFolder: $(Build.ArtifactStagingDirectory)/ui-docs
-          - task: AzureFileCopy@4
+          - task: AzureFileCopy@6
             displayName: 'Copy UI Docs to blob storage'
             inputs:
               SourcePath: '$(Build.ArtifactStagingDirectory)/ui-docs/*'
