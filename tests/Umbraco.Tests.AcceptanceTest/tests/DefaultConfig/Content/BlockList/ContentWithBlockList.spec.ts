@@ -403,7 +403,7 @@ test('can move away from a content node with a block list after making no change
 
 test('cannot create a block when a property value exceeds the configured maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const numericDataTypeId = await umbracoApi.dataType.createDefaultNumericWithMinMax(numericDataTypeName, 1, 10);
+  const numericDataTypeId = await umbracoApi.dataType.createDefaultNumericDataTypeWithMinAndMax(numericDataTypeName, 1, 10);
   const numericElementTypeId = await umbracoApi.documentType.createDefaultElementType(numericElementTypeName, groupName, numericDataTypeName, numericDataTypeId);
   const customDataTypeId = await umbracoApi.dataType.createBlockListDataTypeWithABlock(customDataTypeName, numericElementTypeId);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, customDataTypeId);

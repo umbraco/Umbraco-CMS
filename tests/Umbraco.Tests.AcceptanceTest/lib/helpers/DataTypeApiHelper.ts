@@ -1300,7 +1300,7 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createDecimalWithMinMax(name: string, min: number, max: number) {
+  async createDecimalDataTypeWithMinAndMax(name: string, min: number, max: number) {
     await this.ensureNameNotExists(name);
 
     const dataType = new DecimalDataTypeBuilder()
@@ -2015,7 +2015,7 @@ export class DataTypeApiHelper {
     return await this.save(dataType);
   }
 
-  async createDefaultNumericWithMinMax(name: string, min: number, max: number) {
+  async createDefaultNumericDataTypeWithMinAndMax(name: string, min: number, max: number) {
     await this.ensureNameNotExists(name);
 
     const dataType = new NumericDataTypeBuilder()

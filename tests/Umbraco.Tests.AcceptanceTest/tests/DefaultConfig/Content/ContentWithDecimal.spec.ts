@@ -25,7 +25,7 @@ test('cannot publish a decimal value below the configured minimum', {tag: '@rele
   const max = 100;
   const belowMin = 1;
   const warningMessage = `The value ${belowMin} is less than the allowed minimum value of ${min}`;
-  const dataTypeId = await umbracoApi.dataType.createDecimalWithMinMax(customDataTypeName, min, max);
+  const dataTypeId = await umbracoApi.dataType.createDecimalDataTypeWithMinAndMax(customDataTypeName, min, max);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -52,7 +52,7 @@ test('cannot publish a decimal value above the configured maximum', {tag: '@rele
   const max = 10;
   const aboveMax = 11;
   const warningMessage = `The value ${aboveMax} is greater than the allowed maximum value of ${max}`;
-  const dataTypeId = await umbracoApi.dataType.createDecimalWithMinMax(customDataTypeName, min, max);
+  const dataTypeId = await umbracoApi.dataType.createDecimalDataTypeWithMinAndMax(customDataTypeName, min, max);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
