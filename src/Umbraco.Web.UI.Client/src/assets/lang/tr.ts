@@ -1663,6 +1663,7 @@ export default {
 		stateLockedOut: 'Kilitlendi',
 		stateInvited: 'Davet edildi',
 		stateInactive: 'Etkin Değil',
+		type: 'Tür',
 		sortNameAscending: 'Ad (AZ)',
 		sortNameDescending: 'Ad (ZA)',
 		sortCreateDateAscending: 'En eski',
