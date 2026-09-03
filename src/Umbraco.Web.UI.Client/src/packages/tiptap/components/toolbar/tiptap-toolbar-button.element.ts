@@ -18,11 +18,15 @@ export class UmbTiptapToolbarButtonElement<
 	@state()
 	protected isActive = false;
 
+	@state()
+	protected isDisabled = false;
+
 	override connectedCallback() {
 		super.connectedCallback();
 
 		if (this.editor) {
 			this.editor.on('transaction', this.#onEditorUpdate);
+			this.#onEditorUpdate();
 		}
 	}
 
@@ -37,6 +41,7 @@ export class UmbTiptapToolbarButtonElement<
 	readonly #onEditorUpdate = () => {
 		if (this.api && this.editor && this.manifest) {
 			this.isActive = this.api.isActive(this.editor);
+			this.isDisabled = this.api.isDisabled(this.editor);
 		}
 	};
 
@@ -48,7 +53,7 @@ export class UmbTiptapToolbarButtonElement<
 				look=${this.isActive ? 'outline' : 'default'}
 				label=${label}
 				title=${label}
-				?disabled=${this.api?.isDisabled(this.editor)}
+				?disabled=${this.isDisabled}
 				@click=${() => this.api?.execute(this.editor)}>
 				${when(
 					this.manifest?.meta.icon,

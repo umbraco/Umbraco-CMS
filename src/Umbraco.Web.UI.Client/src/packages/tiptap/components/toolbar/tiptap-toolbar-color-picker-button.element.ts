@@ -15,7 +15,7 @@ export class UmbTiptapToolbarColorPickerButtonElement extends UmbTiptapToolbarBu
 
 	override render() {
 		const label = this.localize.string(this.manifest?.meta.label);
-		const disabled = this.api?.isDisabled(this.editor);
+		const disabled = this.isDisabled;
 		return html`
 			<uui-button-group>
 				<uui-button

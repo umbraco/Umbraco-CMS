@@ -107,3 +107,108 @@ describe('UmbTiptapToolbarButtonElement', () => {
 		expect(editorStub.listenerCount('transaction')).to.equal(0);
 	});
 });
+
+/**
+ * Editor stub whose `isDisabled` condition (caret inside a list) is independent of
+ * `isActive` (which is pinned to `false`). Isolates the #23823 bug: `isDisabled` must
+ * re-evaluate on every `transaction`, not only as a side effect of `isActive` changing.
+ */
+function makeListAwareEditorStub() {
+	const listeners = new Map<string, Array<() => void>>();
+	let inList = false;
+
+	return {
+		on(event: string, fn: () => void) {
+			const bucket = listeners.get(event) ?? [];
+			bucket.push(fn);
+			listeners.set(event, bucket);
+		},
+		off(event: string, fn: () => void) {
+			const bucket = listeners.get(event) ?? [];
+			listeners.set(event, bucket.filter((f) => f !== fn));
+		},
+		get inList() {
+			return inList;
+		},
+		/** Simulates the caret moving in/out of a list, independent of any mark. */
+		fireTransaction() {
+			inList = !inList;
+			for (const fn of listeners.get('transaction') ?? []) fn();
+		},
+	};
+}
+
+describe('UmbTiptapToolbarButtonElement — disabled state (#23823)', () => {
+	let editorStub: ReturnType<typeof makeListAwareEditorStub>;
+	let element: UmbTiptapToolbarButtonElement;
+
+	const listAwareApi: UmbTiptapToolbarElementApi = {
+		isActive: () => false,
+		isDisabled: (e?: Editor) => (e as any)?.inList === true,
+		execute: () => {},
+	} as unknown as UmbTiptapToolbarElementApi;
+
+	const textAlignManifest = {
+		type: 'tiptapToolbarExtension',
+		kind: 'button',
+		alias: 'Umb.Tiptap.Toolbar.TextAlignCenter',
+		name: 'Text Align Center',
+		meta: { alias: 'textAlignCenter', label: 'Align center', icon: 'icon-text-align-center' },
+	} as any;
+
+	const isDisabled = () => element.shadowRoot?.querySelector('uui-button')?.hasAttribute('disabled');
+
+	beforeEach(() => {
+		editorStub = makeListAwareEditorStub();
+
+		element = document.createElement('umb-tiptap-toolbar-button') as UmbTiptapToolbarButtonElement;
+		element.editor = editorStub as unknown as Editor;
+		element.api = listAwareApi;
+		element.manifest = textAlignManifest;
+		document.body.appendChild(element);
+	});
+
+	afterEach(() => {
+		element.remove();
+	});
+
+	it('re-evaluates isDisabled on transaction even when isActive does not change', async () => {
+		await element.updateComplete;
+		expect(isDisabled()).to.equal(false);
+
+		editorStub.fireTransaction(); // caret enters a list — isActive stays false throughout
+		await element.updateComplete;
+
+		expect(isDisabled()).to.equal(true);
+	});
+
+	it('re-enables once the disabling condition clears', async () => {
+		editorStub.fireTransaction();
+		await element.updateComplete;
+		expect(isDisabled()).to.equal(true);
+
+		editorStub.fireTransaction(); // caret leaves the list
+		await element.updateComplete;
+
+		expect(isDisabled()).to.equal(false);
+	});
+
+	it('seeds the disabled state on connect, before any transaction fires', async () => {
+		const alwaysDisabledApi: UmbTiptapToolbarElementApi = {
+			isActive: () => false,
+			isDisabled: () => true,
+			execute: () => {},
+		} as unknown as UmbTiptapToolbarElementApi;
+
+		const seededElement = document.createElement('umb-tiptap-toolbar-button') as UmbTiptapToolbarButtonElement;
+		seededElement.editor = editorStub as unknown as Editor;
+		seededElement.api = alwaysDisabledApi;
+		seededElement.manifest = textAlignManifest;
+		document.body.appendChild(seededElement);
+
+		await seededElement.updateComplete;
+		expect(seededElement.shadowRoot?.querySelector('uui-button')?.hasAttribute('disabled')).to.equal(true);
+
+		seededElement.remove();
+	});
+});

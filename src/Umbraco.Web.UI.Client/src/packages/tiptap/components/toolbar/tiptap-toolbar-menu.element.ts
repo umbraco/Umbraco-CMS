@@ -18,6 +18,9 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 	@state()
 	protected isActive = false;
 
+	@state()
+	protected isDisabled = false;
+
 	public api?: UmbTiptapToolbarElementApi;
 
 	public editor?: Editor;
@@ -36,6 +39,7 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 
 		if (this.editor) {
 			this.editor.on('transaction', this.#onEditorUpdate);
+			this.#onEditorUpdate();
 		}
 	}
 
@@ -111,12 +115,13 @@ export class UmbTiptapToolbarMenuElement extends UmbLitElement {
 	readonly #onEditorUpdate = () => {
 		if (this.api && this.editor && this.manifest) {
 			this.isActive = this.api.isActive(this.editor) || this.#isMenuActive(this.#menu) || false;
+			this.isDisabled = this.api.isDisabled(this.editor);
 		}
 	};
 
 	override render() {
 		const label = this.localize.string(this.manifest?.meta.label);
-		const disabled = this.api?.isDisabled(this.editor);
+		const disabled = this.isDisabled;
 		return html`
 			${when(
 				this.manifest?.meta.look === 'icon',
