@@ -2,9 +2,7 @@ import { UmbTrashableEntityWorkspaceContextBase } from './trashable-entity-works
 import { UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT } from './trashable-entity-workspace.context-token.js';
 import {
 	UmbTestRecycleBinControllerHostElement,
-	UmbTestRecycleBinRepository,
 	UmbTestTrashableEntityWorkspaceContext,
-	createTestRecycleBinRepositoryManifest,
 	stubHistory,
 } from './trashable-entity-workspace-context.test-utils.js';
 import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '../contexts/is-trashed/constants.js';
@@ -12,19 +10,10 @@ import { UmbEntityRestoredFromRecycleBinEvent, UmbEntityTrashedEvent } from '../
 import { aTimeout, expect } from '@open-wc/testing';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-
-const TEST_REPOSITORY_ALIAS = 'Umb.Test.TrashableEntityWorkspaceContextBase.RecycleBinRepository';
+import { UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 
 class TestTrashableEntityWorkspaceContext extends UmbTrashableEntityWorkspaceContextBase {
 	readonly redirectPathCalls: Array<UmbEntityModel> = [];
-
-	constructor(host: UmbControllerHost) {
-		super(host);
-		this._setRecycleBinRepositoryAlias(TEST_REPOSITORY_ALIAS);
-	}
 
 	protected override getRedirectPath({ entity }: { entity: UmbEntityModel }): string {
 		this.redirectPathCalls.push(entity);
@@ -32,35 +21,15 @@ class TestTrashableEntityWorkspaceContext extends UmbTrashableEntityWorkspaceCon
 	}
 }
 
-/** Configured with a repository alias that is never registered, so `#redirectToParent` always rejects. */
-class TestTrashableEntityWorkspaceContextWithMissingRepository extends UmbTrashableEntityWorkspaceContextBase {
-	constructor(host: UmbControllerHost) {
-		super(host);
-		this._setRecycleBinRepositoryAlias('Umb.Test.TrashableEntityWorkspaceContextBase.MissingRecycleBinRepository');
-	}
-
-	protected override getRedirectPath(): string {
-		return '/test/never-reached';
-	}
-}
-
 describe('UmbTrashableEntityWorkspaceContextBase', () => {
 	let host: UmbTestRecycleBinControllerHostElement;
 	let actionEventContext: UmbActionEventContext;
 	let workspaceContext: UmbTestTrashableEntityWorkspaceContext;
+	let parentEntityContext: UmbParentEntityContext;
 	let context: TestTrashableEntityWorkspaceContext;
 	let history: ReturnType<typeof stubHistory>;
 
-	before(() => {
-		umbExtensionsRegistry.register(createTestRecycleBinRepositoryManifest(TEST_REPOSITORY_ALIAS));
-	});
-
-	after(() => {
-		umbExtensionsRegistry.unregister(TEST_REPOSITORY_ALIAS);
-	});
-
 	beforeEach(async () => {
-		UmbTestRecycleBinRepository.reset();
 		history = stubHistory();
 
 		host = new UmbTestRecycleBinControllerHostElement();
@@ -69,6 +38,7 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 		actionEventContext = new UmbActionEventContext(host);
 		workspaceContext = new UmbTestTrashableEntityWorkspaceContext(host);
 		new UmbContextProviderController(host, UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT, workspaceContext as never);
+		parentEntityContext = new UmbParentEntityContext(host);
 
 		context = new TestTrashableEntityWorkspaceContext(host);
 
@@ -179,27 +149,22 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 	});
 
 	describe('redirect on trash', () => {
-		it('redirects to the parent when the trashed entity had a parent', async () => {
-			UmbTestRecycleBinRepository.originalParent = { unique: 'parent-unique' };
+		it('redirects to the parent from the parent entity context', () => {
+			parentEntityContext.setParent({ unique: 'parent-unique', entityType: 'test-entity-type' });
 
 			dispatchTrashed();
-			await aTimeout(50);
 
-			expect(UmbTestRecycleBinRepository.requestOriginalParentCalls).to.deep.equal(['test-unique']);
 			expect(context.redirectPathCalls).to.have.lengthOf(1);
 			expect(context.redirectPathCalls[0]).to.deep.equal({ entityType: 'test-entity-type', unique: 'parent-unique' });
-			expect(history.replaceStateCalls).to.have.lengthOf(1);
-			expect(history.replaceStateCalls[0].url).to.equal('/test/edit/parent-unique');
-			expect(history.pushStateCalls).to.have.lengthOf(0);
+			expect(history.pushStateCalls).to.have.lengthOf(1);
+			expect(history.pushStateCalls[0].url).to.equal('/test/edit/parent-unique');
+			expect(history.replaceStateCalls).to.have.lengthOf(0);
 			// Redirecting shouldn't also reload — reload() is for the modal (stay-put) case only.
 			expect(workspaceContext.reloadCallCount).to.equal(0);
 		});
 
-		it('redirects to the fallback path when the trashed entity had no parent (root)', async () => {
-			UmbTestRecycleBinRepository.originalParent = null;
-
+		it('redirects to the fallback path when the trashed entity had no parent (root)', () => {
 			dispatchTrashed();
-			await aTimeout(50);
 
 			expect(context.redirectPathCalls).to.have.lengthOf(1);
 			expect(context.redirectPathCalls[0]).to.deep.equal({ entityType: 'test-entity-type', unique: null });
@@ -211,55 +176,66 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 
 		it('does not redirect when hosted in a modal, but still reloads', async () => {
 			workspaceContext.modalContext = { data: {} };
-			UmbTestRecycleBinRepository.originalParent = { unique: 'parent-unique' };
+			parentEntityContext.setParent({ unique: 'parent-unique', entityType: 'test-entity-type' });
 
 			dispatchTrashed();
-			await aTimeout(50);
+			await aTimeout(0);
 
 			expect(workspaceContext.reloadCallCount).to.equal(1);
-			expect(UmbTestRecycleBinRepository.requestOriginalParentCalls).to.have.lengthOf(0);
 			expect(history.pushStateCalls).to.have.lengthOf(0);
 			expect(history.replaceStateCalls).to.have.lengthOf(0);
 		});
 
-		it('does not redirect for a restored entity', async () => {
-			UmbTestRecycleBinRepository.originalParent = { unique: 'parent-unique' };
+		it('does not redirect for a restored entity', () => {
+			parentEntityContext.setParent({ unique: 'parent-unique', entityType: 'test-entity-type' });
 
 			dispatchRestored();
-			await aTimeout(50);
 
-			expect(UmbTestRecycleBinRepository.requestOriginalParentCalls).to.have.lengthOf(0);
 			expect(history.pushStateCalls).to.have.lengthOf(0);
 			expect(history.replaceStateCalls).to.have.lengthOf(0);
 		});
 
-		it('does not redirect when a different entity was trashed', async () => {
-			UmbTestRecycleBinRepository.originalParent = { unique: 'parent-unique' };
+		it('does not redirect when a different entity was trashed', () => {
+			parentEntityContext.setParent({ unique: 'parent-unique', entityType: 'test-entity-type' });
 
 			dispatchTrashed({ unique: 'some-other-unique' });
-			await aTimeout(50);
 
-			expect(UmbTestRecycleBinRepository.requestOriginalParentCalls).to.have.lengthOf(0);
 			expect(history.pushStateCalls).to.have.lengthOf(0);
 			expect(history.replaceStateCalls).to.have.lengthOf(0);
+		});
+
+		it('uses the parent captured when the trashed event is handled, unaffected by a later change to the context', () => {
+			parentEntityContext.setParent({ unique: 'original-parent', entityType: 'test-entity-type' });
+
+			dispatchTrashed();
+			parentEntityContext.setParent({ unique: 'changed-afterwards', entityType: 'test-entity-type' });
+
+			expect(history.pushStateCalls).to.have.lengthOf(1);
+			expect(history.pushStateCalls[0].url).to.equal('/test/edit/original-parent');
 		});
 	});
 
 	describe('redirect failure', () => {
-		it('falls back to reloading in place when the redirect rejects', async () => {
+		it('falls back to reloading in place when getRedirectPath throws', async () => {
+			class TestTrashableEntityWorkspaceContextWithThrowingRedirect extends UmbTrashableEntityWorkspaceContextBase {
+				protected override getRedirectPath(): string {
+					throw new Error('Redirect path could not be resolved.');
+				}
+			}
+
 			const failHost = new UmbTestRecycleBinControllerHostElement();
 			document.body.appendChild(failHost);
 
 			const failActionEventContext = new UmbActionEventContext(failHost);
 			const failWorkspaceContext = new UmbTestTrashableEntityWorkspaceContext(failHost);
 			new UmbContextProviderController(failHost, UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT, failWorkspaceContext as never);
-			new TestTrashableEntityWorkspaceContextWithMissingRepository(failHost);
+			new TestTrashableEntityWorkspaceContextWithThrowingRedirect(failHost);
 			await aTimeout(0);
 
 			failActionEventContext.dispatchEvent(
 				new UmbEntityTrashedEvent({ unique: 'test-unique', entityType: 'test-entity-type' }),
 			);
-			await aTimeout(50);
+			await aTimeout(0);
 
 			expect(failWorkspaceContext.reloadCallCount).to.equal(1);
 

@@ -1,33 +1,36 @@
 import { UmbIsTrashedEntityContext } from '../contexts/is-trashed/is-trashed.entity-context.js';
 import { UmbEntityRestoredFromRecycleBinEvent, UmbEntityTrashedEvent } from '../entity-action/index.js';
-import type { UmbRecycleBinRepository } from '../recycle-bin-repository.interface.js';
 import { UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT } from './trashable-entity-workspace.context-token.js';
 import type { UmbTrashableEntityWorkspaceContext } from './types.js';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	UMB_PARENT_ENTITY_CONTEXT,
+	type UmbEntityModel,
+	type UmbParentEntityContext,
+} from '@umbraco-cms/backoffice/entity';
 import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Adds recycle-bin support (readonly-when-trashed, reload on trash/restore, redirect to parent when the current
  * user trashes the open entity) to any workspace context satisfying {@link UmbTrashableEntityWorkspaceContext}.
- *
- * Call {@link UmbTrashableEntityWorkspaceContextBase#_setRecycleBinRepositoryAlias} in the constructor of the subclass
- * to configure which recycle-bin repository to use.
  * @abstract
  * @class UmbTrashableEntityWorkspaceContextBase
  * @augments {UmbContextBase}
  */
 export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextBase {
-	#recycleBinRepositoryAlias?: string;
 	#workspaceContext?: UmbTrashableEntityWorkspaceContext;
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#parentEntityContext?: UmbParentEntityContext;
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'UmbTrashableEntityWorkspaceContext');
+
+		this.consumeContext(UMB_PARENT_ENTITY_CONTEXT, (instance) => {
+			this.#parentEntityContext = instance;
+		});
 
 		this.consumeContext(UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
@@ -54,15 +57,6 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 			this.#actionEventContext = actionEventContext;
 			this.#addEventListeners();
 		});
-	}
-
-	/**
-	 * Configures which recycle-bin repository to use for parent lookups. Call this in the subclass constructor,
-	 * before any trash/restore event can fire.
-	 * @param {string} alias - The recycle-bin repository's extension alias.
-	 */
-	protected _setRecycleBinRepositoryAlias(alias: string) {
-		this.#recycleBinRepositoryAlias = alias;
 	}
 
 	/**
@@ -108,41 +102,28 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 
 		// Only reload when staying put (a modal), to refresh the visible trashed state — when redirecting away,
 		// the new data isn't needed here.
-		const unique = event.getUnique();
-		if (unique && !this.#workspaceContext?.modalContext) {
-			this.#redirectToParent(unique).catch((error) => {
+		if (event.getUnique() && !this.#workspaceContext?.modalContext) {
+			try {
+				this.#redirectToParent();
+			} catch (error) {
 				console.error('Failed to redirect after trashing, reloading in place instead:', error);
 				this.#workspaceContext?.reload();
-			});
+			}
 			return;
 		}
 
 		this.#workspaceContext?.reload();
 	};
 
-	async #redirectToParent(unique: string) {
+	#redirectToParent() {
 		if (!this.#workspaceContext) return;
 
-		if (!this.#recycleBinRepositoryAlias) throw new Error('Recycle bin repository alias is not set');
-		const recycleBinRepository = await createExtensionApiByAlias<UmbRecycleBinRepository>(
-			this,
-			this.#recycleBinRepositoryAlias,
-		);
-
-		const { data } = await recycleBinRepository.requestOriginalParent({ unique });
-		const parentUnique = data?.unique ?? null;
 		const entityType = this.#workspaceContext.getEntityType();
+		const parentUnique = this.#parentEntityContext?.getParent()?.unique ?? null;
 
-		if (parentUnique) {
-			// replaceState: staying within the same edit/:unique route, whose own setup() re-triggers on URL change
-			// and loads the new unique — an inaccessible parent falls through to the normal forbidden/not-found state.
-			window.history.replaceState(null, '', this.getRedirectPath({ entity: { entityType, unique: parentUnique } }));
-			return;
-		}
-
-		// pushState: no parent means leaving the workspace entirely for a different top-level route, so this is a
-		// new history entry rather than replacing the current one.
-		window.history.pushState(null, '', this.getRedirectPath({ entity: { entityType, unique: null } }));
+		// Trashing doesn't delete the entity — it stays reachable, readonly, at its own edit URL. So unlike a
+		// delete or a rename, that URL is still worth keeping in history: pushState rather than replaceState.
+		window.history.pushState(null, '', this.getRedirectPath({ entity: { entityType, unique: parentUnique } }));
 	}
 
 	#onTrashStateChange(isTrashed?: boolean) {

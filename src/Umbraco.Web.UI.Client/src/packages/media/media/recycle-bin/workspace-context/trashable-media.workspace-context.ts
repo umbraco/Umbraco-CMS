@@ -1,16 +1,9 @@
-import { UMB_MEDIA_RECYCLE_BIN_REPOSITORY_ALIAS } from '../repository/constants.js';
 import { UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_MEDIA_SECTION_PATH } from '../../../media-section/paths.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbTrashableEntityWorkspaceContextBase } from '@umbraco-cms/backoffice/recycle-bin';
 
 export class UmbTrashableMediaWorkspaceContext extends UmbTrashableEntityWorkspaceContextBase {
-	constructor(host: UmbControllerHost) {
-		super(host);
-		this._setRecycleBinRepositoryAlias(UMB_MEDIA_RECYCLE_BIN_REPOSITORY_ALIAS);
-	}
-
 	protected override getRedirectPath({ entity }: { entity: UmbEntityModel }): string {
 		if (!entity.unique) {
 			return UMB_MEDIA_SECTION_PATH;

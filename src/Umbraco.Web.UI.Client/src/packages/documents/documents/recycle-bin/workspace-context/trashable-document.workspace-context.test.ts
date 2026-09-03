@@ -1,5 +1,4 @@
 import { UmbTrashableDocumentWorkspaceContext } from './trashable-document.workspace-context.js';
-import { UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS } from '../repository/constants.js';
 import { UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_DOCUMENTS_SECTION_PATH } from '../../../section/paths.js';
 import { aTimeout, expect } from '@open-wc/testing';
@@ -8,8 +7,7 @@ import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-ap
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT,
@@ -53,40 +51,16 @@ class FakeDocumentWorkspaceContext implements UmbTrashableEntityWorkspaceContext
 	destroy() {}
 }
 
-class FakeDocumentRecycleBinRepository {
-	static originalParent: { unique: string } | null = null;
-	destroy() {}
-	async requestOriginalParent() {
-		return { data: FakeDocumentRecycleBinRepository.originalParent };
-	}
-}
-
-const repositoryManifest: ManifestApi = {
-	type: 'repository',
-	alias: UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
-	name: 'Fake Document Recycle Bin Repository',
-	api: FakeDocumentRecycleBinRepository,
-};
-
 describe('UmbTrashableDocumentWorkspaceContext', () => {
 	let host: UmbTestHostElement;
 	let actionEventContext: UmbActionEventContext;
+	let parentEntityContext: UmbParentEntityContext;
 	let pushStateCalls: Array<{ url: string }>;
 	let replaceStateCalls: Array<{ url: string }>;
 	const originalPushState = window.history.pushState;
 	const originalReplaceState = window.history.replaceState;
 
-	before(() => {
-		umbExtensionsRegistry.register(repositoryManifest);
-	});
-
-	after(() => {
-		umbExtensionsRegistry.unregister(UMB_DOCUMENT_RECYCLE_BIN_REPOSITORY_ALIAS);
-	});
-
 	beforeEach(async () => {
-		FakeDocumentRecycleBinRepository.originalParent = null;
-
 		pushStateCalls = [];
 		replaceStateCalls = [];
 		window.history.pushState = (_data: unknown, _unused: string, url?: string | URL | null) => {
@@ -102,6 +76,7 @@ describe('UmbTrashableDocumentWorkspaceContext', () => {
 		actionEventContext = new UmbActionEventContext(host);
 		const workspaceContext = new FakeDocumentWorkspaceContext(host);
 		new UmbContextProviderController(host, UMB_TRASHABLE_ENTITY_WORKSPACE_CONTEXT, workspaceContext as never);
+		parentEntityContext = new UmbParentEntityContext(host);
 
 		new UmbTrashableDocumentWorkspaceContext(host);
 		await aTimeout(0);
@@ -113,37 +88,32 @@ describe('UmbTrashableDocumentWorkspaceContext', () => {
 		document.body.removeChild(host);
 	});
 
-	it('redirects to the parent document edit path via UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN', async () => {
-		FakeDocumentRecycleBinRepository.originalParent = { unique: 'parent-document-unique' };
+	it('redirects to the parent document edit path via UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN', () => {
+		parentEntityContext.setParent({ unique: 'parent-document-unique', entityType: 'document' });
 
 		actionEventContext.dispatchEvent(new UmbEntityTrashedEvent({ unique: 'document-unique', entityType: 'document' }));
-		await aTimeout(50);
 
-		expect(replaceStateCalls).to.have.lengthOf(1);
-		expect(replaceStateCalls[0].url).to.equal(
+		expect(pushStateCalls).to.have.lengthOf(1);
+		expect(pushStateCalls[0].url).to.equal(
 			UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: 'parent-document-unique' }),
 		);
-		expect(pushStateCalls).to.have.lengthOf(0);
+		expect(replaceStateCalls).to.have.lengthOf(0);
 	});
 
-	it('redirects to the documents section path when the trashed document had no parent', async () => {
-		FakeDocumentRecycleBinRepository.originalParent = null;
-
+	it('redirects to the documents section path when the trashed document had no parent', () => {
 		actionEventContext.dispatchEvent(new UmbEntityTrashedEvent({ unique: 'document-unique', entityType: 'document' }));
-		await aTimeout(50);
 
 		expect(pushStateCalls).to.have.lengthOf(1);
 		expect(pushStateCalls[0].url).to.equal(UMB_DOCUMENTS_SECTION_PATH);
 		expect(replaceStateCalls).to.have.lengthOf(0);
 	});
 
-	it('does not redirect for an unrelated entity type using the same repository alias', async () => {
-		FakeDocumentRecycleBinRepository.originalParent = { unique: 'parent-document-unique' };
+	it('does not redirect for an unrelated entity type', () => {
+		parentEntityContext.setParent({ unique: 'parent-document-unique', entityType: 'document' });
 
 		actionEventContext.dispatchEvent(
 			new UmbEntityTrashedEvent({ unique: 'document-unique', entityType: 'some-other-entity-type' }),
 		);
-		await aTimeout(50);
 
 		expect(pushStateCalls).to.have.lengthOf(0);
 		expect(replaceStateCalls).to.have.lengthOf(0);

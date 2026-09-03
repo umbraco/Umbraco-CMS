@@ -1,5 +1,4 @@
 import type { UmbTrashableEntityWorkspaceContext } from './types.js';
-import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -77,35 +76,6 @@ export class UmbTestTrashableEntityWorkspaceContext implements UmbTrashableEntit
 
 	destroy() {}
 }
-
-/**
- * A minimal `UmbRecycleBinRepository` stand-in, registered into `umbExtensionsRegistry` under whichever alias the
- * context-under-test expects. `originalParent` and `requestOriginalParentCalls` are static so a test can configure
- * the response before dispatching a trash event, regardless of which repository alias/instance ends up used.
- */
-export class UmbTestRecycleBinRepository {
-	static originalParent: { unique: string } | null = null;
-	static requestOriginalParentCalls: Array<string> = [];
-
-	static reset() {
-		UmbTestRecycleBinRepository.originalParent = null;
-		UmbTestRecycleBinRepository.requestOriginalParentCalls = [];
-	}
-
-	async requestOriginalParent(args: { unique: string }) {
-		UmbTestRecycleBinRepository.requestOriginalParentCalls.push(args.unique);
-		return { data: UmbTestRecycleBinRepository.originalParent };
-	}
-
-	destroy() {}
-}
-
-export const createTestRecycleBinRepositoryManifest = (alias: string): ManifestApi => ({
-	type: 'repository',
-	alias,
-	name: 'Test Recycle Bin Repository',
-	api: UmbTestRecycleBinRepository,
-});
 
 /**
  * Monkey-patches `window.history.pushState`/`replaceState` to record calls instead of navigating — this project
