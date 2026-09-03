@@ -1361,9 +1361,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 		<key alias="translation">Traduction</key>
 		<key alias="users">Utilisateurs</key>
 	</area>
-	<area alias="help">
-		<key alias="theBestUmbracoVideoTutorials">Les meilleurs tutoriels vidéo Umbraco</key>
-	</area>
 	<area alias="settings">
 		<key alias="defaulttemplate">Modèle par défaut</key>
 		<key alias="importDocumentTypeHelp">Pour importer un type de document, trouvez le fichier ".udt" sur votre ordinateur en cliquant sur le bouton "Parcourir" et cliquez sur "Importer" (une confirmation vous sera demandée à l'écran suivant)</key>

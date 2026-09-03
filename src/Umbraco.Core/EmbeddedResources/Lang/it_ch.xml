@@ -1651,12 +1651,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="translation">Traduzione</key>
 		<key alias="users">Utenti</key>
 	</area>
-	<area alias="help">
-		<key alias="tours">Tours</key>
-		<key alias="theBestUmbracoVideoTutorials">I migliori video tutorial su Umbraco</key>
-		<key alias="umbracoForum">Visita our.umbraco.com</key>
-		<key alias="umbracoTv">Visita umbraco.tv</key>
-	</area>
 	<area alias="settings">
 		<key alias="defaulttemplate"><![CDATA[Template di base]]></key>
 		<key alias="importDocumentTypeHelp">
