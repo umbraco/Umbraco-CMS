@@ -171,6 +171,11 @@ export class DocumentApiHelper {
     return response.status();
   }
 
+  async publishWithCultures(id: string, cultures: string[]) {
+    const publishSchedulesData = {publishSchedules: cultures.map(culture => ({culture}))};
+    return await this.publish(id, publishSchedulesData);
+  }
+
   async unpublish(id: string, cultures: string[] | null = null) {
     if (id == null) {
       return;
@@ -188,6 +193,18 @@ export class DocumentApiHelper {
     const urls = await response.json();
 
     return urls[0].urlInfos[0].url;
+  }
+
+  async getDocumentUrlByCulture(id: string, culture: string) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
+    const urls = await response.json();
+    const urlInfo = urls[0]?.urlInfos?.find(info => info.culture === culture);
+
+    if (!urlInfo?.url) {
+      throw new Error(`No URL found for document '${id}' and culture '${culture}'.`);
+    }
+
+    return urlInfo.url;
   }
 
   async moveToRecycleBin(id: string) {
@@ -1612,6 +1629,24 @@ export class DocumentApiHelper {
     };
 
     return await this.publish(id, publishScheduleData);
+  }
+
+  async createVariantDocumentWithTemplateAndParent(documentTypeId: string, templateId: string, name: string, cultures: string[], parentId?: string) {
+    await this.ensureNameNotExists(name);
+
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .withTemplateId(templateId);
+
+    if (parentId) {
+      documentBuilder.withParentId(parentId);
+    }
+
+    for (const culture of cultures) {
+      documentBuilder.addVariant().withName(name).withCulture(culture).done();
+    }
+
+    return await this.create(documentBuilder.build());
   }
 
   async createDocumentWithTextContentAndParent(documentName: string, documentTypeId: string, textContent: string, dataTypeName: string, parentId: string) {
