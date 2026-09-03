@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
 /// <summary>
-///     Represents the base model for content variants with culture and segment support.
+///     Represents the base model for content variants with culture support.
 /// </summary>
 public abstract class VariantModelBase
 {
