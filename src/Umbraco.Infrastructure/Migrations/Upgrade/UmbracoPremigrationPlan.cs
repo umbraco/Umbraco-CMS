@@ -62,5 +62,10 @@ public class UmbracoPremigrationPlan : MigrationPlan
         // To 18.0.0
         To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
         To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
+
+        // To 18.2.0
+        // The lock is required to write data types, and migrations in the main plan do so, so it has to exist
+        // before that plan runs.
+        To<V_18_2_0.AddDataTypesLock>("{2B8F0C41-9D57-4E63-B1A9-7F4E52D6C08B}");
     }
 }

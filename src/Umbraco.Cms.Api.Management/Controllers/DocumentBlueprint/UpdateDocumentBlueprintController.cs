@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 /// Controller for updating document blueprints.
 /// </summary>
 [ApiVersion("1.0")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentBlueprints)]
 public class UpdateDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IDocumentBlueprintEditingPresentationFactory _blueprintEditingPresentationFactory;

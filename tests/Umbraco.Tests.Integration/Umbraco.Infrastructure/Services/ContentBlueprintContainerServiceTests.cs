@@ -1,19 +1,46 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class ContentBlueprintContainerServiceTests : UmbracoIntegrationTest
+internal sealed class ContentBlueprintContainerServiceTests : EntityTypeContainerServiceTestsBase<IContent>
 {
+    protected override IEntityTypeContainerService<IContent> ContainerService => ContentBlueprintContainerService;
+
+    private IContentBlueprintEditingService ContentBlueprintEditingService => GetRequiredService<IContentBlueprintEditingService>();
+
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    protected override async Task<Guid> CreateContainedEntityAsync(EntityContainer container)
+    {
+        // Deliberately not cached across calls: the fixture instance is reused for every test, while the database
+        // is recreated per test, so a cached content type would not exist for the second test onwards.
+        var contentType = ContentTypeBuilder.CreateBasicContentType($"test{Guid.NewGuid():N}", "Test");
+        var contentTypeResult = await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(contentTypeResult.Success, $"Failed to create content type: {contentTypeResult.Result}");
+
+        var createModel = new ContentBlueprintCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            ParentKey = container.Key,
+            Variants = [new VariantModel { Name = $"Blueprint {Guid.NewGuid():N}" }],
+        };
+
+        var result = await ContentBlueprintEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, $"Failed to create blueprint: {result.Status}");
+        return result.Result.Content!.Key;
+    }
+
     private IContentBlueprintContainerService ContentBlueprintContainerService => GetRequiredService<IContentBlueprintContainerService>();
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
@@ -260,5 +287,25 @@ internal sealed class ContentBlueprintContainerServiceTests : UmbracoIntegration
             Assert.IsFalse(result.Success);
             Assert.AreEqual(EntityContainerOperationStatus.NotFound, result.Status);
         });
+    }
+
+    /// <summary>
+    ///     A blueprint has to keep its document blueprint object type through a container move, or it stops being
+    ///     reachable as a blueprint.
+    /// </summary>
+    [Test]
+    public async Task Can_Move_Container_And_Keep_Blueprints_As_Blueprints()
+    {
+        EntityContainer source = await CreateContainerAsync("Source Container");
+        EntityContainer target = await CreateContainerAsync("Target Container");
+
+        Guid blueprintKey = await CreateContainedEntityAsync(source);
+
+        var result = await ContainerService.MoveAsync(source.Key, target.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success, $"Failed to move container: {result.Result}");
+
+        IContent? blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
+        Assert.NotNull(blueprint);
+        Assert.IsTrue(blueprint.Blueprint, "The moved blueprint should still be flagged as a blueprint.");
     }
 }
