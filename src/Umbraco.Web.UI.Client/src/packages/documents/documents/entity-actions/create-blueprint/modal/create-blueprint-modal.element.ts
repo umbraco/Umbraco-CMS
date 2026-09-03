@@ -4,6 +4,7 @@ import { html, customElement, css, state } from '@umbraco-cms/backoffice/externa
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-create-blueprint-modal')
 export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
@@ -20,6 +21,12 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 	@state()
 	private _blueprintName = '';
 
+	@state()
+	private _parentUnique: string | null = null;
+
+	@state()
+	private _hasSelectedLocation = false;
+
 	override firstUpdated() {
 		this.#documentUnique = this.data?.unique ?? '';
 		this.#getDocumentData();
@@ -33,8 +40,23 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 		this._blueprintName = data.variants[0].name;
 	}
 
+	#onLocationSelected(event: UmbSelectedEvent) {
+		event.stopPropagation();
+		this._parentUnique = event.unique ?? null;
+		this._hasSelectedLocation = true;
+	}
+
+	#onLocationDeselected(event: UmbDeselectedEvent) {
+		event.stopPropagation();
+		this._parentUnique = null;
+		this._hasSelectedLocation = false;
+	}
+
 	async #handleSave() {
-		this.value = { name: this._blueprintName, parent: null };
+		this.value = {
+			name: this._blueprintName,
+			parent: this._parentUnique ? { id: this._parentUnique } : null,
+		};
 		this.modalContext?.submit();
 	}
 
@@ -52,6 +74,15 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 								@input=${(e: UUIInputEvent) => (this._blueprintName = e.target.value as string)}></uui-input>
 						</div>
 					</umb-property-layout>
+					<umb-property-layout label=${this.localize.term('general_choose')} orientation="vertical" mandatory>
+						<umb-tree
+							slot="editor"
+							alias="Umb.Tree.DocumentBlueprint"
+							.props=${{ hideTreeItemActions: true, foldersOnly: true }}
+							@selected=${this.#onLocationSelected}
+							@deselected=${this.#onLocationDeselected}>
+						</umb-tree>
+					</umb-property-layout>
 				</uui-box>
 				<uui-button
 					slot="actions"
@@ -64,6 +95,7 @@ export class UmbCreateBlueprintModalElement extends UmbModalBaseElement<
 					look="primary"
 					color="positive"
 					label=${this.localize.term('buttons_save')}
+					?disabled=${!this._blueprintName.trim() || !this._hasSelectedLocation}
 					@click="${this.#handleSave}"></uui-button>
 			</umb-body-layout>
 		`;
