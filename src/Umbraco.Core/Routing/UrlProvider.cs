@@ -71,12 +71,12 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         private UrlMode ResolveMode(UrlMode mode)
         {
-            if (mode != UrlMode.Default)
+            if (mode is not UrlMode.Default)
             {
                 return mode;
             }
 
-            return Mode == UrlMode.Default ? UrlMode.Auto : Mode;
+            return Mode is UrlMode.Default ? UrlMode.Auto : Mode;
         }
 
         #endregion
