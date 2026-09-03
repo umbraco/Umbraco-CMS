@@ -6,7 +6,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'workspaceContext',
 		name: 'Trashable Media Workspace Context',
-		alias: 'Umb.Context.Media.Trashable',
+		alias: 'Umb.WorkspaceContext.Media.Trashable',
 		api: UmbTrashableMediaWorkspaceContext,
 		conditions: [
 			{
