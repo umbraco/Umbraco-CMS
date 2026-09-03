@@ -154,7 +154,7 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 						value: member.email,
 					},
 					{
-						columnAlias: 'memberGroup',
+						columnAlias: 'memberGroups',
 						value: html`<umb-value-summary-extension
 							.valueType=${UMB_MEMBER_GROUP_UNIQUES_VALUE_TYPE}
 							.value=${member.groups}></umb-value-summary-extension>`,
