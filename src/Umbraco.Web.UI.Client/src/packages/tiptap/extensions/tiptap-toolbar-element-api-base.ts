@@ -20,7 +20,7 @@ export abstract class UmbTiptapToolbarElementApiBase extends UmbControllerBase i
 	 * A method to execute the toolbar element action.
 	 * @see {ManifestTiptapToolbarExtension}
 	 * @param {Editor} editor The editor instance.
-	 * @param {unknown} args Extra arguments, whose shape depends on the toolbar kind — e.g. the `menu` and `styleMenu`
+	 * @param {...unknown} args Extra arguments, whose shape depends on the toolbar kind — e.g. the `menu` and `styleMenu`
 	 * kinds pass the invoked `MetaTiptapToolbarMenuItem` as the first argument.
 	 */
 	public abstract execute(editor?: Editor, ...args: Array<unknown>): void;
@@ -29,7 +29,7 @@ export abstract class UmbTiptapToolbarElementApiBase extends UmbControllerBase i
 	 * Informs the toolbar element if it is active or not. It uses the manifest meta alias to check if the toolbar element is active.
 	 * @see {ManifestTiptapToolbarExtension}
 	 * @param {Editor} editor The editor instance.
-	 * @param {unknown} _args Extra arguments, whose shape depends on the toolbar kind — e.g. the `menu` and `styleMenu`
+	 * @param {...unknown} _args Extra arguments, whose shape depends on the toolbar kind — e.g. the `menu` and `styleMenu`
 	 * kinds pass the `MetaTiptapToolbarMenuItem` to check as the first argument.
 	 * @returns {boolean} Returns true if the toolbar element is active.
 	 */
