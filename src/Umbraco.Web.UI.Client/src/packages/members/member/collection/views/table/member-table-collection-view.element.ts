@@ -42,7 +42,7 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 		},
 		{
 			name: this.localize.term('treeHeaders_memberGroups'),
-			alias: 'memberGroup',
+			alias: 'memberGroups',
 		},
 		{
 			name: this.localize.term('content_membertype'),
