@@ -35,8 +35,9 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 
 	@property({ type: Array })
 	public set selection(ids: Array<string>) {
-		this.#selection = ids;
-		super.value = ids.length > 0 ? ids.join(',') : undefined;
+		const safeIds = Array.isArray(ids) ? ids : [];
+		this.#selection = safeIds;
+		super.value = safeIds.length > 0 ? safeIds.join(',') : undefined;
 	}
 	public get selection(): Array<string> {
 		return this.#selection;
