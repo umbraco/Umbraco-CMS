@@ -11,3 +11,5 @@ export class UmbTrashableDocumentWorkspaceContext extends UmbTrashableEntityWork
 		return UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: entity.unique });
 	}
 }
+
+export { UmbTrashableDocumentWorkspaceContext as api };
