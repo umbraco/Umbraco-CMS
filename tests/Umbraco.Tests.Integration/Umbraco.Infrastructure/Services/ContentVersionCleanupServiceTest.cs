@@ -282,7 +282,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
 
         // Second cleanup run — should have nothing to do
         var secondResult = ContentVersionService.PerformContentVersionCleanup(DateTime.UtcNow.AddHours(1));
-        Assert.That(secondResult.Count, Is.EqualTo(0), "Second run should delete nothing");
+        Assert.That(secondResult, Is.Empty, "Second run should delete nothing");
 
         var afterSecond = GetReport();
 

@@ -146,7 +146,7 @@ internal sealed partial class UserServiceCrudTests
             await userService.FilterAsync(createEditorAttempt.Result.CreatedUser!.Key, filter, 0, 10000);
         Assert.That(editorFilterAttempt.Success, Is.True);
         var editorAllUsers = editorFilterAttempt.Result.Items.ToList();
-        Assert.That(editorAllUsers.Count, Is.EqualTo(0));
+        Assert.That(editorAllUsers, Is.Empty);
     }
 
     [Test]

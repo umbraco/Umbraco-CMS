@@ -44,7 +44,7 @@ public partial class ElementEditingServiceTests
     {
         var containerKey = Guid.NewGuid();
         var container = (await ElementContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.That(GetFolderChildren(containerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(containerKey), Is.Empty);
 
         var element = await CreateInvariantElement();
 
@@ -93,7 +93,7 @@ public partial class ElementEditingServiceTests
             Assert.That(element.Path, Is.EqualTo($"{Constants.System.Root},{element.Id}"));
         });
 
-        Assert.That(GetFolderChildren(containerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(containerKey), Is.Empty);
     }
 
     [Test]
@@ -121,7 +121,7 @@ public partial class ElementEditingServiceTests
         Assert.That(result, Has.Length.EqualTo(1));
         Assert.That(result.First().Key, Is.EqualTo(element.Key));
 
-        Assert.That(GetFolderChildren(containerKey1).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(containerKey1), Is.Empty);
     }
 
     [Test]
@@ -310,7 +310,7 @@ public partial class ElementEditingServiceTests
         Assert.That(element, Is.Not.Null);
         Assert.That(element.Trashed, Is.False);
 
-        Assert.That(GetFolderChildren(trashedContainerKey, true).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(trashedContainerKey, true), Is.Empty);
     }
 
     [Test]
@@ -334,7 +334,7 @@ public partial class ElementEditingServiceTests
         Assert.That(element, Is.Not.Null);
         Assert.That(element.Trashed, Is.True);
 
-        Assert.That(GetFolderChildren(trashedContainerKey, true).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(trashedContainerKey, true), Is.Empty);
     }
 
     [Test]

@@ -501,7 +501,7 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             Assert.That(assigned, Has.Length.EqualTo(2));
 
             var unassigned = repo.GetAssignedDomains(-999, true).ToArray();
-            Assert.That(unassigned.Length, Is.EqualTo(0));
+            Assert.That(unassigned, Is.Empty);
         }
     }
 }

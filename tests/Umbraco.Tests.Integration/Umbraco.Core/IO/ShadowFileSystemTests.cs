@@ -586,7 +586,7 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         scope.Complete();
         scope.Dispose();
         scopedFileSystems = false;
-        TestHelper.TryAssert(() => Assert.That(Directory.GetDirectories(shadowfs).Length, Is.EqualTo(0)));
+        TestHelper.TryAssert(() => Assert.That(Directory.GetDirectories(shadowfs), Is.Empty));
         Assert.That(phy.FileExists("sub/f4.txt"), Is.True);
         Assert.That(Directory.Exists(shadowfs + "/" + id), Is.False);
 

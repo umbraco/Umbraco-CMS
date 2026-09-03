@@ -139,7 +139,7 @@ public partial class ElementEditingServiceTests
         Assert.That(element, Is.Not.Null);
         Assert.That(element.Trashed, Is.True);
 
-        Assert.That(GetFolderChildren(trashedContainerKey, true).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(trashedContainerKey, true), Is.Empty);
     }
 
     [Test]

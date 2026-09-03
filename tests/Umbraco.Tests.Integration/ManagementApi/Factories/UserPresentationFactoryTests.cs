@@ -124,12 +124,12 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         Assert.That(model.Languages.Count(), Is.EqualTo(2));
         Assert.That(model.Languages.ContainsAll(["en-US", "da-DK"]), Is.True);
         Assert.That(model.HasDocumentRootAccess, Is.True);
-        Assert.That(model.DocumentStartNodeIds.Count, Is.EqualTo(0));
+        Assert.That(model.DocumentStartNodeIds, Is.Empty);
         Assert.That(model.HasMediaRootAccess, Is.False);
         Assert.That(model.MediaStartNodeIds, Has.Count.EqualTo(1));
         Assert.That(model.MediaStartNodeIds.First().Id, Is.EqualTo(rootMediaFolder.Key));
         Assert.That(model.HasElementRootAccess, Is.True);
-        Assert.That(model.ElementStartNodeIds.Count, Is.EqualTo(0));
+        Assert.That(model.ElementStartNodeIds, Is.Empty);
         Assert.That(model.HasAccessToSensitiveData, Is.False);
     }
 

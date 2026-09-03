@@ -1118,7 +1118,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             contentType.RemovePropertyType("title");
             ContentTypeRepository.Save(contentType);
             userGroup = UserGroupRepository.Get(userGroup.Id);
-            Assert.That(userGroup.GranularPermissions.Count, Is.EqualTo(0));
+            Assert.That(userGroup.GranularPermissions, Is.Empty);
         }
     }
 
@@ -1138,7 +1138,7 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
             // Remove the content type and verify all permissions are removed from the user group.
             ContentTypeRepository.Delete(contentType);
             userGroup = UserGroupRepository.Get(userGroup.Id);
-            Assert.That(userGroup.GranularPermissions.Count, Is.EqualTo(0));
+            Assert.That(userGroup.GranularPermissions, Is.Empty);
         }
     }
 

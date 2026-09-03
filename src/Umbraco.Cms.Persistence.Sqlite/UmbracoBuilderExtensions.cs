@@ -2,11 +2,13 @@ using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Persistence.Sqlite.Configuration;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Persistence.Sqlite.Services;
 using Umbraco.Extensions;
@@ -62,6 +64,9 @@ public static class UmbracoBuilderExtensions
                 options.ConnectionString = connectionStringBuilder.ConnectionString;
             }
         });
+
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IPostConfigureOptions<ConnectionStrings>, ConfigureSqliteConnectionStringTimeouts>());
 
         return builder;
     }

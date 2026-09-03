@@ -86,7 +86,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests
             .ToArray();
 
         Assert.That(totalItems, Is.EqualTo(0));
-        Assert.That(children.Length, Is.EqualTo(0));
+        Assert.That(children, Is.Empty);
     }
 
     [Test]

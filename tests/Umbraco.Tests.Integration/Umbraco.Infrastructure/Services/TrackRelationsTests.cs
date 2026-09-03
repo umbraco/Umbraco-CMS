@@ -236,8 +236,8 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
         RelationDeletedTracker.Reset();
         ContentService.Save(content);
 
-        Assert.That(RelationSavedTracker.SavedRelations.Count, Is.EqualTo(0));
-        Assert.That(RelationDeletedTracker.DeletedRelations.Count, Is.EqualTo(0));
+        Assert.That(RelationSavedTracker.SavedRelations, Is.Empty);
+        Assert.That(RelationDeletedTracker.DeletedRelations, Is.Empty);
         Assert.That(RelationSavedTracker.LastIsAutomatic, Is.Null);
         Assert.That(RelationDeletedTracker.LastIsAutomatic, Is.Null);
     }

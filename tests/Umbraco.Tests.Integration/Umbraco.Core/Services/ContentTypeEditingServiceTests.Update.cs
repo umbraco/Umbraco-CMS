@@ -248,7 +248,7 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         var allowedContentTypes = contentType.AllowedContentTypes?.ToArray();
         Assert.That(allowedContentTypes, Is.Not.Null);
-        Assert.That(allowedContentTypes.Length, Is.EqualTo(0));
+        Assert.That(allowedContentTypes, Is.Empty);
 
         // expect RefreshOther when changing allowed types
         AssertContentTypeRefreshPayload(refreshedPayloads, contentType.Id, ContentTypeChangeTypes.RefreshOther);
@@ -410,7 +410,7 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.That(contentType, Is.Not.Null);
         Assert.That(contentType.IsElement, Is.EqualTo(isElement));
-        Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(0));
+        Assert.That(contentType.PropertyGroups, Is.Empty);
         Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(0));
 
         Assert.That(contentType.NoGroupPropertyTypes.Count(), Is.EqualTo(0));
@@ -485,7 +485,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         var contentType = contentTypeCreateAttempt.Result;
         Assert.That(contentType.NoGroupPropertyTypes.Count(), Is.EqualTo(1));
         Assert.That(contentType.NoGroupPropertyTypes.Single().Alias, Is.EqualTo("testProperty"));
-        Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(0));
+        Assert.That(contentType.PropertyGroups, Is.Empty);
 
         ContentTypeCacheRefresher.JsonPayload[]? refreshedPayloads = null;
         ContentTypeCacheRefreshedNotificationHandler.ContentTypeCacheRefreshed = payloads
@@ -504,7 +504,7 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.That(contentType, Is.Not.Null);
         Assert.That(contentType.IsElement, Is.True);
-        Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(0));
+        Assert.That(contentType.PropertyGroups, Is.Empty);
         Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(0));
         Assert.That(contentType.NoGroupPropertyTypes.Count(), Is.EqualTo(0));
 
@@ -543,7 +543,7 @@ internal sealed partial class ContentTypeEditingServiceTests
 
         Assert.That(contentType, Is.Not.Null);
         Assert.That(contentType.IsElement, Is.EqualTo(isElement));
-        Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(0));
+        Assert.That(contentType.PropertyGroups, Is.Empty);
         Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(1));
 
         var property = contentType.PropertyTypes.First();

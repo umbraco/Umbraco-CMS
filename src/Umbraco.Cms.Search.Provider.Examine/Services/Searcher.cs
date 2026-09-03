@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Globalization;
 using System.Reflection;
 using Examine;
 using Examine.Lucene;
@@ -601,7 +602,7 @@ public class Searcher : IExamineSearcher
 
                     foreach (IFacetValue decimalExactFacetValue in examineDecimalFacets)
                     {
-                        if (decimal.TryParse(decimalExactFacetValue.Label, out var labelValue) is false)
+                        if (TryParseFacetLabelAsDecimal(decimalExactFacetValue.Label, out var labelValue) is false)
                         {
                             // Cannot convert the label to decimal, skipping.
                             continue;
@@ -662,6 +663,24 @@ public class Searcher : IExamineSearcher
             }
         }
     }
+
+    /// <summary>
+    /// Attempts to parse a facet label as a decimal value, handling both invariant and current culture formats.
+    /// </summary>
+    /// <param name="label">The facet label to parse.</param>
+    /// <param name="value">The parsed decimal value, if successful.</param>
+    /// <returns>True if the label was successfully parsed as a decimal; otherwise, false.</returns>
+    /// <remarks>
+    /// Numeric facet labels are formatted by the search index using the culture of the thread that performed the
+    /// indexing, which is not necessarily the culture of the thread performing the search. The format carries a
+    /// decimal separator but never group separators, which is what makes replacing a comma safe.
+    /// Known gap: when the indexing culture's decimal separator is neither "." nor "," (for example fa-IR) and
+    /// the search culture differs, the label fails to parse and its bucket is omitted from the facet result.
+    /// Whole numbers are unaffected, as are the matched documents themselves.
+    /// </remarks>
+    internal static bool TryParseFacetLabelAsDecimal(string label, out decimal value)
+        => decimal.TryParse(label.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value)
+           || decimal.TryParse(label, NumberStyles.Float, CultureInfo.CurrentCulture, out value);
 
     /// <summary>
     /// Override this method to extract custom <see cref="Facet"/> types to <see cref="FacetResult"/> in derived classes.

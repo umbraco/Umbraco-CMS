@@ -261,10 +261,10 @@ internal partial class BlockListElementLevelVariationTests
         // the content and element types are created invariant; now make them culture variant, and enable culture variance on the "variantText" property
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Culture;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         contentType.Variations = ContentVariation.Culture;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         RefreshContentTypeCache(elementType, contentType);
 
@@ -349,11 +349,11 @@ internal partial class BlockListElementLevelVariationTests
         // the content and element types are created as variant; now update the element type according to the test case
         elementType.Variations = elementVariationAfterPublish;
         elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = elementVariationAfterPublish;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // ...and make the content type invariant
         contentType.Variations = ContentVariation.Nothing;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         RefreshContentTypeCache(elementType, contentType);
 
@@ -475,6 +475,90 @@ internal partial class BlockListElementLevelVariationTests
             var variantProperty = blockListItem.Settings.Properties.Last();
             Assert.That(variantProperty.Alias, Is.EqualTo("variantText"));
             Assert.That(variantProperty.GetValue()!.ToString()!, Does.StartWith(expectedStartsWith));
+        });
+    }
+
+    [TestCase("en-US", "English")]
+    [TestCase("da-DK", "Danish")]
+    public async Task Can_Become_Invariant_After_Publish_For_Variant_Block_Property(string culture, string expectedStartsWith)
+    {
+        var elementType = await CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new[]
+            {
+                new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "English invariant content value" },
+                        new() { Alias = "variantText", Value = "English variant content value", Culture = "en-US" },
+                    },
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "English invariant settings value" },
+                        new() { Alias = "variantText", Value = "English variant settings value", Culture = "en-US" },
+                    },
+                    "en-US",
+                    null),
+                new BlockProperty(
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "Danish invariant content value" },
+                        new() { Alias = "variantText", Value = "Danish variant content value", Culture = "da-DK" },
+                    },
+                    new List<BlockPropertyValue>
+                    {
+                        new() { Alias = "invariantText", Value = "Danish invariant settings value" },
+                        new() { Alias = "variantText", Value = "Danish variant settings value", Culture = "da-DK" },
+                    },
+                    "da-DK",
+                    null),
+            },
+            true);
+
+        // the element type is made invariant after publishing. the "blocks" property varies by culture, so each culture
+        // holds its own block value - which means every culture retains the values it was published with.
+        elementType.Variations = ContentVariation.Nothing;
+        elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        RefreshContentTypeCache(elementType);
+
+        SetVariationContext(culture, null);
+
+        var publishedContent = GetPublishedContent(content.Key);
+
+        var value = publishedContent.GetProperty("blocks")!.GetValue() as BlockListModel;
+        Assert.That(value, Is.Not.Null);
+        Assert.That(value.Count, Is.EqualTo(1));
+
+        var blockListItem = value.First();
+        Assert.That(blockListItem.Content.Properties.Count(), Is.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            var invariantProperty = blockListItem.Content.Properties.First();
+            Assert.That(invariantProperty.Alias, Is.EqualTo("invariantText"));
+            Assert.That(invariantProperty.GetValue()!.ToString()!.StartsWith(expectedStartsWith), Is.True);
+
+            var variantProperty = blockListItem.Content.Properties.Last();
+            Assert.That(variantProperty.Alias, Is.EqualTo("variantText"));
+            Assert.That(variantProperty.GetValue()!.ToString()!.StartsWith(expectedStartsWith), Is.True);
+        });
+
+        Assert.That(blockListItem.Settings.Properties.Count(), Is.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            var invariantProperty = blockListItem.Settings.Properties.First();
+            Assert.That(invariantProperty.Alias, Is.EqualTo("invariantText"));
+            Assert.That(invariantProperty.GetValue()!.ToString()!.StartsWith(expectedStartsWith), Is.True);
+
+            var variantProperty = blockListItem.Settings.Properties.Last();
+            Assert.That(variantProperty.Alias, Is.EqualTo("variantText"));
+            Assert.That(variantProperty.GetValue()!.ToString()!.StartsWith(expectedStartsWith), Is.True);
         });
     }
 

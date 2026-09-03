@@ -12,7 +12,7 @@ public partial class ElementContainerServiceTests
     {
         var rootContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
 
         var otherRootContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(otherRootContainerKey, "Other Root Container", null, Constants.Security.SuperUserKey);
@@ -21,7 +21,7 @@ public partial class ElementContainerServiceTests
         var childContainer = (await ElementContainerService.CreateAsync(childContainerKey, "Child Container", otherRootContainerKey, Constants.Security.SuperUserKey)).Result;
         Assert.That(childContainer, Is.Not.Null);
 
-        Assert.That(GetFolderChildren(childContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(childContainerKey), Is.Empty);
         Assert.That(GetFolderChildren(otherRootContainerKey), Has.Length.EqualTo(1));
 
         var moveResult = await ElementContainerService.MoveAsync(rootContainerKey, childContainerKey, Constants.Security.SuperUserKey);
@@ -48,7 +48,7 @@ public partial class ElementContainerServiceTests
     {
         var rootContainerKey = Guid.NewGuid();
         var rootContainer = (await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
 
         var childContainerKey = Guid.NewGuid();
         var childContainer = (await ElementContainerService.CreateAsync(childContainerKey, "Child Container", rootContainerKey, Constants.Security.SuperUserKey)).Result;
@@ -68,7 +68,7 @@ public partial class ElementContainerServiceTests
         });
 
         Assert.That(GetAtRoot(), Has.Length.EqualTo(2));
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
 
         childContainer = await ElementContainerService.GetAsync(childContainerKey);
         Assert.That(childContainer, Is.Not.Null);
@@ -109,7 +109,7 @@ public partial class ElementContainerServiceTests
         Assert.That(GetFolderChildren(rootContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(childContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(grandchildContainerKey), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(greatGrandchildContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(greatGrandchildContainerKey), Is.Empty);
 
         var moveResult = await ElementContainerService.MoveAsync(childContainerKey, null, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
@@ -119,10 +119,10 @@ public partial class ElementContainerServiceTests
         });
 
         Assert.That(GetAtRoot(), Has.Length.EqualTo(2));
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
         Assert.That(GetFolderChildren(childContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(grandchildContainerKey), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(greatGrandchildContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(greatGrandchildContainerKey), Is.Empty);
 
         childContainer = await ElementContainerService.GetAsync(childContainerKey);
         Assert.That(childContainer, Is.Not.Null);
@@ -172,10 +172,10 @@ public partial class ElementContainerServiceTests
         Assert.That(greatGrandchildContainer.Level, Is.EqualTo(3));
 
         Assert.That(GetAtRoot(), Has.Length.EqualTo(2));
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
         Assert.That(GetFolderChildren(childContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(grandchildContainerKey), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(greatGrandchildContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(greatGrandchildContainerKey), Is.Empty);
 
         var moveResult = await ElementContainerService.MoveAsync(childContainerKey, rootContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
@@ -188,7 +188,7 @@ public partial class ElementContainerServiceTests
         Assert.That(GetFolderChildren(rootContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(childContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(grandchildContainerKey), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(greatGrandchildContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(greatGrandchildContainerKey), Is.Empty);
 
         childContainer = await ElementContainerService.GetAsync(childContainerKey);
         Assert.That(childContainer, Is.Not.Null);
@@ -243,10 +243,10 @@ public partial class ElementContainerServiceTests
 
         Assert.That(GetAtRoot(), Has.Length.EqualTo(2));
         Assert.That(GetFolderChildren(rootContainerKey), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(otherRootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(otherRootContainerKey), Is.Empty);
         Assert.That(GetFolderChildren(childContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(grandchildContainerKey), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(greatGrandchildContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(greatGrandchildContainerKey), Is.Empty);
 
         var moveResult = await ElementContainerService.MoveAsync(childContainerKey, otherRootContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
@@ -256,11 +256,11 @@ public partial class ElementContainerServiceTests
         });
 
         Assert.That(GetAtRoot(), Has.Length.EqualTo(2));
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
         Assert.That(GetFolderChildren(otherRootContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(childContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(grandchildContainerKey), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(greatGrandchildContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(greatGrandchildContainerKey), Is.Empty);
 
         childContainer = await ElementContainerService.GetAsync(childContainerKey);
         Assert.That(childContainer, Is.Not.Null);
@@ -358,7 +358,7 @@ public partial class ElementContainerServiceTests
         Assert.That(grandchildContainer.Level, Is.EqualTo(2));
 
         Assert.That(GetAtRoot(), Has.Length.EqualTo(2));
-        Assert.That(GetFolderChildren(setup.RootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(setup.RootContainerKey), Is.Empty);
 
         var grandchildren = GetFolderChildren(setup.ChildContainerKey);
         Assert.That(grandchildren, Has.Length.EqualTo(setup.ChildContainerItems));
@@ -386,7 +386,7 @@ public partial class ElementContainerServiceTests
     {
         var rootContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
 
         var childContainerKey = Guid.NewGuid();
         var childContainer = (await ElementContainerService.CreateAsync(childContainerKey, "Child Container", rootContainerKey, Constants.Security.SuperUserKey)).Result;
@@ -454,7 +454,7 @@ public partial class ElementContainerServiceTests
     {
         var rootContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
 
         var childContainerKey = Guid.NewGuid();
         var childContainer = (await ElementContainerService.CreateAsync(childContainerKey, "Child Container", rootContainerKey, Constants.Security.SuperUserKey)).Result;
@@ -594,7 +594,7 @@ public partial class ElementContainerServiceTests
             Assert.That(movingWasCalled, Is.True);
             Assert.That(movedWasCalled, Is.False);
 
-            Assert.That(GetFolderChildren(firstContainerKey).Length, Is.EqualTo(0));
+            Assert.That(GetFolderChildren(firstContainerKey), Is.Empty);
         }
         finally
         {
@@ -608,7 +608,7 @@ public partial class ElementContainerServiceTests
     {
         var rootContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
 
         var moveResult = await ElementContainerService.MoveAsync(rootContainerKey, rootContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>

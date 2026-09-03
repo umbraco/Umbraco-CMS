@@ -215,7 +215,7 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         Assert.Multiple(() =>
         {
             Assert.That(content!.PublishedCultures.Count(), Is.EqualTo(0));
-            Assert.That(schedules.FullSchedule.Count, Is.EqualTo(0));
+            Assert.That(schedules.FullSchedule, Is.Empty);
         });
     }
 }

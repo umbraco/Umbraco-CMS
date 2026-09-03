@@ -125,7 +125,7 @@ public partial class ContentEditingServiceTests
             }
             else
             {
-                Assert.That(copiedChildren.Length, Is.EqualTo(0));
+                Assert.That(copiedChildren, Is.Empty);
                 Assert.That(total, Is.EqualTo(0));
             }
         }
@@ -192,7 +192,7 @@ public partial class ContentEditingServiceTests
             }
             else
             {
-                Assert.That(copiedChildren.Length, Is.EqualTo(0));
+                Assert.That(copiedChildren, Is.Empty);
                 Assert.That(total, Is.EqualTo(0));
             }
         }
@@ -234,7 +234,7 @@ public partial class ContentEditingServiceTests
             }
             else
             {
-                Assert.That(copiedChildren.Length, Is.EqualTo(0));
+                Assert.That(copiedChildren, Is.Empty);
                 Assert.That(total, Is.EqualTo(0));
             }
         }

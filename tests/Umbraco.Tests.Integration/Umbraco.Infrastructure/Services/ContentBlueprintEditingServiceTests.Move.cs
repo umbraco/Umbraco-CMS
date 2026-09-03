@@ -11,7 +11,7 @@ public partial class ContentBlueprintEditingServiceTests
     {
         var containerKey = Guid.NewGuid();
         var container = (await ContentBlueprintContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey)).Result;
-        Assert.That(GetBlueprintChildren(containerKey).Length, Is.EqualTo(0));
+        Assert.That(GetBlueprintChildren(containerKey), Is.Empty);
 
         var blueprintKey = Guid.NewGuid();
         await ContentBlueprintEditingService.CreateAsync(SimpleContentBlueprintCreateModel(blueprintKey, null), Constants.Security.SuperUserKey);
@@ -48,7 +48,7 @@ public partial class ContentBlueprintEditingServiceTests
         Assert.That(GetBlueprintChildren(containerKey), Has.Length.EqualTo(1));
 
         await ContentBlueprintEditingService.MoveAsync(blueprintKey, null, Constants.Security.SuperUserKey);
-        Assert.That(GetBlueprintChildren(containerKey).Length, Is.EqualTo(0));
+        Assert.That(GetBlueprintChildren(containerKey), Is.Empty);
 
         var blueprint = await ContentBlueprintEditingService.GetAsync(blueprintKey);
         Assert.That(blueprint, Is.Not.Null);

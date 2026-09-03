@@ -116,7 +116,7 @@ public partial class ElementContainerServiceTests
             EntityContainerNotificationHandler.DeletedContainer = null;
         }
 
-        Assert.That(GetAtRoot().Length, Is.EqualTo(0));
+        Assert.That(GetAtRoot(), Is.Empty);
         Assert.That(await ElementContainerService.GetAsync(containerKey), Is.Null);
     }
 

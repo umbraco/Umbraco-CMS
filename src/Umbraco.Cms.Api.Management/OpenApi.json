@@ -43043,6 +43043,7 @@
           "isProtected",
           "ancestors",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -43080,6 +43081,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "id": {
             "type": "string",
@@ -46234,6 +46238,7 @@
         "required": [
           "mediaType",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -46253,6 +46258,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "id": {
             "type": "string",

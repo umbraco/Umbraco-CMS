@@ -836,7 +836,7 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
         var elementRelations = relationService
             .GetByParent(content, Constants.Conventions.RelationTypes.RelatedElementAlias)
             .ToArray();
-        Assert.That(elementRelations.Length, Is.EqualTo(0), "External block content must not create a generic umbElement relation.");
+        Assert.That(elementRelations, Is.Empty, "External block content must not create a generic umbElement relation.");
     }
 
     private async Task<IDataType> CreateBlockListDataType(IContentType elementType)

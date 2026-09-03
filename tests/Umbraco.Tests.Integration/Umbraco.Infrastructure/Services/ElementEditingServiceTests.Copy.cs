@@ -40,7 +40,7 @@ public partial class ElementEditingServiceTests
         var original = await CreateInvariantElement(container1.Key);
 
         Assert.That(GetFolderChildren(container1.Key), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(container2.Key).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(container2.Key), Is.Empty);
 
         var copyResult = await ElementEditingService.CopyAsync(original.Key, container2.Key, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>

@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
@@ -322,6 +323,60 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
             Assert.That(ancestorKeysAsArray[1], Is.EqualTo(Grandchild3.Key));
             Assert.That(ancestorKeysAsArray[2], Is.EqualTo(Child2.Key));
             Assert.That(ancestorKeysAsArray[3], Is.EqualTo(Root.Key));
+        });
+    }
+
+    [Test]
+    public void Can_Get_Has_Children_For_Node_With_Children()
+    {
+        var result = DocumentNavigationQueryService.TryGetHasChildren(Root.Key, out var hasChildren);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.True);
+            Assert.That(hasChildren, Is.True);
+        });
+    }
+
+    [Test]
+    public void Can_Get_Has_Children_For_Node_Without_Children()
+    {
+        // The node exists, so the lookup succeeds - it simply has nothing beneath it.
+        var result = DocumentNavigationQueryService.TryGetHasChildren(Grandchild1.Key, out var hasChildren);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.True);
+            Assert.That(hasChildren, Is.False);
+        });
+    }
+
+    [Test]
+    public void Cannot_Get_Has_Children_For_Node_Not_In_Structure()
+    {
+        var result = DocumentNavigationQueryService.TryGetHasChildren(Guid.NewGuid(), out var hasChildren);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.False);
+            Assert.That(hasChildren, Is.False);
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Has_Children_In_Bin_For_Trashed_Node()
+    {
+        // Child1 has two children, and trashing it moves the whole branch into the recycle bin structure.
+        await ContentEditingService.MoveToRecycleBinAsync(Child1.Key, Constants.Security.SuperUserKey);
+
+        var inStructure = DocumentNavigationQueryService.TryGetHasChildren(Child1.Key, out _);
+        var inBin = DocumentNavigationQueryService.TryGetHasChildrenInBin(Child1.Key, out var hasChildrenInBin);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(inStructure, Is.False, "Trashed nodes are removed from the main structure");
+            Assert.That(inBin, Is.True);
+            Assert.That(hasChildrenInBin, Is.True);
         });
     }
 }

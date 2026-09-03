@@ -1,5 +1,6 @@
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -14,6 +15,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 public class BlockEditorVarianceHandlerTests
 {
     private record BlockPropertyValueConfig(string Alias, string? Culture, string? Segment, object? Value);
+
+    private record AlignedPropertyValueConfig(ContentVariation Variation, string? Culture, string Alias, object? Value, string? Segment = null);
 
     [Test]
     public async Task AlignedPropertyVarianceAsync_Assigns_Default_Culture_When_Culture_Variance_Is_Enabled()
@@ -123,6 +126,53 @@ public class BlockEditorVarianceHandlerTests
         {
             Assert.That(variation.ContentKey, Is.EqualTo(element.Key));
             Assert.That(variation.Culture, Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Retains_Owning_Property_Culture_When_Expected_Invariant()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose =
+            [
+                new() { ContentKey = element.Key, Culture = "da-DK", Segment = "danish" },
+                new() { ContentKey = element.Key, Culture = "en-US", Segment = "english" },
+            ],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, "en-US");
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.That(variation.Culture, Is.Null);
+            Assert.That(variation.Segment, Is.EqualTo("english"));
+        });
+    }
+
+    [Test]
+    public async Task AlignedExposeVarianceAsync_Falls_Back_To_Default_Culture_When_No_Entry_For_Owning_Property_Culture()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var element = PublishedElement(ContentVariation.Culture);
+        var blockValue = new BlockListValue
+        {
+            Expose =
+            [
+                new() { ContentKey = element.Key, Culture = "da-DK", Segment = "danish" },
+            ],
+        };
+
+        var result = await ExecuteAlignedExposeVarianceAsync(owner, element, blockValue, "en-US");
+
+        var variation = result.Single();
+        Assert.Multiple(() =>
+        {
+            Assert.That(variation.Culture, Is.Null);
+            Assert.That(variation.Segment, Is.EqualTo("danish"));
         });
     }
 
@@ -248,6 +298,210 @@ public class BlockEditorVarianceHandlerTests
     }
 
     [Test]
+    public async Task AlignedPropertyVarianceAsync_Retains_Owning_Property_Culture_When_Culture_Variance_Is_Disabled()
+    {
+        var result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Nothing,
+            ContentVariation.Nothing,
+            new BlockPropertyValue { Culture = "en-US", Value = "English" },
+            culture: "en-US");
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Culture, Is.Null);
+            Assert.That(result.Value, Is.EqualTo("English"));
+        });
+    }
+
+    [Test]
+    public async Task AlignedPropertyVarianceAsync_Falls_Back_To_Default_Culture_When_No_Value_For_Owning_Property_Culture()
+    {
+        var result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Nothing,
+            ContentVariation.Nothing,
+            new BlockPropertyValue { Culture = "da-DK", Value = "Danish" },
+            culture: "en-US");
+
+        Assert.That(result, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Culture, Is.Null);
+            Assert.That(result.Value, Is.EqualTo("Danish"));
+        });
+    }
+
+    [Test]
+    public async Task AlignedPropertyVarianceAsync_Prefers_Owning_Property_Culture_Over_Default_Culture()
+    {
+        IList<BlockPropertyValue> result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Nothing,
+            ContentVariation.Nothing,
+            [
+                new() { Alias = "text", Culture = "da-DK", Value = "Danish" },
+                new() { Alias = "text", Culture = "en-US", Value = "English" },
+            ],
+            culture: "en-US");
+
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.First().Culture, Is.Null);
+            Assert.That(result.First().Value, Is.EqualTo("English"));
+        });
+    }
+
+    [Test]
+    public async Task AlignedPropertyVarianceAsync_Assigns_Owning_Property_Culture_When_Culture_Variance_Is_Enabled()
+    {
+        var result = await ExecuteAlignedPropertyVarianceAsync(
+            ContentVariation.Culture,
+            ContentVariation.Culture,
+            new BlockPropertyValue { Culture = null, Value = "Shared" },
+            culture: "en-US");
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Culture, Is.EqualTo("en-US"));
+    }
+
+    [Test]
+    public void AlignExposeVariance_Retains_Expose_For_Block_Without_Values()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var contentDataKey = Guid.NewGuid();
+        var expose = CreateBlockItemVariations((contentDataKey, "da-DK", null));
+        var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, [], expose);
+
+        ExecuteAlignExposeVariance(owner, blockValue);
+
+        Assert.That(blockValue.Expose, Has.Count.EqualTo(1));
+        Assert.That(blockValue.Expose.First().Culture, Is.Null);
+    }
+
+    [Test]
+    public void AlignExposeVariance_Retains_Segments_For_Block_Without_Values()
+    {
+        var owner = PublishedElement(ContentVariation.Nothing);
+        var contentDataKey = Guid.NewGuid();
+        var expose = CreateBlockItemVariations(
+            (contentDataKey, "da-DK", "segment-one"),
+            (contentDataKey, "da-DK", "segment-two"));
+        var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, [], expose);
+
+        ExecuteAlignExposeVariance(owner, blockValue);
+
+        Assert.That(blockValue.Expose, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(blockValue.Expose.All(e => e.Culture is null), Is.True);
+            Assert.That(blockValue.Expose.Any(e => e.Segment == "segment-one"), Is.True);
+            Assert.That(blockValue.Expose.Any(e => e.Segment == "segment-two"), Is.True);
+        });
+    }
+
+    [Test]
+    public void AlignExposeVariance_Aligns_Expose_For_Block_Without_Values_To_Variant_Element_Type()
+    {
+        var owner = PublishedElement(ContentVariation.Culture);
+        var contentDataKey = Guid.NewGuid();
+        var expose = CreateBlockItemVariations((contentDataKey, null, null));
+        var blockValue = CreateBlockListValue(contentDataKey, owner.ContentType.Key, [], expose);
+
+        ExecuteAlignExposeVariance(owner, blockValue, "en-US");
+
+        Assert.That(blockValue.Expose, Has.Count.EqualTo(1));
+        Assert.That(blockValue.Expose.First().Culture, Is.EqualTo("en-US"));
+    }
+
+    [Test]
+    public async Task AlignPropertyVarianceAsync_Retains_Value_For_Aligned_Culture()
+    {
+        var propertyValues = CreatePropertyValues(
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "da-DK", "text", "Danish"),
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "en-US", "text", "English"));
+
+        var result = await ExecuteAlignPropertyVarianceAsync(ContentVariation.Culture, propertyValues, "en-US");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result.First().Culture, Is.Null);
+            Assert.That(result.First().Value, Is.EqualTo("English"));
+        });
+    }
+
+    [Test]
+    public async Task AlignPropertyVarianceAsync_Falls_Back_To_Default_Culture_When_No_Value_For_Aligned_Culture()
+    {
+        var propertyValues = CreatePropertyValues(
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "da-DK", "text", "Danish"));
+
+        var result = await ExecuteAlignPropertyVarianceAsync(ContentVariation.Culture, propertyValues, "en-US");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result.First().Culture, Is.Null);
+            Assert.That(result.First().Value, Is.EqualTo("Danish"));
+        });
+    }
+
+    [Test]
+    public async Task AlignPropertyVarianceAsync_Retains_Invariant_Value_Over_Culture_Values()
+    {
+        var propertyValues = CreatePropertyValues(
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, null, "text", "Invariant"),
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "da-DK", "text", "Danish"));
+
+        var result = await ExecuteAlignPropertyVarianceAsync(ContentVariation.Culture, propertyValues, null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result.First().Culture, Is.Null);
+            Assert.That(result.First().Value, Is.EqualTo("Invariant"));
+        });
+    }
+
+    [Test]
+    public async Task AlignPropertyVarianceAsync_Aligns_Each_Property_Independently()
+    {
+        var propertyValues = CreatePropertyValues(
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "da-DK", "one", "One in Danish"),
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "en-US", "one", "One in English"),
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "da-DK", "two", "Two in Danish"),
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "en-US", "two", "Two in English"));
+
+        var result = await ExecuteAlignPropertyVarianceAsync(ContentVariation.Culture, propertyValues, "en-US");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result.First(v => v.Alias == "one").Value, Is.EqualTo("One in English"));
+            Assert.That(result.First(v => v.Alias == "two").Value, Is.EqualTo("Two in English"));
+        });
+    }
+
+    [Test]
+    public async Task AlignPropertyVarianceAsync_Aligns_Each_Segment_Independently()
+    {
+        var propertyValues = CreatePropertyValues(
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "da-DK", "text", "Danish", "one"),
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "en-US", "text", "English", "one"),
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "da-DK", "text", "Danish", "two"),
+            new AlignedPropertyValueConfig(ContentVariation.Nothing, "en-US", "text", "English", "two"));
+
+        var result = await ExecuteAlignPropertyVarianceAsync(ContentVariation.Culture, propertyValues, "en-US");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Has.Count.EqualTo(2));
+            Assert.That(result.First(v => v.Segment == "one").Value, Is.EqualTo("English"));
+            Assert.That(result.First(v => v.Segment == "two").Value, Is.EqualTo("English"));
+        });
+    }
+
+    [Test]
     public void AlignExposeVariance_Removes_Exposed_Keys_When_Not_In_ContentData()
     {
         var owner = PublishedElement(ContentVariation.Culture);
@@ -323,23 +577,49 @@ public class BlockEditorVarianceHandlerTests
     private static async Task<BlockPropertyValue?> ExecuteAlignedPropertyVarianceAsync(
         ContentVariation ownerVariation,
         ContentVariation propertyTypeVariation,
-        BlockPropertyValue propertyValue)
+        BlockPropertyValue propertyValue,
+        string? culture = null)
+    {
+        IList<BlockPropertyValue> result = await ExecuteAlignedPropertyVarianceAsync(
+            ownerVariation,
+            propertyTypeVariation,
+            [propertyValue],
+            culture);
+        return result.SingleOrDefault();
+    }
+
+    private static async Task<IList<BlockPropertyValue>> ExecuteAlignedPropertyVarianceAsync(
+        ContentVariation ownerVariation,
+        ContentVariation propertyTypeVariation,
+        IList<BlockPropertyValue> propertyValues,
+        string? culture = null)
     {
         var owner = PublishedElement(ownerVariation);
         var subject = BlockEditorVarianceHandler("da-DK", owner);
         return await subject.AlignedPropertyVarianceAsync(
-            propertyValue,
-            PublishedPropertyType(propertyTypeVariation),
-            owner);
+            propertyValues,
+            PublishedContentType(propertyTypeVariation),
+            owner,
+            culture);
+    }
+
+    private static IPublishedContentType PublishedContentType(ContentVariation propertyTypeVariation)
+    {
+        var contentTypeMock = new Mock<IPublishedContentType>();
+        contentTypeMock
+            .Setup(m => m.GetPropertyType(It.IsAny<string>()))
+            .Returns(PublishedPropertyType(propertyTypeVariation));
+        return contentTypeMock.Object;
     }
 
     private static async Task<IEnumerable<BlockItemVariation>> ExecuteAlignedExposeVarianceAsync(
         IPublishedElement owner,
         IPublishedElement element,
-        BlockListValue blockValue)
+        BlockListValue blockValue,
+        string? culture = null)
     {
         var subject = BlockEditorVarianceHandler("da-DK", element);
-        return await subject.AlignedExposeVarianceAsync(blockValue, owner, element);
+        return await subject.AlignedExposeVarianceAsync(blockValue, owner, element, culture);
     }
 
     private static IPublishedElement PublishedElement(ContentVariation variation)
@@ -408,10 +688,10 @@ public class BlockEditorVarianceHandlerTests
             Expose = expose,
         };
 
-    private static void ExecuteAlignExposeVariance(IPublishedElement owner, BlockListValue blockValue)
+    private static void ExecuteAlignExposeVariance(IPublishedElement owner, BlockListValue blockValue, string? culture = null)
     {
         var subject = BlockEditorVarianceHandler("da-DK", owner);
-        subject.AlignExposeVariance(blockValue);
+        subject.AlignExposeVariance(blockValue, culture);
     }
 
     private static List<BlockPropertyValue> CreatePropertyValues(params (ContentVariation variation, string? culture)[] configs) =>
@@ -419,6 +699,16 @@ public class BlockEditorVarianceHandlerTests
         {
             Culture = c.culture,
             PropertyType = CreatePropertyType(c.variation),
+        }).ToList();
+
+    private static List<BlockPropertyValue> CreatePropertyValues(params AlignedPropertyValueConfig[] configs) =>
+        configs.Select(c => new BlockPropertyValue
+        {
+            Alias = c.Alias,
+            Culture = c.Culture,
+            Segment = c.Segment,
+            Value = c.Value,
+            PropertyType = CreatePropertyType(c.Variation),
         }).ToList();
 
     private static IPropertyType CreatePropertyType(ContentVariation variation)

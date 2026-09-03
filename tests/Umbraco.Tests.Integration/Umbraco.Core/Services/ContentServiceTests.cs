@@ -204,7 +204,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         ContentService.DeleteBlueprint(blueprint);
 
         var found = ContentService.GetBlueprintsForContentTypes().ToArray();
-        Assert.That(found.Length, Is.EqualTo(0));
+        Assert.That(found, Is.Empty);
     }
 
     [Test]
@@ -389,7 +389,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         runSched = ContentService.PerformScheduledPublish(
             now.AddMinutes(1)).ToList();
 
-        Assert.That(runSched.Count, Is.EqualTo(0));
+        Assert.That(runSched, Is.Empty);
     }
 
     [Test]
@@ -414,7 +414,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // Assert
         contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
         sched = contentSchedule.FullSchedule;
-        Assert.That(sched.Count, Is.EqualTo(0));
+        Assert.That(sched, Is.Empty);
         Assert.That(ContentService.Publish(content, content.AvailableCultures.ToArray()).Success, Is.True);
     }
 
@@ -2899,13 +2899,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // value has been set but no tags have been created (not published)
         Assert.That(content.GetValue(propAlias), Is.EqualTo("[\"hello\",\"world\"]"));
         var contentTags = TagService.GetTagsForEntity(content.Id).ToArray();
-        Assert.That(contentTags.Length, Is.EqualTo(0));
+        Assert.That(contentTags, Is.Empty);
 
         // reloading the content yields the same result
         content = (Content)ContentService.GetById(content.Id);
         Assert.That(content.GetValue(propAlias), Is.EqualTo("[\"hello\",\"world\"]"));
         contentTags = TagService.GetTagsForEntity(content.Id).ToArray();
-        Assert.That(contentTags.Length, Is.EqualTo(0));
+        Assert.That(contentTags, Is.Empty);
 
         // publish
         ContentService.Publish(content, new []{ "*" });
@@ -2921,7 +2921,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // copy is not published, so property has value, but no tags have been created
         Assert.That(copy.GetValue(propAlias), Is.EqualTo("[\"hello\",\"world\"]"));
         var copiedTags = TagService.GetTagsForEntity(copy.Id).ToArray();
-        Assert.That(copiedTags.Length, Is.EqualTo(0));
+        Assert.That(copiedTags, Is.Empty);
 
         // publish
         ContentService.Publish(copy, new []{ "*" });
@@ -3976,7 +3976,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             Ordering.By("name", culture: langFr.IsoCode)).ToList();
 
         Assert.That(total, Is.EqualTo(0));
-        Assert.That(list.Count, Is.EqualTo(0));
+        Assert.That(list, Is.Empty);
 
         // filter
         list = ContentService.GetPagedChildren(

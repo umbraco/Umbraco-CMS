@@ -6,7 +6,7 @@
   </PropertyGroup>
   <!-- Global packages (private, build-time packages for all projects) -->
   <ItemGroup>
-    <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.10.91" />
+    <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.10.94" />
     <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <!-- TODO (V18): Bump Umbraco.Code to 3.0.0 stable before release of 18.0.0 -->
     <GlobalPackageReference Include="Umbraco.Code" Version="3.0.0-beta" />
@@ -48,7 +48,7 @@
   <ItemGroup>
     <PackageVersion Include="Asp.Versioning.Mvc" Version="10.2.1" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.2.1" />
-    <PackageVersion Include="BitFaster.Caching" Version="2.6.0" />
+    <PackageVersion Include="BitFaster.Caching" Version="2.6.1" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
     <PackageVersion Include="Examine" Version="4.0.0" />
     <PackageVersion Include="Examine.Core" Version="4.0.0" />
@@ -64,9 +64,9 @@
     <PackageVersion Include="ncrontab" Version="3.4.0" />
     <PackageVersion Include="NPoco" Version="6.2.0" />
     <PackageVersion Include="NPoco.SqlServer" Version="6.2.0" />
-    <PackageVersion Include="OpenIddict.Abstractions" Version="7.6.0" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.6.0" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.6.0" />
+    <PackageVersion Include="OpenIddict.Abstractions" Version="7.6.1" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="7.6.1" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="7.6.1" />
     <PackageVersion Include="Serilog" Version="4.4.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Process" Version="3.0.0" />

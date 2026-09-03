@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
 
@@ -64,6 +65,55 @@ public class GlobalSettingsValidatorTests
     {
         var validator = new GlobalSettingsValidator();
         var options = new GlobalSettings { TimeOut = TimeSpan.FromHours(12) };
+
+        var result = validator.Validate("settings", options);
+        Assert.That(result.Succeeded, Is.True);
+    }
+
+    [Test]
+    public void Returns_Fail_For_Configuration_With_Negative_DatabaseCommandTimeout()
+    {
+        var validator = new GlobalSettingsValidator();
+        var options = new GlobalSettings { DatabaseCommandTimeout = TimeSpan.FromSeconds(-1) };
+
+        var result = validator.Validate("settings", options);
+        Assert.That(result.Succeeded, Is.False);
+    }
+
+    [Test]
+    public void Returns_Fail_For_Configuration_With_Negative_DatabaseConnectTimeout()
+    {
+        var validator = new GlobalSettingsValidator();
+        var options = new GlobalSettings { DatabaseConnectTimeout = TimeSpan.FromSeconds(-1) };
+
+        var result = validator.Validate("settings", options);
+        Assert.That(result.Succeeded, Is.False);
+    }
+
+    [Test]
+    public void Returns_Success_For_Configuration_With_Zero_DatabaseTimeouts()
+    {
+        // Zero is meaningful: it configures no limit at all.
+        var validator = new GlobalSettingsValidator();
+        var options = new GlobalSettings
+        {
+            DatabaseCommandTimeout = TimeSpan.Zero,
+            DatabaseConnectTimeout = TimeSpan.Zero,
+        };
+
+        var result = validator.Validate("settings", options);
+        Assert.That(result.Succeeded, Is.True);
+    }
+
+    [Test]
+    public void Returns_Success_For_Configuration_With_Valid_DatabaseTimeouts()
+    {
+        var validator = new GlobalSettingsValidator();
+        var options = new GlobalSettings
+        {
+            DatabaseCommandTimeout = TimeSpan.FromMinutes(5),
+            DatabaseConnectTimeout = TimeSpan.FromSeconds(30),
+        };
 
         var result = validator.Validate("settings", options);
         Assert.That(result.Succeeded, Is.True);

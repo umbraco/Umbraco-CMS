@@ -232,7 +232,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
             parents = repository.GetPagedParentEntitiesByChildId(createdMedia[0].Id, 1, 11, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
             Assert.That(totalRecords, Is.EqualTo(6));
-            Assert.That(parents.Count, Is.EqualTo(0));
+            Assert.That(parents, Is.Empty);
 
             parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 0, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
             Assert.That(totalRecords, Is.EqualTo(3));
@@ -240,7 +240,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
             parents = repository.GetPagedParentEntitiesByChildId(createdContent[0].Id, 1, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
             Assert.That(totalRecords, Is.EqualTo(3));
-            Assert.That(parents.Count, Is.EqualTo(0));
+            Assert.That(parents, Is.Empty);
         }
     }
 
@@ -323,7 +323,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
             parents = repository.GetPagedChildEntitiesByParentId(createdContent[0].Id, 1, 6, out totalRecords, [relatedContentRelType.Id, relatedMediaRelType.Id, relatedMemberRelType.Id]).ToList();
             Assert.That(totalRecords, Is.EqualTo(6));
-            Assert.That(parents.Count, Is.EqualTo(0));
+            Assert.That(parents, Is.Empty);
         }
     }
 

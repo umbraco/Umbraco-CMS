@@ -178,7 +178,7 @@ internal sealed class PopulateSortableValueForDatePropertyDataTest : UmbracoInte
     private async Task AssertSortableValuesCleared(int contentTypeId)
     {
         var results = await GetPropertyDataWithSortableValues(contentTypeId);
-        Assert.That(results.Count, Is.EqualTo(0), "Expected sortableValue to be NULL for all property data rows.");
+        Assert.That(results, Is.Empty, "Expected sortableValue to be NULL for all property data rows.");
     }
 
     private async Task AssertSortableValuesAreCorrectlyFormatted(int contentTypeId)

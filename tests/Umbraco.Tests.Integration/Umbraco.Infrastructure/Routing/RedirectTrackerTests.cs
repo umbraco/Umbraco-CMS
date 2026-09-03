@@ -195,7 +195,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
 
-        Assert.That(dict.Count, Is.EqualTo(0), "Old route should not be stored for content that has no published URL.");
+        Assert.That(dict, Is.Empty, "Old route should not be stored for content that has no published URL.");
     }
 
     /// <summary>
@@ -273,7 +273,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
 
-        Assert.That(dict.Count, Is.EqualTo(0));
+        Assert.That(dict, Is.Empty);
     }
 
     /// <summary>

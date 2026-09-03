@@ -96,10 +96,22 @@ internal sealed class ContentIndexingService : IContentIndexingService
             return;
         }
 
-        if (indexRegistration.SameOriginOnly && origin != _originProvider.GetCurrent())
+        var currentOrigin = _originProvider.GetCurrent();
+        if (indexRegistration.SameOriginOnly && origin != currentOrigin)
         {
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug(
+                    "Skipping rebuild of index {IndexAlias} - it only accepts same-origin rebuilds, and the request originated from {RequestOrigin} rather than {CurrentOrigin}.",
+                    indexRegistration.IndexAlias,
+                    origin,
+                    currentOrigin);
+            }
+
             return;
         }
+
+        _logger.LogInformation("Queued rebuild of index {IndexAlias}", indexRegistration.IndexAlias);
 
         _backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken => await RebuildAsync(indexRegistration, cancellationToken));
     }
@@ -111,6 +123,8 @@ internal sealed class ContentIndexingService : IContentIndexingService
         {
             return;
         }
+
+        _logger.LogInformation("Starting rebuild of index {IndexAlias}", indexRegistration.IndexAlias);
 
         await _eventAggregator.PublishAsync(new IndexRebuildStartingNotification(indexRegistration.IndexAlias), cancellationToken);
 

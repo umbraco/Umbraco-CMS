@@ -22,7 +22,7 @@ public partial class ElementContainerServiceTests
             Assert.That(moveResult.Result, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
-        Assert.That(GetAtRoot().Length, Is.EqualTo(0));
+        Assert.That(GetAtRoot(), Is.Empty);
 
         await AssertContainerIsInRecycleBin(rootContainerKey);
     }
@@ -32,7 +32,7 @@ public partial class ElementContainerServiceTests
     {
         var rootContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
 
         var childContainerKey = Guid.NewGuid();
         await ElementContainerService.CreateAsync(childContainerKey, "Child Container", rootContainerKey, Constants.Security.SuperUserKey);
@@ -48,7 +48,7 @@ public partial class ElementContainerServiceTests
         });
 
         Assert.That(GetAtRoot(), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
 
         await AssertContainerIsInRecycleBin(childContainerKey);
     }
@@ -68,7 +68,7 @@ public partial class ElementContainerServiceTests
         Assert.That(GetAtRoot(), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(rootContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(childContainerKey), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(grandchildContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(grandchildContainerKey), Is.Empty);
 
         var moveResult = await ElementContainerService.MoveToRecycleBinAsync(rootContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
@@ -77,10 +77,10 @@ public partial class ElementContainerServiceTests
             Assert.That(moveResult.Result, Is.EqualTo(EntityContainerOperationStatus.Success));
         });
 
-        Assert.That(GetAtRoot().Length, Is.EqualTo(0));
+        Assert.That(GetAtRoot(), Is.Empty);
         Assert.That(GetFolderChildren(rootContainerKey, true), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(childContainerKey, true), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(grandchildContainerKey, true).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(grandchildContainerKey, true), Is.Empty);
 
         await AssertContainerIsInRecycleBin(rootContainerKey);
     }
@@ -104,7 +104,7 @@ public partial class ElementContainerServiceTests
         Assert.That(GetFolderChildren(rootContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(childContainerKey), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(grandchildContainerKey), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(greatGrandchildContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(greatGrandchildContainerKey), Is.Empty);
 
         var moveResult = await ElementContainerService.MoveToRecycleBinAsync(childContainerKey, Constants.Security.SuperUserKey);
         Assert.Multiple(() =>
@@ -114,10 +114,10 @@ public partial class ElementContainerServiceTests
         });
 
         Assert.That(GetAtRoot(), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
         Assert.That(GetFolderChildren(childContainerKey, true), Has.Length.EqualTo(1));
         Assert.That(GetFolderChildren(grandchildContainerKey, true), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(greatGrandchildContainerKey, true).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(greatGrandchildContainerKey, true), Is.Empty);
 
         await AssertContainerIsInRecycleBin(childContainerKey);
     }
@@ -149,7 +149,7 @@ public partial class ElementContainerServiceTests
         Assert.That(grandchildContainer.Trashed, Is.True);
 
         Assert.That(GetAtRoot(), Has.Length.EqualTo(1));
-        Assert.That(GetFolderChildren(setup.RootContainerKey).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(setup.RootContainerKey), Is.Empty);
 
         var grandchildren = GetFolderChildren(setup.ChildContainerKey, true);
         Assert.That(grandchildren, Has.Length.EqualTo(setup.ChildContainerItems));
@@ -206,7 +206,7 @@ public partial class ElementContainerServiceTests
         Assert.That(grandchildContainer.Level, Is.EqualTo(3));
         Assert.That(grandchildContainer.Trashed, Is.True);
 
-        Assert.That(GetAtRoot().Length, Is.EqualTo(0));
+        Assert.That(GetAtRoot(), Is.Empty);
         Assert.That(GetFolderChildren(setup.RootContainerKey, true), Has.Length.EqualTo(1));
 
         var grandchildren = GetFolderChildren(setup.ChildContainerKey, true);
@@ -267,7 +267,7 @@ public partial class ElementContainerServiceTests
             Assert.That(movingWasCalled, Is.True);
             Assert.That(movedWasCalled, Is.True);
 
-            Assert.That(GetAtRoot().Length, Is.EqualTo(0));
+            Assert.That(GetAtRoot(), Is.Empty);
         }
         finally
         {
@@ -335,8 +335,8 @@ public partial class ElementContainerServiceTests
         Assert.That(rootContainer, Is.Not.Null);
         Assert.That(rootContainer.Trashed, Is.False);
 
-        Assert.That(GetFolderChildren(rootContainerKey).Length, Is.EqualTo(0));
-        Assert.That(GetFolderChildren(trashedContainerKey, true).Length, Is.EqualTo(0));
+        Assert.That(GetFolderChildren(rootContainerKey), Is.Empty);
+        Assert.That(GetFolderChildren(trashedContainerKey, true), Is.Empty);
     }
 
     [Test]
