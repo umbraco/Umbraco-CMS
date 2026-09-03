@@ -140,12 +140,21 @@ export class DocumentBlueprintApiHelper {
   async createFromDocument(documentBlueprintName: string, documentId: string, parentId?: string) {
     const documentBlueprintData = {
       "name": documentBlueprintName,
-      "parent": parentId ? parentId : null,
+      "parent": parentId ? {"id": parentId} : null,
       "document": {
         "id": documentId
       }
     };
     const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/from-document', documentBlueprintData);
+    return this.api.getIdFromLocation(response);
+  }
+
+  async createFolder(name: string, parentId?: string) {
+    const folder = {
+      name: name,
+      parent: parentId ? {id: parentId} : null
+    };
+    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document-blueprint/folder', folder);
     return this.api.getIdFromLocation(response);
   }
 
