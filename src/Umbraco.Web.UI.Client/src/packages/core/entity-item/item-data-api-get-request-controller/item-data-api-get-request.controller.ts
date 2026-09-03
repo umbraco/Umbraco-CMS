@@ -71,10 +71,15 @@ export class UmbItemDataApiGetRequestController<
 		const error = errors[0];
 
 		if (this.#disableNotifications === false) {
-			await umbPeekError(this, {
-				headline: 'Error fetching items',
-				message: 'An error occurred while fetching items.',
-			});
+			try {
+				await umbPeekError(this, {
+					headline: 'Error fetching items',
+					message: 'An error occurred while fetching items.',
+				});
+			} catch {
+				// Telling the user is best effort - it needs a notification context, which a host is not obliged to
+				// provide. Failing to report the error must not replace it with a different one.
+			}
 		}
 
 		// A chunk that failed carries an UmbApiError or UmbCancelError with the status and problem details on it, so
