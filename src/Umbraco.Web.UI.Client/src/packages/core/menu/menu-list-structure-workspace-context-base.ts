@@ -7,17 +7,13 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 
 /**
- * Base class for a menu structure workspace context for an entity that is not organized in a tree,
- * i.e. a flat list of items directly under a single, fixed root (such as Users or Webhooks).
- *
- * A subclass is responsible for retrieving/constructing its own structure items (ordered root
- * first, current item last) and reporting them via `_setStructure`. This base then holds
- * the resulting `structure` observable and keeps `UMB_PARENT_ENTITY_CONTEXT` in sync with it.
+ * Base class for a menu structure workspace context for an entity that is organized as a flat
+ * list of items directly under a single, fixed root (such as Users or Webhooks), rather than a tree.
  * @abstract
- * @class UmbMenuStructureWorkspaceContextBase
+ * @class UmbMenuListStructureWorkspaceContextBase
  * @augments {UmbContextBase}
  */
-export abstract class UmbMenuStructureWorkspaceContextBase
+export abstract class UmbMenuListStructureWorkspaceContextBase
 	extends UmbContextBase
 	implements UmbMenuStructureWorkspaceContext
 {
@@ -37,7 +33,7 @@ export abstract class UmbMenuStructureWorkspaceContextBase
 	 * entity context to the item preceding the current one.
 	 * @param {Array<UmbStructureItemModel>} items - The structure items, root first, current item last.
 	 * @protected
-	 * @memberof UmbMenuStructureWorkspaceContextBase
+	 * @memberof UmbMenuListStructureWorkspaceContextBase
 	 */
 	protected _setStructure(items: Array<UmbStructureItemModel>): void {
 		this.#structure.setValue(items);

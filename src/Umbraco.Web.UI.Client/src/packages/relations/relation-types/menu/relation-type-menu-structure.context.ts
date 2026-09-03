@@ -1,9 +1,9 @@
 import { UMB_RELATION_TYPE_WORKSPACE_CONTEXT } from '../workspace/relation-type/relation-type-workspace.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbMenuStructureWorkspaceContextBase } from '@umbraco-cms/backoffice/menu';
+import { UmbMenuListStructureWorkspaceContextBase } from '@umbraco-cms/backoffice/menu';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbRelationTypeMenuStructureWorkspaceContext extends UmbMenuStructureWorkspaceContextBase {
+export class UmbRelationTypeMenuStructureWorkspaceContext extends UmbMenuListStructureWorkspaceContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
 

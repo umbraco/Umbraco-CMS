@@ -1,9 +1,9 @@
 import { UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbMenuStructureWorkspaceContextBase, type UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
+import { UmbMenuListStructureWorkspaceContextBase, type UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbLanguageNavigationStructureWorkspaceContext extends UmbMenuStructureWorkspaceContextBase {
+export class UmbLanguageNavigationStructureWorkspaceContext extends UmbMenuListStructureWorkspaceContextBase {
 	#workspaceContext?: typeof UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
