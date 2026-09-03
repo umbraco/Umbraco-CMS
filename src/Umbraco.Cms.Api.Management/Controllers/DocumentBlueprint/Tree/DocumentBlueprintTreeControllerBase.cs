@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 /// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentBlueprint}")]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentBlueprints)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessForDocumentBlueprintTree)]
 public class DocumentBlueprintTreeControllerBase : UserStartNodeFolderTreeControllerBase<DocumentBlueprintTreeItemResponseModel>
 {
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
