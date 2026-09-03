@@ -194,6 +194,10 @@ export class UmbManagementApiDetailDataRequestManager<
 				const getItemsController = new UmbItemDataApiGetRequestController(this, {
 					api: async (args) => ({ data: (await this.#readMany!(args.uniques)).data.items }),
 					uniques: newIds,
+					// Reading many is an optimisation over reading one at a time, and a caller that can fall back to
+					// the latter recovers without the user being affected. The error is returned either way, so it is
+					// the caller's decision whether it is worth reporting.
+					disableNotifications: true,
 				});
 
 				const { data: serverData, error: serverError } = await getItemsController.request();
