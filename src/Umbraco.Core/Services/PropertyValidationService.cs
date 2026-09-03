@@ -275,7 +275,6 @@ public class PropertyValidationService : IPropertyValidationService
                         Culture = culture,
                         Segment = null,
                         CulturesBeingValidated = validationContext.CulturesBeingValidated,
-                        SegmentsBeingValidated = validationContext.SegmentsBeingValidated,
                     }))
             {
                 return false;
