@@ -110,6 +110,7 @@ public static class UmbracoBuilderExtensions
             .AddNotificationHandler<DraftMediaCacheRefresherNotification, ContentIndexingNotificationHandler>()
             .AddNotificationHandler<DraftMemberCacheRefresherNotification, ContentIndexingNotificationHandler>()
             .AddNotificationHandler<PublishedContentCacheRefresherNotification, ContentIndexingNotificationHandler>()
+            .AddNotificationHandler<Umbraco.Cms.Core.Notifications.ElementCacheRefresherNotification, ElementIndexingNotificationHandler>()
             .AddNotificationAsyncHandler<PublicAccessDetailedCacheRefresherNotification, PublicAccessIndexingNotificationHandler>();
 
         builder
