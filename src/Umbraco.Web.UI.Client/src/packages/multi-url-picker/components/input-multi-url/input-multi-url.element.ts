@@ -187,6 +187,14 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	@state()
 	private _resolvedLinkUrls: Array<{ unique: string; url: string }> = [];
 
+	// A link's name and URL only depend on its unique, so they are requested once per unique. This
+	// spares every link that is merely moved or re-assigned unchanged — such as on a re-order — from
+	// being looked up again. A unique is marked before its lookup starts, so a second render does not
+	// fire the same request while the first is in flight, and un-marked again if nothing came back,
+	// so a lookup that failed can be retried.
+	#requestedNameUniques = new Set<string>();
+	#requestedUrlUniques = new Set<string>();
+
 	#linkPickerModal;
 
 	// Holds what the link picker modal remembers between opens. The modal is rendered in the modal
@@ -271,46 +279,66 @@ export class UmbInputMultiUrlElement extends UmbFormControlMixin<string, typeof 
 	}
 
 	#populateLinksNameAndUrl() {
-		this._resolvedLinkNames = [];
-		this._resolvedLinkUrls = [];
-
-		// Documents and media have URLs saved in the local link format.
-		// Display the actual URL to align with what the user sees when they selected it initially.
-		this.#urls.forEach(async (link) => {
-			if (!link.unique) return;
-
-			let name: string | undefined = undefined;
-			let url: string | undefined = undefined;
-
-			switch (link.type) {
-				case 'document': {
-					if (!link.name || link.name.length === 0) {
-						name = await this.#getNameForDocument(link.unique);
-					}
-					url = await this.#getUrlForDocument(link.unique);
-					break;
-				}
-				case 'media': {
-					if (!link.name || link.name.length === 0) {
-						name = await this.#getNameForMedia(link.unique);
-					}
-					url = await this.#getUrlForMedia(link.unique);
-					break;
-				}
-				default:
-					break;
-			}
-
-			if (name) {
-				const resolvedName = { unique: link.unique, name };
-				this._resolvedLinkNames = [...this._resolvedLinkNames, resolvedName];
-			}
-
-			if (url) {
-				const resolvedUrl = { unique: link.unique, url };
-				this._resolvedLinkUrls = [...this._resolvedLinkUrls, resolvedUrl];
-			}
+		this.#urls.forEach((link) => {
+			this.#resolveLinkName(link);
+			this.#resolveLinkUrl(link);
 		});
+	}
+
+	// Documents and media have URLs saved in the local link format.
+	// Display the actual URL to align with what the user sees when they selected it initially.
+	async #resolveLinkUrl(link: UmbLinkPickerLink) {
+		const unique = link.unique;
+		if (!unique || this.#requestedUrlUniques.has(unique)) return;
+
+		this.#requestedUrlUniques.add(unique);
+
+		let url: string;
+
+		switch (link.type) {
+			case 'document':
+				url = await this.#getUrlForDocument(unique);
+				break;
+			case 'media':
+				url = await this.#getUrlForMedia(unique);
+				break;
+			default:
+				return;
+		}
+
+		if (!url) {
+			this.#requestedUrlUniques.delete(unique);
+			return;
+		}
+
+		this._resolvedLinkUrls = [...this._resolvedLinkUrls, { unique, url }];
+	}
+
+	async #resolveLinkName(link: UmbLinkPickerLink) {
+		const unique = link.unique;
+		if (!unique || link.name || this.#requestedNameUniques.has(unique)) return;
+
+		this.#requestedNameUniques.add(unique);
+
+		let name: string;
+
+		switch (link.type) {
+			case 'document':
+				name = await this.#getNameForDocument(unique);
+				break;
+			case 'media':
+				name = await this.#getNameForMedia(unique);
+				break;
+			default:
+				return;
+		}
+
+		if (!name) {
+			this.#requestedNameUniques.delete(unique);
+			return;
+		}
+
+		this._resolvedLinkNames = [...this._resolvedLinkNames, { unique, name }];
 	}
 
 	async #getUrlForDocument(unique: string) {
