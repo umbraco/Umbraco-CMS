@@ -104,49 +104,71 @@ test('can remove an image from the image media picker', async ({umbracoApi, umbr
   await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-// TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
-test.skip('image count can not be less than min amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
+test('image count can not be less than min amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const minAmount = 2;
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
-  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 1);
+  await umbracoApi.media.ensureNameNotExists(mediaName);
+  await umbracoApi.media.createDefaultMediaWithImage(mediaName);
+  // The picker has to allow multiple items: umb-input-rich-media deliberately skips the min check when the value
+  // is empty and the property is not mandatory, so the min is only reachable with a non-empty value below it.
+  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, minAmount, 5, false, false, true);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
+  // Pick a single image when the minimum is two
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickSaveButton();
+  await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(mediaName);
+  await umbracoUi.content.clickChooseModalButton();
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  await umbracoApi.media.ensureNameNotExists(mediaName);
 });
 
-// TODO: Remove skip when the front-end is ready as there are currently no displayed error notification.
-test.skip('image count can not be more than max amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
+test('image count can not be more than max amount set in image media picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
+  const maxAmount = 2;
+  // Names must not be substrings of one another or the media card locator matches more than one card.
+  const firstMediaName = 'AlphaPickerImage';
+  const secondMediaName = 'BravoPickerImage';
+  const thirdMediaName = 'CharliePickerImage';
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
-  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, 0);
+  for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
+    await umbracoApi.media.ensureNameNotExists(name);
+    await umbracoApi.media.createDefaultMediaWithImage(name);
+  }
+  // A max of 1 hides the add button once an image is picked, so the overflow is only reachable above that.
+  const dataTypeId = await umbracoApi.dataType.createImageMediaPickerDataType(customDataTypeName, 0, maxAmount, false, false, true);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, customDataTypeName, dataTypeId, groupName);
   await umbracoApi.document.createDefaultDocument(contentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
   // Act
+  // Pick one image more than the maximum allows
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickChooseButton();
-  await umbracoUi.content.clickMediaWithName(mediaName);
-  await umbracoUi.content.clickSubmitButton();
-  await umbracoUi.content.clickSaveButton();
+  for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
+    await umbracoUi.content.clickChooseButtonAndSelectMediaWithName(name);
+    await umbracoUi.content.clickChooseModalButton();
+  }
+  await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
   await umbracoUi.content.isErrorNotificationVisible();
 
   // Clean
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
+  for (const name of [firstMediaName, secondMediaName, thirdMediaName]) {
+    await umbracoApi.media.ensureNameNotExists(name);
+  }
 });
 
 test('can add an image from the image media picker with a start node', async ({umbracoApi, umbracoUi}) => {
@@ -231,8 +253,7 @@ test('can reset focal point in a image from the image media picker', async ({umb
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
 });
 
-// TODO: Remove skip when the front-end is ready as currently the crop is not being selected.
-test.skip('can add an image from the image media picker with a image crop', async ({umbracoApi, umbracoUi}) => {
+test('can add an image from the image media picker with a image crop', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const cropLabel = 'TestCrop';
   const cropWidth = 100;

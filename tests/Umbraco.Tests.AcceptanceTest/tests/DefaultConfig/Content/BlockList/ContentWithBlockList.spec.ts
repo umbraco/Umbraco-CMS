@@ -200,6 +200,8 @@ test('can add settings model for the block in the content', async ({umbracoApi, 
   await umbracoApi.documentType.ensureNameNotExists(settingModelName);
 });
 
+// Unwritten: addBlockElementBtn resolves with .first(), so once a block exists it reopens that block instead
+// of adding a second one. Not the block card drag bug - a content entry has no anchor in its shadow root.
 test.skip('can move blocks in the content', async ({umbracoApi, umbracoUi}) => {
   // TODO: Implement it later
 });

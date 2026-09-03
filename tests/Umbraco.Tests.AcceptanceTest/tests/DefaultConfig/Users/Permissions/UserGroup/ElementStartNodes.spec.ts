@@ -48,7 +48,8 @@ test('can see root element start node and children', async ({umbracoApi, umbraco
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName);
 });
 
-// Skip this test since currently the front-end does not support adding a specific element as start nodes
+// Feature gap: a plain element cannot be a start node - UserGroupPresentationFactory resolves them as
+// UmbracoObjectTypes.ElementContainer, so creating the user group returns 404.
 test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithElementStartNode(userGroupName, childElementOneId);
@@ -68,8 +69,7 @@ test.skip('can see parent of start node but not access it', async ({umbracoApi, 
   await umbracoUi.library.isChildElementInTreeVisible(rootFolderName, childElementTwoName, false);
 });
 
-// Currently the front-end does not support adding a specific element as start nodes
-test.skip('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
+test('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createSimpleUserGroupWithLibrarySection(userGroupName);
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -80,5 +80,7 @@ test.skip('cannot see any element when no element start nodes specified', async 
   await umbracoUi.user.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
+  // Positive precondition: the section must actually render, otherwise the absence check below is vacuous.
+  await umbracoUi.library.isSectionWithNameVisible('Library');
   await umbracoUi.library.isElementInTreeVisible(rootFolderName, false);
 });

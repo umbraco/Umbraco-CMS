@@ -144,8 +144,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   expect(contentData.values[0].value).toContain(elementId);
 });
 
-// Currently there is no validation message displayed
-test.fixme('can validate minimum amount in element picker', async ({umbracoApi, umbracoUi}) => {
+test('can validate minimum amount in element picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 2;
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerWithValidationLimit(elementPickerDataTypeName, minAmount);
@@ -163,7 +162,7 @@ test.fixme('can validate minimum amount in element picker', async ({umbracoApi, 
   await umbracoUi.content.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.content.isValidationMessageVisible('This field need more items');
+  await umbracoUi.content.isTextWithExactNameVisible('Minimum ' + minAmount + ' entries, requires 1 more.');
   await umbracoUi.content.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 

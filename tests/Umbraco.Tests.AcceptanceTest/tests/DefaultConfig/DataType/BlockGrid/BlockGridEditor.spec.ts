@@ -196,7 +196,9 @@ test('can remove a block in a group from a block grid editor', {tag: '@smoke'}, 
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeFalsy();
 });
 
-test.fixme('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+// Product bug: the card's anchor sits in uui-card-block-type's shadow root, which setupIgnorerElements cannot
+// reach, so a native link drag starts and the sorter ignores the drop. Affects block reordering generally.
+test.skip('can move a block from a group to another group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const secondGroupName = 'MoveToHereGroup';
@@ -209,10 +211,9 @@ test.fixme('can move a block from a group to another group in a block grid edito
   await umbracoUi.dataType.clickAddGroupButton();
   await umbracoUi.dataType.enterGroupName(secondGroupName, 1);
   // Drag and Drop
-  const dragFromLocator = await umbracoUi.dataType.getLinkWithName(elementTypeName);
-  const dragToLocator = await umbracoUi.dataType.getAddButtonInGroupWithName(secondGroupName);
-  // TODO: This needs to be fixed
-  await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, -10, 0, 10);
+  const dragFromLocator = await umbracoUi.dataType.getBlockCardInGroupWithName(groupName, elementTypeName);
+  const dragToLocator = await umbracoUi.dataType.getBlocksContainerInGroupWithName(secondGroupName);
+  await umbracoUi.dataType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 10);
   await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
 
   // Assert
@@ -220,16 +221,27 @@ test.fixme('can move a block from a group to another group in a block grid edito
   expect(await umbracoApi.dataType.doesBlockGridGroupContainCorrectBlocks(blockGridEditorName, groupName, [elementTypeId])).toBeFalsy();
 });
 
-test.fixme('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
+test('can delete a group in a block grid editor', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
   const elementTypeId = await umbracoApi.documentType.createDefaultElementType(elementTypeName, groupName, dataTypeName, textStringData.id);
   await umbracoApi.dataType.createBlockGridWithABlockInAGroup(blockGridEditorName, elementTypeId, groupName);
   expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockGridContainGroupWithName(blockGridEditorName, groupName)).toBeTruthy();
 
   // Act
   await umbracoUi.dataType.goToDataType(blockGridEditorName);
-  // TODO: Implement it later
+  await umbracoUi.dataType.clickDeleteGroupButtonWithName(groupName);
+  await umbracoUi.dataType.clickConfirmToDeleteButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockGridContainGroupWithName(blockGridEditorName, groupName)).toBeFalsy();
+  // Deleting a group moves its blocks out of the group rather than deleting them
+  expect(await umbracoApi.dataType.doesBlockEditorContainBlocksWithContentTypeIds(blockGridEditorName, [elementTypeId])).toBeTruthy();
+
+  // Clean
+  await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
 test('can add a min and max amount to a block grid editor', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
@@ -370,9 +382,23 @@ test('can update grid columns in a block grid editor', async ({umbracoApi, umbra
   expect(await umbracoApi.dataType.doesBlockGridContainGridColumns(blockGridEditorName, gridColumns)).toBeTruthy();
 });
 
-// TODO: wait until fixed by frontend, currently you are able to insert multiple stylesheets
-test.skip('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
-  // TODO: Implement it later
+test('can add a stylesheet a block grid editor', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const stylesheetName = 'TestStylesheet.css';
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
+  await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
+  await umbracoApi.dataType.createEmptyBlockGrid(blockGridEditorName);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.chooseLayoutStylesheetWithName(stylesheetName);
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockGridContainLayoutStylesheet(blockGridEditorName, stylesheetName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
 });
 
 test('can remove a stylesheet in a block grid editor', async ({umbracoApi, umbracoUi}) => {

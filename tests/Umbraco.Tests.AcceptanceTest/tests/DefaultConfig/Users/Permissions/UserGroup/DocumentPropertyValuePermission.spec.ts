@@ -10,13 +10,14 @@ const documentName = 'TestDocument';
 const documentTypeName = 'TestDocumentType';
 const dataTypeName = 'Textstring';
 const textString = 'This is test textstring';
+let documentId = null;
 
 test.beforeEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
   await umbracoApi.document.ensureNameNotExists(documentName);
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  await umbracoApi.document.createDocumentWithTextContent(documentName, documentTypeId, textString, dataTypeName);
+  documentId = await umbracoApi.document.createDocumentWithTextContent(documentName, documentTypeId, textString, dataTypeName);
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -57,7 +58,8 @@ test('can see property values with UI read but not UI write permission', {tag: '
   await umbracoUi.content.isPropertyEditorUiWithNameReadOnly('text-box');
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the user may not
+// read renders an empty workspace. Expected text should be 'Access denied'. Navigation fixed to deep-link.
 test.skip('cannot open content without document read permission even with UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermissionAndReadPropertyValueDocumentPermission(userGroupName, false, true);
@@ -66,8 +68,9 @@ test.skip('cannot open content without document read permission even with UI rea
   await umbracoUi.goToBackOffice();
 
   // Act
+  // Without document read permission the node is not in the tree at all, so it has to be deep-linked.
   await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
-  await umbracoUi.content.goToContentWithName(documentName);
+  await umbracoUi.content.goToWorkspacePath(`/workspace/document/edit/${documentId}`);
 
   // Assert
   await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');

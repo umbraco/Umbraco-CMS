@@ -70,7 +70,8 @@ test('can read content node with permission enabled', {tag: '@release'}, async (
   await umbracoUi.content.doesDocumentHaveName(rootDocumentName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/20505): deep-linking to a document the user may not
+// read renders an empty umb-document-workspace-editor instead of Access denied. Navigation fixed to deep-link.
 test.skip('can not read content node with permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermission(userGroupName, false);
@@ -80,7 +81,8 @@ test.skip('can not read content node with permission disabled', async ({umbracoA
   await umbracoUi.userGroup.goToSection(ConstantHelper.sections.content, false);
 
   // Act
-  await umbracoUi.content.goToContentWithName(rootDocumentName);
+  // Without read permission the node is not in the tree at all, so it has to be deep-linked.
+  await umbracoUi.content.goToWorkspacePath(`/workspace/document/edit/${rootDocumentId}`);
 
   // Assert
   await umbracoUi.content.doesDocumentWorkspaceHaveText('Not found');
@@ -284,25 +286,7 @@ test('can not publish content with publish permission disabled', async ({umbraco
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
-// Skip this as this function is removed from the front-end.
-test.skip('can set permissions with set permissions permission enabled', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsDocumentPermission(userGroupName);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content, false);
-
-  // Act
-  await umbracoUi.content.clickActionsMenuForContent(rootDocumentName);
-  // await umbracoUi.content.clickSetPermissionsButton();
-
-  // Assert
-  // await umbracoUi.content.doesDocumentPermissionsDialogExist();
-});
-
-// Skip this as this function is removed from the front-end.
-test.skip('can not set permissions with set permissions permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('does not show an actions menu when no document actions are available', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithSetPermissionsDocumentPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);

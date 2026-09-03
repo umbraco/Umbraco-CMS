@@ -58,22 +58,7 @@ test('can update step size value', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'step', stepSizeValue)).toBeTruthy();
 });
 
-// Skip this test as currently this setting is removed.
-test.skip('can allow decimals', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createDefaultNumericDataType(customDataTypeName);
-  await umbracoUi.dataType.goToDataType(customDataTypeName);
-
-  // Act
-  await umbracoUi.dataType.clickAllowDecimalsToggle();
-  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
-
-  // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'allowDecimals', true)).toBeTruthy();
-});
-
-// TODO: Remove skip when the front-end is ready. Currently you still can update the minimum greater than the maximum.
-// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/17509
+// Product gap (https://github.com/umbraco/Umbraco-CMS/issues/17509): no min/max cross-validation, the save succeeds.
 test.skip('cannot update the minimum greater than the maximum', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minimumValue = 5;

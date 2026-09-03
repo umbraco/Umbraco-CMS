@@ -126,6 +126,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
   private readonly expandChildItemsForMediaBtn: Locator;
   private readonly tiptapToolbarConfiguration: Locator;
   private readonly addGroupToolbarBtn: Locator;
+  private readonly blockGroups: Locator;
+  private readonly layoutStylesheetAddBtn: Locator;
   private readonly addRowToolbarBtn: Locator;
   private readonly tiptapExtensionsConfiguration: Locator;
   private readonly propertyEditor: Locator;
@@ -320,6 +322,8 @@ export class DataTypeUiHelper extends UiBaseLocators {
     // Tiptap
     this.tiptapToolbarConfiguration = this.page.locator('umb-property-editor-ui-tiptap-toolbar-configuration');
     this.addGroupToolbarBtn = this.tiptapToolbarConfiguration.locator('uui-button').filter({hasText: 'Add group'});
+    this.blockGroups = page.locator('.group');
+    this.layoutStylesheetAddBtn = page.getByTestId('property:layoutStylesheet').locator('#btn-add');
     this.addRowToolbarBtn = this.tiptapToolbarConfiguration.locator('uui-button').filter({hasText: 'Add row'});
     this.tiptapExtensionsConfiguration = this.page.locator('umb-property-editor-ui-tiptap-extensions-configuration');
     this.propertyEditor = this.page.locator('umb-ref-property-editor-ui');
@@ -953,6 +957,14 @@ export class DataTypeUiHelper extends UiBaseLocators {
     await this.click(this.hideContentEditorBlockGridBtn);
   }
 
+  async chooseLayoutStylesheetWithName(name: string) {
+    await this.click(this.layoutStylesheetAddBtn);
+    await this.openCaretButtonForName('wwwroot');
+    await this.openCaretButtonForName('css');
+    await this.clickTreeItemWithName(name, this.sidebarModal);
+    await this.clickChooseModalButton();
+  }
+
   async chooseBlockCustomStylesheetWithName(name: string) {
     await this.click(this.chooseCustomStylesheetBtn);
     await this.openCaretButtonForName('wwwroot');
@@ -1139,9 +1151,39 @@ export class DataTypeUiHelper extends UiBaseLocators {
     return this.page.getByRole('link', {name: name});
   }
 
+  private async getGroupWithName(name: string) {
+    await this.isVisible(this.blockGroups.first());
+    const index = await this.blockGroups.getByRole('textbox').evaluateAll(
+      (inputs, groupName) => inputs.findIndex((input) => (input as HTMLInputElement).value === groupName),
+      name,
+    );
+    // A not-found name gives index -1; avoid that and verify the match below instead.
+    const group = this.blockGroups.nth(Math.max(index, 0));
+    await expect(group.getByRole('textbox')).toHaveValue(name);
+    return group;
+  }
+
+  async clickDeleteGroupButtonWithName(name: string) {
+    const group = await this.getGroupWithName(name);
+    // The trash uui-icon inside the button intercepts pointer events, so the click has to be forced.
+    await this.click(group.getByLabel('Delete'), {force: true});
+  }
+
+  async getBlockCardInGroupWithName(groupName: string, blockName: string) {
+    const group = await this.getGroupWithName(groupName);
+    return group.locator('umb-block-type-card').filter({has: this.page.getByText(blockName, {exact: true})});
+  }
+
+  async getBlocksContainerInGroupWithName(groupName: string) {
+    const group = await this.getGroupWithName(groupName);
+    return group.locator('#blocks');
+  }
+
   async getAddButtonInGroupWithName(name: string) {
-    await this.isVisible(this.page.locator('.group').filter({hasText: name}).locator('#add-button'));
-    return this.page.locator('.group').filter({hasText: name}).locator('#add-button');
+    const group = await this.getGroupWithName(name);
+    const addButton = group.locator('#add-button');
+    await this.isVisible(addButton);
+    return addButton;
   }
 
   async clickRemoveStylesheetButton(stylesheetName: string) {
@@ -1230,8 +1272,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async doesBlockHaveThumbnailImage(blockName: string, thumbnailImageUrl: string) {
+    // Saving returns to the parent workspace before the card re-renders, so the default timeout can be too tight under CI load.
     const blockCardLocator = this.blockTypeCard.filter({hasText: blockName});
-    await this.hasAttribute(blockCardLocator.locator('img'), 'src', thumbnailImageUrl);
+    await this.hasAttribute(blockCardLocator.locator('img'), 'src', thumbnailImageUrl, ConstantHelper.timeout.long);
   }
 
   async addTimeZones(timeZones: string[]) {
@@ -1280,8 +1323,9 @@ export class DataTypeUiHelper extends UiBaseLocators {
   }
 
   async doesBlockHaveNoThumbnailImage(blockName: string) {
+    // Same post-save return-navigation delay as doesBlockHaveThumbnailImage above.
     const blockCardLocator = this.blockTypeCard.filter({hasText: blockName});
-    await expect(blockCardLocator.locator('img')).toHaveCount(0);
+    await expect(blockCardLocator.locator('img')).toHaveCount(0, {timeout: ConstantHelper.timeout.long});
   }
 
   // Dynamic Root

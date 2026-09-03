@@ -68,7 +68,8 @@ test('can create a saved search', {tag: '@smoke'}, async ({umbracoApi, umbracoUi
   await umbracoApi.logViewer.deleteSavedSearch(searchName);
 });
 
-// TODO: unskip, currently flaky
+// Needs redesigning: it compares rendered rows against whole-log API totals, but the viewer pages at 100 and
+// mixes levels on one page. Assert on the level filter totals instead.
 test.skip('can create a complex saved search', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const searchName = 'ComplexTest';
@@ -136,48 +137,33 @@ test('can expand a log entry', async ({umbracoUi}) => {
   await umbracoUi.logViewer.doesDetailedLogHaveText('The token');
 });
 
-// Currently only works if the user is using the locale 'en-US' otherwise it will fail
-test.skip('can sort logs by timestamp', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const locale = 'en-US';
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true,
-  };
-
+test('can sort logs by timestamp', async ({umbracoUi}) => {
   //Act
   await umbracoUi.logViewer.clickSearchButton();
   // Sorts logs by timestamp
   await umbracoUi.logViewer.clickSortLogByTimestampButton();
-  // Gets the last log from the log viewer
-  const lastLog = await umbracoApi.logViewer.getLog(0, 1, 'Descending');
-  const dateToFormat = new Date(lastLog.items[0].timestamp);
-  const lastLogTimestamp = new Intl.DateTimeFormat(locale, options).format(dateToFormat);
 
   // Assert
-  await umbracoUi.logViewer.doesFirstLogHaveTimestamp(lastLogTimestamp);
+  // Checks the loaded page is itself in ascending order, rather than against an external snapshot.
+  await expect.poll(async () => {
+    const timestamps = (await umbracoUi.logViewer.getLogTimestamps()).map((timestamp) => new Date(timestamp).getTime());
+    return timestamps.every((timestamp, index) => index === 0 || timestamps[index - 1] <= timestamp);
+  }).toBe(true);
 });
 
-// Will fail if there is not enough logs.
-test.skip('can use pagination', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const secondPageLogs = await umbracoApi.logViewer.getLog(100, 100, 'Ascending');
-  const firstLogOnSecondPage = secondPageLogs.items[0].renderedMessage;
-
+test('can use pagination', async ({umbracoUi, page}) => {
   // Act
   await umbracoUi.logViewer.clickSearchButton();
+  // The instance keeps writing log entries, so comparing against an API snapshot races with the UI.
+  // Reading both pages from the UI keeps the assertion stable whatever the log volume is.
+  const firstLogOnFirstPage = await umbracoUi.logViewer.getFirstLogMessage();
   await umbracoUi.logViewer.clickPageNumber(2);
 
   // Assert
-  await umbracoUi.logViewer.doesFirstLogHaveMessage(firstLogOnSecondPage);
-  // TODO: Remove the comment below when the issue is resolved.
-  // At the time this test was created, the UI only highlights page 1. Uncomment the line below when the issue is resolved.
-  // await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
+  // Poll rather than read once: the message element can re-render in place, so a plain visibility
+  // wait can be satisfied by the still-stale page-1 content before the page-2 fetch resolves.
+  await expect.poll(() => umbracoUi.logViewer.getFirstLogMessage()).not.toEqual(firstLogOnFirstPage);
+  await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
 });
 
 test('can use a saved search', async ({umbracoApi, umbracoUi}) => {
