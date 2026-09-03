@@ -42,4 +42,9 @@ export abstract class UmbMenuListStructureWorkspaceContextBase
 		const parent = items.filter((item) => item.unique !== current?.unique).pop();
 		this.#parentContext.setParent(parent ? { unique: parent.unique, entityType: parent.entityType } : undefined);
 	}
+
+	override destroy(): void {
+		super.destroy();
+		this.#structure.destroy();
+	}
 }

@@ -96,6 +96,11 @@ export class UmbMemberMenuStructureWorkspaceContext
 
 		this.#structure.setValue(items);
 	}
+
+	override destroy(): void {
+		super.destroy();
+		this.#structure.destroy();
+	}
 }
 
 export { UmbMemberMenuStructureWorkspaceContext as api };
