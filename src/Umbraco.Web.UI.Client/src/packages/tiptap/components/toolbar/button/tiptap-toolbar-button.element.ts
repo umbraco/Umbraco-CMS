@@ -1,9 +1,9 @@
-import type { Editor } from '../../externals.js';
+import type { Editor } from '../../../externals.js';
 import type {
 	ManifestTiptapToolbarExtension,
 	ManifestTiptapToolbarExtensionButtonKind,
-} from '../../extensions/tiptap-toolbar.extension.js';
-import type { UmbTiptapToolbarElementApi } from '../../extensions/types.js';
+} from '../../../extensions/tiptap-toolbar.extension.js';
+import type { UmbTiptapToolbarElementApi } from '../../../extensions/types.js';
 import { customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 

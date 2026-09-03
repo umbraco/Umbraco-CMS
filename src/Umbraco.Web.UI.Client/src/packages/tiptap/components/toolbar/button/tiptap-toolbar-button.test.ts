@@ -1,6 +1,6 @@
 import { UmbTiptapToolbarButtonElement } from './tiptap-toolbar-button.element.js';
-import type { UmbTiptapToolbarElementApi } from '../../extensions/types.js';
-import type { Editor } from '../../externals.js';
+import type { UmbTiptapToolbarElementApi } from '../../../extensions/types.js';
+import type { Editor } from '../../../externals.js';
 import { expect } from '@open-wc/testing';
 
 /**

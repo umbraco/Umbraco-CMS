@@ -1,15 +1,15 @@
-import type { Editor } from '../../externals.js';
+import type { Editor } from '../../../externals.js';
 import type {
 	ManifestTiptapToolbarExtensionMenuKind,
 	MetaTiptapToolbarMenuItem,
 	UmbTiptapToolbarElementApi,
-} from '../../extensions/index.js';
-import type { UmbCascadingMenuItem } from '../cascading-menu-popover/cascading-menu-popover.element.js';
+} from '../../../extensions/index.js';
+import type { UmbCascadingMenuItem } from '../../cascading-menu-popover/cascading-menu-popover.element.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestMenu } from '@umbraco-cms/backoffice/menu';
 
-import '../cascading-menu-popover/cascading-menu-popover.element.js';
+import '../../cascading-menu-popover/cascading-menu-popover.element.js';
 
 @customElement('umb-tiptap-toolbar-menu')
 export class UmbTiptapToolbarMenuElement extends UmbLitElement {

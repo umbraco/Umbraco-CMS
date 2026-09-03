@@ -1,4 +1,4 @@
-import type { ManifestTiptapToolbarExtensionActionButtonKind } from '../../extensions/tiptap-toolbar.extension.js';
+import type { ManifestTiptapToolbarExtensionActionButtonKind } from '../../../extensions/tiptap-toolbar.extension.js';
 import { UmbTiptapToolbarButtonElement } from './tiptap-toolbar-button.element.js';
 import { customElement, html, when } from '@umbraco-cms/backoffice/external/lit';
 
