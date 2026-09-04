@@ -7011,6 +7011,31 @@ export type GetItemDocumentBlueprintResponses = {
 
 export type GetItemDocumentBlueprintResponse = GetItemDocumentBlueprintResponses[keyof GetItemDocumentBlueprintResponses];
 
+export type GetItemDocumentBlueprintFolderData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/document-blueprint/folder';
+};
+
+export type GetItemDocumentBlueprintFolderErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemDocumentBlueprintFolderResponses = {
+    /**
+     * OK
+     */
+    200: Array<FolderItemResponseModel>;
+};
+
+export type GetItemDocumentBlueprintFolderResponse = GetItemDocumentBlueprintFolderResponses[keyof GetItemDocumentBlueprintFolderResponses];
+
 export type GetTreeDocumentBlueprintAncestorsData = {
     body?: never;
     path?: never;

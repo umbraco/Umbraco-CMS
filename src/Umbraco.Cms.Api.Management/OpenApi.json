@@ -8743,6 +8743,52 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/document-blueprint/folder": {
+      "get": {
+        "tags": [
+          "Document Blueprint"
+        ],
+        "summary": "Gets a collection of document blueprint folder items.",
+        "description": "Gets a collection of document blueprint folder items identified by the provided Ids.",
+        "operationId": "GetItemDocumentBlueprintFolder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FolderItemResponseModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/tree/document-blueprint/ancestors": {
       "get": {
         "tags": [
