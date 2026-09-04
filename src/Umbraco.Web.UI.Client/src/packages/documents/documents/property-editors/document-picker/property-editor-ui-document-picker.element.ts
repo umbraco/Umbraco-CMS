@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
-import { UmbDynamicRootResolver } from '@umbraco-cms/backoffice/content-picker';
-import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/content-picker';
+import { UmbDynamicRootResolver } from '@umbraco-cms/backoffice/dynamic-root';
+import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

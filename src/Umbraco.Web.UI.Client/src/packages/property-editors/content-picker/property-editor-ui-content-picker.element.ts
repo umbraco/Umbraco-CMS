@@ -1,6 +1,6 @@
-import { UmbDynamicRootResolver } from './dynamic-root/dynamic-root-resolver.controller.js';
 import type { UmbInputContentElement } from './components/input-content/index.js';
 import type { UmbContentPickerSource, UmbContentPickerSourceType } from './types.js';
+import { UmbDynamicRootResolver } from '@umbraco-cms/backoffice/dynamic-root';
 import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';

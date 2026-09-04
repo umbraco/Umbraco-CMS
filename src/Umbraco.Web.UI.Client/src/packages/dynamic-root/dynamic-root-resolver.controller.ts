@@ -1,4 +1,4 @@
-import type { UmbContentPickerDynamicRoot } from '../types.js';
+import type { UmbContentPickerDynamicRoot } from './types.js';
 import { UmbContentPickerDynamicRootRepository } from './repository/index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CONTENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content';

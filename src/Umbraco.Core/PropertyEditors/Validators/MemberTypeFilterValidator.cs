@@ -62,6 +62,7 @@ internal static class MemberTypeFilterValidator
 
         // The member service has no lookup by several keys, so the picked members are fetched one at a time. The
         // number of them is bounded by what an editor can pick.
+        // TODO: fetch in one go once IMemberService gains a lookup by several keys.
         using ICoreScope scope = coreScopeProvider.CreateCoreScope();
         IMember?[] members = keys.Select(memberService.GetById).ToArray();
         scope.Complete();

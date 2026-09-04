@@ -1,8 +1,8 @@
 import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
 import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
-import { UmbDynamicRootResolver } from '@umbraco-cms/backoffice/content-picker';
-import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/content-picker';
+import { UmbDynamicRootResolver } from '@umbraco-cms/backoffice/dynamic-root';
+import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

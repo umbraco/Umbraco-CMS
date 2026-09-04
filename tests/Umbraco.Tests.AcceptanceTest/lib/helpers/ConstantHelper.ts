@@ -106,7 +106,7 @@
     2: ['Dynamic root', 'Resolve the start node from the content being edited, when no start node is set'],
     3: ['Enable Focal Point', ''],
     4: ['Image Crops', 'Local crops, stored on document'],
-    5: ['Ignore User Start Nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
+    5: ['Ignore User Start Nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
   }
 
   public static readonly labelSettings = {
@@ -158,7 +158,7 @@
   }
 
   public static readonly singleUrlPickerSettings = {
-    0: ['Ignore user start nodes', 'Selecting this option allows a user to choose nodes that they normally dont have access to.'],
+    0: ['Ignore user start nodes', "Selecting this option allows a user to choose nodes that they normally don't have access to."],
     1: ['Overlay Size', 'Select the width of the overlay.'],
     2: ['Hide anchor/query string input', 'Selecting this hides the anchor/query string input field in the link picker overlay.'],
     3: ['Culture-specific document links', 'Enable specifying a culture when linking to documents.']

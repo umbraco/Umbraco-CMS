@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Nodes;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -22,6 +24,18 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MemberPickerPropertyEditor" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">The data value editor factory.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
+    public MemberPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
+        : this(
+            dataValueEditorFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IIOHelper>())
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberPickerPropertyEditor" /> class.

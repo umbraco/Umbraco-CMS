@@ -104,6 +104,11 @@ public class MigrateSingleUrlPickerDataTypes : AsyncMigrationBase
         }
     }
 
+    /// <remarks>
+    /// <c>maxNumber</c> is written by <see cref="MultiUrlPickerConfiguration" />, so the key is always present on a
+    /// configured picker and always holds a number - but it is read back out of the stored configuration
+    /// dictionary rather than the typed class, hence parsing whatever string form it arrives in.
+    /// </remarks>
     private static bool HoldsSingleLink(IDataType dataType)
         => dataType.ConfigurationData.TryGetValue(MaxNumberConfigurationKey, out var maxNumber)
            && maxNumber?.ToString() is { Length: > 0 } configured

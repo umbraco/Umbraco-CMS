@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -51,16 +51,18 @@ public class MigrateTypedLabelDataTypes : AsyncMigrationBase
     /// Every value type a label could be configured with maps onto an editor. The ones that only ever yielded a
     /// string are split by the column they are stored in, so that no value has to be relocated.
     /// </remarks>
-    internal static string EditorAliasForValueType(string valueType)
+    internal static string EditorAliasForValueType(string valueType) => EditorForValueType(valueType).EditorAlias;
+
+    private static (string EditorAlias, string EditorUiAlias) EditorForValueType(string valueType)
         => valueType.ToUpperInvariant() switch
         {
-            ValueTypes.Integer => Constants.PropertyEditors.Aliases.LabelInteger,
-            ValueTypes.Bigint => Constants.PropertyEditors.Aliases.LabelBigInt,
-            ValueTypes.Decimal => Constants.PropertyEditors.Aliases.LabelDecimal,
-            ValueTypes.DateTime or ValueTypes.Date => Constants.PropertyEditors.Aliases.LabelDateTime,
-            ValueTypes.Time => Constants.PropertyEditors.Aliases.LabelTime,
-            ValueTypes.Text or ValueTypes.Json or ValueTypes.Xml => Constants.PropertyEditors.Aliases.LabelText,
-            _ => Constants.PropertyEditors.Aliases.Label,
+            ValueTypes.Integer => (Constants.PropertyEditors.Aliases.LabelInteger, "Umb.PropertyEditorUi.Label.Integer"),
+            ValueTypes.Bigint => (Constants.PropertyEditors.Aliases.LabelBigInt, "Umb.PropertyEditorUi.Label.BigInt"),
+            ValueTypes.Decimal => (Constants.PropertyEditors.Aliases.LabelDecimal, "Umb.PropertyEditorUi.Label.Decimal"),
+            ValueTypes.DateTime or ValueTypes.Date => (Constants.PropertyEditors.Aliases.LabelDateTime, "Umb.PropertyEditorUi.Label.DateTime"),
+            ValueTypes.Time => (Constants.PropertyEditors.Aliases.LabelTime, "Umb.PropertyEditorUi.Label.Time"),
+            ValueTypes.Text or ValueTypes.Json or ValueTypes.Xml => (Constants.PropertyEditors.Aliases.LabelText, "Umb.PropertyEditorUi.Label.Text"),
+            _ => (Constants.PropertyEditors.Aliases.Label, "Umb.PropertyEditorUi.Label"),
         };
 
     /// <summary>
@@ -79,7 +81,7 @@ public class MigrateTypedLabelDataTypes : AsyncMigrationBase
         foreach (IDataType dataType in dataTypes)
         {
             var valueType = ConfiguredValueType(dataType);
-            var editorAlias = EditorAliasForValueType(valueType);
+            (var editorAlias, var editorUiAlias) = EditorForValueType(valueType);
 
             // The configuration value no longer selects anything, so it goes whether or not the editor changes.
             var configurationChanged = dataType.ConfigurationData
@@ -106,7 +108,7 @@ public class MigrateTypedLabelDataTypes : AsyncMigrationBase
             }
 
             dataType.Editor = editor;
-            dataType.EditorUiAlias = EditorUiAliasFor(editorAlias);
+            dataType.EditorUiAlias = editorUiAlias;
 
             // Take the storage type from the editor now holding the data type. Each label editor declares the value
             // type its predecessor's configuration did, so this is the column the values already occupy.
@@ -129,7 +131,4 @@ public class MigrateTypedLabelDataTypes : AsyncMigrationBase
            && valueType?.ToString() is { Length: > 0 } configuredValueType
             ? configuredValueType
             : ValueTypes.String;
-
-    private static string EditorUiAliasFor(string editorAlias)
-        => $"Umb.PropertyEditorUi.Label.{editorAlias.Split('.').Last()}";
 }

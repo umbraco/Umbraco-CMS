@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -23,28 +23,29 @@ public class LabelValueConverter : PropertyValueConverterBase
 {
     /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
-        => propertyType.EditorAlias switch
-        {
-            Constants.PropertyEditors.Aliases.Label => true,
-            Constants.PropertyEditors.Aliases.LabelText => true,
-            Constants.PropertyEditors.Aliases.LabelInteger => true,
-            Constants.PropertyEditors.Aliases.LabelBigInt => true,
-            Constants.PropertyEditors.Aliases.LabelDecimal => true,
-            Constants.PropertyEditors.Aliases.LabelDateTime => true,
-            Constants.PropertyEditors.Aliases.LabelTime => true,
-            _ => false,
-        };
+        => ModelType(propertyType.EditorAlias) is not null;
 
     /// <inheritdoc />
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-        => propertyType.EditorAlias switch
+        => ModelType(propertyType.EditorAlias) ?? typeof(string);
+
+    /// <summary>
+    /// Gets the type the label editor with the given alias yields, or null when the alias is not a label editor.
+    /// </summary>
+    /// <remarks>
+    /// Which editors this converter claims and what each one yields are the same question, so they are answered
+    /// in one place: a new label editor cannot be given a type without also being claimed.
+    /// </remarks>
+    private static Type? ModelType(string editorAlias)
+        => editorAlias switch
         {
+            Constants.PropertyEditors.Aliases.Label or Constants.PropertyEditors.Aliases.LabelText => typeof(string),
             Constants.PropertyEditors.Aliases.LabelInteger => typeof(int),
             Constants.PropertyEditors.Aliases.LabelBigInt => typeof(long),
             Constants.PropertyEditors.Aliases.LabelDecimal => typeof(decimal),
             Constants.PropertyEditors.Aliases.LabelDateTime => typeof(DateTime),
             Constants.PropertyEditors.Aliases.LabelTime => typeof(TimeSpan),
-            _ => typeof(string),
+            _ => null,
         };
 
     /// <inheritdoc />

@@ -1,5 +1,5 @@
-import type { UmbContentPickerDynamicRoot } from '../../types.js';
 import type { UmbInputContentPickerDocumentRootElement } from '../components/index.js';
+import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/dynamic-root';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
