@@ -191,7 +191,7 @@ describe('UmbTrashableEntityWorkspaceContextBase', () => {
 
 			dispatchTrashed();
 
-			expect(workspaceContext.resetUnpersistedChangesCallCount).to.equal(1);
+			expect(workspaceContext.resetDataCallCount).to.equal(1);
 			expect(history.pushStateCalls).to.have.lengthOf(1);
 			expect(history.pushStateCalls[0].url).to.equal('/test/edit/parent-unique');
 			expect(workspaceContext.reloadCallCount).to.equal(0);

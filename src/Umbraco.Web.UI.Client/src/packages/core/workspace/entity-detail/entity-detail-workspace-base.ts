@@ -513,10 +513,10 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	}
 
 	/**
-	 * Resets any unpersisted local changes, reverting the current data back to the last persisted state.
+	 * Resets the data back to the last persisted state, discarding any local changes.
 	 * @memberof UmbEntityDetailWorkspaceContextBase
 	 */
-	public resetUnpersistedChanges(): void {
+	public resetData(): void {
 		this._data.resetCurrent();
 	}
 

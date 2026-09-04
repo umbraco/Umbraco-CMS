@@ -106,9 +106,9 @@ export abstract class UmbTrashableEntityWorkspaceContextBase extends UmbContextB
 		// the new data isn't needed here.
 		if (event.getUnique() && !this.#workspaceContext?.modalContext) {
 			// The entity is already trashed server-side by this point, so any local edits are moot — reset
-			// them first so pushState's navigation guard doesn't intercept the redirect with a "discard
+			// the data first so pushState's navigation guard doesn't intercept the redirect with a "discard
 			// changes?" prompt the user never asked for.
-			this.#workspaceContext?.resetUnpersistedChanges();
+			this.#workspaceContext?.resetData();
 
 			try {
 				this.#redirectToParent();
