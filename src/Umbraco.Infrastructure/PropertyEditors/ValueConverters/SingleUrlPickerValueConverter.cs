@@ -12,14 +12,14 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 /// <summary>
-/// Converts the value stored by the Multi URL Picker property editor into a collection of strongly-typed link objects
-/// that can be easily consumed by application code.
+/// Converts the value stored by the single URL picker property editor into a strongly-typed link object that can be
+/// easily consumed by application code.
 /// </summary>
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-public class MultiUrlPickerValueConverter : MultiUrlPickerValueConverterBase
+public class SingleUrlPickerValueConverter : MultiUrlPickerValueConverterBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="MultiUrlPickerValueConverter"/> class with the specified dependencies.
+    /// Initializes a new instance of the <see cref="SingleUrlPickerValueConverter"/> class with the specified dependencies.
     /// </summary>
     /// <param name="proflog">The <see cref="IProfilingLogger"/> used for profiling and logging.</param>
     /// <param name="jsonSerializer">The <see cref="IJsonSerializer"/> used for serializing and deserializing JSON data.</param>
@@ -29,7 +29,7 @@ public class MultiUrlPickerValueConverter : MultiUrlPickerValueConverterBase
     /// <param name="apiContentRouteBuilder">The <see cref="IApiContentRouteBuilder"/> used to build API content routes.</param>
     /// <param name="contentCache">The <see cref="IPublishedContentCache"/> used to cache published content.</param>
     /// <param name="mediaCache">The <see cref="IPublishedMediaCache"/> used to cache published media.</param>
-    public MultiUrlPickerValueConverter(
+    public SingleUrlPickerValueConverter(
         IProfilingLogger proflog,
         IJsonSerializer jsonSerializer,
         IPublishedUrlProvider publishedUrlProvider,
@@ -51,20 +51,20 @@ public class MultiUrlPickerValueConverter : MultiUrlPickerValueConverterBase
     }
 
     /// <inheritdoc />
-    protected override bool HoldsMultipleLinks => true;
+    protected override bool HoldsMultipleLinks => false;
 
     /// <summary>
     /// Determines whether this value converter should be used for the specified property type.
     /// </summary>
     /// <param name="propertyType">The property type to evaluate.</param>
-    /// <returns><c>true</c> if the property type uses the Multi URL Picker editor; otherwise, <c>false</c>.</returns>
+    /// <returns><c>true</c> if the property type uses the single URL picker editor; otherwise, <c>false</c>.</returns>
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
-        Constants.PropertyEditors.Aliases.MultiUrlPicker.Equals(propertyType.EditorAlias);
+        Constants.PropertyEditors.Aliases.SingleUrlPicker.Equals(propertyType.EditorAlias);
 
     /// <summary>
     /// Determines the CLR type returned for the property value.
     /// </summary>
     /// <param name="propertyType">The published property type to evaluate.</param>
-    /// <returns><see cref="IEnumerable{Link}" />.</returns>
-    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<Link>);
+    /// <returns><see cref="Link" />.</returns>
+    public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(Link);
 }

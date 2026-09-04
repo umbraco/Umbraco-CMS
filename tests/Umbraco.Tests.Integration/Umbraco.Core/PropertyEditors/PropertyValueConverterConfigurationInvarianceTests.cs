@@ -57,7 +57,6 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
     private static readonly string[] _knownVariantModelTypes =
     [
         Constants.PropertyEditors.Aliases.DropDownListFlexible,
-        Constants.PropertyEditors.Aliases.MultiUrlPicker,
     ];
 
     /// <summary>

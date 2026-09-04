@@ -317,6 +317,11 @@ public static partial class Constants
             public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
 
             /// <summary>
+            ///     Alias for the URL picker editor holding a single link.
+            /// </summary>
+            public const string SingleUrlPicker = "Umbraco.SingleUrlPicker";
+
+            /// <summary>
             ///     Configuration-less string.
             /// </summary>
             public const string PlainString = "Umbraco.Plain.String";
