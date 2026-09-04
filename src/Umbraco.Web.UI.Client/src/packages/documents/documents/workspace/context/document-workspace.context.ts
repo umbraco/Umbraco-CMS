@@ -19,21 +19,15 @@ import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
-import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbEntityRestoredFromRecycleBinEvent,
-	UmbEntityTrashedEvent,
-	UmbIsTrashedEntityContext,
-} from '@umbraco-cms/backoffice/recycle-bin';
 import { UmbPreviewController } from '@umbraco-cms/backoffice/preview';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type { UmbWorkspaceActionExecutionOptions } from '@umbraco-cms/backoffice/workspace';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
@@ -67,11 +61,9 @@ export class UmbDocumentWorkspaceContext
 
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
-	#isTrashedContext = new UmbIsTrashedEntityContext(this);
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#previewController = new UmbPreviewController(this);
-	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -113,12 +105,6 @@ export class UmbDocumentWorkspaceContext
 			};
 		});
 
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
-			this.#removeEventListeners();
-			this.#actionEventContext = actionEventContext;
-			this.#addEventListeners();
-		});
-
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
@@ -149,8 +135,6 @@ export class UmbDocumentWorkspaceContext
 			},
 			null,
 		);
-
-		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed), null);
 
 		this.routes.setRoutes([
 			{
@@ -217,11 +201,6 @@ export class UmbDocumentWorkspaceContext
 				},
 			},
 		]);
-	}
-
-	override resetState(): void {
-		super.resetState();
-		this.#isTrashedContext.setIsTrashed(false);
 	}
 
 	protected override async _loadSegmentsFor(unique: string): Promise<void> {
@@ -372,53 +351,6 @@ export class UmbDocumentWorkspaceContext
 			If the user does not have permission, we set it to true = permitted to be read-only. */
 			permitted: true,
 		});
-	}
-
-	#addEventListeners() {
-		this.#actionEventContext?.addEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
-		this.#actionEventContext?.addEventListener(
-			UmbEntityRestoredFromRecycleBinEvent.TYPE,
-			this.#onRecycleBinEvent as EventListener,
-		);
-	}
-
-	#removeEventListeners() {
-		this.#actionEventContext?.removeEventListener(UmbEntityTrashedEvent.TYPE, this.#onRecycleBinEvent as EventListener);
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityRestoredFromRecycleBinEvent.TYPE,
-			this.#onRecycleBinEvent as EventListener,
-		);
-	}
-
-	#onRecycleBinEvent = (event: UmbEntityTrashedEvent | UmbEntityRestoredFromRecycleBinEvent) => {
-		const unique = this.getUnique();
-		const entityType = this.getEntityType();
-		if (event.getUnique() !== unique || event.getEntityType() !== entityType) return;
-		this.reload();
-	};
-
-	#onTrashStateChange(isTrashed?: boolean) {
-		this.#isTrashedContext.setIsTrashed(isTrashed ?? false);
-
-		const guardUnique = `UMB_PREVENT_EDIT_TRASHED_ITEM`;
-
-		if (!isTrashed) {
-			this.readOnlyGuard.removeRule(guardUnique);
-			return;
-		}
-
-		const rule: UmbVariantGuardRule = {
-			unique: guardUnique,
-			permitted: true,
-		};
-
-		// TODO: Change to use property write guard when it supports making the name read-only.
-		this.readOnlyGuard.addRule(rule);
-	}
-
-	public override destroy(): void {
-		this.#removeEventListeners();
-		super.destroy();
 	}
 }
 
