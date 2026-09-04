@@ -1,5 +1,6 @@
 import { UmbTiptapToolbarMenuElement } from './tiptap-toolbar-menu.element.js';
-import type { UmbTiptapToolbarElementApi } from '../../../extensions/types.js';
+import type { UmbCascadingMenuPopoverElement } from '../../cascading-menu-popover/cascading-menu-popover.element.js';
+import type { MetaTiptapToolbarMenuItem, UmbTiptapToolbarElementApi } from '../../../extensions/types.js';
 import type { Editor } from '../../../externals.js';
 import { expect } from '@open-wc/testing';
 
@@ -108,5 +109,59 @@ describe('UmbTiptapToolbarMenuElement — disabled state (#23823)', () => {
 		expect(seededElement.shadowRoot?.querySelector('uui-button')?.hasAttribute('disabled')).to.equal(true);
 
 		seededElement.remove();
+	});
+});
+
+describe('UmbTiptapToolbarMenuElement — per-item active state (#23660)', () => {
+	let element: UmbTiptapToolbarMenuElement;
+
+	const editorStub = {} as unknown as Editor;
+
+	const dataAwareApi: UmbTiptapToolbarElementApi = {
+		isActive: (_editor?: Editor, item?: MetaTiptapToolbarMenuItem) => item?.data === 'serif',
+		isDisabled: () => false,
+		execute: () => {},
+	} as unknown as UmbTiptapToolbarElementApi;
+
+	const menuManifest = {
+		type: 'tiptapToolbarExtension',
+		kind: 'menu',
+		alias: 'Umb.Tiptap.Toolbar.Test',
+		name: 'Test Menu',
+		meta: { alias: 'testMenu', label: 'Test', icon: 'icon-text' },
+		items: [
+			{ label: 'Sans serif', data: 'sans-serif' },
+			{ label: 'Serif', data: 'serif' },
+		],
+	} as any;
+
+	beforeEach(() => {
+		element = document.createElement('umb-tiptap-toolbar-menu') as UmbTiptapToolbarMenuElement;
+		element.editor = editorStub;
+		element.api = dataAwareApi;
+		element.manifest = menuManifest;
+		document.body.appendChild(element);
+	});
+
+	afterEach(() => {
+		element.remove();
+	});
+
+	it('calls isActive(editor, item) per item, so an extension can highlight the item matching its data', async () => {
+		// `manifest`'s setter resolves the cascading menu items asynchronously (#setMenu); flush
+		// the microtask queue so they're populated, then force the render that picks them up.
+		for (let i = 0; i < 10; i++) {
+			await Promise.resolve();
+		}
+		(element as unknown as { requestUpdate(): void }).requestUpdate();
+		await element.updateComplete;
+
+		const popover = element.shadowRoot?.querySelector('umb-cascading-menu-popover') as
+			| UmbCascadingMenuPopoverElement
+			| null
+			| undefined;
+		const items = popover?.items ?? [];
+
+		expect(items.map((item) => item.isActive?.())).to.deep.equal([false, true]);
 	});
 });
