@@ -155,7 +155,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             const string query = "SELECT value FROM umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id=@id";
 
-            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
+            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds}";
 
             BoundNextCommandByLockTimeout(db);
 
@@ -193,7 +193,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             const string query =
                 @"UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
 
-            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
+            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds}";
 
             BoundNextCommandByLockTimeout(db);
 
