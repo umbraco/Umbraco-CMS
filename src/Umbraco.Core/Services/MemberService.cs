@@ -1231,8 +1231,8 @@ namespace Umbraco.Cms.Core.Services
                 Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
             };
 
-            scope.Complete();
             scope.Notifications.Publish(new ExportedMemberNotification(member, model));
+            scope.Complete();
 
             return model;
         }

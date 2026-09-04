@@ -60,6 +60,19 @@ public class HealthCheckNotifierJobTests
     }
 
     [Test]
+    public void Completes_Scope_When_Notification_Method_Throws()
+    {
+        var sut = CreateHealthCheckNotifier();
+        _mockNotificationMethod
+            .Setup(x => x.SendAsync(It.IsAny<HealthCheckResults>()))
+            .ThrowsAsync(new InvalidOperationException());
+
+        Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync());
+
+        _mockScope.Verify(x => x.Complete(), Times.Once);
+    }
+
+    [Test]
     public async Task Executes_Only_Enabled_Checks()
     {
         var sut = CreateHealthCheckNotifier();
