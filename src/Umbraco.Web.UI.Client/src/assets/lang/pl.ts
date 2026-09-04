@@ -895,6 +895,17 @@ export default {
 		sortHelp:
 			'Przesuń poszczególne elementy w górę oraz w dół aż będą w odpowiedniej kolejności lub kliknij na nagłówku kolumny, aby posortować całą kolekcję elementów',
 		sortPleaseWait: 'Proszę czekać. Trwa sortowanie elementów.',
+		sortByFieldHeadline: 'Sortuj według pola',
+		sortByFieldSentence: 'Sortuj wszystkie elementy podrzędne według',
+		sortByFieldDirectionLabel: 'Kierunek',
+		sortByFieldAscending: 'Rosnąco',
+		sortByFieldDescending: 'Malejąco',
+		sortByFieldNameOption: 'Nazwa',
+		sortByFieldCreateDateOption: 'Utworzono',
+		sortByFieldUpdateDateOption: 'Ostatnia edycja',
+		sortIndividuallyHeadline: 'Sortuj pojedynczo',
+		sortByFieldCultureSentence: 'w języku',
+		sortByFieldCultureLabel: 'Język',
 	},
 	speechBubbles: {
 		validationFailedHeader: 'Walidacja',
