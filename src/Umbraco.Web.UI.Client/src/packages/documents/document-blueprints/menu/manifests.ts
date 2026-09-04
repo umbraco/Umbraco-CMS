@@ -1,6 +1,7 @@
 import { UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS } from '../tree/constants.js';
 import { UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_BLUEPRINT_MENU_ALIAS, UMB_DOCUMENT_BLUEPRINT_MENU_ITEM_ALIAS } from './constants.js';
+import { UMB_CURRENT_USER_DOCUMENT_BLUEPRINT_ACCESS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/current-user';
 import { UMB_LIBRARY_SECTION_ALIAS } from '@umbraco-cms/backoffice/library';
 import { UMB_SECTION_ALIAS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import type { ManifestMenu, ManifestSectionSidebarAppMenuWithEntityActionsKind } from '@umbraco-cms/backoffice/menu';
@@ -41,6 +42,9 @@ const sectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind = {
 		{
 			alias: UMB_SECTION_ALIAS_CONDITION_ALIAS,
 			match: UMB_LIBRARY_SECTION_ALIAS,
+		},
+		{
+			alias: UMB_CURRENT_USER_DOCUMENT_BLUEPRINT_ACCESS_CONDITION_ALIAS,
 		},
 	],
 };
