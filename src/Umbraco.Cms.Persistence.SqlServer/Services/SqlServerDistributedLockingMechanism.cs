@@ -60,6 +60,23 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
     private sealed class SqlServerDistributedLock : IDistributedLock
     {
+        /// <summary>
+        ///     The SQL Server error number reported when the server gives up waiting for a lock, having
+        ///     waited for the period set by <c>SET LOCK_TIMEOUT</c>.
+        /// </summary>
+        private const int LockRequestTimeoutError = 1222;
+
+        /// <summary>
+        ///     The SQL Server error number reported when the client gives up waiting for the command,
+        ///     having waited for its command timeout.
+        /// </summary>
+        /// <remarks>
+        ///     The lock statement runs under a command timeout derived from the lock timeout, so a command
+        ///     that times out obtaining the lock is reported as a lock timeout too, rather than escaping
+        ///     the mechanism untranslated.
+        /// </remarks>
+        private const int CommandTimeoutError = -2;
+
         private readonly SqlServerDistributedLockingMechanism _parent;
         private readonly TimeSpan _timeout;
 
@@ -92,7 +109,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
                         throw new ArgumentOutOfRangeException(nameof(lockType), lockType, @"Unsupported lockType");
                 }
             }
-            catch (SqlException ex) when (ex.Number == 1222)
+            catch (SqlException ex) when (ex.Number is LockRequestTimeoutError or CommandTimeoutError)
             {
                 if (LockType == DistributedLockType.ReadLock)
                 {
@@ -146,7 +163,11 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             const string query = "SELECT value FROM umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id=@id";
 
-            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
+            // Cast to int, so that a fractional millisecond cannot put a culture-specific decimal mark
+            // into the statement - which would not be valid T-SQL.
+            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds}";
+
+            BoundNextCommandByLockTimeout(db);
 
             // execute the lock timeout query and the actual query in a single server roundtrip
             var i = db.ExecuteScalar<int?>($"{lockTimeoutQuery};{query}", new { id = LockId });
@@ -182,7 +203,11 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             const string query =
                 @"UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
 
-            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {_timeout.TotalMilliseconds}";
+            // Cast to int, so that a fractional millisecond cannot put a culture-specific decimal mark
+            // into the statement - which would not be valid T-SQL.
+            var lockTimeoutQuery = $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds}";
+
+            BoundNextCommandByLockTimeout(db);
 
             // execute the lock timeout query and the actual query in a single server roundtrip
             var i = db.Execute($"{lockTimeoutQuery};{query}", new { id = LockId });
@@ -193,5 +218,19 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
                 throw new ArgumentException($"LockObject with id={LockId} does not exist.");
             }
         }
+
+        /// <summary>
+        ///     Bounds the next statement executed on the database by a command timeout derived from this
+        ///     lock's own timeout.
+        /// </summary>
+        /// <param name="db">The database that will execute the lock statement.</param>
+        /// <remarks>
+        ///     Without this the ambient command timeout can abort the statement while the server is still
+        ///     waiting for the row lock, surfacing a raw timeout instead of a lock timeout exception.
+        ///     <c>OneTimeCommandTimeout</c> is reset once the command executes, so it cannot leak into the
+        ///     rest of the scope.
+        /// </remarks>
+        private void BoundNextCommandByLockTimeout(IUmbracoDatabase db)
+            => db.OneTimeCommandTimeout = _timeout.ToLockCommandTimeoutSeconds();
     }
 }
