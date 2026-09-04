@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -2522,5 +2523,213 @@ internal partial class BlockListElementLevelVariationTests
             Assert.IsFalse(content.IsCultureEdited("en-US"), "en-US culture should not be marked as edited");
             Assert.IsFalse(content.IsCultureEdited("da-DK"), "da-DK culture should not be marked as edited");
         });
+    }
+
+    /// <summary>
+    /// When an invariant Block List property holds culture-variant block values, editing only the
+    /// non-default culture's nested value must flag that specific culture as edited - not the default
+    /// culture - so that culture-aware publishing (e.g. branch publish) knows it needs republishing.
+    /// </summary>
+    [Test]
+    public async Task Editing_A_Non_Default_Culture_Block_Value_Flags_That_Culture_As_Edited()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "The first invariant content value" },
+                new() { Alias = "variantText", Value = "The first content value in English", Culture = "en-US" },
+                new() { Alias = "variantText", Value = "The first content value in Danish", Culture = "da-DK" },
+            },
+            new List<BlockPropertyValue>(),
+            publishContent: false);
+
+        // Route the initial value through ContentEditingService.UpdateAsync (as the backoffice does) so the
+        // block values are canonically sorted before the first publish - this avoids an unrelated, pre-existing
+        // false-positive "edited" state caused by JSON key-ordering differences between the edited and
+        // published value (see Publishing_All_Cultures_Should_Not_Mark_Content_As_Edited above).
+        var currentBlocksJson = (string)content.Properties["blocks"]!.GetValue()!;
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = [new PropertyValueModel { Alias = "blocks", Value = currentBlocksJson }],
+            Variants =
+            [
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+            ],
+        };
+        var updateResult = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
+
+        content = ContentService.GetById(content.Key)!;
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+
+        // reload to get the persisted Edited/EditedCultures state after the initial publish.
+        content = ContentService.GetById(content.Key)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(content.Edited);
+            Assert.IsFalse(content.IsCultureEdited("en-US"));
+            Assert.IsFalse(content.IsCultureEdited("da-DK"));
+        });
+
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        blockListValue.ContentData[0].Values.Single(v => v.Alias == "variantText" && v.Culture == "da-DK").Value = "The second content value in Danish";
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        // reload again to get the persisted Edited/EditedCultures state after this save.
+        content = ContentService.GetById(content.Key)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(content.IsCultureEdited("en-US"), "English content did not change and must not be flagged as edited.");
+            Assert.IsTrue(content.IsCultureEdited("da-DK"), "Danish content changed inside the invariant Block List property and must be flagged as edited.");
+        });
+    }
+
+    /// <summary>
+    /// Branch publishing an already-published, culture-variant document must republish a culture whose
+    /// only pending change lives inside a nested, culture-variant block value of an otherwise
+    /// culture-invariant Block List property.
+    /// </summary>
+    [Test]
+    public async Task Can_Publish_Branch_Republishes_Non_Default_Culture_Changed_Only_Inside_Invariant_Block()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(
+            contentType,
+            elementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "invariantText", Value = "Invariant value" },
+                new() { Alias = "variantText", Value = "English v1", Culture = "en-US" },
+                new() { Alias = "variantText", Value = "Danish v1", Culture = "da-DK" },
+            },
+            new List<BlockPropertyValue>(),
+            true);
+
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        blockListValue.ContentData[0].Values.Single(v => v.Alias == "variantText" && v.Culture == "da-DK").Value = "Danish v2";
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        var results = ContentService.PublishBranch(content, PublishBranchFilter.Default, content.AvailableCultures.ToArray()).ToArray();
+
+        Assert.AreEqual(1, results.Length);
+        Assert.AreEqual(PublishResultType.SuccessPublishCulture, results[0].Result, "Branch publish must republish because Danish content changed.");
+
+        SetVariationContext("da-DK", null);
+        var publishedContent = GetPublishedContent(content.Key);
+        var blockListModel = publishedContent.Value<BlockListModel>("blocks");
+        Assert.AreEqual("Danish v2", blockListModel!.First().Content.Value<string>("variantText"));
+    }
+
+    /// <summary>
+    /// The same branch-republish behaviour must also hold when the changed culture-variant value sits
+    /// inside a nested block list (blocks within blocks), each wrapped by its own culture-invariant
+    /// Block List property.
+    /// </summary>
+    [Test]
+    public async Task Can_Publish_Branch_Republishes_Non_Default_Culture_Changed_Only_Inside_Nested_Invariant_Blocks()
+    {
+        var nestedElementType = CreateElementType(ContentVariation.Culture, "myNestedElementType");
+        var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
+
+        var rootElementType = new ContentTypeBuilder()
+            .WithAlias("myRootElementType")
+            .WithName("My Root Element Type")
+            .WithIsElement(true)
+            .WithContentVariation(ContentVariation.Culture)
+            .AddPropertyType()
+            .WithAlias("variantText")
+            .WithName("Variant text")
+            .WithDataTypeId(Constants.DataTypes.Textbox)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+            .WithValueStorageType(ValueStorageType.Nvarchar)
+            .WithVariations(ContentVariation.Culture)
+            .Done()
+            .AddPropertyType()
+            .WithAlias("nestedBlocks")
+            .WithName("Nested blocks")
+            .WithDataTypeId(nestedBlockListDataType.Id)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.BlockList)
+            .WithValueStorageType(ValueStorageType.Ntext)
+            .WithVariations(ContentVariation.Nothing)
+            .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
+        var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
+        var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
+
+        var nestedElementContentKey = Guid.NewGuid();
+        var nestedElementSettingsKey = Guid.NewGuid();
+        var content = CreateContent(
+            contentType,
+            rootElementType,
+            new List<BlockPropertyValue>
+            {
+                new() { Alias = "variantText", Value = "Root content value in English", Culture = "en-US" },
+                new() { Alias = "variantText", Value = "Root content value in Danish", Culture = "da-DK" },
+                new()
+                {
+                    Alias = "nestedBlocks",
+                    Value = BlockListPropertyValue(
+                        nestedElementType,
+                        nestedElementContentKey,
+                        nestedElementSettingsKey,
+                        new BlockProperty(
+                            new List<BlockPropertyValue>
+                            {
+                                new() { Alias = "variantText", Value = "Nested English v1", Culture = "en-US" },
+                                new() { Alias = "variantText", Value = "Nested Danish v1", Culture = "da-DK" },
+                            },
+                            new List<BlockPropertyValue>(),
+                            null,
+                            null)),
+                },
+            },
+            [],
+            true);
+
+        var blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        blockListValue.ContentData[0].Values.Single(v => v.Alias == "nestedBlocks").Value = BlockListPropertyValue(
+            nestedElementType,
+            nestedElementContentKey,
+            nestedElementSettingsKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "variantText", Value = "Nested English v1", Culture = "en-US" },
+                    new() { Alias = "variantText", Value = "Nested Danish v2", Culture = "da-DK" },
+                },
+                new List<BlockPropertyValue>(),
+                null,
+                null));
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        Assert.IsTrue(content.IsCultureEdited("da-DK"), "Nested Danish content changed and must be flagged as edited.");
+
+        var results = ContentService.PublishBranch(content, PublishBranchFilter.Default, content.AvailableCultures.ToArray()).ToArray();
+
+        Assert.AreEqual(1, results.Length);
+        Assert.AreEqual(PublishResultType.SuccessPublishCulture, results[0].Result, "Branch publish must republish because nested Danish content changed.");
+
+        SetVariationContext("da-DK", null);
+        var publishedContent = GetPublishedContent(content.Key);
+        var rootBlock = publishedContent.Value<BlockListModel>("blocks")!.First();
+        var nestedBlock = rootBlock.Content.Value<BlockListModel>("nestedBlocks")!.First();
+        Assert.AreEqual("Nested Danish v2", nestedBlock.Content.Value<string>("variantText"));
     }
 }

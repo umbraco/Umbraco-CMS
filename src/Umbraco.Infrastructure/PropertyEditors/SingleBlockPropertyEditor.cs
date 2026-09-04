@@ -92,6 +92,13 @@ public class SingleBlockPropertyEditor : DataEditor
         return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData, allowedCultures);
     }
 
+    /// <inheritdoc />
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
+    {
+        var valueEditor = (SingleBlockEditorPropertyValueEditor)GetValueEditor();
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue);
+    }
+
     internal sealed class SingleBlockEditorPropertyValueEditor : BlockEditorPropertyValueEditor<SingleBlockValue, SingleBlockLayoutItem>
     {
         /// <summary>

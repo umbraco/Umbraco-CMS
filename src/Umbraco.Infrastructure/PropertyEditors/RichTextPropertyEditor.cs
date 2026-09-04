@@ -164,6 +164,13 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
         return valueEditor.MergeVariantInvariantPropertyValue(sourceValue, targetValue, canUpdateInvariantData,allowedCultures);
     }
 
+    /// <inheritdoc />
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
+    {
+        var valueEditor = (RichTextPropertyValueEditor)GetValueEditor();
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue);
+    }
+
     /// <summary>
     ///     Create a custom value editor
     /// </summary>
@@ -527,6 +534,26 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
             // structure is global, and markup follows structure
             var mergedEditorValue = new RichTextEditorValue { Markup = sourceRichTextEditorValue.Markup, Blocks = blocksMergeResult };
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(mergedEditorValue, _jsonSerializer);
+        }
+
+        internal override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
+        {
+            TryParseEditorValue(sourceValue, out RichTextEditorValue? sourceRichTextEditorValue);
+            TryParseEditorValue(targetValue, out RichTextEditorValue? targetRichTextEditorValue);
+
+            if (sourceRichTextEditorValue?.Blocks is null && targetRichTextEditorValue?.Blocks is null)
+            {
+                // no blocks on either side - any difference is in the markup, which is invariant/structural
+                // for this property - let the caller fall back to the default culture.
+                return [];
+            }
+
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? sourceBlockEditorData =
+                sourceRichTextEditorValue?.Blocks is not null ? ConvertAndClean(sourceRichTextEditorValue.Blocks) : null;
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? targetBlockEditorData =
+                targetRichTextEditorValue?.Blocks is not null ? ConvertAndClean(targetRichTextEditorValue.Blocks) : null;
+
+            return GetChangedCulturesForBlockValue(sourceBlockEditorData?.BlockValue, targetBlockEditorData?.BlockValue);
         }
 
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)

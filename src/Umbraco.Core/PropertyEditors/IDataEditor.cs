@@ -85,4 +85,16 @@ public interface IDataEditor : IDiscoverable
         object? targetValue,
         bool canUpdateInvariantData,
         HashSet<string> allowedCultures) => sourceValue;
+
+    /// <summary>
+    ///     Determines the specific cultures that contain an actual content change within an otherwise
+    ///     culture-invariant property's value, for editors that support partial per-culture publishing
+    ///     (see <see cref="CanMergePartialPropertyValues"/>).
+    /// </summary>
+    /// <param name="sourceValue">The source (edited) property value.</param>
+    /// <param name="targetValue">The target (published) property value.</param>
+    /// <returns>
+    ///     The set of cultures containing an actual edit.
+    /// </returns>
+    IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue) => [];
 }
