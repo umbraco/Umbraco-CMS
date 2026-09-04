@@ -1,24 +1,24 @@
-using Umbraco.Cms.Core.PropertyEditors;
+﻿using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Extensions;
 
 /// <summary>
-/// Provides extension methods for configuring and working with Media Picker 3 settings in Umbraco.
+/// Provides extension methods for configuring and working with media picker settings in Umbraco.
 /// </summary>
-public static class MediaPicker3ConfigurationExtensions
+public static class MediaPickerConfigurationExtensions
 {
     /// <summary>
     ///     Applies the configuration to ensure only valid crops are kept and have the correct width/height.
     /// </summary>
-    public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, MediaPicker3Configuration? configuration)
+    public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, MediaPickerConfigurationBase? configuration)
     {
         var crops = new List<ImageCropperValue.ImageCropperCrop>();
 
-        MediaPicker3Configuration.CropConfiguration[]? configuredCrops = configuration?.Crops;
+        MediaPickerConfigurationBase.CropConfiguration[]? configuredCrops = configuration?.Crops;
         if (configuredCrops != null)
         {
-            foreach (MediaPicker3Configuration.CropConfiguration configuredCrop in configuredCrops)
+            foreach (MediaPickerConfigurationBase.CropConfiguration configuredCrop in configuredCrops)
             {
                 ImageCropperValue.ImageCropperCrop? crop =
                     imageCropperValue.Crops?.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
