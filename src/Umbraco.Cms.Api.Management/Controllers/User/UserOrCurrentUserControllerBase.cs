@@ -103,6 +103,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Element Start Node not found")
                 .WithDetail("Some of the provided element start nodes was not found.")
                 .Build()),
+            UserOperationStatus.DocumentBlueprintStartNodeNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Document Blueprint Start Node not found")
+                .WithDetail("Some of the provided document blueprint start nodes was not found.")
+                .Build()),
             UserOperationStatus.UserNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The user was not found")
                 .WithDetail("The specified user was not found.")
