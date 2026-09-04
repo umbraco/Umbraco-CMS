@@ -107,9 +107,14 @@ public static partial class Constants
             public const string ColorPickerEyeDropper = "Umbraco.ColorPicker.EyeDropper";
 
             /// <summary>
-            ///     Content Picker.
+            ///     Content Picker, holding a single document.
             /// </summary>
             public const string ContentPicker = "Umbraco.ContentPicker";
+
+            /// <summary>
+            ///     Document Picker, holding any number of documents.
+            /// </summary>
+            public const string MultipleDocumentPicker = "Umbraco.MultipleDocumentPicker";
 
             /// <summary>
             ///     DateTime.
