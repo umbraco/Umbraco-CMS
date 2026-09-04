@@ -18,6 +18,11 @@ public static class DistributedLockTimeoutExtensions
     ///     Allows a margin on top of the lock timeout, so that a mechanism able to report a lock timeout
     ///     of its own gets to do so before the client abandons the command. Rounds up, so that a
     ///     sub-second timeout cannot become zero seconds - which providers read as no limit at all.
+    ///     <para>
+    ///         The result is a function of the lock's own wait alone, deliberately independent of any
+    ///         ambient command timeout: a lock statement reads or writes a single row, so a longer
+    ///         configured timeout buys it nothing, and a shorter one would stop it waiting as asked.
+    ///     </para>
     /// </remarks>
     public static int ToLockCommandTimeoutSeconds(this TimeSpan lockTimeout)
         => (int)Math.Ceiling(lockTimeout.TotalSeconds) + MarginInSeconds;

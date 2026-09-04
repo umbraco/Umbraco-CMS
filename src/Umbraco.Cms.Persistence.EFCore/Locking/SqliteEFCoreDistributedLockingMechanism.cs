@@ -170,6 +170,7 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
 
                 var query = @$"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id = {LockId.ToString(CultureInfo.InvariantCulture)}";
 
+                // The timeout is set on the context, which outlives the lock, so it has to be put back.
                 int? originalCommandTimeout = database.Database.GetCommandTimeout();
 
                 try
@@ -177,6 +178,8 @@ internal sealed class SqliteEFCoreDistributedLockingMechanism<T> : IDistributedL
                     // imagine there is an existing writer, whilst elapsed time is < command timeout sqlite will busy loop
                     // Important to note that if this value == 0 then Command.DefaultTimeout (30s) is used.
                     // Math.Ceiling such that (0 < totalseconds < 1) is rounded up to 1.
+                    // Here the command timeout *is* the wait for the lock, so - unlike the SQL Server
+                    // mechanisms - it is the lock timeout exactly, with no margin added on top.
                     database.Database.SetCommandTimeout((int)Math.Ceiling(_timeout.TotalSeconds));
                     var i = await database.Database.ExecuteScalarAsync<int>(query);
 

@@ -155,6 +155,8 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             const string query = "SELECT value FROM umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id=@id";
 
+            // Cast to int, so that a fractional millisecond cannot put a culture-specific decimal mark
+            // into the statement - which would not be valid T-SQL.
             var lockTimeoutQuery = $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds}";
 
             BoundNextCommandByLockTimeout(db);
@@ -193,6 +195,8 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             const string query =
                 @"UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
 
+            // Cast to int, so that a fractional millisecond cannot put a culture-specific decimal mark
+            // into the statement - which would not be valid T-SQL.
             var lockTimeoutQuery = $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds}";
 
             BoundNextCommandByLockTimeout(db);
