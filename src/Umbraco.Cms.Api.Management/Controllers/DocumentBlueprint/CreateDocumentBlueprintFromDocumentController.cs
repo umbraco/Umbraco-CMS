@@ -78,6 +78,7 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
                 fromDocumentRequestModel.Document.Id,
                 fromDocumentRequestModel.Name,
                 fromDocumentRequestModel.Id,
+                fromDocumentRequestModel.Parent?.Id,
                 CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
