@@ -12,6 +12,7 @@ interface UmbDetailCacheEntryModel<DetailDataModelType> {
  */
 export class UmbManagementApiDetailDataCache<DetailDataModelType> {
 	#entries: Map<string, UmbDetailCacheEntryModel<DetailDataModelType>> = new Map();
+	#serverEventsConnected = false;
 
 	/**
 	 * Checks if an entry exists in the cache
@@ -74,5 +75,31 @@ export class UmbManagementApiDetailDataCache<DetailDataModelType> {
 	 */
 	clear(): void {
 		this.#entries.clear();
+	}
+
+	/**
+	 * Whether server events are connected, which is the condition under which cached entries
+	 * can be trusted — server events are what invalidates them.
+	 * This lives on the cache rather than on each consumer because the cache is shared: a
+	 * consumer constructed later inherits the known state instead of re-deriving it from an
+	 * asynchronous context lookup, during which it would otherwise bypass the cache.
+	 * @returns {boolean} - True if server events are connected, false otherwise
+	 * @memberof UmbManagementApiDetailDataCache
+	 */
+	get serverEventsConnected(): boolean {
+		return this.#serverEventsConnected;
+	}
+
+	/**
+	 * Sets whether server events are connected, clearing the cache when they are not
+	 * @param {boolean} value - True if server events are connected, false otherwise
+	 * @memberof UmbManagementApiDetailDataCache
+	 */
+	setServerEventsConnected(value: boolean): void {
+		this.#serverEventsConnected = value;
+
+		if (value === false) {
+			this.clear();
+		}
 	}
 }
