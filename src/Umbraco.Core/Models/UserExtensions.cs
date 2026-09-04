@@ -476,7 +476,7 @@ public static class UserExtensions
                 continue; // ignore rogue node (no path)
             }
 
-            if (StartsWithPath(snp, binPath))
+            if (binPath is not null && StartsWithPath(snp, binPath))
             {
                 continue; // ignore bin
             }
@@ -498,7 +498,7 @@ public static class UserExtensions
                 continue; // ignore rogue node (no path)
             }
 
-            if (StartsWithPath(snp, binPath))
+            if (binPath is not null && StartsWithPath(snp, binPath))
             {
                 continue; // ignore bin
             }
@@ -543,10 +543,17 @@ public static class UserExtensions
         test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';
 
     /// <summary>
-    ///     Gets the recycle bin path for the specified object type.
+    ///     Gets the recycle bin path for the specified object type, or <c>null</c> for a tree that has no
+    ///     recycle bin.
     /// </summary>
-    private static string GetBinPath(UmbracoObjectTypes objectType)
+    private static string? GetBinPath(UmbracoObjectTypes objectType)
     {
+        // Document blueprints have no recycle bin, so there is no bin branch to exclude.
+        if (objectType is UmbracoObjectTypes.DocumentBlueprint or UmbracoObjectTypes.DocumentBlueprintContainer)
+        {
+            return null;
+        }
+
         var binPath = Constants.System.RootString + ",";
         switch (objectType)
         {
