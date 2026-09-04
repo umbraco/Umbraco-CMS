@@ -60,8 +60,16 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
     private sealed class SqlServerDistributedLock : IDistributedLock
     {
+        /// <summary>
+        ///     The SQL Server error number reported when the server gives up waiting for a lock, having
+        ///     waited for the period set by <c>SET LOCK_TIMEOUT</c>.
+        /// </summary>
         private const int LockRequestTimeoutError = 1222;
 
+        /// <summary>
+        ///     The SQL Server error number reported when the client gives up waiting for the command,
+        ///     having waited for its command timeout.
+        /// </summary>
         /// <remarks>
         ///     The lock statement runs under a command timeout derived from the lock timeout, so a command
         ///     that times out obtaining the lock is reported as a lock timeout too, rather than escaping
@@ -211,11 +219,16 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             }
         }
 
+        /// <summary>
+        ///     Bounds the next statement executed on the database by a command timeout derived from this
+        ///     lock's own timeout.
+        /// </summary>
+        /// <param name="db">The database that will execute the lock statement.</param>
         /// <remarks>
         ///     Without this the ambient command timeout can abort the statement while the server is still
         ///     waiting for the row lock, surfacing a raw timeout instead of a lock timeout exception.
-        ///     <see cref="NPoco.IDatabase.OneTimeCommandTimeout" /> is reset once the command executes, so it
-        ///     cannot leak into the rest of the scope.
+        ///     <c>OneTimeCommandTimeout</c> is reset once the command executes, so it cannot leak into the
+        ///     rest of the scope.
         /// </remarks>
         private void BoundNextCommandByLockTimeout(IUmbracoDatabase db)
             => db.OneTimeCommandTimeout = _timeout.ToLockCommandTimeoutSeconds();

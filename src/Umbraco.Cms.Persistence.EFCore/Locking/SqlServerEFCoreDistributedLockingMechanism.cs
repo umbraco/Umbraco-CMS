@@ -69,8 +69,16 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
     /// </summary>
     private sealed class SqlServerDistributedLock : IDistributedLock
     {
+        /// <summary>
+        ///     The SQL Server error number reported when the server gives up waiting for a lock, having
+        ///     waited for the period set by <c>SET LOCK_TIMEOUT</c>.
+        /// </summary>
         private const int LockRequestTimeoutError = 1222;
 
+        /// <summary>
+        ///     The SQL Server error number reported when the client gives up waiting for the command,
+        ///     having waited for its command timeout.
+        /// </summary>
         /// <remarks>
         ///     The lock statement runs under a command timeout derived from the lock timeout, so a command
         ///     that times out obtaining the lock is reported as a lock timeout too, rather than escaping
@@ -233,6 +241,10 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
             }).GetAwaiter().GetResult();
         }
 
+        /// <summary>
+        ///     Gets the command timeout, in whole seconds, that the statement obtaining this lock runs
+        ///     under, derived from the lock's own timeout.
+        /// </summary>
         /// <remarks>
         ///     Without this the ambient command timeout can abort the statement while the server is still
         ///     waiting for the row lock, surfacing a raw timeout instead of a lock timeout exception.
