@@ -1,4 +1,3 @@
-/* eslint-disable local-rules/enforce-umbraco-external-imports */
 import type { ProseMirrorNode } from '../../../externals.js';
 import { TableView } from '@tiptap/pm/tables';
 import type { ViewMutationRecord } from '@tiptap/pm/view';
