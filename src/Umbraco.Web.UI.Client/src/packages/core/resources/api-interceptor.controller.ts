@@ -277,7 +277,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	}
 
 	/**
-	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any. Removes the umb-notifications from the headers.
+	 * Interceptor which checks responses for the umb-notifications header and displays them as a notification if any.
 	 * @param {umbHttpClient} client The OpenAPI client to add the interceptor to. It can be any client supporting Response and Request interceptors.
 	 * @internal
 	 */
@@ -364,10 +364,13 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
-		// Construct new headers but preserve "X-" headers from the original response
+		// Construct new headers but preserve "X-" headers and Umbraco's own "Umb-" headers from the original
+		// response, so interceptors running after the one that rebuilt it can still read them.
+		// @see https://github.com/umbraco/Umbraco-CMS/issues/23589
 		const headersOverride: Record<string, string> = {};
 		originalResponse.headers.forEach((value, key) => {
-			if (key.toLowerCase().startsWith('x-')) {
+			const name = key.toLowerCase();
+			if (name.startsWith('x-') || name.startsWith('umb-')) {
 				headersOverride[key] = value;
 			}
 		});
