@@ -700,7 +700,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         if (contentType.VariesByCulture())
         {
             // get the content names for each culture, keeping in mind that there may be multiple per culture
-            // as each culture can have several segments. we'll prioritize the segment-less names
+            // as each culture can have several segments.
             var variantNamesByCulture = contentEditingModelBase.Variants
                 .Where(v => v.Culture.IsNullOrWhiteSpace() == false)
                 .GroupBy(v => v.Culture!)
