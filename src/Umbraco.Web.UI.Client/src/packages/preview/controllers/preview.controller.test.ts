@@ -53,6 +53,40 @@ class FakePreviewRepository {
 	}
 }
 
+type HandedOverWindow = {
+	name: string;
+	closed: boolean;
+	closeCount: number;
+	focusCount: number;
+	replacedWith: string | null;
+	focus: () => void;
+	close: () => void;
+	location: { replace: (url: string) => void };
+};
+
+function createHandedOverWindow(): HandedOverWindow {
+	const win: HandedOverWindow = {
+		name: '',
+		closed: false,
+		closeCount: 0,
+		focusCount: 0,
+		replacedWith: null,
+		focus() {
+			this.focusCount++;
+		},
+		close() {
+			this.closeCount++;
+			this.closed = true;
+		},
+		location: {
+			replace: (url: string) => {
+				win.replacedWith = url;
+			},
+		},
+	};
+	return win;
+}
+
 const ARGS = { unique: 'doc-1', urlProviderAlias: 'umbDocumentUrlProvider' } as const;
 
 describe('UmbPreviewController', () => {
@@ -126,9 +160,7 @@ describe('UmbPreviewController', () => {
 
 	describe('message-only response', () => {
 		it('does not open a window and throws with the message', async () => {
-			const repository = new FakePreviewRepository(
-				urlInfo({ url: null, message: 'No preview available' }),
-			);
+			const repository = new FakePreviewRepository(urlInfo({ url: null, message: 'No preview available' }));
 			const controller = createController(repository);
 
 			let thrown: unknown;
@@ -140,6 +172,46 @@ describe('UmbPreviewController', () => {
 
 			expect(openSpy.calls).to.have.lengthOf(0);
 			expect((thrown as Error)?.message).to.equal('No preview available');
+		});
+	});
+
+	describe('a window opened during the user gesture (#22626)', () => {
+		it('adopts the handed-over window instead of opening a new one', async () => {
+			const repository = new FakePreviewRepository(urlInfo());
+			const controller = createController(repository);
+			const handedOver = createHandedOverWindow();
+
+			await controller.preview({ ...ARGS }, handedOver as unknown as WindowProxy);
+
+			expect(openSpy.calls).to.have.lengthOf(0);
+			expect(handedOver.name).to.equal('umbpreview-doc-1');
+			expect(handedOver.replacedWith).to.be.a('string');
+			expect(new URL(handedOver.replacedWith!).searchParams.has('rnd')).to.be.true;
+			expect(handedOver.focusCount).to.equal(1);
+			expect(handedOver.closeCount).to.equal(0);
+		});
+
+		it('closes the handed-over window when no preview URL is returned', async () => {
+			const repository = new FakePreviewRepository(urlInfo({ url: null, message: 'No preview available' }));
+			const controller = createController(repository);
+			const handedOver = createHandedOverWindow();
+
+			try {
+				await controller.preview({ ...ARGS }, handedOver as unknown as WindowProxy);
+			} catch {
+				// expected - the controller rethrows the message
+			}
+
+			expect(handedOver.closeCount).to.equal(1);
+		});
+
+		it('still opens a window itself when none was handed over', async () => {
+			const repository = new FakePreviewRepository(urlInfo());
+			const controller = createController(repository);
+
+			await controller.preview({ ...ARGS });
+
+			expect(openSpy.calls).to.have.lengthOf(1);
 		});
 	});
 });

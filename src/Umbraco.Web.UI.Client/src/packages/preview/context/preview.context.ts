@@ -260,11 +260,38 @@ export class UmbPreviewContext extends UmbContextBase {
 		return this.getHostElement().shadowRoot?.querySelector('#wrapper') as HTMLElement;
 	}
 
-	async openWebsite() {
-		let url = await this.#getPublishedUrl();
+	/**
+	 * Opens the previewed page outside of preview mode.
+	 * @param {WindowProxy | null} [websiteWindow] - A window opened synchronously during the user gesture.
+	 * Safari only allows `window.open` from the gesture's synchronous call stack, and resolving the
+	 * published URL takes an await, so click handlers must open the tab up front and hand it over (#22626).
+	 * @memberof UmbPreviewContext
+	 */
+	async openWebsite(websiteWindow?: WindowProxy | null) {
+		let url: string | null;
+		try {
+			url = await this.#getPublishedUrl();
+		} catch (error) {
+			websiteWindow?.close();
+			throw error;
+		}
 
 		if (!url) {
 			url = this.#previewUrl.getValue() as string;
+		}
+
+		if (!url) {
+			websiteWindow?.close();
+			return;
+		}
+
+		if (websiteWindow) {
+			// window.open() resolves a relative URL against this document, but navigating another window
+			// resolves against *its* document — about:blank, which has no base — and silently does
+			// nothing. Resolve here so a relative URL behaves the same either way.
+			websiteWindow.location.replace(new URL(url, window.location.href).toString());
+			websiteWindow.focus();
+			return;
 		}
 
 		window.open(url, '_blank');
