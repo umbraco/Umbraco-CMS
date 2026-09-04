@@ -20,7 +20,8 @@ public class ConfigurationDataTypeController : DataTypeControllerBase
     /// Initializes a new instance of the <see cref="ConfigurationDataTypeController"/> class.
     /// </summary>
     /// <param name="dataTypesSettings">An <see cref="IOptionsSnapshot{T}"/> containing the <see cref="DataTypesSettings"/> configuration options.</param>
-    public ConfigurationDataTypeController(IOptionsSnapshot<DataTypesSettings> dataTypesSettings) => _dataTypesSettings = dataTypesSettings.Value;
+    public ConfigurationDataTypeController(IOptionsSnapshot<DataTypesSettings> dataTypesSettings)
+        => _dataTypesSettings = dataTypesSettings.Value;
 
     /// <summary>
     /// Retrieves the configuration settings for data types, including whether data types can be changed and the identifiers for document and media list views.
@@ -39,6 +40,7 @@ public class ConfigurationDataTypeController : DataTypeControllerBase
             CanBeChanged = _dataTypesSettings.CanBeChanged,
             DocumentListViewId = Constants.DataTypes.Guids.ListViewContentGuid,
             MediaListViewId = Constants.DataTypes.Guids.ListViewMediaGuid,
+            ShowDeprecatedPropertyEditors = _dataTypesSettings.ShowDeprecatedPropertyEditors,
         };
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }

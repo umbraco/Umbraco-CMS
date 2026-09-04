@@ -1,4 +1,5 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
+import { UmbDataTypesConfigurationRepository } from '../../../configuration/index.js';
 import { css, customElement, html, nothing, property, ref } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -33,6 +34,7 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 
 	#workspaceContext?: typeof UMB_DATA_TYPE_WORKSPACE_CONTEXT.TYPE;
 	#addButton?: UUIButtonElement;
+	#configurationRepository = new UmbDataTypesConfigurationRepository(this);
 
 	constructor() {
 		super();
@@ -69,7 +71,12 @@ export class UmbDataTypeDetailsWorkspacePropertyEditorPickerElement extends UmbF
 	}
 
 	async #openPropertyEditorUIPicker() {
+		const { data: configuration } = await this.#configurationRepository.requestConfiguration();
+
 		const value = await umbOpenModal(this, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
+			data: {
+				showDeprecated: configuration?.showDeprecatedPropertyEditors,
+			},
 			value: {
 				selection: this.propertyEditorUiAlias ? [this.propertyEditorUiAlias] : [],
 			},
