@@ -57,8 +57,10 @@ public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorV
         }
         else
         {
-            // make sure we extend validation to invariant block values (no element level variation)
-            var segmentsToValidate = segmentsByCulture.SelectMany(s => s.Segments).Distinct().ToArray();
+            // make sure we extend validation to invariant block values (no element level variation).
+            // only the segments present among the invariant values apply here; segments found on another
+            // culture's values are not overrides of the invariant ones.
+            var segmentsToValidate = segmentsByCulture.FirstOrDefault(s => s.Culture is null)?.Segments ?? [];
             foreach (var segment in segmentsToValidate.DefaultIfEmpty(null))
             {
                 elementTypeValidation.AddRange(GetBlockEditorDataValidation(blockEditorData, null, segment));
