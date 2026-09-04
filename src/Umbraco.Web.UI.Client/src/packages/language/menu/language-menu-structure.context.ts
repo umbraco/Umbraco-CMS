@@ -1,3 +1,4 @@
+import { UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbMenuListStructureWorkspaceContextBase, type UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
@@ -28,7 +29,7 @@ export class UmbLanguageNavigationStructureWorkspaceContext extends UmbMenuListS
 		const items: Array<UmbStructureItemModel> = [
 			{
 				unique: null,
-				entityType: 'language-root',
+				entityType: UMB_LANGUAGE_ROOT_ENTITY_TYPE,
 				name: '#treeHeaders_languages',
 				isFolder: false,
 			},
