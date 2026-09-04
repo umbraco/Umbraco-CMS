@@ -283,7 +283,7 @@ The editor is configured via `UmbPropertyEditorConfigCollection`:
 
 ### Tiptap Library Imports
 
-Always import Tiptap types and extensions from `externals.ts`:
+Import Tiptap's own extension classes (`Bold`, `Table`, `TextAlign`, ...) from `externals.ts`, not from their individual npm packages — those packages are bundled into this package, so a bare import would be a second, disconnected copy of the same extension:
 
 ```typescript
 // Correct
@@ -293,6 +293,16 @@ import type { Extension } from '../../externals.js';
 // Incorrect - bypasses project configuration
 import { Bold } from '@tiptap/extension-bold';
 ```
+
+`@tiptap/core` and every `@tiptap/pm/*` subpath (ProseMirror) are different: they're externalised (see `vite.config.ts`) and importmap-provided at those exact bare specifiers, so the backoffice, this package, and any package-supplied Tiptap extension all share one instance — required for `PluginKey`/`Decoration` identity to work across package boundaries (#23703). Import them directly:
+
+```typescript
+// Also correct — @tiptap/core and @tiptap/pm/* are shared, not bundled
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import type { EditorView } from '@tiptap/pm/view';
+```
+
+`externals.ts` re-exports a handful of ProseMirror types (`NodeSelection`, `ProseMirrorNode`) for convenience; anything it doesn't cover, import directly from `@tiptap/pm/*` as above.
 
 ### Shadow DOM Scoping
 

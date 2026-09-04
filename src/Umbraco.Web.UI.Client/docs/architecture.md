@@ -79,6 +79,12 @@ Each directory under `src/packages/` is a self-contained domain module. Design p
 
 Packages expose subpath exports (e.g., `@umbraco-cms/backoffice/dashboard`, `@umbraco-cms/backoffice/media`). Each maps to an `index.ts` barrel file. See `package.json` exports field for the full list.
 
+### Import Map
+
+The backoffice serves its modules to the browser via an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap), built by `devops/importmap/index.js`. Every entry in `package.json`'s `exports` field becomes a `@umbraco-cms/backoffice/<subpath>` importmap key automatically — this covers the vast majority of the surface, including `src/external/*` wrapper packages (`@umbraco-cms/backoffice/external/lit`, etc.).
+
+A small number of dependencies also need **bare** specifiers — the exact string a third-party package would import, not an `@umbraco-cms/`-prefixed alias — because their published code has that specifier compiled in and can't be pointed elsewhere. `createImportMap`'s `additionalImports` option exists for this; `devops/build/create-umbraco-package.js` is the only caller that passes anything (`devops/importmap/tiptap.js` supplies `@tiptap/core`, `@tiptap/pm/*` and the underlying `prosemirror-*` packages — see `src/packages/tiptap/CLAUDE.md`). Reach for this only when a bare specifier is unavoidable: it makes the dependency's major version part of the backoffice's public runtime contract.
+
 ---
 
 ## Design Patterns
