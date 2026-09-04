@@ -56,7 +56,6 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	@property({ type: Boolean })
 	public notFound?: boolean;
-	private _hasSlottedContent: boolean;
 
 	@property({ attribute: false })
 	public get variantId(): UmbVariantId | undefined {
@@ -79,6 +78,9 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	public get overrides(): Array<UmbDeepPartialObject<ManifestWorkspaceView>> | undefined {
 		return undefined;
 	}
+
+	@state()
+	private _hasSlottedContent?: boolean;
 
 	@state()
 	private _workspaceViews: Array<UmbWorkspaceViewContext> = [];
