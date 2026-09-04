@@ -4,6 +4,7 @@ using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 using Umbraco.Cms.Api.Management.Security.Authorization.Dictionary;
+using Umbraco.Cms.Api.Management.Security.Authorization.DocumentBlueprint;
 using Umbraco.Cms.Api.Management.Security.Authorization.Element;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Api.Management.Security.Authorization.User;
@@ -27,6 +28,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, DictionaryPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ElementPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ElementContainerPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, DocumentBlueprintPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupPermissionHandler>();
@@ -157,6 +159,12 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         {
             AddAuthenticationSchemes(policy);
             policy.Requirements.Add(new ElementContainerPermissionRequirement());
+        });
+
+        options.AddPolicy(AuthorizationPolicies.DocumentBlueprintPermissionByResource, policy =>
+        {
+            AddAuthenticationSchemes(policy);
+            policy.Requirements.Add(new DocumentBlueprintPermissionRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.MediaPermissionByResource, policy =>
