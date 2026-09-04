@@ -2,12 +2,16 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
@@ -20,16 +24,31 @@ public class DeleteDocumentBlueprintController : DocumentBlueprintControllerBase
 {
     private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IAuthorizationService _authorizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteDocumentBlueprintController"/> class, which handles requests to delete document blueprints.
     /// </summary>
     /// <param name="contentBlueprintEditingService">Service used for editing content blueprints.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
-    public DeleteDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    /// <param name="authorizationService">The authorization service.</param>
+    public DeleteDocumentBlueprintController(
+        IContentBlueprintEditingService contentBlueprintEditingService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IAuthorizationService authorizationService)
     {
         _contentBlueprintEditingService = contentBlueprintEditingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _authorizationService = authorizationService;
+    }
+
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
+    public DeleteDocumentBlueprintController(IContentBlueprintEditingService contentBlueprintEditingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : this(
+            contentBlueprintEditingService,
+            backOfficeSecurityAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
+    {
     }
 
     [HttpDelete("{id:guid}")]
@@ -41,6 +60,16 @@ public class DeleteDocumentBlueprintController : DocumentBlueprintControllerBase
     [EndpointDescription("Deletes a document blueprint identified by the provided Id.")]
     public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            DocumentBlueprintPermissionResource.WithKeys(id),
+            AuthorizationPolicies.DocumentBlueprintPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentBlueprintEditingService.DeleteAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
