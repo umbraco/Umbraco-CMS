@@ -202,9 +202,39 @@ public static partial class Constants
             public const string MultipleTextstring = "Umbraco.MultipleTextstring";
 
             /// <summary>
-            ///     Label.
+            ///     Label, holding a string.
             /// </summary>
             public const string Label = "Umbraco.Label";
+
+            /// <summary>
+            ///     Label, holding a long string.
+            /// </summary>
+            public const string LabelText = "Umbraco.Label.Text";
+
+            /// <summary>
+            ///     Label, holding an integer.
+            /// </summary>
+            public const string LabelInteger = "Umbraco.Label.Integer";
+
+            /// <summary>
+            ///     Label, holding a big integer.
+            /// </summary>
+            public const string LabelBigInt = "Umbraco.Label.BigInt";
+
+            /// <summary>
+            ///     Label, holding a decimal.
+            /// </summary>
+            public const string LabelDecimal = "Umbraco.Label.Decimal";
+
+            /// <summary>
+            ///     Label, holding a date and time.
+            /// </summary>
+            public const string LabelDateTime = "Umbraco.Label.DateTime";
+
+            /// <summary>
+            ///     Label, holding a time.
+            /// </summary>
+            public const string LabelTime = "Umbraco.Label.Time";
 
             /// <summary>
             ///     Picker Relations.

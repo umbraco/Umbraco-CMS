@@ -119,6 +119,11 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
         });
     }
 
+    /// <remarks>
+    /// Each built-in label data type sits on the label editor for the type of value it holds, and that is what the
+    /// handler keys off. The editor alias is stated here to match, even though it is resolved from the data type when
+    /// the content type is saved.
+    /// </remarks>
     [SetUp]
     protected async Task CreateAllLabelEditorsContentType()
     {
@@ -127,17 +132,17 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
             .AddPropertyType()
             .WithAlias("bigIntValue")
             .WithDataTypeId(Constants.DataTypes.LabelBigint)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelBigInt)
             .Done()
             .AddPropertyType()
             .WithAlias("decimalValue")
             .WithDataTypeId(Constants.DataTypes.LabelDecimal)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelDecimal)
             .Done()
             .AddPropertyType()
             .WithAlias("integerValue")
             .WithDataTypeId(Constants.DataTypes.LabelInt)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelInteger)
             .Done()
             .AddPropertyType()
             .WithAlias("stringValue")
@@ -147,12 +152,12 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
             .AddPropertyType()
             .WithAlias("timeValue")
             .WithDataTypeId(Constants.DataTypes.LabelTime)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelTime)
             .Done()
             .AddPropertyType()
             .WithAlias("dateTimeValue")
             .WithDataTypeId(Constants.DataTypes.LabelDateTime)
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Label)
+            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.LabelDateTime)
             .Done()
             .Build();
 

@@ -2338,54 +2338,55 @@ internal sealed class DatabaseDataCreator
                 });
         }
 
+        // There is one label editor per type of value a label can hold.
         InsertDataTypeDto(
             Constants.DataTypes.LabelString,
             Constants.PropertyEditors.Aliases.Label,
             "Umb.PropertyEditorUi.Label",
             "Nvarchar",
-            "{\"umbracoDataValueType\":\"STRING\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelInt,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelInteger,
+            "Umb.PropertyEditorUi.Label.Integer",
             "Integer",
-            "{\"umbracoDataValueType\":\"INT\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelBigint,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelBigInt,
+            "Umb.PropertyEditorUi.Label.BigInt",
             "Nvarchar",
-            "{\"umbracoDataValueType\":\"BIGINT\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelDateTime,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelDateTime,
+            "Umb.PropertyEditorUi.Label.DateTime",
             "Date",
-            "{\"umbracoDataValueType\":\"DATETIME\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelDecimal,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelDecimal,
+            "Umb.PropertyEditorUi.Label.Decimal",
             "Decimal",
-            "{\"umbracoDataValueType\":\"DECIMAL\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelTime,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelTime,
+            "Umb.PropertyEditorUi.Label.Time",
             "Date",
-            "{\"umbracoDataValueType\":\"TIME\"}");
+            null);
         InsertDataTypeDto(
             Constants.DataTypes.LabelBytes,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelBigInt,
+            "Umb.PropertyEditorUi.Label.BigInt",
             "Nvarchar",
-            "{\"umbracoDataValueType\":\"BIGINT\", \"labelTemplate\":\"{=value | bytes}\"}");
+            "{\"labelTemplate\":\"{=value | bytes}\"}");
         InsertDataTypeDto(
             Constants.DataTypes.LabelPixels,
-            Constants.PropertyEditors.Aliases.Label,
-            "Umb.PropertyEditorUi.Label",
+            Constants.PropertyEditors.Aliases.LabelInteger,
+            "Umb.PropertyEditorUi.Label.Integer",
             "Integer",
-            "{\"umbracoDataValueType\":\"INT\", \"labelTemplate\":\"{=value}px\"}");
+            "{\"labelTemplate\":\"{=value}px\"}");
 
         if (_database.Exists<NodeDto>(Constants.DataTypes.DateTime))
         {

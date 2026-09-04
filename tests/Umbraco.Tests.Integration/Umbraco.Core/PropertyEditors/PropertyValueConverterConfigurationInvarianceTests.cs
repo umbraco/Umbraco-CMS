@@ -57,7 +57,6 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
     private static readonly string[] _knownVariantModelTypes =
     [
         Constants.PropertyEditors.Aliases.DropDownListFlexible,
-        Constants.PropertyEditors.Aliases.Label,
         Constants.PropertyEditors.Aliases.MediaPicker3,
         Constants.PropertyEditors.Aliases.MultiUrlPicker,
         Constants.PropertyEditors.Aliases.Slider,
@@ -73,8 +72,6 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
     /// </summary>
     private static readonly Dictionary<string, object?[]> _constrainedDomains = new()
     {
-        [$"{nameof(LabelConfiguration)}.{nameof(LabelConfiguration.ValueType)}"] =
-            StringConstantsOf(typeof(ValueTypes)),
         [$"{nameof(MultiNodePickerConfigurationTreeSource)}.{nameof(MultiNodePickerConfigurationTreeSource.ObjectType)}"] =
             StringConstantsOf(typeof(Constants.UdiEntityType)),
     };
