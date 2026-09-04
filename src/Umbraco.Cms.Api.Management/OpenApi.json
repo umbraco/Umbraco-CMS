@@ -17026,11 +17026,13 @@
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
+                  }
                 }
               }
             }
@@ -29636,11 +29638,13 @@
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
+                  }
                 }
               }
             }
@@ -29721,11 +29725,13 @@
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
                 "schema": {
-                  "type": "array",
+                  "type": [
+                    "null",
+                    "array"
+                  ],
                   "items": {
                     "$ref": "#/components/schemas/NotificationHeaderModel"
-                  },
-                  "nullable": true
+                  }
                 }
               }
             }
@@ -43403,6 +43409,7 @@
           "isProtected",
           "ancestors",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -43440,6 +43447,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "id": {
             "type": "string",
@@ -46682,6 +46692,7 @@
         "required": [
           "mediaType",
           "sortOrder",
+          "hasChildren",
           "id",
           "flags",
           "values",
@@ -46701,6 +46712,9 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "hasChildren": {
+            "type": "boolean"
           },
           "id": {
             "type": "string",

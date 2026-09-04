@@ -328,6 +328,8 @@ export default {
 		isSensitiveValue:
 			'Denne værdi er skjult.Hvis du har brug for adgang til at se denne værdi, bedes du\n      kontakte din web-administrator.\n    ',
 		isSensitiveValue_short: 'Denne værdi er skjult.',
+		isSensitiveValueNotice:
+			'Hvis du har brug for adgang til at se de skjulte værdier, bedes du kontakte din web-administrator.',
 		languagesToPublish: 'Hvilke sprog vil du gerne udgive?',
 		languagesToSendForApproval: 'Hvilke sprog vil du gerne sende til godkendelse?',
 		languagesToSchedule: 'Hvilke sprog vil du gerne planlægge?',
@@ -1904,7 +1906,7 @@ export default {
 		tabDirectPropertiesDropZone: 'Drag properties here to place directly on the tab',
 		usingEditor: 'using this editor will get updated with the new settings.',
 		historyCleanupHeading: 'Historikoprydning',
-		historyCleanupDescription: 'Tillad tilsidesættelse af de globale indstillinger for historikoprydning.',
+		historyCleanupDescription: 'Tilsidesæt de globale indstillinger for historikoprydning.',
 		historyCleanupKeepAllVersionsNewerThanDays: 'Behold alle versioner nyere end antal dage',
 		historyCleanupKeepLatestVersionPerDayForDays: 'Behold den seneste version pr. dag i antal dage',
 		historyCleanupPreventCleanup: 'Forhindre oprydning',

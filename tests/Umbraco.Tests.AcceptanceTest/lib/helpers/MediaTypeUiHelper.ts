@@ -74,7 +74,7 @@ export class MediaTypeUiHelper extends UiBaseLocators {
   }
 
   async clickSaveButtonAndWaitForMediaTypeToBeUpdated() {
-    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.mediaType, this.clickSaveButton(), ConstantHelper.statusCodes.ok);
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.mediaType, this.clickSaveButton(), ConstantHelper.statusCodes.ok, ConstantHelper.httpMethods.put);
   }
 
   async clickConfirmToDeleteButtonAndWaitForMediaTypeToBeDeleted() {

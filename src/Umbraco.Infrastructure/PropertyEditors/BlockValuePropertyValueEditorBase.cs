@@ -209,7 +209,16 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                     ?? throw new ArgumentException("One or more block properties did not have a resolved property type. Block editor values must be resolved before attempting to map them from editor.", nameof(editedItems));
 
                 // Lookup the property editor.
-                IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
+                //
+                // While the single block list migration runs, converted values reach here before their data types have
+                // been switched over, so the alias still names the Block List editor - which yields null for a value
+                // that is already in single block shape, silently replacing the content. The override routes those
+                // values to the single block editor instead (https://github.com/umbraco/Umbraco-CMS/issues/23596).
+                // TODO (V22): Remove the override once the single block list migration it exists for is removed.
+                IDataEditor? propertyEditor = _propertyEditors[
+                    SingleBlockMigrationEditorAliasOverride.Resolve(
+                        propertyType.DataTypeKey,
+                        propertyType.PropertyEditorAlias)];
                 if (propertyEditor is null)
                 {
                     continue;
@@ -294,7 +303,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     {
         MapBlockItemDataToEditor(property, blockValue.ContentData, culture, segment);
         MapBlockItemDataToEditor(property, blockValue.SettingsData, culture, segment);
-        _blockEditorVarianceHandler.AlignExposeVariance(blockValue);
+        _blockEditorVarianceHandler.AlignExposeVariance(blockValue, culture);
     }
 
     protected IEnumerable<Guid> ConfiguredElementTypeKeys(IBlockConfiguration configuration)
@@ -315,8 +324,9 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             // if changes were made to the element type variations, we need those changes reflected in the block property values.
             // for regular content this happens when a content type is saved (copies of property values are created in the DB),
             // but for local block level properties we don't have that kind of handling, so we to do it manually.
-            // to be friendly we'll map "formerly invariant properties" to the default language ISO code instead of performing a
-            // hard reset of the property values (which would likely be the most correct thing to do from a data point of view).
+            // to be friendly we'll map the values onto the culture being aligned - falling back to the default language -
+            // instead of performing a hard reset of the property values (which would likely be the most correct thing to
+            // do from a data point of view).
             item.Values = _blockEditorVarianceHandler.AlignPropertyVarianceAsync(item.Values, culture).GetAwaiter().GetResult();
             foreach (BlockPropertyValue blockPropertyValue in item.Values)
             {

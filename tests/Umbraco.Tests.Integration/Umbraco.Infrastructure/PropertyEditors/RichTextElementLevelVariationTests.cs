@@ -664,6 +664,81 @@ internal sealed class RichTextElementLevelVariationTests : BlockEditorElementVar
         }
     }
 
+    [TestCase("en-US", "variantText value for en-US")]
+    [TestCase("da-DK", "variantText value for da-DK")]
+    public async Task Can_Become_Invariant_After_Publish_For_Variant_Block_Property(string culture, string expectedVariantValue)
+    {
+        var elementType = await CreateElementType(ContentVariation.Culture);
+        var rteDataType = await CreateRichTextDataType(elementType);
+        var contentType = await CreateContentType(ContentVariation.Culture, rteDataType, ContentVariation.Culture);
+
+        var contentElementKey = Guid.NewGuid();
+
+        // Each culture of this block property is stored as its own document, and a document can carry entries
+        // for cultures other than its own. The value retained must be the one for the culture being mapped,
+        // not the default language's.
+        RichTextEditorValue RichTextValueFor(string valueCulture) => new()
+        {
+            Markup = $"""
+                      <p>Some text for {valueCulture}.</p>
+                      <umb-rte-block data-content-key="{contentElementKey:D}"><!--Umbraco-Block--></umb-rte-block>
+                      """,
+            Blocks = new RichTextBlockValue([new RichTextBlockLayoutItem(contentElementKey)])
+            {
+                ContentData =
+                [
+                    new(contentElementKey, elementType.Key, elementType.Alias)
+                    {
+                        Values =
+                        [
+                            new() { Alias = "invariantText", Value = "The invariant value" },
+                            new() { Alias = "variantText", Culture = "en-US", Value = valueCulture == "en-US" ? "variantText value for en-US" : null },
+                            new() { Alias = "variantText", Culture = "da-DK", Value = valueCulture == "da-DK" ? "variantText value for da-DK" : null },
+                        ],
+                    },
+                ],
+                SettingsData = [],
+                Expose =
+                [
+                    new(contentElementKey, "en-US", null),
+                    new(contentElementKey, "da-DK", null),
+                ],
+            },
+        };
+
+        var content = CreateContent(contentType);
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(RichTextValueFor("en-US")), "en-US");
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(RichTextValueFor("da-DK")), "da-DK");
+        ContentService.Save(content);
+
+        PublishContent(content, ["en-US", "da-DK"]);
+
+        // the element type is made invariant after publishing. the "blocks" property varies by culture, so each culture
+        // holds its own block value - which means every culture retains the value it was published with.
+        elementType.Variations = ContentVariation.Nothing;
+        elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Nothing;
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+
+        RefreshContentTypeCache(elementType);
+
+        SetVariationContext(culture, null);
+
+        var publishedContent = GetPublishedContent(content.Key);
+        var property = publishedContent.GetProperty("blocks");
+        Assert.IsNotNull(property);
+
+        var propertyValue = property.GetDeliveryApiValue(false, culture) as RichTextModel;
+        Assert.IsNotNull(propertyValue);
+
+        var blocks = propertyValue.Blocks.ToArray();
+        Assert.AreEqual(1, blocks.Length);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("The invariant value", blocks[0].Content.Properties["invariantText"]);
+            Assert.AreEqual(expectedVariantValue, blocks[0].Content.Properties["variantText"]);
+        });
+    }
+
     private async Task<IDataType> CreateRichTextDataType(IContentType elementType)
         => await CreateBlockEditorDataType(
             Constants.PropertyEditors.Aliases.RichText,

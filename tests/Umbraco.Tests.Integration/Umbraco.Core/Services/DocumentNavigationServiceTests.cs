@@ -324,4 +324,58 @@ internal sealed partial class DocumentNavigationServiceTests : DocumentNavigatio
             Assert.AreEqual(Root.Key, ancestorKeysAsArray[3]);
         });
     }
+
+    [Test]
+    public void Can_Get_Has_Children_For_Node_With_Children()
+    {
+        var result = DocumentNavigationQueryService.TryGetHasChildren(Root.Key, out var hasChildren);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.IsTrue(hasChildren);
+        });
+    }
+
+    [Test]
+    public void Can_Get_Has_Children_For_Node_Without_Children()
+    {
+        // The node exists, so the lookup succeeds - it simply has nothing beneath it.
+        var result = DocumentNavigationQueryService.TryGetHasChildren(Grandchild1.Key, out var hasChildren);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result);
+            Assert.IsFalse(hasChildren);
+        });
+    }
+
+    [Test]
+    public void Cannot_Get_Has_Children_For_Node_Not_In_Structure()
+    {
+        var result = DocumentNavigationQueryService.TryGetHasChildren(Guid.NewGuid(), out var hasChildren);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(result);
+            Assert.IsFalse(hasChildren);
+        });
+    }
+
+    [Test]
+    public async Task Can_Get_Has_Children_In_Bin_For_Trashed_Node()
+    {
+        // Child1 has two children, and trashing it moves the whole branch into the recycle bin structure.
+        await ContentEditingService.MoveToRecycleBinAsync(Child1.Key, Constants.Security.SuperUserKey);
+
+        var inStructure = DocumentNavigationQueryService.TryGetHasChildren(Child1.Key, out _);
+        var inBin = DocumentNavigationQueryService.TryGetHasChildrenInBin(Child1.Key, out var hasChildrenInBin);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(inStructure, "Trashed nodes are removed from the main structure");
+            Assert.IsTrue(inBin);
+            Assert.IsTrue(hasChildrenInBin);
+        });
+    }
 }

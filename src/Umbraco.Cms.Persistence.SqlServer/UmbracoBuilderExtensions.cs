@@ -2,11 +2,13 @@ using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Persistence.SqlServer.Configuration;
 using Umbraco.Cms.Persistence.SqlServer.Interceptors;
 using Umbraco.Cms.Persistence.SqlServer.Services;
 
@@ -57,6 +59,9 @@ public static class UmbracoBuilderExtensions
                 options.ProviderName = Constants.ProviderName;
             }
         });
+
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IPostConfigureOptions<ConnectionStrings>, ConfigureSqlServerConnectionStringTimeouts>());
 
         return builder;
     }
