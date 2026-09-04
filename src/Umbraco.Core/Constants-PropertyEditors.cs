@@ -142,9 +142,25 @@ public static partial class Constants
             public const string TimeOnly = "Umbraco.TimeOnly";
 
             /// <summary>
+            ///     DropDown List, holding any number of values.
+            /// </summary>
+            /// <remarks>
+            ///     The alias reads "flexible" because the editor used to be flexible about how many values it held.
+            ///     It no longer is - a dropdown holding a single value is <see cref="SingleDropDown" /> - but the
+            ///     alias is stored against every dropdown data type, so it stays as it is.
+            /// </remarks>
+            public const string MultipleDropDown = "Umbraco.DropDown.Flexible";
+
+            /// <summary>
+            ///     DropDown List, holding a single value.
+            /// </summary>
+            public const string SingleDropDown = "Umbraco.SingleDropDown";
+
+            /// <summary>
             ///     DropDown List.
             /// </summary>
-            public const string DropDownListFlexible = "Umbraco.DropDown.Flexible";
+            [Obsolete("Use MultipleDropDown instead, which names the same editor for what it now does. Scheduled for removal in Umbraco 21.")]
+            public const string DropDownListFlexible = MultipleDropDown;
 
             /// <summary>
             ///     Grid.

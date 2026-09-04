@@ -27,8 +27,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.PropertyEditors;
 /// <c>Umbraco.SingleBlock</c> was split out of <c>Umbraco.BlockList</c>.
 /// </para>
 /// <para>
-/// The exemptions below are the whole of the permitted variance, and both lists are asserted exactly: a new offender
-/// fails, and so does an entry that has since been fixed.
+/// The exempt converters below are the whole of the permitted variance, and the list is asserted exactly: a new
+/// offender fails, and so does an entry that has since been fixed.
 /// </para>
 /// </remarks>
 [TestFixture]
@@ -52,19 +52,6 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
     ];
 
     /// <summary>
-    /// Editors that still derive their model type from configuration, each awaiting its split on this branch.
-    /// </summary>
-    private static readonly string[] _knownVariantModelTypes =
-    [
-        Constants.PropertyEditors.Aliases.DropDownListFlexible,
-    ];
-
-    /// <summary>
-    /// Editors that still derive their Delivery API model type from configuration.
-    /// </summary>
-    private static readonly string[] _knownVariantDeliveryApiModelTypes = [];
-
-    /// <summary>
     /// Values whose meaningful domain cannot be discovered by reflection, so the permutations have to be told.
     /// </summary>
     private static readonly Dictionary<string, object?[]> _constrainedDomains = new()
@@ -84,7 +71,7 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
         var variantEditorAliases = VariantEditorAliases(
             (converter, propertyType) => converter.GetPropertyValueType(propertyType));
 
-        Assert.That(variantEditorAliases, Is.EquivalentTo(_knownVariantModelTypes));
+        Assert.That(variantEditorAliases, Is.Empty);
     }
 
     [Test]
@@ -95,7 +82,7 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
                 ? deliveryApiConverter.GetDeliveryApiPropertyValueType(propertyType)
                 : null);
 
-        Assert.That(variantEditorAliases, Is.EquivalentTo(_knownVariantDeliveryApiModelTypes));
+        Assert.That(variantEditorAliases, Is.Empty);
     }
 
     /// <summary>

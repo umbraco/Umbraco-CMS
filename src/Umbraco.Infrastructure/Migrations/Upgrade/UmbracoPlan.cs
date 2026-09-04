@@ -125,6 +125,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.MigrateRangeSliderDataTypes>("{97463AFC-D1AB-4D31-9001-2061DBEDE25D}");
         To<V_19_0_0.MigrateSingleMediaPickerDataTypes>("{B84A1E90-9F3C-4C1F-9E51-3A2D7C4F8B16}");
         To<V_19_0_0.MigrateSingleUrlPickerDataTypes>("{4E0B7D51-6C89-4A3F-B1D2-7F5A9E30C48B}");
+        To<V_19_0_0.MigrateSingleDropDownDataTypes>("{A21C6F84-3B5D-4E92-8C07-1D4F6B8A5E30}");
     }
 
     /// <summary>

@@ -2421,10 +2421,10 @@ internal sealed class DatabaseDataCreator
 
         InsertDataTypeDto(
             Constants.DataTypes.DropDownSingle,
-            Constants.PropertyEditors.Aliases.DropDownListFlexible,
-            "Umb.PropertyEditorUi.Dropdown",
+            Constants.PropertyEditors.Aliases.SingleDropDown,
+            "Umb.PropertyEditorUi.SingleDropdown",
             "Nvarchar",
-            "{\"multiple\":false}");
+            "{}");
 
         if (_database.Exists<NodeDto>(-40))
         {
@@ -2459,10 +2459,10 @@ internal sealed class DatabaseDataCreator
 
         InsertDataTypeDto(
             Constants.DataTypes.DropDownMultiple,
-            Constants.PropertyEditors.Aliases.DropDownListFlexible,
+            Constants.PropertyEditors.Aliases.MultipleDropDown,
             "Umb.PropertyEditorUi.Dropdown",
             "Nvarchar",
-            "{\"multiple\":true}");
+            "{}");
 
         if (_database.Exists<NodeDto>(-43))
         {
