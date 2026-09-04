@@ -46,6 +46,14 @@ public class SystemTextJsonSerializerTests
         Assert.IsFalse(subject.TryDeserialize<MyItem>("something something", out _));
     }
 
+    [TestCase("[]")]
+    [TestCase("{\"anotherProperty\":\"value\"}")]
+    public void TryDeserialize_Cannot_Handle_Json_Of_Unexpected_Shape(string json)
+    {
+        var subject = new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        Assert.IsFalse(subject.TryDeserialize<MyItem>(json, out _));
+    }
+
     private class MyItem
     {
         public required string MyProperty { get; set; }

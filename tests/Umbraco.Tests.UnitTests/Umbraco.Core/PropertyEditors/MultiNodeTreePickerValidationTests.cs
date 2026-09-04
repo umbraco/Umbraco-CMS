@@ -25,7 +25,7 @@ public class MultiNodeTreePickerValidationTests
     [TestCase(2, true, "[{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"},{\"type\":\"document\",\"unique\":\"25ef6fd2-db48-450a-8c48-df3ad75adf4b\"}]")]
     [TestCase(3, false, "[{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"},{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"}]")]
     [TestCase(2, false, "[{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"}]")]
-    [TestCase(1, false, null)]
+    [TestCase(1, true, null)]
     [TestCase(0, true, null)]
     public void Validates_Minimum_Entries(int min, bool shouldSucceed, string? value)
     {
@@ -35,6 +35,49 @@ public class MultiNodeTreePickerValidationTests
         var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
 
         TestShouldSucceed(shouldSucceed, result);
+    }
+
+    [TestCase(null)]
+    [TestCase("[]")]
+    public void Can_Validate_Empty_Value_When_Minimum_Configured_And_Not_Mandatory(string? value)
+    {
+        var (valueEditor, _, _, _, _) = CreateValueEditor();
+        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { MinNumber = 3 };
+
+        var result = valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(result);
+    }
+
+    // The editor value is a JSON array of entity references, but the persisted value is a comma separated list of
+    // UDIs. Neither form may be reported as missing when it holds references.
+    [TestCase("[{\"type\":\"document\",\"unique\":\"86eb02a7-793f-4406-9152-9736b6b64bee\"}]")]
+    [TestCase("umb://document/86eb02a7793f440691529736b6b64bee")]
+    public void Can_Validate_Populated_Value_When_Mandatory(string value)
+    {
+        var (valueEditor, _, _, _, _) = CreateValueEditor();
+        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { MinNumber = 0 };
+
+        var result = valueEditor.Validate(value, true, null, PropertyValidationContext.Empty());
+
+        Assert.IsEmpty(result);
+    }
+
+    [TestCase(null)]
+    [TestCase("[]")]
+    public void Cannot_Validate_Empty_Value_When_Mandatory(string? value)
+    {
+        var (valueEditor, _, _, _, _) = CreateValueEditor();
+        valueEditor.ConfigurationObject = new MultiNodePickerConfiguration { MinNumber = 3 };
+
+        var result = valueEditor.Validate(value, true, null, PropertyValidationContext.Empty());
+
+        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(
+            value is null
+                ? Constants.Validation.ErrorMessages.Properties.Missing
+                : Constants.Validation.ErrorMessages.Properties.Empty,
+            result.First().ErrorMessage);
     }
 
     private static void TestShouldSucceed(bool shouldSucceed, IEnumerable<ValidationResult> result)

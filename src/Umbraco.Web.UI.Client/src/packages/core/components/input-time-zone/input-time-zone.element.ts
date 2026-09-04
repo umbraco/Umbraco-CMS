@@ -11,7 +11,11 @@ import {
 	ref,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import {
+	isBelowMinItemCount,
+	UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+	UmbFormControlMixin,
+} from '@umbraco-cms/backoffice/validation';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { getTimeZoneList, getTimeZoneOffset } from '@umbraco-cms/backoffice/utils';
@@ -47,16 +51,7 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	 * @attr
 	 */
 	@property({ type: Number })
-	public set min(value) {
-		this.#min = value;
-	}
-	public get min() {
-		if (this.required && this.#min < 1) {
-			return 1;
-		}
-		return this.#min;
-	}
-	#min = 0;
+	min = 0;
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -109,6 +104,13 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 	@property({ type: Boolean })
 	required?: boolean;
 
+	/**
+	 * Sets the message shown when the input is required and no value is set.
+	 * @type {string}
+	 */
+	@property({ type: String, attribute: 'required-message' })
+	requiredMessage?: string;
+
 	@property({ type: Array, reflect: false })
 	override set value(value: Array<string>) {
 		super.value = [...new Set(value.filter((v) => !!v))];
@@ -134,9 +136,15 @@ export class UmbInputTimeZoneElement extends UmbFormControlMixin<Array<string>, 
 		}));
 
 		this.addValidator(
+			'valueMissing',
+			() => this.requiredMessage ?? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY,
+			() => !this.readonly && !!this.required && this.value.length === 0,
+		);
+
+		this.addValidator(
 			'rangeUnderflow',
 			() => this.localize.term('validation_entriesShort', this.min, this.min - this.value.length),
-			() => this.value.length < this.min,
+			() => isBelowMinItemCount(this.value.length, this.min),
 		);
 
 		this.addValidator(

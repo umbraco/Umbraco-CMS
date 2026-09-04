@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PropertyEditors;
+using Umbraco.Cms.Infrastructure.PropertyEditors.Validators;
 using Umbraco.Extensions;
 using BlockGridAreaConfiguration = Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration.BlockGridAreaConfiguration;
 
@@ -165,6 +166,9 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
 
+        /// <inheritdoc />
+        public override IValueRequiredValidator RequiredValidator => new BlockEditorValueRequiredValidator<BlockGridValue>(JsonSerializer);
+
         protected override BlockGridValue CreateWithLayout(IEnumerable<BlockGridLayoutItem> layout) => new(layout);
 
         private sealed class MinMaxValidator : BlockEditorMinMaxValidatorBase<BlockGridValue, BlockGridLayoutItem>
@@ -226,7 +230,8 @@ public abstract class BlockGridPropertyEditorBase : DataEditor, IValueSchemaProv
                         continue;
                     }
 
-                    if ((areaConfig.MinAllowed.HasValue && area.Items.Length < areaConfig.MinAllowed) || (areaConfig.MaxAllowed.HasValue && area.Items.Length > areaConfig.MaxAllowed))
+                    if (ItemCountValidationHelper.IsBelowMinimum(area.Items.Length, areaConfig.MinAllowed)
+                        || (areaConfig.MaxAllowed.HasValue && area.Items.Length > areaConfig.MaxAllowed))
                     {
                         validationResults.Add(new ValidationResult(TextService.Localize("validation", "entriesAreasMismatch")));
                     }

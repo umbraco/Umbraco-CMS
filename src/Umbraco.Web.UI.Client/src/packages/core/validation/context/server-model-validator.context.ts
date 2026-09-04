@@ -1,6 +1,7 @@
 import type { UmbValidator } from '../interfaces/validator.interface.js';
 import type { UmbValidationPathTranslator } from '../types.js';
 import { UmbValidationPathTranslationController } from '../controllers/validation-path-translation/index.js';
+import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UMB_VALIDATION_MISSING_LOCALIZATION_KEY } from '../const.js';
 import { UMB_VALIDATION_CONTEXT } from './validation.context-token.js';
 import { UMB_SERVER_MODEL_VALIDATOR_CONTEXT } from './server-model-validator.context-token.js';
 import type { UmbValidationMessage } from './validation-messages.manager.js';
@@ -10,6 +11,16 @@ import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbApiError } from '@umbraco-cms/backoffice/resources';
+
+/**
+ * The server reports a value that is missing separately from one that is present but empty. That distinction is
+ * meaningful over the API, but not to an editor, so the two are presented as the same message.
+ * @param {string} body - the message as returned by the server.
+ * @returns {string} the message to present.
+ */
+function toEditorMessage(body: string): string {
+	return body === UMB_VALIDATION_MISSING_LOCALIZATION_KEY ? UMB_VALIDATION_EMPTY_LOCALIZATION_KEY : body;
+}
 
 export class UmbServerModelValidatorContext extends UmbContextBase implements UmbValidator {
 	#pathTranslators: Array<ClassConstructor<UmbValidationPathTranslator<any>>> = [];
@@ -96,7 +107,9 @@ export class UmbServerModelValidatorContext extends UmbContextBase implements Um
 						path = path.slice(0, -6) + '.value';
 					}
 
-					newBodies.forEach((body: string) => messages.push({ type: 'server', key: UmbId.new(), path, body }));
+					newBodies.forEach((body: string) =>
+						messages.push({ type: 'server', key: UmbId.new(), path, body: toEditorMessage(body) }),
+					);
 					//this.#context!.messages.addMessages('server', path, errorBody.errors[path]);
 				});
 			}

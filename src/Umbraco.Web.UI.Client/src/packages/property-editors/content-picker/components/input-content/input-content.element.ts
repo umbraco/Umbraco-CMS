@@ -110,7 +110,7 @@ export class UmbInputContentElement extends UmbFormControlMixin<string | undefin
 		this.addValidator(
 			'valueMissing',
 			() => this.requiredMessage,
-			() => !this.readonly && (this.required || this.min > 0) && this.selection.length === 0,
+			() => !this.readonly && this.required && this.selection.length === 0,
 		);
 	}
 
