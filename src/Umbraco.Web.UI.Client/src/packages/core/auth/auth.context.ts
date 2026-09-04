@@ -497,24 +497,30 @@ export class UmbAuthContext extends UmbContextBase {
 	 * Performs the actual refresh request and applies the result.
 	 * A definitive rejection (e.g. `invalid_grant`) marks the session as dead, so every
 	 * subsequent API request does not fire its own doomed refresh attempt. When the rejected
-	 * refresh belonged to an established session, the user is also timed out so the
-	 * re-authentication flow starts. Transient failures (network errors, 5xx) leave the
-	 * session state untouched so a later attempt can retry.
+	 * refresh belonged to an established session that is still the one in hand, the user is
+	 * also timed out so the re-authentication flow starts. A rejection that belongs to a
+	 * superseded session is discarded instead, leaving the newer session intact. Transient
+	 * failures (network errors, 5xx) leave the session state untouched so a later attempt
+	 * can retry.
 	 * @returns {Promise<boolean>} True if the refresh succeeded, otherwise false.
 	 */
 	async #performRefresh(): Promise<boolean> {
+		// Capture the session being refreshed so a rejection can be attributed to it. If a
+		// newer session was established while the request was in flight, the rejection is
+		// stale — the server revoked the *old* session, so tearing down state would kill a
+		// session that is perfectly valid.
 		// A rejection with no session in hand means nobody is signed in — not that a session
 		// expired. Timing out there re-authenticates in a popup and leaves the caller to
 		// navigate, where a cold boot needs the ordinary login redirect.
-		const hadSession = !!this.#session.getValue();
+		const sessionBefore = this.#session.getValue();
 		const result = await this.#client.refreshToken();
 		if (result.response) {
 			this.#updateSession(result.response.expiresIn, result.response.issuedAt);
 			return true;
 		}
-		if (result.fatal) {
+		if (result.fatal && this.#session.getValue() === sessionBefore) {
 			this.#sessionDead = true;
-			if (hadSession) {
+			if (sessionBefore) {
 				this.timeOut();
 			}
 		}
