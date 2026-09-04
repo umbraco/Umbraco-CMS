@@ -31,6 +31,7 @@ public static class UserGroupExtensions
             group.StartContentId,
             group.StartMediaId,
             group.StartElementId,
+            group.StartDocumentBlueprintId,
             group.Alias,
             group.AllowedLanguages,
             group.AllowedSections,
