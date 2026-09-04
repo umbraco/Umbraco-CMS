@@ -641,6 +641,18 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         return _jsonSerializer.Serialize(mergeResult);
     }
 
+    /// <summary>
+    /// Determines the specific cultures that contain an actual content, settings, or exposure change within an
+    /// otherwise culture-invariant block property value, by deserializing and comparing <paramref name="sourceValue"/>
+    /// (edited) against <paramref name="targetValue"/> (published).
+    /// </summary>
+    /// <param name="sourceValue">The source (edited) property value.</param>
+    /// <param name="targetValue">The target (published) property value.</param>
+    /// <returns>
+    /// The set of cultures containing an actual edit, or an empty collection if neither value can be
+    /// resolved as block editor data - callers should treat an empty collection as "unable to narrow down the
+    /// affected culture(s)" and fall back to flagging the default culture as edited.
+    /// </returns>
     internal virtual IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
     {
         BlockEditorData<TValue, TLayout>? sourceBlockEditorData = sourceValue is not null ? BlockEditorValues.DeserializeAndClean(sourceValue) : null;
@@ -656,13 +668,20 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     }
 
     /// <summary>
-    /// Compares the content and settings data of two block values and returns the set of cultures for which a
-    /// nested, culture-variant block property value differs (added, removed, or changed) between
-    /// <paramref name="sourceBlockValue"/> (edited) and <paramref name="targetBlockValue"/> (published).
+    /// Compares two block values and returns the set of cultures for which a nested, culture-variant block
+    /// property value or block exposure differs (added, removed, or changed) between
+    /// <paramref name="sourceBlockValue"/> (edited) and <paramref name="targetBlockValue"/> (published). Block
+    /// layout is not compared, as it is invariant and shared between all cultures.
     /// </summary>
+    /// <param name="sourceBlockValue">The source (edited) block value, or <c>null</c> if none exists.</param>
+    /// <param name="targetBlockValue">The target (published) block value, or <c>null</c> if none has been published yet.</param>
+    /// <returns>
+    /// The set of cultures for which a content, settings, or exposure change was detected. A changed
+    /// value or exposure entry that is itself culture-invariant is attributed to the default culture.
+    /// </returns>
     protected HashSet<string> GetChangedCulturesForBlockValue(TValue? sourceBlockValue, TValue? targetBlockValue)
     {
-        // NOTE: default ISO code is cached at repo level.
+        // NOTE: the default culture is cached at repo level.
         var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
 
         var changedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -680,6 +699,10 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     /// <paramref name="targetExpose"/> (published). Unlike layout, which is invariant/shared between all
     /// cultures, exposure is culture-specific - a block can be exposed for one culture and hidden for another.
     /// </summary>
+    /// <param name="sourceExpose">The source (edited) exposure entries.</param>
+    /// <param name="targetExpose">The target (published) exposure entries.</param>
+    /// <param name="defaultCulture">The culture to attribute a toggled, genuinely invariant exposure entry to.</param>
+    /// <param name="changedCultures">The set that any changed cultures are added to.</param>
     private static void CollectChangedExposureCultures(
         IList<BlockItemVariation> sourceExpose,
         IList<BlockItemVariation> targetExpose,
