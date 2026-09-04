@@ -60,7 +60,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 
 	override render() {
 		if (this._hasProperties === undefined || this._groups === undefined) {
-			return nothing;
+			return html`<umb-view-loader></umb-view-loader>`;
 		}
 		return html`
 			${this._hasProperties
@@ -71,7 +71,7 @@ export class UmbContentWorkspaceViewEditTabElement extends UmbLitElement {
 								.containerId=${this._containerId}></umb-content-workspace-view-edit-properties>
 						</uui-box>
 					`
-				: ''}
+				: nothing}
 			${repeat(
 				this._groups,
 				(group) => group.key,
