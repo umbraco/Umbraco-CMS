@@ -70,6 +70,19 @@ public class UserUpdateModel
     public bool HasElementRootAccess { get; set; }
 
     /// <summary>
+    ///     Gets or sets the collection of document blueprint start node keys for the user.
+    /// </summary>
+    /// <remarks>
+    ///     These define the document blueprint tree sections the user has access to.
+    /// </remarks>
+    public ISet<Guid> DocumentBlueprintStartNodeKeys { get; set; } = new HashSet<Guid>();
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the user has access to the document blueprint root.
+    /// </summary>
+    public bool HasDocumentBlueprintRootAccess { get; set; }
+
+    /// <summary>
     ///     Gets or sets the collection of user group keys the user belongs to.
     /// </summary>
 
