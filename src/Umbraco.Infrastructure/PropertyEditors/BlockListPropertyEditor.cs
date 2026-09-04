@@ -55,10 +55,10 @@ public class BlockListPropertyEditor : BlockListPropertyEditorBase
     }
 
     /// <inheritdoc />
-    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
     {
         var valueEditor = (BlockListEditorPropertyValueEditor)GetValueEditor();
-        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue);
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
     }
 
     /// <inheritdoc/>

@@ -170,7 +170,8 @@ internal static class PropertyFactory
                                 changedCultures = dataEditor
                                     .GetChangedCulturesForPartialPropertyValues(
                                         propertyValue?.EditedValue,
-                                        propertyValue?.PublishedValue)
+                                        propertyValue?.PublishedValue,
+                                        defaultCulture)
                                     .ToArray();
                             }
 

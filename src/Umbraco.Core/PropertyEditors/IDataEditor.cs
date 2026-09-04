@@ -93,8 +93,13 @@ public interface IDataEditor : IDiscoverable
     /// </summary>
     /// <param name="sourceValue">The source (edited) property value.</param>
     /// <param name="targetValue">The target (published) property value.</param>
+    /// <param name="defaultCulture">
+    ///     The default culture to attribute a change to when it cannot be tied to one specific culture
+    ///     (e.g. a genuinely invariant nested value, or a purely structural change).
+    /// </param>
     /// <returns>
-    ///     The set of cultures containing an actual edit.
+    ///     The set of cultures containing an actual edit. Empty if the editor is unable to determine this,
+    ///     in which case the caller should fall back to flagging <paramref name="defaultCulture"/> as edited.
     /// </returns>
-    IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue) => [];
+    IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture) => [];
 }

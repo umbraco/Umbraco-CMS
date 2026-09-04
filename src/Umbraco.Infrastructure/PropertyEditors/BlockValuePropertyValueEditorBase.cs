@@ -648,12 +648,16 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     /// </summary>
     /// <param name="sourceValue">The source (edited) property value.</param>
     /// <param name="targetValue">The target (published) property value.</param>
+    /// <param name="defaultCulture">
+    /// The default culture to attribute a change to when it cannot be tied to one specific culture (e.g. a
+    /// genuinely invariant nested value, or a purely structural change).
+    /// </param>
     /// <returns>
     /// The set of cultures containing an actual edit, or an empty collection if neither value can be
     /// resolved as block editor data - callers should treat an empty collection as "unable to narrow down the
-    /// affected culture(s)" and fall back to flagging the default culture as edited.
+    /// affected culture(s)" and fall back to flagging <paramref name="defaultCulture"/> as edited.
     /// </returns>
-    internal virtual IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
+    internal virtual IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
     {
         BlockEditorData<TValue, TLayout>? sourceBlockEditorData = sourceValue is not null ? BlockEditorValues.DeserializeAndClean(sourceValue) : null;
         BlockEditorData<TValue, TLayout>? targetBlockEditorData = targetValue is not null ? BlockEditorValues.DeserializeAndClean(targetValue) : null;
@@ -664,7 +668,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
             return [];
         }
 
-        return GetChangedCulturesForBlockValue(sourceBlockEditorData?.BlockValue, targetBlockEditorData?.BlockValue);
+        return GetChangedCulturesForBlockValue(sourceBlockEditorData?.BlockValue, targetBlockEditorData?.BlockValue, defaultCulture);
     }
 
     /// <summary>
@@ -675,15 +679,13 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
     /// </summary>
     /// <param name="sourceBlockValue">The source (edited) block value, or <c>null</c> if none exists.</param>
     /// <param name="targetBlockValue">The target (published) block value, or <c>null</c> if none has been published yet.</param>
+    /// <param name="defaultCulture">The culture to attribute a changed, genuinely invariant value or exposure entry to.</param>
     /// <returns>
     /// The set of cultures for which a content, settings, or exposure change was detected. A changed
-    /// value or exposure entry that is itself culture-invariant is attributed to the default culture.
+    /// value or exposure entry that is itself culture-invariant is attributed to <paramref name="defaultCulture"/>.
     /// </returns>
-    protected HashSet<string> GetChangedCulturesForBlockValue(TValue? sourceBlockValue, TValue? targetBlockValue)
+    protected HashSet<string> GetChangedCulturesForBlockValue(TValue? sourceBlockValue, TValue? targetBlockValue, string defaultCulture)
     {
-        // NOTE: the default culture is cached at repo level.
-        var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
-
         var changedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         CollectChangedCultures(sourceBlockValue?.ContentData ?? [], targetBlockValue?.ContentData ?? [], defaultCulture, changedCultures);

@@ -165,10 +165,10 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
     }
 
     /// <inheritdoc />
-    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
     {
         var valueEditor = (RichTextPropertyValueEditor)GetValueEditor();
-        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue);
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
     }
 
     /// <summary>
@@ -536,7 +536,7 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
             return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(mergedEditorValue, _jsonSerializer);
         }
 
-        internal override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
+        internal override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
         {
             TryParseEditorValue(sourceValue, out RichTextEditorValue? sourceRichTextEditorValue);
             TryParseEditorValue(targetValue, out RichTextEditorValue? targetRichTextEditorValue);
@@ -553,7 +553,7 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
             BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? targetBlockEditorData =
                 targetRichTextEditorValue?.Blocks is not null ? ConvertAndClean(targetRichTextEditorValue.Blocks) : null;
 
-            return GetChangedCulturesForBlockValue(sourceBlockEditorData?.BlockValue, targetBlockEditorData?.BlockValue);
+            return GetChangedCulturesForBlockValue(sourceBlockEditorData?.BlockValue, targetBlockEditorData?.BlockValue, defaultCulture);
         }
 
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)

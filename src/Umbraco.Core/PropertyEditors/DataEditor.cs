@@ -219,5 +219,5 @@ public class DataEditor : IDataEditor
         HashSet<string> allowedCultures) => sourceValue;
 
     /// <inheritdoc />
-    public virtual IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue) => [];
+    public virtual IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture) => [];
 }

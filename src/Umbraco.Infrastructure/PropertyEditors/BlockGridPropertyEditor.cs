@@ -64,10 +64,10 @@ public class BlockGridPropertyEditor : BlockGridPropertyEditorBase
     }
 
     /// <inheritdoc />
-    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
     {
         var valueEditor = (BlockGridEditorPropertyValueEditor)GetValueEditor();
-        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue);
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
     }
 
     #region Pre Value Editor

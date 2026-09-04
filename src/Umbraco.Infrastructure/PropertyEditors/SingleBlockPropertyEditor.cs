@@ -93,10 +93,10 @@ public class SingleBlockPropertyEditor : DataEditor
     }
 
     /// <inheritdoc />
-    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue)
+    public override IEnumerable<string> GetChangedCulturesForPartialPropertyValues(object? sourceValue, object? targetValue, string defaultCulture)
     {
         var valueEditor = (SingleBlockEditorPropertyValueEditor)GetValueEditor();
-        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue);
+        return valueEditor.GetChangedCulturesForPartialPropertyValues(sourceValue, targetValue, defaultCulture);
     }
 
     internal sealed class SingleBlockEditorPropertyValueEditor : BlockEditorPropertyValueEditor<SingleBlockValue, SingleBlockLayoutItem>
