@@ -115,7 +115,9 @@ describe('UmbTiptapToolbarMenuElement — disabled state (#23823)', () => {
 describe('UmbTiptapToolbarMenuElement — per-item active state (#23660)', () => {
 	let element: UmbTiptapToolbarMenuElement;
 
-	const editorStub = {} as unknown as Editor;
+	// The element subscribes to `transaction` on connect and unsubscribes on disconnect, so a stub has to be an event
+	// emitter even for a test that never fires one.
+	const editorStub = { on: () => {}, off: () => {} } as unknown as Editor;
 
 	const dataAwareApi: UmbTiptapToolbarElementApi = {
 		isActive: (_editor?: Editor, item?: MetaTiptapToolbarMenuItem) => item?.data === 'serif',
