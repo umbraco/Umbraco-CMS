@@ -22,6 +22,8 @@ public static class AuthorizationPolicies
 
     public const string ElementFolderPermissionByResource = nameof(ElementFolderPermissionByResource);
 
+    public const string DocumentBlueprintPermissionByResource = nameof(DocumentBlueprintPermissionByResource);
+
     // Single section access
     public const string SectionAccessContent = nameof(SectionAccessContent);
     public const string SectionAccessPackages = nameof(SectionAccessPackages);
