@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -19,17 +22,35 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentBlueprint}")]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentBlueprints)]
-public class DocumentBlueprintTreeControllerBase : FolderTreeControllerBase<DocumentBlueprintTreeItemResponseModel>
+public class DocumentBlueprintTreeControllerBase : UserStartNodeFolderTreeControllerBase<DocumentBlueprintTreeItemResponseModel>
 {
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 21.")]
     public DocumentBlueprintTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
         IEntitySearchService entitySearchService,
         IIdKeyMap idKeyMap,
         IDocumentPresentationFactory documentPresentationFactory)
-        : base(entityService, flagProviders, entitySearchService, idKeyMap)
+        : this(
+            entityService,
+            flagProviders,
+            entitySearchService,
+            idKeyMap,
+            documentPresentationFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentBlueprintStartNodeTreeFilterService>())
+    {
+    }
+
+    public DocumentBlueprintTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IEntitySearchService entitySearchService,
+        IIdKeyMap idKeyMap,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDocumentBlueprintStartNodeTreeFilterService treeFilterService)
+        : base(entityService, flagProviders, entitySearchService, idKeyMap, treeFilterService)
         => _documentPresentationFactory = documentPresentationFactory;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.DocumentBlueprint;
