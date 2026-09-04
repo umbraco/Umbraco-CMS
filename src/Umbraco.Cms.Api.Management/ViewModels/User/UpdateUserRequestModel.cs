@@ -33,4 +33,8 @@ public class UpdateUserRequestModel : UserPresentationBase
     public ISet<ReferenceByIdModel> ElementStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
     public bool HasElementRootAccess { get; init; }
+
+    public ISet<ReferenceByIdModel> DocumentBlueprintStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
+
+    public bool HasDocumentBlueprintRootAccess { get; init; }
 }
