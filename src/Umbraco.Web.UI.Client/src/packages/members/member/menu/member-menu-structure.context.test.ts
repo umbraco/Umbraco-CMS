@@ -9,6 +9,20 @@ import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
+
+const SECTION_PATHNAME = 'member-management';
+
+class UmbSectionContextStub extends UmbContextBase {
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_SECTION_CONTEXT);
+	}
+
+	getPathname() {
+		return SECTION_PATHNAME;
+	}
+}
 
 class UmbMemberWorkspaceContextStub extends UmbContextBase {
 	readonly #unique = new UmbBasicState<string | null | undefined>(undefined);
@@ -56,10 +70,12 @@ class UmbMemberWorkspaceContextStub extends UmbContextBase {
 @customElement('umb-test-member-menu-structure-host')
 class UmbTestMemberMenuStructureHostElement extends UmbControllerHostElementMixin(HTMLElement) {
 	workspaceContext!: UmbMemberWorkspaceContextStub;
+	sectionContext!: UmbSectionContextStub;
 
 	override connectedCallback() {
 		super.connectedCallback();
 		this.workspaceContext = new UmbMemberWorkspaceContextStub(this);
+		this.sectionContext = new UmbSectionContextStub(this);
 	}
 }
 
@@ -137,5 +153,50 @@ describe('UmbMemberMenuStructureWorkspaceContext', () => {
 		await flushMicrotasks();
 
 		expect(await firstValueFrom(context.structure)).to.deep.equal([ROOT_ITEM, CURRENT_ITEM]);
+	});
+
+	describe('getItemHref', () => {
+		it('returns the workspace edit path for an item with a unique', () => {
+			const href = context.getItemHref(CURRENT_ITEM);
+
+			expect(href).to.equal(
+				UMB_WORKSPACE_EDIT_PATH_PATTERN.generateAbsolute({
+					sectionName: SECTION_PATHNAME,
+					entityType: CURRENT_ITEM.entityType,
+					unique: CURRENT_ITEM.unique!,
+				}),
+			);
+		});
+
+		it('returns undefined for an item without a unique', () => {
+			expect(context.getItemHref(ROOT_ITEM)).to.equal(undefined);
+		});
+	});
+
+	describe('destroy', () => {
+		it('completes the structure observable without replaying its last value', async () => {
+			host.workspaceContext.setUnique(CURRENT_ITEM.unique);
+			host.workspaceContext.setVariants([INPUT_VARIANT]);
+			host.workspaceContext.setIsNew(false);
+			await flushMicrotasks();
+			expect(await firstValueFrom(context.structure)).to.deep.equal([ROOT_ITEM, CURRENT_ITEM]);
+
+			context.destroy();
+
+			let didEmit = false;
+			let didComplete = false;
+			await new Promise<void>((resolve) => {
+				context.structure.subscribe({
+					next: () => (didEmit = true),
+					complete: () => {
+						didComplete = true;
+						resolve();
+					},
+				});
+			});
+
+			expect(didEmit).to.equal(false);
+			expect(didComplete).to.equal(true);
+		});
 	});
 });
