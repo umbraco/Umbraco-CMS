@@ -22,6 +22,11 @@ namespace Umbraco.Cms.Api.Management.Security;
 internal sealed class CompressedTicketSerializer : IDataSerializer<AuthenticationTicket>
 {
     /// <summary>
+    ///     An upper bound on the decompressed payload size.
+    /// </summary>
+    private const int MaxDecompressedLength = 4 * 1024 * 1024;
+
+    /// <summary>
     ///     Marks a payload as compressed.
     /// </summary>
     /// <remarks>
@@ -29,11 +34,6 @@ internal sealed class CompressedTicketSerializer : IDataSerializer<Authenticatio
     ///     byte is always zero. A marker with a non-zero second byte therefore cannot be mistaken for one.
     /// </remarks>
     private static readonly byte[] _compressedMarker = [0x55, 0x5A];
-
-    /// <summary>
-    ///     An upper bound on the decompressed payload size.
-    /// </summary>
-    private const int MaxDecompressedLength = 4 * 1024 * 1024;
 
     private readonly IDataSerializer<AuthenticationTicket> _inner;
     private readonly bool _compress;
@@ -64,8 +64,7 @@ internal sealed class CompressedTicketSerializer : IDataSerializer<Authenticatio
 
         var compressed = Compress(serialized);
 
-        // Compression can grow a small payload, in which case the uncompressed form is written instead. This keeps the
-        // worst case at parity with not compressing at all.
+        // Compression can grow a small payload, in which case the uncompressed form is written instead.
         return compressed.Length < serialized.Length
             ? compressed
             : serialized;
@@ -89,8 +88,7 @@ internal sealed class CompressedTicketSerializer : IDataSerializer<Authenticatio
         catch (Exception)
         {
             // A payload that cannot be read is reported as absent rather than as a failure, so the caller treats it
-            // the same as no payload at all. Truncation is the case that matters: it can leave a valid prefix that
-            // decompresses cleanly and only fails once the ticket is read back out of it.
+            // the same as no payload at all.
             return null;
         }
     }

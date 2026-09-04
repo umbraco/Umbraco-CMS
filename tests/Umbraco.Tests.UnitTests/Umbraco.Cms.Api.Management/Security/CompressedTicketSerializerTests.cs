@@ -199,7 +199,7 @@ public class CompressedTicketSerializerTests
             "en-US",
             Guid.NewGuid().ToString(),
             ["content", "media", "settings", "packages", "users", "members", "forms", "translation"],
-            Enumerable.Range(0, roleCount).Select(_ => Guid.NewGuid().ToString()).ToArray());
+            Enumerable.Range(0, roleCount).Select(_ => Guid.NewGuid().ToString()));
 
         return new AuthenticationTicket(
             new ClaimsPrincipal(identity),

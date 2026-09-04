@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -94,8 +94,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             "Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware",
             Constants.Security.BackOfficeAuthenticationType,
             "v2");
-        // TicketDataFormat is SecureDataFormat<AuthenticationTicket> over TicketSerializer.Default and exposes no
-        // constructor taking a serializer, so the base type is constructed directly to substitute one.
+
         var ticketDataFormat = new SecureDataFormat<AuthenticationTicket>(
             new CompressedTicketSerializer(TicketSerializer.Default),
             dataProtector);
