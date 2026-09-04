@@ -669,8 +669,35 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         CollectChangedCultures(sourceBlockValue?.ContentData ?? [], targetBlockValue?.ContentData ?? [], defaultCulture, changedCultures);
         CollectChangedCultures(sourceBlockValue?.SettingsData ?? [], targetBlockValue?.SettingsData ?? [], defaultCulture, changedCultures);
+        CollectChangedExposureCultures(sourceBlockValue?.Expose ?? [], targetBlockValue?.Expose ?? [], defaultCulture, changedCultures);
 
         return changedCultures;
+    }
+
+    /// <summary>
+    /// Compares the exposure of two block values and returns the set of cultures for which a block's exposure
+    /// was toggled (added or removed) between <paramref name="sourceExpose"/> (edited) and
+    /// <paramref name="targetExpose"/> (published). Unlike layout, which is invariant/shared between all
+    /// cultures, exposure is culture-specific - a block can be exposed for one culture and hidden for another.
+    /// </summary>
+    private static void CollectChangedExposureCultures(
+        IList<BlockItemVariation> sourceExpose,
+        IList<BlockItemVariation> targetExpose,
+        string defaultCulture,
+        HashSet<string> changedCultures)
+    {
+        foreach (BlockItemVariation sourceVariation in sourceExpose.Where(sv => targetExpose.Any(tv => AreEqual(sv, tv)) is false))
+        {
+            changedCultures.Add(sourceVariation.Culture ?? defaultCulture);
+        }
+
+        foreach (BlockItemVariation targetVariation in targetExpose.Where(tv => sourceExpose.Any(sv => AreEqual(sv, tv)) is false))
+        {
+            changedCultures.Add(targetVariation.Culture ?? defaultCulture);
+        }
+
+        static bool AreEqual(BlockItemVariation a, BlockItemVariation b) =>
+            a.ContentKey == b.ContentKey && a.Culture == b.Culture && a.Segment == b.Segment;
     }
 
     private void CollectChangedCultures(

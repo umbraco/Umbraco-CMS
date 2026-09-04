@@ -2732,4 +2732,95 @@ internal partial class BlockListElementLevelVariationTests
         var nestedBlock = rootBlock.Content.Value<BlockListModel>("nestedBlocks")!.First();
         Assert.AreEqual("Nested Danish v2", nestedBlock.Content.Value<string>("variantText"));
     }
+
+    /// <summary>
+    /// Exposure (<see cref="BlockListValue.Expose"/>) is culture-specific, unlike layout: exposing a block for
+    /// an additional culture - with no change to any block value - must flag that specific culture as edited,
+    /// so branch publishing republishes it and picks up the newly-exposed block.
+    /// </summary>
+    [Test]
+    public async Task Can_Publish_Branch_Republishes_Non_Default_Culture_Changed_Only_Via_Exposure()
+    {
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var contentElementKey = Guid.NewGuid();
+        var settingsElementKey = Guid.NewGuid();
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            contentElementKey,
+            settingsElementKey,
+            new BlockProperty(
+                new List<BlockPropertyValue>
+                {
+                    new() { Alias = "invariantText", Value = "Invariant content value" },
+                    new() { Alias = "variantText", Value = "English content value", Culture = "en-US" },
+                    new() { Alias = "variantText", Value = "Danish content value", Culture = "da-DK" },
+                },
+                new List<BlockPropertyValue>(),
+                null,
+                null));
+
+        // exposed for English only, initially.
+        blockListValue.Expose = [new() { ContentKey = contentElementKey, Culture = "en-US" }];
+        var propertyValueJson = JsonSerializer.Serialize(blockListValue);
+        content.Properties["blocks"]!.SetValue(propertyValueJson);
+
+        // route the initial value through ContentEditingService.UpdateAsync (as the backoffice does) so the
+        // block values are canonically sorted before the first publish - this avoids an unrelated, pre-existing
+        // false-positive "edited" state caused by JSON key-ordering differences between the edited and
+        // published value (see Publishing_All_Cultures_Should_Not_Mark_Content_As_Edited above).
+        var updateModel = new ContentUpdateModel
+        {
+            Properties = [new PropertyValueModel { Alias = "blocks", Value = propertyValueJson }],
+            Variants =
+            [
+                new VariantModel { Name = content.GetCultureName("en-US")!, Culture = "en-US" },
+                new VariantModel { Name = content.GetCultureName("da-DK")!, Culture = "da-DK" },
+            ],
+        };
+        var updateResult = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
+
+        content = ContentService.GetById(content.Key)!;
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+
+        content = ContentService.GetById(content.Key)!;
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(content.IsCultureEdited("en-US"));
+            Assert.IsFalse(content.IsCultureEdited("da-DK"));
+        });
+
+        SetVariationContext("da-DK", null);
+        Assert.AreEqual(0, GetPublishedContent(content.Key).Value<BlockListModel>("blocks")!.Count, "The block is not yet exposed for Danish.");
+
+        // now also expose the same block for Danish - no block value changes at all.
+        blockListValue = JsonSerializer.Deserialize<BlockListValue>((string)content.Properties["blocks"]!.GetValue()!);
+        blockListValue.Expose =
+        [
+            new() { ContentKey = contentElementKey, Culture = "en-US" },
+            new() { ContentKey = contentElementKey, Culture = "da-DK" },
+        ];
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(content.IsCultureEdited("en-US"), "English exposure did not change and must not be flagged as edited.");
+            Assert.IsTrue(content.IsCultureEdited("da-DK"), "Danish exposure changed and must be flagged as edited.");
+        });
+
+        var results = ContentService.PublishBranch(content, PublishBranchFilter.Default, content.AvailableCultures.ToArray()).ToArray();
+
+        Assert.AreEqual(1, results.Length);
+        Assert.AreEqual(PublishResultType.SuccessPublishCulture, results[0].Result, "Branch publish must republish because Danish exposure changed.");
+
+        SetVariationContext("da-DK", null);
+        var blockListModel = GetPublishedContent(content.Key).Value<BlockListModel>("blocks");
+        Assert.AreEqual(1, blockListModel!.Count);
+        Assert.AreEqual("Danish content value", blockListModel.First().Content.Value<string>("variantText"));
+    }
 }
