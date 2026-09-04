@@ -424,6 +424,31 @@ public static class UserExtensions
     }
 
     /// <summary>
+    ///     Gets the document blueprint start node paths for the user.
+    /// </summary>
+    /// <param name="user">The user to get paths for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>An array of document blueprint start node paths, or <c>null</c> if no start nodes are defined.</returns>
+    public static string[]? GetDocumentBlueprintStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
+    {
+        var cacheKey = user.UserCacheKey(CacheKeys.UserDocumentBlueprintStartNodePathsPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
+        return runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
+            {
+                var startNodeIds = user.CalculateDocumentBlueprintStartNodeIds(entityService, appCaches);
+                return entityService
+                    .GetAllPaths(UmbracoObjectTypes.DocumentBlueprintContainer, startNodeIds)
+                    .Select(x => x.Path)
+                    .ToArray();
+            },
+            TimeSpan.FromMinutes(2),
+            true);
+    }
+
+    /// <summary>
     ///     Gets the element start node paths for the user.
     /// </summary>
     /// <param name="user">The user to get paths for.</param>

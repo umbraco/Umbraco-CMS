@@ -57,6 +57,11 @@ public static class CacheKeys
     public const string UserElementStartNodePathsPrefix = "ElementStartNodePaths";
 
     /// <summary>
+    ///     Cache key prefix for user's document blueprint start node paths.
+    /// </summary>
+    public const string UserDocumentBlueprintStartNodePathsPrefix = "DocumentBlueprintStartNodePaths";
+
+    /// <summary>
     ///     Cache key for content recycle bin.
     /// </summary>
     public const string ContentRecycleBinCacheKey = "recycleBin_content";
