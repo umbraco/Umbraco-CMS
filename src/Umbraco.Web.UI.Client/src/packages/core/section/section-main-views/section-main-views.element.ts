@@ -110,47 +110,50 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	async #createRoutes() {
+		if (this._views === undefined && this._dashboards === undefined) return;
 		const viewAliases = new Set<string>();
 
-		const dashboardRoutes = this._dashboards?.map((manifest) => {
-			viewAliases.add(manifest.alias);
-			const context = this.#getOrCreateViewContext(manifest.alias);
-			context.setTitle(this.#getDashboardName(manifest));
-			return {
-				path: this.#constructDashboardPath(manifest),
-				component: () => createExtensionElement(manifest),
-				setup: (component?: any) => {
-					if (this.#currentProvidedView !== context) {
-						this.#currentProvidedView?.unprovide();
-					}
-					if (component) {
-						this.#currentProvidedView = context;
-						context.provideAt(component);
-						component.manifest = manifest;
-					}
-				},
-			} as UmbRoute;
-		});
+		const dashboardRoutes =
+			this._dashboards?.map((manifest) => {
+				viewAliases.add(manifest.alias);
+				const context = this.#getOrCreateViewContext(manifest.alias);
+				context.setTitle(this.#getDashboardName(manifest));
+				return {
+					path: this.#constructDashboardPath(manifest),
+					component: () => createExtensionElement(manifest),
+					setup: (component?: any) => {
+						if (this.#currentProvidedView !== context) {
+							this.#currentProvidedView?.unprovide();
+						}
+						if (component) {
+							this.#currentProvidedView = context;
+							context.provideAt(component);
+							component.manifest = manifest;
+						}
+					},
+				} as UmbRoute;
+			}) ?? [];
 
-		const viewRoutes = this._views?.map((manifest) => {
-			viewAliases.add(manifest.alias);
-			const context = this.#getOrCreateViewContext(manifest.alias);
-			context.setTitle(this.#getViewName(manifest));
-			return {
-				path: this.#constructViewPath(manifest),
-				component: () => createExtensionElement(manifest),
-				setup: async (component?: any) => {
-					if (this.#currentProvidedView !== context) {
-						this.#currentProvidedView?.unprovide();
-					}
-					if (component) {
-						this.#currentProvidedView = context;
-						context.provideAt(component);
-						component.manifest = manifest;
-					}
-				},
-			} as UmbRoute;
-		});
+		const viewRoutes =
+			this._views?.map((manifest) => {
+				viewAliases.add(manifest.alias);
+				const context = this.#getOrCreateViewContext(manifest.alias);
+				context.setTitle(this.#getViewName(manifest));
+				return {
+					path: this.#constructViewPath(manifest),
+					component: () => createExtensionElement(manifest),
+					setup: async (component?: any) => {
+						if (this.#currentProvidedView !== context) {
+							this.#currentProvidedView?.unprovide();
+						}
+						if (component) {
+							this.#currentProvidedView = context;
+							context.provideAt(component);
+							component.manifest = manifest;
+						}
+					},
+				} as UmbRoute;
+			}) ?? [];
 
 		this.#cleanupViewContexts(viewAliases);
 
@@ -171,9 +174,15 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	override render() {
+		/*if (!this._routes || this._routes.length === 0) {
+			// If not routes, then render nothing.
+			// TODO: Remove this in v.19, this means sections must provide a dashboard or a view, otherwise the spinner will be shown forever. [NL]
+			// MAKE SURE WE HAVE COVERED USERS, MEMBERS.
+			return nothing;
+		}*/
 		return html`
 			<umb-body-layout main-no-padding>
-				${this.#renderDashboards()} ${this.#renderViews()}
+				${this.#renderDashboardsNav()} ${this.#renderViewsNav()}
 				<umb-router-slot
 					.routes=${this._routes}
 					@init=${(event: UmbRouterSlotInitEvent) => {
@@ -192,66 +201,64 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		return dashboard.meta?.label ? this.localize.string(dashboard.meta.label) : (dashboard.name ?? dashboard.alias);
 	}
 
-	#renderDashboards() {
+	#renderDashboardsNav() {
+		if (!((this._dashboards?.length > 0 && this._views?.length > 0) || this._dashboards?.length > 1)) {
+			return nothing;
+		}
 		// Only show dashboards if there are more than one dashboard or if there are both dashboards and views
-		return (this._dashboards.length > 0 && this._views.length > 0) || this._dashboards.length > 1
-			? html`
-					<uui-tab-group slot="header" id="dashboards">
-						${this._dashboards.map((dashboard) => {
-							const dashboardPath = this.#constructDashboardPath(dashboard);
-							const dashboardName = this.#getDashboardName(dashboard);
-							const hint = this._hintMap.get(dashboard.alias);
-							// If this path matches, or if this is the default view and the active path is empty.
-							const isActive =
-								this._activePath === dashboardPath || (this._defaultView === dashboardPath && this._activePath === '');
-							return html`
-								<uui-tab href="${this._routerPath}/${dashboardPath}" label=${dashboardName} ?active="${isActive}">
-									${dashboardName}
-									${hint && !isActive
-										? html`<umb-badge
-												slot="extra"
-												.color=${hint.color ?? 'default'}
-												?attention=${hint.color === 'invalid'}
-												>${hint.text}</umb-badge
-											>`
-										: nothing}
-								</uui-tab>
-							`;
-						})}
-					</uui-tab-group>
-				`
-			: nothing;
+		return html`
+			<uui-tab-group slot="header" id="dashboards">
+				${this._dashboards.map((dashboard) => {
+					const dashboardPath = this.#constructDashboardPath(dashboard);
+					const dashboardName = this.#getDashboardName(dashboard);
+					const hint = this._hintMap.get(dashboard.alias);
+					// If this path matches, or if this is the default view and the active path is empty.
+					const isActive =
+						this._activePath === dashboardPath || (this._defaultView === dashboardPath && this._activePath === '');
+					return html`
+						<uui-tab href="${this._routerPath}/${dashboardPath}" label=${dashboardName} ?active="${isActive}">
+							${dashboardName}
+							${hint && !isActive
+								? html`<umb-badge slot="extra" .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+										>${hint.text}</umb-badge
+									>`
+								: nothing}
+						</uui-tab>
+					`;
+				})}
+			</uui-tab-group>
+		`;
 	}
 
-	#renderViews() {
+	#renderViewsNav() {
+		if (!((this._views?.length > 0 && this._dashboards?.length > 0) || this._views?.length > 1)) {
+			return nothing;
+		}
 		// Only show views if there are more than one view or if there are both dashboards and views
-		return (this._views.length > 0 && this._dashboards.length > 0) || this._views.length > 1
-			? html`
-					<uui-tab-group slot="navigation" id="views">
-						${this._views.map((view) => {
-							const viewName = this.#getViewName(view);
-							const viewPath = this.#constructViewPath(view);
-							const hint = this._hintMap.get(view.alias);
-							// If this path matches, or if this is the default view and the active path is empty.
-							const isActive =
-								this._activePath === viewPath || (this._defaultView === viewPath && this._activePath === '');
-							return html`
-								<uui-tab href="${this._routerPath}/${viewPath}" label="${viewName}" ?active="${isActive}">
-									<div slot="icon">
-										<umb-icon name=${view.meta.icon}></umb-icon>
-										${hint && !isActive
-											? html`<umb-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
-													>${hint.text}</umb-badge
-												>`
-											: nothing}
-									</div>
-									${viewName}
-								</uui-tab>
-							`;
-						})}
-					</uui-tab-group>
-				`
-			: nothing;
+		return html`
+			<uui-tab-group slot="navigation" id="views">
+				${this._views.map((view) => {
+					const viewName = this.#getViewName(view);
+					const viewPath = this.#constructViewPath(view);
+					const hint = this._hintMap.get(view.alias);
+					// If this path matches, or if this is the default view and the active path is empty.
+					const isActive = this._activePath === viewPath || (this._defaultView === viewPath && this._activePath === '');
+					return html`
+						<uui-tab href="${this._routerPath}/${viewPath}" label="${viewName}" ?active="${isActive}">
+							<div slot="icon">
+								<umb-icon name=${view.meta.icon}></umb-icon>
+								${hint && !isActive
+									? html`<umb-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+											>${hint.text}</umb-badge
+										>`
+									: nothing}
+							</div>
+							${viewName}
+						</uui-tab>
+					`;
+				})}
+			</uui-tab-group>
+		`;
 	}
 
 	static override styles = [
