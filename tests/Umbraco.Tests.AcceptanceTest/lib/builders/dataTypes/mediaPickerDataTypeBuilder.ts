@@ -1,9 +1,10 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 import {MediaPickerCropBuilder} from './mediaPickerBuilder';
 
+// There is one media picker editor per number of items it holds, so the two builders differ in which
+// editor they target, and only the multiple picker has an item count to validate.
 export class MediaPickerDataTypeBuilder extends DataTypeBuilder {
   filter: string;
-  multiple: boolean;
   minValue: number;
   maxValue: number;
   enableLocalFocalPoint: boolean;
@@ -20,11 +21,6 @@ export class MediaPickerDataTypeBuilder extends DataTypeBuilder {
 
   withFilter(filter: string) {
     this.filter = filter;
-    return this;
-  }
-
-  withMultiple(multiple: boolean) {
-    this.multiple = multiple;
     return this;
   }
 
@@ -67,12 +63,6 @@ export class MediaPickerDataTypeBuilder extends DataTypeBuilder {
         value: this.filter
       });
     }
-    if (this.multiple !== undefined) {
-      values.push({
-        alias: 'multiple',
-        value: this.multiple !== undefined ? this.multiple : false
-      });
-    }
     if (this.minValue !== undefined || this.maxValue !== undefined) {
       values.push({
         alias: 'validationLimit',
@@ -109,5 +99,13 @@ export class MediaPickerDataTypeBuilder extends DataTypeBuilder {
       });
     }
     return values;
+  }
+}
+
+export class SingleMediaPickerDataTypeBuilder extends MediaPickerDataTypeBuilder {
+  constructor() {
+    super();
+    this.editorAlias = 'Umbraco.SingleMediaPicker';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.SingleMediaPicker';
   }
 }

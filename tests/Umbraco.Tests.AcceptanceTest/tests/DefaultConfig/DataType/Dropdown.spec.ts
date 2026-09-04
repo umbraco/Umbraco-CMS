@@ -1,12 +1,22 @@
-import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+﻿import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const customDataTypeName = 'Custom Dropdown';
-const editorAlias = 'Umbraco.DropDown.Flexible';
-const editorUiAlias = 'Umb.PropertyEditorUi.Dropdown';
+// There is one dropdown editor per number of values it holds, so the built-in data types are on
+// different editors rather than differing by configuration.
 const dropdowns = [
-  {type: 'Dropdown', multipleChoice: false},
-  {type: 'Dropdown multiple', multipleChoice: true}
+  {
+    type: 'Dropdown',
+    editorAlias: 'Umbraco.SingleDropDown',
+    editorUiAlias: 'Umb.PropertyEditorUi.SingleDropdown',
+    settings: ConstantHelper.singleDropdownSettings
+  },
+  {
+    type: 'Dropdown multiple',
+    editorAlias: 'Umbraco.DropDown.Flexible',
+    editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+    settings: ConstantHelper.dropdownSettings
+  }
 ];
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
@@ -17,19 +27,6 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
-});
-
-test('can enable multiple choice', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createDefaultDropdownDataType(customDataTypeName);
-  await umbracoUi.dataType.goToDataType(customDataTypeName);
-
-  // Act
-  await umbracoUi.dataType.clickEnableMultipleChoiceToggle();
-  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
-
-  // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'multiple', true)).toBeTruthy();
 });
 
 test('can add option', async ({umbracoApi, umbracoUi}) => {
@@ -67,14 +64,14 @@ for (const dropdown of dropdowns) {
     await umbracoUi.dataType.goToDataType(dropdown.type);
 
     // Assert
-    await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.dropdownSettings);
-    await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.dropdownSettings);
-    await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
-    await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
+    await umbracoUi.dataType.doesSettingHaveValue(dropdown.settings);
+    await umbracoUi.dataType.doesSettingItemsHaveCount(dropdown.settings);
+    await umbracoUi.dataType.doesPropertyEditorHaveAlias(dropdown.editorAlias);
+    await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(dropdown.editorUiAlias);
     const dataTypeDefaultData = await umbracoApi.dataType.getByName(dropdown.type);
-    expect(dataTypeDefaultData.editorAlias).toBe(editorAlias);
-    expect(dataTypeDefaultData.editorUiAlias).toBe(editorUiAlias);
-    expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'multiple', dropdown.multipleChoice)).toBeTruthy();
+    expect(dataTypeDefaultData.editorAlias).toBe(dropdown.editorAlias);
+    expect(dataTypeDefaultData.editorUiAlias).toBe(dropdown.editorUiAlias);
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'multiple')).toBeFalsy();
     expect(await umbracoApi.dataType.doesDataTypeHaveValue(dropdown.type, 'items')).toBeFalsy();
   });
 }

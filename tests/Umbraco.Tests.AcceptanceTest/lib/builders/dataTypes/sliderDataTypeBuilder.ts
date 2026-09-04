@@ -1,13 +1,12 @@
 import {DataTypeBuilder} from './dataTypeBuilder';
 
+// There is one slider editor per shape of value it holds, so the range values belong to the range slider
+// builder rather than being switched on with a flag.
 export class SliderDataTypeBuilder extends DataTypeBuilder {
   minVal: number;
   maxVal: number;
-  enableRange: boolean;
   initVal1: number;
-  initVal2: number;
   step: number;
-  minimumRange: number;
 
   constructor() {
     super();
@@ -25,30 +24,13 @@ export class SliderDataTypeBuilder extends DataTypeBuilder {
     return this;
   }
 
-  withEnableRange(enableRange: boolean) {
-    this.enableRange = enableRange;
-    return this;
-  }
-
   withInitialValueOne(initialValueOne: number) {
     this.initVal1 = initialValueOne;
     return this;
   }
 
-  withInitialValueTwo(initialValueTwo: number) {
-    if (this.enableRange) {
-      this.initVal2 = initialValueTwo;
-    }
-    return this;
-  }
-
   withStep(step: number) {
     this.step = step;
-    return this;
-  }
-
-  withMinimumRange(minimumRange: number) {
-    this.minimumRange = minimumRange;
     return this;
   }
 
@@ -63,20 +45,42 @@ export class SliderDataTypeBuilder extends DataTypeBuilder {
       value: this.maxVal || 0
     });
     values.push({
-      alias: 'enableRange',
-      value: this.enableRange || false
-    });
-    values.push({
       alias: 'initVal1',
       value: this.initVal1 || 0
     });
     values.push({
-      alias: 'initVal2',
-      value: this.initVal2 || 0
-    });
-    values.push({
       alias: 'step',
       value: this.step || 0
+    });
+    return values;
+  }
+}
+
+export class RangeSliderDataTypeBuilder extends SliderDataTypeBuilder {
+  initVal2: number;
+  minimumRange: number;
+
+  constructor() {
+    super();
+    this.editorAlias = 'Umbraco.RangeSlider';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.RangeSlider';
+  }
+
+  withInitialValueTwo(initialValueTwo: number) {
+    this.initVal2 = initialValueTwo;
+    return this;
+  }
+
+  withMinimumRange(minimumRange: number) {
+    this.minimumRange = minimumRange;
+    return this;
+  }
+
+  getValues() {
+    let values: any = super.getValues();
+    values.push({
+      alias: 'initVal2',
+      value: this.initVal2 || 0
     });
     values.push({
       alias: 'minimumRange',

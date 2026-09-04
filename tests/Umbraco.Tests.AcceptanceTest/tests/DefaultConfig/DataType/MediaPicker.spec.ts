@@ -1,4 +1,4 @@
-import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+﻿import {AliasHelper, ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const mediaPickerTypes = [
@@ -6,9 +6,13 @@ const mediaPickerTypes = [
   {type: 'Multiple Media Picker', isMultiple: true},
   {type: 'Image Media Picker', isMultiple: false},
   {type: 'Multiple Image Media Picker', isMultiple: true},
+  // There is one media picker editor per number of items it holds, so the built-in data types are on
+  // different editors rather than differing by configuration.
 ];
 const editorAlias = 'Umbraco.MediaPicker3';
 const editorUiAlias = 'Umb.PropertyEditorUi.MediaPicker';
+const singleEditorAlias = 'Umbraco.SingleMediaPicker';
+const singleEditorUiAlias = 'Umb.PropertyEditorUi.SingleMediaPicker';
 const customDataTypeName = 'Custom Media Picker';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
@@ -19,19 +23,6 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(customDataTypeName);
-});
-
-test('can update pick multiple items', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  await umbracoApi.dataType.createDefaultMediaPickerDataType(customDataTypeName);
-  await umbracoUi.dataType.goToDataType(customDataTypeName);
-
-  // Act
-  await umbracoUi.dataType.clickPickMultipleItemsToggle();
-  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
-
-  // Assert
-  expect(await umbracoApi.dataType.doesDataTypeHaveValue(customDataTypeName, 'multiple', true)).toBeTruthy();
 });
 
 test('can update amount', async ({umbracoApi, umbracoUi}) => {
@@ -214,11 +205,20 @@ for (const mediaPicker of mediaPickerTypes) {
     await umbracoUi.dataType.goToDataType(mediaPicker.type);
 
     // Assert
-    await umbracoUi.dataType.doesSettingHaveValue(ConstantHelper.mediaPickerSettings);
-    await umbracoUi.dataType.doesSettingItemsHaveCount(ConstantHelper.mediaPickerSettings);
-    await umbracoUi.dataType.doesPropertyEditorHaveAlias(editorAlias);
-    await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(editorUiAlias);
-    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'multiple', mediaPicker.isMultiple)).toBeTruthy();
+    const expectedSettings = mediaPicker.isMultiple
+      ? ConstantHelper.mediaPickerSettings
+      : ConstantHelper.singleMediaPickerSettings;
+    const expectedAlias = mediaPicker.isMultiple ? editorAlias : singleEditorAlias;
+    const expectedUiAlias = mediaPicker.isMultiple ? editorUiAlias : singleEditorUiAlias;
+
+    await umbracoUi.dataType.doesSettingHaveValue(expectedSettings);
+    await umbracoUi.dataType.doesSettingItemsHaveCount(expectedSettings);
+    await umbracoUi.dataType.doesPropertyEditorHaveAlias(expectedAlias);
+    await umbracoUi.dataType.doesPropertyEditorHaveUiAlias(expectedUiAlias);
+    const dataTypeDefaultData = await umbracoApi.dataType.getByName(mediaPicker.type);
+    expect(dataTypeDefaultData.editorAlias).toBe(expectedAlias);
+    expect(dataTypeDefaultData.editorUiAlias).toBe(expectedUiAlias);
+    expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'multiple')).toBeFalsy();
     if (mediaPicker.type.includes('Image')) {
       const imageTypeData = await umbracoApi.mediaType.getByName('Image');
       expect(await umbracoApi.dataType.doesDataTypeHaveValue(mediaPicker.type, 'filter', imageTypeData.id)).toBeTruthy();
