@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ValueSummary.MemberGroup.Uniques',
 		name: 'Member Group Uniques Value Summary',
 		forValueType: UMB_MEMBER_GROUP_UNIQUES_VALUE_TYPE,
-		element: () => import('./member-group-uniques-value-summary.js'),
-		valueResolver: () => import('./member-group-uniques-value-summary.js'),
+		element: () => import('./member-groups-value-summary.js'),
+		valueResolver: () => import('./member-groups-value-summary.js'),
 	},
 ];

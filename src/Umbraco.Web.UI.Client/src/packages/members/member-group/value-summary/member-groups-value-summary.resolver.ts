@@ -3,17 +3,18 @@ import type { UmbMemberGroupItemModel } from '../repository/item/types.js';
 import type { UmbValueSummaryResolveResult, UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
-export class UmbMemberGroupUniquesValueSummaryResolver
+export class UmbMemberGroupsValueSummaryResolver
 	extends UmbControllerBase
-	implements UmbValueSummaryResolver<Array<string>, Array<UmbMemberGroupItemModel>>
+	implements UmbValueSummaryResolver<string | Array<string> | undefined, Array<UmbMemberGroupItemModel>>
 {
 	#repo = new UmbMemberGroupItemRepository(this);
 
 	async resolveValues(
-		values: ReadonlyArray<Array<string>>,
+		values: ReadonlyArray<string | Array<string> | undefined>,
 	): Promise<UmbValueSummaryResolveResult<Array<UmbMemberGroupItemModel>>> {
-		const allUniques = [...new Set(values.flat())];
+		const allUniques = [...new Set(values.flatMap((v) => this.#toUniques(v)))];
 		if (!allUniques.length) return { data: values.map(() => []) };
 
 		const { data, asObservable } = await this.#repo.requestItems(allUniques);
@@ -28,13 +29,19 @@ export class UmbMemberGroupUniquesValueSummaryResolver
 		};
 	}
 
+	#toUniques(value: string | Array<string> | undefined): Array<string> {
+		return Array.isArray(value) ? value : splitStringToArray(value);
+	}
+
 	#map(
-		values: ReadonlyArray<Array<string>>,
+		values: ReadonlyArray<string | Array<string> | undefined>,
 		items: ReadonlyArray<UmbMemberGroupItemModel>,
 	): ReadonlyArray<Array<UmbMemberGroupItemModel>> {
 		const itemByUnique = new Map(items.map((item) => [item.unique, item]));
 		return values.map((v) =>
-			v.map((unique) => itemByUnique.get(unique)).filter((item): item is UmbMemberGroupItemModel => !!item),
+			this.#toUniques(v)
+				.map((unique) => itemByUnique.get(unique))
+				.filter((item): item is UmbMemberGroupItemModel => !!item),
 		);
 	}
 }
