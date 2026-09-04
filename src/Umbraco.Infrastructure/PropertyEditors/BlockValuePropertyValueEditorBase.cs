@@ -711,18 +711,27 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         string defaultCulture,
         HashSet<string> changedCultures)
     {
-        foreach (BlockItemVariation sourceVariation in sourceExpose.Where(sv => targetExpose.Any(tv => AreEqual(sv, tv)) is false))
+        var sourceKeys = sourceExpose.Select(ToKey).ToHashSet();
+        var targetKeys = targetExpose.Select(ToKey).ToHashSet();
+
+        foreach (BlockItemVariation sourceVariation in sourceExpose)
         {
-            changedCultures.Add(sourceVariation.Culture ?? defaultCulture);
+            if (targetKeys.Contains(ToKey(sourceVariation)) is false)
+            {
+                changedCultures.Add(sourceVariation.Culture ?? defaultCulture);
+            }
         }
 
-        foreach (BlockItemVariation targetVariation in targetExpose.Where(tv => sourceExpose.Any(sv => AreEqual(sv, tv)) is false))
+        foreach (BlockItemVariation targetVariation in targetExpose)
         {
-            changedCultures.Add(targetVariation.Culture ?? defaultCulture);
+            if (sourceKeys.Contains(ToKey(targetVariation)) is false)
+            {
+                changedCultures.Add(targetVariation.Culture ?? defaultCulture);
+            }
         }
 
-        static bool AreEqual(BlockItemVariation a, BlockItemVariation b) =>
-            a.ContentKey == b.ContentKey && a.Culture == b.Culture && a.Segment == b.Segment;
+        static (Guid ContentKey, string? Culture, string? Segment) ToKey(BlockItemVariation variation) =>
+            (variation.ContentKey, variation.Culture, variation.Segment);
     }
 
     private void CollectChangedCultures(
@@ -731,10 +740,18 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
         string defaultCulture,
         HashSet<string> changedCultures)
     {
+        Dictionary<Guid, BlockItemData> sourceBlockItemsByKey = ToBlockItemsByKey(sourceBlockItems);
+        Dictionary<Guid, BlockItemData> targetBlockItemsByKey = ToBlockItemsByKey(targetBlockItems);
+
         // blocks removed entirely (present in published, gone from edited): every value they held is an edit
         // for its own culture (its removal is the change).
-        foreach (BlockItemData targetBlockItem in targetBlockItems.Where(tb => sourceBlockItems.Any(sb => sb.Key == tb.Key) is false))
+        foreach (BlockItemData targetBlockItem in targetBlockItems)
         {
+            if (sourceBlockItemsByKey.ContainsKey(targetBlockItem.Key))
+            {
+                continue;
+            }
+
             foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
             {
                 changedCultures.Add(targetBlockPropertyValue.Culture ?? defaultCulture);
@@ -743,8 +760,7 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
         foreach (BlockItemData sourceBlockItem in sourceBlockItems)
         {
-            BlockItemData? targetBlockItem = targetBlockItems.FirstOrDefault(tb => tb.Key == sourceBlockItem.Key);
-            if (targetBlockItem is null)
+            if (targetBlockItemsByKey.TryGetValue(sourceBlockItem.Key, out BlockItemData? targetBlockItem) is false)
             {
                 // block newly added in the edited value: every value it holds is an edit for its own culture.
                 foreach (BlockPropertyValue sourceBlockPropertyValue in sourceBlockItem.Values)
@@ -755,19 +771,21 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 continue;
             }
 
+            Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue> sourceValuesByKey = ToBlockPropertyValuesByKey(sourceBlockItem.Values);
+            Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue> targetValuesByKey = ToBlockPropertyValuesByKey(targetBlockItem.Values);
+
             // values removed from an existing block also count as edits for their own culture.
-            foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values.Where(tv =>
-                         sourceBlockItem.Values.Any(sv => sv.Alias == tv.Alias && sv.Culture == tv.Culture && sv.Segment == tv.Segment) is false))
+            foreach (BlockPropertyValue targetBlockPropertyValue in targetBlockItem.Values)
             {
-                changedCultures.Add(targetBlockPropertyValue.Culture ?? defaultCulture);
+                if (sourceValuesByKey.ContainsKey(ToKey(targetBlockPropertyValue)) is false)
+                {
+                    changedCultures.Add(targetBlockPropertyValue.Culture ?? defaultCulture);
+                }
             }
 
             foreach (BlockPropertyValue sourceBlockPropertyValue in sourceBlockItem.Values)
             {
-                BlockPropertyValue? targetBlockPropertyValue = targetBlockItem.Values.FirstOrDefault(tv =>
-                    tv.Alias == sourceBlockPropertyValue.Alias &&
-                    tv.Culture == sourceBlockPropertyValue.Culture &&
-                    tv.Segment == sourceBlockPropertyValue.Segment);
+                targetValuesByKey.TryGetValue(ToKey(sourceBlockPropertyValue), out BlockPropertyValue? targetBlockPropertyValue);
 
                 // is this another editor that supports partial merging? i.e. blocks within blocks - recurse,
                 // mirroring the recursion performed by MergePartialPropertyValueForCulture.
@@ -780,7 +798,8 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 {
                     var nestedChangedCultures = nestedDataEditor!.GetChangedCulturesForPartialPropertyValues(
                         sourceBlockPropertyValue.Value,
-                        targetBlockPropertyValue?.Value)
+                        targetBlockPropertyValue?.Value,
+                        defaultCulture)
                         .ToArray();
 
                     if (nestedChangedCultures.Length is 0)
@@ -808,6 +827,31 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
                 }
             }
         }
+
+        static Dictionary<Guid, BlockItemData> ToBlockItemsByKey(List<BlockItemData> blockItems)
+        {
+            var result = new Dictionary<Guid, BlockItemData>(blockItems.Count);
+            foreach (BlockItemData blockItem in blockItems)
+            {
+                result.TryAdd(blockItem.Key, blockItem);
+            }
+
+            return result;
+        }
+
+        static Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue> ToBlockPropertyValuesByKey(IList<BlockPropertyValue> values)
+        {
+            var result = new Dictionary<(string Alias, string? Culture, string? Segment), BlockPropertyValue>(values.Count);
+            foreach (BlockPropertyValue value in values)
+            {
+                result.TryAdd(ToKey(value), value);
+            }
+
+            return result;
+        }
+
+        static (string Alias, string? Culture, string? Segment) ToKey(BlockPropertyValue value) =>
+            (value.Alias, value.Culture, value.Segment);
     }
 
     private bool BlockPropertyValuesAreEqual(object? sourceValue, object? targetValue)
