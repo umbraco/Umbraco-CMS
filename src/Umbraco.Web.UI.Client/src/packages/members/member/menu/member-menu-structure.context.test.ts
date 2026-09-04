@@ -11,6 +11,7 @@ import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu'
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
+import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 
 const SECTION_PATHNAME = 'member-management';
 
@@ -153,6 +154,28 @@ describe('UmbMemberMenuStructureWorkspaceContext', () => {
 		await flushMicrotasks();
 
 		expect(await firstValueFrom(context.structure)).to.deep.equal([ROOT_ITEM, CURRENT_ITEM]);
+	});
+
+	describe('UMB_PARENT_ENTITY_CONTEXT', () => {
+		it('is the root while the entity is new', async () => {
+			host.workspaceContext.setUnique(null);
+			host.workspaceContext.setVariants([{ ...INPUT_VARIANT, name: 'New Member' }]);
+			host.workspaceContext.setIsNew(true);
+			await flushMicrotasks();
+
+			const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
+			expect(parentContext?.getParent()).to.deep.equal({ unique: null, entityType: UMB_MEMBER_ROOT_ENTITY_TYPE });
+		});
+
+		it('is the root for an existing entity', async () => {
+			host.workspaceContext.setUnique(CURRENT_ITEM.unique);
+			host.workspaceContext.setVariants([INPUT_VARIANT]);
+			host.workspaceContext.setIsNew(false);
+			await flushMicrotasks();
+
+			const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
+			expect(parentContext?.getParent()).to.deep.equal({ unique: null, entityType: UMB_MEMBER_ROOT_ENTITY_TYPE });
+		});
 	});
 
 	describe('getItemHref', () => {

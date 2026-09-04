@@ -8,6 +8,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
+import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 
 class UmbRelationTypeWorkspaceContextStub extends UmbContextBase {
 	readonly #unique = new UmbBasicState<string | undefined>(undefined);
@@ -113,5 +114,25 @@ describe('UmbRelationTypeMenuStructureWorkspaceContext', () => {
 				isFolder: false,
 			},
 		]);
+	});
+
+	describe('UMB_PARENT_ENTITY_CONTEXT', () => {
+		it('is the root for an existing entity', async () => {
+			host.workspaceContext.setUnique('test-unique');
+			host.workspaceContext.setName('Related Documents');
+			await flushMicrotasks();
+
+			const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
+			expect(parentContext?.getParent()).to.deep.equal({ unique: ROOT_ITEM.unique, entityType: ROOT_ITEM.entityType });
+		});
+
+		it('is the root before the entity has a unique', async () => {
+			host.workspaceContext.setUnique(undefined);
+			host.workspaceContext.setName('New Relation Type');
+			await flushMicrotasks();
+
+			const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
+			expect(parentContext?.getParent()).to.deep.equal({ unique: ROOT_ITEM.unique, entityType: ROOT_ITEM.entityType });
+		});
 	});
 });

@@ -9,6 +9,7 @@ import { UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffi
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
+import { UMB_PARENT_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 
 class UmbEntityNamedDetailWorkspaceContextStub extends UmbContextBase {
 	public readonly IS_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT = true;
@@ -132,5 +133,29 @@ describe('UmbMemberGroupMenuStructureWorkspaceContext', () => {
 		await flushMicrotasks();
 
 		expect(await firstValueFrom(context.structure)).to.deep.equal([ROOT_ITEM, CURRENT_ITEM]);
+	});
+
+	describe('UMB_PARENT_ENTITY_CONTEXT', () => {
+		it('is the root while the entity is new', async () => {
+			host.workspaceContext.setEntityType(UMB_MEMBER_GROUP_ENTITY_TYPE);
+			host.workspaceContext.setUnique(null);
+			host.workspaceContext.setName('New Member Group');
+			host.workspaceContext.setIsNew(true);
+			await flushMicrotasks();
+
+			const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
+			expect(parentContext?.getParent()).to.deep.equal({ unique: ROOT_ITEM.unique, entityType: ROOT_ITEM.entityType });
+		});
+
+		it('is the root for an existing entity', async () => {
+			host.workspaceContext.setEntityType(UMB_MEMBER_GROUP_ENTITY_TYPE);
+			host.workspaceContext.setUnique(CURRENT_ITEM.unique);
+			host.workspaceContext.setName(CURRENT_ITEM.name);
+			host.workspaceContext.setIsNew(false);
+			await flushMicrotasks();
+
+			const parentContext = await context.getContext(UMB_PARENT_ENTITY_CONTEXT);
+			expect(parentContext?.getParent()).to.deep.equal({ unique: ROOT_ITEM.unique, entityType: ROOT_ITEM.entityType });
+		});
 	});
 });
