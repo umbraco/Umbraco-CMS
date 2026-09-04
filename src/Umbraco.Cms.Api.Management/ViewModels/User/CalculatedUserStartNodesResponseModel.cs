@@ -33,4 +33,8 @@ public class CalculatedUserStartNodesResponseModel
     public ISet<ReferenceByIdModel> ElementStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
 
     public bool HasElementRootAccess { get; set; }
+
+    public ISet<ReferenceByIdModel> DocumentBlueprintStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
+
+    public bool HasDocumentBlueprintRootAccess { get; set; }
 }
