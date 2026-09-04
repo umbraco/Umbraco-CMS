@@ -8,6 +8,7 @@ import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbEntityBulkActionProgressController } from '@umbraco-cms/backoffice/entity-bulk-action';
 
 /**
  * Entity action for trashing an item.
@@ -35,7 +36,10 @@ export class UmbTrashEntityAction<
 			this.args.meta.recycleBinRepositoryAlias,
 		);
 
-		const { error } = await recycleBinRepository.requestTrash({ unique: this.args.unique });
+		const { error } = await new UmbEntityBulkActionProgressController(this).runIndeterminate({
+			headline: '#actions_trashInProgress',
+			operation: (abortSignal) => recycleBinRepository.requestTrash({ unique: this.args.unique! }, abortSignal),
+		});
 		if (error) {
 			throw error;
 		}

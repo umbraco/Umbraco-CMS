@@ -71,6 +71,7 @@ export default {
 		toInTheTreeStructureBelow: 'to in the tree structure below',
 		translate: 'Translate',
 		trash: 'Trash',
+		trashInProgress: 'Trashing in progress - please wait...',
 		unlock: 'Unlock',
 		unpublish: 'Unpublish',
 		update: 'Update',
