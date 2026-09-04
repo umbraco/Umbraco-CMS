@@ -43,6 +43,7 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
     /// configuration is. The multi node tree picker is deprecated in favour of the dedicated document, media, element
     /// and member pickers, and its model is frozen as it stands rather than migrated.
     /// </remarks>
+#pragma warning disable CS0618 // the multi node tree picker is obsolete, and exempt for exactly that reason
     private static readonly Type[] _exemptConverters =
     [
         typeof(BlockListPropertyValueConverter),
@@ -59,6 +60,7 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
         [$"{nameof(MultiNodePickerConfigurationTreeSource)}.{nameof(MultiNodePickerConfigurationTreeSource.ObjectType)}"] =
             StringConstantsOf(typeof(Constants.UdiEntityType)),
     };
+#pragma warning restore CS0618
 
     private PropertyEditorCollection PropertyEditors => GetRequiredService<PropertyEditorCollection>();
 

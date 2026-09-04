@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Core.PropertyEditors;
+﻿namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Represents the configuration for the slider value editor.

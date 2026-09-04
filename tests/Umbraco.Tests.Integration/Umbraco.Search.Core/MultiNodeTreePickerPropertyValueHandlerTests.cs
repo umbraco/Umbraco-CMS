@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -8,6 +8,9 @@ using Umbraco.Cms.Search.Core.Models.Indexing;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Testing.Search;
+
+// The multi node tree picker is obsolete, but must keep working for the whole deprecation period.
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Search.Core;
 
@@ -219,3 +222,5 @@ public class MultiNodeTreePickerPropertyValueHandlerTests : ContentTestBase
         IndexerAndSearcher.Reset();
     }
 }
+
+#pragma warning restore CS0618 // Type or member is obsolete

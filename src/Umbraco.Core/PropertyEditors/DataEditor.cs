@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
