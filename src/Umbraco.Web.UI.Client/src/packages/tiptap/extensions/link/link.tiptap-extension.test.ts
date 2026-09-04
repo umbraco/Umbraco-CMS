@@ -62,6 +62,52 @@ describe('UmbLink', () => {
 		expect(editor.getHTML()).to.not.include('rel=');
 	});
 
+	describe('the type attribute', () => {
+		it('does not add a type attribute to a link that has none', () => {
+			editor.commands.setContent('<p><a href="https://example.com">link</a></p>');
+
+			expect(editor.getHTML()).to.not.include('type=');
+		});
+
+		it('drops the type attribute from a link that is not a local link (regression)', () => {
+			editor.commands.setContent('<p><a href="https://example.com" type="external">link</a></p>');
+
+			expect(editor.getHTML()).to.not.include('type=');
+		});
+
+		it('serializes the entity type of a local document link', () => {
+			editor.commands.setContent(
+				'<p><a href="/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" type="document">link</a></p>',
+			);
+
+			expect(editor.getHTML()).to.include('type="document"');
+		});
+
+		it('serializes the entity type of a local media link', () => {
+			editor.commands.setContent(
+				'<p><a href="/{localLink:7e21a725-b905-4c5f-86dc-8c41ec116e39}" type="media">link</a></p>',
+			);
+
+			expect(editor.getHTML()).to.include('type="media"');
+		});
+
+		it('serializes the entity type of a local link stored without a leading slash', () => {
+			editor.commands.setContent(
+				'<p><a href="{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" type="document">link</a></p>',
+			);
+
+			expect(editor.getHTML()).to.include('type="document"');
+		});
+
+		it('drops the type attribute from a URL that merely contains the local link token', () => {
+			editor.commands.setContent(
+				'<p><a href="https://example.com/?ref=/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}" type="external">link</a></p>',
+			);
+
+			expect(editor.getHTML()).to.not.include('type=');
+		});
+	});
+
 	// The `data-*` attributes extension is part of the default rich text editor configuration, and it round-trips
 	// every `data-*` attribute it finds. Without it, these tests pass no matter what `data-router-slot` does.
 	describe('with the `data-*` attributes extension enabled', () => {
