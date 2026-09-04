@@ -1,10 +1,15 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Providers;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Imaging.ImageSharp.ImageProcessors;
@@ -26,6 +31,23 @@ public static class UmbracoBuilderExtensions
     /// <returns>The <see cref="IServiceCollection" />.</returns>
     public static IServiceCollection AddUmbracoImageSharp(this IUmbracoBuilder builder)
     {
+        ImagingSettings imagingSettings = builder.Config
+            .GetSection(Constants.Configuration.ConfigImaging)
+            .Get<ImagingSettings>() ?? new ImagingSettings();
+
+        // ImageSharp pools unmanaged memory sized against the available memory and releases it only
+        // on a gen2 collection, so on a memory constrained host it sits at rest well above what the
+        // site needs. Applied before the configuration is shared so nothing allocates from the
+        // default pool first.
+        if (imagingSettings.Memory.Enabled)
+        {
+            Configuration.Default.MemoryAllocator = MemoryAllocator.Create(new MemoryAllocatorOptions
+            {
+                MaximumPoolSizeMegabytes = imagingSettings.Memory.ResolveMaximumPoolSizeMegabytes(
+                    GC.GetGCMemoryInfo().TotalAvailableMemoryBytes),
+            });
+        }
+
         // Add default ImageSharp configuration and service implementations
         builder.Services.AddSingleton(Configuration.Default);
         builder.Services.AddUnique<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
@@ -54,7 +76,11 @@ public static class UmbracoBuilderExtensions
         {
             options.AddFilter(new UmbracoPipelineFilter(nameof(ImageSharpComposer))
             {
-                PrePipeline = prePipeline => prePipeline.UseImageSharp()
+                PrePipeline = prePipeline =>
+                {
+                    prePipeline.UseMiddleware<ImageProcessingThrottleMiddleware>();
+                    prePipeline.UseImageSharp();
+                }
             });
         });
 
