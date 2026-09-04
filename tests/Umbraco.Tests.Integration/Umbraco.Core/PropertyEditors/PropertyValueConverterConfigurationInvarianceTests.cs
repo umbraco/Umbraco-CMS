@@ -59,7 +59,6 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
         Constants.PropertyEditors.Aliases.DropDownListFlexible,
         Constants.PropertyEditors.Aliases.MediaPicker3,
         Constants.PropertyEditors.Aliases.MultiUrlPicker,
-        Constants.PropertyEditors.Aliases.Slider,
     ];
 
     /// <summary>

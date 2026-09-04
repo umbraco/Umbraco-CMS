@@ -1,0 +1,375 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Text.Json.Nodes;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+/// Represents a slider editor.
+/// </summary>
+/// <remarks>
+/// There is one slider editor per shape of value a slider holds - a single value or a range of two - so that the
+/// type a slider property yields follows from the editor rather than from its configuration. Both are edited and
+/// stored the same way, which is what this base holds.
+/// </remarks>
+public abstract class SliderPropertyEditorBase : DataEditor, IValueSchemaProvider
+{
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="SliderPropertyEditorBase" /> class.
+    /// </summary>
+    /// <param name="dataValueEditorFactory">Factory used to create data value editors for the slider property editor.</param>
+    protected SliderPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory)
+        : base(dataValueEditorFactory)
+        => SupportsReadOnly = true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(SliderPropertyValueEditor.SliderRange);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("object", "null"),
+            ["properties"] = new JsonObject
+            {
+                ["from"] = new JsonObject
+                {
+                    ["type"] = "number",
+                    ["description"] = "Slider range start value",
+                },
+                ["to"] = new JsonObject
+                {
+                    ["type"] = "number",
+                    ["description"] = "Slider range end value (same as 'from' for single-value slider)",
+                },
+            },
+            ["required"] = new JsonArray("from", "to"),
+            ["description"] = "Slider value with from/to range",
+        };
+
+        // Add min/max constraints from configuration if available
+        if (configuration is SliderConfigurationBase sliderConfig)
+        {
+            var fromSchema = (JsonObject)schema["properties"]!["from"]!;
+            var toSchema = (JsonObject)schema["properties"]!["to"]!;
+
+            if (sliderConfig.MinimumValue != 0)
+            {
+                fromSchema["minimum"] = sliderConfig.MinimumValue;
+                toSchema["minimum"] = sliderConfig.MinimumValue;
+            }
+
+            if (sliderConfig.MaximumValue != 0)
+            {
+                fromSchema["maximum"] = sliderConfig.MaximumValue;
+                toSchema["maximum"] = sliderConfig.MaximumValue;
+            }
+        }
+
+        return schema;
+    }
+
+    /// <inheritdoc />
+    protected override IDataValueEditor CreateValueEditor()
+        => DataValueEditorFactory.Create<SliderPropertyValueEditor>(Attribute!);
+
+    /// <summary>
+    /// Defines the value editor for the slider property editor.
+    /// </summary>
+    internal sealed class SliderPropertyValueEditor : DataValueEditor
+    {
+        private readonly IJsonSerializer _jsonSerializer;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SliderPropertyValueEditor"/> class.
+        /// </summary>
+        public SliderPropertyValueEditor(
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute,
+            ILocalizedTextService localizedTextService)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
+        {
+            _jsonSerializer = jsonSerializer;
+            Validators.AddRange(new RangeValidator(localizedTextService), new MinMaxValidator(localizedTextService), new StepValidator(localizedTextService));
+        }
+
+        /// <inheritdoc/>
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+            // value is stored as a string - either a single decimal value
+            // or a two decimal values separated by comma (for range sliders)
+            var value = property.GetValue(culture, segment);
+            if (value is not string stringValue)
+            {
+                return null;
+            }
+
+            var parts = stringValue.Split(Constants.CharArrays.Comma);
+            var parsed = parts
+                .Select(s => decimal.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var i) ? i : (decimal?)null)
+                .Where(i => i != null)
+                .Select(i => i!.Value)
+                .ToArray();
+
+            return parts.Length == parsed.Length && parsed.Length is 1 or 2
+                ? new SliderRange { From = parsed.First(), To = parsed.Last() }
+                : null;
+        }
+
+        /// <inheritdoc/>
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+            => editorValue.Value is not null && _jsonSerializer.TryDeserialize(editorValue.Value, out SliderRange? sliderRange)
+                ? sliderRange.ToString()
+                : null;
+
+        /// <summary>
+        /// Represents a slider value.
+        /// </summary>
+        internal sealed class SliderRange
+        {
+            /// <summary>
+            /// Gets or sets the slider range from value.
+            /// </summary>
+            public decimal From { get; set; }
+
+            /// <summary>
+            /// Gets or sets the slide range to value.
+            /// </summary>
+            public decimal To { get; set; }
+
+            /// <inheritdoc/>
+            public override string ToString()
+                => From == To
+                    ? $"{From.ToString(CultureInfo.InvariantCulture)}"
+                    : $"{From.ToString(CultureInfo.InvariantCulture)},{To.ToString(CultureInfo.InvariantCulture)}";
+        }
+
+        /// <summary>
+        /// Base validator for the slider property editor validation against data type configured values.
+        /// </summary>
+        internal abstract class SliderPropertyConfigurationValidatorBase
+        {
+            /// <summary>
+            /// The configuration key for the minimum value.
+            /// </summary>
+            protected const string ConfigurationKeyMinValue = "minVal";
+
+            /// <summary>
+            /// The configuration key for the maximum value.
+            /// </summary>
+            protected const string ConfigurationKeyMaxValue = "maxVal";
+
+            /// <summary>
+            /// The configuration key for the step value.
+            /// </summary>
+            protected const string ConfigurationKeyStepValue = "step";
+
+            /// <summary>
+            /// The configuration key for the minimum range value.
+            /// </summary>
+            protected const string ConfigurationKeyMinimumRangeValue = "minimumRange";
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="SliderPropertyConfigurationValidatorBase"/> class.
+            /// </summary>
+            protected SliderPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService) => LocalizedTextService = localizedTextService;
+
+            /// <summary>
+            /// Gets the <see cref="ILocalizedTextService"/>.
+            /// </summary>
+            protected ILocalizedTextService LocalizedTextService { get; }
+
+            /// <summary>
+            /// Parses a <see cref="SliderRange"/> from the provided value.
+            /// </summary>
+            protected static bool TryParsePropertyValue(object? value, [NotNullWhen(true)] out SliderRange? parsedValue)
+            {
+                if (value is null || value is not JsonObject valueAsJsonObject)
+                {
+                    parsedValue = null;
+                    return false;
+                }
+
+                var from = GetDecimalValue(valueAsJsonObject, nameof(SliderRange.From).ToLowerInvariant());
+                var to = GetDecimalValue(valueAsJsonObject, nameof(SliderRange.To).ToLowerInvariant());
+                if (from.HasValue is false || to.HasValue is false)
+                {
+                    parsedValue = null;
+                    return false;
+                }
+
+                parsedValue = new SliderRange
+                {
+                    From = from.Value,
+                    To = to.Value,
+                };
+
+                return true;
+            }
+
+            private static decimal? GetDecimalValue(JsonObject valueAsJsonObject, string key)
+                => valueAsJsonObject[key]?.GetValue<decimal>();
+        }
+
+        /// <summary>
+        /// Validates the range configuration for the slider property editor.
+        /// </summary>
+        internal sealed class RangeValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="RangeValidator"/> class.
+            /// </summary>
+            /// <param name="localizedTextService">The localized text service.</param>
+            public RangeValidator(ILocalizedTextService localizedTextService)
+                : base(localizedTextService)
+            {
+            }
+
+            /// <inheritdoc/>
+            public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
+            {
+                if (TryParsePropertyValue(value, out SliderRange? sliderRange) is false)
+                {
+                    yield break;
+                }
+
+                if (dataTypeConfiguration is not SliderConfigurationBase sliderConfiguration)
+                {
+                    yield break;
+                }
+
+                // Only the editor that holds a range accepts one, and its configuration is what identifies it.
+                var rangeSliderConfiguration = sliderConfiguration as RangeSliderConfiguration;
+
+                if (rangeSliderConfiguration is null && sliderRange.From != sliderRange.To)
+                {
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "unexpectedRange", [sliderRange.ToString()]),
+                        ["value"]);
+                }
+
+                if (rangeSliderConfiguration is not null && sliderRange.To < sliderRange.From)
+                {
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "invalidRange", [sliderRange.ToString()]),
+                        ["value"]);
+                }
+
+                if (rangeSliderConfiguration is not null
+                    && IsRangeSpanBelowMinimum(rangeSliderConfiguration, sliderRange, out var effectiveMinimumRange))
+                {
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "minimumRange", [sliderRange.ToString(), effectiveMinimumRange.ToString(CultureInfo.InvariantCulture)]),
+                        ["value"]);
+                }
+            }
+
+            /// <summary>
+            /// Checks whether the span between the range values is below the configured minimum range.
+            /// Negative minimumRange values are clamped to zero (treated as "no minimum range").
+            /// </summary>
+            private static bool IsRangeSpanBelowMinimum(RangeSliderConfiguration configuration, SliderRange range, out decimal effectiveMinimumRange)
+            {
+                effectiveMinimumRange = Math.Max(configuration.MinimumRange, 0);
+                return range.To >= range.From &&
+                    (range.To - range.From) < effectiveMinimumRange;
+            }
+        }
+
+        /// <summary>
+        /// Validates the min/max configuration for the slider property editor.
+        /// </summary>
+        internal sealed class MinMaxValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
+            /// </summary>
+            /// <param name="localizedTextService">Service used to provide localized text for validation messages.</param>
+            public MinMaxValidator(ILocalizedTextService localizedTextService)
+                : base(localizedTextService)
+            {
+            }
+
+            /// <inheritdoc/>
+            public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
+            {
+                if (TryParsePropertyValue(value, out SliderRange? sliderRange) is false)
+                {
+                    yield break;
+                }
+
+                if (dataTypeConfiguration is not SliderConfigurationBase sliderConfiguration)
+                {
+                    yield break;
+                }
+
+                if (sliderRange.From < sliderConfiguration.MinimumValue)
+                {
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [sliderRange.From.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
+                        ["value"]);
+                }
+
+                if (sliderConfiguration.MaximumValue != 0 && sliderRange.To > sliderConfiguration.MaximumValue)
+                {
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MaximumValue.ToString(CultureInfo.InvariantCulture)]),
+                        ["value"]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Validates the step configuration for the slider property editor.
+        /// </summary>
+        internal sealed class StepValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="StepValidator"/> class.
+            /// </summary>
+            public StepValidator(ILocalizedTextService localizedTextService)
+                : base(localizedTextService)
+            {
+            }
+
+            /// <inheritdoc/>
+            public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration, PropertyValidationContext validationContext)
+            {
+                if (TryParsePropertyValue(value, out SliderRange? sliderRange) is false)
+                {
+                    yield break;
+                }
+
+                if (dataTypeConfiguration is not SliderConfigurationBase sliderConfiguration)
+                {
+                    yield break;
+                }
+
+                if (ValidationHelper.IsValueValidForStep(sliderRange.From, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false ||
+                    ValidationHelper.IsValueValidForStep(sliderRange.To, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false)
+                {
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
+                        ["value"]);
+                }
+            }
+        }
+    }
+}

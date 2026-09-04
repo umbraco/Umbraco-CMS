@@ -2,10 +2,10 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Slider',
-	alias: 'Umbraco.Slider',
+	name: 'Range Slider',
+	alias: 'Umbraco.RangeSlider',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Slider',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.RangeSlider',
 		settings: {
 			properties: [
 				{
@@ -22,10 +22,18 @@ export const manifest: ManifestPropertyEditorSchema = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 					config: [{ alias: 'step', value: '0.00001' }],
 				},
+				{
+					alias: 'minimumRange',
+					label: 'Minimum range',
+					description: 'Minimum difference between the low and high values. Set to 0 to allow equal values.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
+					config: [{ alias: 'step', value: '0.00001' }],
+				},
 			],
 			defaultData: [
 				{ alias: 'minVal', value: 0.0 },
 				{ alias: 'maxVal', value: 100.0 },
+				{ alias: 'minimumRange', value: 0.0 },
 			],
 		},
 	},

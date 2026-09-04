@@ -247,9 +247,14 @@ public static partial class Constants
             public const string RadioButtonList = "Umbraco.RadioButtonList";
 
             /// <summary>
-            ///     Slider.
+            ///     Slider, holding a single value.
             /// </summary>
             public const string Slider = "Umbraco.Slider";
+
+            /// <summary>
+            ///     Slider, holding a range of two values.
+            /// </summary>
+            public const string RangeSlider = "Umbraco.RangeSlider";
 
             /// <summary>
             ///     Tags.
