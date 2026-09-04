@@ -14,15 +14,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     The default converter for all property editors that expose a JSON value type
 /// </summary>
 /// <remarks>
-///     Since this is a default (umbraco) converter it will be ignored if another converter found conflicts with this one.
+///     Since this is a default converter, it is ignored when a non-default converter also applies. Other default converters
+///     for property editors with a JSON value type must declare that they shadow this one.
 /// </remarks>
 [DefaultPropertyValueConverter]
 public class JsonValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly ILogger<JsonValueConverter> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
-
-    private readonly string[] _excludedPropertyEditors = { Constants.PropertyEditors.Aliases.MediaPicker3 };
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="JsonValueConverter" /> class.
@@ -34,16 +33,13 @@ public class JsonValueConverter : PropertyValueConverterBase, IDeliveryApiProper
     }
 
     /// <summary>
-    ///     It is a converter for any value type that is "JSON"
-    ///     Unless it's in the Excluded Property Editors list
-    ///     The new MediaPicker 3 stores JSON but we want to use its own ValueConvertor
+    ///     Determines whether this converter applies to any property editor whose value type is <see cref="ValueTypes.Json" />.
     /// </summary>
     /// <param name="propertyType">The published property type to check.</param>
     /// <returns>True if this converter can convert the property type.</returns>
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
         _propertyEditors.TryGet(propertyType.EditorAlias, out IDataEditor? editor)
-        && editor.GetValueEditor().ValueType.InvariantEquals(ValueTypes.Json)
-        && _excludedPropertyEditors.Contains(propertyType.EditorAlias) == false;
+        && editor.GetValueEditor().ValueType.InvariantEquals(ValueTypes.Json);
 
     /// <summary>
     /// Gets the type of the property value for the given published property type.
