@@ -60,7 +60,7 @@ public class HealthCheckNotifierJobTests
     }
 
     [Test]
-    public void Completes_Scope_When_Notification_Method_Throws()
+    public void Does_Not_Complete_Scope_When_Notification_Method_Throws()
     {
         var sut = CreateHealthCheckNotifier();
         _mockNotificationMethod
@@ -69,7 +69,7 @@ public class HealthCheckNotifierJobTests
 
         Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync());
 
-        _mockScope.Verify(x => x.Complete(), Times.Once);
+        _mockScope.Verify(x => x.Complete(), Times.Never);
     }
 
     [Test]
