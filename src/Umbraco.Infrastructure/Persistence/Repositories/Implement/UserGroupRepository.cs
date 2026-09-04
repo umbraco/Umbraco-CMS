@@ -512,6 +512,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.StartContentId,
                 x => x.StartMediaId,
                 x => x.StartElementId,
+                x => x.StartDocumentBlueprintId,
                 x => x.UpdateDate,
                 x => x.Alias,
                 x => x.Name,

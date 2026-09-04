@@ -39,6 +39,7 @@ public class User : EntityBase, IUser, IProfile
     private int[]? _startContentIds;
     private int[]? _startMediaIds;
     private int[]? _startElementIds;
+    private int[]? _startDocumentBlueprintIds;
     private HashSet<IReadOnlyUserGroup> _userGroups;
 
     private string _username;
@@ -58,6 +59,7 @@ public class User : EntityBase, IUser, IProfile
         _startContentIds = [];
         _startMediaIds = [];
         _startElementIds = [];
+        _startDocumentBlueprintIds = [];
 
         // cannot be null
         _rawPasswordValue = string.Empty;
@@ -107,6 +109,7 @@ public class User : EntityBase, IUser, IProfile
         _startContentIds = [];
         _startMediaIds = [];
         _startElementIds = [];
+        _startDocumentBlueprintIds = [];
     }
 
     /// <summary>
@@ -134,7 +137,7 @@ public class User : EntityBase, IUser, IProfile
         IEnumerable<IReadOnlyUserGroup> userGroups,
         int[] startContentIds,
         int[] startMediaIds)
-        : this(globalSettings, id, name, email, username, rawPasswordValue, passwordConfig, userGroups, startContentIds, startMediaIds, [])
+        : this(globalSettings, id, name, email, username, rawPasswordValue, passwordConfig, userGroups, startContentIds, startMediaIds, [], [])
     {
     }
 
@@ -152,6 +155,7 @@ public class User : EntityBase, IUser, IProfile
     /// <param name="startContentIds">The start content identifiers.</param>
     /// <param name="startMediaIds">The start media identifiers.</param>
     /// <param name="startElementIds">The start element identifiers.</param>
+    [Obsolete("Use the constructor that includes startDocumentBlueprintIds. Scheduled for removal in Umbraco 21.")]
     public User(
         GlobalSettings globalSettings,
         int id,
@@ -164,6 +168,38 @@ public class User : EntityBase, IUser, IProfile
         int[] startContentIds,
         int[] startMediaIds,
         int[] startElementIds)
+        : this(globalSettings, id, name, email, username, rawPasswordValue, passwordConfig, userGroups, startContentIds, startMediaIds, startElementIds, [])
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="User"/> class for an existing user.
+    /// </summary>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="email">The email.</param>
+    /// <param name="username">The username.</param>
+    /// <param name="rawPasswordValue">The raw password value.</param>
+    /// <param name="passwordConfig">The password configuration.</param>
+    /// <param name="userGroups">The user groups.</param>
+    /// <param name="startContentIds">The start content identifiers.</param>
+    /// <param name="startMediaIds">The start media identifiers.</param>
+    /// <param name="startElementIds">The start element identifiers.</param>
+    /// <param name="startDocumentBlueprintIds">The start document blueprint container identifiers.</param>
+    public User(
+        GlobalSettings globalSettings,
+        int id,
+        string? name,
+        string email,
+        string? username,
+        string? rawPasswordValue,
+        string? passwordConfig,
+        IEnumerable<IReadOnlyUserGroup> userGroups,
+        int[] startContentIds,
+        int[] startMediaIds,
+        int[] startElementIds,
+        int[] startDocumentBlueprintIds)
         : this(globalSettings)
     {
         // we allow whitespace for this value so just check null
@@ -199,6 +235,7 @@ public class User : EntityBase, IUser, IProfile
         _startContentIds = startContentIds ?? throw new ArgumentNullException(nameof(startContentIds));
         _startMediaIds = startMediaIds ?? throw new ArgumentNullException(nameof(startMediaIds));
         _startElementIds = startElementIds ?? throw new ArgumentNullException(nameof(startElementIds));
+        _startDocumentBlueprintIds = startDocumentBlueprintIds ?? throw new ArgumentNullException(nameof(startDocumentBlueprintIds));
     }
 
     /// <inheritdoc />
@@ -417,6 +454,20 @@ public class User : EntityBase, IUser, IProfile
     {
         get => _startElementIds;
         set => SetPropertyValueAndDetectChanges(value, ref _startElementIds, nameof(StartElementIds), IntegerEnumerableComparer);
+    }
+
+    /// <summary>
+    ///     Gets or sets the start document blueprint container ids.
+    /// </summary>
+    /// <value>
+    ///     The start document blueprint container ids.
+    /// </value>
+    [DataMember]
+    [DoNotClone]
+    public int[]? StartDocumentBlueprintIds
+    {
+        get => _startDocumentBlueprintIds;
+        set => SetPropertyValueAndDetectChanges(value, ref _startDocumentBlueprintIds, nameof(StartDocumentBlueprintIds), IntegerEnumerableComparer);
     }
 
     /// <inheritdoc />
