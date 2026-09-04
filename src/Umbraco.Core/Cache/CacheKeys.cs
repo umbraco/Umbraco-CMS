@@ -37,6 +37,11 @@ public static class CacheKeys
     public const string UserAllElementStartNodesPrefix = "AllElementStartNodes";
 
     /// <summary>
+    ///     Cache key prefix for user's document blueprint start nodes.
+    /// </summary>
+    public const string UserAllDocumentBlueprintStartNodesPrefix = "AllDocumentBlueprintStartNodes";
+
+    /// <summary>
     ///     Cache key prefix for user's media start node paths.
     /// </summary>
     public const string UserMediaStartNodePathsPrefix = "MediaStartNodePaths";

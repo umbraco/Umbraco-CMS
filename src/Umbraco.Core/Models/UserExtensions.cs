@@ -119,6 +119,14 @@ public static class UserExtensions
             Constants.System.RecycleBinMedia);
 
     /// <summary>
+    ///     Determines whether the user has access to the document blueprint root.
+    /// </summary>
+    internal static bool HasDocumentBlueprintRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
+        ContentPermissions.HasPathAccessWithoutRecycleBin(
+            Constants.System.RootString,
+            user.CalculateDocumentBlueprintStartNodeIds(entityService, appCaches));
+
+    /// <summary>
     ///     Determines whether the user has access to the elements root.
     /// </summary>
     internal static bool HasElementRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
@@ -331,6 +339,37 @@ public static class UserExtensions
             true);
 
         return result;
+    }
+
+    /// <summary>
+    ///     Gets the document blueprint start node identifiers for the user.
+    /// </summary>
+    /// <param name="user">The user to calculate start nodes for.</param>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="appCaches">The application caches.</param>
+    /// <returns>
+    ///     The combined start node identifiers, or <c>null</c> when none are granted, which denies access.
+    /// </returns>
+    public static int[]? CalculateDocumentBlueprintStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
+    {
+        var cacheKey = user.UserCacheKey(CacheKeys.UserAllDocumentBlueprintStartNodesPrefix);
+        IAppPolicyCache runtimeCache = GetUserCache(appCaches);
+        return runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
+            {
+                var gsn = user.Groups.Where(x => x.StartDocumentBlueprintId.HasValue)
+                    .Select(x => x.StartDocumentBlueprintId!.Value).Distinct().ToArray();
+                var usn = user.StartDocumentBlueprintIds;
+                if (usn is not null)
+                {
+                    return CombineStartNodes(UmbracoObjectTypes.DocumentBlueprintContainer, gsn, usn, entityService);
+                }
+
+                return null;
+            },
+            TimeSpan.FromMinutes(2),
+            true);
     }
 
     /// <summary>

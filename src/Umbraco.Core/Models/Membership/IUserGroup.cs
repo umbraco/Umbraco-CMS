@@ -27,6 +27,12 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     int? StartElementId { get; set; }
 
     /// <summary>
+    ///     Gets or sets the container that members of the group start at in the document blueprint tree.
+    ///     A null value gives the group no access to document blueprints.
+    /// </summary>
+    int? StartDocumentBlueprintId { get; set; }
+
+    /// <summary>
     ///     The icon
     /// </summary>
     string? Icon { get; set; }
