@@ -125,6 +125,8 @@ export type CalculatedUserStartNodesResponseModel = {
     hasMediaRootAccess: boolean;
     elementStartNodeIds: Array<ReferenceByIdModel>;
     hasElementRootAccess: boolean;
+    documentBlueprintStartNodeIds: Array<ReferenceByIdModel>;
+    hasDocumentBlueprintRootAccess: boolean;
 };
 
 export type ChangePasswordCurrentUserRequestModel = {
@@ -509,6 +511,8 @@ export type CreateUserGroupRequestModel = {
     mediaRootAccess: boolean;
     elementStartNode?: null | ReferenceByIdModel;
     elementRootAccess: boolean;
+    documentBlueprintStartNode?: null | ReferenceByIdModel;
+    documentBlueprintRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<IPermissionPresentationModel>;
 };
@@ -562,6 +566,8 @@ export type CurrentUserResponseModel = {
     hasMediaRootAccess: boolean;
     elementStartNodeIds: Array<ReferenceByIdModel>;
     hasElementRootAccess: boolean;
+    documentBlueprintStartNodeIds: Array<ReferenceByIdModel>;
+    hasDocumentBlueprintRootAccess: boolean;
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
@@ -3225,6 +3231,8 @@ export type UpdateUserGroupRequestModel = {
     mediaRootAccess: boolean;
     elementStartNode?: null | ReferenceByIdModel;
     elementRootAccess: boolean;
+    documentBlueprintStartNode?: null | ReferenceByIdModel;
+    documentBlueprintRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<IPermissionPresentationModel>;
 };
@@ -3242,6 +3250,8 @@ export type UpdateUserRequestModel = {
     hasMediaRootAccess: boolean;
     elementStartNodeIds: Array<ReferenceByIdModel>;
     hasElementRootAccess: boolean;
+    documentBlueprintStartNodeIds: Array<ReferenceByIdModel>;
+    hasDocumentBlueprintRootAccess: boolean;
     email: string;
     userName: string;
     name: string;
@@ -3334,6 +3344,8 @@ export type UserGroupResponseModel = {
     mediaRootAccess: boolean;
     elementStartNode?: null | ReferenceByIdModel;
     elementRootAccess: boolean;
+    documentBlueprintStartNode?: null | ReferenceByIdModel;
+    documentBlueprintRootAccess: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<IPermissionPresentationModel>;
 };
@@ -3389,6 +3401,8 @@ export type UserResponseModel = {
     hasMediaRootAccess: boolean;
     elementStartNodeIds: Array<ReferenceByIdModel>;
     hasElementRootAccess: boolean;
+    documentBlueprintStartNodeIds: Array<ReferenceByIdModel>;
+    hasDocumentBlueprintRootAccess: boolean;
     avatarUrls: Array<string>;
     state: UserStateModel;
     failedLoginAttempts: number;
