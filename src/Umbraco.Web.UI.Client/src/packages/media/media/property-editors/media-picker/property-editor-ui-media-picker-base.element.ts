@@ -1,6 +1,8 @@
 import type { UmbInputRichMediaElement } from '../../components/input-rich-media/input-rich-media.element.js';
 import type { UmbCropModel, UmbMediaPickerValueModel } from '../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
+import { UmbDynamicRootResolver } from '@umbraco-cms/backoffice/content-picker';
+import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/content-picker';
 import { html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -43,6 +45,8 @@ export abstract class UmbPropertyEditorUIMediaPickerElementBase
 		const startNodeId = config.getValueByAlias<string>('startNodeId') ?? '';
 		this._startNode = startNodeId ? { unique: startNodeId, entityType: UMB_MEDIA_ENTITY_TYPE } : undefined;
 
+		this.#dynamicRoot = config.getValueByAlias<UmbContentPickerDynamicRoot>('dynamicRoot');
+
 		const minMax = config.getValueByAlias<UmbNumberRangeValueType>('validationLimit');
 		this._min = minMax?.min ?? 0;
 		this._max = this.multiple ? (minMax?.max ?? Infinity) : 1;
@@ -69,6 +73,10 @@ export abstract class UmbPropertyEditorUIMediaPickerElementBase
 
 	@state()
 	private _startNode?: UmbTreeStartNode;
+
+	#dynamicRoot?: UmbContentPickerDynamicRoot;
+
+	#dynamicRootResolver = new UmbDynamicRootResolver(this);
 
 	@state()
 	private _focalPointEnabled: boolean = false;
@@ -115,8 +123,16 @@ export abstract class UmbPropertyEditorUIMediaPickerElementBase
 		);
 	}
 
-	override firstUpdated() {
+	override async firstUpdated() {
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-rich-media')!);
+
+		// A fixed start node wins; the dynamic root is only resolved when there is none.
+		if (!this._startNode) {
+			const unique = await this.#dynamicRootResolver.resolveStartNodeUnique(this.#dynamicRoot);
+			if (unique) {
+				this._startNode = { unique, entityType: UMB_MEDIA_ENTITY_TYPE };
+			}
+		}
 	}
 
 	override focus() {

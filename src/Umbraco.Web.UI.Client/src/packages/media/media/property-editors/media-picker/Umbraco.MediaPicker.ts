@@ -28,6 +28,12 @@ export const manifest: ManifestPropertyEditorSchema = {
 					config: [{ alias: 'validationLimit', value: { min: 0, max: 1 } }],
 				},
 				{
+					alias: 'dynamicRoot',
+					label: 'Dynamic root',
+					description: 'Resolve the start node from the content being edited, when no start node is set',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.DynamicRoot',
+				},
+				{
 					alias: 'enableLocalFocalPoint',
 					label: 'Enable Focal Point',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',

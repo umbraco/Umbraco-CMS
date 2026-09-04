@@ -51,6 +51,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 						config: [{ alias: 'validationLimit', value: { min: 0, max: 1 } }],
 						weight: 30,
 					},
+					{
+						alias: 'dynamicRoot',
+						label: 'Dynamic root',
+						description: 'Resolve the start node from the content being edited, when no start node is set',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.DynamicRoot',
+						weight: 40,
+					},
 				],
 			},
 		},

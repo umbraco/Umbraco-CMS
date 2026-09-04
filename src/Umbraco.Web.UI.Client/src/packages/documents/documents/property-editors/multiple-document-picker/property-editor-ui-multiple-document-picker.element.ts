@@ -1,5 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
+import { UmbDynamicRootResolver } from '@umbraco-cms/backoffice/content-picker';
+import type { UmbContentPickerDynamicRoot } from '@umbraco-cms/backoffice/content-picker';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -33,6 +35,7 @@ export class UmbPropertyEditorUIMultipleDocumentPickerElement
 		this._max = minMax?.max ?? Infinity;
 
 		this._startNodeId = config.getValueByAlias('startNodeId');
+		this.#dynamicRoot = config.getValueByAlias<UmbContentPickerDynamicRoot>('dynamicRoot');
 
 		const allowedContentTypes = config.getValueByAlias<string>('allowedContentTypes');
 		this._allowedContentTypes = allowedContentTypes ? allowedContentTypes.split(',').filter(Boolean) : undefined;
@@ -62,6 +65,10 @@ export class UmbPropertyEditorUIMultipleDocumentPickerElement
 	@state()
 	private _startNodeId?: string;
 
+	#dynamicRoot?: UmbContentPickerDynamicRoot;
+
+	#dynamicRootResolver = new UmbDynamicRootResolver(this);
+
 	@state()
 	private _allowedContentTypes?: Array<string>;
 
@@ -84,8 +91,13 @@ export class UmbPropertyEditorUIMultipleDocumentPickerElement
 		);
 	}
 
-	override firstUpdated() {
+	override async firstUpdated() {
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-input-document')!);
+
+		// A fixed start node wins; the dynamic root is only resolved when there is none.
+		if (!this._startNodeId) {
+			this._startNodeId = await this.#dynamicRootResolver.resolveStartNodeUnique(this.#dynamicRoot);
+		}
 
 		if (this._min && this._max && this._min > this._max) {
 			console.warn(

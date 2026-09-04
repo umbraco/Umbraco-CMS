@@ -37,6 +37,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 						],
 						weight: 20,
 					},
+					{
+						alias: 'dynamicRoot',
+						label: 'Dynamic root',
+						description: 'Resolve the start node from the content being edited, when no start node is set',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.DynamicRoot',
+						weight: 30,
+					},
 				],
 			},
 		},
