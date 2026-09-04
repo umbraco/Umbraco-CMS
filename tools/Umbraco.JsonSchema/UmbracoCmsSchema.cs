@@ -1,6 +1,8 @@
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 
+namespace Umbraco.JsonSchema;
+
 internal sealed class UmbracoCmsSchema
 {
     public required UmbracoDefinition Umbraco { get; set; }
