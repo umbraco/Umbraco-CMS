@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT } from '../../user-permissions/document/constants.js';
+import { UMB_CURRENT_USER_DOCUMENT_BLUEPRINT_ACCESS_CONDITION_ALIAS } from '@umbraco-cms/backoffice/current-user';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -23,6 +24,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
+			},
+			{
+				alias: UMB_CURRENT_USER_DOCUMENT_BLUEPRINT_ACCESS_CONDITION_ALIAS,
 			},
 		],
 	},
