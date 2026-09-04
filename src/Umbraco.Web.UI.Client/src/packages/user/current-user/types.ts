@@ -13,12 +13,14 @@ export interface UmbCurrentUserModel {
 	allowedSections: Array<string>;
 	avatarUrls: Array<string>;
 	documentStartNodeUniques: Array<UmbReferenceByUnique>;
+	documentBlueprintStartNodeUniques: Array<UmbReferenceByUnique>;
 	elementStartNodeUniques: Array<UmbReferenceByUnique>;
 	email: string;
 	fallbackPermissions: Array<string>;
 	hasAccessToAllLanguages: boolean;
 	hasAccessToSensitiveData: boolean;
 	hasDocumentRootAccess: boolean;
+	hasDocumentBlueprintRootAccess: boolean;
 	hasElementRootAccess: boolean;
 	hasMediaRootAccess: boolean;
 	isAdmin: boolean;
