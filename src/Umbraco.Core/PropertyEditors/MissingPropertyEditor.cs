@@ -39,6 +39,7 @@ public class MissingPropertyEditor : IDataEditor
     public string Name => "Missing property editor";
 
     /// <inheritdoc />
+    [Obsolete("Nothing reads this value. Declare \"deprecated\" on the property editor UI manifest instead, which is what the backoffice reads. Scheduled for removal in Umbraco 21.")]
     public bool IsDeprecated => false;
 
     /// <inheritdoc />

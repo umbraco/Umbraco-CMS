@@ -68,6 +68,7 @@ public sealed class DataEditorAttribute : Attribute
     ///     Gets or sets a value indicating whether the value editor is deprecated.
     /// </summary>
     /// <remarks>A deprecated editor is still supported but not proposed in the UI.</remarks>
+    [Obsolete("Nothing reads this value. Declare \"deprecated\" on the property editor UI manifest instead, which is what the backoffice reads. Scheduled for removal in Umbraco 21.")]
     public bool IsDeprecated { get; set; }
 
     /// <summary>

@@ -49,6 +49,12 @@ export interface MetaPropertyEditorUi {
 	 * @example ["text", "input", "string"]
 	 */
 	keywords?: string[];
+	/**
+	 * Whether this property editor UI is deprecated. A deprecated property editor UI is not offered when picking
+	 * an editor for a data type, but continues to work for the data types already using it.
+	 * @default false
+	 */
+	deprecated?: boolean;
 }
 
 // Model
