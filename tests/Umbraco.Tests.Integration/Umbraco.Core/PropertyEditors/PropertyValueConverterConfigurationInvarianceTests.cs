@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Reflection;
@@ -57,7 +57,6 @@ internal sealed class PropertyValueConverterConfigurationInvarianceTests : Umbra
     private static readonly string[] _knownVariantModelTypes =
     [
         Constants.PropertyEditors.Aliases.DropDownListFlexible,
-        Constants.PropertyEditors.Aliases.MediaPicker3,
         Constants.PropertyEditors.Aliases.MultiUrlPicker,
     ];
 

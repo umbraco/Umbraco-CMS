@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.PropertyEditors;
+﻿using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core;
 
@@ -175,6 +175,11 @@ public static partial class Constants
             ///     Media Picker v.3.
             /// </summary>
             public const string MediaPicker3 = "Umbraco.MediaPicker3";
+
+            /// <summary>
+            ///     Media Picker, holding a single item.
+            /// </summary>
+            public const string SingleMediaPicker = "Umbraco.SingleMediaPicker";
 
             /// <summary>
             ///     Multiple Media Picker.

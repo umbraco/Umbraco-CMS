@@ -2,10 +2,10 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Media Picker',
-	alias: 'Umbraco.MediaPicker3',
+	name: 'Single Media Picker',
+	alias: 'Umbraco.SingleMediaPicker',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.SingleMediaPicker',
 		settings: {
 			properties: [
 				{
@@ -13,13 +13,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 					label: 'Accepted types',
 					description: 'Limit to specific types',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaTypePicker',
-				},
-				{
-					alias: 'validationLimit',
-					label: 'Amount',
-					description: 'Set a required range of medias',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
-					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
 				},
 				{
 					alias: 'startNodeId',

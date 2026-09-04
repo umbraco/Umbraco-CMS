@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
@@ -123,6 +123,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_19_0_0.RemoveLegacyExamineIndexFiles>("{6F1A9C3D-2B4E-4F7A-8C1D-9E3F5A7B2C60}");
         To<V_19_0_0.MigrateTypedLabelDataTypes>("{D5F54DD5-A01E-4CB9-A34D-D078BA571C17}");
         To<V_19_0_0.MigrateRangeSliderDataTypes>("{97463AFC-D1AB-4D31-9001-2061DBEDE25D}");
+        To<V_19_0_0.MigrateSingleMediaPickerDataTypes>("{B84A1E90-9F3C-4C1F-9E51-3A2D7C4F8B16}");
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -2687,10 +2687,10 @@ internal sealed class DatabaseDataCreator
                 new DataTypeDto
                 {
                     NodeId = 1051,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
-                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
+                    EditorAlias = Constants.PropertyEditors.Aliases.SingleMediaPicker,
+                    EditorUiAlias = "Umb.PropertyEditorUi.SingleMediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
+                    Configuration = "{}",
                 });
         }
 
@@ -2706,7 +2706,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"multiple\": true}",
+                    Configuration = "{}",
                 });
         }
 
@@ -2719,11 +2719,10 @@ internal sealed class DatabaseDataCreator
                 new DataTypeDto
                 {
                     NodeId = 1053,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
-                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
+                    EditorAlias = Constants.PropertyEditors.Aliases.SingleMediaPicker,
+                    EditorUiAlias = "Umb.PropertyEditorUi.SingleMediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
-                                    "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
+                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image + "\"}",
                 });
         }
 
@@ -2739,8 +2738,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker",
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image +
-                                    "\", \"multiple\": true}",
+                    Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image + "\"}",
                 });
         }
 

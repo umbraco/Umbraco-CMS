@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Text.Json;
@@ -22,7 +22,11 @@ public class JsonValueConverter : PropertyValueConverterBase, IDeliveryApiProper
     private readonly ILogger<JsonValueConverter> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
 
-    private readonly string[] _excludedPropertyEditors = { Constants.PropertyEditors.Aliases.MediaPicker3 };
+    private readonly string[] _excludedPropertyEditors =
+    {
+        Constants.PropertyEditors.Aliases.MediaPicker3,
+        Constants.PropertyEditors.Aliases.SingleMediaPicker,
+    };
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="JsonValueConverter" /> class.
