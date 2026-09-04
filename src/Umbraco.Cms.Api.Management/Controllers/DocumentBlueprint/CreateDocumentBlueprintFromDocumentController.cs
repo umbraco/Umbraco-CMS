@@ -63,6 +63,16 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
             return Forbidden();
         }
 
+        AuthorizationResult documentBlueprintAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            DocumentBlueprintPermissionResource.Root(),
+            AuthorizationPolicies.DocumentBlueprintPermissionByResource);
+
+        if (documentBlueprintAuthorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result =
             await _contentBlueprintEditingService.CreateFromContentAsync(
                 fromDocumentRequestModel.Document.Id,
