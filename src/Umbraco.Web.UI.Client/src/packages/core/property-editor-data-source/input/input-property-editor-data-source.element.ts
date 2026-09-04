@@ -185,12 +185,13 @@ export class UmbInputPropertyEditorDataSourceElement extends UUIFormControlMixin
 					(status) => {
 						const unique = status.unique;
 						const item = this._items?.find((x) => x.unique === unique);
+						const isError = status.state.type === 'error';
 						return html`<umb-entity-item-ref
 							id=${unique}
 							.item=${item}
-							?error=${status.state.type === 'error'}
+							?error=${isError}
 							.errorMessage=${status.state.error}
-							?readonly=${this.readonly}
+							?readonly=${this.readonly || isError}
 							?standalone=${this.max === 1}>
 							${when(
 								!this.readonly,
