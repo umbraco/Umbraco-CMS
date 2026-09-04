@@ -1411,6 +1411,7 @@ internal sealed class DatabaseDataCreator
                 StartMediaId = -1,
                 StartContentId = -1,
                 StartElementId = -1,
+                StartDocumentBlueprintId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
                 Description = "Users with full access to all sections and functionality",
