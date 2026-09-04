@@ -5,24 +5,26 @@ import { UmbMenuListStructureWorkspaceContextBase, type UmbStructureItemModel } 
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbUserGroupMenuStructureWorkspaceContext extends UmbMenuListStructureWorkspaceContextBase {
-	#workspaceContext?: typeof UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT.TYPE;
-
 	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.consumeContext(UMB_ENTITY_NAMED_DETAIL_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
 			if (!instance) return;
 
 			this.observe(
-				observeMultiple([instance.unique, instance.entityType, instance.name]),
-				([unique, entityType, name]) => this.#requestStructure(unique, entityType, name),
+				observeMultiple([instance.unique, instance.entityType, instance.name, instance.isNew]),
+				([unique, entityType, name, isNew]) => this.#requestStructure(unique, entityType, name, isNew),
 				'umbUserGroupMenuStructureObserver',
 			);
 		});
 	}
 
-	#requestStructure(unique: string | null | undefined, entityType: string | undefined, name: string | undefined) {
+	#requestStructure(
+		unique: string | null | undefined,
+		entityType: string | undefined,
+		name: string | undefined,
+		isNew: boolean | undefined,
+	) {
 		if (!entityType) return;
 
 		// While new, the item itself does not exist yet, so its ancestors are just the (fixed) root.
@@ -35,7 +37,7 @@ export class UmbUserGroupMenuStructureWorkspaceContext extends UmbMenuListStruct
 			},
 		];
 
-		if (!this.#workspaceContext?.getIsNew()) {
+		if (!isNew) {
 			items.push({
 				unique: unique ?? null,
 				entityType,

@@ -24,7 +24,6 @@ export class UmbMemberMenuStructureWorkspaceContext
 	// Marker read by UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT's apiCheck to discover this context.
 	public readonly IS_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT = true;
 
-	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
@@ -44,12 +43,11 @@ export class UmbMemberMenuStructureWorkspaceContext
 		});
 
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
 			if (!instance) return;
 
 			this.observe(
-				observeMultiple([instance.unique, instance.entityType, instance.variants]),
-				([unique, entityType, variants]) => this.#requestStructure(unique, entityType, variants),
+				observeMultiple([instance.unique, instance.entityType, instance.variants, instance.isNew]),
+				([unique, entityType, variants, isNew]) => this.#requestStructure(unique, entityType, variants, isNew),
 				'umbMemberMenuStructureObserver',
 			);
 		});
@@ -70,6 +68,7 @@ export class UmbMemberMenuStructureWorkspaceContext
 		unique: string | null | undefined,
 		entityType: string | undefined,
 		variants: Array<UmbEntityVariantModel>,
+		isNew: boolean | undefined,
 	) {
 		if (!entityType) return;
 
@@ -82,7 +81,7 @@ export class UmbMemberMenuStructureWorkspaceContext
 			},
 		];
 
-		if (!this.#workspaceContext?.getIsNew()) {
+		if (!isNew) {
 			items.push({
 				unique: unique ?? null,
 				entityType,
