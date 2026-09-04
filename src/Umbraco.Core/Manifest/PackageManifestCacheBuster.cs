@@ -9,6 +9,8 @@ namespace Umbraco.Cms.Core.Manifest;
 /// </summary>
 public static class PackageManifestCacheBuster
 {
+    private const int ShortHashLength = 7;
+
     // The /App_Plugins root with a trailing slash, so the StartsWith check honours a path-segment boundary
     // (and never matches e.g. "/App_PluginsFoo/...").
     private static readonly string _appPluginsPrefix = Constants.SystemDirectories.AppPlugins.EnsureEndsWith('/');
@@ -19,14 +21,22 @@ public static class PackageManifestCacheBuster
     ///     version alone when no host cache-buster is set, to the short hash alone when the package has no version, and
     ///     to <c>null</c> when there is nothing to bust.
     /// </summary>
+    /// <remarks>
+    ///     Hashing keeps the value's length and character set predictable, and keeps host deployment identifiers out of
+    ///     the publicly served asset URLs (see https://github.com/umbraco/Umbraco-CMS/issues/23641).
+    /// </remarks>
     public static string? ComputeCacheBuster(string? version, string? cacheBuster)
-        => (version.NullOrWhiteSpaceAsNull(), cacheBuster.NullOrWhiteSpaceAsNull()) switch
+    {
+        var hostHash = cacheBuster.NullOrWhiteSpaceAsNull() is { } hostCacheBuster ? ShortHash(hostCacheBuster) : null;
+
+        return (version.NullOrWhiteSpaceAsNull(), hostHash) switch
         {
-            (not null, not null) => $"{version}-{cacheBuster}",
+            (not null, not null) => $"{version}-{hostHash}",
             (not null, null) => version,
-            (null, not null) => cacheBuster,
+            (null, not null) => hostHash,
             _ => null,
         };
+    }
 
     /// <summary>
     ///     Appends <c>?umb__rnd=&lt;cacheBuster&gt;</c> to a clean <c>/App_Plugins</c> URL. URLs outside
@@ -51,4 +61,6 @@ public static class PackageManifestCacheBuster
             ? $"{url}?{query}"
             : $"{url[..fragmentIndex]}?{query}{url[fragmentIndex..]}";
     }
+
+    private static string ShortHash(string value) => value.GenerateHash()[..ShortHashLength];
 }
