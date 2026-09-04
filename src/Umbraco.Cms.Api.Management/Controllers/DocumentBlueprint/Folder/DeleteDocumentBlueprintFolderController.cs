@@ -1,8 +1,14 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Folder;
 
@@ -12,6 +18,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Folder;
 [ApiVersion("1.0")]
 public class DeleteDocumentBlueprintFolderController : DocumentBlueprintFolderControllerBase
 {
+    private readonly IAuthorizationService _authorizationService;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteDocumentBlueprintFolderController"/> class.
     /// </summary>
@@ -19,8 +27,19 @@ public class DeleteDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     /// <param name="contentBlueprintContainerService">Service used to manage content blueprint folders (containers).</param>
     public DeleteDocumentBlueprintFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IContentBlueprintContainerService contentBlueprintContainerService)
+        IContentBlueprintContainerService contentBlueprintContainerService,
+        IAuthorizationService authorizationService)
         : base(backOfficeSecurityAccessor, contentBlueprintContainerService)
+        => _authorizationService = authorizationService;
+
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 21.")]
+    public DeleteDocumentBlueprintFolderController(
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IContentBlueprintContainerService contentBlueprintContainerService)
+        : this(
+            backOfficeSecurityAccessor,
+            contentBlueprintContainerService,
+            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>())
     {
     }
 
@@ -37,5 +56,18 @@ public class DeleteDocumentBlueprintFolderController : DocumentBlueprintFolderCo
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Deletes a document blueprint folder.")]
     [EndpointDescription("Deletes a document blueprint folder identified by the provided Id.")]
-    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id) => await DeleteFolderAsync(id);
+    public async Task<IActionResult> Delete(CancellationToken cancellationToken, Guid id)
+    {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            DocumentBlueprintPermissionResource.WithKeys(id),
+            AuthorizationPolicies.DocumentBlueprintPermissionByResource);
+
+        if (authorizationResult.Succeeded is false)
+        {
+            return Forbidden();
+        }
+
+        return await DeleteFolderAsync(id);
+    }
 }
