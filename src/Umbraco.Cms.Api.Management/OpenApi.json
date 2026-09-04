@@ -40470,7 +40470,9 @@
           "mediaStartNodeIds",
           "hasMediaRootAccess",
           "elementStartNodeIds",
-          "hasElementRootAccess"
+          "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -40503,6 +40505,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           }
         }
@@ -42179,7 +42190,8 @@
           "permissions",
           "documentRootAccess",
           "mediaRootAccess",
-          "elementRootAccess"
+          "elementRootAccess",
+          "documentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -42260,6 +42272,19 @@
             ]
           },
           "elementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentBlueprintRootAccess": {
             "type": "boolean"
           },
           "fallbackPermissions": {
@@ -42445,6 +42470,8 @@
           "hasMediaRootAccess",
           "elementStartNodeIds",
           "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess",
           "avatarUrls",
           "languages",
           "hasAccessToAllLanguages",
@@ -42495,6 +42522,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           },
           "avatarUrls": {
@@ -53069,7 +53105,8 @@
           "permissions",
           "documentRootAccess",
           "mediaRootAccess",
-          "elementRootAccess"
+          "elementRootAccess",
+          "documentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -53145,6 +53182,19 @@
           "elementRootAccess": {
             "type": "boolean"
           },
+          "documentBlueprintStartNode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentBlueprintRootAccess": {
+            "type": "boolean"
+          },
           "fallbackPermissions": {
             "type": "array",
             "items": {
@@ -53189,6 +53239,8 @@
           "hasMediaRootAccess",
           "elementStartNodeIds",
           "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess",
           "email",
           "userName",
           "name",
@@ -53224,6 +53276,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           },
           "email": {
@@ -53475,7 +53536,8 @@
           "aliasCanBeChanged",
           "documentRootAccess",
           "mediaRootAccess",
-          "elementRootAccess"
+          "elementRootAccess",
+          "documentBlueprintRootAccess"
         ],
         "type": "object",
         "properties": {
@@ -53559,6 +53621,19 @@
             ]
           },
           "elementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "documentBlueprintRootAccess": {
             "type": "boolean"
           },
           "fallbackPermissions": {
@@ -53696,6 +53771,8 @@
           "hasMediaRootAccess",
           "elementStartNodeIds",
           "hasElementRootAccess",
+          "documentBlueprintStartNodeIds",
+          "hasDocumentBlueprintRootAccess",
           "avatarUrls",
           "state",
           "failedLoginAttempts",
@@ -53745,6 +53822,15 @@
             }
           },
           "hasElementRootAccess": {
+            "type": "boolean"
+          },
+          "documentBlueprintStartNodeIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceByIdModel"
+            }
+          },
+          "hasDocumentBlueprintRootAccess": {
             "type": "boolean"
           },
           "avatarUrls": {
