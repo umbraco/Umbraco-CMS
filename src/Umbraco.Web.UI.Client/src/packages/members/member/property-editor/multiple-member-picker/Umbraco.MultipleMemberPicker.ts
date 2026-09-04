@@ -2,10 +2,10 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Member Picker',
-	alias: 'Umbraco.MemberPicker',
+	name: 'Multiple Member Picker',
+	alias: 'Umbraco.MultipleMemberPicker',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberPicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleMemberPicker',
 		settings: {
 			properties: [
 				{
@@ -14,6 +14,14 @@ export const manifest: ManifestPropertyEditorSchema = {
 					description: 'Limit to specific member types',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberTypePicker',
 					weight: 10,
+				},
+				{
+					alias: 'validationLimit',
+					label: 'Amount',
+					description: 'Set a required range of members',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
+					config: [{ alias: 'validationRange', value: { min: 0, max: Infinity } }],
+					weight: 20,
 				},
 			],
 		},

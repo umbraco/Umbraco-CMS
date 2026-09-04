@@ -208,9 +208,14 @@ public static partial class Constants
             public const string MultipleMediaPicker = "Umbraco.MultipleMediaPicker";
 
             /// <summary>
-            ///     Member Picker.
+            ///     Member Picker, holding a single member.
             /// </summary>
             public const string MemberPicker = "Umbraco.MemberPicker";
+
+            /// <summary>
+            ///     Member Picker, holding any number of members.
+            /// </summary>
+            public const string MultipleMemberPicker = "Umbraco.MultipleMemberPicker";
 
             /// <summary>
             ///     Member Group Picker.

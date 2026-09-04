@@ -1,7 +1,10 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -18,13 +21,19 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueEditorIsReusable = true)]
 public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
 {
+    private readonly IIOHelper _ioHelper;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberPickerPropertyEditor" /> class.
     /// </summary>
     /// <param name="dataValueEditorFactory">The data value editor factory.</param>
-    public MemberPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
+    /// <param name="ioHelper">The IO helper.</param>
+    public MemberPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
-        => SupportsReadOnly = true;
+    {
+        _ioHelper = ioHelper;
+        SupportsReadOnly = true;
+    }
 
     /// <inheritdoc />
     public Type? GetValueType(object? configuration) => typeof(Guid?);
@@ -40,13 +49,17 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
     };
 
     /// <inheritdoc />
+    protected override IConfigurationEditor CreateConfigurationEditor() =>
+        new MemberPickerConfigurationEditor(_ioHelper);
+
+    /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MemberPickerPropertyValueEditor>(Attribute!);
 
     /// <summary>
     ///     Provides the value editor for the member picker property editor.
     /// </summary>
-    private sealed class MemberPickerPropertyValueEditor : DataValueEditor, IDataValueReference
+    internal sealed class MemberPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IMemberService _memberService;
 
@@ -55,9 +68,15 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
-            IMemberService memberService)
+            IMemberService memberService,
+            ILocalizedTextService localizedTextService,
+            ICoreScopeProvider coreScopeProvider)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
-            => _memberService = memberService;
+        {
+            _memberService = memberService;
+            Validators.Add(new TypedValidatorRunner<string, MemberPickerConfigurationBase>(
+                new SingleMemberTypeFilterValidator(localizedTextService, memberService, coreScopeProvider)));
+        }
 
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
