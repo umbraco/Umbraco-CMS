@@ -169,7 +169,8 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
 
                 // This path can pass the timeout straight to the command, so it needs no save and restore.
                 var number = await dbContext.Database.ExecuteScalarAsync<int?>(
-                    $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id={LockId}",
+                    $"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};SELECT value FROM dbo.umbracoLock WITH (ROWLOCK, REPEATABLEREAD) WHERE id=@id",
+                    [new SqlParameter("@id", LockId)],
                     commandTimeOut: TimeSpan.FromSeconds(CommandTimeoutSeconds));
 
                 if (number == null)
@@ -210,11 +211,14 @@ internal sealed class SqlServerEFCoreDistributedLockingMechanism<T> : IDistribut
                 int rowsAffected;
                 try
                 {
-#pragma warning disable EF1002
+                    // S2077: SET LOCK_TIMEOUT only accepts a literal, so the timeout cannot be a
+                    // parameter. It is an int, and the lock id is parameterized, so no part of the
+                    // statement comes from a string.
+#pragma warning disable EF1002, S2077
                     rowsAffected = await dbContext.Database.ExecuteSqlRawAsync(
                         @$"SET LOCK_TIMEOUT {(int)_timeout.TotalMilliseconds};UPDATE umbracoLock WITH (ROWLOCK, REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id={{0}}",
                         LockId);
-#pragma warning restore EF1002
+#pragma warning restore EF1002, S2077
                 }
                 finally
                 {
