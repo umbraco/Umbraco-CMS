@@ -23,12 +23,12 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrade.V_19_0_0;
 
 /// <summary>
-/// Tests that <see cref="AddDocumentBlueprintStartNodeToUserGroup" /> grants document blueprint access to
+/// Tests that <see cref="GrantDocumentBlueprintAccessToSettingsGroups" /> grants document blueprint access to
 /// exactly the groups that could reach blueprints while they lived in the Settings section.
 /// </summary>
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class AddDocumentBlueprintStartNodeToUserGroupTests : UmbracoIntegrationTest
+internal sealed class GrantDocumentBlueprintAccessToSettingsGroupsTests : UmbracoIntegrationTest
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
@@ -94,9 +94,9 @@ internal sealed class AddDocumentBlueprintStartNodeToUserGroupTests : UmbracoInt
 
     private async Task ExecuteMigrationAsync()
     {
-        MigrationPlan plan = new MigrationPlan(nameof(AddDocumentBlueprintStartNodeToUserGroupTests))
+        MigrationPlan plan = new MigrationPlan(nameof(GrantDocumentBlueprintAccessToSettingsGroupsTests))
             .From(string.Empty)
-            .To<AddDocumentBlueprintStartNodeToUserGroup>("done");
+            .To<GrantDocumentBlueprintAccessToSettingsGroups>("done");
 
         var executor = new MigrationPlanExecutor(
             GetRequiredService<ICoreScopeProvider>(),
