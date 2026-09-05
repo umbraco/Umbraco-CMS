@@ -544,7 +544,9 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
             if (sourceRichTextEditorValue?.Blocks is null && targetRichTextEditorValue?.Blocks is null)
             {
                 // no blocks on either side - any difference is in the markup, which is invariant/structural
-                // for this property - let the caller fall back to the default culture.
+                // for this property. Deliberately return empty rather than diffing the markup: this
+                // explicitly hands the change to the caller's default-culture fallback, it is not an
+                // "unable to determine" signal.
                 return [];
             }
 
