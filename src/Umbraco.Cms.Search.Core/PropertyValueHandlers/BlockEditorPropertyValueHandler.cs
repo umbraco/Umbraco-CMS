@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -15,13 +17,16 @@ namespace Umbraco.Cms.Search.Core.PropertyValueHandlers;
 /// <summary>
 /// Base class for property value handlers of block-based editors (block list, block grid, single block, rich text).
 /// Recursively indexes the property values of the blocks' content, accumulating them per culture/segment variation.
+/// Also flattens the content of any externally referenced (reusable) elements into the same index entry, when enabled.
 /// </summary>
 internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IContentTypeService _contentTypeService;
+    private readonly IElementService _elementService;
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly PropertyValueHandlerCollection _propertyValueHandlerCollection;
+    private readonly IOptions<IndexingSettings> _indexingSettings;
     private readonly ILogger<BlockEditorPropertyValueHandler> _logger;
 
     /// <summary>
@@ -29,20 +34,26 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
     /// </summary>
     /// <param name="jsonSerializer">The JSON serializer used to deserialize the block property's stored value.</param>
     /// <param name="contentTypeService">The service used to resolve the contained blocks' element types.</param>
+    /// <param name="elementService">The service used to resolve externally referenced (reusable) elements.</param>
     /// <param name="propertyEditorCollection">The property editor collection used to resolve each contained property's editor.</param>
     /// <param name="propertyValueHandlerCollection">The property value handler collection used to index each contained property's value.</param>
+    /// <param name="indexingSettings">The indexing settings, used to determine whether external element content should be flattened into the index.</param>
     /// <param name="logger">The logger used to record diagnostic information when indexing blocks.</param>
     protected BlockEditorPropertyValueHandler(
         IJsonSerializer jsonSerializer,
         IContentTypeService contentTypeService,
+        IElementService elementService,
         PropertyEditorCollection propertyEditorCollection,
         PropertyValueHandlerCollection propertyValueHandlerCollection,
+        IOptions<IndexingSettings> indexingSettings,
         ILogger<BlockEditorPropertyValueHandler> logger)
     {
         _jsonSerializer = jsonSerializer;
         _contentTypeService = contentTypeService;
+        _elementService = elementService;
         _propertyEditorCollection = propertyEditorCollection;
         _propertyValueHandlerCollection = propertyValueHandlerCollection;
+        _indexingSettings = indexingSettings;
         _logger = logger;
     }
 
@@ -52,8 +63,8 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
     /// <inheritdoc />
     public virtual IEnumerable<IndexField> GetIndexFields(IProperty property, string? culture, string? segment, bool published, IContentBase contentContext)
     {
-        BlockValue? blockValue = ParsePropertyValue(property, culture, segment, published);
-        if (blockValue is null || blockValue.ContentData.Count == 0)
+        BlockValue? blockValue = ParseBlockValue(property, culture, segment, published);
+        if (blockValue is null)
         {
             return [];
         }
@@ -62,16 +73,37 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
         return ToIndexFields(blockIndexValues, property.Alias);
     }
 
-    private BlockValue? ParsePropertyValue(IProperty property, string? culture, string? segment, bool published)
+    /// <summary>
+    /// Parses the property's stored value into its concrete block value type.
+    /// </summary>
+    /// <param name="property">The block property.</param>
+    /// <param name="culture">The requested culture.</param>
+    /// <param name="segment">The requested segment.</param>
+    /// <param name="published">Whether to parse the published or draft value.</param>
+    /// <returns>The parsed block value, or null if the property carries no (valid) block value.</returns>
+    protected abstract BlockValue? ParseBlockValue(IProperty property, string? culture, string? segment, bool published);
+
+    /// <summary>
+    /// Parses the property's stored value into the given concrete block value type.
+    /// </summary>
+    /// <typeparam name="TBlockValue">The concrete block value type to deserialize into.</typeparam>
+    /// <param name="property">The block property.</param>
+    /// <param name="culture">The requested culture.</param>
+    /// <param name="segment">The requested segment.</param>
+    /// <param name="published">Whether to parse the published or draft value.</param>
+    /// <returns>The parsed block value, or null if the property carries no (valid) block value.</returns>
+    protected TBlockValue? ParseBlockValue<TBlockValue>(IProperty property, string? culture, string? segment, bool published)
+        where TBlockValue : BlockValue
     {
         var value = property.GetValue(culture, segment, published) as string;
         return value?.DetectIsJson() is true
-            ? _jsonSerializer.Deserialize<BlockValue>(value)
+            ? _jsonSerializer.Deserialize<TBlockValue>(value)
             : null;
     }
 
     /// <summary>
     /// Builds the cumulative index values for all contained blocks of a block property, keyed by culture/segment variation.
+    /// Also flattens in the content of any externally referenced (reusable) elements, when enabled.
     /// </summary>
     /// <param name="blockValue">The parsed block property value.</param>
     /// <param name="property">The block property.</param>
@@ -87,7 +119,14 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
         string? segment,
         bool published,
         IContentBase contentContext)
-        => GetCumulativeIndexValues(blockValue.ContentData, blockValue.Expose, property, culture, segment, published, contentContext);
+    {
+        Dictionary<(string? Culture, string? Segment), CumulativeIndexValue> cumulativeIndexValuesByVariation =
+            GetCumulativeIndexValues(blockValue.ContentData, blockValue.Expose, property, culture, segment, published, contentContext);
+
+        AmendWithExternalElementIndexValues(blockValue, property, culture, segment, published, contentContext, cumulativeIndexValuesByVariation);
+
+        return cumulativeIndexValuesByVariation;
+    }
 
     /// <summary>
     /// Builds the cumulative index values for the given block content items, keyed by culture/segment variation.
@@ -312,19 +351,123 @@ internal abstract class BlockEditorPropertyValueHandler : IPropertyValueHandler
     }
 
     /// <summary>
-    /// Represents the deserialized value of a block property.
+    /// Flattens the content of any externally referenced (reusable) elements found in the block value's layout into
+    /// the cumulative index values, when enabled via <see cref="IndexingSettings.IndexExternalBlockElements"/>.
     /// </summary>
-    protected class BlockValue
+    /// <remarks>
+    /// External element content is only ever flattened into the published index: it is fetched via its own
+    /// published values, so a draft-only indexing pass has nothing valid to contribute.
+    /// </remarks>
+    private void AmendWithExternalElementIndexValues(
+        BlockValue blockValue,
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published,
+        IContentBase contentContext,
+        Dictionary<(string? Culture, string? Segment), CumulativeIndexValue> cumulativeIndexValuesByVariation)
     {
-        /// <summary>
-        /// Gets the block content items.
-        /// </summary>
-        public required List<BlockItemData> ContentData { get; init; }
+        if (published is false || _indexingSettings.Value.IndexExternalBlockElements is false)
+        {
+            return;
+        }
 
-        /// <summary>
-        /// Gets the block variations exposed for publishing.
-        /// </summary>
-        public required List<BlockItemVariation> Expose { get; init; }
+        Guid[] externalContentKeys = FlattenLayoutItems(blockValue.Layout.Values.SelectMany(layoutItems => layoutItems))
+            .Where(layoutItem => layoutItem.IsExternalContent)
+            .Select(layoutItem => layoutItem.ContentKey)
+            .Distinct()
+            .ToArray();
+
+        if (externalContentKeys.Length == 0)
+        {
+            return;
+        }
+
+        var propertyCultures = GetPropertyCultures(property.PropertyType, culture, published, contentContext);
+
+        foreach (IElement element in _elementService.GetByIds(externalContentKeys))
+        {
+            if (element.Trashed || element.Published is false)
+            {
+                continue;
+            }
+
+            foreach (var propertyCulture in propertyCultures)
+            {
+                foreach (IProperty elementProperty in element.Properties)
+                {
+                    IPropertyType propertyType = elementProperty.PropertyType;
+
+                    // as with locally contained blocks, a nested property type set to invariant is still valid
+                    // even if the requested variation is explicit - force it to the requested variation in that case.
+                    if (culture is not null)
+                    {
+                        propertyType.Variations |= ContentVariation.Culture;
+                    }
+
+                    if (segment is not null)
+                    {
+                        propertyType.Variations |= ContentVariation.Segment;
+                    }
+
+                    if (propertyType.VariesByCulture() && propertyCulture is null)
+                    {
+                        continue;
+                    }
+
+                    IDataEditor? editor = _propertyEditorCollection[propertyType.PropertyEditorAlias];
+                    if (editor is null)
+                    {
+                        _logger.LogDebug(
+                            "No property editor found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
+                            propertyType.PropertyEditorAlias);
+                        continue;
+                    }
+
+                    IPropertyValueHandler? elementPropertyValueHandler = _propertyValueHandlerCollection.GetPropertyValueHandler(propertyType);
+                    if (elementPropertyValueHandler is null)
+                    {
+                        _logger.LogDebug(
+                            "No property value handler found for property editor alias {propertyEditorAlias} - skipped indexing of external element property value.",
+                            propertyType.PropertyEditorAlias);
+                        continue;
+                    }
+
+                    IndexField[] elementPropertyIndexFields = elementPropertyValueHandler
+                        .GetIndexFields(elementProperty, propertyCulture, segment, published, contentContext)
+                        .ToArray();
+
+                    foreach (IndexField elementPropertyIndexField in elementPropertyIndexFields)
+                    {
+                        if (cumulativeIndexValuesByVariation.TryGetValue((elementPropertyIndexField.Culture, elementPropertyIndexField.Segment), out CumulativeIndexValue? elementIndexValue) is false)
+                        {
+                            elementIndexValue = new CumulativeIndexValue();
+                            cumulativeIndexValuesByVariation.Add((elementPropertyIndexField.Culture, elementPropertyIndexField.Segment), elementIndexValue);
+                        }
+
+                        AmendCumulativeIndexValue(elementIndexValue, elementPropertyIndexField.Value);
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Recursively flattens a set of layout items and any layout items they themselves contain (e.g. block grid areas).
+    /// </summary>
+    /// <param name="layoutItems">The layout items to flatten.</param>
+    /// <returns>The layout items and all of their contained layout items.</returns>
+    private static IEnumerable<IBlockLayoutItem> FlattenLayoutItems(IEnumerable<IBlockLayoutItem> layoutItems)
+    {
+        foreach (IBlockLayoutItem layoutItem in layoutItems)
+        {
+            yield return layoutItem;
+
+            foreach (IBlockLayoutItem containedLayoutItem in FlattenLayoutItems(layoutItem.GetContainedLayouts()))
+            {
+                yield return containedLayoutItem;
+            }
+        }
     }
 
     /// <summary>
