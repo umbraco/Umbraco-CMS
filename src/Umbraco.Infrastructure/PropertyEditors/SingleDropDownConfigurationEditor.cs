@@ -6,6 +6,9 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Represents the configuration editor for the dropdown property editor holding a single value.
+/// </summary>
 internal sealed class SingleDropDownConfigurationEditor : ConfigurationEditor<SingleDropDownConfiguration>
 {
     /// <summary>

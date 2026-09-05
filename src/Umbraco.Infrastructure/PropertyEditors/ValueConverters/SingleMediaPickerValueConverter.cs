@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// Converts the value stored by the single media picker property editor into a strongly-typed object representing
 /// the selected media item and its associated crop data, making it accessible for use in code.
 /// </summary>
-[DefaultPropertyValueConverter]
+[DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class SingleMediaPickerValueConverter : MediaPickerWithCropsValueConverterBase
 {
     /// <summary>

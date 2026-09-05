@@ -77,6 +77,16 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
     {
         private readonly IMemberService _memberService;
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MemberPickerPropertyValueEditor" /> class.
+        /// </summary>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="attribute">The data editor attribute.</param>
+        /// <param name="memberService">The member service.</param>
+        /// <param name="localizedTextService">The localized text service.</param>
+        /// <param name="coreScopeProvider">The scope provider.</param>
         public MemberPickerPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -92,6 +102,7 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
                 new SingleMemberTypeFilterValidator(localizedTextService, memberService, coreScopeProvider)));
         }
 
+        /// <inheritdoc />
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             // the stored value is either an UDI or an integer ID - need to transform this into the corresponding member key
@@ -114,12 +125,16 @@ public class MemberPickerPropertyEditor : DataEditor, IValueSchemaProvider
             return null;
         }
 
-        // the editor value is expected to be the member key - store it as the member UDI
+        /// <inheritdoc />
+        /// <remarks>
+        ///     The editor value is expected to be the member key, which is stored as the member UDI.
+        /// </remarks>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             => editorValue.Value is string stringValue && Guid.TryParse(stringValue, out Guid memberKey)
                 ? new GuidUdi(Constants.UdiEntityType.Member, memberKey)
                 : null;
 
+        /// <inheritdoc />
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
             var asString = value is string str ? str : value?.ToString();

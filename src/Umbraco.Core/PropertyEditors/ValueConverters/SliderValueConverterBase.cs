@@ -21,6 +21,8 @@ public abstract class SliderValueConverterBase : PropertyValueConverterBase
     /// <summary>
     /// Reads a range from the stored value.
     /// </summary>
+    /// <param name="sourceString">The stored value.</param>
+    /// <returns>The range the stored value holds, or an empty range when it holds none.</returns>
     protected static Range<decimal> ReadRange(string? sourceString)
     {
         if (sourceString is null)
@@ -58,6 +60,8 @@ public abstract class SliderValueConverterBase : PropertyValueConverterBase
     /// <summary>
     /// Reads a single value from the stored value.
     /// </summary>
+    /// <param name="sourceString">The stored value.</param>
+    /// <returns>The value the stored value holds, or the default when it holds none.</returns>
     protected static decimal ReadDecimal(string? sourceString)
     {
         if (string.IsNullOrEmpty(sourceString))
@@ -86,6 +90,9 @@ public abstract class SliderValueConverterBase : PropertyValueConverterBase
     /// <summary>
     /// Helper method for parsing a decimal consistently.
     /// </summary>
+    /// <param name="representation">The value to parse.</param>
+    /// <param name="value">The parsed value, or the default when parsing failed.</param>
+    /// <returns><c>true</c> if the value could be parsed; otherwise, <c>false</c>.</returns>
     protected static bool TryParseDecimal(string? representation, out decimal value)
         => decimal.TryParse(representation, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
 }

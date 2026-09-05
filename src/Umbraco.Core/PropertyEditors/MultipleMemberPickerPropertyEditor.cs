@@ -126,6 +126,9 @@ public class MultipleMemberPickerPropertyEditor : DataEditor, IValueSchemaProvid
         /// <summary>
         ///     Deserializes the provided value into the keys of the picked members.
         /// </summary>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="value">The stored value.</param>
+        /// <returns>The keys of the picked members.</returns>
         internal static IEnumerable<Guid> Deserialize(IJsonSerializer jsonSerializer, object? value)
         {
             var asString = value as string ?? value?.ToString();

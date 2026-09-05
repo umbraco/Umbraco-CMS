@@ -10,6 +10,7 @@ public class SingleMediaPickerConfigurationEditor : ConfigurationEditor<SingleMe
     /// <summary>
     ///     Initializes a new instance of the <see cref="SingleMediaPickerConfigurationEditor" /> class.
     /// </summary>
+    /// <param name="ioHelper">An <see cref="IIOHelper" /> used for file and path operations.</param>
     public SingleMediaPickerConfigurationEditor(IIOHelper ioHelper)
         : base(ioHelper)
     {

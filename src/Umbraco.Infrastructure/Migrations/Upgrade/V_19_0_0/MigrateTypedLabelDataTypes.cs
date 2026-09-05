@@ -51,6 +51,8 @@ public class MigrateTypedLabelDataTypes : AsyncMigrationBase
     /// Every value type a label could be configured with maps onto an editor. The ones that only ever yielded a
     /// string are split by the column they are stored in, so that no value has to be relocated.
     /// </remarks>
+    /// <param name="valueType">The value type the label was configured with.</param>
+    /// <returns>The alias of the label editor that holds that value type.</returns>
     internal static string EditorAliasForValueType(string valueType) => EditorForValueType(valueType).EditorAlias;
 
     private static (string EditorAlias, string EditorUiAlias) EditorForValueType(string valueType)
@@ -71,6 +73,10 @@ public class MigrateTypedLabelDataTypes : AsyncMigrationBase
     /// <remarks>
     /// Extracted into an internal static method to support integration testing.
     /// </remarks>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="propertyEditors">The property editors.</param>
+    /// <param name="logger">The logger.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     internal static async Task ExecuteMigration(
         IDataTypeService dataTypeService,
         PropertyEditorCollection propertyEditors,

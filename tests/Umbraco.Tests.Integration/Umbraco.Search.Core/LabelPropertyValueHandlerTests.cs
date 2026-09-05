@@ -119,6 +119,10 @@ public class LabelPropertyValueHandlerTests : ContentTestBase
         });
     }
 
+    /// <summary>
+    /// Creates a content type holding a property for every built-in label data type.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     /// <remarks>
     /// Each built-in label data type sits on the label editor for the type of value it holds, and that is what the
     /// handler keys off. The editor alias is stated here to match, even though it is resolved from the data type when

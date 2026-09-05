@@ -59,6 +59,10 @@ public class MigrateSingleMediaPickerDataTypes : AsyncMigrationBase
     /// <remarks>
     /// Extracted into an internal static method to support integration testing.
     /// </remarks>
+    /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="propertyEditors">The property editors.</param>
+    /// <param name="logger">The logger.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     internal static async Task ExecuteMigration(
         IDataTypeService dataTypeService,
         PropertyEditorCollection propertyEditors,

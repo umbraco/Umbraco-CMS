@@ -234,8 +234,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.dropdown = page.locator("select#native");
     this.splitView = page.locator("#splitViews");
     this.setADateTxt = page.getByLabel("Set a date…");
+    // The single and multiple media pickers are separate elements, and a property can be either.
     this.chooseMediaPickerBtn = page.locator(
-      "umb-property-editor-ui-media-picker #btn-add",
+      "umb-property-editor-ui-media-picker #btn-add, umb-property-editor-ui-single-media-picker #btn-add",
     );
     this.chooseMemberPickerBtn = page.locator(
       "umb-property-editor-ui-member-picker #btn-add",

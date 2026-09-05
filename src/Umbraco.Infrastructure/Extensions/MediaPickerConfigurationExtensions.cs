@@ -11,6 +11,8 @@ public static class MediaPickerConfigurationExtensions
     /// <summary>
     ///     Applies the configuration to ensure only valid crops are kept and have the correct width/height.
     /// </summary>
+    /// <param name="imageCropperValue">The value to apply the configuration to.</param>
+    /// <param name="configuration">The configuration holding the crops to keep.</param>
     public static void ApplyConfiguration(this ImageCropperValue imageCropperValue, MediaPickerConfigurationBase? configuration)
     {
         var crops = new List<ImageCropperValue.ImageCropperCrop>();

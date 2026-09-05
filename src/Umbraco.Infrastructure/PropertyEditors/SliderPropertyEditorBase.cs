@@ -98,6 +98,11 @@ public abstract class SliderPropertyEditorBase : DataEditor, IValueSchemaProvide
         /// <summary>
         /// Initializes a new instance of the <see cref="SliderPropertyValueEditor"/> class.
         /// </summary>
+        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="ioHelper">The IO helper.</param>
+        /// <param name="attribute">The data editor attribute.</param>
+        /// <param name="localizedTextService">The localized text service.</param>
         public SliderPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -189,6 +194,7 @@ public abstract class SliderPropertyEditorBase : DataEditor, IValueSchemaProvide
             /// <summary>
             /// Initializes a new instance of the <see cref="SliderPropertyConfigurationValidatorBase"/> class.
             /// </summary>
+            /// <param name="localizedTextService">The localized text service.</param>
             protected SliderPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService) => LocalizedTextService = localizedTextService;
 
             /// <summary>
@@ -199,6 +205,9 @@ public abstract class SliderPropertyEditorBase : DataEditor, IValueSchemaProvide
             /// <summary>
             /// Parses a <see cref="SliderRange"/> from the provided value.
             /// </summary>
+            /// <param name="value">The value to parse.</param>
+            /// <param name="parsedValue">The parsed range, or <c>null</c> when parsing failed.</param>
+            /// <returns><c>true</c> if the value could be parsed; otherwise, <c>false</c>.</returns>
             protected static bool TryParsePropertyValue(object? value, [NotNullWhen(true)] out SliderRange? parsedValue)
             {
                 if (value is not JsonObject valueAsJsonObject)
@@ -344,6 +353,7 @@ public abstract class SliderPropertyEditorBase : DataEditor, IValueSchemaProvide
             /// <summary>
             /// Initializes a new instance of the <see cref="StepValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">The localized text service.</param>
             public StepValidator(ILocalizedTextService localizedTextService)
                 : base(localizedTextService)
             {

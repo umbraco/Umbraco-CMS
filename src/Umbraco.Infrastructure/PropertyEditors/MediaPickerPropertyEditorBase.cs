@@ -326,6 +326,9 @@ public abstract class MediaPickerPropertyEditorBase : DataEditor, IValueSchemaPr
         /// <summary>
         /// Deserializes the provided JSON value into a list of <see cref="MediaWithCropsDto"/>.
         /// </summary>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="value">The stored JSON value.</param>
+        /// <returns>The picked media items and their crops.</returns>
         internal static IEnumerable<MediaWithCropsDto> Deserialize(IJsonSerializer jsonSerializer, object? value)
         {
             var rawJson = value is string str ? str : value?.ToString();
@@ -582,6 +585,9 @@ public abstract class MediaPickerPropertyEditorBase : DataEditor, IValueSchemaPr
             /// <summary>
             /// Initializes a new instance of the <see cref="AllowedTypeValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">The localized text service.</param>
+            /// <param name="mediaService">The media service.</param>
+            /// <param name="allowedMediaTypeHelper">The helper deciding whether a media type is allowed.</param>
             public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaService mediaService, AllowedMediaTypeHelper allowedMediaTypeHelper)
             {
                 _localizedTextService = localizedTextService;
