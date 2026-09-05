@@ -1,4 +1,4 @@
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -17,6 +17,15 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 
 	@property({ type: Boolean, reflect: true })
 	default = false;
+
+	/**
+	 * The URL to navigate to when the template card is opened.
+	 * @type {string}
+	 * @attr href
+	 * @default undefined
+	 */
+	@property({ type: String })
+	href?: string;
 
 	#id = '';
 
@@ -47,10 +56,7 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 
 	override render() {
 		return html`<div id="card">
-			<button id="open-part" aria-label="Open ${this.name}" @click="${this.#openTemplate}">
-				<uui-icon class="logo" name="icon-document-html"></uui-icon>
-				<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
-			</button>
+			${this.href ? this.#renderLink() : this.#renderButton()}
 			<uui-button
 				id="bottom"
 				label="${this.localize.term('settings_defaulttemplate')}"
@@ -60,6 +66,27 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 			</uui-button>
 			<slot name="actions"></slot>
 		</div>`;
+	}
+
+	#renderButton() {
+		return html`
+			<button id="open-part" aria-label="Open ${this.name}" @click="${this.#openTemplate}">
+				${this.#renderContent()}
+			</button>
+		`;
+	}
+
+	#renderLink() {
+		return html`
+			<a id="open-part" aria-label="Open ${this.name}" tabindex=${ifDefined(!this.disabled ? 0 : undefined)} href=${ifDefined(!this.disabled ? this.href : undefined)}>${this.#renderContent()}</a>
+		`;
+	}
+
+	#renderContent() {
+		return html`
+			<uui-icon class="logo" name="icon-document-html"></uui-icon>
+			<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
+		`;
 	}
 
 	static override styles = [
@@ -121,6 +148,8 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 				cursor: pointer;
 				flex-grow: 1;
 				font-family: inherit;
+				color: inherit;
+				text-decoration: none;
 			}
 
 			#open-part,
