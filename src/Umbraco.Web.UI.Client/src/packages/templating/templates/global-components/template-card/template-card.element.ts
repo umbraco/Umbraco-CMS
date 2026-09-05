@@ -67,9 +67,10 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 			<uui-button
 				id="bottom"
 				label="${this.localize.term('settings_defaulttemplate')}"
+				look=${this.default ? 'default' : 'secondary'}
 				?disabled="${this.default}"
 				@click="${this.#setSelection}">
-				(${this.localize.term(this.default ? 'settings_defaulttemplate' : 'grid_setAsDefault')})
+				${this.localize.term(this.default ? 'settings_defaulttemplate' : 'grid_setAsDefault')}
 			</uui-button>
 			<slot name="actions"></slot>
 		</div>`;
@@ -98,7 +99,7 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 	#renderContent() {
 		return html`
 			<uui-icon class="logo" name="icon-document-html"></uui-icon>
-			<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
+			<div>${this.name.length ? this.name : 'Untitled template'}</div>
 		`;
 	}
 
@@ -158,6 +159,7 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 				display: flex;
 				flex-direction: column;
 				align-items: center;
+				justify-content: center;
 				cursor: pointer;
 				flex-grow: 1;
 				font-family: inherit;
@@ -181,16 +183,13 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 			}
 
 			#open-part:focus-visible,
-			#open-part:focus-visible uui-icon,
-			#open-part:hover,
-			#open-part:hover uui-icon {
+			#open-part:hover {
 				text-decoration: underline;
 				color: var(--uui-color-interactive-emphasis);
 			}
 
 			#open-part uui-icon {
-				font-size: var(--uui-size-20);
-				color: var(--uui-color-divider-emphasis);
+				font-size: var(--uui-size-10);
 			}
 		`,
 	];
