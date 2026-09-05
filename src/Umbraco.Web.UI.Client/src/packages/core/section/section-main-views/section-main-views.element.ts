@@ -174,12 +174,12 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	override render() {
-		/*if (!this._routes || this._routes.length === 0) {
+		if (!this._routes || this._routes.length === 0) {
 			// If not routes, then render nothing.
 			// TODO: Remove this in v.19, this means sections must provide a dashboard or a view, otherwise the spinner will be shown forever. [NL]
 			// MAKE SURE WE HAVE COVERED USERS, MEMBERS.
 			return nothing;
-		}*/
+		}
 		return html`
 			<umb-body-layout main-no-padding>
 				${this.#renderDashboardsNav()} ${this.#renderViewsNav()}
