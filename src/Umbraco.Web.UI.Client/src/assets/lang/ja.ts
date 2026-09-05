@@ -200,7 +200,6 @@ export default {
 	},
 	clipboard: {
 		labelForClearClipboard: 'クリップボードをクリア',
-		labelCopyToClipboard: 'クリップボードにコピー',
 		labelForCopyToClipboard: 'クリップボードにコピー',
 		confirmDeleteHeadline: 'クリップボードから削除',
 		confirmDeleteDescription: '本当に <strong>{0}</strong> をクリップボードから削除しますか？',
