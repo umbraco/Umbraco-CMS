@@ -16,6 +16,7 @@ import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * Default element for the `blockAction` extension type.
@@ -39,40 +40,7 @@ export class UmbBlockActionDefaultElement<
 		this.#api = api;
 		this._href = undefined;
 
-		(async () => {
-			// TODO: Ideally the this.observe would accept a Promise<Observable> and handle the async resolution internally, but for now we await it here. [NL]
-			const hrefObservable = await this.#api?.getHrefObservable?.();
-			if (hrefObservable) {
-				this.observe(hrefObservable, (href) => (this._href = href), 'observeHref');
-			} else {
-				this._href = await this.#api?.getHref?.();
-			}
-
-			const pathObservable = await this.#api?.getValidationDataPathObservable?.();
-			this.observe(
-				pathObservable,
-				async (path) => {
-					this.removeUmbControllerByAlias('observeValidation');
-					path ??= await this.#api?.getValidationDataPath?.();
-					if (path) {
-						new UmbObserveValidationStateController(
-							this,
-							path,
-							(hasMessages) => (this._invalid = hasMessages),
-							'observeValidation',
-						);
-					}
-				},
-				'observeValidationPath',
-			);
-			if (this.#api && !pathObservable && !!this.#api.getValidationDataPath) {
-				new UmbDeprecation({
-					deprecated: 'Block Action getValidationDataPath is deprecated.',
-					removeInVersion: '20.0.0',
-					solution: 'Use getValidationDataPathObservable instead.',
-				}).warn();
-			}
-		})();
+		this.#gotApi();
 	}
 
 	@state()
@@ -80,6 +48,54 @@ export class UmbBlockActionDefaultElement<
 
 	@state()
 	private _invalid = false;
+
+	async #gotApi() {
+		// TODO: Ideally the this.observe would accept a Promise<Observable> and handle the async resolution internally, but for now we await it here. [NL]
+		const hrefObservable = await this.#api?.getHrefObservable?.();
+		if (hrefObservable) {
+			this.observe(hrefObservable, (href) => (this._href = href), 'observeHref');
+		} else {
+			this._href = await this.#api?.getHref?.();
+		}
+
+		let pathObservable: Observable<string | undefined> | undefined = undefined;
+		if (this.#api?.getValidationDataPathObservable) {
+			pathObservable = await this.#api?.getValidationDataPathObservable?.();
+		}
+		this.observe(
+			pathObservable,
+			async (path) => {
+				this.removeUmbControllerByAlias('observeValidation');
+				if (path) {
+					new UmbObserveValidationStateController(
+						this,
+						path,
+						(hasMessages) => (this._invalid = hasMessages),
+						'observeValidation',
+					);
+				} else {
+					this._invalid = false;
+				}
+			},
+			'observeValidationPath',
+		);
+		if (this.#api && !pathObservable && !!this.#api.getValidationDataPath) {
+			const path = await this.#api.getValidationDataPath();
+			if (path) {
+				new UmbObserveValidationStateController(
+					this,
+					path,
+					(hasMessages) => (this._invalid = hasMessages),
+					'observeValidation',
+				);
+				new UmbDeprecation({
+					deprecated: 'Block Action getValidationDataPath is deprecated.',
+					removeInVersion: '20.0.0',
+					solution: 'Use getValidationDataPathObservable instead.',
+				}).warn();
+			}
+		}
+	}
 
 	async #onClick(event: PointerEvent) {
 		if (this._href) return;
