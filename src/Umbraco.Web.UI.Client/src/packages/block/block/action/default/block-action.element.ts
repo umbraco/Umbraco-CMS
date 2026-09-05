@@ -63,7 +63,7 @@ export class UmbBlockActionDefaultElement<
 						);
 					}
 				},
-				'observeValidation',
+				'observeValidationPath',
 			);
 			if (this.#api && !pathObservable && !!this.#api.getValidationDataPath) {
 				new UmbDeprecation({
