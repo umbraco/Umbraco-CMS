@@ -11,8 +11,8 @@ const mediaPickerTypes = [
 ];
 const editorAlias = 'Umbraco.MediaPicker3';
 const editorUiAlias = 'Umb.PropertyEditorUi.MediaPicker';
-const singleEditorAlias = 'Umbraco.SingleMediaPicker';
-const singleEditorUiAlias = 'Umb.PropertyEditorUi.SingleMediaPicker';
+const singleEditorAlias = 'Umbraco.MediaPicker.Single';
+const singleEditorUiAlias = 'Umb.PropertyEditorUi.MediaPicker.Single';
 const customDataTypeName = 'Custom Media Picker';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {

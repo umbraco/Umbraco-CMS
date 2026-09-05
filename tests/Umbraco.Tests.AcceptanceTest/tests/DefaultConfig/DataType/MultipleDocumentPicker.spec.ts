@@ -3,8 +3,8 @@ import {expect} from "@playwright/test";
 
 const propertyEditorName = 'Multiple Document Picker';
 const customDataTypeName = 'Custom Multiple Document Picker';
-const editorAlias = 'Umbraco.MultipleDocumentPicker';
-const editorUiAlias = 'Umb.PropertyEditorUi.MultipleDocumentPicker';
+const editorAlias = 'Umbraco.DocumentPicker.Multiple';
+const editorUiAlias = 'Umb.PropertyEditorUi.DocumentPicker.Multiple';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();

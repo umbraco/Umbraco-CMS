@@ -79,7 +79,7 @@ export class MultiUrlPickerDataTypeBuilder extends DataTypeBuilder {
 export class SingleUrlPickerDataTypeBuilder extends MultiUrlPickerDataTypeBuilder {
   constructor() {
     super();
-    this.editorAlias = 'Umbraco.SingleUrlPicker';
-    this.editorUiAlias = 'Umb.PropertyEditorUi.SingleUrlPicker';
+    this.editorAlias = 'Umbraco.UrlPicker.Single';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.UrlPicker.Single';
   }
 }

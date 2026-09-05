@@ -3,8 +3,8 @@ import {expect} from "@playwright/test";
 
 const propertyEditorName = 'Single URL Picker';
 const customDataTypeName = 'Custom Single URL Picker';
-const editorAlias = 'Umbraco.SingleUrlPicker';
-const editorUiAlias = 'Umb.PropertyEditorUi.SingleUrlPicker';
+const editorAlias = 'Umbraco.UrlPicker.Single';
+const editorUiAlias = 'Umb.PropertyEditorUi.UrlPicker.Single';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();

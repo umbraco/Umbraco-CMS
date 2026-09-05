@@ -1,5 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.MediaPicker.js';
-import { manifest as singleSchemaManifest } from './Umbraco.SingleMediaPicker.js';
+import { manifest as singleSchemaManifest } from './Umbraco.MediaPicker.Single.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 const keywords = [
@@ -36,12 +36,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.SingleMediaPicker',
+		alias: 'Umb.PropertyEditorUi.MediaPicker.Single',
 		name: 'Single Media Picker Property Editor UI',
 		element: () => import('./property-editor-ui-single-media-picker.element.js'),
 		meta: {
 			label: 'Single Media Picker',
-			propertyEditorSchemaAlias: 'Umbraco.SingleMediaPicker',
+			propertyEditorSchemaAlias: 'Umbraco.MediaPicker.Single',
 			icon: 'icon-picture',
 			group: '#propertyEditorUIGroups_media',
 			keywords: [...keywords, 'single', 'one'],

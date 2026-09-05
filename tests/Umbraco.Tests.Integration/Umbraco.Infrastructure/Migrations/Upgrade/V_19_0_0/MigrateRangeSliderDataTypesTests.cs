@@ -36,7 +36,7 @@ internal sealed class MigrateRangeSliderDataTypesTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.That(migrated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.RangeSlider));
-            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.RangeSlider"));
+            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.Slider.Range"));
             Assert.That(migrated.ConfigurationData.ContainsKey("enableRange"), Is.False);
         });
     }

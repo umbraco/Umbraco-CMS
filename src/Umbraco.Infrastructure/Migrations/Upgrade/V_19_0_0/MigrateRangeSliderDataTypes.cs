@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 public class MigrateRangeSliderDataTypes : AsyncMigrationBase
 {
     private const string EnableRangeConfigurationKey = "enableRange";
-    private const string RangeSliderEditorUiAlias = "Umb.PropertyEditorUi.RangeSlider";
+    private const string RangeSliderEditorUiAlias = "Umb.PropertyEditorUi.Slider.Range";
 
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyEditorCollection _propertyEditors;

@@ -34,8 +34,8 @@ export class MultipleMemberPickerDataTypeBuilder extends MemberPickerDataTypeBui
 
   constructor() {
     super();
-    this.editorAlias = 'Umbraco.MultipleMemberPicker';
-    this.editorUiAlias = 'Umb.PropertyEditorUi.MultipleMemberPicker';
+    this.editorAlias = 'Umbraco.MemberPicker.Multiple';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.MemberPicker.Multiple';
   }
 
   withMinValue(minValue: number) {

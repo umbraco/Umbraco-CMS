@@ -37,7 +37,7 @@ internal sealed class MigrateSingleMediaPickerDataTypesTests : UmbracoIntegratio
         Assert.Multiple(() =>
         {
             Assert.That(migrated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.SingleMediaPicker));
-            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.SingleMediaPicker"));
+            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.MediaPicker.Single"));
             Assert.That(migrated.ConfigurationData.ContainsKey("multiple"), Is.False);
         });
     }

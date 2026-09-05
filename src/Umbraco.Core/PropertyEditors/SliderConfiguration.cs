@@ -9,10 +9,10 @@ public class SliderConfiguration : SliderConfigurationBase
     /// Gets or sets a value indicating whether range selection is enabled (two handles).
     /// </summary>
     /// <remarks>
-    ///     No longer used. A slider that holds a range is the separate <c>Umbraco.RangeSlider</c> editor, so that the
+    ///     No longer used. A slider that holds a range is the separate <c>Umbraco.Slider.Range</c> editor, so that the
     ///     type a slider property yields cannot change with its configuration.
     /// </remarks>
-    [Obsolete("No longer used. Use the Umbraco.RangeSlider property editor for a slider holding a range. Scheduled for removal in Umbraco 21.")]
+    [Obsolete("No longer used. Use the Umbraco.Slider.Range property editor for a slider holding a range. Scheduled for removal in Umbraco 21.")]
     [ConfigurationField("enableRange")]
     public bool EnableRange { get; set; }
 

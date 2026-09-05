@@ -36,7 +36,7 @@ internal sealed class MigrateSingleUrlPickerDataTypesTests : UmbracoIntegrationT
         Assert.Multiple(() =>
         {
             Assert.That(migrated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.SingleUrlPicker));
-            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.SingleUrlPicker"));
+            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.UrlPicker.Single"));
             Assert.That(migrated.ConfigurationData.ContainsKey("maxNumber"), Is.False);
             Assert.That(migrated.ConfigurationData.ContainsKey("minNumber"), Is.False);
         });

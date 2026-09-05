@@ -31,7 +31,7 @@ export class DropdownDataTypeBuilder extends DataTypeBuilder {
 export class SingleDropdownDataTypeBuilder extends DropdownDataTypeBuilder {
   constructor() {
     super();
-    this.editorAlias = 'Umbraco.SingleDropDown';
-    this.editorUiAlias = 'Umb.PropertyEditorUi.SingleDropdown';
+    this.editorAlias = 'Umbraco.DropDown.Single';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.Dropdown.Single';
   }
 }

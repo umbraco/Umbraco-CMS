@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 public class MigrateSingleDropDownDataTypes : AsyncMigrationBase
 {
     private const string MultipleConfigurationKey = "multiple";
-    private const string SingleDropDownEditorUiAlias = "Umb.PropertyEditorUi.SingleDropdown";
+    private const string SingleDropDownEditorUiAlias = "Umb.PropertyEditorUi.Dropdown.Single";
 
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyEditorCollection _propertyEditors;

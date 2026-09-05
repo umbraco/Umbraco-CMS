@@ -1,5 +1,5 @@
 import { manifest as schemaManifest } from './Umbraco.MultiUrlPicker.js';
-import { manifest as singleSchemaManifest } from './Umbraco.SingleUrlPicker.js';
+import { manifest as singleSchemaManifest } from './Umbraco.UrlPicker.Single.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 const settingsProperties = [
@@ -43,12 +43,12 @@ export const manifests = [
 	},
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.SingleUrlPicker',
+		alias: 'Umb.PropertyEditorUi.UrlPicker.Single',
 		name: 'Single URL Picker Property Editor UI',
 		element: () => import('./property-editor-ui-single-url-picker.element.js'),
 		meta: {
 			label: 'Single URL Picker',
-			propertyEditorSchemaAlias: 'Umbraco.SingleUrlPicker',
+			propertyEditorSchemaAlias: 'Umbraco.UrlPicker.Single',
 			icon: 'icon-link',
 			group: '#propertyEditorUIGroups_pickers',
 			keywords: ['url', 'link', 'cta', 'single', 'one'],

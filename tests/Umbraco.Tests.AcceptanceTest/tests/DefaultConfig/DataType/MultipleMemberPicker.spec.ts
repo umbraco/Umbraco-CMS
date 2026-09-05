@@ -3,8 +3,8 @@ import {expect} from "@playwright/test";
 
 const propertyEditorName = 'Multiple Member Picker';
 const customDataTypeName = 'Custom Multiple Member Picker';
-const editorAlias = 'Umbraco.MultipleMemberPicker';
-const editorUiAlias = 'Umb.PropertyEditorUi.MultipleMemberPicker';
+const editorAlias = 'Umbraco.MemberPicker.Multiple';
+const editorUiAlias = 'Umb.PropertyEditorUi.MemberPicker.Multiple';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();

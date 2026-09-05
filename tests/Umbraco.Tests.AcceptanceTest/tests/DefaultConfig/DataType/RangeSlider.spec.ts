@@ -3,8 +3,8 @@ import {expect} from "@playwright/test";
 
 const propertyEditorName = 'Range Slider';
 const customDataTypeName = 'Custom Range Slider';
-const editorAlias = 'Umbraco.RangeSlider';
-const editorUiAlias = 'Umb.PropertyEditorUi.RangeSlider';
+const editorAlias = 'Umbraco.Slider.Range';
+const editorUiAlias = 'Umb.PropertyEditorUi.Slider.Range';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();

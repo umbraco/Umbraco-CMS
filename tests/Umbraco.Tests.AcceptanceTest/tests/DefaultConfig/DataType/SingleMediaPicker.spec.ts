@@ -3,8 +3,8 @@ import {expect} from "@playwright/test";
 
 const propertyEditorName = 'Single Media Picker';
 const customDataTypeName = 'Custom Single Media Picker';
-const editorAlias = 'Umbraco.SingleMediaPicker';
-const editorUiAlias = 'Umb.PropertyEditorUi.SingleMediaPicker';
+const editorAlias = 'Umbraco.MediaPicker.Single';
+const editorUiAlias = 'Umb.PropertyEditorUi.MediaPicker.Single';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();

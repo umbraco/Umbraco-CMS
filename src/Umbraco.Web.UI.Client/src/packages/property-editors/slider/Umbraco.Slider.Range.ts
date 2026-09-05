@@ -3,9 +3,9 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
 	name: 'Range Slider',
-	alias: 'Umbraco.RangeSlider',
+	alias: 'Umbraco.Slider.Range',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.RangeSlider',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Slider.Range',
 		settings: {
 			properties: [
 				{

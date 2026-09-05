@@ -3,8 +3,8 @@ import {expect} from "@playwright/test";
 
 const propertyEditorName = 'Single Dropdown';
 const customDataTypeName = 'Custom Single Dropdown';
-const editorAlias = 'Umbraco.SingleDropDown';
-const editorUiAlias = 'Umb.PropertyEditorUi.SingleDropdown';
+const editorAlias = 'Umbraco.DropDown.Single';
+const editorUiAlias = 'Umb.PropertyEditorUi.Dropdown.Single';
 
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   await umbracoUi.goToBackOffice();

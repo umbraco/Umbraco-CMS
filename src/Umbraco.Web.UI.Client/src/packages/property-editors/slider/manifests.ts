@@ -1,4 +1,4 @@
-import { manifest as rangeSliderSchemaManifest } from './Umbraco.RangeSlider.js';
+import { manifest as rangeSliderSchemaManifest } from './Umbraco.Slider.Range.js';
 import { manifest as sliderSchemaManifest } from './Umbraco.Slider.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
@@ -66,19 +66,19 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'propertyValuePreset',
-		forPropertyEditorSchemaAlias: 'Umbraco.RangeSlider',
+		forPropertyEditorSchemaAlias: 'Umbraco.Slider.Range',
 		alias: 'Umb.PropertyValuePreset.RangeSlider',
 		name: 'Property Editor Schema Range Slider Preset for Initial Values',
 		api: () => import('./range-slider-property-value-preset.js'),
 	},
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.RangeSlider',
+		alias: 'Umb.PropertyEditorUi.Slider.Range',
 		name: 'Range Slider Property Editor UI',
 		element: () => import('./property-editor-ui-range-slider.element.js'),
 		meta: {
 			label: 'Range Slider',
-			propertyEditorSchemaAlias: 'Umbraco.RangeSlider',
+			propertyEditorSchemaAlias: 'Umbraco.Slider.Range',
 			icon: 'icon-navigation-horizontal',
 			group: '#propertyEditorUIGroups_common',
 			keywords: ['number', 'range', 'percentage', 'between', 'span', 'scale', 'from', 'to'],

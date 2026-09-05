@@ -25,7 +25,7 @@ public class MigrateSingleMediaPickerDataTypes : AsyncMigrationBase
 {
     private const string MultipleConfigurationKey = "multiple";
     private const string ValidationLimitConfigurationKey = "validationLimit";
-    private const string SingleMediaPickerEditorUiAlias = "Umb.PropertyEditorUi.SingleMediaPicker";
+    private const string SingleMediaPickerEditorUiAlias = "Umb.PropertyEditorUi.MediaPicker.Single";
 
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyEditorCollection _propertyEditors;

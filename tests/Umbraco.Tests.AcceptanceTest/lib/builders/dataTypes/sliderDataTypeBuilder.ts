@@ -62,8 +62,8 @@ export class RangeSliderDataTypeBuilder extends SliderDataTypeBuilder {
 
   constructor() {
     super();
-    this.editorAlias = 'Umbraco.RangeSlider';
-    this.editorUiAlias = 'Umb.PropertyEditorUi.RangeSlider';
+    this.editorAlias = 'Umbraco.Slider.Range';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.Slider.Range';
   }
 
   withInitialValueTwo(initialValueTwo: number) {

@@ -2422,7 +2422,7 @@ internal sealed class DatabaseDataCreator
         InsertDataTypeDto(
             Constants.DataTypes.DropDownSingle,
             Constants.PropertyEditors.Aliases.SingleDropDown,
-            "Umb.PropertyEditorUi.SingleDropdown",
+            "Umb.PropertyEditorUi.Dropdown.Single",
             "Nvarchar",
             "{}");
 
@@ -2688,7 +2688,7 @@ internal sealed class DatabaseDataCreator
                 {
                     NodeId = 1051,
                     EditorAlias = Constants.PropertyEditors.Aliases.SingleMediaPicker,
-                    EditorUiAlias = "Umb.PropertyEditorUi.SingleMediaPicker",
+                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker.Single",
                     DbType = "Ntext",
                     Configuration = "{}",
                 });
@@ -2720,7 +2720,7 @@ internal sealed class DatabaseDataCreator
                 {
                     NodeId = 1053,
                     EditorAlias = Constants.PropertyEditors.Aliases.SingleMediaPicker,
-                    EditorUiAlias = "Umb.PropertyEditorUi.SingleMediaPicker",
+                    EditorUiAlias = "Umb.PropertyEditorUi.MediaPicker.Single",
                     DbType = "Ntext",
                     Configuration = "{\"filter\":\"" + Constants.MediaTypes.Guids.Image + "\"}",
                 });

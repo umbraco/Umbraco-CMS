@@ -11,8 +11,8 @@ export class MultipleDocumentPickerDataTypeBuilder extends DataTypeBuilder {
 
   constructor() {
     super();
-    this.editorAlias = 'Umbraco.MultipleDocumentPicker';
-    this.editorUiAlias = 'Umb.PropertyEditorUi.MultipleDocumentPicker';
+    this.editorAlias = 'Umbraco.DocumentPicker.Multiple';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.DocumentPicker.Multiple';
   }
 
   withAllowedContentTypes(allowedContentTypes: string) {

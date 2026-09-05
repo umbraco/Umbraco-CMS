@@ -37,7 +37,7 @@ internal sealed class MigrateSingleDropDownDataTypesTests : UmbracoIntegrationTe
         Assert.Multiple(() =>
         {
             Assert.That(migrated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.SingleDropDown));
-            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.SingleDropdown"));
+            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.Dropdown.Single"));
             Assert.That(migrated.ConfigurationData.ContainsKey("multiple"), Is.False);
         });
     }
@@ -103,7 +103,7 @@ internal sealed class MigrateSingleDropDownDataTypesTests : UmbracoIntegrationTe
         Assert.Multiple(() =>
         {
             Assert.That(migrated.EditorAlias, Is.EqualTo(Constants.PropertyEditors.Aliases.SingleDropDown));
-            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.SingleDropdown"));
+            Assert.That(migrated.EditorUiAlias, Is.EqualTo("Umb.PropertyEditorUi.Dropdown.Single"));
         });
     }
 

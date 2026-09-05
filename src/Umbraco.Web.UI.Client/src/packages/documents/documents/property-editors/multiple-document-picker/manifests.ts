@@ -1,15 +1,15 @@
-import { manifest as schemaManifest } from './Umbraco.MultipleDocumentPicker.js';
+import { manifest as schemaManifest } from './Umbraco.DocumentPicker.Multiple.js';
 import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'propertyEditorUi',
-		alias: 'Umb.PropertyEditorUi.MultipleDocumentPicker',
+		alias: 'Umb.PropertyEditorUi.DocumentPicker.Multiple',
 		name: 'Multiple Document Picker Property Editor UI',
 		element: () => import('./property-editor-ui-multiple-document-picker.element.js'),
 		meta: {
 			label: 'Multiple Document Picker',
-			propertyEditorSchemaAlias: 'Umbraco.MultipleDocumentPicker',
+			propertyEditorSchemaAlias: 'Umbraco.DocumentPicker.Multiple',
 			icon: 'icon-documents',
 			group: '#propertyEditorUIGroups_pickers',
 			keywords: [

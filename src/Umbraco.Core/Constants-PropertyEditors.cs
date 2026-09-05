@@ -114,7 +114,7 @@ public static partial class Constants
             /// <summary>
             ///     Document Picker, holding any number of documents.
             /// </summary>
-            public const string MultipleDocumentPicker = "Umbraco.MultipleDocumentPicker";
+            public const string MultipleDocumentPicker = "Umbraco.DocumentPicker.Multiple";
 
             /// <summary>
             ///     DateTime.
@@ -159,7 +159,7 @@ public static partial class Constants
             /// <summary>
             ///     DropDown List, holding a single value.
             /// </summary>
-            public const string SingleDropDown = "Umbraco.SingleDropDown";
+            public const string SingleDropDown = "Umbraco.DropDown.Single";
 
             /// <summary>
             ///     DropDown List.
@@ -200,7 +200,7 @@ public static partial class Constants
             /// <summary>
             ///     Media Picker, holding a single item.
             /// </summary>
-            public const string SingleMediaPicker = "Umbraco.SingleMediaPicker";
+            public const string SingleMediaPicker = "Umbraco.MediaPicker.Single";
 
             /// <summary>
             ///     Multiple Media Picker.
@@ -215,7 +215,7 @@ public static partial class Constants
             /// <summary>
             ///     Member Picker, holding any number of members.
             /// </summary>
-            public const string MultipleMemberPicker = "Umbraco.MultipleMemberPicker";
+            public const string MultipleMemberPicker = "Umbraco.MemberPicker.Multiple";
 
             /// <summary>
             ///     Member Group Picker.
@@ -285,7 +285,7 @@ public static partial class Constants
             /// <summary>
             ///     Slider, holding a range of two values.
             /// </summary>
-            public const string RangeSlider = "Umbraco.RangeSlider";
+            public const string RangeSlider = "Umbraco.Slider.Range";
 
             /// <summary>
             ///     Tags.
@@ -345,7 +345,7 @@ public static partial class Constants
             /// <summary>
             ///     Alias for the URL picker editor holding a single link.
             /// </summary>
-            public const string SingleUrlPicker = "Umbraco.SingleUrlPicker";
+            public const string SingleUrlPicker = "Umbraco.UrlPicker.Single";
 
             /// <summary>
             ///     Configuration-less string.

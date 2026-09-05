@@ -3,9 +3,9 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/prope
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
 	name: 'Multiple Member Picker',
-	alias: 'Umbraco.MultipleMemberPicker',
+	alias: 'Umbraco.MemberPicker.Multiple',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleMemberPicker',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberPicker.Multiple',
 		settings: {
 			properties: [
 				{

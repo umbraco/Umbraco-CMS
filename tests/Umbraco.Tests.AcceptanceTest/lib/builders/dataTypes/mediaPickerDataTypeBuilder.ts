@@ -105,7 +105,7 @@ export class MediaPickerDataTypeBuilder extends DataTypeBuilder {
 export class SingleMediaPickerDataTypeBuilder extends MediaPickerDataTypeBuilder {
   constructor() {
     super();
-    this.editorAlias = 'Umbraco.SingleMediaPicker';
-    this.editorUiAlias = 'Umb.PropertyEditorUi.SingleMediaPicker';
+    this.editorAlias = 'Umbraco.MediaPicker.Single';
+    this.editorUiAlias = 'Umb.PropertyEditorUi.MediaPicker.Single';
   }
 }

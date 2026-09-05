@@ -30,7 +30,7 @@ public class MigrateSingleUrlPickerDataTypes : AsyncMigrationBase
 {
     private const string MinNumberConfigurationKey = "minNumber";
     private const string MaxNumberConfigurationKey = "maxNumber";
-    private const string SingleUrlPickerEditorUiAlias = "Umb.PropertyEditorUi.SingleUrlPicker";
+    private const string SingleUrlPickerEditorUiAlias = "Umb.PropertyEditorUi.UrlPicker.Single";
 
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyEditorCollection _propertyEditors;

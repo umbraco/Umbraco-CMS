@@ -7,8 +7,8 @@ const customDataTypeName = 'Custom Dropdown';
 const dropdowns = [
   {
     type: 'Dropdown',
-    editorAlias: 'Umbraco.SingleDropDown',
-    editorUiAlias: 'Umb.PropertyEditorUi.SingleDropdown',
+    editorAlias: 'Umbraco.DropDown.Single',
+    editorUiAlias: 'Umb.PropertyEditorUi.Dropdown.Single',
     settings: ConstantHelper.singleDropdownSettings
   },
   {
