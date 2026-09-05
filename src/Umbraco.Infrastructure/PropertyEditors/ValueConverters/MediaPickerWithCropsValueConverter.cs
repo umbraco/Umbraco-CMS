@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// Converts the value stored by the Media Picker with Crops property editor into a strongly-typed object
 /// representing the selected media items and their associated crop data, making it accessible for use in code.
 /// </summary>
-[DefaultPropertyValueConverter]
+[DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class MediaPickerWithCropsValueConverter : MediaPickerWithCropsValueConverterBase
 {
     /// <summary>
