@@ -1,6 +1,7 @@
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { css, html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UUICardElement } from '@umbraco-cms/backoffice/external/uui';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-template-card
@@ -11,35 +12,41 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 // TODO: This should extends the UUICardElement, and the visual look of this should be like the UserCard or similarly.
 // TOOD: Consider if this should be select in the 'persisted'-select style when it is selected as a default. (But its should not use the runtime-selection style)
 @customElement('umb-template-card')
-export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 	@property({ type: String })
-	override name = '';
+	name = '';
 
 	@property({ type: Boolean, reflect: true })
 	default = false;
-
-	/**
-	 * The URL to navigate to when the template card is opened.
-	 * @type {string}
-	 * @attr href
-	 * @default undefined
-	 */
-	@property({ type: String })
-	href?: string;
 
 	#id = '';
 
 	@property({ type: String })
 	public override set id(newId: string) {
 		this.#id = newId;
-		super.value = newId;
 	}
 	public override get id() {
 		return this.#id;
 	}
 
-	protected override getFormElement() {
-		return undefined;
+	// TODO: Remove in v.20
+	public set value(newId: string) {
+		new UmbDeprecation({
+			deprecated: 'UmbTemplateCardElement.value',
+			solution:
+				'Use the "id" property instead. The "value" property will be removed in version 20.0.0 of the backoffice.',
+			removeInVersion: '20.0.0',
+		}).warn();
+		this.id = newId;
+	}
+	public get value() {
+		new UmbDeprecation({
+			deprecated: 'UmbTemplateCardElement.value',
+			solution:
+				'Use the "id" property instead. The "value" property will be removed in version 20.0.0 of the backoffice.',
+			removeInVersion: '20.0.0',
+		}).warn();
+		return this.#id;
 	}
 
 	#setSelection(e: KeyboardEvent) {
@@ -78,7 +85,13 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 
 	#renderLink() {
 		return html`
-			<a id="open-part" aria-label="Open ${this.name}" tabindex=${ifDefined(!this.disabled ? 0 : undefined)} href=${ifDefined(!this.disabled ? this.href : undefined)}>${this.#renderContent()}</a>
+			<a
+				id="open-part"
+				aria-label="Open ${this.name}"
+				tabindex=${ifDefined(!this.disabled ? 0 : undefined)}
+				href=${ifDefined(!this.disabled ? this.href : undefined)}
+				>${this.#renderContent()}</a
+			>
 		`;
 	}
 
@@ -90,6 +103,7 @@ export class UmbTemplateCardElement extends UUIFormControlMixin(UmbLitElement, '
 	}
 
 	static override styles = [
+		...UUICardElement.styles,
 		css`
 			:host {
 				box-sizing: border-box;
