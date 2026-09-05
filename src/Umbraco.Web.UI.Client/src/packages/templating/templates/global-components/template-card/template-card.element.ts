@@ -124,8 +124,8 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 				flex-direction: column;
 				align-items: stretch;
 				border-radius: var(--uui-border-radius);
-				border: 1px solid var(--uui-color-divider-emphasis);
-				background-color: var(--uui-color-background);
+				border: 1px solid var(--uui-color-border);
+				background-color: var(--uui-color-surface);
 				padding: var(--uui-size-4);
 			}
 
@@ -157,7 +157,6 @@ export class UmbTemplateCardElement extends UmbElementMixin(UUICardElement) {
 				text-align: center;
 				display: flex;
 				flex-direction: column;
-				font-weight: 700;
 				align-items: center;
 				cursor: pointer;
 				flex-grow: 1;
